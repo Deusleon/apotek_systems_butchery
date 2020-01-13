@@ -199,7 +199,7 @@ class ProductController extends Controller
             $product->purchase_uom = $request->purchaseUoM;
             $product->indication = $request->indication;
             $product->dosage = $request->dosage;
-            $product->status = intval($request->status);
+            $product->status = 1;
             $product->min_quantinty = str_replace(',', '', $request->min_stock);
             $product->max_quantinty = str_replace(',', '', $request->max_stock);
 
