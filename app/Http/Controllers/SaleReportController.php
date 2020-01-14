@@ -37,6 +37,7 @@ class SaleReportController extends Controller
         $date_range = explode("-", $request->date_range);
         $from = trim($date_range[0]);
         $to = trim($date_range[1]);
+        $receipt_size = Setting::where('id', 119)->value('value');
         $pharmacy['name'] = Setting::where('id', 100)->value('value');
         $pharmacy['logo'] = Setting::where('id', 105)->value('value');
         $pharmacy['address'] = Setting::where('id', 106)->value('value');
@@ -121,7 +122,7 @@ class SaleReportController extends Controller
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
             ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
             ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
-            ->where('status','!=',3)
+//            ->where('status','!=',3)
             ->get();
 
         $sales = array();
@@ -213,7 +214,7 @@ class SaleReportController extends Controller
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
             ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
             ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
-            ->where('sales_details.status','!=',3)
+//            ->where('sales_details.status','!=',3)
             ->join('users', 'users.id', '=', 'sales.created_by')
             ->whereNotIn('sale_id', DB::table('sales_credits')->pluck('sale_id'))
             ->groupby(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"))

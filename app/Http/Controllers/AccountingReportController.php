@@ -317,7 +317,7 @@ class AccountingReportController extends Controller
                 DB::raw('date(date) as dates'))
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
             ->whereBetween(DB::raw('date(date)'), [$date[0], $date[1]])
-            ->where('sales_details.status', '!=', 3)
+//            ->where('sales_details.status', '!=', 3)
             ->join('users', 'users.id', '=', 'sales.created_by')
             ->whereNotIn('sale_id', DB::table('sales_credits')->pluck('sale_id'))
             ->groupby(DB::Raw('date(date)'))
@@ -350,7 +350,7 @@ class AccountingReportController extends Controller
                 DB::raw('date(date) as dates'))
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
             ->whereBetween(DB::raw('date(date)'), [$date[0], $date[1]])
-            ->where('sales_details.status', '!=', 3)
+//            ->where('sales_details.status', '!=', 3)
             ->join('users', 'users.id', '=', 'sales.created_by')
             ->whereNotIn('sale_id', DB::table('sales_credits')->pluck('sale_id'))
             ->get();
@@ -459,7 +459,7 @@ class AccountingReportController extends Controller
                 DB::raw('date(date) as dates'))
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
             ->whereBetween(DB::raw('date(date)'), [$date[0], $date[1]])
-            ->where('sales_details.status', '!=', 3)
+//            ->where('sales_details.status', '!=', 3)
             ->join('users', 'users.id', '=', 'sales.created_by')
             ->whereNotIn('sale_id', DB::table('sales_credits')->pluck('sale_id'))
             ->get();

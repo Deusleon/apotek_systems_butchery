@@ -428,7 +428,6 @@ class SaleController extends Controller
             ->with(compact('vat'));
     }
 
-
     public function creditsTracking()
     {
         $customers = Customer::where('total_credit', '>', 0)->get();
@@ -436,10 +435,10 @@ class SaleController extends Controller
             ->with(compact('customers'));
     }
 
-
     public function getCashReceipt()
     {
 
+        $receipt_size = Setting::where('id', 119)->value('value');
         $pharmacy['name'] = Setting::where('id', 100)->value('value');
         $pharmacy['logo'] = Setting::where('id', 105)->value('value');
         $pharmacy['address'] = Setting::where('id', 106)->value('value');
@@ -484,16 +483,24 @@ class SaleController extends Controller
         }
 
         $data = $grouped_sales;
-        $pdf = PDF::loadView('sales.cash_sales.receipt',
-            compact('data', 'pharmacy'));
+        if ($receipt_size === 'Thermal Paper'){
+            $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
+                compact('data', 'pharmacy'));
+        }else{
+            $pdf = PDF::loadView('sales.cash_sales.receipt',
+                compact('data', 'pharmacy'));
+        }
+//        $pdf = PDF::loadView('sales.cash_sales.receipt',
+//            compact('data', 'pharmacy'));
 
-        return $pdf->download($receipt_no . '.pdf');
+        return $pdf->stream($receipt_no . '.pdf');
 
 //return $grouped_sales;
     }
 
     public function getCreditReceipt()
     {
+        $receipt_size = Setting::where('id', 119)->value('value');
         $pharmacy['name'] = Setting::where('id', 100)->value('value');
         $pharmacy['logo'] = Setting::where('id', 105)->value('value');
         $pharmacy['address'] = Setting::where('id', 106)->value('value');
