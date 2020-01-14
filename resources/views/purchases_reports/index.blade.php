@@ -13,7 +13,7 @@
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#"> Reports / Purchases Reports </a></li>
+    <li class="breadcrumb-item"><a href="#"> Reports / Pharmacy Reports / Purchases Reports </a></li>
 @endsection
 
 @section("content")
@@ -91,7 +91,7 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="supplier">Supplier Name</label>
+                                    <label for="supplier">Supplier Name</label><font color="red">*</font>
                                     <select name="supplier" class="js-example-basic-single form-control drop"
                                             onchange="filterInvoiceBySupplier()" id="supplier_ids">
                                         <option value="" selected disabled>Select Supplier...</option>
@@ -304,7 +304,7 @@
                 $("#suppliers").prop("required", false);
                 $("#suppliers").val("");
                 $("#suppliers").change();
-                $("#supplier_ids").prop("required", false);
+                $("#supplier_ids").prop("required", true);
             } else {
                 document.getElementById('material_options').style.display = 'none';
 
