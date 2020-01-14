@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Cash Sale Details Report</title>
+    <title>Receipt</title>
     <style>
 
         body {
@@ -9,17 +9,18 @@
         }
 
         * {
-            font-family: Verdana, Arial, sans-serif;
+            font-family: MingLiu, MingLiU-ExtB, sans-serif;
         }
 
         table, th, td {
             /*border: 1px solid black;*/
-            border-collapse: collapse;
+            /*border-collapse: collapse;*/
             padding: 10px;
         }
 
         table {
-            page-break-inside: auto
+            page-break-inside: auto;
+            border-collapse: collapse;
         }
 
         tr {
@@ -39,18 +40,24 @@
             /*border-spacing: 5px;*/
             width: 100%;
             margin-top: -2%;
+            border-top: 1px solid black;
+        }
+
+        #table-detail thead tr th {
+            border-bottom: 1px solid #000000;
         }
 
         #table-detail-main {
             width: 103%;
             margin-top: -2%;
             margin-bottom: -2%;
-            border-collapse: collapse;
+            /*border-collapse: collapse;*/
+
         }
 
         #table-detail tr > {
-             /*line-height: 13px;*/
-         }
+            /*line-height: 13px;*/
+        }
 
         #table-detail-main tr > {
             line-height: 15px;
@@ -96,7 +103,7 @@
 {{--        </div>--}}
 {{--    </div>--}}
 {{--</div>--}}
-<div class="row" style="padding-top: -2%; width: 30%; margin-left: -2%">
+<div class="row" style="padding-top: -3%; width: 40%; margin-left: -6.5%">
     <h3 align="center"><b>RECEIPT</b></h3>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['name']}}</h3>
     <h5 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h5>
@@ -112,7 +119,7 @@
                 <td style="padding-top: -1%">TIN: {{$pharmacy['tin_number']}}</td>
             </tr>
         </table>
-        <table class="table table-bordered" id="table-detail" align="center">
+        <table id="table-detail" align="center">
             <!-- loop the product names here -->
             <thead>
             <tr>
@@ -129,8 +136,8 @@
                 </tr>
             @endforeach
         </table>
-        <hr style="margin-left: 10%">
-        <table id="table-total">
+        <hr style="margin-left: 4%; margin-right: -4%">
+        <table id="table-total" style="width: 100%;">
             <tr>
                 <td style="padding-top: -1%; width: 50%">Total:</td>
                 <td></td>
@@ -139,16 +146,30 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td align="right" style="padding-top: -1%">
-                    <div style="margin-right: 60%">{{number_format(($dat[0]['grand_total']),2)}}</div>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td align="" style="padding-top: -1%">
+                    <div style="margin-left: -15%; margin-right: 15%">{{number_format(($dat[0]['grand_total']),2)}}</div>
                 </td>
             </tr>
         </table>
-        <h5 align="center">Sold By {{$dat[0]['sold_by']}}</h5>
+        <hr style="margin-left: 4%; margin-right: -4%; margin-top: -2%">
+
+        <h5 align="center" style="margin-top: -0%">Sold By {{$dat[0]['sold_by']}}</h5>
     @endforeach
 
 </div>
 
 </body>
+
+{{--<script type="text/javascript">--}}
+{{--    try {--}}
+{{--        this.print();--}}
+{{--    } catch (e) {--}}
+{{--        window.onload = window.print;--}}
+{{--    }--}}
+{{--</script>--}}
+
 </html>
 
