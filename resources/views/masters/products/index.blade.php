@@ -291,7 +291,7 @@
                     var row_data = $('#fixed-header1').DataTable().row($(this).parents('tr')).data();
                     $('#edit').find('.modal-body #id').val(row_data.id);
                     $('#edit').find('.modal-body #name_edit').val(row_data.name);
-                    $('#edit').find('.modal-body #barcode_edit').val(row_data.barcode);
+                    $('#edit').find('.modal-body #barcode_edits').val(row_data.barcode);
                     $('#edit').find('.modal-body #generic_edit').val(row_data.generic);
                     $('#edit').find('.modal-body #category_options').val(row_data.category_id);
                     $('#edit').find('.modal-body #sub_categories').val(row_data.sub_category_id);
@@ -346,7 +346,7 @@
                     console.log(row_data);
                     $('#edit').find('.modal-body #id').val(row_data.id);
                     $('#edit').find('.modal-body #name_edit').val(row_data.name);
-                    $('#edit').find('.modal-body #barcode_edit').val(row_data.barcode);
+                    $('#edit').find('.modal-body #barcode_edits').val(row_data.barcode);
                     $('#edit').find('.modal-body #generic_edit').val(row_data.generic);
                     $('#edit').find('.modal-body #category_options').val(row_data.category_id);
                     $('#edit').find('.modal-body #sub_categories').val(row_data.sub_category_id);
@@ -379,6 +379,11 @@
                         if (hasFocus) {
                             $("#barcode_edit").val(data.string);
                         }
+
+                        if ($('#barcode_edits').is(':focus')) {
+                            $("#barcode_edits").val(data.string);
+                        }
+
                     })
                         .bind('scannerDetectionError', function (e, data) {
                             // console.log('detection error ' + data.string);

@@ -26,7 +26,7 @@
                     <div class="form-group row">
                         <label for="barcode" class="col-md-4 col-form-label text-md-right">Barcode</label>
                         <div class="col-md-8">
-                            <input type="text" class="form-control" id="barcode_edit" name="barcode"
+                            <input type="text" class="form-control" id="barcode_edits" name="barcode"
                                    placeholder="" value="{{ old('barcode') }}">
                         </div>
                     </div>
