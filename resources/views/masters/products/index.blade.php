@@ -156,6 +156,7 @@
 
             @include('partials.notification')
             <script src="{{asset("assets/apotek/js/notification.js")}}"></script>
+            <script src="{{asset("assets/apotek/js/scannerDetection.js")}}"></script>
 
             <script>
 
@@ -342,6 +343,27 @@
                     $('#delete').find('.modal-body #product_id').val(row_data.id);
                     $('#delete').modal('show');
                 });
+
+                /*barcode*/
+                $(window).ready(function () {
+                    // console.log('all is well');
+                    $(window).scannerDetection();
+                    $(window).bind('scannerDetectionComplete', function (e, data) {
+                        // console.log('complete ' + data.string);
+                        var hasFocus = $('#barcode_edit').is(':focus');
+                        if (hasFocus) {
+                            $("#barcode_edit").val(data.string);
+                        }
+                    })
+                        .bind('scannerDetectionError', function (e, data) {
+                            // console.log('detection error ' + data.string);
+                        })
+                        .bind('scannerDetectionReceive', function (e, data) {
+                            // console.log('Recieve');
+                            // console.log(data.evt.which);
+                        });
+                });
+                /*end barcode*/
 
 
                 $('#product-table-status-filter').on('click', '#activate', function () {

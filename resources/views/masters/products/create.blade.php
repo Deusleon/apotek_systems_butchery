@@ -38,7 +38,7 @@
                                 <label for="barcode" class="col-md-4 col-form-label text-md-right">Barcode</label>
                                 <div class="col-md-8">
                                     <input type="text" class="form-control" id="barcode_edit" name="barcode"
-                                           placeholder="" value="{{ old('barcode') }}">
+                                           placeholder="" value="{{ old('barcode') }}" autocomplete="off">
                                 </div>
                             </div>
 
