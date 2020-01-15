@@ -85,6 +85,7 @@
                             <thead>
                             <tr>
                                 <th>Product Name</th>
+                                <th hidden>Barcode</th>
                                 <th>Category</th>
                                 <th>Created at</th>
                                 @can('Manage Products')
@@ -103,6 +104,7 @@
                             <thead>
                             <tr>
                                 <th>Product Name</th>
+                                <th hidden>Barcode</th>
                                 <th>Category</th>
                                 <th>Created at</th>
                                 @can('Manage Products')
@@ -127,6 +129,7 @@
                             <thead>
                             <tr>
                                 <th>Product Name</th>
+                                <th hidden>Barcode</th>
                                 <th>Category</th>
                                 <th>Created at</th>
                                 @can('Manage Products')
@@ -163,6 +166,7 @@
                 var table = $('#fixed-header2').DataTable({
                     'columns': [
                         {'data': 'name'},
+                        {"data": "barcode"},
                         {'data': 'category'},
                         {'data': 'date'},
                             @can('Manage Products')
@@ -172,6 +176,12 @@
                         }
                         @endcan
 
+                    ],
+                    'columnDefs': [
+                        {
+                            'targets': [1],
+                            'visible': false
+                        }
                     ]
                 });
 
@@ -189,6 +199,7 @@
                         },
                         "columns": [
                             {"data": "name"},
+                            {"data": "barcode"},
                             {"data": "category"},
                             {"data": "date"},
                                 @can('Manage Products')
@@ -197,6 +208,12 @@
                                 defaultContent: "<button type='button' id='shows' class='btn btn-sm btn-rounded btn-success'>Show</button><button type='button' id='edits' class='btn btn-sm btn-rounded btn-primary'>Edit</button><button type='button' id='deletes' class='btn btn-sm btn-rounded btn-danger'>Delete</button>"
                             }
                             @endcan
+                        ],
+                        'columnDefs': [
+                            {
+                                'targets': [1],
+                                'visible': false
+                            }
                         ]
 
                     });
@@ -222,6 +239,7 @@
                         },
                         "columns": [
                             {"data": "name"},
+                            {"data": "barcode"},
                             {"data": "category"},
                             {"data": "date"},
                                 @can('Manage Products')
@@ -230,6 +248,12 @@
                                 defaultContent: "<button type='button' id='show-active' class='btn btn-sm btn-rounded btn-success'>Show</button><button type='button' id='edit-active' class='btn btn-sm btn-rounded btn-primary'>Edit</button><button type='button' id='delete-active' class='btn btn-sm btn-rounded btn-danger'>Delete</button>"
                             }
                             @endcan
+                        ],
+                        'columnDefs': [
+                            {
+                                'targets': [1],
+                                'visible': false
+                            }
                         ]
 
                     });
@@ -350,6 +374,7 @@
                     $(window).scannerDetection();
                     $(window).bind('scannerDetectionComplete', function (e, data) {
                         // console.log('complete ' + data.string);
+
                         var hasFocus = $('#barcode_edit').is(':focus');
                         if (hasFocus) {
                             $("#barcode_edit").val(data.string);

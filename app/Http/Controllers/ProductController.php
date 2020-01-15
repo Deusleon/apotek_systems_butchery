@@ -119,6 +119,7 @@ class ProductController extends Controller
 
             $products = Product::where('id', 'LIKE', "%{$search}%")
                 ->orWhere('name', 'LIKE', "%{$search}%")
+                ->orWhere('barcode', 'LIKE', "%{$search}%")
                 ->Where('status', '1')
                 ->offset($start)
                 ->limit($limit)
@@ -127,6 +128,7 @@ class ProductController extends Controller
 
             $totalFiltered = Product::where('id', 'LIKE', "%{$search}%")
                 ->orWhere('name', 'LIKE', "%{$search}%")
+                ->orWhere('barcode', 'LIKE', "%{$search}%")
                 ->Where('status', '1')
                 ->count();
         }
