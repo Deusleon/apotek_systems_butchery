@@ -356,7 +356,7 @@
                 document.getElementById('period_warning').style.display = 'none';
                 document.getElementById('status_warning').style.display = 'none';
                 return false;
-            } else if (Number(period_id) === 0) {
+            } else if (Number(period_id) < 0) {
                 document.getElementById('period_warning').style.display = 'block';
                 document.getElementById('supplier_warning').style.display = 'none';
                 document.getElementById('status_warning').style.display = 'none';
