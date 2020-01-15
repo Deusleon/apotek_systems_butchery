@@ -205,6 +205,12 @@ $('#cart_table tbody').on('change', '#edit_quantity', function () {
     var row_data = cart_table.row($(this).parents('tr')).data();
     var index = cart_table.row($(this).parents('tr')).index();
 
+    if (document.getElementById("edit_quantity").value === '') {
+        edit_btn_set = 1;
+        notify('Quantity is required', 'top', 'right', 'warning');
+        return false;
+    }
+
     row_data[1] = numberWithCommas(document.getElementById("edit_quantity").value);
 
     // row_data[1] = Number((document.getElementById("edit_quantity").value));
