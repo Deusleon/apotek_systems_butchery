@@ -75,7 +75,7 @@
                                 <label for="expense_description"
                                        class="col-md-4 col-form-label text-md-right">{{ __('Expense Description') }}</label>
                                 <div class="col-md-8">
-                                    <input type="text" class="form-control" name="expense_description" required>
+                                    <input type="text" class="form-control" name="expense_description">
                                 </div>
                             </div>
 

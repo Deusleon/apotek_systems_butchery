@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Customer;
 use DB;
+use Exception;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
@@ -53,8 +54,13 @@ class CustomerController extends Controller
 
     public function destroy(Request $request)
     {
-        Customer::find($request->id)->delete();
-        session()->flash("alert-danger", "Customer Deleted successfully!");
-        return back();
+        try {
+            Customer::find($request->id)->delete();
+            session()->flash("alert-danger", "Customer Deleted successfully!");
+            return back();
+        } catch (Exception $exception) {
+            session()->flash("alert-danger", "Customer in use!");
+            return back();
+        }
     }
 }
