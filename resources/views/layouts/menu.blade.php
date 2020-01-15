@@ -178,9 +178,9 @@
             @can('View Products Categories')
                 <li class=""><a href="{{route('categories.index')}}" class="">Product Categories</a></li>
             @endcan
-            @can('View Product Subcategories')
-                <li class=""><a href="{{route('sub-categories.index')}}" class="">Product Subcategories</a></li>
-            @endcan
+            {{--            @can('View Product Subcategories')--}}
+            {{--                <li class=""><a href="{{route('sub-categories.index')}}" class="">Product Subcategories</a></li>--}}
+            {{--            @endcan--}}
             @can('View Price Categories')
                 <li class=""><a href="{{route('price-categories.index')}}" class="">Price Categories</a></li>
             @endcan

@@ -46,7 +46,7 @@
                     </div>
 
                     <div class="form-group row" style="margin-top: -2%">
-                        <label for="code" class="col-md-5 col-form-label text-md-right">Minimum Stock Quantity:</label>
+                        <label for="code" class="col-md-5 col-form-label text-md-right">Min. Stock Quantity:</label>
                         <div class="col-md-7">
                             <input type="text" readonly class="form-control-plaintext"
                                    value="email@example.com" id="min_stock_edit" name="min_stock">
@@ -54,7 +54,7 @@
                     </div>
 
                     <div class="form-group row" style="margin-top: -2%">
-                        <label for="code" class="col-md-5 col-form-label text-md-right">Maximum Stock Quantity:</label>
+                        <label for="code" class="col-md-5 col-form-label text-md-right">Max. Stock Quantity:</label>
                         <div class="col-md-7">
                             <input type="text" readonly class="form-control-plaintext" id="max_stock_edit"
                                    name="max_stock"

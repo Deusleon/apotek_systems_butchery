@@ -12,70 +12,74 @@
                 @method("PUT")
 
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="product_name">Product Name <font color="red">*</font></label>
-                                <input type="text" class="form-control" id="name_edit" name="name"
-                                       aria-describedby="emailHelp" maxlength="50" minlength="2"
-                                       placeholder="" required value="{{ old('name') }}">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="barcode">Barcode</label>
-                                <input type="text" class="form-control" id="barcode_edit" name="barcode"
-                                       placeholder="" value="{{ old('barcode') }}">
-                            </div>
+
+                    <div class="form-group row">
+                        <label for="product_name" class="col-md-4 col-form-label text-md-right">Product Name <font
+                                color="red">*</font></label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="name_edit" name="name"
+                                   aria-describedby="emailHelp" maxlength="50" minlength="2"
+                                   placeholder="" required value="{{ old('name') }}">
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="exampleFormControlSelect1">Category <font color="red">*</font></label>
-                                <select name="category" class="form-control" id="category_options"
-                                        onchange="editOption()">
-                                    <option id="category_edit" disabled selected></option>
-                                    @foreach($categories as $cat)
-                                        <option value="{{$cat->id}}">{{ $cat->name }}</option>
-                                    @endforeach
-                                </select>
-                                <span id="category_borders" style="display: none; color: red; font-size: 0.9em">category required</span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="saleUoM">Unit of Measure</label>
-                                <input type="number" class="form-control" id="sale_edit" name="sale_uom"
-                                       placeholder="" value="{{ old('saleUoM') }}" min="1">
-                            </div>
+
+                    <div class="form-group row">
+                        <label for="barcode" class="col-md-4 col-form-label text-md-right">Barcode</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="barcode_edit" name="barcode"
+                                   placeholder="" value="{{ old('barcode') }}">
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="min_stock">Minimum Stock Quantity</label>
-                                <input type="text" class="form-control" id="min_stock_edit" name="min_stock"
-                                       placeholder="" value="{{ old('min_stock') }}" min="1"
-                                       onkeypress="return isNumberKey(event,this)">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="max_stock">Maximum Stock Quantity</label>
-                                <input type="text" class="form-control" id="max_stock_edit" name="max_stock"
-                                       placeholder="" value="{{ old('max_stock') }}" min="1"
-                                       onkeypress="return isNumberKey(event,this)">
-                            </div>
-                        </div>
-                        <div class="col-md-4" hidden>
-                            <div class="form-group">
-                                <label for="status">Status</label>
-                                <input type="text" class="form-control" id="status_edit" name="status"
-                                       placeholder="" value="1" readonly>
-                            </div>
+
+
+                    <div class="form-group row">
+                        <label for="exampleFormControlSelect1" class="col-md-4 col-form-label text-md-right">Category
+                            <font color="red">*</font></label>
+                        <div class="col-md-8">
+                            <select name="category" class="form-control" id="category_options"
+                                    onchange="editOption()">
+                                <option id="category_edit" disabled selected></option>
+                                @foreach($categories as $cat)
+                                    <option value="{{$cat->id}}">{{ $cat->name }}</option>
+                                @endforeach
+                            </select>
+                            <span id="category_borders" style="display: none; color: red; font-size: 0.9em">category required</span>
                         </div>
                     </div>
+
+                    <div class="form-group row">
+                        <label for="saleUoM" class="col-md-4 col-form-label text-md-right">Unit of Measure</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="sale_edit" name="sale_uom"
+                                   placeholder="" value="{{ old('saleUoM') }}" min="1">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="min_stock" class="col-md-4 col-form-label text-md-right">Min. Stock Quantity</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="min_stock_edit" name="min_stock"
+                                   placeholder="" value="{{ old('min_stock') }}" min="1"
+                                   onkeypress="return isNumberKey(event,this)">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="max_stock" class="col-md-4 col-form-label text-md-right">Max. Stock Quantity</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="max_stock_edit" name="max_stock"
+                                   placeholder="" value="{{ old('max_stock') }}" min="1"
+                                   onkeypress="return isNumberKey(event,this)">
+                        </div>
+                    </div>
+                    <div class="col-md-4" hidden>
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <input type="text" class="form-control" id="status_edit" name="status"
+                                   placeholder="" value="1" readonly>
+                        </div>
+                    </div>
+
 
                     <input type="hidden" name="code" id="code_edit">
 

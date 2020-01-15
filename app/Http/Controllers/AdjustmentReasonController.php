@@ -16,11 +16,16 @@ class AdjustmentReasonController extends Controller
 
     public function store(Request $request)
     {
-        $adjustment = new AdjustmentReason;
-        $adjustment->reason = $request->reason;
-        $adjustment->save();
-        session()->flash("alert-success", "Reason added successfully!");
-        return back();
+        try {
+            $adjustment = new AdjustmentReason;
+            $adjustment->reason = $request->reason;
+            $adjustment->save();
+            session()->flash("alert-success", "Reason added successfully!");
+            return back();
+        } catch (Exception $exception) {
+            session()->flash("alert-danger", "Reason Exists!");
+            return back();
+        }
     }
 
     public function update(Request $request)

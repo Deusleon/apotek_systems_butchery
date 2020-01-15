@@ -18,12 +18,17 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        $category = new Category;
-        $category->name = $request->name;
-        $category->save();
+        try {
+            $category = new Category;
+            $category->name = $request->name;
+            $category->save();
+            session()->flash("alert-success", "Product Category Added Successfully!");
+            return back();
+        } catch (Exception $exception) {
+            session()->flash("alert-danger", "Product Category Exists!");
+            return back();
+        }
 
-        session()->flash("alert-success", "Product Category Added Successfully!");
-        return back();
     }
 
     public function destroy(Request $request)

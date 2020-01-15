@@ -40,7 +40,7 @@
         }
 
         .select2-container {
-            width: 103% !important;
+            width: 100% !important;
         }
 
     </style>

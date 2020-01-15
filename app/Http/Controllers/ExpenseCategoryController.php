@@ -19,13 +19,17 @@ class ExpenseCategoryController extends Controller
 
     public function store(Request $request)
     {
+        try {
+            $expense_category = new AccExpenseCategory;
+            $expense_category->name = $request->name;
+            $expense_category->save();
 
-        $expense_category = new AccExpenseCategory;
-        $expense_category->name = $request->name;
-        $expense_category->save();
-
-        session()->flash("alert-success", "Expense category added successfully!");
-        return back();
+            session()->flash("alert-success", "Expense Category Added Successfully!");
+            return back();
+        } catch (Exception $exception) {
+            session()->flash("alert-danger", "Expense Category Exists!");
+            return back();
+        }
     }
 
 
