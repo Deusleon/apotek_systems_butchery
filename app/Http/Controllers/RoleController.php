@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
@@ -64,7 +65,7 @@ class RoleController extends Controller
     {
         $request->validate([
             'name' => 'required|string|min:2|max:50',
-            'description' => 'required|string|min:5|max:50',
+            'description' => 'required|string|min:2|max:50',
             'permissions' => 'required',
         ]);
 
@@ -83,11 +84,16 @@ class RoleController extends Controller
 
     public function destroy(Request $request)
     {
-        $role = Role::find($request->role_id);
-        $role->syncPermissions([]);
+        try {
+            $role = Role::find($request->role_id);
+            $role->syncPermissions([]);
 
-        Role::destroy($request->role_id);
-        session()->flash("alert-success", "Role deleted successfully!");
-        return back();
+            Role::destroy($request->role_id);
+            session()->flash("alert-success", "Role deleted successfully!");
+            return back();
+        } catch (Exception $exception) {
+            session()->flash("alert-danger", "Role in use!");
+            return back();
+        }
     }
 }
