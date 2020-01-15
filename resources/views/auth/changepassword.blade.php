@@ -1,76 +1,97 @@
-@extends('layouts.app')
-@section('content')
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">Change password</div>
+<!DOCTYPE html>
+<html lang="en">
 
-                    <div class="card-body">
-                        @if (session('error'))
-                            <div class="alert alert-danger">
-                                {{ session('error') }}
-                            </div>
-                        @endif
-                        @if (session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
-                        @endif
-                        <form class="form-horizontal" method="POST" action="{{ route('changePassword') }}">
-                            {{ csrf_field() }}
+<head>
+    <title>APOTEk System</title>
 
-                            <div class="form-group{{ $errors->has('current-password') ? ' has-error' : '' }}">
-                                <label for="new-password" class="col-md-4 control-label">Current Password</label>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="description" content=""/>
+    <meta name="keywords" content=""/>
+    <meta name="author" content="CodedThemes"/>
 
-                                <div class="col-md-6">
-                                    <input id="current-password" type="password" class="form-control"
-                                           name="current-password" required>
+    <!-- Favicon icon -->
+    <link rel="icon" href="{{asset("apotek.ico")}}" type="image/x-icon">
 
-                                    @if ($errors->has('current-password'))
-                                        <span class="help-block">
+    <!-- fontawesome icon -->
+    <link rel="stylesheet" href="{{asset("assets/fonts/fontawesome/css/fontawesome-all.min.css")}}">
+
+    <!-- animation css -->
+    <link rel="stylesheet" href="{{asset("assets/plugins/animation/css/animate.min.css")}}">
+    <!-- vendor css -->
+    <link rel="stylesheet" href="{{asset("assets/css/style.css")}}">
+
+
+</head>
+
+<body>
+<div class="auth-wrapper">
+    <div class="auth-content">
+
+        <div class="card">
+            <div class="card-body text-center">
+
+                @if (session('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                @endif
+                @if (session('success'))
+                    <div class="alert alert-success">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('changePassword') }}">
+                    @csrf
+                    <div class="mb-4">
+                        <i class="feather icon-unlock auth-icon"></i>
+                    </div>
+
+                    <h3 class="mb-4">Change Password</h3>
+                    <div class="input-group mb-3{{ $errors->has('current-password') ? ' has-error' : '' }}">
+                        <input id="current-password" type="password" class="form-control"
+                               name="current-password" placeholder="Current Password" required>
+
+                        @if ($errors->has('current-password'))
+                            <span class="help-block">
                                         <strong>{{ $errors->first('current-password') }}</strong>
                                     </span>
-                                    @endif
-                                </div>
-                            </div>
+                        @endif
+                    </div>
 
-                            <div class="form-group{{ $errors->has('new-password') ? ' has-error' : '' }}">
-                                <label for="new-password" class="col-md-4 control-label">New Password</label>
+                    <div class="input-group mb-3{{ $errors->has('new-password') ? ' has-error' : '' }}">
+                        <input id="new-password" type="password" class="form-control" name="new-password"
+                               placeholder="New Password"
+                               required>
 
-                                <div class="col-md-6">
-                                    <input id="new-password" type="password" class="form-control" name="new-password"
-                                           required>
-
-                                    @if ($errors->has('new-password'))
-                                        <span class="help-block">
+                        @if ($errors->has('new-password'))
+                            <span class="help-block">
                                         <strong>{{ $errors->first('new-password') }}</strong>
                                     </span>
-                                    @endif
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="new-password-confirm" class="col-md-4 control-label">Confirm New
-                                    Password</label>
-
-                                <div class="col-md-6">
-                                    <input id="new-password-confirm" type="password" class="form-control"
-                                           name="new-password_confirmation" required>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="col-md-6 col-md-offset-4">
-                                    <button type="submit" class="btn btn-primary">
-                                        Change Password
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
+                        @endif
                     </div>
-                </div>
+
+                    <div class="input-group mb-3">
+                        <input id="new-password-confirm" type="password" class="form-control"
+                               name="new-password_confirmation" placeholder="Confirm New Password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-12 col-md-offset-4">
+                            <button type="submit" class="btn btn-primary">
+                                Change
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+
             </div>
         </div>
     </div>
-@endsection
+</div>
+
+</body>
+</html>
