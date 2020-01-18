@@ -67,7 +67,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Products<font color="red">*</font></label>
-                                        <select id="products" class="js-example-basic-single form-control">
+                                        <select id="products" class="form-control">
                                             <option value="" disabled selected style="display:none;">Select Product
                                             </option>
                                         </select>
@@ -276,7 +276,9 @@
             token: '{{ csrf_token() }}',
             routes: {
                 selectProducts: '{{route('selectProducts')}}',
-                storeCreditSale: '{{route('credit-sales.storeCreditSale')}}'
+                storeCreditSale: '{{route('credit-sales.storeCreditSale')}}',
+                filterProductByWord: '{{route('filter-product-by-word')}}'
+
 
             }
         };
