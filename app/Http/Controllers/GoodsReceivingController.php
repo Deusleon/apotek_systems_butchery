@@ -219,6 +219,8 @@ class GoodsReceivingController extends Controller
     public function orderReceive(Request $request)
     {
 
+//        dd($request->all());
+
         $quantity = str_replace(',', '', $request->quantity);
         $unit_sell_price = str_replace(',', '', $request->sell_price);
         $unit_buy_price = str_replace(',', '', $request->price);
@@ -236,7 +238,7 @@ class GoodsReceivingController extends Controller
             $stock->expiry_date = null;
         }
         $stock->quantity = $quantity;
-        $stock->unit_cost = $request->price;
+        $stock->unit_cost = str_replace(',', '', $request->price);
         $stock->store_id = 1;
         $stock->save();
 
@@ -263,7 +265,7 @@ class GoodsReceivingController extends Controller
 
         $price = new PriceList;
         $price->stock_id = $stock->id;
-        $price->price = $request->sell_price;
+        $price->price = str_replace(',', '', $request->sell_price);
         $price->price_category_id = $request->price_category;
         $price->save();
 
