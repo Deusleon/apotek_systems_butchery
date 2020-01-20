@@ -39,7 +39,7 @@ Route::middleware(["auth"])->group(function () {
 
 
     //Categories routes
-    Route::resource('masters/categories', 'CategoryController')->only([
+    Route::resource('masters/product-categories', 'CategoryController')->only([
         'index', 'store', 'update', 'destroy'
     ]);
 

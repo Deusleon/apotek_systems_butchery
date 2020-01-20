@@ -7,7 +7,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="{{route('categories.store')}}" method="post">
+            <form action="{{route('product-categories.store')}}" method="post">
                 @csrf()
                 <div class="modal-body">
                     <div class="form-group row">

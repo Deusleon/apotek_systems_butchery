@@ -7,7 +7,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="{{route('categories.update','id')}}" method="post">
+            <form action="{{route('product-categories.update','id')}}" method="post">
                 @csrf()
                 @method("PUT")
 

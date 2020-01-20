@@ -17,7 +17,7 @@
                                     class="btn btn-secondary btn-sm"
                                     data-toggle="modal"
                                     data-target="#create">
-                                Add Expense Category
+                                Add Category
                             </button>
                         @endcan
                         <div class="table-responsive">

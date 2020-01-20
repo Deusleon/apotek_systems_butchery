@@ -176,7 +176,7 @@
                 <li class=""><a href="{{route('products.index')}}" class="">Products</a></li>
             @endcan
             @can('View Products Categories')
-                <li class=""><a href="{{route('categories.index')}}" class="">Product Categories</a></li>
+                <li class=""><a href="{{route('product-categories.index')}}" class="">Product Categories</a></li>
             @endcan
             {{--            @can('View Product Subcategories')--}}
             {{--                <li class=""><a href="{{route('sub-categories.index')}}" class="">Product Subcategories</a></li>--}}
@@ -200,15 +200,14 @@
             @can('View Locations')
                 <li class=""><a href="{{route('locations.index')}}" class="">Locations</a></li>
             @endcan
+            @can('View Data Import')
+                <li class="nav-item"><a href="{{route('import.index')}}" class="nav-link"><span class="pcoded-mtext">Import</span></a>
+                </li>
+            @endcan
             {{--        <!--   <li class=""><a href="{{route('general-settings.index')}}" class="">General Settings</a></li> -->--}}
         </ul>
     @endcan
 </li>
-@can('View Data Import')
-    <li class="nav-item"><a href="{{route('import.index')}}" class="nav-link"><span class="pcoded-micon"><i
-                    class="fas fa-file-excel"></i></span><span class="pcoded-mtext">Import</span></a>
-    </li>
-@endcan
 
 @can('View Settings')
     <li class="nav-item"><a href="{{route('configurations.index')}}" class="nav-link"><span class="pcoded-micon"><i

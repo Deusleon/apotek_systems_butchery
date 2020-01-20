@@ -101,8 +101,8 @@ class ProductController extends Controller
         $columns = array(
             0 => 'name',
             1 => 'category_id',
-            2 => 'created_at',
-            3 => 'name',
+            2 => 'category_id',
+            3 => 'created_at',
         );
 
         $totalData = Product::where('status', '1')->count();
@@ -125,6 +125,7 @@ class ProductController extends Controller
             $products = Product::where('id', 'LIKE', "%{$search}%")
                 ->orWhere('name', 'LIKE', "%{$search}%")
                 ->orWhere('barcode', 'LIKE', "%{$search}%")
+                ->orWhere('created_at', 'LIKE', "%{$search}%")
                 ->Where('status', '1')
                 ->offset($start)
                 ->limit($limit)
@@ -134,6 +135,7 @@ class ProductController extends Controller
             $totalFiltered = Product::where('id', 'LIKE', "%{$search}%")
                 ->orWhere('name', 'LIKE', "%{$search}%")
                 ->orWhere('barcode', 'LIKE', "%{$search}%")
+                ->orWhere('created_at', 'LIKE', "%{$search}%")
                 ->Where('status', '1')
                 ->count();
         }

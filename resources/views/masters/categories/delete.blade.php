@@ -7,7 +7,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="{{ route('categories.destroy','id')}}" method="post">
+            <form action="{{ route('product-categories.destroy','id')}}" method="post">
                 @csrf
                 @method("DELETE")
 

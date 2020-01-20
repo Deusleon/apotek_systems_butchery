@@ -181,6 +181,9 @@
                         {
                             'targets': [1],
                             'visible': false
+                        }, {
+                            "targets": [4],
+                            "orderable": false
                         }
                     ]
                 });
@@ -213,6 +216,9 @@
                             {
                                 'targets': [1],
                                 'visible': false
+                            }, {
+                                "targets": [4],
+                                "orderable": false
                             }
                         ]
 
@@ -253,6 +259,9 @@
                             {
                                 'targets': [1],
                                 'visible': false
+                            }, {
+                                "targets": [4],
+                                "orderable": false
                             }
                         ]
 
