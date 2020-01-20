@@ -204,7 +204,7 @@ class SaleController extends Controller
         if ($request->ajax()) {
             $this->store($request);
             return response()->json([
-                'redirect_to' => route('getCashReceipt')
+                'redirect_to' => route('getCashReceipt', '1')
             ]);
         }
     }
@@ -398,7 +398,7 @@ class SaleController extends Controller
                 $request->customer_id = $customer['id'];
                 $this->store($request);
                 return response()->json([
-                    'redirect_to' => route('getCashReceipt')
+                    'redirect_to' => route('getCashReceipt', '-1')
                 ]);
             } else {
                 session()->flash("alert-danger", "Customer Name is Required");
@@ -440,7 +440,7 @@ class SaleController extends Controller
             ->with(compact('customers'));
     }
 
-    public function getCashReceipt()
+    public function getCashReceipt($page)
     {
 
         $receipt_size = Setting::where('id', 119)->value('value');
@@ -448,7 +448,26 @@ class SaleController extends Controller
         $pharmacy['logo'] = Setting::where('id', 105)->value('value');
         $pharmacy['address'] = Setting::where('id', 106)->value('value');
         $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
+        $pharmacy['phone'] = Setting::where('id', 107)->value('value');
+        $pharmacy['slogan'] = Setting::where('id', 104)->value('value');
+
+
         $id = SalesDetail::orderBy('id', 'desc')->value('sale_id');
+
+        $paid = null;
+        $balance = null;
+        $remark = null;
+        if (intVal($page) === -1) {
+            /*get paid amount*/
+            $amounts = SalesCredit::select('sale_id', 'remark', DB::raw('sum(paid_amount) as paid'), DB::raw('sum(balance) as balance'))
+                ->where('sale_id', $id)
+                ->groupby('sale_id')
+                ->first();
+            $paid = $amounts->paid;
+            $balance = $amounts->balance;
+            $remark = $amounts->remark;
+        }
+
         $sale_detail = SalesDetail::where('sale_id', $id)->get();
 
         $sales = array();
@@ -457,7 +476,11 @@ class SaleController extends Controller
         foreach ($sale_detail as $item) {
             $receipt_no = $item->sale['receipt_number'];
             $amount = $item->amount - $item->discount;
-            $vat_percent = $item->vat / $item->price;
+            if (intVal($item->vat) === 0) {
+                $vat_percent = 0;
+            } else {
+                $vat_percent = $item->vat / $item->price;
+            }
             $sub_total = ($amount / (1 + $vat_percent));
             $vat = $amount - $sub_total;
             $sn++;
@@ -476,6 +499,9 @@ class SaleController extends Controller
                 'total_vat' => ($item->sale['cost']['vat']),
                 'sold_by' => $item->sale['user']['name'],
                 'customer' => $item->sale['customer']['name'],
+                'paid' => $paid,
+                'balance' => $balance,
+                'remark' => $remark,
                 'created_at' => date('Y-m-d', strtotime($item->sale['date']))
             ));
         }
@@ -490,10 +516,10 @@ class SaleController extends Controller
         $data = $grouped_sales;
         if ($receipt_size === 'Thermal Paper') {
             $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
-                compact('data', 'pharmacy'));
+                compact('data', 'pharmacy', 'page'));
         } else {
             $pdf = PDF::loadView('sales.cash_sales.receipt',
-                compact('data', 'pharmacy'));
+                compact('data', 'pharmacy', 'page'));
         }
 //        $pdf = PDF::loadView('sales.cash_sales.receipt',
 //            compact('data', 'pharmacy'));

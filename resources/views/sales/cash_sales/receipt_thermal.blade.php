@@ -79,6 +79,14 @@
             font-weight: normal;
         }
 
+        h5 {
+            font-weight: normal;
+        }
+
+        h6 {
+            font-weight: normal;
+        }
+
         #container .logo-container {
             padding-top: -2%;
             text-align: center;
@@ -107,16 +115,25 @@
     <h3 align="center"><b>RECEIPT</b></h3>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['name']}}</h3>
     <h5 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h5>
+    <h5 align="center" style="margin-top: -1%">Phone: {{$pharmacy['phone']}}</h5>
+
     @foreach($data as $datas => $dat)
         <table id="table-detail-main">
             <tr>
-                <td>Receipt #: {{$datas}}</td>
+                <td><b>Receipt #</b>: {{$datas}}</td>
             </tr>
             <tr>
-                <td style="padding-top: -1%">Customer: {{$data[$datas][0]['customer']}}</td>
+                @if($data[$datas][0]['customer'])
+                    <td style="padding-top: -1%"><b>Customer</b>: {{$data[$datas][0]['customer']}}</td>
+                @else
+                    <td style="padding-top: -1%"><b>Customer</b>: CASH</td>
+                @endif
             </tr>
             <tr>
-                <td style="padding-top: -1%">TIN: {{$pharmacy['tin_number']}}</td>
+                <td style="padding-top: -1%"><b>TIN</b>: {{$pharmacy['tin_number']}}</td>
+            </tr>
+            <tr>
+                <td style="padding-top: -1%"><b>Date</b>: {{date('j M, Y', strtotime($dat[0]['created_at']))}}</td>
             </tr>
         </table>
         <table id="table-detail" align="center">
@@ -137,26 +154,54 @@
             @endforeach
         </table>
         <hr style="margin-left: 4%; margin-right: -4%">
-        <table id="table-total" style="width: 100%;">
-            <tr>
-                <td style="padding-top: -1%; width: 50%">Total:</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td align="" style="padding-top: -1%">
-                    <div style="margin-left: -15%; margin-right: 15%">{{number_format(($dat[0]['grand_total']),2)}}</div>
-                </td>
-            </tr>
-        </table>
+        <div style="margin-left: 10%;width: 29.6%;margin-top: 2%; padding: -1.6%"><b>Sub Total</b>
+        </div>
+        <div align="right"
+             style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
+            {{number_format(($dat[0]['grand_total']-$dat[0]['total_vat'] + $dat[0]['discount_total']),2)}}
+        </div>
+        <div style="margin-left: 10%;width: 29.6%;margin-top: 2%; padding: -1.6%"><b>VAT</b>
+        </div>
+        <div align="right"
+             style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
+            {{number_format($dat[0]['total_vat'],2)}}
+        </div>
+        <div style="margin-left: 10%;width: 29.6%;margin-top: 2%; padding: -1.6%"><b>Total</b>
+        </div>
+        <div align="right"
+             style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
+            {{number_format(($dat[0]['grand_total']),2)}}
+        </div>
         <hr style="margin-left: 4%; margin-right: -4%; margin-top: -2%">
 
+
+        @if($page === "-1")
+            <hr style="margin-left: 4%; margin-right: -4%">
+            <div style="margin-left: 10%;width: 29.6%;margin-top: 2%; padding: -1.6%"><b>Paid</b>
+            </div>
+            <div align="right"
+                 style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
+                {{number_format($dat[0]['paid'],2)}}
+            </div>
+            <div style="margin-left: 10%;width: 29.6%;margin-top: 2%; padding: -1.6%"><b>Balance</b>
+            </div>
+            <div align="right"
+                 style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
+                {{number_format($dat[0]['grand_total'],2)}}
+            </div>
+            <div style="margin-left: 10%;width: 29.6%;margin-top: 2%; padding: -1.6%"><b>Remark</b>
+            </div>
+            <div align="right"
+                 style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
+                {{$dat[0]['remark']}}
+            </div>
+
+            <hr style="margin-left: 4%; margin-right: -4%; margin-top: -2%">
+        @endif
+
         <h5 align="center" style="margin-top: -0%">Sold By {{$dat[0]['sold_by']}}</h5>
+        <h5 align="center" style="margin-top: -1%; font-style: italic">Sold By {{$pharmacy['slogan']}}</h5>
+
     @endforeach
 
 </div>

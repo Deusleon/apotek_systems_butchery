@@ -608,7 +608,8 @@ function deselect() {
 }
 
 function deselect1() {
-    document.getElementById("credit_sales_form").reset();
+    // document.getElementById("credit_sales_form").reset();
+    $('#price_category').val('').change();
     sub_total = 0;
     total = 0;
     cart = [];
@@ -1115,7 +1116,7 @@ function saveCashSale() {
         cache: "false",
         data: form,
         success: function (data) {
-            window.location = data.redirect_to;
+            window.open(data.redirect_to);
             triggerSaleType();
         }, complete: function () {
             notify('Sale recorded successfully', 'top', 'right', 'success');
@@ -1124,7 +1125,8 @@ function saveCashSale() {
     });
 }
 
-$('#credit_sales_form').on('submit', function () {
+$('#credit_sales_form').on('submit', function (e) {
+    e.preventDefault();
 
     var cart = document.getElementById("order_cart").value;
 
@@ -1149,7 +1151,7 @@ function saveCreditSale() {
         success: function (data) {
             notify('Credit sale recorded successfully', 'top', 'right', 'success');
             deselect1();
-            window.location = data.redirect_to;
+            window.open(data.redirect_to);
         }
     });
 }

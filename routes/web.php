@@ -148,7 +148,7 @@ Route::middleware(["auth"])->group(function () {
     Route::get('sales/sale-histories', 'SaleController@SalesHistory')->name('sale-histories.SalesHistory');
     Route::get('sales/sale-date', 'SaleController@getSalesHistory')->name('getSalesHistory');
     Route::post('sales/select-products', 'SaleController@selectProducts')->name('selectProducts');
-    Route::get('sales/cash-sale/receipt', 'SaleController@getCashReceipt')->name('getCashReceipt');
+    Route::get('sales/cash-sale/receipt/{page}', 'SaleController@getCashReceipt')->name('getCashReceipt');
     Route::get('sales/credit-sale/receipt', 'SaleController@getCreditReceipt')->name('getCreditReceipt');
     Route::get('sales/sale/filter-by-word', 'SaleController@filterProductByWord')->name('filter-product-by-word');
     Route::post('sales/history/sale-reprint', 'SaleController@receiptReprint')->name('sale-reprint-receipt');
