@@ -328,7 +328,9 @@
             routes: {
                 goodsreceiving: '{{route('receiving-price-category')}}',
                 filterBySupplier: '{{route('filter-invoice')}}',
-                itemFormSave: '{{route('goods-receiving.itemReceive')}}'
+                itemFormSave: '{{route('goods-receiving.itemReceive')}}',
+                orderFormSave: '{{route('goods-receiving.orderReceive')}}'
+
             }
         };
 

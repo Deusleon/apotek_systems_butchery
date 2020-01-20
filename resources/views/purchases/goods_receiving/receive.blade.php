@@ -13,7 +13,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form id="order_reveice" action="{{route('goods-receiving.orderReceive')}}" method="post" name="return-form"
+            <form id="order_reveice" name="return-form"
                   enctype="multipart/form-data">
                 @csrf()
                 <div class="modal-body">
@@ -57,14 +57,20 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="batch_number">Expire Date</label>
-                                <input type="text" name="expire_date" class="form-control" id="expire_date_1"
-                                       autocomplete="off">
-                                <div class="form-group form-check">
-                                    <input type="checkbox" class="form-check-input" id="expire_check_id"
-                                           style="padding:10px" value="true" onchange="findchecked()">
-                                    <label class="form-check-label" for="expire_check">No Expire Date</label>
-                                </div>
+                                @if($expire_date === "YES")
+                                    <label for="batch_number">Expire Date</label>
+                                    <input type="text" name="expire_date" class="form-control" id="expire_date_1"
+                                           autocomplete="off">
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" class="form-check-input" id="expire_check_id"
+                                               style="padding:10px" value="true" onchange="findchecked()">
+                                        <label class="form-check-label" for="expire_check">No Expire Date</label>
+                                    </div>
+                                @else
+                                    <label for="batch_number">Expire Date</label>
+                                    <input type="text" name="expire_date" class="form-control" id="expire_date_1"
+                                           autocomplete="off" readonly disabled>
+                                @endif
                             </div>
                         </div>
                         <div class="col-md-6">

@@ -221,94 +221,97 @@ class GoodsReceivingController extends Controller
     public function orderReceive(Request $request)
     {
 
-//        dd($request->all());
+        if ($request->ajax()) {
+            $quantity = str_replace(',', '', $request->quantity);
+            $unit_sell_price = str_replace(',', '', $request->sell_price);
+            $unit_buy_price = str_replace(',', '', $request->price);
+            $total_buyprice = $quantity * $unit_buy_price;
+            $total_sellprice = $quantity * $unit_sell_price;
+            $profit = $total_sellprice - $total_buyprice;
 
-        $quantity = str_replace(',', '', $request->quantity);
-        $unit_sell_price = str_replace(',', '', $request->sell_price);
-        $unit_buy_price = str_replace(',', '', $request->price);
-        $total_buyprice = $quantity * $unit_buy_price;
-        $total_sellprice = $quantity * $unit_sell_price;
-        $profit = $total_sellprice - $total_buyprice;
+            $date = date('Y-m-d');
+            $stock = new CurrentStock;
+            $stock->product_id = $request->product_id;
+            $stock->batch_number = $request->batch_number;
+            if ($request->expire_date != null) {
+                $stock->expiry_date = $request->expire_date;
+            } else {
+                $stock->expiry_date = null;
+            }
+            $stock->quantity = $quantity;
+            $stock->unit_cost = str_replace(',', '', $request->price);
+            $stock->store_id = 1;
+            $stock->save();
 
-        $date = date('Y-m-d');
-        $stock = new CurrentStock;
-        $stock->product_id = $request->product_id;
-        $stock->batch_number = $request->batch_number;
-        if ($request->expire_date != null) {
-            $stock->expiry_date = $request->expire_date;
-        } else {
-            $stock->expiry_date = null;
+
+            /*insert into stock tracking*/
+            $stock_tracking = new StockTracking;
+            $stock_tracking->stock_id = $stock->id;
+            $stock_tracking->product_id = $request->product_id;
+            $stock_tracking->quantity = $quantity;
+            $stock_tracking->store_id = 1;
+            $stock_tracking->updated_by = Auth::user()->id;
+            $stock_tracking->out_mode = 'New Product Purchase';
+            $stock_tracking->updated_at = date('Y-m-d');
+            $stock_tracking->movement = 'IN';
+            $stock_tracking->save();
+
+
+            $order_details = OrderDetail::find($request->order_details_id);
+            $order_details->received_by = Auth::user()->id;
+            $order_details->received_at = $date;
+            $order_details->received_qty = $quantity;
+            $order_details->item_status = 'Received';
+            $order_details->save();
+
+            $price = new PriceList;
+            $price->stock_id = $stock->id;
+            $price->price = str_replace(',', '', $request->sell_price);
+            $price->price_category_id = $request->price_category;
+            $price->save();
+
+            $order_id = OrderDetail::where('id', $request->order_details_id)->value('order_id');
+            $number_of_items = OrderDetail::where('order_id', $order_id)->count();
+            $number_of_received_item = OrderDetail::where('order_id', $order_id)
+                ->where('item_status', 'Received')->count();
+
+            $order = Order::find($order_id);
+            $order->received_at = $date;
+            $order->received_by = Auth::user()->id;
+            if ($number_of_items > $number_of_received_item) {
+                $order->status = '2';
+            } else {
+                $order->status = '3';
+            }
+
+            $order->save();
+
+            $incoming_stock = new GoodsReceiving;
+            $incoming_stock->product_id = $request->product_id;
+            $incoming_stock->supplier_id = $request->supplier_id;
+            $incoming_stock->invoice_no = $request->invoice;
+            $incoming_stock->batch_number = $request->batch_number;
+            if ($request->expire_date != null) {
+                $incoming_stock->expire_date = $request->expire_date;
+            } else {
+                $incoming_stock->expire_date = null;
+            }
+            $incoming_stock->quantity = $quantity;
+            $incoming_stock->unit_cost = str_replace(',', '', $request->price);
+            $incoming_stock->sell_price = str_replace(',', '', $request->sell_price);
+            $incoming_stock->order_details_id = $request->order_details_id;
+            $incoming_stock->total_cost = $total_buyprice;
+            $incoming_stock->total_sell = $total_sellprice;
+            $incoming_stock->item_profit = $profit;
+            $incoming_stock->save();
+
+
+            $message = array();
+            array_push($message, array(
+                'message' => 'success'
+            ));
+            return $message;
         }
-        $stock->quantity = $quantity;
-        $stock->unit_cost = str_replace(',', '', $request->price);
-        $stock->store_id = 1;
-        $stock->save();
-
-
-        /*insert into stock tracking*/
-        $stock_tracking = new StockTracking;
-        $stock_tracking->stock_id = $stock->id;
-        $stock_tracking->product_id = $request->product_id;
-        $stock_tracking->quantity = $quantity;
-        $stock_tracking->store_id = 1;
-        $stock_tracking->updated_by = Auth::user()->id;
-        $stock_tracking->out_mode = 'New Product Purchase';
-        $stock_tracking->updated_at = date('Y-m-d');
-        $stock_tracking->movement = 'IN';
-        $stock_tracking->save();
-
-
-        $order_details = OrderDetail::find($request->order_details_id);
-        $order_details->received_by = Auth::user()->id;
-        $order_details->received_at = $date;
-        $order_details->received_qty = $quantity;
-        $order_details->item_status = 'Received';
-        $order_details->save();
-
-        $price = new PriceList;
-        $price->stock_id = $stock->id;
-        $price->price = str_replace(',', '', $request->sell_price);
-        $price->price_category_id = $request->price_category;
-        $price->save();
-
-        $order_id = OrderDetail::where('id', $request->order_details_id)->value('order_id');
-        $number_of_items = OrderDetail::where('order_id', $order_id)->count();
-        $number_of_received_item = OrderDetail::where('order_id', $order_id)
-            ->where('item_status', 'Received')->count();
-
-        $order = Order::find($order_id);
-        $order->received_at = $date;
-        $order->received_by = Auth::user()->id;
-        if ($number_of_items > $number_of_received_item) {
-            $order->status = '2';
-        } else {
-            $order->status = '3';
-        }
-
-        $order->save();
-
-        $incoming_stock = new GoodsReceiving;
-        $incoming_stock->product_id = $request->product_id;
-        $incoming_stock->supplier_id = $request->supplier_id;
-        $incoming_stock->invoice_no = $request->invoice;
-        $incoming_stock->batch_number = $request->batch_number;
-        if ($request->expire_date != null) {
-            $incoming_stock->expire_date = $request->expire_date;
-        } else {
-            $incoming_stock->expire_date = null;
-        }
-        $incoming_stock->quantity = $quantity;
-        $incoming_stock->unit_cost = str_replace(',', '', $request->price);
-        $incoming_stock->sell_price = str_replace(',', '', $request->sell_price);
-        $incoming_stock->order_details_id = $request->order_details_id;
-        $incoming_stock->total_cost = $total_buyprice;
-        $incoming_stock->total_sell = $total_sellprice;
-        $incoming_stock->item_profit = $profit;
-        $incoming_stock->save();
-
-
-        session()->flash("alert-success", "Item Received Successfully!");
-        return redirect()->route('goods-receiving.index');
 
     }
 

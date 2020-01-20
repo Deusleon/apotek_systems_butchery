@@ -294,8 +294,10 @@ function orderReceive(items, supplier) {
 
 }
 
+let remove_row_index;
 $('#items_table tbody').on('click', '#receive_btn', function () {
     var index = items_table.row($(this).parents('tr')).index();
+    remove_row_index = index;
     var data = items_table.row($(this).parents('tr')).data();
     $('#receive').modal('show');
     $('#receive').find('.modal-body #rec_qty').val(numberWithCommas(data[2]));
@@ -311,29 +313,6 @@ $('#items_table tbody').on('click', '#receive_btn', function () {
 
     document.getElementById('save_btn').style.display = 'block';
 
-//     function getPrice2(item_id, price_cat,supplier_ids) {
-//     $.ajax({
-//         url: configurations.routes.goodsreceiving,
-//         type: "get",
-//         dataType: "json",
-//         data: {
-//             'item_id': item_id,
-//             'price_cat': price_cat,
-//             'supplier_ids':supplier_ids
-//         },
-
-//         // success: function (data) {
-//         //     if (data.length === 0) {
-//         //         /*empty*/
-//         //         $("#sell_price_i").val(formatMoney('0'));
-//         //     } else {
-//         //         $("#pr_id").val(formatMoney(data[0]['unit_cost']));
-//         //         $("#sell_price_i").val(formatMoney(data[0]['price']));
-//         //     }
-//         // }
-
-//     });
-// }
 
     $('#receive').on('change', '#rec_qty', function () {
         var quantity_ = document.getElementById('rec_qty').value;
@@ -429,7 +408,7 @@ $('#myFormId').on('submit', function (e) {
 
     var cart_data = document.getElementById("received_cart").value;
 
-    if (cart_data === ''){
+    if (cart_data === '') {
         notify('Item receive list is empty', 'top', 'right', 'warning');
         return false;
     }
@@ -472,7 +451,27 @@ function saveInvoiceForm() {
     });
 }
 
-$('#order_reveice').on('submit', function () {
+function saveOrderReceiveForm() {
+    var form = $('#order_reveice').serialize();
+
+    $.ajax({
+        url: config.routes.orderFormSave,
+        type: "get",
+        dataType: "json",
+        cache: "false",
+        data: form,
+        success: function (data) {
+            if (data[0].message === 'success') {
+                notify('Order received successfully', 'top', 'right', 'success');
+                items_table.row(remove_row_index).remove().draw();
+                $('#receive').modal('hide');
+            }
+        }
+    });
+}
+
+$('#order_reveice').on('submit', function (e) {
+    e.preventDefault();
     var unit_price = document.getElementById('pr_id').value;
     var sell_price = document.getElementById('sell_price_i').value;
     var unit_price_parse = (parseFloat(unit_price.replace(/\,/g, ''), 10));
@@ -482,6 +481,8 @@ $('#order_reveice').on('submit', function () {
         notify('Item cannot have 0 price', 'top', 'right', 'warning');
         return false;
     }
+
+    saveOrderReceiveForm();
 
 });
 
