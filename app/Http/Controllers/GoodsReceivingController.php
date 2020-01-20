@@ -79,6 +79,16 @@ class GoodsReceivingController extends Controller
                     ->groupBy('inv_current_stock.product_id')
                     ->get();
 
+            } else {
+                $products = PriceList::where('price_category_id', $request->price_category)
+                    ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
+                    ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                    ->join('inv_incoming_stock', 'inv_incoming_stock.product_id', '=', 'inv_products.id')
+                    ->Where('inv_products.status', '1')
+                    ->Where('inv_products.id', $request->product_id)
+                    ->select('inv_products.id as id', 'name', 'supplier_id')
+                    ->groupBy('inv_current_stock.product_id')
+                    ->get();
             }
 
             foreach ($products as $product) {
