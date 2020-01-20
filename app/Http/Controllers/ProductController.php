@@ -68,10 +68,15 @@ class ProductController extends Controller
         $product->status = $request->status;
         $product->min_quantinty = str_replace(',', '', $request->min_stock);
         $product->max_quantinty = str_replace(',', '', $request->max_stock);
-        $product->save();
+        try {
+            $product->save();
+            session()->flash("alert-success", "Product updated successfully!");
+            return back();
+        } catch (Exception $exception) {
+            session()->flash("alert-danger", "Product exists!");
+            return back();
+        }
 
-        session()->flash("alert-success", "Product updated successfully!");
-        return back();
     }
 
 

@@ -23,9 +23,15 @@ class SupplierController extends Controller
         $supplier->address = $request->address;
         $supplier->mobile = $request->phone;
         $supplier->email = $request->email;
-        $supplier->save();
-        session()->flash("alert-success", "Supplier Added Successfully!");
-        return back();
+        try {
+            $supplier->save();
+            session()->flash("alert-success", "Supplier Added Successfully!");
+            return back();
+        } catch (Exception $exception) {
+            session()->flash("alert-danger", "Supplier exists!");
+            return back();
+        }
+
     }
 
     public function update(Request $request)
@@ -37,10 +43,14 @@ class SupplierController extends Controller
         $supplier->mobile = $request->mobile;
         $supplier->email = $request->email;
 
-        $supplier->save();
-
-        session()->flash("alert-success", "Supplier Updated Successfully!");
-        return back();
+        try {
+            $supplier->save();
+            session()->flash("alert-success", "Supplier updated Successfully!");
+            return back();
+        } catch (Exception $exception) {
+            session()->flash("alert-danger", "Supplier exists!");
+            return back();
+        }
     }
 
     public function destroy(Request $request)

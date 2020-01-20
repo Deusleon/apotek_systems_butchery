@@ -37,10 +37,14 @@ class PriceCategoryController extends Controller
         $price_category = PriceCategory::find($request->price_category_id);
         $price_category->type = $request->code;
         $price_category->name = $request->name;
-        $price_category->save();
-
-        session()->flash("alert-success", "Price category updated successfully!");
-        return back();
+        try {
+            $price_category->save();
+            session()->flash("alert-success", "Price category updated successfully!");
+            return back();
+        } catch (Exception $exception) {
+            session()->flash("alert-danger", "Price category exists!");
+            return back();
+        }
 
     }
 

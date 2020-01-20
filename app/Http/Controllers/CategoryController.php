@@ -48,9 +48,14 @@ class CategoryController extends Controller
     {
         $category = Category::find($request->id);
         $category->name = $request->name;
-        $category->save();
-        session()->flash("alert-success", "Product category updated successfully!");
-        return back();
+        try {
+            $category->save();
+            session()->flash("alert-success", "Product category updated successfully!");
+            return back();
+        } catch (Exception $exception) {
+            session()->flash("alert-danger", "Product category exists!");
+            return back();
+        }
     }
 
 }

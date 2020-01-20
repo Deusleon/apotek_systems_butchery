@@ -32,16 +32,21 @@ class AdjustmentReasonController extends Controller
     {
         $adjustment = AdjustmentReason::find($request->adjustment_id);
         $adjustment->reason = $request->name;
-        $adjustment->save();
-        session()->flash("alert-success", "Reason updated successfully!");
-        return back();
+        try {
+            $adjustment->save();
+            session()->flash("alert-success", "Reason updated successfully!");
+            return back();
+        } catch (Exception $exception) {
+            session()->flash("alert-danger", "Reason exists!");
+            return back();
+        }
 
     }
 
    public function destroy(Request $request)
     {
          try {
-            AdjustmentReason::destroy($request->id);
+             AdjustmentReason::destroy($request->adjustment_id);
              session()->flash("alert-danger", "Reason Deleted successfully!");
             return back();
          } catch (Exception $exception) {

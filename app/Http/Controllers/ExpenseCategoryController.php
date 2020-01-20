@@ -37,9 +37,15 @@ class ExpenseCategoryController extends Controller
     {
         $expense_category = AccExpenseCategory::find($request->id);
         $expense_category->name = $request->name;
-        $expense_category->save();
-        session()->flash("alert-success", "Expense category updated successfully!");
-        return back();
+        try {
+            $expense_category->save();
+            session()->flash("alert-success", "Expense category updated successfully!");
+            return back();
+        } catch (Exception $exception) {
+            session()->flash("alert-danger", "Expense category exists!");
+            return back();
+        }
+
     }
 
 
