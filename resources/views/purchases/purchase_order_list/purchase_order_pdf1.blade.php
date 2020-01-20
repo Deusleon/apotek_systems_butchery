@@ -72,6 +72,8 @@
 
 <h4 align="center">{{$pharmacy['name']}}</h4>
 <h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
+<h4 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h4>
+
 <h2 align="center" style="margin-top: -2%">Purchase Order</h2>
 <div class="row" style="margin-top: 10%;">
     <div class="col-md-12">
@@ -96,7 +98,6 @@
                 <th align="left">Product Name</th>
                 <th align="right">Quantity</th>
                 <th align="right">Price</th>
-                <th align="right">Sub Total</th>
                 <th align="right">VAT</th>
                 <th align="right">Amount</th>
             </tr>
@@ -108,7 +109,6 @@
                         <div style="margin-right: 50%">{{$item->ordered_qty}}</div>
                     </td>
                     <td align="right">{{number_format($item->unit_price,2)}}</td>
-                    <td align="right">{{number_format($item->sub_total,2)}}</td>
                     <td align="right">{{number_format($item->vat,2)}}</td>
                     <td align="right">{{number_format($item->amount,2)}}</td>
                 </tr>

@@ -545,6 +545,8 @@ class InventoryReportController extends Controller
         $pharmacy['name'] = Setting::where('id', 100)->value('value');
         $pharmacy['address'] = Setting::where('id', 106)->value('value');
         $pharmacy['logo'] = Setting::where('id', 105)->value('value');
+        $pharmacy['phone'] = Setting::where('id', 107)->value('value');
+
 
         $pdfs = new PDFMerger();
 //        $pharmacy = GeneralSetting::all();

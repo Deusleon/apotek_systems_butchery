@@ -29,7 +29,7 @@ var order_history_datatable = $('#order_history_datatable').DataTable({
             data: "action",
             defaultContent: "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm' size='2'/><button id='print_btn' class='btn btn-secondary btn-rounded btn-sm'><span class='fa fa-print' aria-hidden='true'></span> Print</button><input type='button' value='Cancel' id='cancel_btn' class='btn btn-danger btn-rounded btn-sm' size='2' />"
         }
-    ]
+    ], aaSorting: [[2, "desc"]]
 });
 
 var order_details_table = $('#order_details_table').DataTable({

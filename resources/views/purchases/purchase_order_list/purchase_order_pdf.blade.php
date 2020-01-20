@@ -79,7 +79,7 @@
             <th align="left">Product Name</th>
             <th align="right">Quantity</th>
             <th align="right">Price</th>
-            <th align="right">Sub Total</th>
+            <th align="right" hidden>Sub Total</th>
             <th align="right">VAT</th>
             <th align="right">Amount</th>
         </tr>
@@ -91,7 +91,7 @@
                     <div style="margin-right: 50%">{{$item->ordered_qty}}</div>
                 </td>
                 <td align="right">{{number_format($item->unit_price,2)}}</td>
-                <td align="right">{{number_format($item->sub_total,2)}}</td>
+                <td align="right" hidden>{{number_format($item->sub_total,2)}}</td>
                 <td align="right">{{number_format($item->vat,2)}}</td>
                 <td align="right">{{number_format($item->amount,2)}}</td>
             </tr>
