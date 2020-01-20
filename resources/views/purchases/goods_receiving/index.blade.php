@@ -185,55 +185,92 @@
                     </div>
                     <hr>
                     <div class="row">
-                        <div class="col-md-3">
-                            <div class="form-group" style="padding-top: 10px">
-                                <div style="width: 99%">
-                                    <label for="price_category">Price Category <font color="red">*</font></label>
-                                    <select name="price_category" class="form-control js-example-basic-single"
-                                            id="price_category" required="true" onchange="priceByCategory()">
-                                        @foreach($price_categories as $price_category)
-                                            <option value="{{$price_category->id}}">{{$price_category->name}}</option>
-                                        @endforeach
-                                    </select>
+                        @if($expire_date === "YES")
+                            <div class="col-md-3">
+                                <div class="form-group" style="padding-top: 10px">
+                                    <div style="width: 99%">
+                                        <label for="price_category">Price Category <font color="red">*</font></label>
+                                        <select name="price_category" class="form-control js-example-basic-single"
+                                                id="price_category" required="true" onchange="priceByCategory()">
+                                            @foreach($price_categories as $price_category)
+                                                <option
+                                                    value="{{$price_category->id}}">{{$price_category->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group" style="padding-top: 10px">
-                                <label for="code">Buy Price<font color="red">*</font></label>
-                                <input type="text" id="buy_price" name="unit_cost" class="form-control" min="0"
-                                       value="0" required="true" onchange="amountCheck()"
-                                       onkeypress="return isNumberKey(event,this)">
-                                <span class="help-inline"></span>
-                                <div class="text text-danger" class="price_error"></div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group" style="padding-top: 10px">
-                                <label for="code">Sell Price<font color="red">*</font></label>
-                                <input type="text" name="sell_price" class="form-control" min="0" value="0"
-                                       required="true" id="sell_price_id" onchange="amountCheck()"
-                                       onkeypress="return isNumberKey(event,this)">
-                                <span class="help-inline"></span>
-                                <div class="amount_error text text-danger"></div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-
-                            <div class="form-group" style="padding-top: 10px">
-                                <label>Expire Date <font color="red">*</font></label>
-                                <input type="text" name="expire_date" class="form-control" id="expire_date_21"
-                                       autocomplete="off" required="true">
-
-                                <div class="form-group form-check">
-                                    <input type="checkbox" class="form-check-input" id="expire_check"
-                                           style="padding:10px" value="true" onchange="findselected()">
-                                    <label class="form-check-label" for="expire_check">No Expire Date</label>
+                            <div class="col-md-3">
+                                <div class="form-group" style="padding-top: 10px">
+                                    <label for="code">Buy Price<font color="red">*</font></label>
+                                    <input type="text" id="buy_price" name="unit_cost" class="form-control" min="0"
+                                           value="0" required="true" onchange="amountCheck()"
+                                           onkeypress="return isNumberKey(event,this)">
+                                    <span class="help-inline"></span>
+                                    <div class="text text-danger" class="price_error"></div>
                                 </div>
                             </div>
+                            <div class="col-md-3">
+                                <div class="form-group" style="padding-top: 10px">
+                                    <label for="code">Sell Price<font color="red">*</font></label>
+                                    <input type="text" name="sell_price" class="form-control" min="0" value="0"
+                                           required="true" id="sell_price_id" onchange="amountCheck()"
+                                           onkeypress="return isNumberKey(event,this)">
+                                    <span class="help-inline"></span>
+                                    <div class="amount_error text text-danger"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group" style="padding-top: 10px">
+                                    <label>Expire Date <font color="red">*</font></label>
+                                    <input type="text" name="expire_date" class="form-control" id="expire_date_21"
+                                           autocomplete="off" required="true">
 
-                        </div>
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" class="form-check-input" id="expire_check"
+                                               style="padding:10px" value="true" onchange="findselected()">
+                                        <label class="form-check-label" for="expire_check">No Expire Date</label>
+                                    </div>
+                                </div>
+
+                            </div>
+                        @else
+                            <div class="col-md-4">
+                                <div class="form-group" style="padding-top: 10px">
+                                    <div style="width: 99%">
+                                        <label for="price_category">Price Category <font color="red">*</font></label>
+                                        <select name="price_category" class="form-control js-example-basic-single"
+                                                id="price_category" required="true" onchange="priceByCategory()">
+                                            @foreach($price_categories as $price_category)
+                                                <option
+                                                    value="{{$price_category->id}}">{{$price_category->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group" style="padding-top: 10px">
+                                    <label for="code">Buy Price<font color="red">*</font></label>
+                                    <input type="text" id="buy_price" name="unit_cost" class="form-control" min="0"
+                                           value="0" required="true" onchange="amountCheck()"
+                                           onkeypress="return isNumberKey(event,this)">
+                                    <span class="help-inline"></span>
+                                    <div class="text text-danger" class="price_error"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group" style="padding-top: 10px">
+                                    <label for="code">Sell Price<font color="red">*</font></label>
+                                    <input type="text" name="sell_price" class="form-control" min="0" value="0"
+                                           required="true" id="sell_price_id" onchange="amountCheck()"
+                                           onkeypress="return isNumberKey(event,this)">
+                                    <span class="help-inline"></span>
+                                    <div class="amount_error text text-danger"></div>
+                                </div>
+                            </div>
+                        @endif
+
                     </div>
 
                     @if($back_date=="YES")
@@ -363,11 +400,19 @@
                 singleDatePicker: true,
                 showDropdowns: true,
                 minDate: start,
-                autoUpdateInput: true,
+                autoUpdateInput: false,
                 locale: {
                     format: 'DD-M-YYYY'
                 }
             });
+        });
+
+        $('input[name="expire_date"]').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('MM/DD/YYYY'));
+        });
+
+        $('input[name="expire_date"]').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
         });
 
         $(function () {
@@ -384,11 +429,11 @@
             });
         });
 
-        $('input[name="purchase_date"]').on('apply.daterangepicker', function(ev, picker) {
+        $('input[name="purchase_date"]').on('apply.daterangepicker', function (ev, picker) {
             $(this).val(picker.startDate.format('DD-MM-YYYY'));
         });
 
-        $('input[name="purchase_date"]').on('cancel.daterangepicker', function(ev, picker) {
+        $('input[name="purchase_date"]').on('cancel.daterangepicker', function (ev, picker) {
             $(this).val('');
         });
 

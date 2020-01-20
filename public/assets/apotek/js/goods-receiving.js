@@ -460,7 +460,7 @@ function saveInvoiceForm() {
                 document.getElementById('buy_price').value = '0';
                 document.getElementById('sell_price_id').value = '0';
                 var today_date = moment().toDate();
-                document.getElementById('expire_date_21').value = moment(today_date).format('D-M-YYYY');
+                // document.getElementById('expire_date_21').value = moment(today_date).format('D-M-YYYY');
                 deselect();
             } else {
                 notify('Item name exists', 'top', 'right', 'danger');

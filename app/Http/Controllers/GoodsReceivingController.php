@@ -23,6 +23,11 @@ class GoodsReceivingController extends Controller
 
     public function index()
     {
+        $batch_setting = Setting::where('id', 110)->value('value');/*batch number setting*/
+        $invoice_setting = Setting::where('id', 115)->value('value');/*invoice setting*/
+        $back_date = Setting::where('id', 114)->value('value');
+        $expire_date = Setting::where('id', 123)->value('value');
+
         $orders = Order::where('status', '<=', '3')
             ->get();
         $order_details = OrderDetail::all();
@@ -31,9 +36,6 @@ class GoodsReceivingController extends Controller
         $current_stock = $this->allProductToReceive();
         $price_categories = PriceCategory::all();
         $invoices = Invoice::all();
-        $batch_setting = Setting::where('id', 110)->value('value');/*batch number setting*/
-        $invoice_setting = Setting::where('id', 115)->value('value');/*invoice setting*/
-        $back_date = Setting::where('id', 114)->value('value');
 
         $selling_prices = DB::table('sales_prices');
         $order_receiving = DB::table('order_details')
@@ -44,7 +46,7 @@ class GoodsReceivingController extends Controller
         return View::make('purchases.goods_receiving.index',
             (compact('orders', 'order_details', 'suppliers',
                 'order_receiving', 'price_categories', 'buying_prices',
-                'current_stock', 'item_stocks', 'invoices', 'batch_setting', 'invoice_setting','back_date')));
+                'current_stock', 'item_stocks', 'invoices', 'batch_setting', 'invoice_setting', 'back_date', 'expire_date')));
     }
 
 
@@ -134,9 +136,9 @@ class GoodsReceivingController extends Controller
                 //update
                 $update_stock = CurrentStock::find($current_stock->first()->id);
                 $update_stock->batch_number = $request->batch_number;
-                if ($request->expire_date != null){
+                if ($request->expire_date != null) {
                     $update_stock->expiry_date = date('Y-m-d', strtotime($request->expire_date));
-                }else{
+                } else {
                     $update_stock->expiry_date = null;
                 }
                 $update_stock->quantity = $cart['quantity'];
@@ -148,9 +150,9 @@ class GoodsReceivingController extends Controller
                 $stock = new CurrentStock;
                 $stock->product_id = $cart['id'];
                 $stock->batch_number = $request->batch_number;
-                if ($request->expire_date != null){
+                if ($request->expire_date != null) {
                     $stock->expiry_date = date('Y-m-d', strtotime($request->expire_date));
-                }else{
+                } else {
                     $stock->expiry_date = null;
                 }
                 $stock->quantity = $cart['quantity'];
@@ -186,9 +188,9 @@ class GoodsReceivingController extends Controller
             $incoming_stock->supplier_id = $request->supplier;
             $incoming_stock->invoice_no = $request->invoice_no;
             $incoming_stock->batch_number = $request->batch_number;
-            if ($request->expire_date != null){
+            if ($request->expire_date != null) {
                 $incoming_stock->expire_date = date('Y-m-d', strtotime($request->expire_date));
-            }else{
+            } else {
                 $incoming_stock->expire_date = null;
             }
             $incoming_stock->quantity = $cart['quantity'];
@@ -198,9 +200,9 @@ class GoodsReceivingController extends Controller
             $incoming_stock->item_profit = $profit;
             $incoming_stock->created_by = Auth::user()->id;
             $incoming_stock->sell_price = str_replace(',', '', $request->sell_price);
-            if ($request->purchase_date != null){
+            if ($request->purchase_date != null) {
                 $incoming_stock->created_at = date('Y-m-d', strtotime($request->purchase_date));
-            }else{
+            } else {
                 $incoming_stock->created_at = date('Y-m-d');
 
             }
@@ -232,9 +234,9 @@ class GoodsReceivingController extends Controller
         $stock = new CurrentStock;
         $stock->product_id = $request->product_id;
         $stock->batch_number = $request->batch_number;
-        if ($request->expire_date != null){
+        if ($request->expire_date != null) {
             $stock->expiry_date = $request->expire_date;
-        }else{
+        } else {
             $stock->expiry_date = null;
         }
         $stock->quantity = $quantity;
@@ -290,9 +292,9 @@ class GoodsReceivingController extends Controller
         $incoming_stock->supplier_id = $request->supplier_id;
         $incoming_stock->invoice_no = $request->invoice;
         $incoming_stock->batch_number = $request->batch_number;
-        if ($request->expire_date != null){
+        if ($request->expire_date != null) {
             $incoming_stock->expire_date = $request->expire_date;
-        }else{
+        } else {
             $incoming_stock->expire_date = null;
         }
         $incoming_stock->quantity = $quantity;
