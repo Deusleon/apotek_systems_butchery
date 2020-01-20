@@ -153,7 +153,7 @@
                 case 104:
                     element = document.createElement("textarea");
                     element.setAttribute("type", "text");
-                    element.setAttribute("id", "appended");
+                    element.setAttribute("id", "slogan");
                     element.setAttribute("value", data[2]);
                     element.setAttribute("name", "formdata");
                     element.setAttribute("class", "form-control");
@@ -274,7 +274,7 @@
                 case 120:
                     element.setAttribute("type", "number");
                     element.setAttribute("min", "0");
-                    element.setAttribute("id", "appended");
+                    element.setAttribute("id", "vat");
                     element.setAttribute("value", data[2]);
                     element.setAttribute("name", "formdata");
                     element.setAttribute("class", "form-control");
@@ -285,7 +285,7 @@
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata"><option value="YES">YES</option><option value="NO">NO</option></select>';
                     break;
                 case 122:
-                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata">   @foreach($store as $store)<option value="{{$store->name}}">{{$store->name}}</option>@endforeach</select>';
+                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="store">   @foreach($store as $store)<option value="{{$store->name}}">{{$store->name}}</option>@endforeach</select>';
                     break;
                 case 123:
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="back_date"><option value="YES">YES</option><option value="NO">NO</option></select>';
@@ -311,6 +311,19 @@
 
             if ($('#batch_number').length) {
                 document.getElementById('batch_number').value = data[2];
+            }
+
+            if ($('#slogan').length) {
+                document.getElementById('slogan').value = data[2];
+            }
+
+            if ($('#vat').length) {
+                data[2] = data[2].replace("%", "");
+                document.getElementById('vat').value = data[2];
+            }
+
+            if ($('#store').length) {
+                document.getElementById('store').value = data[2];
             }
 
         });

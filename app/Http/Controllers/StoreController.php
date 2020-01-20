@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Setting;
 use App\Store;
 use Exception;
 use Illuminate\Http\Request;
@@ -33,10 +34,22 @@ class StoreController extends Controller
 
     public function destroy(Request $request)
     {
+
+        $default_store = Setting::where('id', 122)->value('value');
+
         try {
-            Store::destroy($request->id);
-            session()->flash("alert-danger", "Store Deleted successfully!");
-            return back();
+            $check_store = Store::find($request->id);
+
+            if ($default_store === $check_store->name) {
+                session()->flash("alert-danger", "Please change default store in settings!");
+                return back();
+            } else {
+                Store::destroy($request->id);
+                session()->flash("alert-danger", "Store Deleted successfully!");
+                return back();
+            }
+
+
         } catch (Exception $exception) {
             session()->flash("alert-danger", "Store in use!");
             return back();
