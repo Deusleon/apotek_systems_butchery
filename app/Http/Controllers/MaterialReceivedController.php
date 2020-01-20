@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\GoodsReceiving;
 use App\Product;
+use App\Setting;
 use App\Supplier;
 use DB;
 use Illuminate\Http\Request;
@@ -17,8 +18,11 @@ class MaterialReceivedController extends Controller
     {
         $suppliers = Supplier::orderby('name', 'ASC')->get();
         $products = Product::all();
+        $expire_date = Setting::where('id', 123)->value('value');
 
-        return View::make('purchases.material_received.index', (compact('suppliers', 'products')));
+
+        return View::make('purchases.material_received.index',
+            (compact('suppliers', 'products', 'expire_date')));
 
     }
 
@@ -68,21 +72,21 @@ class MaterialReceivedController extends Controller
         $data = array();
         $material_received = GoodsReceiving::where(DB::Raw("DATE_FORMAT(created_at,'%m/%d/%Y')"), '>=', $from)
             ->where(DB::Raw("DATE_FORMAT(created_at,'%m/%d/%Y')"), '<=', $to)
-            ->orderby('id','DESC')
+            ->orderby('id', 'DESC')
             ->get();
 
         if ($request->supplier_id) {
             $material_received = GoodsReceiving::where(DB::Raw("DATE_FORMAT(created_at,'%m/%d/%Y')"), '>=', $from)
                 ->where(DB::Raw("DATE_FORMAT(created_at,'%m/%d/%Y')"), '<=', $to)
                 ->where('supplier_id', $request->supplier_id)
-                ->orderby('id','DESC')
+                ->orderby('id', 'DESC')
                 ->get();
         }
         if ($request->product_id) {
             $material_received = GoodsReceiving::where(DB::Raw("DATE_FORMAT(created_at,'%m/%d/%Y')"), '>=', $from)
                 ->where(DB::Raw("DATE_FORMAT(created_at,'%m/%d/%Y')"), '<=', $to)
                 ->where('product_id', $request->product_id)
-                ->orderby('id','DESC')
+                ->orderby('id', 'DESC')
                 ->get();
         }
         if (($request->product_id) && ($request->supplier_id)) {
@@ -90,7 +94,7 @@ class MaterialReceivedController extends Controller
                 ->where(DB::Raw("DATE_FORMAT(created_at,'%m/%d/%Y')"), '<=', $to)
                 ->where('product_id', $request->product_id)
                 ->where('supplier_id', $request->supplier_id)
-                ->orderby('id','DESC')
+                ->orderby('id', 'DESC')
                 ->get();
         }
 

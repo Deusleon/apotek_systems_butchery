@@ -301,12 +301,21 @@
             "order": [[0, "desc"]]
         });
 
+        $('#expire_date_edit').keydown(function (event) {
+            return false;
+        });
+
         $('#received_material_table tbody').on('click', '#edit_btn', function () {
             var row_data = $('#received_material_table').DataTable().row($(this).parents('tr')).data();
+
             $('#edit').find('.modal-body #name_edit').val(row_data.product.name);
             $('#edit').find('.modal-body #quantity_edit').val(numberWithCommas(row_data.quantity));
             $('#edit').find('.modal-body #price_edit').val(formatMoney(row_data.unit_cost));
-            $('#edit').find('.modal-body #expire_date_edit').val(moment(row_data.expire_date).format('DD-MM-Y'));
+            if (row_data.expire_date) {
+                $('#edit').find('.modal-body #expire_date_edit').val(moment(row_data.expire_date).format('DD-MM-Y'));
+            } else {
+                $('#edit').find('.modal-body #expire_date_edit').val('');
+            }
             $('#edit').find('.modal-body #receive_date_edit').val(moment(row_data.created_at).format('D-M-Y'));
             $('#edit').find('.modal-body #id').val(row_data.id);
             $('#edit').modal('show');
