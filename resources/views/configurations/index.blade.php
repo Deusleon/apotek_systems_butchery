@@ -259,35 +259,13 @@
                 case 110:
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="batch_number"><option value="YES">YES</option><option value="NO">NO</option></select>';
                     break;
-                case 111:
-                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata"><option value="YES">YES</option><option value="NO">NO</option></select>';
-                    break;
-                case 112:
-                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata"><option value="Total Cost / Qty">Total Cost / Qty</option><option value="Total Cost * Qty">Total Cost * Qty</option></select>';
-                    break;
-                case 113:
-                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata"><option value="YES">YES</option><option value="NO">NO</option></select>';
-                    break;
                 case 114:
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="back_date"><option value="YES">YES</option><option value="NO">NO</option></select>';
                     break;
                 case 115:
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="invoice"><option value="YES">YES</option><option value="NO">NO</option></select>';
                     break;
-                case 116:
-                    element.setAttribute("type", "number");
-                    element.setAttribute("min", "1");
-                    element.setAttribute("id", "appended");
-                    element.setAttribute("value", data[2]);
-                    element.setAttribute("name", "formdata");
-                    element.setAttribute("class", "form-control");
-                    element.setAttribute("placeholder", "Enter Number of Copies");
-                    document.getElementById("formInput").appendChild(element);
-                    break;
                 case 117:
-                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata"><option value="YES">YES</option><option value="NO">NO</option></select>';
-                    break;
-                case 118:
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata"><option value="YES">YES</option><option value="NO">NO</option></select>';
                     break;
                 case 119:
@@ -308,6 +286,12 @@
                     break;
                 case 122:
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata">   @foreach($store as $store)<option value="{{$store->name}}">{{$store->name}}</option>@endforeach</select>';
+                    break;
+                case 123:
+                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="back_date"><option value="YES">YES</option><option value="NO">NO</option></select>';
+                    break;
+                case 124:
+                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="back_date"><option value="YES">YES</option><option value="NO">NO</option></select>';
                     break;
                 default:
                 // code block
