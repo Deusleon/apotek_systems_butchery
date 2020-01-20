@@ -224,7 +224,11 @@ class SaleController extends Controller
         $sn = 0;
         foreach ($sale_detail as $item) {
             $amount = $item->amount - $item->discount;
-            $vat_percent = $item->vat / $item->price;
+            if (intVal($item->vat) === 0) {
+                $vat_percent = 0;
+            } else {
+                $vat_percent = $item->vat / $item->price;
+            }
             $sub_total = ($amount / (1 + $vat_percent));
             $vat = $amount - $sub_total;
             $sn++;
