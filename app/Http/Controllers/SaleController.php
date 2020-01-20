@@ -24,6 +24,8 @@ class SaleController extends Controller
     {
         $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
         $back_date = Setting::where('id', 114)->value('value');
+        $fixed_price = Setting::where('id', 124)->value('value');
+
         $price_category = PriceCategory::orderBy('id', 'ASC')->get();
         $customers = Customer::orderBy('id', 'ASC')->get();
         $current_stock = CurrentStock::all();
@@ -32,7 +34,7 @@ class SaleController extends Controller
             ->with(compact('price_category'))
             ->with(compact('current_stock'))
             ->with(compact('back_date'))
-            ->with(compact('vat'));
+            ->with(compact('vat'))->with(compact('fixed_price'));
     }
 
     public function creditSale()
@@ -483,10 +485,10 @@ class SaleController extends Controller
         }
 
         $data = $grouped_sales;
-        if ($receipt_size === 'Thermal Paper'){
+        if ($receipt_size === 'Thermal Paper') {
             $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
                 compact('data', 'pharmacy'));
-        }else{
+        } else {
             $pdf = PDF::loadView('sales.cash_sales.receipt',
                 compact('data', 'pharmacy'));
         }

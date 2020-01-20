@@ -9,6 +9,14 @@ var customer_option = document.getElementById('customers').value;
 
 var tax = Number(document.getElementById("vat").value);
 
+let fixed_price;
+
+try {
+    fixed_price = document.getElementById("fixed_price").value;
+} catch (e) {
+    console.log('fixed_price_not_found')
+}
+
 
 var items_table = $('#items_table').DataTable({
     searching: true,
@@ -184,7 +192,11 @@ $('#cart_table tbody').on('click', '#edit_btn', function () {
         quantity = row_data[1].toString().replace(',', '');
         price = row_data[2];
         row_data[1] = "<input style='width: 80%' type='text' min='1' class='form-control' id='edit_quantity' required  onkeypress='return isNumberKey(event,this)'>";
-        row_data[2] = "<input style='width: 130%; margin-left: -10%' type='text' class='form-control' id='edit_price' required  onkeypress='return isNumberKey(event,this)'>";
+
+        if (fixed_price === "NO") {
+            row_data[2] = "<input style='width: 130%; margin-left: -10%' type='text' class='form-control' id='edit_price' required  onkeypress='return isNumberKey(event,this)'>";
+        }
+
         cart[index] = row_data;
         cart_table.clear();
         cart_table.rows.add(cart);
@@ -193,14 +205,19 @@ $('#cart_table tbody').on('click', '#edit_btn', function () {
         var quantity_ = quantity.split('<');
 
         document.getElementById("edit_quantity").value = quantity_[0];
-        document.getElementById("edit_price").value = price;
+
+        if (fixed_price === "NO") {
+            document.getElementById("edit_price").value = price;
+        }
 
         edit_btn_set = 1;
 
     } else {
         // document.getElementById("edit_quantity").value
         $('#edit_quantity').change();
-        $('#edit_price').change();
+        if (fixed_price === "NO") {
+            $('#edit_price').change();
+        }
     }
 });
 
@@ -217,13 +234,25 @@ $('#cart_table tbody').on('change', '#edit_quantity', function () {
     }
 
     /*for vat*/
-    var vat = Number((parseFloat(document.getElementById("edit_price").value.replace(/\,/g, ''), 10) * tax).toFixed(2));
-    var unit_total = formatMoney(parseFloat(document.getElementById("edit_price").value.replace(/\,/g, ''), 10) + vat);
-    let vat_money = formatMoney(vat);
+    var vat;
+    var unit_total;
+    let vat_money;
+    if (fixed_price === "NO") {
+        vat = Number((parseFloat(document.getElementById("edit_price").value.replace(/\,/g, ''), 10) * tax).toFixed(2));
+        unit_total = formatMoney(parseFloat(document.getElementById("edit_price").value.replace(/\,/g, ''), 10) + vat);
+        vat_money = formatMoney(vat);
+    } else {
+        vat = Number((parseFloat(row_data[2].replace(/\,/g, ''), 10) * tax).toFixed(2));
+        unit_total = formatMoney(parseFloat(row_data[2].replace(/\,/g, ''), 10) + vat);
+        vat_money = formatMoney(vat);
+    }
     /*end for vat*/
 
     row_data[1] = numberWithCommas(document.getElementById("edit_quantity").value);
-    row_data[2] = formatMoney(parseFloat(document.getElementById("edit_price").value.replace(/\,/g, ''), 10));
+
+    if (fixed_price === "NO") {
+        row_data[2] = formatMoney(parseFloat(document.getElementById("edit_price").value.replace(/\,/g, ''), 10));
+    }
 
 
     // row_data[1] = Number((document.getElementById("edit_quantity").value));
@@ -253,53 +282,56 @@ $('#cart_table tbody').on('change', '#edit_quantity', function () {
     discount();
 });
 
-$('#cart_table tbody').on('change', '#edit_price', function () {
-    edit_btn_set = 0;
-    var row_data = cart_table.row($(this).parents('tr')).data();
-    var index = cart_table.row($(this).parents('tr')).index();
+if (fixed_price === "NO") {
+    $('#cart_table tbody').on('change', '#edit_price', function () {
+        edit_btn_set = 0;
+        var row_data = cart_table.row($(this).parents('tr')).data();
+        var index = cart_table.row($(this).parents('tr')).index();
 
-    if (document.getElementById("edit_price").value === '') {
-        edit_btn_set = 1;
-        notify('Price is required', 'top', 'right', 'warning');
-        return false;
-    }
+        if (document.getElementById("edit_price").value === '') {
+            edit_btn_set = 1;
+            notify('Price is required', 'top', 'right', 'warning');
+            return false;
+        }
 
 
-    /*for vat*/
-    var vat = Number((parseFloat(document.getElementById("edit_price").value.replace(/\,/g, ''), 10) * tax).toFixed(2));
-    var unit_total = formatMoney(parseFloat(document.getElementById("edit_price").value.replace(/\,/g, ''), 10) + vat);
-    let vat_money = formatMoney(vat);
-    /*end for vat*/
+        /*for vat*/
+        var vat = Number((parseFloat(document.getElementById("edit_price").value.replace(/\,/g, ''), 10) * tax).toFixed(2));
+        var unit_total = formatMoney(parseFloat(document.getElementById("edit_price").value.replace(/\,/g, ''), 10) + vat);
+        let vat_money = formatMoney(vat);
+        /*end for vat*/
 
-    row_data[1] = numberWithCommas(document.getElementById("edit_quantity").value);
-    row_data[2] = formatMoney(parseFloat(document.getElementById("edit_price").value.replace(/\,/g, ''), 10));
+        row_data[1] = numberWithCommas(document.getElementById("edit_quantity").value);
+        row_data[2] = formatMoney(parseFloat(document.getElementById("edit_price").value.replace(/\,/g, ''), 10));
 
-    // row_data[1] = Number((document.getElementById("edit_quantity").value));
-    if (Number(parseFloat(row_data[1].replace(/\,/g, ''), 10)) < 1) {
-        row_data[1] = 1
-    }
-    dif = row_data[5] - row_data[1].toString().replace(/,/g, '');
+        // row_data[1] = Number((document.getElementById("edit_quantity").value));
+        if (Number(parseFloat(row_data[1].replace(/\,/g, ''), 10)) < 1) {
+            row_data[1] = 1
+        }
+        dif = row_data[5] - row_data[1].toString().replace(/,/g, '');
 
-    if ($('#quotes_page').length) {//Qoutes has no maximum quantity
-        row_data[2] = formatMoney(parseFloat(row_data[2].replace(/\,/g, ''), 10));
-        row_data[3] = formatMoney(parseFloat(vat_money.replace(/\,/g, ''), 10) * row_data[1].toString().replace(',', ''));
-        row_data[4] = formatMoney(parseFloat(unit_total.replace(/\,/g, ''), 10) * row_data[1].toString().replace(',', ''));
-    } else if (dif < 0) {
-        row_data[1] = row_data[5];
-        row_data[2] = formatMoney(parseFloat(row_data[2].replace(/\,/g, ''), 10));
-        row_data[3] = formatMoney(parseFloat(vat_money.replace(/\,/g, ''), 10) * row_data[5]);
-        row_data[4] = formatMoney(parseFloat(unit_total.replace(/\,/g, ''), 10) * row_data[5]);
-        row_data[1] = numberWithCommas(row_data[5]) + " " + "<span class='text text-danger'>Max</span>";
+        if ($('#quotes_page').length) {//Qoutes has no maximum quantity
+            row_data[2] = formatMoney(parseFloat(row_data[2].replace(/\,/g, ''), 10));
+            row_data[3] = formatMoney(parseFloat(vat_money.replace(/\,/g, ''), 10) * row_data[1].toString().replace(',', ''));
+            row_data[4] = formatMoney(parseFloat(unit_total.replace(/\,/g, ''), 10) * row_data[1].toString().replace(',', ''));
+        } else if (dif < 0) {
+            row_data[1] = row_data[5];
+            row_data[2] = formatMoney(parseFloat(row_data[2].replace(/\,/g, ''), 10));
+            row_data[3] = formatMoney(parseFloat(vat_money.replace(/\,/g, ''), 10) * row_data[5]);
+            row_data[4] = formatMoney(parseFloat(unit_total.replace(/\,/g, ''), 10) * row_data[5]);
+            row_data[1] = numberWithCommas(row_data[5]) + " " + "<span class='text text-danger'>Max</span>";
 
-    } else {
-        row_data[2] = formatMoney(parseFloat(row_data[2].replace(/\,/g, ''), 10));
-        row_data[3] = formatMoney(parseFloat(vat_money.replace(/\,/g, ''), 10) * row_data[1].toString().replace(',', ''));
-        row_data[4] = formatMoney(parseFloat(unit_total.replace(/\,/g, ''), 10) * row_data[1].toString().replace(',', ''));
-    }//replace the quantity with max stock qty available
+        } else {
+            row_data[2] = formatMoney(parseFloat(row_data[2].replace(/\,/g, ''), 10));
+            row_data[3] = formatMoney(parseFloat(vat_money.replace(/\,/g, ''), 10) * row_data[1].toString().replace(',', ''));
+            row_data[4] = formatMoney(parseFloat(unit_total.replace(/\,/g, ''), 10) * row_data[1].toString().replace(',', ''));
+        }//replace the quantity with max stock qty available
 
-    cart[index] = row_data;
-    discount();
-});
+        cart[index] = row_data;
+        discount();
+    });
+}
+
 
 $('#cart_table tbody').on('click', '#delete_btn', function () {
     edit_btn_set = 0;

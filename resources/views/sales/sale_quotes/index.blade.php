@@ -143,6 +143,7 @@
                         <input type="hidden" id="price_cat" name="price_category_id">
                         <input type="hidden" id="discount_value" name="discount_amount">
                         <input type="hidden" id="order_cart" name="cart">
+                        <input type="hidden" value="" id="fixed_price">
 
                         <input type="hidden" value="" id="category">
                         <input type="hidden" value="" id="customers">

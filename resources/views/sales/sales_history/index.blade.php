@@ -87,6 +87,7 @@
                     <input type="hidden" value="" id="category">
                     <input type="hidden" value="" id="customers">
                     <input type="hidden" value="" id="print" name="reprint_receipt">
+                    <input type="hidden" value="" id="fixed_price">
 
                 </form>
 

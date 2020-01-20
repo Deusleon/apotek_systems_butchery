@@ -125,6 +125,7 @@
                 <input type="hidden" value="" id="category">
                 <input type="hidden" value="" id="customers">
                 <input type="hidden" value="" id="print">
+                <input type="hidden" value="" id="fixed_price">
 
             </div>
         </div>

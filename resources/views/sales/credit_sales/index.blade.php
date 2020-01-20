@@ -137,6 +137,7 @@
                                     <input type="hidden" id="credit_sale" name="credit" value="Yes">
                                     <input type="hidden" id="order_cart" name="cart">
                                     <input type="hidden" value="{{$vat}}" id="vat">
+                                    <input type="hidden" value="{{$fixed_price}}" id="fixed_price">
                                 </div>
                             @else
                                 <div class="row">

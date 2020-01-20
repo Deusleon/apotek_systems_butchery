@@ -187,6 +187,7 @@
                         @endif
                         <input type="hidden" value="{{$price_category}}" id="category">
                         <input type="hidden" value="{{$customers}}" id="customers">
+                        <input type="hidden" value="{{$fixed_price}}" id="fixed_price">
 
                         <hr>
                         <div class="row">
