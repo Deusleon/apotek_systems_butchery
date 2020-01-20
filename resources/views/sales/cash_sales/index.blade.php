@@ -71,14 +71,17 @@
                         @if($back_date=="NO")
                             <div class="row">
                                 <div class="col-md-4">
-                                    <div style="width: 99%">
-                                        <label>Discount</label>
-                                        <input type="text" onchange="discount()" id="sale_discount" class="form-control"
-                                               value="0"/>
-                                        <span class="help-inline">
+                                    @if($enable_discount === "YES")
+                                        <div style="width: 99%">
+                                            <label>Discount</label>
+                                            <input type="text" onchange="discount()" id="sale_discount"
+                                                   class="form-control"
+                                                   value="0"/>
+                                            <span class="help-inline">
                                           <div class="text text-danger" style="display: none;" id="discount_error">Invalid Discount</div>
                                            </span>
-                                    </div>
+                                        </div>
+                                    @endif
                                 </div>
                                 <div class="col-md-4">
                                     <div style="width: 99%" hidden>
@@ -127,15 +130,18 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <div style="width: 99%">
-                                        <label>Discount</label>
-                                        <input type="text" onchange="discount()" id="sale_discount" class="form-control"
-                                               value="0"/>
-                                    </div>
-                                    <span class="help-inline">
+                                    @if($enable_discount === "YES")
+                                        <div style="width: 99%">
+                                            <label>Discount</label>
+                                            <input type="text" onchange="discount()" id="sale_discount"
+                                                   class="form-control"
+                                                   value="0"/>
+                                        </div>
+                                        <span class="help-inline">
                                                         <div class="text text-danger" style="display: none;"
                                                              id="discount_error">Invalid Discount</div>
                                                     </span>
+                                    @endif
                                 </div>
                                 <div class="col-md-4">
                                     <div class="row">
@@ -165,19 +171,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                {{--                                <div class="col-md-3">--}}
-                                {{--                                    <div style="width: 99%">--}}
-                                {{--                                        <label><b>Sub Total</b></label>--}}
-                                {{--                                        <input type="text" id="sub_total" class="form-control" readonly value="0"/>--}}
-                                {{--                                    </div>--}}
-                                {{--                                </div>--}}
-                                {{--                                <div class="col-md-3">--}}
-                                {{--                                    <div style="width: 99%">--}}
-                                {{--                                        <label><b>Total</b></label>--}}
-                                {{--                                        <input type="text" id="total" class="form-control" readonly value="0"/>--}}
-                                {{--                                    </div>--}}
 
-                                {{--                                </div>--}}
                                 <input type="hidden" id="price_cat" name="price_category_id">
                                 <input type="hidden" id="discount_value" name="discount_amount">
                                 <input type="hidden" id="order_cart" name="cart">
@@ -188,24 +182,28 @@
                         <input type="hidden" value="{{$price_category}}" id="category">
                         <input type="hidden" value="{{$customers}}" id="customers">
                         <input type="hidden" value="{{$fixed_price}}" id="fixed_price">
+                        <input type="hidden" value="{{$enable_discount}}" id="enable_discount">
 
-                        <hr>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div style="width: 99%">
-                                    <label><b>Paid</b></label>
-                                    <input type="text" onchange="discount()" id="sale_paid" class="form-control"
-                                           value="0"/>
+                        @if($enable_paid === "YES")
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div style="width: 99%">
+                                        <label><b>Paid</b></label>
+                                        <input type="text" onchange="discount()" id="sale_paid" class="form-control"
+                                               value="0"/>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div style="width: 99%">
+                                        <label><b>Change</b></label>
+                                        <input type="text" id="change_amount" class="form-control" value="0" readonly/>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div style="width: 99%">
-                                    <label><b>Change</b></label>
-                                    <input type="text" id="change_amount" class="form-control" value="0" readonly/>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
+                            <hr>
+                        @endif
+
                         <div class="row">
                             <div class="col-md-6"></div>
                             <div class="col-md-6">

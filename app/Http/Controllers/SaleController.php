@@ -25,6 +25,9 @@ class SaleController extends Controller
         $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
         $back_date = Setting::where('id', 114)->value('value');
         $fixed_price = Setting::where('id', 124)->value('value');
+        $enable_discount = Setting::where('id', 111)->value('value');
+        $enable_paid = Setting::where('id', 112)->value('value');
+
 
         $price_category = PriceCategory::orderBy('id', 'ASC')->get();
         $customers = Customer::orderBy('id', 'ASC')->get();
@@ -32,8 +35,8 @@ class SaleController extends Controller
         return View::make('sales.cash_sales.index')
             ->with(compact('customers'))
             ->with(compact('price_category'))
-            ->with(compact('current_stock'))
-            ->with(compact('back_date'))
+            ->with(compact('current_stock'))->with(compact('enable_discount'))
+            ->with(compact('back_date'))->with(compact('enable_paid'))
             ->with(compact('vat'))->with(compact('fixed_price'));
     }
 
@@ -42,7 +45,7 @@ class SaleController extends Controller
         $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
         $back_date = Setting::where('id', 114)->value('value');
         $fixed_price = Setting::where('id', 124)->value('value');
-
+        $enable_discount = Setting::where('id', 111)->value('value');
 
         $price_category = PriceCategory::orderBy('id', 'ASC')->get();
         $customers = Customer::orderBy('id', 'ASC')->get();
@@ -51,7 +54,7 @@ class SaleController extends Controller
             ->with(compact('customers'))
             ->with(compact('price_category'))
             ->with(compact('back_date'))
-            ->with(compact('current_stock'))
+            ->with(compact('current_stock'))->with(compact('enable_discount'))
             ->with(compact('vat'))->with(compact('fixed_price'));
     }
 

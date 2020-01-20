@@ -187,7 +187,7 @@
             </div>
             <div align="right"
                  style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
-                {{number_format($dat[0]['grand_total'],2)}}
+                {{number_format($dat[0]['grand_total'] - $dat[0]['paid'],2)}}
             </div>
             <div style="margin-left: 10%;width: 29.6%;margin-top: 2%; padding: -1.6%"><b>Remark</b>
             </div>

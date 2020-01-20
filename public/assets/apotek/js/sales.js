@@ -10,9 +10,11 @@ var customer_option = document.getElementById('customers').value;
 var tax = Number(document.getElementById("vat").value);
 
 let fixed_price;
+let discount_enable;
 
 try {
     fixed_price = document.getElementById("fixed_price").value;
+    discount_enable = document.getElementById('enable_discount').value;
 } catch (e) {
     console.log('fixed_price_not_found')
 }
@@ -404,8 +406,13 @@ function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
 }
 
 function discount() {
-    var dis = (document.getElementById("sale_discount").value);
-    sale_discount = (parseFloat(dis.replace(/\,/g, ''), 10) || 0);
+    if (discount_enable === "YES") {
+        var dis = (document.getElementById("sale_discount").value);
+        sale_discount = (parseFloat(dis.replace(/\,/g, ''), 10) || 0);
+    } else {
+        sale_discount = 0;
+    }
+
     var sub_total, total_vat, total = 0;
     if (cart[0]) {
         var result = [];
@@ -489,17 +496,25 @@ function discount() {
 
     if (total < 0) {
         document.getElementById('save_btn').disabled = 'true';
-        document.getElementById('discount_error').style.display = 'block';
+        if (discount_enable === "YES") {
+            document.getElementById('discount_error').style.display = 'block';
+        }
     } else {
-        document.getElementById('discount_error').style.display = 'none';
+        if (discount_enable === "YES") {
+            document.getElementById('discount_error').style.display = 'none';
+        }
         $('#save_btn').prop('disabled', false);
     }
 
 //Change Calculator
-    var change = 0;
-    var paid = document.getElementById("sale_paid").value;
-    sale_paid_amount = (parseFloat(paid.replace(/\,/g, ''), 10) || 0);
-    change = sale_paid_amount - total;
+    try {
+        var change = 0;
+        var paid = document.getElementById("sale_paid").value;
+        sale_paid_amount = (parseFloat(paid.replace(/\,/g, ''), 10) || 0);
+        change = sale_paid_amount - total;
+    } catch (e) {
+
+    }
 
 //Credit Sales
     var customer;
@@ -522,20 +537,32 @@ function discount() {
             $('#save_btn').prop('disabled', false);
             $('div.credit_max').text(formatMoney(max_credit)).css({"font-weight": "Bold", "color": "green"});
         }
-        document.getElementById("paid_value").value = sale_paid_amount;
+        try {
+            document.getElementById("paid_value").value = sale_paid_amount;
+        } catch (e) {
+
+        }
         $('div.sub-total').text(formatMoney(sub_total)).css("font-weight", "Bold");
         $('div.tax-amount').text(formatMoney(total_vat)).css("font-weight", "Bold");
         $('div.total-amount').text(formatMoney(total)).css("font-weight", "Bold");
         $('div.balance-amount').text(formatMoney(balance)).css("font-weight", "Bold");
     } else {
-        document.getElementById('change_amount').value = formatMoney(change);
+
+        try {
+            document.getElementById('change_amount').value = formatMoney(change);
+        } catch (e) {
+
+        }
     }
 
 
     stringified_cart = JSON.stringify(order_cart);
     document.getElementById("order_cart").value = stringified_cart;
     document.getElementById("price_cat").value = price_category;
-    document.getElementById("discount_value").value = sale_discount;
+    if (discount_enable === "YES") {
+        document.getElementById("discount_value").value = sale_discount;
+    }
+
     document.getElementById("total").value = formatMoney(total);
     document.getElementById("sub_total").value = formatMoney(sub_total);
     var t = document.getElementById("total").value;
@@ -592,12 +619,18 @@ function deselect() {
     // rePopulateSelect2();
     // rePopulateSelect2Customer();
     $('#customer_id').val('').change();
-    document.getElementById('sale_discount').value = 0.0;
+    if (discount_enable === "YES") {
+        document.getElementById('sale_discount').value = 0.0;
+    }
     document.getElementById('sub_total').value = 0.0;
     document.getElementById('total_vat').value = 0.0;
     document.getElementById('total').value = 0.0;
-    document.getElementById('sale_paid').value = 0.0;
-    document.getElementById('change_amount').value = 0.0;
+    try {
+        document.getElementById('sale_paid').value = 0.0;
+        document.getElementById('change_amount').value = 0.0;
+    } catch (e) {
+
+    }
 
     sub_total = 0;
     total = 0;
@@ -832,15 +865,17 @@ $('#items_table tbody').on('click', '#rtn_btn', function () {
     });
 });
 
-$("#sale_discount").on('change', function (evt) {
-    if (evt.which != 110) {//not a fullstop
-        var n = Math.abs((parseFloat($(this).val().replace(/\,/g, ''), 10) || 0));
-        $(this).val(n.toLocaleString("en", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }));
-    }
-});
+if (discount_enable === "YES") {
+    $("#sale_discount").on('change', function (evt) {
+        if (evt.which != 110) {//not a fullstop
+            var n = Math.abs((parseFloat($(this).val().replace(/\,/g, ''), 10) || 0));
+            $(this).val(n.toLocaleString("en", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            }));
+        }
+    });
+}
 
 $("#paying").on('change', function (evt) {
     if (evt.which != 110) {//not a fullstop

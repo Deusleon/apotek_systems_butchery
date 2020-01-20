@@ -259,6 +259,12 @@
                 case 110:
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="batch_number"><option value="YES">YES</option><option value="NO">NO</option></select>';
                     break;
+                case 111:
+                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="discount"><option value="YES">YES</option><option value="NO">NO</option></select>';
+                    break;
+                case 112:
+                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="paid"><option value="YES">YES</option><option value="NO">NO</option></select>';
+                    break;
                 case 114:
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="back_date"><option value="YES">YES</option><option value="NO">NO</option></select>';
                     break;
@@ -324,6 +330,14 @@
 
             if ($('#store').length) {
                 document.getElementById('store').value = data[2];
+            }
+
+            if ($('#paid').length) {
+                document.getElementById('paid').value = data[2];
+            }
+
+            if ($('#discount').length) {
+                document.getElementById('discount').value = data[2];
             }
 
         });

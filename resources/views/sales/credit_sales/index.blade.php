@@ -98,38 +98,68 @@
                             <hr>
                             @if($back_date=="NO")
                                 <div class="row">
-                                    <div class="col-md-4">
-                                        <div style="width: 99%">
-                                            <label>Discount</label>
-                                            <input type="text" onchange="discount()" id="sale_discount"
-                                                   class="form-control" value="0"/>
-                                        </div>
-                                        <span class="help-inline">
+                                    @if($enable_discount === "YES")
+                                        <div class="col-md-4">
+                                            <div style="width: 99%">
+                                                <label>Discount</label>
+                                                <input type="text" onchange="discount()" id="sale_discount"
+                                                       class="form-control" value="0"/>
+                                            </div>
+                                            <span class="help-inline">
 <div class="text text-danger" style="display: none;" id="discount_error">Invalid Discount!</div>
 </span>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div style="width: 99%">
-                                            <label>Paid</label>
-                                            <input type="text" onchange="discount()" id="sale_paid" class="form-control"
-                                                   value="0"/>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div style="width: 99%">
-                                            <label>Grace Period</label>
-                                            <select class="js-example-basic-single form-control" name="grace_period">
-                                                <option value="1">1 Day</option>
-                                                <option value="7">7 Days</option>
-                                                <option value="14">14 Days</option>
-                                                <option value="21">21 Days</option>
-                                                <option value="30">30 Days</option>
-                                                <option value="60">60 Days</option>
-                                                <option value="90">90 Days</option>
-                                            </select>
+                                        <div class="col-md-4">
+                                            <div style="width: 99%">
+                                                <label>Paid</label>
+                                                <input type="text" onchange="discount()" id="sale_paid"
+                                                       class="form-control"
+                                                       value="0"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div style="width: 99%">
+                                                <label>Grace Period</label>
+                                                <select class="js-example-basic-single form-control"
+                                                        name="grace_period">
+                                                    <option value="1">1 Day</option>
+                                                    <option value="7">7 Days</option>
+                                                    <option value="14">14 Days</option>
+                                                    <option value="21">21 Days</option>
+                                                    <option value="30">30 Days</option>
+                                                    <option value="60">60 Days</option>
+                                                    <option value="90">90 Days</option>
+                                                </select>
 
+                                            </div>
                                         </div>
-                                    </div>
+                                    @else
+                                        <div class="col-md-6">
+                                            <div style="width: 99%">
+                                                <label>Paid</label>
+                                                <input type="text" onchange="discount()" id="sale_paid"
+                                                       class="form-control"
+                                                       value="0"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div style="width: 99%">
+                                                <label>Grace Period</label>
+                                                <select class="js-example-basic-single form-control"
+                                                        name="grace_period">
+                                                    <option value="1">1 Day</option>
+                                                    <option value="7">7 Days</option>
+                                                    <option value="14">14 Days</option>
+                                                    <option value="21">21 Days</option>
+                                                    <option value="30">30 Days</option>
+                                                    <option value="60">60 Days</option>
+                                                    <option value="90">90 Days</option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    @endif
+
 
                                     <input type="hidden" id="price_cat" name="price_category_id">
                                     <input type="hidden" id="discount_value" name="discount_amount">
