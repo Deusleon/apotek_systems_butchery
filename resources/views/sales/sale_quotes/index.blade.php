@@ -37,8 +37,7 @@
         </ul>
         <div class="tab-content" id="pills-tabContent">
             <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                <form id="quote_sale_form" action="{{ route('sale-quotes.store') }}" method="post"
-                      enctype="multipart/form-data">
+                <form id="quote_sale_form">
                     @csrf()
                     <div class="row">
                         <div class="col-md-3">
@@ -55,7 +54,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Products</label>
-                                <select id="products" class="js-example-basic-single form-control">
+                                <select id="products" class="form-control">
                                     <option value="" disabled selected style="display:none;">Select Product</option>
                                 </select>
                             </div>
@@ -63,7 +62,8 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label for="code">Customer Name <font color="red">*</font></label>
-                                <select name="customer_id" class="js-example-basic-single form-control" required>
+                                <select id="customer_id" name="customer_id" class="js-example-basic-single form-control"
+                                        required>
                                     <option value="" disabled selected="true">Select Customer</option>
                                     @foreach($customers as $customer)
                                         <option value="{{$customer->id}}">{{$customer->name}}</option>
@@ -83,11 +83,13 @@
                     <hr>
                     <div class="row">
                         <div class="col-md-4">
-                            <div style="width: 99%">
-                                <label>Discount</label>
-                                <input type="text" onchange="discount()" id="sale_discount" class="form-control"
-                                       value="0"/>
-                            </div>
+                            @if($enable_discount === "YES")
+                                <div style="width: 99%">
+                                    <label>Discount</label>
+                                    <input type="text" onchange="discount()" id="sale_discount" class="form-control"
+                                           value="0"/>
+                                </div>
+                            @endif
                         </div>
                         <div class="col-md-4">
 
@@ -120,21 +122,8 @@
                                 <span class="help-inline text text-danger" style="display: none; margin-left: 63%"
                                       id="discount_error">Invalid Amount</span>
                             </div>
-                            {{--                            <div style="width: 99%">--}}
-                            {{--                                <label><b>Sub Total</b></label>--}}
-                            {{--                                <input type="text" id="sub_total" class="form-control" readonly value="0"/>--}}
-                            {{--                            </div>--}}
                         </div>
-                        {{--                        <div class="col-md-4">--}}
-                        {{--                            <div style="width: 99%">--}}
-                        {{--                                <label><b>Total Amount</b></label>--}}
-                        {{--                                <input type="text" id="total" class="form-control" readonly value="0"/>--}}
-                        {{--                            </div>--}}
-                        {{--                            <span class="help-inline">--}}
-                        {{--                                          <div class="text text-danger" style="display: none;" id="discount_error">Invalid Total Amount (Negative Value!)</div>--}}
-                        {{--                                           </span>--}}
-                        {{--                        </div>--}}
-                        {{--                        <input type="hidden" value="" id="total_vat">--}}
+
 
                         <input type="hidden" value="{{$vat}}" id="vat">
                         <input type="hidden" value="0" id="sale_paid">
@@ -148,6 +137,7 @@
                         <input type="hidden" value="" id="category">
                         <input type="hidden" value="" id="customers">
                         <input type="hidden" value="" id="print">
+                        <input type="hidden" value="{{$enable_discount}}" id="enable_discount">
 
                     </div>
                     <hr>
@@ -198,13 +188,18 @@
                                     <td>{{number_format($quote->cost->sub_total,2)}}</td>
                                     <td>{{number_format($quote->cost->vat,2)}}</td>
                                     <td>{{number_format($quote->cost->discount,2)}}</td>
-                                    <td>{{number_format($quote->cost->amount,2)}}</td>
+                                    <td>{{number_format($quote->cost->amount - $quote->cost->discount,2)}}</td>
                                     <td>
                                         <button class="btn btn-sm btn-rounded btn-success" type="button"
                                                 onclick="quoteDetails('{{$quote->remark}}',{{$quote->details}})"
-                                                id="quote_details"
-                                        >Show
+                                                id="quote_details">Show
                                         </button>
+                                        <a href="{{route('receiptReprint',$quote->id)}}" target="_blank">
+                                            <button class="btn btn-sm btn-rounded btn-secondary" type="button"><span
+                                                    class='fa fa-print' aria-hidden='true'></span>
+                                                Print
+                                            </button>
+                                        </a>
                                     </td>
                             </tr>
                             @endforeach
@@ -222,11 +217,19 @@
 @push("page_scripts")
     @include('partials.notification')
     <script type="text/javascript">
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
         var config = {
             token: '{{ csrf_token() }}',
             routes: {
-                selectProducts: '{{route('selectProducts')}}'
-
+                selectProducts: '{{route('selectProducts')}}',
+                storeQuote: '{{ route('storeQuote') }}',
+                filterProductByWord: '{{route('filter-product-by-word')}}'
             }
         };
 
@@ -234,7 +237,7 @@
             $('#sale_quotes-Table').DataTable({
                 language: {
                     emptyTable: "No Sales Quote Data Available in the Table"
-                },
+                }, aaSorting: [[0, 'desc']]
             });
         });
 

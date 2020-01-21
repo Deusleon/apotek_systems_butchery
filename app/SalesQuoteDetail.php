@@ -3,7 +3,6 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use App\SalesQuote;
 
 class SalesQuoteDetail extends Model
 {
@@ -11,7 +10,14 @@ class SalesQuoteDetail extends Model
     public $timestamps = false;
 
 
-    public function quote(){
-        return $this->belongsTo(SalesQuote::class,'quote_id','id');
+    public function quote()
+    {
+        return $this->belongsTo(SalesQuote::class, 'quote_id', 'id');
     }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
+    }
+
 }

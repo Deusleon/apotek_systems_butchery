@@ -653,6 +653,7 @@ function deselect1() {
 
 function deselectQuote() {
     document.getElementById("quote_sale_form").reset();
+    $('#customer_id').val('').change();
     sub_total = 0;
     total = 0;
     cart = [];
@@ -1191,7 +1192,8 @@ function saveCreditSale() {
     });
 }
 
-$('#quote_sale_form').on('submit', function () {
+$('#quote_sale_form').on('submit', function (e) {
+    e.preventDefault();
 
     var cart = document.getElementById("order_cart").value;
 
@@ -1200,7 +1202,27 @@ $('#quote_sale_form').on('submit', function () {
         return false;
     }
 
+    saveQuoteForm();
+
 });
+
+function saveQuoteForm() {
+    var form = $('#quote_sale_form').serialize();
+
+    $.ajax({
+        url: config.routes.storeQuote,
+        type: "post",
+        dataType: "json",
+        cache: "false",
+        data: form,
+        success: function (data) {
+            notify('Quote recorded successfully', 'top', 'right', 'success');
+            deselectQuote();
+            window.open(data.redirect_to);
+        }
+    });
+
+}
 
 function isNumberKey(evt, obj) {
     var charCode = (evt.which) ? evt.which : event.keyCode;

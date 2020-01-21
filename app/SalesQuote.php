@@ -2,9 +2,9 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
-use App\SalesQuoteDetail;
 use DB;
+use Illuminate\Database\Eloquent\Model;
+
 class SalesQuote extends Model
 {
     protected $table = 'sales_quotes';
@@ -29,5 +29,15 @@ class SalesQuote extends Model
                 	 )
                 ->groupBy('quote_id');
    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 
 }

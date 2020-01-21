@@ -47,5 +47,9 @@ class Product extends Model
         return $this->hasMany(GoodsReceiving::class, 'product_id');
     }
 
+    public function quoteDetail()
+    {
+        return $this->hasMany(SalesQuoteDetail::class, 'product_id');
+    }
 
 }
