@@ -25,19 +25,19 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label for="code" class="col-md-4 col-form-label text-md-right">Amount <font color="red">*</font></label>
+                        <label for="code" class="col-md-4 col-form-label text-md-right">Amount <font
+                                color="red">*</font></label>
                         <div class="col-md-8">
                             <input type="text" class="form-control" value="" id="paying"
                                    placeholder="Enter Paying Amount" required>
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label for="code" class="col-md-4 col-form-label text-md-right">Remark <font
-                                color="red">*</font></label>
+                        <label for="code" class="col-md-4 col-form-label text-md-right">Remark</label>
                         <div class="col-md-8">
                             <textarea type="text" class="form-control"
                                       name="remark"
-                                      placeholder="Enter Remark" required></textarea>
+                                      placeholder="Enter Remark"></textarea>
                         </div>
                     </div>
                     <input type="hidden" name="sale_id" id="id_of_sale" value="">

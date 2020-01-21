@@ -211,7 +211,7 @@
                     data: "action",
                     defaultContent: "<button type='button' id='open_btn' class='btn btn-sm btn-rounded btn-success'>Open</button>"
                 }
-            ]
+            ], aaSorting: [[1, "desc"]]
         });
 
 

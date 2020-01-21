@@ -124,7 +124,7 @@ var credit_payment_table = $('#credit_payment_table').DataTable({
             data: "action",
             defaultContent: "<button type='button' id='pay_btn' class='btn btn-sm btn-rounded btn-primary'>Pay</button>"
         }
-    ]
+    ], aaSorting: [[2, "desc"]]
 });
 
 var sale_history_table = $('#sale_history_table').DataTable({

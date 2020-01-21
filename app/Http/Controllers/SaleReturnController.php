@@ -33,8 +33,7 @@ class SaleReturnController extends Controller
         $from = $request->date[0];
         $to = $request->date[1];
         $user = Auth::user()->id;
-        $sales = Sale::where('created_by', $user)
-            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
+        $sales = Sale::where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
             ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
             ->get();
         foreach ($sales as $sale) {

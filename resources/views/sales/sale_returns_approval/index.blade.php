@@ -73,31 +73,6 @@
                 </div>
             </div>
 
-            {{--            <div class="row">--}}
-
-            {{--                <div class="col-md-4">--}}
-
-            {{--                    <label>Date of Return</label>--}}
-            {{--                    <input type="text" class="form-control" id="returned_date" onchange="getRetunedProducts()">--}}
-            {{--                </div>--}}
-            {{--                <div class="col-md-4">--}}
-            {{--                    <label for="code">Status</label>--}}
-            {{--                    <select id="retun_status"--}}
-            {{--                            class="js-example-basic-single form-control" onchange="getRetunedProducts()">--}}
-            {{--                        <option value="2">Pending</option>--}}
-            {{--                        <option value="3">Approved</option>--}}
-            {{--                        <option value="4">Rejected</option>--}}
-            {{--                    </select>--}}
-            {{--                </div>--}}
-
-            {{--                <div class="form-group col-md-4">--}}
-            {{--                    <label for="Search">Search</label>--}}
-            {{--                    <input type="text" class="form-control" id="searching_returns" placeholder="Search"/>--}}
-            {{--                </div>--}}
-
-            {{--            </div>--}}
-
-
             <div class="table-responsive">
                 <table id="return_table" class="display table nowrap table-striped table-hover" style="width:100%">
                     <thead>
@@ -250,7 +225,7 @@
                     defaultContent: "<button type='button' id='approve' class='btn btn-sm btn-rounded btn-primary'>Approve</button><button type='button' id='reject' class='btn btn-sm btn-rounded btn-danger'>Reject</button>"
                 }
 
-            ]
+            ], aaSorting: [[1, "desc"]]
         });
 
         $('#searching_returns').on('keyup', function () {

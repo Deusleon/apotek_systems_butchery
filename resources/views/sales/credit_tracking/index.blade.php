@@ -78,37 +78,6 @@
                     <input type="hidden" value="" id="print">
                     <input type="hidden" value="" id="fixed_price">
 
-                    {{--                    <div class="row">--}}
-                    {{--                        --}}
-                    {{--                        <div class="form-group col-md-4">--}}
-                    {{--                            <label for="filter">Sale Date</label>--}}
-                    {{--                            <input type="text" name="date_of_sale" class="form-control" id="sales_date" value=""/>--}}
-                    {{--                        </div>--}}
-                    {{--                        <div class="col-md-4">--}}
-                    {{--                            <div class="form-group">--}}
-                    {{--                                <label for="code">Customer</label>--}}
-                    {{--                                <select name="customer_id" id="customer_payment"--}}
-                    {{--                                        class="js-example-basic-single form-control">--}}
-                    {{--                                    <option value="">Select Customer</option>--}}
-                    {{--                                    @foreach($customers as $customer)--}}
-                    {{--                                        <option value="{{$customer->id}}">{{$customer->name}}</option>--}}
-                    {{--                                    @endforeach--}}
-                    {{--                                </select>--}}
-                    {{--                            </div>--}}
-                    {{--                        </div>--}}
-                    {{--                        <div class="col-md-4">--}}
-                    {{--                            <div class="form-group">--}}
-                    {{--                                <label for="code">Credit Status</label>--}}
-                    {{--                                <select name="status" id="payment-status" class="js-example-basic-single form-control">--}}
-                    {{--                                    <option value="all">All</option>--}}
-                    {{--                                    <option value="not_paid">Not Paid</option>--}}
-                    {{--                                    <option value="partial_paid">Partial Paid</option>--}}
-                    {{--                                    <option value="full_paid">Full Paid</option>--}}
-                    {{--                                </select>--}}
-                    {{--                            </div>--}}
-                    {{--                        </div>--}}
-                    {{--                    </div>--}}
-
                     <div class="row" id="detail">
                         <hr>
                         @can('Credit Payment')
