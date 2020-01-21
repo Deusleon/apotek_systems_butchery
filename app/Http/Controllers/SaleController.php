@@ -67,10 +67,45 @@ class SaleController extends Controller
 
     public function getPaymentsHistory()
     {
+        $customers = Customer::get();
+
         $payments = SalesCredit::join('sales', 'sales.id', '=', 'sales_credits.sale_id')
             ->join('customers', 'customers.id', '=', 'sales.customer_id')
             ->get();
-        return view('sales.payment_history.index', compact("payments"));
+        return view('sales.payment_history.index', compact('payments', 'customers'));
+    }
+
+    public function paymentHistoryFilter(Request $request)
+    {
+        if ($request->ajax()) {
+            $dates = explode(" - ", $request->date);
+            if ($request->customer_id === null) {
+                /*return all by date*/
+                $payments = SalesCredit::join('sales', 'sales.id', '=', 'sales_credits.sale_id')
+                    ->join('customers', 'customers.id', '=', 'sales.customer_id')
+                    ->whereBetween(DB::raw('date(created_at)'), [date('Y-m-d', strtotime($dates[0])),
+                        date('Y-m-d', strtotime($dates[1]))])
+                    ->get();
+            } else {
+                if ($request->date === null) {
+                    $payments = SalesCredit::join('sales', 'sales.id', '=', 'sales_credits.sale_id')
+                        ->join('customers', 'customers.id', '=', 'sales.customer_id')
+                        ->where('sales.customer_id', $request->customer_id)
+                        ->get();
+                } else {
+                    $payments = SalesCredit::join('sales', 'sales.id', '=', 'sales_credits.sale_id')
+                        ->join('customers', 'customers.id', '=', 'sales.customer_id')
+                        ->whereBetween(DB::raw('date(created_at)'), [date('Y-m-d', strtotime($dates[0])),
+                            date('Y-m-d', strtotime($dates[1]))])
+                        ->where('sales.customer_id', $request->customer_id)
+                        ->get();
+                }
+
+            }
+
+            return $payments;
+
+        }
     }
 
     public function CreditSalePayment(Request $request)

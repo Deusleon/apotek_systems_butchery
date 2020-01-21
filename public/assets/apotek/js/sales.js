@@ -804,47 +804,6 @@ $('#sale_history_table tbody').on('click', '#sale_receipt_reprint', function () 
     document.getElementById("print").value = row_data.receipt_number;
 });
 
-
-// function saleDetails(items){
-// document.getElementById('sales').style.display='none';
-// sold=" <h4><span class='badge badge-success'>Sold</span></h4>"
-// pending=" <h4><span class='badge badge-warning'>Pending</span></h4>"
-// returned=" <h4><span class='badge badge-danger'>Returned</span></h4>"
-// sale_items = [];
-// items.forEach(function(item){
-// var item_data=[];
-// item_data.push(item.id);
-// item_data.push(item.name);
-// item_data.push(item.quantity);
-// item_data.push(item.price);
-// item_data.push(item.vat);
-// item_data.push(item.discount);
-// item_data.push(item.amount);
-// if (item.status ==2) {
-// item_data.push(pending)
-// }
-// else if (item.status ==3) {
-// item_data.push(returned)
-// }
-// else{
-// item_data.push(sold)
-// }
-// sale_items.push(item_data);
-// })
-// items_table.clear();
-// items_table.rows.add(sale_items);
-// items_table.column(0).visible(false);
-// items_table.draw();
-// document.getElementById('items').style.display='block';
-// $('#cancel').on('click', function() {
-// return_cart = [];
-// document.getElementById('sales').style.display='block';
-// document.getElementById('items').style.display='none';
-// });
-
-// }
-
-
 $('#items_table tbody').on('click', '#rtn_btn', function () {
     var index = items_table.row($(this).parents('tr')).index();
     var data = items_table.row($(this).parents('tr')).data();
