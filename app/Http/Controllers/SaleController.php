@@ -219,7 +219,38 @@ class SaleController extends Controller
         $pharmacy['logo'] = Setting::where('id', 105)->value('value');
         $pharmacy['address'] = Setting::where('id', 106)->value('value');
         $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
+        $pharmacy['phone'] = Setting::where('id', 107)->value('value');
+        $pharmacy['slogan'] = Setting::where('id', 104)->value('value');
+
+
         $id = Sale::where('receipt_number', $request->reprint_receipt)->value('id');
+
+        /*check if receipt is credit or not*/
+        $credit_sale = SalesCredit::where('sale_id', $id)->get();
+        $page = null;
+        $paid = null;
+        $balance = null;
+        $remark = null;
+        if ($credit_sale->isEmpty()) {
+            /*not credit*/
+            $page = 1; //normal sale
+        } else {
+            /*credit*/
+            $page = -1; //credit
+            $remarks = SalesCredit::select('remark')
+                ->where('sale_id', $id)
+                ->orderby('id', 'desc')
+                ->first();
+
+            $amounts = SalesCredit::select('sale_id', 'remark', DB::raw('sum(paid_amount) as paid'), DB::raw('sum(balance) as balance'))
+                ->where('sale_id', $id)
+                ->groupby('sale_id')
+                ->first();
+            $paid = $amounts->paid;
+            $balance = $amounts->balance;
+            $remark = $remarks->remark;
+        }
+
         $sale_detail = SalesDetail::where('sale_id', $id)->get();
 
         $sales = array();
@@ -250,6 +281,9 @@ class SaleController extends Controller
                 'total_vat' => ($item->sale['cost']['vat']),
                 'sold_by' => $item->sale['user']['name'],
                 'customer' => $item->sale['customer']['name'],
+                'paid' => $paid,
+                'balance' => $balance,
+                'remark' => $remark,
                 'created_at' => date('Y-m-d', strtotime($item->sale['date']))
             ));
         }
@@ -263,7 +297,7 @@ class SaleController extends Controller
 
         $data = $grouped_sales;
         $pdf = PDF::loadView('sales.cash_sales.receipt',
-            compact('data', 'pharmacy'));
+            compact('data', 'pharmacy', 'page'));
 
         return $pdf->download($request->reprint_receipt . '.pdf');
 
