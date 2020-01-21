@@ -46,52 +46,12 @@ class StockAdjustmentController extends Controller
 
             foreach ($current_stock as $item) {
 
-                if ($item->product_id == $request->product_id) {
-
-                    if ($item->quantity >= $quantity) {
-                        //subtract
-                        if ($quantity < 0) {
-                            $match_field = ['id' => $item->id, 'product_id' => $request->product_id];
-                            $sub = $item->quantity + $quantity;
-                            $deduct = CurrentStock::where($match_field)->first();
-//                            dd($sub);
-                            if ($sub < 0) {
-                                $deduct->quantity = 0;
-                                $quantity = $sub;
-                            } else {
-                                $deduct->quantity = $sub;
-                                $quantity = 0;
-                            }
-                            //okay
-                            $deduct->save();
-                        } else {
-                            $sub = $item->quantity - $quantity;
-                            $match_field = ['id' => $item->id, 'product_id' => $request->product_id];
-                            $deduct = CurrentStock::where($match_field)->first();
-                            $deduct->quantity = $sub;
-                            $deduct->save();
-                            break;
-                        }
-
-                    } else {
-                        //subtract to  get negative
-                        $sub = $item->quantity - $quantity;
-                        if ($sub < 0) {
-                            $match_field = ['id' => $item->id, 'product_id' => $request->product_id];
-                            $deduct = CurrentStock::where($match_field)->first();
-                            $deduct->quantity = 0;
-                            $deduct->save();
-                            $quantity = $sub;
-                        } else {
-                            $match_field = ['id' => $item->id, 'product_id' => $request->product_id];
-                            $deduct = CurrentStock::where($match_field)->first();
-                            $deduct->quantity = $sub;
-                            $deduct->save();
-                            $quantity = $sub;
-
-                        }
-
-                    }
+                if ($item->product_id == $request->product_id && $item->id == $request->id) {
+                    $match_field = ['id' => $item->id, 'product_id' => $request->product_id];
+                    $sub = $item->quantity - $quantity;
+                    $deduct = CurrentStock::where($match_field)->first();
+                    $deduct->quantity = $sub;
+                    $deduct->save();
                 }
             }
 
