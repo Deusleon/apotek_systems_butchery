@@ -132,6 +132,8 @@
 <h4 align="center">{{$pharmacy['name']}}</h4>
 <h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
 <h2 align="center" style="margin-top: -2%">Stock Issue</h2>
+<h5 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h5>
+
 
 {{--<div class="topcorner">--}}
 {{--    <p>{{$data[0]['issue_no']}}</p>--}}
@@ -190,8 +192,8 @@
                 <th>Product Name</th>
                 <th>Expiry Date</th>
                 <th>Qty</th>
-                <th>Price</th>
-                <th>Amount</th>
+                <th align="right">Price</th>
+                <th align="right">Amount</th>
             </tr>
             </thead>
             <!-- loop the product names here -->
@@ -202,7 +204,7 @@
                     <td align="right">
                         <div style="margin-right: 50%">{{ floatval($issue->quantity) }}</div>
                     </td>
-                    <td align="right">{{ $issue->currentStock['unit_cost'] }}</td>
+                    <td align="right">{{number_format($issue->currentStock['unit_cost'],2)}}</td>
                     <td align="right">{{number_format($issue->sub_total,2)}}</td>
                 </tr>
             @endforeach

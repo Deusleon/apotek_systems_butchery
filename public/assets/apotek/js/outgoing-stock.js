@@ -8,7 +8,7 @@ var table_ledger_filter = $('#fixed-header-ledger').DataTable({
         {'data': 'quantity'},
         {'data': 'user.name'},
         {'data': 'date'}
-    ]
+    ], aaSorting: [[4, "desc"]]
 });
 
 var table_daily_stock = $('#fixed-header2').DataTable({

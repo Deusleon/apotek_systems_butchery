@@ -49,7 +49,7 @@
                             <div class="form-group">
                                 <label for="exampleFormControlSelect1">Batch Number</label>
                                 <input type="text" class="form-control" id="batch_no"
-                                       name="batch_number" value="{{ old('batch_number') }}" readonly>
+                                       name="batch_number" value="{{ old('batch_number') }}">
                             </div>
                         </div>
                         <div class="col-md-6">

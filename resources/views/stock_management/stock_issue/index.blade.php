@@ -69,7 +69,7 @@
             <div class="card-body">
                 <div class="tab-pane fade show active" id="new_sale" role="tabpanel" aria-labelledby="new_sale-tab">
                     <form id="issue" action="{{ route('stock-issue.store') }}" method="post"
-                          enctype="multipart/form-data" target="_blank">
+                          enctype="multipart/form-data">
                         @csrf()
                         <div class="row">
                             <div class="col-md-6">

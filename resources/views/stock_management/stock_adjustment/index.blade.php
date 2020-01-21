@@ -145,7 +145,7 @@
                         "data": "action",
                         defaultContent: "<button type='button' id='shows' class='btn btn-sm btn-rounded btn-success'>Show</button>"
                     }
-                ]
+                ], aaSorting: [[3, "desc"]]
 
             });
         }
