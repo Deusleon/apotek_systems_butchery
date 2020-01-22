@@ -61,10 +61,14 @@ class StoreController extends Controller
     {
         $store = Store::find($request->id);
         $store->name = $request->name;
-        $store->save();
-
-        session()->flash("alert-success", "Store Updated Successfully!");
-        return back();
+        try {
+            $store->save();
+            session()->flash("alert-success", "Store Updated Successfully!");
+            return back();
+        } catch (Exception $exception) {
+            session()->flash("alert-danger", "Store Exists!");
+            return back();
+        }
 
     }
 

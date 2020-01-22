@@ -86,28 +86,6 @@
                     </select>
                 </div>
 
-                {{--                    <div class="col-md-4">--}}
-
-                {{--                        <label>Date</label>--}}
-                {{--                        <input type="text" name="expire_date" class="form-control" id="receive_date"--}}
-                {{--                               onchange="getMaterialsReceived()">--}}
-                {{--                    </div>--}}
-
-                {{--                    <div class="col-md-4">--}}
-                {{--                        <div class="form-group">--}}
-                {{--                            <label for="code">Supplier Name</label>--}}
-                {{--                            <select class="js-example-basic-single form-control" id="supplier"--}}
-                {{--                                    onchange="getMaterialsReceived()">--}}
-                {{--                                <option value="">Select Supplier</option>--}}
-                {{--                                @foreach($suppliers as $supplier)--}}
-                {{--                                    <option value="{{$supplier->id}}">{{$supplier->name}}</option>--}}
-                {{--                                @endforeach--}}
-                {{--                            </select>--}}
-
-                {{--                        </div>--}}
-                {{--                    </div>--}}
-
-                {{--                </div>--}}
                 <div id="tbody1" class="table-responsive">
                     <table id="received_material_table" class="display table nowrap table-striped table-hover"
                            style="width:100%">
