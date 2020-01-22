@@ -82,29 +82,52 @@
     </div>
 </div>
 <div class="row" style="padding-top: -2%">
-    <h3 align="center">{{$pharmacy['name']}}</h3>
-    <h6 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h6>
-    <h4 align="center">Credit Sales Summary Report</h4>
+    <h4 align="center">{{$pharmacy['name']}}</h4>
+    <h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
+    <h2 align="center" style="margin-top: -2%">Credit Sales Summary Report</h2>
+    <h5 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h5>
     <h4 align="center" style="margin-top: -2%">{{$pharmacy['date_range']}}</h4>
     <div class="row" style="margin-top: 13%">
         <table id="table-detail" align="center">
             <tr>
-                <th>Sale Date</th>
-                <th>Sub Total</th>
-                <th>Sold By</th>
+                <th align="center">Sale Date</th>
+                <th align="center">Amount</th>
+                {{--                <th>Sold By</th>--}}
             </tr>
 
             @foreach($data as $item)
                 <tr>
                     <td align="center">{{$item['date']}}</td>
-                    <td align="center">{{number_format($item['sub_total'],2)}}</td>
-                    <td align="center">{{$item['sold_by']}}</td>
+                    <td align="right">
+                        <div style="margin-right: 40%">{{number_format($item['sub_total'],2)}}</div>
+                    </td>
+                    {{--                    <td align="center">{{$item['sold_by']}}</td>--}}
                 </tr>
             @endforeach
         </table>
     </div>
-
+</div>
 </body>
+
+<script type="text/php">
+    if ( isset($pdf) ) {
+        $x = 280;
+        $y = 820;
+        $text = "{PAGE_NUM} of {PAGE_COUNT} pages";
+        $font = null;
+        $size = 10;
+        $color = array(0,0,0);
+        $word_space = 0.0;  //  default
+        $char_space = 0.0;  //  default
+        $angle = 0.0;   //  default
+        $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
+
+
+     }
+
+
+</script>
+
 </html>
 
 

@@ -42,6 +42,7 @@ class SaleReportController extends Controller
         $pharmacy['logo'] = Setting::where('id', 105)->value('value');
         $pharmacy['address'] = Setting::where('id', 106)->value('value');
         $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
+        $pharmacy['phone'] = Setting::where('id', 107)->value('value');
         $pharmacy['date_range'] = "From" . " " . date('j M, Y', strtotime($from)) . " " . "To" . " " . date('j M, Y', strtotime($to));
 
         switch ($request->report_option) {
@@ -118,8 +119,9 @@ class SaleReportController extends Controller
 
     private function cashSaleDetailReport($from, $to)
     {
-        $sale_detail = SalesDetail::whereNotIn('sale_id', DB::table('sales_credits')->pluck('sale_id'))
-            ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
+        $sale_detail = SalesDetail::
+//        whereNotIn('sale_id', DB::table('sales_credits')->pluck('sale_id'))
+        join('sales', 'sales.id', '=', 'sales_details.sale_id')
             ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
             ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
 //            ->where('status','!=',3)
@@ -134,7 +136,11 @@ class SaleReportController extends Controller
 
         foreach ($sale_detail as $item) {
             $amount = $item->amount - $item->discount;
-            $vat_percent = $item->vat / $item->price;
+            if (intVal($item->vat) === 0) {
+                $vat_percent = 0;
+            } else {
+                $vat_percent = $item->vat / $item->price;
+            }
             $sub_total = ($amount / (1 + $vat_percent));
             $vat = $amount - $sub_total;
             $grand_total = $grand_total + ($item->amount) - ($item->discount);
@@ -216,7 +222,7 @@ class SaleReportController extends Controller
             ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
 //            ->where('sales_details.status','!=',3)
             ->join('users', 'users.id', '=', 'sales.created_by')
-            ->whereNotIn('sale_id', DB::table('sales_credits')->pluck('sale_id'))
+//            ->whereNotIn('sale_id', DB::table('sales_credits')->pluck('sale_id'))
             ->groupby(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"))
 //            ->groupby('dates', 'created_by')
             ->get();

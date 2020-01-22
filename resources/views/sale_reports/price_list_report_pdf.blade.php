@@ -88,6 +88,7 @@
     <h4 align="center">{{$pharmacy['name']}}</h4>
     <h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
     <h2 align="center" style="margin-top: -2%">Price List Report</h2>
+    <h5 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h5>
     <h4 align="center" style="margin-top: -2%">For {{$data[0]['category_name']}} category</h4>
     <div class="row" style="margin-top: 10%;">
         <div class="col-md-12">
@@ -110,7 +111,27 @@
             </table>
         </div>
     </div>
-
+</div>
 </body>
+
+<script type="text/php">
+    if ( isset($pdf) ) {
+        $x = 280;
+        $y = 820;
+        $text = "{PAGE_NUM} of {PAGE_COUNT} pages";
+        $font = null;
+        $size = 10;
+        $color = array(0,0,0);
+        $word_space = 0.0;  //  default
+        $char_space = 0.0;  //  default
+        $angle = 0.0;   //  default
+        $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
+
+
+     }
+
+
+</script>
+
 </html>
 

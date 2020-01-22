@@ -82,9 +82,10 @@
     </div>
 </div>
 <div class="row" style="padding-top: -2%">
-    <h3 align="center">{{$pharmacy['name']}}</h3>
-    <h6 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h6>
-    <h4 align="center">Credit Sales Details Report</h4>
+    <h4 align="center">{{$pharmacy['name']}}</h4>
+    <h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
+    <h2 align="center" style="margin-top: -2%">Credit Sales Details Report</h2>
+    <h5 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h5>
     <h4 align="center" style="margin-top: -2%">{{$pharmacy['date_range']}}</h4>
 @foreach($data as $datas => $dat)
     <!-- <div class="full-row" style="padding-top: 2%">
@@ -126,8 +127,8 @@
                     <th align="left">Product Name</th>
                     <th align="right">Quantity</th>
                     <th align="right">Price</th>
-                    <th align="right">Sub Total</th>
-                    <th align="right">Discount</th>
+                    {{--<th align="right">Sub Total</th>
+                    <th align="right">Discount</th>--}}
                     <th align="right">VAT</th>
                     <th align="right">Amount</th>
                 </tr>
@@ -138,8 +139,8 @@
                         <td align="left">{{$item['name']}}</td>
                         <td align="right">{{$item['quantity']}}</td>
                         <td align="right">{{number_format($item['price']/$item['quantity'],2)}}</td>
-                        <td align="right">{{number_format($item['sub_total'],2)}}</td>
-                        <td align="right">{{number_format($item['discount'],2)}}</td>
+                        {{--                        <td align="right">{{number_format($item['sub_total'],2)}}</td>--}}
+                        {{--                        <td align="right">{{number_format($item['discount'],2)}}</td>--}}
                         <td align="right">{{number_format($item['vat'],2)}}</td>
                         <td align="right">{{number_format($item['amount'],2)}}</td>
                     </tr>
@@ -243,5 +244,25 @@
         <hr>
 @endforeach
 </body>
+
+<script type="text/php">
+    if ( isset($pdf) ) {
+        $x = 280;
+        $y = 820;
+        $text = "{PAGE_NUM} of {PAGE_COUNT} pages";
+        $font = null;
+        $size = 10;
+        $color = array(0,0,0);
+        $word_space = 0.0;  //  default
+        $char_space = 0.0;  //  default
+        $angle = 0.0;   //  default
+        $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
+
+
+     }
+
+
+</script>
+
 </html>
 
