@@ -108,22 +108,6 @@
                         <image id="loading-image" src="{{asset('assets/images/spinner.gif')}}"></image>
                     </div>
 
-                    <div id="tbody-header" class="table-responsive" style="display: block">
-                        <table id="fixed-header" class="display table nowrap table-striped table-hover"
-                               style="width:100%">
-
-                            <thead>
-                            <tr>
-                                <th>Expense Date</th>
-                                <th>Expense Category</th>
-                                <th>Description</th>
-                                <th>Amount</th>
-                                <th>Payment Method</th>
-                            </tr>
-                            </thead>
-                        </table>
-                    </div>
-
                     <div id="tbody-header-expense" class="table-responsive" style="display: none;">
                         <table id="fixed-header-expense" class="display table nowrap table-striped table-hover"
                                style="width:100%;">
@@ -136,6 +120,7 @@
                                 <th>Amount</th>
                                 <th>Payment Method</th>
                                 <th>User</th>
+                                <th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -143,24 +128,14 @@
                         </table>
                     </div>
 
-                    {{--                    <hr>--}}
-
-                    {{--                    <div class="row">--}}
-                    {{--                        <div class="col-md-6">--}}
-
-                    {{--                        </div>--}}
-                    {{--                        <div class="col-md-6">--}}
-                    {{--                            <b style="font-size: 1.4em; margin-left: 20%">Total Expense: </b>--}}
-                    {{--                            <span id="total_span" style="font-size: 1.4em; float: right"></span><span--}}
-                    {{--                                style="font-size: 1.4em"></span>--}}
-                    {{--                        </div>--}}
-                    {{--                    </div>--}}
                 </div>
             </div>
         </div>
     </div>
 
     @include("expense.create")
+    @include("expense.edit")
+    @include("expense.delete")
 
 @endsection
 
@@ -185,8 +160,41 @@
                     }
                 },
                 {'data': 'payment_method'},
-                {'data': 'user'}
-            ]
+                {'data': 'user'},
+                {
+                    'data': 'action',
+                    defaultContent: "<button class='btn btn-primary btn-rounded btn-sm' type='button' id='edit_btn'>Edit</button><button class='btn btn-danger btn-rounded btn-sm' type='button' id='delete_btn'>Delete</button>"
+                }
+
+            ], aaSorting: [[0, "desc"]]
+
+        });
+
+        $('#fixed-header-expense tbody').on('click', '#edit_btn', function () {
+            var row_data = table_expense_filter.row($(this).parents('tr')).data();
+            var index = table_expense_filter.row($(this).parents('tr')).index();
+
+            $('#edit').find('.modal-body #d_auto_91_edit').val(row_data.created_at);
+            $('#payment_method_edit').val(row_data.payment_method_id).change();
+            $('#edit').find('.modal-body #expense_amount_edit').val(formatMoney(row_data.amount));
+            $('#expense_category_edit').val(row_data.expense_category_id).change();
+            $('#edit').find('.modal-body #expense_description_edit').val(row_data.description);
+            $('#edit').find('.modal-body #expense_id').val(row_data.id);
+
+            $('#edit').modal('show');
+
+        });
+
+        $('#fixed-header-expense tbody').on('click', '#delete_btn', function () {
+            var row_data = table_expense_filter.row($(this).parents('tr')).data();
+            var index = table_expense_filter.row($(this).parents('tr')).index();
+
+            var message = "Are you sure you want to delete expense?";
+            $('#delete').find('.modal-body #message').text(message);
+
+            $('#delete').find('.modal-body #expense_id').val(row_data.id);
+
+            $('#delete').modal('show');
 
         });
 
@@ -222,6 +230,11 @@
         /*category select2 dropdown*/
         $('#expense_category').select2({
             dropdownParent: $('#create')
+        });
+
+        /*category select2 dropdown*/
+        $('#expense_category_edit').select2({
+            dropdownParent: $('#edit')
         });
 
         /*to date*/
@@ -268,6 +281,21 @@
             });
         });
 
+        $(function () {
+            var start = moment();
+            var end = moment();
+
+            $('#d_auto_91_edit').daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                maxDate: end,
+                autoUpdateInput: true,
+                locale: {
+                    format: 'DD-M-YYYY'
+                }
+            });
+        });
+
         /*get expense date*/
         function getExpenseDate() {
             var dates = document.querySelector('input[name=date_of_expense]').value;
@@ -290,9 +318,7 @@
                     to_date: dates[1]
                 },
                 success: function (data) {
-                    document.getElementById("tbody-header").style.display = 'none';
                     document.getElementById("tbody-header-expense").style.display = 'block';
-                    // document.getElementById("total_span").innerHTML = formatMoney(data[0][1]);
 
                     bindDataFilter(data[0][0]);
 
@@ -340,6 +366,11 @@
         $('#expense').on('change', function () {
             var amount = document.getElementById('expense').value;
             document.getElementById('expense').value = formatMoney(amount);
+        });
+
+        $('#expense_amount_edit').on('change', function () {
+            var amount = document.getElementById('expense_amount_edit').value;
+            document.getElementById('expense_amount_edit').value = formatMoney(amount);
         });
 
         function isNumberKey(evt, obj) {

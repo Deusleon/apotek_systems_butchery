@@ -38,12 +38,24 @@ class ExpenseController extends Controller
 
     public function update(Request $request)
     {
+        $expense = Expense::find($request->expense_id);
+        $expense->amount = str_replace(',', '', $request->expense_amount_edit);
+        $expense->expense_category_id = $request->expense_category_edit;
+        $expense->expense_description = $request->expense_description_edit;
+        $expense->payment_method_id = $request->payment_method_edit;
+        $expense->created_at = date('Y-m-d', strtotime($request->expense_date_edit));
+        $expense->updated_by = Auth::user()->id;
+        $expense->save();
 
+        session()->flash("alert-success", "Expense updated successfully!");
+        return back();
     }
 
     public function destroy(Request $request)
     {
-
+        Expense::destroy($request->expense_id);
+        session()->flash("alert-danger", "Expense deleted successfully!");
+        return back();
     }
 
     public function filterExpenseDate(Request $request)
@@ -61,11 +73,14 @@ class ExpenseController extends Controller
                 else
                     $method = "BILL";
                 array_push($results_mod, array(
+                    "id" => $result->id,
                     "created_at" => date('d-m-Y', strtotime($result->created_at)),
                     "expense_Category" => $result->accExpenseCategory['name'],
+                    "expense_category_id" => $result->expense_category_id,
                     "description" => $result->expense_description,
                     "amount" => $result->amount,
                     "payment_method" => $method,
+                    "payment_method_id" => $result->payment_method_id,
                     "user" => $result->user['name']
                 ));
             }

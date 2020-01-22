@@ -271,7 +271,6 @@
 
                 $('#product-table').on('click', '#shows', function () {
                     var row_data = $('#fixed-header1').DataTable().row($(this).parents('tr')).data();
-                    console.log(row_data.min);
                     $('#show').find('.modal-body #name_edit').val(row_data.name);
                     $('#show').find('.modal-body #barcode_edit').val(row_data.barcode);
                     $('#show').find('.modal-body #generic_edit').val(row_data.generic);
