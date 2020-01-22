@@ -351,7 +351,7 @@
 
                 $('#product-table-status-filter-active').on('click', '#edit-active', function () {
                     var row_data = $('#fixed-header3').DataTable().row($(this).parents('tr')).data();
-                    console.log(row_data);
+
                     $('#edit').find('.modal-body #id').val(row_data.id);
                     $('#edit').find('.modal-body #name_edit').val(row_data.name);
                     $('#edit').find('.modal-body #barcode_edits').val(row_data.barcode);
