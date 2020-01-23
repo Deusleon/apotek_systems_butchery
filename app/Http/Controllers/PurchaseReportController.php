@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Category;
+use App\CommonFunctions;
 use App\CurrentStock;
 use App\GoodsReceiving;
 use App\Invoice;
@@ -46,6 +47,8 @@ class PurchaseReportController extends Controller
 
         $pharmacy['name'] = Setting::where('id', 100)->value('value');
         $pharmacy['address'] = Setting::where('id', 106)->value('value');
+        $pharmacy['phone'] = Setting::where('id', 107)->value('value');
+
 
         switch ($request->report_option) {
             case 1:
@@ -107,20 +110,39 @@ class PurchaseReportController extends Controller
         $dates = explode(" - ", $date);
 
         if ($invoice_no == null) {
-            $datas = GoodsReceiving::where('supplier_id', $supplier)
-                ->whereBetween(DB::raw('date(created_at)'),
+            if ($supplier == null) {
+                $datas = GoodsReceiving::whereBetween(DB::raw('date(created_at)'),
                     [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))])
-                ->orderby('created_at', 'DESC')
-                ->get();
+                    ->orderby('created_at', 'DESC')
+                    ->get();
+            } else {
+                $datas = GoodsReceiving::where('supplier_id', $supplier)
+                    ->whereBetween(DB::raw('date(created_at)'),
+                        [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))])
+                    ->orderby('created_at', 'DESC')
+                    ->get();
+            }
+
         } else {
-            $datas = GoodsReceiving::where('supplier_id', $supplier)
-                ->whereBetween(DB::raw('date(created_at)'),
+            if ($supplier == null) {
+                $datas = GoodsReceiving::whereBetween(DB::raw('date(created_at)'),
                     [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))])
-                ->where('invoice_no', '=', $invoice_no)
-                ->orderby('created_at', 'DESC')
-                ->get();
-            foreach ($datas as $data) {
-                $data->invoice_nos = $data->invoice['invoice_no'];
+                    ->where('invoice_no', '=', $invoice_no)
+                    ->orderby('created_at', 'DESC')
+                    ->get();
+            } else {
+                $datas = GoodsReceiving::where('supplier_id', $supplier)
+                    ->whereBetween(DB::raw('date(created_at)'),
+                        [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))])
+                    ->where('invoice_no', '=', $invoice_no)
+                    ->orderby('created_at', 'DESC')
+                    ->get();
+            }
+
+            if ($dates != null) {
+                foreach ($datas as $data) {
+                    $data->invoice_nos = $data->invoice['invoice_no'];
+                }
             }
         }
 
@@ -131,7 +153,131 @@ class PurchaseReportController extends Controller
             $d->dates = $dates;
             $d->supplier_name = $d->supplier['name'];
         }
-        return $datas;
+
+        /*push them in an array*/
+        $raw_data = array();
+        foreach ($datas as $datum) {
+            array_push($raw_data, array(
+                'code' => $datum->product_id,
+                'product_name' => $datum->product['name'],
+                'quantity' => $datum->quantity,
+                'unit_cost' => $datum->unit_cost,
+                'sell_price' => $datum->sell_price,
+                'profit' => $datum->item_profit,
+                'total_cost' => $datum->total_cost,
+                'total_sell' => $datum->total_sell,
+                'date' => date('d-m-Y', strtotime($datum->created_at)),
+                'supplier' => $datum->supplier['name']
+            ));
+        }
+
+        /*make supplier key*/
+        $raw_data_by_key_supplier = array();
+        foreach ($raw_data as $raw_datum) {
+            if (array_key_exists('supplier', $raw_datum)) {
+                $raw_data_by_key_supplier[$raw_datum['supplier']][] = $raw_datum;
+            }
+        }
+
+        /*sum total cost for the total*/
+        $total_cost = 0;
+        $grand_total_cost = array();
+        $grand_total_cost_key = array();
+        foreach ($raw_data_by_key_supplier as $key => $value) {
+            foreach ($value as $item) {
+                $total_cost = $total_cost + $item['total_cost'];
+            }
+            array_push($grand_total_cost, array(
+                'supplier' => $key,
+                'amount' => $total_cost
+            ));
+        }
+        foreach ($grand_total_cost as $raw_datum) {
+            if (array_key_exists('supplier', $raw_datum)) {
+                $grand_total_cost_key[$raw_datum['supplier']][] = $raw_datum;
+            }
+        }
+
+        /*sum total sell for the total*/
+        $total_sell = 0;
+        $grand_total_sell = array();
+        $grand_total_sell_key = array();
+        foreach ($raw_data_by_key_supplier as $key => $value) {
+            foreach ($value as $item) {
+                $total_sell = $total_sell + $item['total_sell'];
+            }
+            array_push($grand_total_sell, array(
+                'supplier' => $key,
+                'amount' => $total_sell
+            ));
+        }
+        foreach ($grand_total_sell as $raw_datum) {
+            if (array_key_exists('supplier', $raw_datum)) {
+                $grand_total_sell_key[$raw_datum['supplier']][] = $raw_datum;
+            }
+        }
+
+        /*sum total profit for the total*/
+        $total_profit = 0;
+        $grand_total_profit = array();
+        $grand_total_profit_key = array();
+
+        $supplier_sum = array();
+        $sum_by_key = new CommonFunctions();
+        foreach ($raw_data_by_key_supplier as $value) {
+            foreach ($value as $item) {
+
+                $index = $sum_by_key->sumByKey($item['supplier'], $supplier_sum, 'supplier');
+                if ($index < 0) {
+                    $supplier_sum[] = $item;
+                } else {
+                    $supplier_sum[$index]['total_cost'] += $item['total_cost'];
+                    $supplier_sum[$index]['total_sell'] += $item['total_sell'];
+                    $supplier_sum[$index]['profit'] += $item['profit'];
+
+                }
+            }
+
+        }
+
+        $test = array();
+        foreach ($supplier_sum as $raw_datum) {
+            if (array_key_exists('supplier', $raw_datum)) {
+                $test[$raw_datum['supplier']][] = $raw_datum;
+            }
+        }
+
+
+        foreach ($raw_data_by_key_supplier as $key => $value) {
+            foreach ($value as $item) {
+                $total_profit = $total_profit + $item['profit'];
+            }
+            array_push($grand_total_profit, array(
+                'supplier' => $key,
+                'amount' => $total_profit
+            ));
+        }
+        foreach ($grand_total_profit as $raw_datum) {
+            if (array_key_exists('supplier', $raw_datum)) {
+                $grand_total_profit_key[$raw_datum['supplier']][] = $raw_datum;
+            }
+        }
+
+        /*what to return to be printed*/
+        if ($supplier != null) {
+            return $datas;
+        } else {
+            $to_print = array();
+            array_push($to_print, array(
+                'data' => $raw_data_by_key_supplier,
+                'cost_by_supplier' => $test,
+                'total_cost' => $grand_total_cost_key,
+                'total_sell' => $grand_total_sell_key,
+                'total_profit' => $grand_total_profit_key
+            ));
+
+            return $to_print;
+        }
 
     }
 
