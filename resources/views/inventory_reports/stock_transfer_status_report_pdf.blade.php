@@ -78,6 +78,7 @@
 
 <h4 align="center">{{$pharmacy['name']}}</h4>
 <h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
+<h5 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h5>
 <h2 align="center" style="margin-top: -2%">Stock Transfer Status Report</h2>
 <h4 align="center" style="margin-top: -2%">
     @if($data[0]->status == 2)

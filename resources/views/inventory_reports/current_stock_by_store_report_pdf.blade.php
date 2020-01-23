@@ -71,6 +71,7 @@
 <h4 align="center">{{$pharmacy['name']}}</h4>
 <h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
 <h2 align="center" style="margin-top: -2%">Current Stock Report</h2>
+<h5 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h5>
 <h4 align="center" style="margin-top: -2%">By {{$data[0]['store']}} Store</h4>
 <div class="row" style="margin-top: 10%;">
     <div class="col-md-12">
