@@ -327,7 +327,11 @@ class AccountingReportController extends Controller
         $total_sell_amount = array();
         foreach ($sale_detail as $item) {
             $value = $item->amount - $item->discount;
-            $vat_percent = $item->vat / $item->price;
+            if (intVal($item->vat) === 0) {
+                $vat_percent = 0;
+            } else {
+                $vat_percent = $item->vat / $item->price;
+            }
             $sub_total = ($value / (1 + $vat_percent));
 
             array_push($total_sell_amount, array(
@@ -468,7 +472,11 @@ class AccountingReportController extends Controller
         $raw_prices_data = array();
         foreach ($sold_items as $detail) {
             $value = $detail->amount - $detail->discount;
-            $vat_percent = $detail->vat / $detail->price;
+            if (intVal($detail->vat) === 0) {
+                $vat_percent = 0;
+            } else {
+                $vat_percent = $detail->vat / $detail->price;
+            }
             $sub_total = ($value / (1 + $vat_percent));
 
             /*get the product*/
