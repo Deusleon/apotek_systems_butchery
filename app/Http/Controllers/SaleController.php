@@ -249,7 +249,7 @@ class SaleController extends Controller
 
     public function receiptReprint(Request $request)
     {
-
+        $receipt_size = Setting::where('id', 119)->value('value');
         $pharmacy['name'] = Setting::where('id', 100)->value('value');
         $pharmacy['logo'] = Setting::where('id', 105)->value('value');
         $pharmacy['address'] = Setting::where('id', 106)->value('value');
@@ -331,10 +331,15 @@ class SaleController extends Controller
         }
 
         $data = $grouped_sales;
-        $pdf = PDF::loadView('sales.cash_sales.receipt',
-            compact('data', 'pharmacy', 'page'));
+        if ($receipt_size === 'Thermal Paper') {
+            $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
+                compact('data', 'pharmacy', 'page'));
+        } else {
+            $pdf = PDF::loadView('sales.cash_sales.receipt',
+                compact('data', 'pharmacy', 'page'));
+        }
 
-        return $pdf->download($request->reprint_receipt . '.pdf');
+        return $pdf->stream($request->reprint_receipt . '.pdf');
 
     }
 
@@ -597,8 +602,6 @@ class SaleController extends Controller
             $pdf = PDF::loadView('sales.cash_sales.receipt',
                 compact('data', 'pharmacy', 'page'));
         }
-//        $pdf = PDF::loadView('sales.cash_sales.receipt',
-//            compact('data', 'pharmacy'));
 
         return $pdf->stream($receipt_no . '.pdf');
 

@@ -111,11 +111,11 @@
 {{--        </div>--}}
 {{--    </div>--}}
 {{--</div>--}}
-<div class="row" style="padding-top: -3%; width: 40%; margin-left: -6.5%">
+<div class="row" style="padding-top: -4%; width: 38%; margin-left: -6.5%">
     <h3 align="center"><b>RECEIPT</b></h3>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['name']}}</h3>
     <h5 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h5>
-    <h5 align="center" style="margin-top: -1%">Phone: {{$pharmacy['phone']}}</h5>
+    <h5 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h5>
 
     @foreach($data as $datas => $dat)
         <table id="table-detail-main">
@@ -160,6 +160,12 @@
              style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
             {{number_format(($dat[0]['grand_total']-$dat[0]['total_vat'] + $dat[0]['discount_total']),2)}}
         </div>
+        <div style="margin-left: 10%;width: 29.6%;margin-top: 2%; padding: -1.6%"><b>Discount</b>
+        </div>
+        <div align="right"
+             style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
+            {{number_format($dat[0]['discount_total'],2)}}
+        </div>
         <div style="margin-left: 10%;width: 29.6%;margin-top: 2%; padding: -1.6%"><b>VAT</b>
         </div>
         <div align="right"
@@ -200,7 +206,7 @@
         @endif
 
         <h5 align="center" style="margin-top: -0%">Sold By {{$dat[0]['sold_by']}}</h5>
-        <h5 align="center" style="margin-top: -1%; font-style: italic">Sold By {{$pharmacy['slogan']}}</h5>
+        <h5 align="center" style="margin-top: -1%; font-style: italic">{{$pharmacy['slogan']}}</h5>
 
     @endforeach
 

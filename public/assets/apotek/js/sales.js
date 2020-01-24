@@ -643,6 +643,14 @@ function deselect() {
 function deselect1() {
     // document.getElementById("credit_sales_form").reset();
     $('#price_category').val('').change();
+    $('#customer').val('').change();
+    try{
+        document.getElementById("sale_paid").value = 0;
+        document.getElementById("sale_discount").value = 0;
+        document.getElementById("remark").value = '';
+    }catch (e) {
+        console.log('cancel_error');
+    }
     sub_total = 0;
     total = 0;
     cart = [];

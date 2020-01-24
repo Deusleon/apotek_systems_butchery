@@ -168,6 +168,9 @@
                                     <input type="hidden" id="order_cart" name="cart">
                                     <input type="hidden" value="{{$vat}}" id="vat">
                                     <input type="hidden" value="{{$fixed_price}}" id="fixed_price">
+                                    <input type="hidden" value="{{$enable_discount}}" id="enable_discount">
+
+
                                 </div>
                             @else
                                 <div class="row">
@@ -214,9 +217,8 @@
                             <hr>
                             <div class="row">
                                 <div class="col-md-8">
-                                    <div class="form-group">
-<textarea name="remark" class="form-control" rows="3"
-          placeholder="Enter Remarks Here"></textarea>
+                                    <div class="form-group"><textarea id="remark" name="remark" class="form-control" rows="3"
+                                                                      placeholder="Enter Remarks Here"></textarea>
                                     </div>
                                 </div>
 

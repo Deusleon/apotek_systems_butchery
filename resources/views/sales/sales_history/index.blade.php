@@ -52,7 +52,7 @@
 
                 </div>
                 <form id="sale_receipt_reprint" action="{{route('sale-reprint-receipt')}}" method="post"
-                      enctype="multipart/form-data">
+                      enctype="multipart/form-data" target="_blank">
                     @csrf()
 
                     <div class="table-responsive" id="sales">
