@@ -54,7 +54,7 @@
                             <label for="contact_person" class="col-md-4 col-form-label text-md-right">Address</label>
                             <div class="col-md-8">
                                 <input type="text" class="form-control" id="address" name="address"
-                                       aria-describedby="emailHelp" maxlength="20">
+                                       aria-describedby="emailHelp" maxlength="90">
                             </div>
                         </div>
                         <div class="modal-footer">

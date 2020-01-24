@@ -86,7 +86,7 @@
                                                 </button>
                                             </a>
                                         @endif
-                                        @if ($user->status == 0)
+                                        @if ($user->status == 0 || $user->status == -1)
                                             <a href="#">
                                                 <button class="btn btn-success btn-sm btn-rounded" type="button"
                                                         data-toggle="modal"
@@ -165,7 +165,7 @@
                 if (status == 1) {
                     var message = "Are you sure you want to de-activate - ".concat(user)
                 }
-                if (status == 0) {
+                if (status == 0 || status == -1) {
                     var message = "Are you sure you want to activate - ".concat(user)
                 }
                 modal.find('.modal-body #userid').val(id);

@@ -81,7 +81,7 @@ class UserController extends Controller
             session()->flash("alert-success", "User de-activated successfully!");
             return redirect()->back();
         }
-        if ($request->status == 0) {
+        if ($request->status == 0 || $request->status == -1) {
             $user = new User;
             $user = User::findOrFail($request->userid);
             $user->status = 1;

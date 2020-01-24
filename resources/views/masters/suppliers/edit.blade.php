@@ -57,7 +57,7 @@
                             <div class="col-md-8">
                                 <input type="text" class="form-control" id="address_edit" name="address"
                                        aria-describedby="emailHelp"
-                                       maxlength="20">
+                                       maxlength="90">
                             </div>
                         </div>
                         <input type="hidden" id="id" name="id">
