@@ -90,8 +90,8 @@
                 <th>Expense Date</th>
                 <th>Expense Category</th>
                 <th>Description</th>
-                <th>Amount</th>
-                <th>Payment Method</th>
+                <th align="right">Amount</th>
+                {{--                <th>Payment Method</th>--}}
             </tr>
             </thead>
             @foreach($data as $item)
@@ -100,11 +100,11 @@
                     <td>{{$item->accExpenseCategory['name']}}</td>
                     <td align="">{{$item->expense_description}}</td>
                     <td align="right">{{number_format($item->amount,2)}}</td>
-                    @if($item->payment_method_id == 1)
-                        <td align="">CASH</td>
-                    @else
-                        <td align="">BILL</td>
-                    @endif
+                    {{--                    @if($item->payment_method_id == 1)--}}
+                    {{--                        <td align="">CASH</td>--}}
+                    {{--                    @else--}}
+                    {{--                        <td align="">BILL</td>--}}
+                    {{--                    @endif--}}
 
                 </tr>
             @endforeach
@@ -135,6 +135,7 @@
 
 
      }
+
 
 
 

@@ -144,6 +144,8 @@ class AccountingReportController extends Controller
             ->whereBetween(DB::raw('date(date)'), [$date[0], $date[1]])
             ->get();
 
+        $expense_amount = Expense::sum('amount');
+
         foreach ($sale_detail as $detail) {
             $total_sell = $total_sell + $detail->amount;
             $total_buy = $total_buy + $detail->currentStock['unit_cost'];
@@ -152,6 +154,7 @@ class AccountingReportController extends Controller
             $detail->total_buy = $total_buy;
             $detail->from = $date[0];
             $detail->to = $date[1];
+            $detail->expense_amount = floatval($expense_amount);
 
         }
 

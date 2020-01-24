@@ -138,8 +138,8 @@
         <table id="table-detail-2" align="center">
             <!-- loop the product names here -->
             <tr>
-                <td align="right">Net Income (Total Sell - Total Buy)</td>
-                <td align="right">{{number_format(($data->last()->total_sell) - ($data->last()->total_buy),2)}}</td>
+                <td align="right">Net Income (Total Sell - Total Buy - Expenses)</td>
+                <td align="right">{{number_format(($data->last()->total_sell) - ($data->last()->total_buy) - ($data->last()->expense_amount),2)}}</td>
             </tr>
         </table>
     </div>
