@@ -359,6 +359,8 @@ class GoodsReceivingController extends Controller
             }
 
         }
+        $sort_column = array_column($max_prices, 'product_name');
+        array_multisort($sort_column, SORT_ASC, $max_prices);
 
         return $max_prices;
 
