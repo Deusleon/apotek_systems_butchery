@@ -32,7 +32,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-6" hidden>
                             <div class="form-group">
                                 <label for="category">Category</label>
                                 <select id="category-name" name="category_id"
@@ -44,7 +44,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="price-category">Price Category</label>
                                 <select id="price-category-name" name="price_category_id"
@@ -56,9 +56,7 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="store">Store</label>
                                 <select id="store-name" name="store_id"
@@ -71,7 +69,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="supplier">Supplier</label>
                                 <select id="supplier-name" name="supplier_id"
