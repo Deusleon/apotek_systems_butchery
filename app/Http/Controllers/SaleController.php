@@ -174,7 +174,7 @@ class SaleController extends Controller
             ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
             ->where('quantity', '>', 0)
             ->where('inv_products.status', '=', 1)
-            ->select('inv_products.id as id', 'name')
+            ->select('inv_products.id as id', 'name', 'barcode')
             ->groupBy('product_id')
             ->limit(100)
             ->get();
@@ -209,7 +209,7 @@ class SaleController extends Controller
                 ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                 ->where('quantity', '>', 0)
                 ->where('inv_products.status', '=', 1)
-                ->select('inv_products.id as id', 'name')
+                ->select('inv_products.id as id', 'name', 'barcode')
                 ->where('name', 'LIKE', "%{$request->word}%")
                 ->groupBy('product_id')
                 ->limit(100)

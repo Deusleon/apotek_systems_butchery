@@ -26,7 +26,7 @@ class ImportDataController extends Controller
     {
         $categories = Category::all();
         $price_categories = PriceCategory::all();
-        $suppliers = Supplier::orderby('name','ASC')->get();
+        $suppliers = Supplier::orderby('name', 'ASC')->get();
         $stores = Store::all();
         return view('import.index', compact('categories', 'price_categories', 'stores', 'suppliers'));
     }
@@ -47,31 +47,37 @@ class ImportDataController extends Controller
                     $data[4] = preg_replace('/[^\d.]/', '', $data[4]);
 
                     try {
-                        if ($data[5] != null){
+                        if ($data[5] != null) {
                             $excelDate = ExcelDateObject::excelToDateTimeObject($data[5]);
                             $excel_date = $excelDate->format('Y-m-d');
-                        }else{
+                        } else {
                             $excel_date = null;
                         }
                         if (is_numeric($data[2]) && is_numeric($data[3]) && is_numeric($data[4])) {
-//                            foreach ($excelDate as $raw_date) {
-//                                $date = date('Y-m-d', strtotime($raw_date));
-//                            }
+
+                            /*check category name if exists*/
+                            $category_id = Category::where('name', $data[7])->value('id');
+
                             array_push($pending_to_save, array(
                                 'name' => $data[1],
-                                'category_id' => $request->category_id,
+//                                'category_id' => $request->category_id,
                                 'price_category_id' => $request->price_category_id,
                                 'store_id' => $request->store_id,
                                 'unit_price' => $data[2],
                                 'sell_price' => $data[3],
                                 'quantity' => $data[4],
-                                'date' => $excel_date
+                                'date' => $excel_date,
+                                'barcode' => $data[6],
+                                'category_id' => $category_id
                             ));
                         } else {
-                            $pending_to_save = [];
-                            session()->flash("alert-danger", "Item row " . $loop_count . " has wrong entry!");
-                            return back();
-                            break;
+                            if ($data[1] != null) {
+                                /*end of data*/
+                                $pending_to_save = [];
+                                session()->flash("alert-danger", "Item row " . $loop_count . " has wrong entry!");
+                                return back();
+                                break;
+                            }
                         }
 
                     } catch (Exception $e) {
@@ -90,6 +96,7 @@ class ImportDataController extends Controller
                 $product = new Product;
                 $product->name = $data['name'];
                 $product->category_id = $data['category_id'];
+                $product->barcode = $data['barcode'];
 
                 try {
                     $product->save();

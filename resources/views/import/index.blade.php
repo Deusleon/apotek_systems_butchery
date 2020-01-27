@@ -36,7 +36,7 @@
                             <div class="form-group">
                                 <label for="category">Category</label>
                                 <select id="category-name" name="category_id"
-                                        class="js-example-basic-single form-control drop" required>
+                                        class="js-example-basic-single form-control drop">
                                     <option value="" selected="true" disabled="disabled">Select Category...</option>
                                     @foreach($categories as $c)
                                         <option value="{{$c->id}}">{{$c->name}}</option>

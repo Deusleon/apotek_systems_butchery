@@ -925,6 +925,7 @@ $('#price_category').change(function () {
             dataType: 'json',
             success: function (result) {
                 $.each(result, function (detail, name) {
+                    console.log(name);
                     $('#products').append($('<option>', {value: detail, text: name}));
                 });
             },
