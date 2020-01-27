@@ -350,7 +350,7 @@ Route::middleware(["auth"])->group(function () {
         'index'
     ]);
     Route::post('file/import/record-import', 'ImportDataController@recordImport')->name('record-import');
-
+    Route::get('file/import/record-import', 'ImportDataController@getImportTemplate')->name('import-template');
 
 });
 

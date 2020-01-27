@@ -16,6 +16,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Response;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDateObject;
 
@@ -166,6 +167,15 @@ class ImportDataController extends Controller
 
         session()->flash("alert-success", "Data Imported Successfully!");
         return back();
+    }
+
+    public function getImportTemplate()
+    {
+        $file = public_path() . "/fileStore/import_template/import_data_template.xlsx";
+        $headers = array(
+            'Content-Type: application/csv',
+        );
+        return Response::download($file, 'import_data_template.csv', $headers);
     }
 
 

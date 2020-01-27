@@ -82,6 +82,11 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <a href="{{route('import-template')}}">Download Template</a>
+                        </div>
+                    </div>
                     <hr>
                     <div class="row">
                         <div class="col-md-5">
