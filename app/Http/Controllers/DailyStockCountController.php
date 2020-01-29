@@ -2,134 +2,103 @@
 
 namespace App\Http\Controllers;
 
+use App\CurrentStock;
+use App\Sale;
 use App\SalesDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+
+ini_set('max_execution_time', 500);
+set_time_limit(500);
+ini_set('memory_limit', '512M');
 
 class DailyStockCountController extends Controller
 {
 
 
-	public function index()
-	{
+    public function index()
+    {
 
-	    $today = date('Y-m-d');
-		$to_index = $this->summation($today);
+        $today = date('Y-m-d');
+        $to_index = $this->summation($today);
 
-		return view('stock_management.daily_stock_count.index')->with([
-			'products' => array_values($to_index),
+        return view('stock_management.daily_stock_count.index')->with([
+            'products' => array_values($to_index),
             'today' => $today
-		]);
+        ]);
 
-	}
+    }
 
-	public function summation($specific_date)
-	{
+    public function summation($specific_date)
+    {
+        $sales_per_date = Sale::where(DB::raw('date(date)'), $specific_date)->get();
 
-		$sales = SalesDetail::all();
-
-        $current_stocks = DB::table('inv_current_stock as g')
-            ->select(DB::raw('g.product_id'),
-                DB::raw('sum(g.quantity) as quantity_on_hand'))
-            ->join(DB::raw('(
-            SELECT 
-            `product_name`,
-            `product_id`
-            FROM
-                `stock_details`
-            GROUP BY `product_id`) as g1'),
-                function ($join) {
-                    $join->on('g1.product_id', '=', 'g.product_id');
-                })
-            ->groupBy(DB::raw('g1.product_id'))
+        $current_stocks = CurrentStock::select(DB::raw('product_id'),
+            DB::raw('sum(quantity) as quantity_on_hand'))
+            ->groupby('product_id')
             ->get();
 
+        $products = array();
+        $dailyStockCount = array();
 
-		$products = array();
-		$dailyStockCount = array();
-
-
-		//pass the sale and extract data for the date
-		foreach($sales as $sale){
-			//get only the date
-            $date = date('Y-m-d', strtotime($sale->sale['date']));
-
-			//the date exists
-			if ($date == $specific_date) {
-
-				array_push($products, array(
-					'product_id' => $sale->currentStock['product_id'],
-					'product_name' => $sale->currentStock->product['name'],
-					'quantity_sold' => $sale->quantity,
-				));
-
-			}
-
-		}
+        /*sale per day*/
+        foreach ($sales_per_date as $sale_per_date) {
+            /*check for that sale id*/
+            $sale_per_date_details = SalesDetail::where('sale_id', $sale_per_date->id)->get();
+            foreach ($sale_per_date_details as $sale_per_date_detail) {
+                array_push($products, array(
+                    'product_id' => $sale_per_date_detail->currentStock['product_id'],
+                    'product_name' => $sale_per_date_detail->currentStock['product']['name'],
+                    'quantity_sold' => $sale_per_date_detail->quantity,
+                ));
+            }
+        }
 
 
-		//loop the results to sum
-		foreach($products as $ar)
-		{
-
-		    foreach($ar as $k => $v)
-		    {
-
-		        if(array_key_exists($v, $dailyStockCount)){
-		            $dailyStockCount[$v]['quantity_sold'] = $dailyStockCount[$v]['quantity_sold'] + $ar['quantity_sold'];
-		            // $dailyStockCount[$v]['quantity_on_hand'] = 1323;
-
+        //loop the results to sum
+        foreach ($products as $ar) {
+            foreach ($ar as $k => $v) {
+                if (array_key_exists($v, $dailyStockCount)) {
+                    $dailyStockCount[$v]['quantity_sold'] = $dailyStockCount[$v]['quantity_sold'] + $ar['quantity_sold'];
                     foreach ($current_stocks as $value) {
-
                         if ($dailyStockCount[$v]['product_id'] == $value->product_id) {
-
-				            $dailyStockCount[$v]['quantity_on_hand'] = $value->quantity_on_hand;
-
-                        }
-
-                    }
-		        }
-		        else if($k == 'product_id'){
-		            $dailyStockCount[$v] = $ar;
-
-                    foreach ($current_stocks as $value) {
-
-                        if ($dailyStockCount[$v]['product_id'] == $value->product_id) {
-
                             $dailyStockCount[$v]['quantity_on_hand'] = $value->quantity_on_hand;
-
                         }
-
                     }
-		        }
+                } else if ($k == 'product_id') {
+                    $dailyStockCount[$v] = $ar;
+                    foreach ($current_stocks as $value) {
+                        if ($dailyStockCount[$v]['product_id'] == $value->product_id) {
+                            $dailyStockCount[$v]['quantity_on_hand'] = $value->quantity_on_hand;
+                        }
+                    }
+                }
+            }
+        }
 
+        return $dailyStockCount;
 
-		    }
-		}
+    }
 
-		return $dailyStockCount;
+    public function showDailyStockFilter(Request $request)
+    {
 
-	}
-
-	public function showDailyStockFilter(Request $request)
-	{
-
-		if ($request->ajax()) {
+        if ($request->ajax()) {
 
             $data = $this->summation($request->date);
 
-			//array_values remove named key
-			return array_values($data);
+            //array_values remove named key
+            return array_values($data);
 
-		}
+        }
 
-	}
+    }
 
-	public function generateDailyStockCountPDF(Request $request)
-	{
+    public function generateDailyStockCountPDF(Request $request)
+    {
 
-		$data = $this->summation($request->sale_date);
-		$new_data = array_values($data);
+        $data = $this->summation($request->sale_date);
+        $new_data = array_values($data);
 
         $view = 'stock_management.daily_stock_count.daily_stock_count';
         $output = 'daily_stock_count.pdf';
@@ -141,7 +110,7 @@ class DailyStockCountController extends Controller
 //
 //        return $pdf->stream('daily_stock_count.pdf');
 
-	}
+    }
 
 
 }
