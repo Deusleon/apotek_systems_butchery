@@ -165,6 +165,7 @@ class AccountingReportController extends Controller
     private function currentStockValue($dates, $price_category_id, $store_id)
     {
         $category_total_cost = array();
+
         $products = PriceList::where('price_category_id', $price_category_id)
             ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
             ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
@@ -182,16 +183,30 @@ class AccountingReportController extends Controller
                 ->where('product_id', $product->id)
                 ->first('price');
 
+
             array_push($category_total_cost, array(
                 'category_name' => $data->currentStock['product']['category']['name'],
-                'buy_price' => $data->currentStock['unit_cost'],
-                'sell_price' => $data->price,
-                'store' => $data->currentStock['store']['name']
+                'buy_price' => $data->currentStock['quantity'] * $data->currentStock['unit_cost'],
+                'sell_price' => $data->currentStock['quantity'] * $data->price,
+                'store' => $data->currentStock['store']['name'],
+                'product_id' => $data->currentStock['product_id'],
+                'quantity' => $data->currentStock['quantity']
             ));
         }
 
-        $sum_by_category = array();
+
+        $sum_by_product_id = array();
         $sum_by_key = new CommonFunctions();
+        foreach ($category_total_cost as $value) {
+            $index = $sum_by_key->sumByKey($value['product_id'], $sum_by_product_id, 'product_id');
+            if ($index < 0) {
+                $sum_by_product_id[] = $value;
+            } else {
+                $sum_by_product_id[$index]['quantity'] += $value['quantity'];
+            }
+        }
+
+        $sum_by_category = array();
         foreach ($category_total_cost as $value) {
             $index = $sum_by_key->sumByKey($value['category_name'], $sum_by_category, 'category_name');
             if ($index < 0) {
