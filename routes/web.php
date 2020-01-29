@@ -146,7 +146,7 @@ Route::middleware(["auth"])->group(function () {
     Route::get('sales/credit-payments', 'SaleController@getCreditsCustomers')->name('credit-payments.getCreditsCustomers');
     Route::post('sales/credit-payments', 'SaleController@CreditSalePayment')->name('credit-payments.creditSalePayment');
     Route::get('sales/sale-histories', 'SaleController@SalesHistory')->name('sale-histories.SalesHistory');
-    Route::get('sales/sale-date', 'SaleController@getSalesHistory')->name('getSalesHistory');
+    Route::post('sales/sale-date', 'SaleController@getSalesHistory')->name('getSalesHistory');
     Route::post('sales/select-products', 'SaleController@selectProducts')->name('selectProducts');
     Route::get('sales/cash-sale/receipt/{page}', 'SaleController@getCashReceipt')->name('getCashReceipt');
     Route::get('sales/credit-sale/receipt', 'SaleController@getCreditReceipt')->name('getCreditReceipt');

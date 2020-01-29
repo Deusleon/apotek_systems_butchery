@@ -127,46 +127,6 @@ var credit_payment_table = $('#credit_payment_table').DataTable({
     ], aaSorting: [[2, "desc"]]
 });
 
-var sale_history_table = $('#sale_history_table').DataTable({
-    bPaginate: true,
-    bInfo: true,
-    ordering: false,
-// dom: 't',
-    columns: [
-        {data: 'receipt_number'},
-        {
-            data: 'date', render: function (date) {
-                return moment(date).format('D-M-YYYY');
-            }
-        },
-        {data: 'cost.name'},
-        {
-            data: 'cost', render: function (cost) {
-                return formatMoney(((cost.amount - cost.discount) / (1 + (cost.vat / cost.sub_total))));
-            }
-        },
-
-        {
-            data: 'cost', render: function (cost) {
-                return formatMoney(((cost.amount - cost.discount) * (cost.vat / cost.sub_total)));
-            }
-        },
-        {
-            data: 'cost.discount', render: function (discount) {
-                return formatMoney(discount);
-            }
-        },
-        {
-            data: 'cost', render: function (cost) {
-                return formatMoney(((cost.amount - cost.discount)));
-            }
-        },
-        {
-            data: "action",
-            defaultContent: "<button type='button' id='sale_details' class='btn btn-sm btn-rounded btn-success'>Show</button><button type='submit' id='sale_receipt_reprint' class='btn btn-sm btn-rounded btn-secondary'><span class='fa fa-print' aria-hidden='true'></span>Print</button>"
-        }
-    ]
-});
 var sale_list_Table = $('#sale_list_Table').DataTable({
     order: [[1, "desc"]],
     dom: 't',
@@ -175,9 +135,6 @@ var sale_list_Table = $('#sale_list_Table').DataTable({
     fixedHeader: true,
 });
 
-$('#searching').on('keyup', function () {
-    sale_history_table.search(this.value).draw();
-});
 $("#products").on('change', function () {
     valueCollection();
 });
@@ -774,44 +731,6 @@ $('#sale_quotes-Table tbody').on('click', '#quote_details', function () {
     $('#quote-details').modal('show');
 });
 
-$('#sale_history_table tbody').on('click', '#sale_details', function () {
-    var row_data = sale_history_table.row($(this).parents('tr')).data();
-    $('#sale-details').modal('show');
-    var items = row_data.details;
-    sold = " <span class='badge badge-success'>Sold</span>";
-    pending = " <span class='badge badge-secondary'>Pending</span>";
-    returned = " <span class='badge badge-danger'>Returned</span>";
-    sale_items = [];
-    items.forEach(function (item) {
-        var item_data = [];
-        item_data.push(item.id);
-        item_data.push(item.name);
-        item_data.push(item.quantity);
-        item_data.push((item.price / item.quantity));
-        item_data.push(item.vat);
-        item_data.push(item.discount);
-        item_data.push(item.amount);
-        if (item.status == 2) {
-            item_data.push(pending)
-        } else if (item.status == 3) {
-            item_data.push(returned)
-        } else {
-            item_data.push(sold)
-        }
-        sale_items.push(item_data);
-    });
-    items_table.clear();
-    items_table.rows.add(sale_items);
-    items_table.columns([0]).visible(false);
-    items_table.draw();
-});
-
-$('#sale_history_table tbody').on('click', '#sale_receipt_reprint', function () {
-    var row_data = sale_history_table.row($(this).parents('tr')).data();
-
-    document.getElementById("print").value = row_data.receipt_number;
-});
-
 $('#items_table tbody').on('click', '#rtn_btn', function () {
     var index = items_table.row($(this).parents('tr')).index();
     var data = items_table.row($(this).parents('tr')).data();
@@ -1018,33 +937,6 @@ function getCredits() {
 
             },
             complete: function () {
-            }
-        });
-    }
-
-}
-
-function getHistory() {
-    var range = document.getElementById('daterange').value;
-    range = range.split('-');
-    if (range) {
-        $('#loading').show();
-        $.ajax({
-            url: config.routes.getSalesHistory,
-            data: {
-                "_token": config.token,
-                "range": range
-            },
-            type: 'get',
-            dataType: 'json',
-            success: function (data) {
-                sale_history_table.clear();
-                sale_history_table.rows.add(data);
-                sale_history_table.draw();
-
-            },
-            complete: function () {
-                $('#loading').hide();
             }
         });
     }

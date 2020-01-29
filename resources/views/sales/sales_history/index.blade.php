@@ -114,6 +114,106 @@
             }
         });
 
+        function getHistory() {
+            var range = document.getElementById('daterange').value;
+            range = range.split('-');
+
+            $("#sale_history_table").dataTable().fnDestroy();
+
+            $('#sale_history_table').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": config.routes.getSalesHistory,
+                    "dataType": "json",
+                    "type": "post",
+                    "cache": false,
+                    "data": {
+                        _token: "{{csrf_token()}}",
+                        range: range
+                    }
+                },
+                "columns": [
+                    {'data': 'receipt_number'},
+                    {
+                        'data': 'date', render: function (date) {
+                            return moment(date).format('D-M-YYYY');
+                        }
+                    },
+                    {'data': 'cost.name'},
+                    {
+                        'data': 'cost', render: function (cost) {
+                            return formatMoney(((cost.amount - cost.discount) / (1 + (cost.vat / cost.sub_total))));
+                        }
+                    },
+
+                    {
+                        'data': 'cost', render: function (cost) {
+                            return formatMoney(((cost.amount - cost.discount) * (cost.vat / cost.sub_total)));
+                        }
+                    },
+                    {
+                        'data': 'cost.discount', render: function (discount) {
+                            return formatMoney(discount);
+                        }
+                    },
+                    {
+                        'data': 'cost', render: function (cost) {
+                            return formatMoney(((cost.amount - cost.discount)));
+                        }
+                    },
+                    {
+                        'data': "action",
+                        defaultContent: "<button type='button' id='sale_details' class='btn btn-sm btn-rounded btn-success'>Show</button><button type='submit' id='sale_receipt_reprint' class='btn btn-sm btn-rounded btn-secondary'><span class='fa fa-print' aria-hidden='true'></span>Print</button>"
+                    }
+                ],
+                "columnDefs": [
+                    {"orderable": false, "targets": [3, 4, 5, 6, 7]}
+                ]
+
+            });
+
+
+        }
+
+        $('#sale_history_table tbody').on('click', '#sale_details', function () {
+            var row_data = $('#sale_history_table').DataTable().row($(this).parents('tr')).data();
+            $('#sale-details').modal('show');
+            var items = row_data.details;
+            sold = " <span class='badge badge-success'>Sold</span>";
+            pending = " <span class='badge badge-secondary'>Pending</span>";
+            returned = " <span class='badge badge-danger'>Returned</span>";
+            sale_items = [];
+            items.forEach(function (item) {
+                var item_data = [];
+                item_data.push(item.id);
+                item_data.push(item.name);
+                item_data.push(item.quantity);
+                item_data.push((item.price / item.quantity));
+                item_data.push(item.vat);
+                item_data.push(item.discount);
+                item_data.push(item.amount);
+                if (item.status == 2) {
+                    item_data.push(pending)
+                } else if (item.status == 3) {
+                    item_data.push(returned)
+                } else {
+                    item_data.push(sold)
+                }
+                sale_items.push(item_data);
+            });
+            items_table.clear();
+            items_table.rows.add(sale_items);
+            items_table.columns([0]).visible(false);
+            items_table.draw();
+        });
+
+        $('#sale_history_table tbody').on('click', '#sale_receipt_reprint', function () {
+            var row_data = $('#sale_history_table').DataTable().row($(this).parents('tr')).data();
+            document.getElementById("print").value = row_data.receipt_number;
+        });
+
+
         var config = {
             token: '{{ csrf_token() }}',
             routes: {
