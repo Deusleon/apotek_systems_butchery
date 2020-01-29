@@ -19,7 +19,6 @@ class SaleQuoteController extends Controller
 
     public function index()
     {
-        dd('here');
         $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
         $enable_discount = Setting::where('id', 111)->value('value');
 
