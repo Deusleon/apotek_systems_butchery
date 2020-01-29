@@ -152,7 +152,7 @@
         var paid_amount = parseFloat(paid_amounts_format.replace(/\,/g, ''), 10);
         var invoice_amount = parseFloat(invoice_amounts_format.replace(/\,/g, ''), 10);
 
-        if ((Number(invoice_amount) >= Number(paid_amount)) && (Number(invoice_amount) && Number(paid_amount) !== Number(0))) {
+        if ((Number(invoice_amount) >= Number(paid_amount))) {
 
             //not zero then sub
             var remain_amount = invoice_amount - paid_amount;
