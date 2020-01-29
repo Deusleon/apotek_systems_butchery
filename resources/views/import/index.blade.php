@@ -48,7 +48,7 @@
                             <div class="form-group">
                                 <label for="price-category">Price Category</label>
                                 <select id="price-category-name" name="price_category_id"
-                                        class="js-example-basic-single form-control drop" required>
+                                        class="js-example-basic-single form-control drop">
                                     <option value="" selected="true" disabled="disabled">Select Category...</option>
                                     @foreach($price_categories as $pc)
                                         <option value="{{$pc->id}}">{{$pc->name}}</option>
@@ -60,7 +60,7 @@
                             <div class="form-group">
                                 <label for="store">Store</label>
                                 <select id="store-name" name="store_id"
-                                        class="js-example-basic-single form-control drop" required>
+                                        class="js-example-basic-single form-control drop">
                                     <option value="" selected="true" disabled="disabled">Select store</option>
                                     @foreach($stores as $store)
                                         <option value="{{$store->id}}">
@@ -73,7 +73,7 @@
                             <div class="form-group">
                                 <label for="supplier">Supplier</label>
                                 <select id="supplier-name" name="supplier_id"
-                                        class="js-example-basic-single form-control drop" required>
+                                        class="js-example-basic-single form-control drop">
                                     <option value="" selected="true" disabled="disabled">Select Supplier...</option>
                                     @foreach($suppliers as $sp)
                                         <option value="{{$sp->id}}">{{$sp->name}}</option>
