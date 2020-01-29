@@ -156,7 +156,7 @@ Route::middleware(["auth"])->group(function () {
 
 
     //Sales Quotes routes
-    Route::get('sales/sales-quotes', 'SaleQuoteController@index')->name('sale-quotes.index');
+    Route::get('sales/sales-quotes/index', 'SaleQuoteController@index')->name('sale-quotes.index');
     Route::post('sales/sales-quotes/store', 'SaleQuoteController@store')->name('sale-quotes.store');
     Route::get('sales/sales-quotes/receipt', 'SaleQuoteController@getQuoteReceipt')->name('getQuoteReceipt');
     Route::post('sales/sales-quotes/save', 'SaleQuoteController@storeQuote')->name('storeQuote');
