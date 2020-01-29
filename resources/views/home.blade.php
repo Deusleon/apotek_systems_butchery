@@ -119,10 +119,13 @@
 
                 {{-- row 2 start --}}
                 <div class="row">
-                    <div class="col-md-6 col-xl-6">
+                    <div class="col-md-12 col-xl-12">
                         <div id='monthly_sales'></div>
                     </div>
-                    <div class="col-md-6 col-xl-6">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-xl-12">
                         <div id='sales_by_category'></div>
                     </div>
                 </div>
@@ -469,7 +472,7 @@
                 }
             ];
 
-            pieSeries.alignLabels = false;
+            pieSeries.alignLabels = true;
             pieSeries.labels.template.bent = true;
             pieSeries.labels.template.radius = 3;
             pieSeries.labels.template.padding(0, 0, 0, 0);
