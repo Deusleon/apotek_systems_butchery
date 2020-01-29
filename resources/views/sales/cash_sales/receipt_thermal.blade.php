@@ -112,7 +112,7 @@
 {{--    </div>--}}
 {{--</div>--}}
 <div class="row" style="padding-top: -4%; width: 38%; margin-left: -6.5%">
-    <h3 align="center"><b>RECEIPT</b></h3>
+    <h3 align="center"><b>BILL</b></h3>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['name']}}</h3>
     <h5 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h5>
     <h5 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h5>

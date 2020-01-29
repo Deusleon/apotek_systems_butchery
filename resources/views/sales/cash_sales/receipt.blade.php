@@ -76,7 +76,7 @@
     </div>
 </div>
 <div class="row" style="padding-top: -2%">
-    <h3 align="center">RECEIPT</h3>
+    <h3 align="center">BILL</h3>
     <h3 align="center" style="margin-top: -2%">{{$pharmacy['name']}}</h3>
     <h6 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h6>
     <h6 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h6>

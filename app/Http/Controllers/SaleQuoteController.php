@@ -106,6 +106,7 @@ class SaleQuoteController extends Controller
     public function getQuoteReceipt()
     {
 
+        $page = -22;
         $receipt_size = Setting::where('id', 119)->value('value');
         $pharmacy['name'] = Setting::where('id', 100)->value('value');
         $pharmacy['logo'] = Setting::where('id', 105)->value('value');
@@ -163,10 +164,10 @@ class SaleQuoteController extends Controller
 
         if ($receipt_size === 'Thermal Paper') {
             $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
-                compact('data', 'pharmacy'));
+                compact('data', 'pharmacy', 'page'));
         } else {
             $pdf = PDF::loadView('sales.sale_quotes.quote_receipt',
-                compact('data', 'pharmacy'));
+                compact('data', 'pharmacy', 'page'));
         }
 
         return $pdf->stream($id . '.pdf');
