@@ -58,21 +58,29 @@ class HomeController extends Controller
 
         $todaySales = DB::table('sale_details')
             ->whereRaw('date(sold_at) = date(now())')
+            ->wherenull('status')
+            ->orwhere('status', '!=', 3)
             ->sum('amount');
 
         $totalDailySales = DB::table('sale_details')
             ->select(DB::raw('date(sold_at) date, sum(amount) value'))
+            ->wherenull('status')
+            ->orwhere('status', '!=', 3)
             ->groupBy(DB::raw('date(sold_at)'))
             ->limit('60')
             ->get();
 
         $totalMonthlySales = DB::table('sale_details')
             ->select(DB::raw("DATE_FORMAT(sold_at, '%b %y') month,sum(amount) amount"))
+            ->wherenull('status')
+            ->orwhere('status', '!=', 3)
             ->groupBy(DB::raw("DATE_FORMAT(sold_at, '%Y%m')"))
             ->get();
 
         $salesByCategory = DB::table('sale_details')
             ->select(DB::raw("category,sum(amount) amount"))
+            ->wherenull('status')
+            ->orwhere('status', '!=', 3)
             ->groupBy('category')
             ->get();
 
