@@ -166,7 +166,7 @@
                         'data': "action",
                         defaultContent: "<button type='button' id='sale_details' class='btn btn-sm btn-rounded btn-success'>Show</button><button type='submit' id='sale_receipt_reprint' class='btn btn-sm btn-rounded btn-secondary'><span class='fa fa-print' aria-hidden='true'></span>Print</button>"
                     }
-                ],
+                ], aaSorting: [[1, 'desc']],
                 "columnDefs": [
                     {"orderable": false, "targets": [3, 4, 5, 6, 7]}
                 ]
