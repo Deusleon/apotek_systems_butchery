@@ -313,6 +313,7 @@ $('#items_table tbody').on('click', '#receive_btn', function () {
     $('#receive').find('.modal-body #product-id').val(data[0]);
     $('#receive').find('.modal-body #order-item-id').val(data[7]);
     $('#receive').find('.modal-body #id_of_supplier').val(data[6]);
+    $('#receive').find('.modal-body #sell_price_i').val('');
     var supplier_ids = data[7];
     var item_id = data[0];
     var e = document.getElementById("price_cat");
