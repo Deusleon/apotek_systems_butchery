@@ -334,12 +334,15 @@ class SaleController extends Controller
         if ($receipt_size === 'Thermal Paper') {
             $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
                 compact('data', 'pharmacy', 'page'));
-        } else {
+            return $pdf->stream($request->reprint_receipt . '.pdf');
+        } else if ($receipt_size === 'A4 / Latter') {
             $pdf = PDF::loadView('sales.cash_sales.receipt',
                 compact('data', 'pharmacy', 'page'));
+            return $pdf->stream($request->reprint_receipt . '.pdf');
+        } else {
+            echo "<script>window.close();</script>";
         }
 
-        return $pdf->stream($request->reprint_receipt . '.pdf');
 
     }
 
@@ -653,14 +656,17 @@ class SaleController extends Controller
         if ($receipt_size === 'Thermal Paper') {
             $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
                 compact('data', 'pharmacy', 'page'));
-        } else {
+            return $pdf->stream($receipt_no . '.pdf');
+
+        } else if ($receipt_size === 'A4 / Latter') {
             $pdf = PDF::loadView('sales.cash_sales.receipt',
                 compact('data', 'pharmacy', 'page'));
+            return $pdf->stream($receipt_no . '.pdf');
+
+        } else {
+            echo "<script>window.close();</script>";
         }
 
-        return $pdf->stream($receipt_no . '.pdf');
-
-//return $grouped_sales;
     }
 
     public function getCreditReceipt()
