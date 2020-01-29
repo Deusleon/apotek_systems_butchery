@@ -201,8 +201,8 @@
                 <li class=""><a href="{{route('locations.index')}}" class="">Locations</a></li>
             @endcan
             @can('View Data Import')
-                <li class="nav-item"><a href="{{route('import.index')}}" class="nav-link"><span class="pcoded-mtext">Import</span></a>
-                </li>
+                    {{--                <li class="nav-item"><a href="{{route('import.index')}}" class="nav-link"><span class="pcoded-mtext">Import</span></a>--}}
+                    {{--                </li>--}}
             @endcan
             {{--        <!--   <li class=""><a href="{{route('general-settings.index')}}" class="">General Settings</a></li> -->--}}
         </ul>
