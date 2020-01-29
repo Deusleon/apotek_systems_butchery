@@ -27,7 +27,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="code">Invoice #</label>
-                                <select name="invoice" class="form-control" id="invoice_ids" required="true">
+                                <select name="invoice" class="form-control" id="invoice_ids">
                                     <option value="" selected="true" disabled>Select Option</option>
                                     {{--                                    @foreach($invoices as $invoice)--}}
                                     {{--                                        <option value="{{$invoice->id}}">{{$invoice->invoice_no}}</option>--}}
