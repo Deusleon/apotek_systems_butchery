@@ -164,7 +164,7 @@ Route::middleware(["auth"])->group(function () {
 
     //Sales Returns routes
     Route::get('sales/sales-returns', 'SaleReturnController@index')->name('sale-returns.index');
-    Route::get('/sales-returns', 'SaleReturnController@getSales')->name('getSales');
+    Route::post('/sales-returns', 'SaleReturnController@getSales')->name('getSales');
     Route::get('/returns', 'SaleReturnController@getRetunedProducts')->name('getRetunedProducts');
     Route::post('sales/sales-returns', 'SaleReturnController@store')->name('sale-returns.store');
     Route::get('sales/returns-approval', 'SaleReturnController@getSalesReturn')->name('sale-returns-approval.getSalesReturn');

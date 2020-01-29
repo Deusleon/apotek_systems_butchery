@@ -9,8 +9,8 @@ use App\SalesDetail;
 use App\SalesReturn;
 use App\Setting;
 use Auth;
-use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use View;
 
 class SaleReturnController extends Controller
@@ -28,20 +28,92 @@ class SaleReturnController extends Controller
             ->with(compact('count'));
     }
 
+//    public function getSales(Request $request)
+//    {
+//        $from = $request->date[0];
+//        $to = $request->date[1];
+//        $user = Auth::user()->id;
+//        $sales = Sale::where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
+//            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
+//            ->get();
+//        foreach ($sales as $sale) {
+//            $sale->cost;
+//            $sale->details;
+//        }
+//        $data = json_decode($sales, true);
+//        return $data;
+//    }
+
     public function getSales(Request $request)
     {
-        $from = $request->date[0];
-        $to = $request->date[1];
-        $user = Auth::user()->id;
-        $sales = Sale::where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
-            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
-            ->get();
-        foreach ($sales as $sale) {
-            $sale->cost;
-            $sale->details;
+
+        $columns = array(
+            0 => 'receipt_number',
+            1 => 'date',
+            2 => 'price_category_id'
+        );
+
+        $from = $request->range[0];
+        $to = $request->range[1];
+
+        $totalData = Sale::whereBetween(DB::raw('date(date)'),
+            [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
+            ->orderby('id', 'DESC')
+            ->count();
+
+        $totalFiltered = $totalData;
+
+        $limit = $request->input('length');
+        $start = $request->input('start');
+        $order = $columns[$request->input('order.0.column')];
+        $dir = $request->input('order.0.dir');
+
+        if (empty($request->input('search.value'))) {
+            $sales = Sale::whereBetween(DB::raw('date(date)'),
+                [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
+                ->offset($start)
+                ->limit($limit)
+                ->orderBy($order, $dir)
+                ->get();
+        } else {
+            $search = $request->input('search.value');
+
+            $sales = Sale::whereBetween(DB::raw('date(date)'),
+                [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
+                ->where('receipt_number', 'LIKE', "%{$search}%")
+                ->orWhere(DB::raw('date(date)'), 'LIKE', "%{$search}%")
+                ->offset($start)
+                ->limit($limit)
+                ->orderBy($order, $dir)
+                ->get();
+
+            $totalFiltered = Sale::whereBetween(DB::raw('date(date)'),
+                [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
+                ->where('receipt_number', 'LIKE', "%{$search}%")
+                ->orWhere(DB::raw('date(date)'), 'LIKE', "%{$search}%")
+                ->count();
         }
-        $data = json_decode($sales, true);
-        return $data;
+
+        $data = array();
+        if (!empty($sales)) {
+            foreach ($sales as $sale) {
+
+                $sale->cost;
+                $sale->details;
+
+            }
+        }
+
+        $json_data = array(
+            "draw" => intval($request->input('draw')),
+            "recordsTotal" => intval($totalData),
+            "recordsFiltered" => intval($totalFiltered),
+            "data" => $sales
+        );
+
+        echo json_encode($json_data);
+
+
     }
 
     public function getRetunedProducts(Request $request)

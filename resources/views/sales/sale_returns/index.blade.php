@@ -115,6 +115,13 @@
     <script src="{{asset("assets/apotek/js/sales.js")}}"></script>
 
     <script type="text/javascript">
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
         $(function () {
 
             var start = moment();
@@ -148,80 +155,71 @@
 
     <script type="text/javascript">
 
-
         function getSales() {
-            var range = document.getElementById("sold_date").value;
-            var date = range.split('-');
-            if (date) {
-                $('#loading').show();
-                $.ajax({
-                    url: '{{route('getSales')}}',
-                    data: {
-                        "_token": '{{ csrf_token() }}',
-                        "date": date
-                    },
-                    type: 'get',
-                    dataType: 'json',
-                    cache: false,
-                    success: function (data) {
+            var range = document.getElementById('sold_date').value;
+            range = range.split('-');
 
-                        sale_list_return_table.clear();
-                        sale_list_return_table.rows.add(data);
-                        sale_list_return_table.draw();
+            $("#sale_list_return_table").dataTable().fnDestroy();
 
-                    },
-                    complete: function () {
-                        $('#loading').hide();
+            $('#sale_list_return_table').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": '{{route('getSales')}}',
+                    "dataType": "json",
+                    "type": "post",
+                    "cache": false,
+                    "data": {
+                        _token: "{{csrf_token()}}",
+                        range: range
                     }
-                });
-            }
+                },
+                "columns": [
+                    {'data': 'receipt_number'},
+                    {
+                        'data': 'date', render: function (date) {
+                            return moment(date).format('D-M-YYYY');
+                        }
+                    },
+                    {'data': 'cost.name'},
+                    {
+                        'data': 'cost', render: function (cost) {
+                            return formatMoney(((cost.amount - cost.discount) / (1 + (cost.vat / cost.sub_total))));
+                        }
+                    },
+
+                    {
+                        'data': 'cost', render: function (cost) {
+                            return formatMoney(((cost.amount - cost.discount) * (cost.vat / cost.sub_total)));
+                        }
+                    },
+                    {
+                        'data': 'cost.discount', render: function (discount) {
+                            return formatMoney(discount);
+                        }
+                    },
+                    {
+                        'data': 'cost', render: function (cost) {
+                            return formatMoney(((cost.amount - cost.discount)));
+                        }
+                    },
+                    {
+                        'data': "action",
+                        defaultContent: "<button type='button' id='open_btn' class='btn btn-sm btn-rounded btn-success'>Open</button>"
+                    }
+                ], aaSorting: [[1, 'desc']],
+                "columnDefs": [
+                    {"orderable": false, "targets": [3, 4, 5, 6, 7]}
+                ]
+
+            });
+
+
         }
 
-
-        var sale_list_return_table = $('#sale_list_return_table').DataTable({
-            bPaginate: true,
-            bInfo: true,
-            // dom: 't',
-            columns: [
-                {data: 'receipt_number'},
-                {
-                    data: 'date', render: function (date) {
-                        return moment(date).format('MMM DD,YYYY');
-                    }
-                },
-                {data: 'cost.name'},
-                {
-                    data: 'cost', render: function (cost) {
-                        return formatMoney(((cost.amount - cost.discount) / (1 + (cost.vat / cost.sub_total))));
-                    }
-                },
-
-                {
-                    data: 'cost', render: function (cost) {
-                        return formatMoney(((cost.amount - cost.discount) * (cost.vat / cost.sub_total)));
-                    }
-                },
-                {data: 'cost.discount'},
-                {
-                    data: 'cost', render: function (cost) {
-                        return formatMoney(((cost.amount - cost.discount)));
-                    }
-                },
-                {
-                    data: "action",
-                    defaultContent: "<button type='button' id='open_btn' class='btn btn-sm btn-rounded btn-success'>Open</button>"
-                }
-            ], aaSorting: [[1, "desc"]]
-        });
-
-
         $('#sale_list_return_table tbody').on('click', '#open_btn', function () {
-            var row_data = sale_list_return_table.row($(this).parents('tr')).data();
+            var row_data = $('#sale_list_return_table').DataTable().row($(this).parents('tr')).data();
             saleReturn(row_data.details);
-        });
-
-        $('#searching_sales').on('keyup', function () {
-            sale_list_return_table.search(this.value).draw();
         });
 
     </script>

@@ -489,24 +489,6 @@ class SaleController extends Controller
 
     }
 
-//    public function getSalesHistory(Request $request)
-//    {
-//        $from = $request->range[0];
-//        $to = $request->range[1];
-//        $user = Auth::user()->id;
-//        $sales = Sale::
-//        whereBetween(DB::raw('date(date)'),
-//            [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
-//            ->orderby('id', 'DESC')
-//            ->get();
-//        foreach ($sales as $sale) {
-//            $sale->cost;
-//            $sale->details;
-//        }
-//        $data = json_decode($sales, true);
-//        return $data;
-//    }
-
     public function getSalesHistory(Request $request)
     {
 
