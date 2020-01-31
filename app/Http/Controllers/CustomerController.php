@@ -26,6 +26,8 @@ class CustomerController extends Controller
         $customer->address = $request->address;
         $customer->phone = $request->phone;
         $customer->email = $request->email;
+        $customer->tin = $request->tin;
+
 
         $customer->save();
 
@@ -41,6 +43,7 @@ class CustomerController extends Controller
         $customer->address = $request->address;
         $customer->phone = $request->phone;
         $customer->email = $request->email;
+        $customer->tin = $request->tin;
         if (!empty($request->credit_limit)) {
             $customer->credit_limit = $request->credit_limit;
         }

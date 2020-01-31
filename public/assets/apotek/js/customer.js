@@ -22,17 +22,19 @@ $('#edit').on('show.bs.modal', function (event) {
     modal.find('.modal-body #credit_input_edit').val(button.data('credit_limit'));
     modal.find('.modal-body #phone_edit').val(button.data('phone'));
     modal.find('.modal-body #email_edit').val(button.data('email'));
+    modal.find('.modal-body #tin_edit').val(button.data('tin'));
+
     validateMobile(input, errorMsg, validMsg, action);
 });
 
 
 $('#delete').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget)
+    var button = $(event.relatedTarget);
     var message = "Are you sure you want to delete '".concat(button.data('name'), "'?");
-    var modal = $(this)
+    var modal = $(this);
     modal.find('.modal-body #message').text(message);
     modal.find('.modal-body #id').val(button.data('id'))
-})
+});
 
 
 //Change the input into money format with fixed 2 decimal places

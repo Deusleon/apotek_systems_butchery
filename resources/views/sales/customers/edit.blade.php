@@ -51,6 +51,13 @@
                                 </div>
                             </div>
                             <div class="form-group row">
+                                <label for="code" class="col-md-4 col-form-label text-md-right">TIN</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" id="tin_edit" name="tin"
+                                           placeholder="Enter TIN" required>
+                                </div>
+                            </div>
+                            <div class="form-group row">
                                 <label for="code" class="col-md-4 col-form-label text-md-right">Credit Limit<font
                                         color="red">*</font></label>
                                 <div class="col-md-8">
