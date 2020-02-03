@@ -79,6 +79,7 @@
                                                         data-address="{{$customer->address}}"
                                                         data-phone="{{$customer->phone}}"
                                                         data-email="{{$customer->email}}"
+                                                        data-tin="{{$customer->tin}}"
 
                                                         type="button"
                                                         data-toggle="modal" data-target="#edit">Edit

@@ -316,6 +316,7 @@ class SaleController extends Controller
                 'total_vat' => ($item->sale['cost']['vat']),
                 'sold_by' => $item->sale['user']['name'],
                 'customer' => $item->sale['customer']['name'],
+                'customer_tin' => $item->sale['customer']['tin'],
                 'paid' => $paid,
                 'balance' => $balance,
                 'remark' => $remark,
@@ -638,6 +639,7 @@ class SaleController extends Controller
                 'total_vat' => ($item->sale['cost']['vat']),
                 'sold_by' => $item->sale['user']['name'],
                 'customer' => $item->sale['customer']['name'],
+                'customer_tin' => $item->sale['customer']['tin'],
                 'paid' => $paid,
                 'balance' => $balance,
                 'remark' => $remark,
@@ -653,14 +655,27 @@ class SaleController extends Controller
         }
 
         $data = $grouped_sales;
+
         if ($receipt_size === 'Thermal Paper') {
-            $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
-                compact('data', 'pharmacy', 'page'));
+            if ($page === "-1") {
+                $pdf = PDF::loadView('sales.cash_sales.credit_receipt_thermal',
+                    compact('data', 'pharmacy', 'page'));
+            } else {
+                $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
+                    compact('data', 'pharmacy', 'page'));
+            }
+
             return $pdf->stream($receipt_no . '.pdf');
 
         } else if ($receipt_size === 'A4 / Latter') {
-            $pdf = PDF::loadView('sales.cash_sales.receipt',
-                compact('data', 'pharmacy', 'page'));
+            if ($page === "-1") {
+                $pdf = PDF::loadView('sales.cash_sales.credit_receipt',
+                    compact('data', 'pharmacy', 'page'));
+            } else {
+                $pdf = PDF::loadView('sales.cash_sales.receipt',
+                    compact('data', 'pharmacy', 'page'));
+            }
+
             return $pdf->stream($receipt_no . '.pdf');
 
         } else {
@@ -706,6 +721,7 @@ class SaleController extends Controller
                 'total_vat' => ($item->sale['cost']['vat']),
                 'sold_by' => $item->sale['user']['name'],
                 'customer' => $item->sale['customer']['name'],
+                'customer_tin' => $item->sale['customer']['tin'],
                 'created_at' => date('Y-m-d', strtotime($item->sale['date']))
             ));
         }

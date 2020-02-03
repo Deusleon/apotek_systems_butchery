@@ -146,7 +146,7 @@
         document.getElementById("amount_edit").value = formatMoney(invoice_amount);
         document.getElementById("amount_paid_edit").value = formatMoney(paid_amount);
 
-        if ((Number(invoice_amount) >= Number(paid_amount)) && (Number(invoice_amount) && Number(paid_amount) !== Number(0))) {
+        if ((Number(invoice_amount) >= Number(paid_amount))) {
 
             //not zero then sub
             var remain_amount = invoice_amount - paid_amount;
