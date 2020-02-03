@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\CurrentStock;
 use Illuminate\Support\Facades\DB;
 
 class InventoryCountSheetController extends Controller
@@ -11,30 +12,17 @@ class InventoryCountSheetController extends Controller
     public function generateInventoryCountSheetPDF()
     {
         $data_og = array();
-        $current_stocks = DB::table('inv_current_stock as g')
-            ->select(DB::raw('g.product_id'), DB::raw('g1.product_name'),
-                DB::raw('sum(g.quantity) as quantity_on_hand'), DB::raw('g.shelf_number')
-                , DB::raw('g1.store'))
-            ->join(DB::raw('(
-            SELECT 
-            `product_name`,
-            `product_id`,
-            `store`
-            FROM
-                `stock_details`
-            GROUP BY `product_id`) as g1'),
-                function ($join) {
-                    $join->on('g1.product_id', '=', 'g.product_id');
-                })
-            ->groupBy(DB::raw('g1.product_id'))
+        $current_stocks = CurrentStock::select(DB::raw('product_id'), 'store_id', 'shelf_number',
+            DB::raw('sum(quantity) as quantity_on_hand'))
+            ->groupby('product_id')
             ->get();
 
         foreach ($current_stocks as $current_stock) {
             array_push($data_og, array(
-                'store' => $current_stock->store,
+                'store' => $current_stock->store['name'],
                 'shelf_no' => $current_stock->shelf_number,
-                'product_id' => $current_stock->product_id,
-                'product_name' => $current_stock->product_name,
+                'product_id' => $current_stock->product['id'],
+                'product_name' => $current_stock->product['name'],
                 'quantity_on_hand' => $current_stock->quantity_on_hand
             ));
         }
