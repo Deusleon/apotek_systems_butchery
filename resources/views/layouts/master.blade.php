@@ -51,6 +51,10 @@
             height: 43px !important;
         }
 
+        table.dataTable tbody th, table.dataTable tbody td {
+            padding: 4px 10px; /* e.g. change 8x to 4px here */
+        }
+
     </style>
 
 
