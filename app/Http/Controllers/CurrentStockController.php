@@ -8,6 +8,7 @@ use App\CurrentStock;
 use App\PriceCategory;
 use App\PriceList;
 use App\Product;
+use App\Setting;
 use App\Store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +18,16 @@ class CurrentStockController extends Controller
 
     public function index()
     {
+        /*get default store*/
+        $default_store = Setting::where('id', 122)->value('value');
+        $stores = Store::where('name', $default_store)->first();
+
+        if ($stores != null) {
+            $default_store_id = $stores->id;
+        } else {
+            $default_store_id = 1;
+        }
+
         $stores = Store::all();
 
         /*return in stock by default
@@ -42,7 +53,8 @@ class CurrentStockController extends Controller
             'categories' => $categories,
             'reasons' => $adjustment_reason,
             'price_categories' => $price_Category,
-            'sale_prices' => $sale_price
+            'sale_prices' => $sale_price,
+            'default_store_id' => $default_store_id
         ]);
     }
 
@@ -66,7 +78,7 @@ class CurrentStockController extends Controller
                 $stock->product_id = $request->product_id;
                 $stock->expiry_date = $request->expiry_date;
                 $stock->batch_number = $request->batch_number;
-                $stock->unit_cost = str_replace(',','',$request->unit_cost);
+                $stock->unit_cost = str_replace(',', '', $request->unit_cost);
                 $stock->quantity = str_replace(',', '', $request->quantity);
                 $stock->store_id = $request->store_id;
                 $stock->shelf_number = $request->shelf_number;
@@ -86,7 +98,7 @@ class CurrentStockController extends Controller
                 $stock->product_id = $request->product_id;
                 $stock->expiry_date = $request->expiry_date;
                 $stock->batch_number = $request->batch_number;
-                $stock->unit_cost = str_replace(',','',$request->unit_cost);
+                $stock->unit_cost = str_replace(',', '', $request->unit_cost);
                 $stock->quantity = str_replace(',', '', $request->quantity);
                 $stock->store_id = $request->store_id;
                 $stock->shelf_number = $request->shelf_number;
@@ -112,7 +124,7 @@ class CurrentStockController extends Controller
             $stock->product_id = $request->product_id;
             $stock->expiry_date = $request->expiry_date;
             $stock->batch_number = $request->batch_number;
-            $stock->unit_cost = str_replace(',','',$request->unit_cost);
+            $stock->unit_cost = str_replace(',', '', $request->unit_cost);
             $stock->quantity = str_replace(',', '', $request->quantity);
             $stock->store_id = $request->store_id;
             $stock->shelf_number = $request->shelf_number;
@@ -171,7 +183,9 @@ class CurrentStockController extends Controller
 
         if ($request->ajax()) {
 
-            $current_stock = CurrentStock::where('product_id', '=', $request->get("val"))->get();
+            $current_stock = CurrentStock::where('product_id', '=', $request->get("val"))
+                ->where('store_id', $request->store_id)
+                ->get();
 
             foreach ($current_stock as $item) {
                 $item->product;
@@ -196,12 +210,14 @@ class CurrentStockController extends Controller
                 $totalData = CurrentStock::select('product_id', DB::raw('sum(quantity) as quantity'))
                     ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                     ->where('category_id', $request->category)
+                    ->where('store_id', $request->store_id)
                     ->groupBy('product_id')
                     ->havingRaw(DB::raw('sum(quantity) > 0'))
                     ->get()
                     ->count();
             } else {
                 $totalData = CurrentStock::select('product_id', DB::raw('sum(quantity) as quantity'))
+                    ->where('store_id', $request->store_id)
                     ->groupBy('product_id')
                     ->havingRaw(DB::raw('sum(quantity) > 0'))
                     ->get()
@@ -222,6 +238,7 @@ class CurrentStockController extends Controller
                     $stocks = CurrentStock::select('product_id', DB::raw('sum(quantity) as quantity'))
                         ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                         ->where('category_id', $request->category)
+                        ->where('store_id', $request->store_id)
                         ->groupBy('product_id')
                         ->havingRaw(DB::raw('sum(quantity) > 0'))
                         ->offset($start)
@@ -231,6 +248,7 @@ class CurrentStockController extends Controller
                 } else {
                     $stocks = CurrentStock::select('product_id', DB::raw('sum(quantity) as quantity'))
                         ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                        ->where('store_id', $request->store_id)
                         ->groupBy('product_id')
                         ->havingRaw(DB::raw('sum(quantity) > 0'))
                         ->offset($start)
@@ -249,6 +267,7 @@ class CurrentStockController extends Controller
                         ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                         ->orWhere('inv_products.name', 'LIKE', "%{$search}%")
                         ->where('category_id', $request->category)
+                        ->where('store_id', $request->store_id)
                         ->groupBy('product_id')
                         ->havingRaw(DB::raw('sum(quantity) > 0'))
                         ->offset($start)
@@ -260,12 +279,14 @@ class CurrentStockController extends Controller
                         ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                         ->orWhere('inv_products.name', 'LIKE', "%{$search}%")
                         ->where('category_id', $request->category)
+                        ->where('store_id', $request->store_id)
                         ->count();
                 } else {
                     $stocks = CurrentStock::select('product_id', DB::raw('sum(quantity) as quantity'))
                         ->where('quantity', 'LIKE', "%{$search}%")
                         ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                         ->orWhere('inv_products.name', 'LIKE', "%{$search}%")
+                        ->where('store_id', $request->store_id)
                         ->groupBy('product_id')
                         ->havingRaw(DB::raw('sum(quantity) > 0'))
                         ->offset($start)
@@ -276,6 +297,7 @@ class CurrentStockController extends Controller
                     $totalFiltered = CurrentStock::where('quantity', 'LIKE', "%{$search}%")
                         ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                         ->orWhere('inv_products.name', 'LIKE', "%{$search}%")
+                        ->where('store_id', $request->store_id)
                         ->count();
                 }
 
@@ -312,12 +334,14 @@ class CurrentStockController extends Controller
                 $totalData = CurrentStock::select('product_id', DB::raw('sum(quantity) as quantity'))
                     ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                     ->where('category_id', $request->category)
+                    ->where('store_id', $request->store_id)
                     ->groupBy('product_id')
                     ->havingRaw(DB::raw('sum(quantity) <= 0'))
                     ->get()
                     ->count();
             } else {
                 $totalData = CurrentStock::select('product_id', DB::raw('sum(quantity) as quantity'))
+                    ->where('store_id', $request->store_id)
                     ->groupBy('product_id')
                     ->havingRaw(DB::raw('sum(quantity) <= 0'))
                     ->get()
@@ -336,6 +360,7 @@ class CurrentStockController extends Controller
                     $stocks = CurrentStock::select('product_id', DB::raw('sum(quantity) as quantity'))
                         ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                         ->where('category_id', $request->category)
+                        ->where('store_id', $request->store_id)
                         ->groupBy('product_id')
                         ->havingRaw(DB::raw('sum(quantity) <= 0'))
                         ->offset($start)
@@ -345,6 +370,7 @@ class CurrentStockController extends Controller
                 } else {
                     $stocks = CurrentStock::select('product_id', DB::raw('sum(quantity) as quantity'))
                         ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                        ->where('store_id', $request->store_id)
                         ->groupBy('product_id')
                         ->havingRaw(DB::raw('sum(quantity) <= 0'))
                         ->offset($start)
@@ -361,6 +387,7 @@ class CurrentStockController extends Controller
                         ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                         ->orWhere('inv_products.name', 'LIKE', "%{$search}%")
                         ->where('category_id', $request->category)
+                        ->where('store_id', $request->store_id)
                         ->groupBy('product_id')
                         ->havingRaw(DB::raw('sum(quantity) <= 0'))
                         ->offset($start)
@@ -372,12 +399,14 @@ class CurrentStockController extends Controller
                         ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                         ->orWhere('inv_products.name', 'LIKE', "%{$search}%")
                         ->where('category_id', $request->category)
+                        ->where('store_id', $request->store_id)
                         ->count();
                 } else {
                     $stocks = CurrentStock::select('product_id', DB::raw('sum(quantity) as quantity'))
                         ->where('quantity', 'LIKE', "%{$search}%")
                         ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                         ->orWhere('inv_products.name', 'LIKE', "%{$search}%")
+                        ->where('store_id', $request->store_id)
                         ->groupBy('product_id')
                         ->havingRaw(DB::raw('sum(quantity) <= 0'))
                         ->offset($start)
@@ -388,6 +417,7 @@ class CurrentStockController extends Controller
                     $totalFiltered = CurrentStock::where('quantity', 'LIKE', "%{$search}%")
                         ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                         ->orWhere('inv_products.name', 'LIKE', "%{$search}%")
+                        ->where('store_id', $request->store_id)
                         ->count();
                 }
 

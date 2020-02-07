@@ -12,6 +12,7 @@ use App\PriceList;
 use App\Product;
 use App\Setting;
 use App\StockTracking;
+use App\Store;
 use App\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -125,6 +126,16 @@ class GoodsReceivingController extends Controller
     public function itemReceive(Request $request)
     {
 
+        /*get default store*/
+        $default_store = Setting::where('id', 122)->value('value');
+        $stores = Store::where('name', $default_store)->first();
+
+        if ($stores != null) {
+            $default_store_id = $stores->id;
+        } else {
+            $default_store_id = 1;
+        }
+
         if ($request->ajax()) {
 
             $cart = json_decode($request->cart, true);
@@ -153,7 +164,7 @@ class GoodsReceivingController extends Controller
                 }
                 $update_stock->quantity = $cart['quantity'];
                 $update_stock->unit_cost = str_replace(',', '', $request->unit_cost);
-                $update_stock->store_id = 1;
+                $update_stock->store_id = $default_store_id;
                 $update_stock->save();
                 $overal_stock_id = $update_stock->id;
             } else {
@@ -167,7 +178,7 @@ class GoodsReceivingController extends Controller
                 }
                 $stock->quantity = $cart['quantity'];
                 $stock->unit_cost = str_replace(',', '', $request->unit_cost);
-                $stock->store_id = 1;
+                $stock->store_id = $default_store_id;
                 $stock->save();
                 $overal_stock_id = $stock->id;
             }
@@ -178,7 +189,7 @@ class GoodsReceivingController extends Controller
             $stock_tracking->stock_id = $overal_stock_id;
             $stock_tracking->product_id = $cart['id'];
             $stock_tracking->quantity = $cart['quantity'];
-            $stock_tracking->store_id = 1;
+            $stock_tracking->store_id = $default_store_id;
             $stock_tracking->updated_by = Auth::user()->id;
             $stock_tracking->out_mode = 'New Product Purchase';
             $stock_tracking->updated_at = date('Y-m-d');
@@ -230,6 +241,15 @@ class GoodsReceivingController extends Controller
 
     public function orderReceive(Request $request)
     {
+        /*get default store*/
+        $default_store = Setting::where('id', 122)->value('value');
+        $stores = Store::where('name', $default_store)->first();
+
+        if ($stores != null) {
+            $default_store_id = $stores->id;
+        } else {
+            $default_store_id = 1;
+        }
 
         if ($request->ajax()) {
             $quantity = str_replace(',', '', $request->quantity);
@@ -250,7 +270,7 @@ class GoodsReceivingController extends Controller
             }
             $stock->quantity = $quantity;
             $stock->unit_cost = str_replace(',', '', $request->price);
-            $stock->store_id = 1;
+            $stock->store_id = $default_store_id;
             $stock->save();
 
 
@@ -259,7 +279,7 @@ class GoodsReceivingController extends Controller
             $stock_tracking->stock_id = $stock->id;
             $stock_tracking->product_id = $request->product_id;
             $stock_tracking->quantity = $quantity;
-            $stock_tracking->store_id = 1;
+            $stock_tracking->store_id = $default_store_id;
             $stock_tracking->updated_by = Auth::user()->id;
             $stock_tracking->out_mode = 'New Product Purchase';
             $stock_tracking->updated_at = date('Y-m-d');

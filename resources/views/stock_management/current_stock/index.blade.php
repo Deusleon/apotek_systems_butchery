@@ -62,14 +62,24 @@
             <div class="card-body">
 
                 <div class="form-group row">
-                    <div class="col-md-6">
-
+                    <div class="col-md-3">
+                        <label for="stock_status" class="col-form-label text-md-right"
+                               style="margin-left: 175%">Store:</label>
+                    </div>
+                    <div class="col-md-3" style="margin-left: 19%;">
+                        <select name="stores_id" class="js-example-basic-single form-control"
+                                id="stores_id">
+                            @foreach($stores as $store)
+                                <option
+                                    value="{{$store->id}}" {{$default_store_id === $store->id  ? 'selected' : ''}}>{{$store->name}}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="col-md-3">
                         <label for="stock_status" class="col-form-label text-md-right"
-                               style="margin-left: 86%">Status:</label>
+                               style="margin-left: -3%">Status:</label>
                     </div>
-                    <div class="col-md-3" style="margin-left: -0.6%;">
+                    <div class="col-md-3" style="margin-left: -19.6%;">
                         <select name="stock_status" class="js-example-basic-single form-control"
                                 id="stock_status_id">
                             <option name="store_name" value="1">In Stock</option>
@@ -193,12 +203,20 @@
             category();
         });
 
+        $('#stores_id').on('change', function () {
+            stores();
+        });
+
+
         function loadInStock() {
             var e = document.getElementById("stock_status_id");
             var value = e.options[e.selectedIndex].value;
 
             var es = document.getElementById("category_id");
             var value_es = es.options[es.selectedIndex].value;
+
+            var es_id = document.getElementById("stores_id");
+            var value_es_id = es_id.options[es_id.selectedIndex].value;
 
             $("#fixed-header1").dataTable().fnDestroy();
             $('#fixed-header1').DataTable({
@@ -212,7 +230,8 @@
                     "data": {
                         _token: "{{csrf_token()}}",
                         status: value,
-                        category: value_es
+                        category: value_es,
+                        store_id: value_es_id
                     },
                     complete: function () {
                         document.getElementById("tbody1").style.display = 'none';
@@ -241,6 +260,9 @@
             var e = document.getElementById("stock_status_id");
             var value = e.options[e.selectedIndex].value;
 
+            var es_id = document.getElementById("stores_id");
+            var value_es_id = es_id.options[es_id.selectedIndex].value;
+
             $('#fixed-header-main').DataTable({
                 "processing": true,
                 "serverSide": true,
@@ -251,7 +273,8 @@
                     "cache": false,
                     "data": {
                         _token: "{{csrf_token()}}",
-                        status: value
+                        status: value,
+                        store_id: value_es_id
                     }
                 },
                 "columns": [
@@ -343,6 +366,10 @@
             loadInStock();
         }
 
+        function stores() {
+            loadInStock();
+        }
+
         function category() {
             loadInStock();
         }
@@ -398,6 +425,7 @@
 
         $('#tbody').on('click', 'button', function () {
             var data = $('#fixed-header1').DataTable().row($(this).parents('tr')).data();
+
             retriveStockDetail(data.product_id);
         });
 
@@ -441,6 +469,9 @@
         function retriveStockDetail(data) {
             var val = data;
 
+            var es_id = document.getElementById("stores_id");
+            var value_es_id = es_id.options[es_id.selectedIndex].value;
+
             var ajaxurl = '{{route('current-stock-detail')}}';
 
             $('#loading').show();
@@ -448,7 +479,10 @@
                 url: ajaxurl,
                 type: "get",
                 dataType: "json",
-                data: {val: val},
+                data: {
+                    val: val,
+                    store_id: value_es_id
+                },
                 success: function (data) {
                     document.getElementById("tbody1").style.display = 'none';
                     document.getElementById("tbody").style.display = 'none';

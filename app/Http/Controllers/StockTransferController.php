@@ -234,18 +234,12 @@ class StockTransferController extends Controller
     {
         if ($request->ajax()) {
 
-//            $products = CurrentStock::select(DB::raw('sum(quantity) as quantity'),
-//                DB::raw('product_id'), DB::raw('max(id) as stock_id'))
-//                ->where('quantity', '>', '0')
-//                ->where('store_id', $request->from_id)
-//                ->groupby('product_id')
-//                ->limit(10)
-//                ->get();
             $products = CurrentStock::select(DB::raw('sum(quantity) as quantity'),
                 DB::raw('product_id'), DB::raw('max(inv_current_stock.id) as stock_id'), 'name')
                 ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                 ->where('quantity', '>', '0')
                 ->where('status', '=', 1)
+                ->where('store_id', $request->from_id)
                 ->groupby('product_id', 'name')
                 ->limit(10)
                 ->get();

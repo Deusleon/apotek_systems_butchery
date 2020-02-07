@@ -11,6 +11,7 @@ use App\SalesCredit;
 use App\SalesDetail;
 use App\Setting;
 use App\StockTracking;
+use App\Store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -349,6 +350,15 @@ class SaleController extends Controller
 
     public function store(Request $request)
     {
+        /*get default store*/
+        $default_store = Setting::where('id', 122)->value('value');
+        $stores = Store::where('name', $default_store)->first();
+
+        if ($stores != null) {
+            $default_store_id = $stores->id;
+        } else {
+            $default_store_id = 1;
+        }
 
         //some attributes declaration
         $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
@@ -399,7 +409,7 @@ class SaleController extends Controller
                                 $stock_tracking->stock_id = $stock->id;
                                 $stock_tracking->product_id = $bought['product_id'];
                                 $stock_tracking->quantity = $bought['quantity'];
-                                $stock_tracking->store_id = 1;
+                                $stock_tracking->store_id = $default_store_id;
                                 $stock_tracking->updated_by = Auth::user()->id;
                                 $stock_tracking->out_mode = 'Credit Sales';
                                 $stock_tracking->updated_at = date('Y-m-d');
@@ -413,7 +423,7 @@ class SaleController extends Controller
                                 $stock_tracking->stock_id = $stock->id;
                                 $stock_tracking->product_id = $bought['product_id'];
                                 $stock_tracking->quantity = $bought['quantity'];
-                                $stock_tracking->store_id = 1;
+                                $stock_tracking->store_id = $default_store_id;
                                 $stock_tracking->updated_by = Auth::user()->id;
                                 $stock_tracking->out_mode = 'Cash Sales';
                                 $stock_tracking->updated_at = date('Y-m-d');
