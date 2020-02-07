@@ -168,6 +168,16 @@ class SaleController extends Controller
 
     public function selectProducts(Request $request)
     {
+        /*get default store*/
+        $default_store = Setting::where('id', 122)->value('value');
+        $stores = Store::where('name', $default_store)->first();
+
+        if ($stores != null) {
+            $default_store_id = $stores->id;
+        } else {
+            $default_store_id = 1;
+        }
+
         $output = [];
         $output[""] = "Select Product";
         $products = PriceList::where('price_category_id', $request->get('id'))
@@ -175,6 +185,7 @@ class SaleController extends Controller
             ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
             ->where('quantity', '>', 0)
             ->where('inv_products.status', '=', 1)
+            ->where('store_id', $default_store_id)
             ->select('inv_products.id as id', 'name', 'barcode')
             ->groupBy('product_id')
             ->limit(100)
@@ -202,6 +213,16 @@ class SaleController extends Controller
 
     public function filterProductByWord(Request $request)
     {
+        /*get default store*/
+        $default_store = Setting::where('id', 122)->value('value');
+        $stores = Store::where('name', $default_store)->first();
+
+        if ($stores != null) {
+            $default_store_id = $stores->id;
+        } else {
+            $default_store_id = 1;
+        }
+
         if ($request->ajax()) {
             $output = [];
             $output[""] = "Select Product";
@@ -210,6 +231,7 @@ class SaleController extends Controller
                 ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                 ->where('quantity', '>', 0)
                 ->where('inv_products.status', '=', 1)
+                ->where('store_id', $default_store_id)
                 ->select('inv_products.id as id', 'name', 'barcode')
                 ->where('name', 'LIKE', "%{$request->word}%")
                 ->groupBy('product_id')
