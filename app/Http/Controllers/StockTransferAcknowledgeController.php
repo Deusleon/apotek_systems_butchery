@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\CurrentStock;
+use App\PriceList;
 use App\Product;
 use App\StockTracking;
 use App\StockTransfer;
@@ -144,6 +145,19 @@ class StockTransferAcknowledgeController extends Controller
         $current_stock->created_by = Auth::user()->id;
         $current_stock->save();
         /*end of insert*/
+
+        /*insert into price*/
+        $prev_price = PriceList::where('stock_id',$request->stock_id)
+            ->orderby('id','desc')
+            ->first();
+        $price = new PriceList;
+        $price->stock_id = $current_stock->id;
+        $price->price = str_replace(',', '', $prev_price->price);
+        $price->price_category_id = $prev_price->price_category_id;
+        $price->status = 1;
+        $price->created_at = date('Y-m-d H:m:s');
+        $price->save();
+        /*end insert*/
 
         /*save in stocktracking*/
         $stock_tracking = new StockTracking;
