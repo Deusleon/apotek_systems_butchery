@@ -322,6 +322,7 @@ class SaleController extends Controller
                     $unit_discount = (($bought['amount'] / $total) * $discount) / $bought['quantity'];
                     $unit_price = $bought['price'];
                     $stocks = CurrentStock::where('product_id', $bought['product_id'])
+                        ->where('store_id', $default_store_id)
                         ->where('quantity', '>', 0)
                         ->get();
 
