@@ -205,7 +205,9 @@ class SaleController extends Controller
                 ->orderBy('stock_id', 'desc')
                 ->where('product_id', $product->id)
                 ->first('price');
-            $quantity = CurrentStock::where('product_id', $product->id)->sum('quantity');
+            $quantity = CurrentStock::where('product_id', $product->id)
+                ->where('store_id', $default_store_id)
+                ->sum('quantity');
             $output["$product->name#@$latest->price#@$product->id#@$quantity"] = $product->name;
         }
         return $output;
@@ -252,7 +254,9 @@ class SaleController extends Controller
                     ->orderBy('stock_id', 'desc')
                     ->where('product_id', $product->id)
                     ->first('price');
-                $quantity = CurrentStock::where('product_id', $product->id)->sum('quantity');
+                $quantity = CurrentStock::where('product_id', $product->id)
+                    ->where('store_id', $default_store_id)
+                    ->sum('quantity');
                 $output["$product->name#@$latest->price#@$product->id#@$quantity"] = $product->name;
             }
             return $output;
@@ -268,106 +272,6 @@ class SaleController extends Controller
                 'redirect_to' => route('getCashReceipt', '1')
             ]);
         }
-    }
-
-    public function receiptReprint(Request $request)
-    {
-        $receipt_size = Setting::where('id', 119)->value('value');
-        $pharmacy['name'] = Setting::where('id', 100)->value('value');
-        $pharmacy['logo'] = Setting::where('id', 105)->value('value');
-        $pharmacy['address'] = Setting::where('id', 106)->value('value');
-        $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
-        $pharmacy['phone'] = Setting::where('id', 107)->value('value');
-        $pharmacy['slogan'] = Setting::where('id', 104)->value('value');
-
-
-        $id = Sale::where('receipt_number', $request->reprint_receipt)->value('id');
-
-        /*check if receipt is credit or not*/
-        $credit_sale = SalesCredit::where('sale_id', $id)->get();
-        $page = null;
-        $paid = null;
-        $balance = null;
-        $remark = null;
-        if ($credit_sale->isEmpty()) {
-            /*not credit*/
-            $page = 1; //normal sale
-        } else {
-            /*credit*/
-            $page = -1; //credit
-            $remarks = SalesCredit::select('remark')
-                ->where('sale_id', $id)
-                ->orderby('id', 'desc')
-                ->first();
-
-            $amounts = SalesCredit::select('sale_id', 'remark', DB::raw('sum(paid_amount) as paid'), DB::raw('sum(balance) as balance'))
-                ->where('sale_id', $id)
-                ->groupby('sale_id')
-                ->first();
-            $paid = $amounts->paid;
-            $balance = $amounts->balance;
-            $remark = $remarks->remark;
-        }
-
-        $sale_detail = SalesDetail::where('sale_id', $id)->get();
-
-        $sales = array();
-        $grouped_sales = array();
-        $sn = 0;
-        foreach ($sale_detail as $item) {
-            $amount = $item->amount - $item->discount;
-            if (intVal($item->vat) === 0) {
-                $vat_percent = 0;
-            } else {
-                $vat_percent = $item->vat / $item->price;
-            }
-            $sub_total = ($amount / (1 + $vat_percent));
-            $vat = $amount - $sub_total;
-            $sn++;
-            array_push($sales, array(
-                'receipt_number' => $item->sale['receipt_number'],
-                'name' => $item->currentStock['product']['name'],
-                'sn' => $sn,
-                'quantity' => $item->quantity,
-                'vat' => $vat,
-                'discount' => $item->discount,
-                'discount_total' => $item->sale['cost']['discount'],
-                'price' => $item->price,
-                'amount' => $amount,
-                'sub_total' => $sub_total,
-                'grand_total' => ($item->sale['cost']['amount']) - ($item->sale['cost']['discount']),
-                'total_vat' => ($item->sale['cost']['vat']),
-                'sold_by' => $item->sale['user']['name'],
-                'customer' => $item->sale['customer']['name'],
-                'customer_tin' => $item->sale['customer']['tin'],
-                'paid' => $paid,
-                'balance' => $balance,
-                'remark' => $remark,
-                'created_at' => date('Y-m-d', strtotime($item->sale['date']))
-            ));
-        }
-
-
-        foreach ($sales as $val) {
-            if (array_key_exists('receipt_number', $val)) {
-                $grouped_sales[$val['receipt_number']][] = $val;
-            }
-        }
-
-        $data = $grouped_sales;
-        if ($receipt_size === 'Thermal Paper') {
-            $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
-                compact('data', 'pharmacy', 'page'));
-            return $pdf->stream($request->reprint_receipt . '.pdf');
-        } else if ($receipt_size === 'A4 / Latter') {
-            $pdf = PDF::loadView('sales.cash_sales.receipt',
-                compact('data', 'pharmacy', 'page'));
-            return $pdf->stream($request->reprint_receipt . '.pdf');
-        } else {
-            echo "<script>window.close();</script>";
-        }
-
-
     }
 
     public function store(Request $request)
@@ -503,6 +407,106 @@ class SaleController extends Controller
             }
 
         }
+
+    }
+
+    public function receiptReprint(Request $request)
+    {
+        $receipt_size = Setting::where('id', 119)->value('value');
+        $pharmacy['name'] = Setting::where('id', 100)->value('value');
+        $pharmacy['logo'] = Setting::where('id', 105)->value('value');
+        $pharmacy['address'] = Setting::where('id', 106)->value('value');
+        $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
+        $pharmacy['phone'] = Setting::where('id', 107)->value('value');
+        $pharmacy['slogan'] = Setting::where('id', 104)->value('value');
+
+
+        $id = Sale::where('receipt_number', $request->reprint_receipt)->value('id');
+
+        /*check if receipt is credit or not*/
+        $credit_sale = SalesCredit::where('sale_id', $id)->get();
+        $page = null;
+        $paid = null;
+        $balance = null;
+        $remark = null;
+        if ($credit_sale->isEmpty()) {
+            /*not credit*/
+            $page = 1; //normal sale
+        } else {
+            /*credit*/
+            $page = -1; //credit
+            $remarks = SalesCredit::select('remark')
+                ->where('sale_id', $id)
+                ->orderby('id', 'desc')
+                ->first();
+
+            $amounts = SalesCredit::select('sale_id', 'remark', DB::raw('sum(paid_amount) as paid'), DB::raw('sum(balance) as balance'))
+                ->where('sale_id', $id)
+                ->groupby('sale_id')
+                ->first();
+            $paid = $amounts->paid;
+            $balance = $amounts->balance;
+            $remark = $remarks->remark;
+        }
+
+        $sale_detail = SalesDetail::where('sale_id', $id)->get();
+
+        $sales = array();
+        $grouped_sales = array();
+        $sn = 0;
+        foreach ($sale_detail as $item) {
+            $amount = $item->amount - $item->discount;
+            if (intVal($item->vat) === 0) {
+                $vat_percent = 0;
+            } else {
+                $vat_percent = $item->vat / $item->price;
+            }
+            $sub_total = ($amount / (1 + $vat_percent));
+            $vat = $amount - $sub_total;
+            $sn++;
+            array_push($sales, array(
+                'receipt_number' => $item->sale['receipt_number'],
+                'name' => $item->currentStock['product']['name'],
+                'sn' => $sn,
+                'quantity' => $item->quantity,
+                'vat' => $vat,
+                'discount' => $item->discount,
+                'discount_total' => $item->sale['cost']['discount'],
+                'price' => $item->price,
+                'amount' => $amount,
+                'sub_total' => $sub_total,
+                'grand_total' => ($item->sale['cost']['amount']) - ($item->sale['cost']['discount']),
+                'total_vat' => ($item->sale['cost']['vat']),
+                'sold_by' => $item->sale['user']['name'],
+                'customer' => $item->sale['customer']['name'],
+                'customer_tin' => $item->sale['customer']['tin'],
+                'paid' => $paid,
+                'balance' => $balance,
+                'remark' => $remark,
+                'created_at' => date('Y-m-d', strtotime($item->sale['date']))
+            ));
+        }
+
+
+        foreach ($sales as $val) {
+            if (array_key_exists('receipt_number', $val)) {
+                $grouped_sales[$val['receipt_number']][] = $val;
+            }
+        }
+
+        $data = $grouped_sales;
+        if ($receipt_size === 'Thermal Paper') {
+            $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
+                compact('data', 'pharmacy', 'page'));
+            return $pdf->stream($request->reprint_receipt . '.pdf');
+        } else if ($receipt_size === 'A4 / Latter') {
+            $pdf = PDF::loadView('sales.cash_sales.receipt',
+                compact('data', 'pharmacy', 'page'));
+            return $pdf->stream($request->reprint_receipt . '.pdf');
+        } else {
+            echo "<script>window.close();</script>";
+        }
+
 
     }
 
