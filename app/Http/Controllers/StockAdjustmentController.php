@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\AdjustmentReason;
 use App\CurrentStock;
 use App\Product;
+use App\Setting;
 use App\StockAdjustment;
 use App\StockTracking;
+use App\Store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -29,6 +31,15 @@ class StockAdjustmentController extends Controller
 
     public function store(Request $request)
     {
+        /*get default store*/
+        $default_store = Setting::where('id', 122)->value('value');
+        $stores = Store::where('name', $default_store)->first();
+
+        if ($stores != null) {
+            $default_store_id = $stores->id;
+        } else {
+            $default_store_id = 1;
+        }
 
         $stock_adjustment = new StockAdjustment;
         $stock_adjustment->stock_id = $request->id;
@@ -43,7 +54,7 @@ class StockAdjustmentController extends Controller
         $current_stock = CurrentStock::all('id', 'product_id', 'quantity', 'store_id');
 
         if ($request->type == "Negative") {
-            $store_id = 1;
+            $store_id = $default_store_id;
             foreach ($current_stock as $item) {
                 $store_id = $item->store_id;
 
@@ -75,7 +86,7 @@ class StockAdjustmentController extends Controller
             return redirect()->route('current-stock.index');
         } else {
             //positive
-            $store_id = 1;
+            $store_id = $default_store_id;
             foreach ($current_stock as $item) {
                 $store_id = $item->store_id;
 
