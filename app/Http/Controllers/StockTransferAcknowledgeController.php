@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\CurrentStock;
 use App\PriceList;
 use App\Product;
+use App\Setting;
 use App\StockTracking;
 use App\StockTransfer;
 use App\Store;
@@ -74,7 +75,6 @@ class StockTransferAcknowledgeController extends Controller
                 foreach ($results as $value) {
                     $value->toStore;
                     $value->fromStore;
-                    dd($value->currentStock);
                     $value->currentStock['product'];
                 }
 
@@ -120,6 +120,16 @@ class StockTransferAcknowledgeController extends Controller
     public function update(Request $request)
     {
 
+        /*get default store*/
+        $default_store = Setting::where('id', 122)->value('value');
+        $stores = Store::where('name', $default_store)->first();
+
+        if ($stores != null) {
+            $default_store_id = $stores->id;
+        } else {
+            $default_store_id = 1;
+        }
+
         $stock_update = CurrentStock::find($request->stock_id);
 
         $remain_stock = $request->quantity_trn - $request->quantity_rcvd;
@@ -163,7 +173,7 @@ class StockTransferAcknowledgeController extends Controller
         $stock_tracking = new StockTracking;
         $stock_tracking->stock_id = $request->stock_id;
         $stock_tracking->quantity = $remain_stock;
-        $stock_tracking->store_id = 1;
+        $stock_tracking->store_id = $default_store_id;
         $stock_tracking->updated_by = Auth::user()->id;
         $stock_tracking->out_mode = 'Stock Transfer';
         $stock_tracking->updated_at = date('Y-m-d');
