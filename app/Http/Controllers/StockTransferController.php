@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\CommonFunctions;
 use App\CurrentStock;
+use App\Setting;
 use App\StockTracking;
 use App\StockTransfer;
 use App\Store;
@@ -33,6 +34,15 @@ class StockTransferController extends Controller
 
     public function store(Request $request)
     {
+        /*get default store*/
+        $default_store = Setting::where('id', 122)->value('value');
+        $stores = Store::where('name', $default_store)->first();
+
+        if ($stores != null) {
+            $default_store_id = $stores->id;
+        } else {
+            $default_store_id = 1;
+        }
 
         $transfer_no = $this->transferNumberAutoGen();
         $to_save_data = array();
@@ -68,7 +78,9 @@ class StockTransferController extends Controller
                 'created_at' => $transfer_created_at
             ));
 
-            $stock_update = CurrentStock::where('product_id', $value['product_id'])->where('quantity', '>', 0)->get();
+            $stock_update = CurrentStock::where('product_id', $value['product_id'])
+                ->where('store_id', $transfer_from_store)
+                ->where('quantity', '>', 0)->get();
 
             foreach ($stock_update as $stock) {
                 if ($stock->quantity >= str_replace(',', '', $value['quantityTran'])) {
@@ -111,7 +123,7 @@ class StockTransferController extends Controller
             $stock_tracking->stock_id = $save_data['stock_id'];
             $stock_tracking->product_id = $save_data['product_id'];
             $stock_tracking->quantity = $save_data['transfer_qty'];
-            $stock_tracking->store_id = 1;
+            $stock_tracking->store_id = $save_data['from'];
             $stock_tracking->updated_by = $save_data['updated_by'];
             $stock_tracking->out_mode = 'Stock Transfer';
             $stock_tracking->updated_at = date('Y-m-d');

@@ -157,8 +157,8 @@ class StockTransferAcknowledgeController extends Controller
         /*end of insert*/
 
         /*insert into price*/
-        $prev_price = PriceList::where('stock_id',$request->stock_id)
-            ->orderby('id','desc')
+        $prev_price = PriceList::where('stock_id', $request->stock_id)
+            ->orderby('id', 'desc')
             ->first();
         $price = new PriceList;
         $price->stock_id = $current_stock->id;
@@ -172,10 +172,22 @@ class StockTransferAcknowledgeController extends Controller
         /*save in stocktracking*/
         $stock_tracking = new StockTracking;
         $stock_tracking->stock_id = $request->stock_id;
+        $stock_tracking->product_id = $transfer->currentStock['product_id'];
         $stock_tracking->quantity = $remain_stock;
         $stock_tracking->store_id = $default_store_id;
         $stock_tracking->updated_by = Auth::user()->id;
         $stock_tracking->out_mode = 'Stock Transfer';
+        $stock_tracking->updated_at = date('Y-m-d');
+        $stock_tracking->movement = 'IN';
+        $stock_tracking->save();
+
+        $stock_tracking = new StockTracking;
+        $stock_tracking->stock_id = $request->stock_id;
+        $stock_tracking->product_id = $transfer->currentStock['product_id'];
+        $stock_tracking->quantity = $request->quantity_rcvd;
+        $stock_tracking->store_id = $transfer->to_store;
+        $stock_tracking->updated_by = Auth::user()->id;
+        $stock_tracking->out_mode = 'Stock Transfer Completed';
         $stock_tracking->updated_at = date('Y-m-d');
         $stock_tracking->movement = 'IN';
         $stock_tracking->save();

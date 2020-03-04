@@ -328,37 +328,6 @@ class SaleController extends Controller
 
                     foreach ($stocks as $stock) {
 
-                        /*stock tracking */
-                        if ($request->credit == 'Yes') {
-                            /*save in stock tracking as OUT*/
-                            if ($bought['quantity'] != 0) {
-                                $stock_tracking = new StockTracking;
-                                $stock_tracking->stock_id = $stock->id;
-                                $stock_tracking->product_id = $bought['product_id'];
-                                $stock_tracking->quantity = $bought['quantity'];
-                                $stock_tracking->store_id = $default_store_id;
-                                $stock_tracking->updated_by = Auth::user()->id;
-                                $stock_tracking->out_mode = 'Credit Sales';
-                                $stock_tracking->updated_at = date('Y-m-d');
-                                $stock_tracking->movement = 'OUT';
-                                $stock_tracking->save();
-                            }
-                        } else {
-                            /*save in stock tracking as OUT*/
-                            if ($bought['quantity'] != 0) {
-                                $stock_tracking = new StockTracking;
-                                $stock_tracking->stock_id = $stock->id;
-                                $stock_tracking->product_id = $bought['product_id'];
-                                $stock_tracking->quantity = $bought['quantity'];
-                                $stock_tracking->store_id = $default_store_id;
-                                $stock_tracking->updated_by = Auth::user()->id;
-                                $stock_tracking->out_mode = 'Cash Sales';
-                                $stock_tracking->updated_at = date('Y-m-d');
-                                $stock_tracking->movement = 'OUT';
-                                $stock_tracking->save();
-                            }
-                        }/*end stock tracking*/
-
                         if ($bought['quantity'] <= $stock->quantity) {
                             $qty = $bought['quantity'];
                             $price = $unit_price * $qty;
@@ -385,6 +354,18 @@ class SaleController extends Controller
                             $details->discount = $sale_discount;
                             $details->save();
                             $stock->save();
+
+                            $stock_tracking = new StockTracking;
+                            $stock_tracking->stock_id = $stock->id;
+                            $stock_tracking->product_id = $bought['product_id'];
+                            $stock_tracking->quantity = $qty;
+                            $stock_tracking->store_id = $default_store_id;
+                            $stock_tracking->updated_by = Auth::user()->id;
+                            $stock_tracking->out_mode = 'Cash Sales';
+                            $stock_tracking->updated_at = date('Y-m-d');
+                            $stock_tracking->movement = 'OUT';
+                            $stock_tracking->save();
+
                         }
                     }
                 }
@@ -421,7 +402,6 @@ class SaleController extends Controller
         $pharmacy['phone'] = Setting::where('id', 107)->value('value');
         $pharmacy['slogan'] = Setting::where('id', 104)->value('value');
         $pharmacy['vrn_number'] = Setting::where('id', 103)->value('value');
-
 
 
         $id = Sale::where('receipt_number', $request->reprint_receipt)->value('id');
@@ -630,7 +610,6 @@ class SaleController extends Controller
         $pharmacy['phone'] = Setting::where('id', 107)->value('value');
         $pharmacy['slogan'] = Setting::where('id', 104)->value('value');
         $pharmacy['vrn_number'] = Setting::where('id', 103)->value('value');
-
 
 
         $id = SalesDetail::orderBy('id', 'desc')->value('sale_id');
