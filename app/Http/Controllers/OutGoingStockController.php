@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Setting;
 use App\StockTracking;
+use App\Store;
 use Illuminate\Http\Request;
 
 class OutGoingStockController extends Controller
@@ -19,9 +21,20 @@ class OutGoingStockController extends Controller
 
         if ($request->ajax()) {
 
+            /*get default store*/
+            $default_store = Setting::where('id', 122)->value('value');
+            $stores = Store::where('name', $default_store)->first();
+
+            if ($stores != null) {
+                $default_store_id = $stores->id;
+            } else {
+                $default_store_id = 1;
+            }
+
             //return all
             $stock_tracking = StockTracking::whereBetween('updated_at', [date('Y-m-d', strtotime($request->date_from))
                 , date('Y-m-d', strtotime($request->date))])
+                ->where('store_id', $default_store_id)
                 ->where('movement', 'OUT')
                 ->get();
 
