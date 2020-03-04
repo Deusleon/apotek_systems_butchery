@@ -54,9 +54,8 @@ class StockAdjustmentController extends Controller
         $current_stock = CurrentStock::all('id', 'product_id', 'quantity', 'store_id');
 
         if ($request->type == "Negative") {
-            $store_id = $default_store_id;
+
             foreach ($current_stock as $item) {
-                $store_id = $item->store_id;
 
                 if ($item->product_id == $request->product_id && $item->id == $request->id) {
                     $match_field = ['id' => $item->id, 'product_id' => $request->product_id];
@@ -72,7 +71,7 @@ class StockAdjustmentController extends Controller
             $stock_tracking->stock_id = $request->id;
             $stock_tracking->product_id = $request->product_id;
             $stock_tracking->quantity = $request->quantity;
-            $stock_tracking->store_id = $store_id;
+            $stock_tracking->store_id = $default_store_id;
             $stock_tracking->updated_by = Auth::user()->id;
             $stock_tracking->out_mode = 'Stock Adjustment';
             $stock_tracking->updated_at = date('Y-m-d');
@@ -86,9 +85,7 @@ class StockAdjustmentController extends Controller
             return redirect()->route('current-stock.index');
         } else {
             //positive
-            $store_id = $default_store_id;
             foreach ($current_stock as $item) {
-                $store_id = $item->store_id;
 
                 if ($item->product_id == $request->product_id && $item->id == $request->id) {
                     $match_field = ['id' => $item->id, 'product_id' => $request->product_id];
@@ -105,7 +102,7 @@ class StockAdjustmentController extends Controller
             $stock_tracking->stock_id = $request->id;
             $stock_tracking->product_id = $request->product_id;
             $stock_tracking->quantity = $request->quantity;
-            $stock_tracking->store_id = $store_id;
+            $stock_tracking->store_id = $default_store_id;
             $stock_tracking->updated_by = Auth::user()->id;
             $stock_tracking->out_mode = 'Stock Adjustment';
             $stock_tracking->updated_at = date('Y-m-d');
