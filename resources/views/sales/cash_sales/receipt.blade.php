@@ -78,9 +78,10 @@
 <div class="row" style="padding-top: -2%">
     <h3 align="center">RECEIPT</h3>
     <h3 align="center" style="margin-top: -2%">{{$pharmacy['name']}}</h3>
-    <h6 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h6>
+    <h5 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h5>
     <h6 align="center" style="margin-top: -2%">{{$pharmacy['phone']}}</h6>
-    <h5 align="center" style="margin-top: -2%">{{$pharmacy['tin_number']}}</h5>
+    <h5 align="center" style="margin-top: -2%">TIN: {{$pharmacy['tin_number']}}</h5>
+    <h5 align="center" style="margin-top: -2%">VRN: {{$pharmacy['vrn_number']}}</h5>
 
     @foreach($data as $datas => $dat)
 

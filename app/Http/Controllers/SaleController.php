@@ -420,6 +420,8 @@ class SaleController extends Controller
         $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
         $pharmacy['phone'] = Setting::where('id', 107)->value('value');
         $pharmacy['slogan'] = Setting::where('id', 104)->value('value');
+        $pharmacy['vrn_number'] = Setting::where('id', 103)->value('value');
+
 
 
         $id = Sale::where('receipt_number', $request->reprint_receipt)->value('id');
@@ -627,6 +629,8 @@ class SaleController extends Controller
         $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
         $pharmacy['phone'] = Setting::where('id', 107)->value('value');
         $pharmacy['slogan'] = Setting::where('id', 104)->value('value');
+        $pharmacy['vrn_number'] = Setting::where('id', 103)->value('value');
+
 
 
         $id = SalesDetail::orderBy('id', 'desc')->value('sale_id');
@@ -728,6 +732,8 @@ class SaleController extends Controller
         $pharmacy['logo'] = Setting::where('id', 105)->value('value');
         $pharmacy['address'] = Setting::where('id', 106)->value('value');
         $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
+        $pharmacy['vrn_number'] = Setting::where('id', 103)->value('value');
+
         $id = SalesDetail::orderBy('id', 'desc')->value('sale_id');
         $sale_detail = SalesDetail::join('sales_credits', 'sales_credits.sale_id', '=', 'sales_details.sale_id')
             ->where('sales_credits.sale_id', $id)->get();
