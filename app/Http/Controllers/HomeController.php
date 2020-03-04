@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\CurrentStock;
 use App\SalesDetail;
+use App\Setting;
+use App\Store;
 use DB;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
@@ -37,6 +39,17 @@ class HomeController extends Controller
      */
     public function index()
     {
+        /*return default store*/
+        $default_store = Setting::where('id', 122)->value('value');
+        $stores = Store::where('name', $default_store)->first();
+
+        if ($stores != null) {
+            $default_store_id = $stores->name;
+        } else {
+            $default_store_id = "Please Set Store";
+        }
+        session()->put('store', $default_store_id);
+
         $outOfStock = CurrentStock::where('quantity', 0)->count();
 
         $outOfStockList = CurrentStock::where('quantity', 0)->get();

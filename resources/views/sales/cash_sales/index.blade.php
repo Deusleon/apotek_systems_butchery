@@ -1,4 +1,5 @@
 @extends("layouts.master")
+
 @section('content-title')
     Point of Sale
 @endsection

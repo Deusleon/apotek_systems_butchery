@@ -14,6 +14,16 @@ class ConfigurationsController extends Controller
 
     public function index()
     {
+        /*return default store*/
+        $default_store = Setting::where('id', 122)->value('value');
+        $stores = Store::where('name', $default_store)->first();
+
+        if ($stores != null) {
+            $default_store_id = $stores->name;
+        } else {
+            $default_store_id = "Please Set Store";
+        }
+        session()->put('store', $default_store_id);
 
         $configurations = Setting::orderBy('id', 'ASC')->get();
         $store = Store::all();
