@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\CurrentStock;
 use App\Sale;
 use App\SalesDetail;
+use App\Setting;
+use App\Store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -31,10 +33,21 @@ class DailyStockCountController extends Controller
 
     public function summation($specific_date)
     {
+        /*get default store*/
+        $default_store = Setting::where('id', 122)->value('value');
+        $stores = Store::where('name', $default_store)->first();
+
+        if ($stores != null) {
+            $default_store_id = $stores->id;
+        } else {
+            $default_store_id = 1;
+        }
+
         $sales_per_date = Sale::where(DB::raw('date(date)'), $specific_date)->get();
 
         $current_stocks = CurrentStock::select(DB::raw('product_id'),
-            DB::raw('sum(quantity) as quantity_on_hand'))
+            DB::raw('sum(quantity) as quantity_on_hand'), 'id')
+            ->where('store_id', $default_store_id)
             ->groupby('product_id')
             ->get();
 
@@ -44,14 +57,21 @@ class DailyStockCountController extends Controller
         /*sale per day*/
         foreach ($sales_per_date as $sale_per_date) {
             /*check for that sale id*/
-            $sale_per_date_details = SalesDetail::where('sale_id', $sale_per_date->id)->get();
+            $sale_per_date_details = SalesDetail::select('sales_details.quantity', 'stock_id')
+                ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
+                ->where('store_id', $default_store_id)
+                ->where('sale_id', $sale_per_date->id)
+                ->get();
             foreach ($sale_per_date_details as $sale_per_date_detail) {
                 array_push($products, array(
                     'product_id' => $sale_per_date_detail->currentStock['product_id'],
                     'product_name' => $sale_per_date_detail->currentStock['product']['name'],
                     'quantity_sold' => $sale_per_date_detail->quantity,
                 ));
+
             }
+
+
         }
 
 
@@ -104,11 +124,6 @@ class DailyStockCountController extends Controller
         $output = 'daily_stock_count.pdf';
         $report_pdf = new InventoryReportController();
         $report_pdf->splitPdf($new_data, $view, $output);
-
-//        $pdf = PDF::loadView('stock_management.daily_stock_count.daily_stock_count',
-//            compact('new_data'));
-//
-//        return $pdf->stream('daily_stock_count.pdf');
 
     }
 
