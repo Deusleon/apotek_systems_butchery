@@ -114,6 +114,7 @@ class SaleQuoteController extends Controller
         $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
         $pharmacy['phone'] = Setting::where('id', 107)->value('value');
         $pharmacy['slogan'] = Setting::where('id', 104)->value('value');
+        $pharmacy['vrn_number'] = Setting::where('id', 103)->value('value');
 
 
         $id = SalesQuoteDetail::orderBy('id', 'desc')->value('quote_id');
@@ -149,6 +150,7 @@ class SaleQuoteController extends Controller
                 'total_vat' => ($item->quote['cost']['vat']),
                 'sold_by' => $item->quote['user']['name'],
                 'customer' => $item->quote['customer']['name'],
+                'customer_tin' => $item->sale['customer']['tin'],
                 'created_at' => date('Y-m-d', strtotime($item->quote['date']))
             ));
         }
@@ -182,6 +184,7 @@ class SaleQuoteController extends Controller
         $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
         $pharmacy['phone'] = Setting::where('id', 107)->value('value');
         $pharmacy['slogan'] = Setting::where('id', 104)->value('value');
+        $pharmacy['vrn_number'] = Setting::where('id', 103)->value('value');
 
         $sale_quote = SalesQuoteDetail::where('quote_id', $id)->get();
 
@@ -214,6 +217,7 @@ class SaleQuoteController extends Controller
                 'total_vat' => ($item->quote['cost']['vat']),
                 'sold_by' => $item->quote['user']['name'],
                 'customer' => $item->quote['customer']['name'],
+                'customer_tin' => $item->sale['customer']['tin'],
                 'created_at' => date('Y-m-d', strtotime($item->quote['date']))
             ));
         }

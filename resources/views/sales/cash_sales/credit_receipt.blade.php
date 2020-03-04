@@ -80,7 +80,9 @@
     <h3 align="center" style="margin-top: -2%">{{$pharmacy['name']}}</h3>
     <h6 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h6>
     <h6 align="center" style="margin-top: -2%">{{$pharmacy['phone']}}</h6>
-    <h5 align="center" style="margin-top: -2%">{{$pharmacy['tin_number']}}</h5>
+    <h5 align="center" style="margin-top: -2%">TIN: {{$pharmacy['tin_number']}}</h5>
+    <h5 align="center" style="margin-top: -2%">VRN: {{$pharmacy['vrn_number']}}</h5>
+
 
     @foreach($data as $datas => $dat)
 
@@ -188,7 +190,7 @@
 </div>
 
 @if($page == -1)
-    <hr>
+    <hr style="margin-left: 2%">
     <div class="full-row" style="padding-top: 1%">
         <div class="col-25"></div>
         <div class="col-50"></div>
@@ -210,8 +212,8 @@
             </div>
         </div>
     </div>
-    <hr>
-    <p><b>Remarks:</b> {{$dat[0]['remark']}}</p>
+    <hr style="margin-left: 2%">
+    <p style="margin-left: 2%"><b>Remarks:</b> {{$dat[0]['remark']}}</p>
 @endif
 
 <h6 align="center">Sold By: {{$dat[0]['sold_by']}}</h6>

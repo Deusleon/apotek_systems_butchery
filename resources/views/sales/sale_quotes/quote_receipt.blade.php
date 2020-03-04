@@ -79,43 +79,45 @@
     <h3 align="center">SALE QUOTE RECEIPT</h3>
     <h3 align="center" style="margin-top: -2%">{{$pharmacy['name']}}</h3>
     <h6 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h6>
-    <h6 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h6>
+    <h6 align="center" style="margin-top: -2%">{{$pharmacy['phone']}}</h6>
+    <h5 align="center" style="margin-top: -2%">TIN: {{$pharmacy['tin_number']}}</h5>
+    <h5 align="center" style="margin-top: -2%">VRN: {{$pharmacy['vrn_number']}}</h5>
 
     @foreach($data as $datas => $dat)
-        <div class="full-row" style="padding-top: 2%">
-            <div class="col-25">
-                <div class="full-row">
-                    <div class="col-50" align="left"><b>Customer: </b></div>
-                    @if($dat[0]['customer'])
-                        <div class="col-50" align="right">{{$dat[0]['customer']}}</div>
-                    @else
-                        <div class="col-50" align="right">CASH</div>
-                    @endif
-                </div>
-            </div>
-            <div class="col-50"></div>
-            <div class="col-25">
-                <div class="full-row">
-                    <div class="col-50" align="left"><b>Quote Date:</b></div>
-                    <div class="col-50" align="right">{{date('j M, Y', strtotime($dat[0]['created_at']))}}</div>
-                </div>
-            </div>
+        <div style="margin-left: 5%; font-size: 13px; width: 25%;;margin-top: 5%; padding: -1.6%"><b>TIN:</b>
         </div>
-        <div class="full-row" style="padding-top: -5%">
-            <div class="col-25">
-                <div class="full-row">
-                    <div class="col-50" align="left"><b>Recept #: </b></div>
-                    <div class="col-50" align="right">{{$datas}}</div>
-                </div>
-            </div>
-            <div class="col-50"></div>
-            <div class="col-25">
-                <div class="full-row">
-                    <div class="col-50" align="left"><b>TIN: </b></div>
-                    <div class="col-50" align="right">{{$pharmacy['tin_number']}}</div>
-                </div>
-            </div>
+        <div align="left"
+             style="margin-left: 12%; font-size: 13px; width: 25%; margin-top: -1%; padding-top: -1.6%; padding-left: 1%">
+            {{$data[$datas][0]['customer_tin']}}
         </div>
+        <div style="margin-left: 80%; font-size: 13px; width: 25%; margin-top: -10%; padding: -1.6%"><b>Recept #:</b>
+        </div>
+        <div align="left"
+             style="margin-left: 87%; font-size: 13px; width: 25%; margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
+            {{$datas}}
+        </div>
+
+        <div style="margin-left: 5%; font-size: 13px; width: 25%;margin-top: 2%; padding: -1.6%"><b>Customer:</b>
+        </div>
+        @if($dat[0]['customer'])
+            <div align="left"
+                 style="margin-left: 12%; font-size: 13px; width: 80%; margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
+                {{$dat[0]['customer']}}
+            </div>
+        @else
+            <div align="left"
+                 style="margin-left: 12%; font-size: 13px; width: 25%; margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
+                CASH
+            </div>
+        @endif
+
+        <div style="margin-left: 80%; font-size: 13px; width: 25%; margin-top: -10%; padding: -1.6%"><b>Sale Date:</b>
+        </div>
+        <div align="left"
+             style="margin-left: 87%; font-size: 13px; width: 25%; margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
+            {{date('j M, Y', strtotime($dat[0]['created_at']))}}
+        </div>
+
 
 </div>
 
