@@ -340,22 +340,24 @@ class HomeController extends Controller
         $dir = $request->input('order.0.dir');
 
         if (empty($request->input('search.value'))) {
-            $out_of_stock = CurrentStock::select('name', 'quantity', 'inv_current_stock.id', 'product_id', 'expiry_date')
+            $expired = CurrentStock::select('name', 'quantity', 'inv_current_stock.id', 'product_id', 'expiry_date')
                 ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                 ->whereRaw('expiry_date <  date(now())')
                 ->offset($start)
                 ->limit($limit)
+                ->orderby('expiry_date', 'desc')
                 ->orderBy($order, $dir)
                 ->get();
         } else {
             $search = $request->input('search.value');
 
-            $out_of_stock = CurrentStock::select('name', 'quantity', 'inv_current_stock.id', 'product_id', 'expiry_date')
+            $expired = CurrentStock::select('name', 'quantity', 'inv_current_stock.id', 'product_id', 'expiry_date')
                 ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                 ->orWhere('name', 'LIKE', "%{$search}%")
                 ->orwhereRaw('expiry_date <  date(now())')
                 ->offset($start)
                 ->limit($limit)
+                ->orderby('expiry_date', 'desc')
                 ->orderBy($order, $dir)
                 ->get();
 
@@ -368,13 +370,13 @@ class HomeController extends Controller
         }
 
         $data = array();
-        if (!empty($out_of_stock)) {
-            foreach ($out_of_stock as $adjustment) {
+        if (!empty($expired)) {
+            foreach ($expired as $item) {
 
-                $nestedData['name'] = $adjustment->name;
-                $nestedData['quantity'] = $adjustment->quantity;
-                $nestedData['product_id'] = $adjustment->product_id;
-                $nestedData['expiry_date'] = $adjustment->expiry_date;
+                $nestedData['name'] = $item->name;
+                $nestedData['quantity'] = $item->quantity;
+                $nestedData['product_id'] = $item->product_id;
+                $nestedData['expiry_date'] = $item->expiry_date;
 
                 $data[] = $nestedData;
 
