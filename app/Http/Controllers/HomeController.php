@@ -144,44 +144,251 @@ class HomeController extends Controller
     public function stockSummary(Request $request)
     {
         if ($request->ajax()) {
+
             switch ($request->summary_no) {
                 case 1:
-                    $outOfStock = CurrentStock::where('quantity', 0)
-                        ->groupby('product_id')
-                        ->get();
-                    foreach ($outOfStock as $value) {
-                        $value->product;
-                    }
-                    return $outOfStock;
+                    return $this->outOfStock($request);
                     break;
                 case 2:
-                    //return all
-                    $stock_tracking = StockTracking::select(DB::raw('sum(quantity) as quantity'), 'product_id', 'stock_id', 'updated_at')
-                        ->whereRaw('month(updated_at) = month(now())')
-                        ->where('movement', 'OUT')
-                        ->where('out_mode', 'Cash Sales')
-                        ->orderby('quantity', 'desc')
-                        ->groupby('product_id')
-                        ->get();
-
-                    //return product object
-                    foreach ($stock_tracking as $tracking) {
-                        $tracking->currentStock->product;
-                        $tracking->user;
-                        $tracking->date = date('d-m-Y', strtotime($tracking->updated_at));
-                    }
-                    return $stock_tracking;
+                    return $this->fastMoving($request);
                     break;
                 case 3:
-                    $expired = CurrentStock::whereRaw('expiry_date <  date(now())')->get();
-                    foreach ($expired as $value) {
-                        $value->product;
-                    }
-                    return $expired;
+                    return $this->expired($request);
                     break;
                 default;
             }
         }
+    }
+
+    public function outOfStock($request)
+    {
+        $columns = array(
+            0 => 'product_id',
+            1 => 'product_id',
+            2 => 'batch_number'
+        );
+
+
+        $totalData = CurrentStock::where('quantity', 0)
+            ->groupby('product_id')
+            ->get();
+
+        $totalFiltered = $totalData->count();
+
+        $limit = $request->input('length');
+        $start = $request->input('start');
+        $order = $columns[$request->input('order.0.column')];
+        $dir = $request->input('order.0.dir');
+
+        if (empty($request->input('search.value'))) {
+            $out_of_stock = CurrentStock::where('quantity', 0)
+                ->groupby('product_id')
+                ->offset($start)
+                ->limit($limit)
+                ->orderBy($order, $dir)
+                ->get();
+        } else {
+            $search = $request->input('search.value');
+
+            $out_of_stock = CurrentStock::join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                ->orwhere('quantity', 0)
+                ->orWhere('name', 'LIKE', "%{$search}%")
+                ->groupby('product_id')
+                ->offset($start)
+                ->limit($limit)
+                ->orderBy($order, $dir)
+                ->get();
+
+            $totalFiltered = CurrentStock::join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                ->orwhere('quantity', 0)
+                ->orWhere('name', 'LIKE', "%{$search}%")
+                ->groupby('product_id')
+                ->get();
+            $totalFiltered = $totalFiltered->count();
+        }
+
+        $data = array();
+        if (!empty($out_of_stock)) {
+            foreach ($out_of_stock as $adjustment) {
+
+                $nestedData['name'] = $adjustment->product['name'];
+                $nestedData['batch_number'] = $adjustment->batch_number;
+                $nestedData['code'] = $adjustment->product['name'];
+                $nestedData['product_id'] = $adjustment->product['id'];
+
+                $data[] = $nestedData;
+
+            }
+        }
+
+        $json_data = array(
+            "draw" => intval($request->input('draw')),
+            "recordsTotal" => intval($totalData->count()),
+            "recordsFiltered" => intval($totalFiltered),
+            "data" => $data
+        );
+
+        echo json_encode($json_data);
+    }
+
+    public function fastMoving($request)
+    {
+        $columns = array(
+            0 => 'product_id',
+            1 => 'product_id',
+            2 => 'batch_number'
+        );
+
+
+        $totalData = StockTracking::select(DB::raw('sum(quantity) as quantity'), 'stock_id', 'product_id', 'stock_id', 'updated_at')
+            ->whereRaw('month(updated_at) = month(now())')
+            ->where('movement', 'OUT')
+            ->where('out_mode', 'Cash Sales')
+            ->orderby('quantity', 'desc')
+            ->groupby('product_id')
+            ->get();
+
+        $totalFiltered = $totalData->count();
+
+        $limit = $request->input('length');
+        $start = $request->input('start');
+        $order = $columns[$request->input('order.0.column')];
+        $dir = $request->input('order.0.dir');
+
+        if (empty($request->input('search.value'))) {
+            $fast_moving = StockTracking::select(DB::raw('sum(quantity) as quantity'), 'stock_id', 'product_id', 'stock_id', 'updated_at')
+                ->whereRaw('month(updated_at) = month(now())')
+                ->where('movement', 'OUT')
+                ->where('out_mode', 'Cash Sales')
+                ->orderby('quantity', 'desc')
+                ->groupby('product_id')
+                ->offset($start)
+                ->limit($limit)
+                ->orderBy($order, $dir)
+                ->get();
+        } else {
+            $search = $request->input('search.value');
+
+            $fast_moving = StockTracking::select(DB::raw('sum(quantity) as quantity'), 'stock_id', 'product_id', 'stock_id', 'updated_at')
+                ->join('inv_products', 'inv_products.id', '=', 'inv_stock_tracking.product_id')
+                ->whereRaw('month(updated_at) = month(now())')
+                ->where('movement', 'OUT')
+                ->where('out_mode', 'Cash Sales')
+                ->orderby('quantity', 'desc')
+                ->orWhere('name', 'LIKE', "%{$search}%")
+                ->groupby('product_id')
+                ->offset($start)
+                ->limit($limit)
+                ->orderBy($order, $dir)
+                ->get();
+
+            $totalFiltered = StockTracking::select(DB::raw('sum(quantity) as quantity'), 'stock_id', 'product_id', 'stock_id', 'updated_at')
+                ->join('inv_products', 'inv_products.id', '=', 'inv_stock_tracking.product_id')
+                ->whereRaw('month(updated_at) = month(now())')
+                ->where('movement', 'OUT')
+                ->where('out_mode', 'Cash Sales')
+                ->orderby('quantity', 'desc')
+                ->orWhere('name', 'LIKE', "%{$search}%")
+                ->groupby('product_id')
+                ->get();
+            $totalFiltered = $totalFiltered->count();
+        }
+
+        $data = array();
+        if (!empty($fast_moving)) {
+            foreach ($fast_moving as $adjustment) {
+
+                $nestedData['name'] = $adjustment->currentStock['product']['name'];
+                $nestedData['product_id'] = $adjustment->product_id;
+                $nestedData['quantity'] = $adjustment->quantity;
+
+
+                $data[] = $nestedData;
+
+            }
+        }
+
+        $json_data = array(
+            "draw" => intval($request->input('draw')),
+            "recordsTotal" => intval($totalData->count()),
+            "recordsFiltered" => intval($totalFiltered),
+            "data" => $data
+        );
+
+        echo json_encode($json_data);
+    }
+
+    public function expired($request)
+    {
+        $columns = array(
+            0 => 'product_id',
+            1 => 'product_id',
+            2 => 'quantity',
+            3 => 'expiry_date'
+
+        );
+
+
+        $totalData = CurrentStock::whereRaw('expiry_date <  date(now())')
+            ->get();
+
+        $totalFiltered = $totalData->count();
+
+        $limit = $request->input('length');
+        $start = $request->input('start');
+        $order = $columns[$request->input('order.0.column')];
+        $dir = $request->input('order.0.dir');
+
+        if (empty($request->input('search.value'))) {
+            $out_of_stock = CurrentStock::select('name', 'quantity', 'inv_current_stock.id', 'product_id', 'expiry_date')
+                ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                ->whereRaw('expiry_date <  date(now())')
+                ->offset($start)
+                ->limit($limit)
+                ->orderBy($order, $dir)
+                ->get();
+        } else {
+            $search = $request->input('search.value');
+
+            $out_of_stock = CurrentStock::select('name', 'quantity', 'inv_current_stock.id', 'product_id', 'expiry_date')
+                ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                ->orWhere('name', 'LIKE', "%{$search}%")
+                ->orwhereRaw('expiry_date <  date(now())')
+                ->offset($start)
+                ->limit($limit)
+                ->orderBy($order, $dir)
+                ->get();
+
+            $totalFiltered = CurrentStock::select('name', 'quantity', 'inv_current_stock.id', 'product_id', 'expiry_date')
+                ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                ->orWhere('name', 'LIKE', "%{$search}%")
+                ->orwhereRaw('expiry_date <  date(now())')
+                ->get();
+            $totalFiltered = $totalFiltered->count();
+        }
+
+        $data = array();
+        if (!empty($out_of_stock)) {
+            foreach ($out_of_stock as $adjustment) {
+
+                $nestedData['name'] = $adjustment->name;
+                $nestedData['quantity'] = $adjustment->quantity;
+                $nestedData['product_id'] = $adjustment->product_id;
+                $nestedData['expiry_date'] = $adjustment->expiry_date;
+
+                $data[] = $nestedData;
+
+            }
+        }
+
+        $json_data = array(
+            "draw" => intval($request->input('draw')),
+            "recordsTotal" => intval($totalData->count()),
+            "recordsFiltered" => intval($totalFiltered),
+            "data" => $data
+        );
+
+        echo json_encode($json_data);
     }
 
 }

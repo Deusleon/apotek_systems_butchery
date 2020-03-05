@@ -312,107 +312,104 @@
 
     <script>
 
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
         $(document).ready(function () {
             var a = document.getElementById('out_of_stock');
             a.click();
         });
 
-        var stock_items_table = $('#stock_items').DataTable({
-            'columns': [
-                {'data': 'product_id'},
-                {'data': 'product.name'},
-                {'data': 'batch_number'}
-            ],
-            searching: false,
-            bPaginate: true,
-        });
-
-        var stock_items_expired_table = $('#stock_items_expired').DataTable({
-            'columns': [
-                {'data': 'product_id'},
-                {'data': 'product.name'},
-                {'data': 'quantity'},
-                {'data': 'expiry_date'}
-            ],
-            searching: false,
-            bPaginate: true,
-        });
-
-        var stock_items_fast_table = $('#stock_items_fast').DataTable({
-            'columns': [
-                {'data': 'product_id'},
-                {'data': 'current_stock.product.name'},
-                {
-                    'data': 'quantity', render: function (quantity) {
-                        return numberWithCommas(quantity);
-                    }
-                }
-            ],
-            searching: false,
-            bPaginate: true,
-        });
-
-
         $('#out_of_stock').on('click', function () {
 
-            $.ajax({
-                url: '{{route('stock-summary')}}',
-                type: "get",
-                dataType: "json",
-                data: {
-                    'summary_no': 1 //out of stock
-                },
-                success: function (data) {
-                    document.getElementById('stock_items_table').style.display = 'block';
-                    document.getElementById('stock_items_expired_table').style.display = 'none';
-                    document.getElementById('stock_items_fast_table').style.display = 'none';
+            document.getElementById('stock_items_table').style.display = 'block';
+            document.getElementById('stock_items_expired_table').style.display = 'none';
+            document.getElementById('stock_items_fast_table').style.display = 'none';
 
-                    stock_items_table.clear();
-                    stock_items_table.rows.add(data);
-                    stock_items_table.draw();
-                }
+            $('#stock_items').DataTable().clear().destroy();
+            $('#stock_items').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "{{ route('stock-summary') }}",
+                    "dataType": "json",
+                    "type": "post",
+                    "cache": false,
+                    "data": {
+                        _token: "{{csrf_token()}}",
+                        summary_no: 1
+                    }
+                },
+                'columns': [
+                    {'data': 'product_id'},
+                    {'data': 'name'},
+                    {'data': 'batch_number'}
+                ],
+                'searching': false
 
             });
 
         });
 
         $('#below').on('click', function () {
-            $.ajax({
-                url: '{{route('stock-summary')}}',
-                type: "get",
-                dataType: "json",
-                data: {
-                    'summary_no': 2 //below
+
+            document.getElementById('stock_items_table').style.display = 'none';
+            document.getElementById('stock_items_expired_table').style.display = 'none';
+            document.getElementById('stock_items_fast_table').style.display = 'block';
+
+            $('#stock_items_fast').DataTable().clear().destroy();
+            $('#stock_items_fast').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "{{ route('stock-summary') }}",
+                    "dataType": "json",
+                    "type": "post",
+                    "cache": false,
+                    "data": {
+                        _token: "{{csrf_token()}}",
+                        summary_no: 2
+                    }
                 },
-                success: function (data) {
-                    document.getElementById('stock_items_table').style.display = 'none';
-                    document.getElementById('stock_items_expired_table').style.display = 'none';
-                    document.getElementById('stock_items_fast_table').style.display = 'block';
-                    stock_items_fast_table.clear();
-                    stock_items_fast_table.rows.add(data);
-                    stock_items_fast_table.draw();
-                }
+                'columns': [
+                    {'data': 'product_id'},
+                    {'data': 'name'},
+                    {'data': 'quantity'}
+                ],
+                'searching': false
 
             });
         });
 
         $('#expired').on('click', function () {
-            $.ajax({
-                url: '{{route('stock-summary')}}',
-                type: "get",
-                dataType: "json",
-                data: {
-                    'summary_no': 3 //expired
-                },
-                success: function (data) {
-                    document.getElementById('stock_items_table').style.display = 'none';
-                    document.getElementById('stock_items_expired_table').style.display = 'block';
-                    document.getElementById('stock_items_fast_table').style.display = 'none';
+            document.getElementById('stock_items_table').style.display = 'none';
+            document.getElementById('stock_items_expired_table').style.display = 'block';
+            document.getElementById('stock_items_fast_table').style.display = 'none';
 
-                    stock_items_expired_table.clear();
-                    stock_items_expired_table.rows.add(data);
-                    stock_items_expired_table.draw();
-                }
+            $('#stock_items_expired').DataTable().clear().destroy();
+            $('#stock_items_expired').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "{{ route('stock-summary') }}",
+                    "dataType": "json",
+                    "type": "post",
+                    "cache": false,
+                    "data": {
+                        _token: "{{csrf_token()}}",
+                        summary_no: 3
+                    }
+                },
+                'columns': [
+                    {'data': 'product_id'},
+                    {'data': 'name'},
+                    {'data': 'quantity'},
+                    {'data': 'expiry_date'}
+                ],
+                'searching': false
 
             });
         });
