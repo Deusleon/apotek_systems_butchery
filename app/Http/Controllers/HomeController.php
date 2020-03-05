@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\CurrentStock;
 use App\SalesDetail;
 use App\Setting;
+use App\StockTracking;
 use App\Store;
 use DB;
 use Illuminate\Contracts\Support\Renderable;
@@ -50,9 +51,18 @@ class HomeController extends Controller
         }
         session()->put('store', $default_store_id);
 
-        $outOfStock = CurrentStock::where('quantity', 0)->count();
+        $outOfStock = CurrentStock::where('quantity', 0)->groupby('product_id')->get();
+        $outOfStock = $outOfStock->count();
+        $outOfStockList = CurrentStock::where('quantity', 0)->groupby('product_id')->get();
 
-        $outOfStockList = CurrentStock::where('quantity', 0)->get();
+        $fast_moving = StockTracking::select(DB::raw('sum(quantity) as quantity'), 'product_id', 'stock_id', 'updated_at')
+            ->whereRaw('month(updated_at) = month(now())')
+            ->where('movement', 'OUT')
+            ->where('out_mode', 'Cash Sales')
+            ->orderby('quantity', 'desc')
+            ->groupby('product_id')
+            ->get();
+        $fast_moving = $fast_moving->count();
 
         $expired = CurrentStock::whereRaw('expiry_date <  date(now())')->count();
 
@@ -100,10 +110,9 @@ class HomeController extends Controller
 
 // dd($salesByCategory);
         return view('home', compact('outOfStock', 'outOfStockList', 'expired', 'avgDailySales', 'todaySales', 'totalDailySales',
-            'totalMonthlySales', 'salesByCategory'));
+            'totalMonthlySales', 'salesByCategory', 'fast_moving'));
 
     }
-
 
     public function showChangePasswordForm()
     {
@@ -130,6 +139,49 @@ class HomeController extends Controller
         $user->save();
         Session::flash("alert-success", "Password changed successfully!");
         return redirect()->route('home');
+    }
+
+    public function stockSummary(Request $request)
+    {
+        if ($request->ajax()) {
+            switch ($request->summary_no) {
+                case 1:
+                    $outOfStock = CurrentStock::where('quantity', 0)
+                        ->groupby('product_id')
+                        ->get();
+                    foreach ($outOfStock as $value) {
+                        $value->product;
+                    }
+                    return $outOfStock;
+                    break;
+                case 2:
+                    //return all
+                    $stock_tracking = StockTracking::select(DB::raw('sum(quantity) as quantity'), 'product_id', 'stock_id', 'updated_at')
+                        ->whereRaw('month(updated_at) = month(now())')
+                        ->where('movement', 'OUT')
+                        ->where('out_mode', 'Cash Sales')
+                        ->orderby('quantity', 'desc')
+                        ->groupby('product_id')
+                        ->get();
+
+                    //return product object
+                    foreach ($stock_tracking as $tracking) {
+                        $tracking->currentStock->product;
+                        $tracking->user;
+                        $tracking->date = date('d-m-Y', strtotime($tracking->updated_at));
+                    }
+                    return $stock_tracking;
+                    break;
+                case 3:
+                    $expired = CurrentStock::whereRaw('expiry_date <  date(now())')->get();
+                    foreach ($expired as $value) {
+                        $value->product;
+                    }
+                    return $expired;
+                    break;
+                default;
+            }
+        }
     }
 
 }

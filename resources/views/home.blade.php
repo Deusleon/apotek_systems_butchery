@@ -17,6 +17,38 @@
             height: 400px;
         }
 
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+
+        /**
+          Component
+        **/
+
+        label {
+            width: 100%;
+        }
+
+        .card-input-element {
+            display: none;
+        }
+
+        .card-input {
+            margin: 10px;
+            padding: 00px;
+        }
+
+        .card-input:hover {
+            cursor: pointer;
+        }
+
+        .card-input-element:checked + .card-input {
+            box-shadow: 0 0 1px 1px #04a9f5;
+        }
+
+
     </style>
 @endsection
 
@@ -143,132 +175,128 @@
             <div class="tab-pane fade" id="pills-stock" role="tabpanel" aria-labelledby="pills-stock-tab">
                 {{-- row starts --}}
                 <div class="row">
+                    <div class="col-md-4 col-lg-4 col-sm-4">
 
-                    <div class="col-xl-4 col-md-6">
-                        <div class="card">
-                            <div class="card-block">
-                                <div class="row align-items-center justify-content-center">
-                                    <div class="col">
-                                        <h3 class="text-c-red">{{$outOfStock}}</h3>
-                                        <h5>Out of Stock</h5>
+                        <label>
+                            <input type="radio" name="stock" id="out_of_stock" class="card-input-element"/>
+
+                            <div class="panel panel-default card-input">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <div class="panel-heading"><h5>Out of Stock</h5></div>
+                                        <div class="panel-body">
+                                            <h3 class="text-c-red">{{$outOfStock}}</h3>
+                                        </div>
                                     </div>
-
                                 </div>
                             </div>
-                        </div>
+
+                        </label>
                     </div>
-                    <div class="col-xl-4 col-md-6">
-                        <div class="card">
-                            <div class="card-block">
-                                <div class="row align-items-center justify-content-center">
-                                    <div class="col">
-                                        <h3 class="text-c-green">{{$outOfStock}}</h3>
-                                        <h5>Below Minimum Level</h5>
-                                    </div>
+                    <div class="col-md-4 col-lg-4 col-sm-4">
 
+                        <label>
+                            <input type="radio" name="stock" id="below" class="card-input-element"/>
+
+                            <div class="panel panel-default card-input">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <div class="panel-heading"><h5>Fast Moving</h5></div>
+                                        <div class="panel-body text-c-green">
+                                            <h3 class="text-c-green">{{$fast_moving}}</h3>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+
+                        </label>
                     </div>
-                    <div class="col-xl-4 col-md-12">
-                        <div class="card">
-                            <div class="card-block">
-                                <div class="row align-items-center justify-content-center">
-                                    <div class="col">
-                                        <h3 class="text-c-red">{{$expired}}</h3>
-                                        <h5>Expired</h5>
-                                    </div>
+                    <div class="col-md-4 col-lg-4 col-sm-4">
 
+                        <label>
+                            <input type="radio" name="stock" id="expired" class="card-input-element"/>
+
+                            <div class="panel panel-default card-input">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <div class="panel-heading"><h5>Expired</h5></div>
+                                        <div class="panel-body text-c-red">
+                                            <h3 class="text-c-red">{{$expired}}</h3>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+
+                        </label>
                     </div>
                 </div>
-                {{-- row ends --}}
 
                 <div class="row">
                     <!-- [ Out of stock start -->
-                    <div class="col-xl-6 col-md-6">
-                        <div class="card Recent-Users">
-                            <div class="card-header">
-                                <h5>Out of Stock Items</h5>
+                    <div class="col-xl-12 col-md-12">
+                        <div class="table-responsive" style="display: none" id="stock_items_table">
+                            <table id="stock_items"
+                                   class="display table nowrap table-striped table-hover"
+                                   style="width:100%">
+                                <thead>
+                                <tr>
+                                    <th>Product Code</th>
+                                    <th>Product</th>
+                                    <th>Batch Number</th>
+                                </tr>
+                                </thead>
+                                <tbody>
 
-                            </div>
-                            <div class="card-block px-0 py-3">
-                                <div class="table-responsive">
-                                    <table id="stock_items" class="display table nowrap table-striped table-hover"
-                                           style="width:100%">
-                                        <thead>
-                                        <tr>
-                                            <th>Id</th>
-                                            <th>Item</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-
-                                        @foreach($outOfStockList as $stock)
-                                            <tr>
-                                                <td>{{$stock->product_id}}</td>
-                                                <td>{{$stock->product->name}}</td>
-
-                                            </tr>
-                                        @endforeach
-
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                                </tbody>
+                            </table>
                         </div>
-                    </div>
-                    <!-- [ out of stock ] end -->
-                    <!-- [ frequent items start -->
-                    <div class="col-xl-6 col-md-6">
-                        <div class="card Recent-Users">
-                            <div class="card-header">
-                                <h5> Fast Moving Items</h5>
 
-                            </div>
-                            <div class="card-block px-0 py-3">
-                                <div class="table-responsive">
-                                    <table id="fast_moving" class="display table nowrap table-striped table-hover"
-                                           style="width:100%">
-                                        <thead>
-                                        <tr>
-                                            <th>Id</th>
-                                            <th>Item</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
+                        <div class="table-responsive" style="display: none" id="stock_items_fast_table">
+                            <table id="stock_items_fast"
+                                   class="display table nowrap table-striped table-hover"
+                                   style="width:100%">
+                                <thead>
+                                <tr>
+                                    <th>Product Code</th>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                </tr>
+                                </thead>
+                                <tbody>
 
-                                        @foreach($outOfStockList as $stock)
-                                            <tr>
-                                                <td>{{$stock->product_id}}</td>
-                                                <td>{{$stock->product->name}}</td>
-
-                                            </tr>
-                                        @endforeach
-
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                                </tbody>
+                            </table>
                         </div>
+
+                        <div class="table-responsive" style="display: none" id="stock_items_expired_table">
+                            <table id="stock_items_expired"
+                                   class="display table nowrap table-striped table-hover"
+                                   style="width:100%">
+                                <thead>
+                                <tr>
+                                    <th>Product Code</th>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Expiry Date</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+
                     </div>
-                    <!-- [ frequent items ] end -->
+
                 </div>
             </div>
-            {{-- /Tab 2 --}}
+            {{-- row ends --}}
 
         </div>
+        {{-- /Tab 2 --}}
+
     </div>
-
-
-
-
-
-
-
-
+    </div>
 
 
 @endsection
@@ -282,13 +310,121 @@
     <script src="{{asset("assets/plugins/amcharts4/themes/animated.js")}}"></script>
 
 
-
     <script>
 
-        $('#stock_items').DataTable({
-            searching: true,
+        $(document).ready(function () {
+            var a = document.getElementById('out_of_stock');
+            a.click();
+        });
+
+        var stock_items_table = $('#stock_items').DataTable({
+            'columns': [
+                {'data': 'product_id'},
+                {'data': 'product.name'},
+                {'data': 'batch_number'}
+            ],
+            searching: false,
             bPaginate: true,
         });
+
+        var stock_items_expired_table = $('#stock_items_expired').DataTable({
+            'columns': [
+                {'data': 'product_id'},
+                {'data': 'product.name'},
+                {'data': 'quantity'},
+                {'data': 'expiry_date'}
+            ],
+            searching: false,
+            bPaginate: true,
+        });
+
+        var stock_items_fast_table = $('#stock_items_fast').DataTable({
+            'columns': [
+                {'data': 'product_id'},
+                {'data': 'current_stock.product.name'},
+                {
+                    'data': 'quantity', render: function (quantity) {
+                        return numberWithCommas(quantity);
+                    }
+                }
+            ],
+            searching: false,
+            bPaginate: true,
+        });
+
+
+        $('#out_of_stock').on('click', function () {
+
+            $.ajax({
+                url: '{{route('stock-summary')}}',
+                type: "get",
+                dataType: "json",
+                data: {
+                    'summary_no': 1 //out of stock
+                },
+                success: function (data) {
+                    document.getElementById('stock_items_table').style.display = 'block';
+                    document.getElementById('stock_items_expired_table').style.display = 'none';
+                    document.getElementById('stock_items_fast_table').style.display = 'none';
+
+                    stock_items_table.clear();
+                    stock_items_table.rows.add(data);
+                    stock_items_table.draw();
+                }
+
+            });
+
+        });
+
+        $('#below').on('click', function () {
+            $.ajax({
+                url: '{{route('stock-summary')}}',
+                type: "get",
+                dataType: "json",
+                data: {
+                    'summary_no': 2 //below
+                },
+                success: function (data) {
+                    document.getElementById('stock_items_table').style.display = 'none';
+                    document.getElementById('stock_items_expired_table').style.display = 'none';
+                    document.getElementById('stock_items_fast_table').style.display = 'block';
+                    stock_items_fast_table.clear();
+                    stock_items_fast_table.rows.add(data);
+                    stock_items_fast_table.draw();
+                }
+
+            });
+        });
+
+        $('#expired').on('click', function () {
+            $.ajax({
+                url: '{{route('stock-summary')}}',
+                type: "get",
+                dataType: "json",
+                data: {
+                    'summary_no': 3 //expired
+                },
+                success: function (data) {
+                    document.getElementById('stock_items_table').style.display = 'none';
+                    document.getElementById('stock_items_expired_table').style.display = 'block';
+                    document.getElementById('stock_items_fast_table').style.display = 'none';
+
+                    stock_items_expired_table.clear();
+                    stock_items_expired_table.rows.add(data);
+                    stock_items_expired_table.draw();
+                }
+
+            });
+        });
+
+        function numberWithCommas(digit) {
+            return String(parseFloat(digit)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+    </script>
+
+
+    <script>
 
         $('#fast_moving').DataTable({
             searching: true,
@@ -477,7 +613,7 @@
             pieSeries.labels.template.radius = 3;
             pieSeries.labels.template.padding(0, 0, 0, 0);
 
-            pieSeries.ticks.template.disabled = true;
+            pieSeries.ticks.template.disabled = false;
 
             // Create a base filter effect (as if it's not there) for the hover to return to
             var shadow = pieSeries.slices.template.filters.push(new am4core.DropShadowFilter);
