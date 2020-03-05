@@ -3,7 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\CurrentStock;
+use App\Setting;
 use Illuminate\Support\Facades\DB;
+use PDF;
+
+ini_set('max_execution_time', 500);
+set_time_limit(500);
+ini_set('memory_limit', '512M');
 
 class InventoryCountSheetController extends Controller
 {
@@ -11,14 +17,20 @@ class InventoryCountSheetController extends Controller
 
     public function generateInventoryCountSheetPDF()
     {
-        $data_og = array();
+
+        $pharmacy['name'] = Setting::where('id', 100)->value('value');
+        $pharmacy['address'] = Setting::where('id', 106)->value('value');
+        $pharmacy['logo'] = Setting::where('id', 105)->value('value');
+        $pharmacy['phone'] = Setting::where('id', 107)->value('value');
+
+        $data = array();
         $current_stocks = CurrentStock::select(DB::raw('product_id'), 'store_id', 'shelf_number',
             DB::raw('sum(quantity) as quantity_on_hand'))
-            ->groupby('product_id')
+            ->groupby('product_id', 'store_id')
             ->get();
 
         foreach ($current_stocks as $current_stock) {
-            array_push($data_og, array(
+            array_push($data, array(
                 'store' => $current_stock->store['name'],
                 'shelf_no' => $current_stock->shelf_number,
                 'product_id' => $current_stock->product['id'],
@@ -27,14 +39,25 @@ class InventoryCountSheetController extends Controller
             ));
         }
 
-        if ($data_og == []) {
+        /*group by store*/
+        $grouped_by_store = [];
+        foreach ($data as $val) {
+            if (array_key_exists('store', $val)) {
+                $grouped_by_store[$val['store']][] = $val;
+            }
+        }
+
+        $data = $grouped_by_store;
+
+//        dd($data);
+
+        if ($data == []) {
             return response()->view('error_pages.pdf_zero_data');
         }
 
-        $view = 'stock_management.daily_stock_count.inventory_count_sheet';
-        $output = 'inventory_count_sheet.pdf';
-        $inventory_report = new InventoryReportController();
-        $inventory_report->splitPdf($data_og, $view, $output);
+        $pdf = PDF::loadView('stock_management.daily_stock_count.inventory_count_sheet',
+            compact('data', 'pharmacy'));
+        return $pdf->stream('inventory_count_sheet.pdf');
 
     }
 

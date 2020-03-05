@@ -36,13 +36,14 @@
         #table-detail {
             /*border-spacing: 5px;*/
             width: 100%;
+            margin-bottom: 10%;
         }
 
         #table-top-detail {
             /*border-spacing: 5px;*/
             width: 100%;
             margin-top: -10%;
-            margin-bottom: 3%;
+            margin-bottom: -3%;
         }
 
         tr:nth-child(even) {
@@ -93,54 +94,70 @@
 </head>
 <body>
 
-<h4 align="center">{{$pharmacy['name']}}</h4>
+<h2 align="center">{{$pharmacy['name']}}</h2>
 <h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
 <h2 align="center" style="margin-top: -2%">Inventory Count Sheet</h2>
 
-<div class="row" style="margin-top: 10%">
+<div class="row" style="margin-top: -2%">
     <div class="col-md-12">
-
-        <table id="table-top-detail" align="center">
-            <thead>
-            <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                <th>Date</th>
-                <th>Store</th>
-                <th>Performed By</th>
-            </tr>
-            <tr style="height:20px;">
-                <td>{{date('d-m-Y')}}</td>
-                <td>{{$data[0]['store']}}</td>
-                <td>{{Auth::user()->name}}</td>
-            </tr>
-            </thead>
-        </table>
-
-        <table id="table-detail" align="center">
-            <thead>
-            <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                <th>Code</th>
-                <th>Product Name</th>
-                <th>Shelf No</th>
-                <th>QOH</th>
-                <th>Physical</th>
-            </tr>
-            </thead>
-            <!-- loop the product names here -->
-            @foreach($data as $stock)
+        <h4 align="center">Perfomed By: {{Auth::user()->name}}, on {{date('d-m-Y')}}</h4>
+        @foreach($data as $key => $datum)
+            <table id="table-top-detail" align="center">
+                <thead>
                 <tr>
-                    <td>{{$stock['product_id']}}</td>
-                    <td>{{$stock['product_name']}}</td>
-                    <td>{{$stock['shelf_no']}}</td>
-                    <td align="right">
-                        <div style="margin-right: 50%">{{number_format($stock['quantity_on_hand'])}}</div>
-                    </td>
-                    <td></td>
+                    <th>Store: {{$key}}</th>
                 </tr>
-            @endforeach
-        </table>
+                </thead>
+            </table>
+
+            <table id="table-detail" align="center">
+                <thead>
+                <tr style="background: #1f273b; color: white; font-size: 0.9em">
+                    <th>Code</th>
+                    <th>Product Name</th>
+                    <th>Shelf No</th>
+                    <th>QOH</th>
+                    <th>Physical</th>
+                </tr>
+                </thead>
+                <!-- loop the product names here -->
+                @foreach($datum as $stock)
+                    <tr>
+                        <td>{{$stock['product_id']}}</td>
+                        <td>{{$stock['product_name']}}</td>
+                        <td>{{$stock['shelf_no']}}</td>
+                        <td align="right">
+                            <div style="margin-right: 50%">{{number_format($stock['quantity_on_hand'])}}</div>
+                        </td>
+                        <td></td>
+                    </tr>
+                @endforeach
+            </table>
+            <hr style="margin-top: -8%; margin-bottom: 2%;margin-left: 2%">
+        @endforeach
     </div>
 </div>
 
+<script type="text/php">
+    if ( isset($pdf) ) {
+        $x = 280;
+        $y = 820;
+        $text = "{PAGE_NUM} of {PAGE_COUNT} pages";
+        $font = null;
+        $size = 10;
+        $color = array(0,0,0);
+        $word_space = 0.0;  //  default
+        $char_space = 0.0;  //  default
+        $angle = 0.0;   //  default
+        $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
+
+
+     }
+
+
+
+
+</script>
 
 </body>
 </html>

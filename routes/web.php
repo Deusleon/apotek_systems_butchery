@@ -322,7 +322,7 @@ Route::middleware(["auth"])->group(function () {
 
     Route::post('inventory-management/daily-stock-count/pdfgen', 'DailyStockCountController@generateDailyStockCountPDF')->name('daily-stock-count-pdf-gen');
 
-    Route::get('inventory-management/inventory-count-sheet/pdfgen', 'InventoryCountSheetController@generateInventoryCountSheetPDF')->name('inventory-count-sheet-pdf-gen');
+    Route::get('inventory-management/inventory-count-sheet/Inventory Count Sheet', 'InventoryCountSheetController@generateInventoryCountSheetPDF')->name('inventory-count-sheet-pdf-gen');
 
     //user roles
     Route::get('user-roles', 'RoleController@index')->name('roles.index');
