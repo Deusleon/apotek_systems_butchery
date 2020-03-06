@@ -123,6 +123,15 @@
             top: 20px;
         }
 
+        .badge-notify {
+            text-decoration-color: #FFFFFF;
+            background: red;
+            border-radius: 50%;
+            position: relative;
+            top: -15px;
+            left: 30px;
+        }
+
     </style>
 
 
@@ -194,19 +203,28 @@
             </li>
             <li>
                 <div class="dropdown">
+                    @if(auth()->user()->unreadNotifications->count() != 0)
+                        <span
+                            class="badge text-white badge-pill badge-notify"
+                            id="span_counter">{{ auth()->user()->unreadNotifications->count() }}</span>
+                    @endif
                     <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i
                             class="icon feather icon-bell"></i></a>
                     <div class="dropdown-menu dropdown-menu-right notification">
                         <div class="noti-head">
                             <h6 class="d-inline-block m-b-0">Notifications</h6>
                             <div class="float-right">
-                                <a href="#!" class="m-r-10">mark as read</a>
-                                <a href="#!">clear all</a>
+                                <a href="#!" id="mark_as_read" class="m-r-10">mark as read</a>
+                                {{--                                <a href="#!">clear all</a>--}}
                             </div>
                         </div>
-                        <ul class="noti-body">
-
-
+                        <ul class="noti-body" id="notification">
+                            @foreach(auth()->user()->unreadNotifications as $notification)
+                                <li><b>OutofStock</b> - <span
+                                        class="text-c-red">{{$notification->data['data'][0]}}</span>;
+                                    <b>Expired</b> - <span class="text-c-red">{{$notification->data['data'][1]}}</span>
+                                </li>
+                            @endforeach
                         </ul>
 
                     </div>
@@ -364,6 +382,40 @@
 
 
 {{-- custom java scripts for the page --}}
+
+<script src="{{asset("assets/apotek/js/scheduling.js")}}"></script>
+
+<script>
+
+    var config = {
+        token: '{{ csrf_token() }}',
+        routes: {
+            task: '{{route('task')}}'
+        }
+    };
+
+    $(document).ready(function () {
+        setInterval(checkStock, 3600000)
+    });
+
+    $('#mark_as_read').on('click', function () {
+        $.ajax({
+            url: '{{route('task-read')}}',
+            type: "get",
+            dataType: "json",
+            success: function (data) {
+                $('#notification').empty();
+                $("#span_counter").remove();
+            },
+            complete: function () {
+                $('#notification').empty();
+                $("#span_counter").remove();
+
+            }
+        });
+    });
+</script>
+
 @stack("page_scripts")
 
 </body>

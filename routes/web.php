@@ -15,6 +15,10 @@ Auth::routes(['register' => false]);
 Route::middleware(["auth"])->group(function () {
 
     Route::get('/home', 'HomeController@index')->name('home');
+
+    Route::get('/tasks', 'HomeController@taskSchedule')->name('task');
+    Route::get('/tasks/read', 'HomeController@markAsRead')->name('task-read');
+
     Route::post('/home/stock-summary', 'HomeController@stockSummary')->name('stock-summary');
 
 

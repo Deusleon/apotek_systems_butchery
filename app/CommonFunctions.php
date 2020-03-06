@@ -4,6 +4,9 @@
 namespace App;
 
 
+use App\Notifications\StockNotification;
+use Illuminate\Support\Facades\DB;
+
 class CommonFunctions
 {
     public function generateNumber()
@@ -40,6 +43,34 @@ class CommonFunctions
         }
 
         return $results;
+    }
+
+    public function stockNotificationSchedule($id)
+    {
+        $key = 'data'; //for expired and out of stock
+
+        /*all notification query*/
+        $notifications = DB::table('notifications')
+            ->where('read_at', null)
+            ->get();
+        $save_flag = 0;
+        foreach ($notifications as $notification) {
+            $decode_data = json_decode($notification->data);
+            foreach ($decode_data as $index => $item) {
+                if ($key === $index) {
+                    /*donot save*/
+                    $save_flag = 1;
+                } else {
+                    /*save*/
+                    $save_flag = 0;
+                }
+            }
+        }
+
+        if ($save_flag === 0) {
+            User::find($id)->notify(new StockNotification);
+        }
+
     }
 
 }

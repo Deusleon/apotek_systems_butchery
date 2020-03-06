@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\CommonFunctions;
 use App\CurrentStock;
 use App\SalesDetail;
 use App\Setting;
@@ -40,6 +41,7 @@ class HomeController extends Controller
      */
     public function index()
     {
+
         /*return default store*/
         $default_store = Setting::where('id', 122)->value('value');
         $stores = Store::where('name', $default_store)->first();
@@ -391,6 +393,24 @@ class HomeController extends Controller
         );
 
         echo json_encode($json_data);
+    }
+
+    public function taskSchedule(Request $request)
+    {
+        if ($request->ajax()) {
+            $commonFunction = new CommonFunctions();
+            $commonFunction->stockNotificationSchedule(Auth::user()->id);
+        }
+    }
+
+    public function markAsRead(Request $request)
+    {
+        if ($request->ajax()) {
+            $id = auth()->user()->unreadNotifications[0]->id;
+            auth()->user()->unreadNotifications->where('id', $id)->markAsRead();
+            return 'marked_read';
+        }
+
     }
 
 }

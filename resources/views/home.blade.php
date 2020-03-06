@@ -309,7 +309,6 @@
     <script src="{{asset("assets/plugins/amcharts4/charts.js")}}"></script>
     <script src="{{asset("assets/plugins/amcharts4/themes/animated.js")}}"></script>
 
-
     <script>
 
         $.ajaxSetup({
