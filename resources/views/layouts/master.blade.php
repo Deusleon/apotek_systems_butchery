@@ -395,7 +395,7 @@
     };
 
     $(document).ready(function () {
-        setInterval(checkStock, 3600000)
+        setInterval(checkStock, 120000)
     });
 
     $('#mark_as_read').on('click', function () {
