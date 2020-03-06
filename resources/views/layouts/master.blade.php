@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <!-- Favicon icon -->
-    <link rel="shortcut icon" type="image/x-icon" href="{{asset("apotek.ico")}}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{asset("APOTEk2.ico")}}">
     <!-- range slider -->
     <link rel="stylesheet" href="{{asset("/assets/plugins/range-slider/css/bootstrap-slider.min.css")}}">
     <link rel="stylesheet" href="{{asset("/assets/css/pages/rangeslider.css")}}">
@@ -137,7 +137,7 @@
         <div class="navbar-brand header-logo">
             <a href="{{route('home')}}" class="b-brand">
                 {{-- <div class="b-bg"> --}}
-                <img src="{{asset('apotek.ico')}}" alt="Apotek">
+                <img style="width: 2vw;" src="{{asset('APOTEk2.ico')}}" alt="Apotek">
                 {{-- </div> --}}
                 <span class="b-title">APOTEk System</span>
             </a>
@@ -179,9 +179,10 @@
                 <div class="dropdown">
                     @can('View Settings')
                         <dfn data-info="This is the default store, where all activities will be based on."><a
-                            href="{{route('configurations.index')}}"> @if(session()->get('store') !== "Please Set Store")
-                                <span class="badge badge-info">Welcome, {{session()->get('store')}}</span> @else <span
-                                    class="badge badge-danger">Please Set Default Store</span> @endif</a></dfn>
+                                href="{{route('configurations.index')}}"> @if(session()->get('store') !== "Please Set Store")
+                                    <span class="badge badge-info">Welcome, {{session()->get('store')}}</span> @else
+                                    <span
+                                        class="badge badge-danger">Please Set Default Store</span> @endif</a></dfn>
                     @else
                         <dfn data-info="This is the default store, where all activities will be based on."><a
                                 href="#"> @if(session()->get('store') !== "Please Set Store")

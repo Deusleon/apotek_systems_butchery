@@ -12,7 +12,7 @@
     <meta name="author" content="CodedThemes"/>
 
     <!-- Favicon icon -->
-    <link rel="icon" href="{{asset("apotek.ico")}}" type="image/x-icon">
+    <link rel="shortcut icon" type="image/x-icon" href="{{asset("APOTEk2.ico")}}">
 
     <!-- fontawesome icon -->
     <link rel="stylesheet" href="{{asset("assets/fonts/fontawesome/css/fontawesome-all.min.css")}}">
