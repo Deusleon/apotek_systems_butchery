@@ -207,6 +207,10 @@
                         <span
                             class="badge text-white badge-pill badge-notify"
                             id="span_counter">{{ auth()->user()->unreadNotifications->count() }}</span>
+                    @else
+                        <span
+                            class="badge text-white badge-pill badge-notify"
+                            id="span_counter"></span>
                     @endif
                     <a class="dropdown-toggle" href="#" data-toggle="dropdown"><i
                             class="icon feather icon-bell"></i></a>
@@ -405,11 +409,11 @@
             dataType: "json",
             success: function (data) {
                 $('#notification').empty();
-                $("#span_counter").remove();
+                $("#span_counter").empty();
             },
             complete: function () {
                 $('#notification').empty();
-                $("#span_counter").remove();
+                $("#span_counter").empty();
 
             }
         });

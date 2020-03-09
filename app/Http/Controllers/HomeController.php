@@ -399,7 +399,7 @@ class HomeController extends Controller
     {
         if ($request->ajax()) {
             $commonFunction = new CommonFunctions();
-            $commonFunction->stockNotificationSchedule(Auth::user()->id);
+            return $commonFunction->stockNotificationSchedule(Auth::user()->id);
         }
     }
 

@@ -68,7 +68,20 @@ class CommonFunctions
         }
 
         if ($save_flag === 0) {
+            /*send notification*/
             User::find($id)->notify(new StockNotification);
+            /*retrieve sent notification*/
+            $all_notification = DB::table('notifications')
+                ->where('read_at', null)
+                ->get();
+            return json_decode($all_notification);
+
+        } else {
+            /*retrieve sent notification*/
+            $all_notification = DB::table('notifications')
+                ->where('read_at', null)
+                ->get();
+            return json_decode($all_notification);
         }
 
     }
