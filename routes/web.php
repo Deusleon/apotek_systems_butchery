@@ -130,7 +130,7 @@ Route::middleware(["auth"])->group(function () {
     Route::get('purchases/goods-receiving.order-receive', 'GoodsReceivingController@orderReceive')->name('goods-receiving.orderReceive');
 
     //Configurations Routes
-    Route::get('/setting', 'ConfigurationsController@index')->name('configurations.index');
+    Route::get('/settings', 'ConfigurationsController@index')->name('configurations.index');
     Route::post('/setting', 'ConfigurationsController@store')->name('configurations.store');
     Route::post('/update-setting', 'ConfigurationsController@update')->name('configurations.update');
 

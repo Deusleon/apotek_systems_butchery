@@ -28,19 +28,19 @@
     <div class="col-sm-12">
         <div class="card">
             <div class="card-body">
-                <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                    <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-secondary btn-sm"
-                            data-toggle="modal"
-                            data-target="#create">
-                        Add Setting
-                    </button>
+                <diwev class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                    {{--                    <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-secondary btn-sm"--}}
+                    {{--                            data-toggle="modal"--}}
+                    {{--                            data-target="#create">--}}
+                    {{--                        Add Setting--}}
+                    {{--                    </button>--}}
 
                     <div class="table-responsive">
                         <table id="setting_table" class="display table nowrap table-striped table-hover"
                                style="width:100%">
                             <thead>
                             <tr>
-                                <th>ID</th>
+                                <th hidden>ID</th>
                                 <th>Name</th>
                                 <th>Value</th>
                                 <th>Actions</th>
@@ -49,7 +49,7 @@
                             <tbody>
                             <tr>
                                 @foreach($configurations as $setting)
-                                    <td>{{$setting->id}}</td>
+                                    <td hidden>{{$setting->id}}</td>
                                     <td>{{$setting->display_name}}</td>
                                     @if($setting->id == 105)
                                         <td><img src="/fileStore/logo/{{$setting->value}}"/></td>
@@ -72,7 +72,7 @@
                         </table>
                     </div>
                     <!-- [ configuration table ] end -->
-                </div>
+                </diwev>
             </div>
         </div>
     </div>

@@ -22,7 +22,7 @@
                     </div>
 
                     <div class="form-group row" style="margin-top: -2%">
-                        <label for="code" class="col-md-5 col-form-label text-md-right">BarCode:</label>
+                        <label for="code" class="col-md-5 col-form-label text-md-right">Barcode:</label>
                         <div class="col-md-7">
                             <input type="text" readonly class="form-control-plaintext" id="barcode_edit" name="barcode"
                                    value="email@example.com">
@@ -38,7 +38,7 @@
                     </div>
 
                     <div class="form-group row" style="margin-top: -2%">
-                        <label for="code" class="col-md-5 col-form-label text-md-right">Unit Of Measure:</label>
+                        <label for="code" class="col-md-5 col-form-label text-md-right">Unit of Measure:</label>
                         <div class="col-md-7">
                             <input type="text" readonly class="form-control-plaintext"
                                    value="email@example.com" id="sale_edit" name="saleUoM">
