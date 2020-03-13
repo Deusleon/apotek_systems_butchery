@@ -275,7 +275,7 @@
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata"><option value="YES">YES</option><option value="NO">NO</option></select>';
                     break;
                 case 119:
-                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata"><option value="Thermal Paper">Thermal Paper</option><option value="A4 / Latter">A4 / Latter</option><option value="None">None</option></select>';
+                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="receipt_size"><option value="Thermal Paper">Thermal Paper</option><option value="A4 / Latter">A4 / Latter</option><option value="None">None</option></select>';
                     break;
                 case 120:
                     element.setAttribute("type", "number");
@@ -288,7 +288,7 @@
                     document.getElementById("formInput").appendChild(element);
                     break;
                 case 121:
-                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata"><option value="YES">YES</option><option value="NO">NO</option></select>';
+                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="support_multi_store"><option value="YES">YES</option><option value="NO">NO</option></select>';
                     break;
                 case 122:
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="store">   @foreach($store as $store)<option value="{{$store->name}}">{{$store->name}}</option>@endforeach</select>';
@@ -301,6 +301,10 @@
                     break;
                 default:
                 // code block
+            }
+
+            if ($('#receipt_size').length) {
+                document.getElementById('receipt_size').value = data[2];
             }
 
             if ($('#back_date').length) {
@@ -338,6 +342,10 @@
 
             if ($('#discount').length) {
                 document.getElementById('discount').value = data[2];
+            }
+
+            if ($('#support_multi_store').length) {
+                document.getElementById('support_multi_store').value = data[2];
             }
 
         });
