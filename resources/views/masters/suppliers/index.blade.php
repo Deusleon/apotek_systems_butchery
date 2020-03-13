@@ -124,8 +124,8 @@
         //Create Modal
         $('#edit').on('show.bs.modal', function () {
             var input = document.querySelector("#phone_edits");
-            var errorMsg = document.querySelector("#error-msg");
-            var validMsg = document.querySelector("#valid-msg");
+            var errorMsg = document.querySelector("#error-msgs");
+            var validMsg = document.querySelector("#valid-msgs");
             validateMobiles(input, errorMsg, validMsg);
         });
 
@@ -155,7 +155,7 @@
                             callback(countryCode);
                         });
                     },
-                    utilsScript: "../assets/plugins/intl-tel-input/js/utils.js?1562189064761",
+                    utilsScript: "{{asset("assets/plugins/intl-tel-input/js/utils.js?1562189064761")}}",
                     onlyCountries: ["tz", "ug", "ke", "rw", "bi", "sd"],
                     nationalMode: false,
                 });
@@ -172,7 +172,7 @@
                             callback(countryCode);
                         });
                     },
-                    utilsScript: "../assets/plugins/intl-tel-input/js/utils.js?1562189064761",
+                    utilsScript: "{{asset("assets/plugins/intl-tel-input/js/utils.js?1562189064761")}}",
                     onlyCountries: ["tz", "ug", "ke", "rw", "bi", "sd"],
                 });
             }
@@ -228,7 +228,7 @@
                             callback(countryCode);
                         });
                     },
-                    utilsScript: "../assets/plugins/intl-tel-input/js/utils.js?1562189064761",
+                    utilsScript: "{{asset("assets/plugins/intl-tel-input/js/utils.js?1562189064761")}}",
                     onlyCountries: ["tz", "ug", "ke", "rw", "bi", "sd"],
                     nationalMode: false,
                 });
@@ -245,7 +245,7 @@
                             callback(countryCode);
                         });
                     },
-                    utilsScript: "../assets/plugins/intl-tel-input/js/utils.js?1562189064761",
+                    utilsScript: "{{asset("assets/plugins/intl-tel-input/js/utils.js?1562189064761")}}",
                     onlyCountries: ["tz", "ug", "ke", "rw", "bi", "sd"],
                 });
             }
@@ -261,7 +261,7 @@
                 reset();
                 if (input.value.trim()) {
                     if (iti.isValidNumber()) {
-                        $('#save_btn').prop('disabled', false);
+                        $('#save_btns').prop('disabled', false);
                         $('#edit_btn').prop('disabled', false);
                         validMsg.classList.remove("hide");
                         document.getElementById('phone_edits').value = iti.getNumber();
@@ -270,7 +270,7 @@
                         }
                     } else {
                         input.classList.add("error");
-                        $('#save_btn').prop('disabled', true);
+                        $('#save_btns').prop('disabled', true);
                         $('#edit_btn').prop('disabled', true);
                         var errorCode = iti.getValidationError();
                         errorMsg.innerHTML = errorMap[errorCode];

@@ -40,8 +40,13 @@
                                 {{--                                       title="Eg:0777-777-777" required="true">--}}
                                 <input type="text" class="form-control"
                                        id="phone_edits" name="mobile" required style="width: 134%;">
-                                <span id="valid-msg" class="hide"></span>
-                                <span id="error-msg" class="text text-danger"></span>
+                                <span id="valid-msgs" class="hide"></span>
+                                <br>
+                                <span id="error-msgs" class="text text-danger"></span>
+                                <br>
+                                <span class="text-danger">
+                                    <strong id="phone_1-error"></strong>
+                                </span>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -63,7 +68,7 @@
                         <input type="hidden" id="id" name="id">
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="submit" id="save_btns" class="btn btn-primary">Save</button>
                         </div>
                     </form>
                 </div>

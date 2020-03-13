@@ -40,7 +40,12 @@
                                 <input type="text" class="form-control"
                                        id="phone_edit" name="phone" required style="width: 134%;">
                                 <span id="valid-msg" class="hide"></span>
+                                <br>
                                 <span id="error-msg" class="text text-danger"></span>
+                                <br>
+                                <span class="text-danger">
+                                    <strong id="phone_1-error"></strong>
+                                </span>
                             </div>
                         </div>
                         <div class="form-group row">
@@ -59,7 +64,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="submit" id="save_btn" class="btn btn-primary">Save</button>
                         </div>
                     </form>
                 </div>
