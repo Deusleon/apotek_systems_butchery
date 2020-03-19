@@ -66,7 +66,7 @@ class HomeController extends Controller
             ->get();
         $fast_moving = $fast_moving->count();
 
-        $expired = CurrentStock::whereRaw('expiry_date <  date(now())')->count();
+        $expired = CurrentStock::where('quantity', '>', 0)->whereRaw('expiry_date <  date(now())')->count();
 
         $totalSales = SalesDetail::sum('amount');
 
@@ -331,7 +331,8 @@ class HomeController extends Controller
         );
 
 
-        $totalData = CurrentStock::whereRaw('expiry_date <  date(now())')
+        $totalData = CurrentStock::where('quantity', '>', 0)
+            ->whereRaw('expiry_date <  date(now())')
             ->get();
 
         $totalFiltered = $totalData->count();
@@ -345,6 +346,7 @@ class HomeController extends Controller
             $expired = CurrentStock::select('name', 'quantity', 'inv_current_stock.id', 'product_id', 'expiry_date')
                 ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                 ->whereRaw('expiry_date <  date(now())')
+                ->where('quantity', '>', 0)
                 ->offset($start)
                 ->limit($limit)
                 ->orderby('expiry_date', 'desc')
@@ -357,6 +359,7 @@ class HomeController extends Controller
                 ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                 ->orWhere('name', 'LIKE', "%{$search}%")
                 ->orwhereRaw('expiry_date <  date(now())')
+                ->where('quantity', '>', 0)
                 ->offset($start)
                 ->limit($limit)
                 ->orderby('expiry_date', 'desc')
@@ -367,6 +370,7 @@ class HomeController extends Controller
                 ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                 ->orWhere('name', 'LIKE', "%{$search}%")
                 ->orwhereRaw('expiry_date <  date(now())')
+                ->where('quantity', '>', 0)
                 ->get();
             $totalFiltered = $totalFiltered->count();
         }

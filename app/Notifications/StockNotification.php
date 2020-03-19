@@ -57,7 +57,7 @@ class StockNotification extends Notification
         $out_of_stock = CurrentStock::where('quantity', 0)
             ->groupby('product_id')
             ->get();
-        $expired = CurrentStock::whereRaw('expiry_date <  date(now())')
+        $expired = CurrentStock::where('quantity', '>', 0)->whereRaw('expiry_date <  date(now())')
             ->get();
 
         $data = [$out_of_stock->count(), $expired->count()];

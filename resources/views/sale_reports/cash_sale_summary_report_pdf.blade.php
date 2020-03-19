@@ -92,7 +92,7 @@
             <tr>
                 <th align="center">Sale Date</th>
                 <th align="center">Amount</th>
-                {{--                <th>Sold By</th>--}}
+                <th align="center">Sold By</th>
             </tr>
 
             @foreach($data as $item)
@@ -101,14 +101,12 @@
                     <td align="right">
                         <div style="margin-right: 40%">{{number_format($item['sub_total'],2)}}</div>
                     </td>
-                    {{--                    <td align="center">{{$item['sold_by']}}</td>--}}
+                    <td align="center">{{$item['sold_by']}}</td>
                 </tr>
             @endforeach
         </table>
     </div>
 </div>
-</body>
-
 <script type="text/php">
     if ( isset($pdf) ) {
         $x = 280;
@@ -126,7 +124,14 @@
      }
 
 
+
+
+
+
+
+
 </script>
+</body>
 
 </html>
 

@@ -353,6 +353,7 @@ class GoodsReceivingController extends Controller
             $incoming_stock->unit_cost = str_replace(',', '', $request->price);
             $incoming_stock->sell_price = str_replace(',', '', $request->sell_price);
             $incoming_stock->order_details_id = $request->order_details_id;
+            $incoming_stock->created_by = Auth::user()->id;
             $incoming_stock->total_cost = $total_buyprice;
             $incoming_stock->total_sell = $total_sellprice;
             $incoming_stock->item_profit = $profit;

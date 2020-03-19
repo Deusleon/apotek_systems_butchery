@@ -95,7 +95,11 @@
                 <tr>
                     <td>{{ $item['product_id'] }}</td>
                     <td>{{$item['name']}}</td>
-                    <td align="">{{date('d-m-Y',strtotime($item['expiry_date']))}}</td>
+                    @if($item['expiry_date'] === null)
+                        <td align=""></td>
+                    @else
+                        <td align="">{{date('d-m-Y',strtotime($item['expiry_date']))}}</td>
+                    @endif
                     <td align="right">
                         <div style="margin-right: 50%">{{number_format($item['quantity'])}}</div>
                     </td>
@@ -123,6 +127,8 @@
 
 
      }
+
+
 
 </script>
 

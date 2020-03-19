@@ -119,11 +119,16 @@ class SaleReportController extends Controller
 
     private function cashSaleDetailReport($from, $to)
     {
+
+        $from = date('Y-m-d', strtotime($from));
+        $to = date('Y-m-d', strtotime($to));
+
         $sale_detail = SalesDetail::
 //        whereNotIn('sale_id', DB::table('sales_credits')->pluck('sale_id'))
         join('sales', 'sales.id', '=', 'sales_details.sale_id')
-            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
-            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
+            ->whereBetween(DB::raw('date(date)'), [$from, $to])
+            //            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
+//            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
 //            ->where('status','!=',3)
             ->get();
 
@@ -210,6 +215,10 @@ class SaleReportController extends Controller
 
     private function cashSaleSummaryReport($from, $to)
     {
+
+        $from = date('Y-m-d', strtotime($from));
+        $to = date('Y-m-d', strtotime($to));
+
         $sale_detail = DB::table('sales_details')
             ->select(DB::raw('sales.id'),
                 DB::raw('sum(amount) as amount'),
@@ -218,12 +227,14 @@ class SaleReportController extends Controller
                 DB::raw('sum(discount) as discount'),
                 DB::raw('date(date) as dates'), DB::raw('created_by'), DB::raw('name'))
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
-            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
-            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
+            ->whereBetween(DB::raw('date(date)'), [$from, $to])
+            //            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
+//            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
 //            ->where('sales_details.status','!=',3)
             ->join('users', 'users.id', '=', 'sales.created_by')
 //            ->whereNotIn('sale_id', DB::table('sales_credits')->pluck('sale_id'))
-            ->groupby(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"))
+            ->groupby('dates')
+            ->orderby('dates', 'desc')
 //            ->groupby('dates', 'created_by')
             ->get();
 
@@ -249,10 +260,14 @@ class SaleReportController extends Controller
     private function creditSaleDetailReport($from, $to)
     {
 
+        $from = date('Y-m-d', strtotime($from));
+        $to = date('Y-m-d', strtotime($to));
+
         $sale_detail = SalesDetail::join('sales_credits', 'sales_credits.sale_id', '=', 'sales_details.sale_id')
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
-            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
-            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
+            ->whereBetween(DB::raw('date(date)'), [$from, $to])
+            //            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
+//            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
             ->get();
 
         $sales = array();
@@ -302,6 +317,10 @@ class SaleReportController extends Controller
 
     private function creditSaleSummaryReport($from, $to)
     {
+
+        $from = date('Y-m-d', strtotime($from));
+        $to = date('Y-m-d', strtotime($to));
+
         $sale_detail = SalesDetail::join('sales_credits', 'sales_credits.sale_id', '=', 'sales_details.sale_id')
             ->select(DB::raw('sales.id'),
                 DB::raw('sum(amount) as amount'),
@@ -310,8 +329,9 @@ class SaleReportController extends Controller
                 DB::raw('sum(discount) as discount'),
                 DB::raw('date(date) as dates'), DB::raw('sales.created_by'), DB::raw('name'))
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
-            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
-            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
+            ->whereBetween(DB::raw('date(date)'), [$from, $to])
+//            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
+//            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
             ->join('users', 'users.id', '=', 'sales.created_by')
             ->groupby('dates', 'created_by')
             ->get();
@@ -337,10 +357,15 @@ class SaleReportController extends Controller
 
     private function creditPaymentReport($from, $to)
     {
+
+        $from = date('Y-m-d', strtotime($from));
+        $to = date('Y-m-d', strtotime($to));
+
         $payments = SalesCredit::join('sales', 'sales.id', '=', 'sales_credits.sale_id')
             ->join('customers', 'customers.id', '=', 'sales.customer_id')
-            ->where(DB::Raw("DATE_FORMAT(sales_credits.created_at,'%m/%d/%Y')"), '>=', $from)
-            ->where(DB::Raw("DATE_FORMAT(sales_credits.created_at,'%m/%d/%Y')"), '<=', $to)
+            ->whereBetween(DB::raw('date(sales_credits.created_at)'), [$from, $to])
+//            ->where(DB::Raw("DATE_FORMAT(sales_credits.created_at,'%m/%d/%Y')"), '>=', $from)
+//            ->where(DB::Raw("DATE_FORMAT(sales_credits.created_at,'%m/%d/%Y')"), '<=', $to)
             ->where('paid_amount', '>', 0)
             ->get();
         return $payments;
@@ -348,9 +373,14 @@ class SaleReportController extends Controller
 
     private function customerStatement($from, $to, $customer_id)
     {
+
+        $from = date('Y-m-d', strtotime($from));
+        $to = date('Y-m-d', strtotime($to));
+
         $data = json_decode(Sale::join('sales_credits', 'sales_credits.sale_id', '=', 'sales.id')
-            ->where(DB::Raw("DATE_FORMAT(sales_credits.created_at,'%m/%d/%Y')"), '>=', $from)
-            ->where(DB::Raw("DATE_FORMAT(sales_credits.created_at,'%m/%d/%Y')"), '<=', $to)
+            ->whereBetween(DB::raw('date(sales_credits.created_at)'), [$from, $to])
+//            ->where(DB::Raw("DATE_FORMAT(sales_credits.created_at,'%m/%d/%Y')"), '>=', $from)
+//            ->where(DB::Raw("DATE_FORMAT(sales_credits.created_at,'%m/%d/%Y')"), '<=', $to)
             ->join('customers', 'customers.id', '=', 'sales.customer_id')
             ->where('customer_id', $customer_id)
 // ->where('paid_amount','>',0)
@@ -535,8 +565,8 @@ class SaleReportController extends Controller
         /*test added*/
         $total = 0;
         foreach ($data_by_key_user_date as $key => $val) {//key user
-            foreach ($val as $key2 => $v){//key 2 date
-                foreach ($v as $inner => $datum){
+            foreach ($val as $key2 => $v) {//key 2 date
+                foreach ($v as $inner => $datum) {
                     $total = $total + $datum['amount'];
                 }
                 $data_by_key_user_date[$key][$key2] = $total;
@@ -549,8 +579,8 @@ class SaleReportController extends Controller
 
         /*sum for the total*/
         $grand_total = 0;
-        foreach ($data_sum_by_user as $key => $value){
-            foreach ($value as $item){
+        foreach ($data_sum_by_user as $key => $value) {
+            foreach ($value as $item) {
                 $grand_total = $grand_total + $item['amount'];
             }
         }
