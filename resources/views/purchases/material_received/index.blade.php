@@ -98,6 +98,7 @@
                             <th>Expire Date</th>
                             <th>Amount</th>
                             <th>Receive Date</th>
+                            <th>Received By</th>
                             <th>Action</th>
                         </tr>
                         </thead>
@@ -165,11 +166,11 @@
             });
         });
 
-        $('input[name="expire_date_edit"]').on('apply.daterangepicker', function(ev, picker) {
+        $('input[name="expire_date_edit"]').on('apply.daterangepicker', function (ev, picker) {
             $(this).val(picker.startDate.format('DD-MM-YYYY'));
         });
 
-        $('input[name="expire_date_edit"]').on('cancel.daterangepicker', function(ev, picker) {
+        $('input[name="expire_date_edit"]').on('cancel.daterangepicker', function (ev, picker) {
             $(this).val('');
         });
 
@@ -188,11 +189,11 @@
             });
         });
 
-        $('input[name="receive_date_edit"]').on('apply.daterangepicker', function(ev, picker) {
+        $('input[name="receive_date_edit"]').on('apply.daterangepicker', function (ev, picker) {
             $(this).val(picker.startDate.format('DD-MM-YYYY'));
         });
 
-        $('input[name="receive_date_edit"]').on('cancel.daterangepicker', function(ev, picker) {
+        $('input[name="receive_date_edit"]').on('cancel.daterangepicker', function (ev, picker) {
             $(this).val('');
         });
 
@@ -253,7 +254,7 @@
                     data: 'expire_date', render: function (expire_date) {
                         var date = moment(expire_date).format('DD-MM-Y');
                         if (date === 'Invalid date') {
-                            return '-';
+                            return '';
                         }
                         return date;
                     }
@@ -268,7 +269,11 @@
                         return moment(date).format('DD-MM-Y');
                     }
                 },
-                { data: 'action', defaultContent: "<div><input type='button' value='Edit' id='edit_btn' class='btn btn-info btn-rounded btn-sm'/><input type='button' value='Delete' id='delete_btn' class='btn btn-danger btn-rounded btn-sm'/></div>"}
+                {data: 'user.name'},
+                {
+                    data: 'action',
+                    defaultContent: "<div><input type='button' value='Edit' id='edit_btn' class='btn btn-info btn-rounded btn-sm'/><input type='button' value='Delete' id='delete_btn' class='btn btn-danger btn-rounded btn-sm'/></div>"
+                }
             ],
             "columnDefs": [
                 {
@@ -309,15 +314,15 @@
         });
 
         $('#price_edit').on('change', function () {
-           var price = document.getElementById('price_edit').value;
+            var price = document.getElementById('price_edit').value;
             document.getElementById('price_edit').value = formatMoney(price);
         });
 
-        $('#quantity_edit').on('change',function () {
+        $('#quantity_edit').on('change', function () {
             var quantity = document.getElementById('quantity_edit').value;
-            if (quantity === ''){
+            if (quantity === '') {
                 document.getElementById('quantity_edit').value = '';
-            }else{
+            } else {
                 document.getElementById('quantity_edit').value = numberWithCommas(quantity);
             }
         });

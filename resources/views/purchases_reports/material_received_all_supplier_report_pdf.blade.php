@@ -56,6 +56,7 @@
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
+
         #category {
             text-transform: uppercase;
         }
@@ -97,7 +98,7 @@
                     <th align="right">Sell Price</th>
                     <th align="right">Profit</th>
                     <th>Receive Date</th>
-
+                    <th>Received By</th>
                 </tr>
                 </thead>
                 @foreach($items as $item)
@@ -112,6 +113,7 @@
                         <td align="right">{{number_format($item['profit'],2)}}</td>
                         <td>{{date('d-m-Y',strtotime($item['date']))}}
                         </td>
+                        <td>{{$item['received_by']}}</td>
                     </tr>
                 @endforeach
             </table>
@@ -154,6 +156,7 @@
 
 
      }
+
 
 
 

@@ -72,4 +72,9 @@ class User extends Authenticatable
         return $this->hasMany(Order::class, 'ordered_by');
     }
 
+    public function goodsReceiving()
+    {
+        return $this->hasMany(GoodsReceiving::class, 'created_by');
+    }
+
 }

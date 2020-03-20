@@ -104,7 +104,7 @@
                 <th align="right">Sell Price</th>
                 <th align="right">Profit</th>
                 <th>Receive Date</th>
-
+                <th>Received By</th>
             </tr>
             </thead>
             @foreach($data as $item)
@@ -119,6 +119,7 @@
                     <td align="right">{{number_format($item->item_profit,2)}}</td>
                     <td>{{date('d-m-Y',strtotime($item->created_at))}}
                     </td>
+                    <td>{{$item->user['name']}}</td>
                 </tr>
             @endforeach
         </table>

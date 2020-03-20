@@ -107,6 +107,7 @@ class MaterialReceivedController extends Controller
         foreach ($material_received as $value) {
             $value->product;
             $value->supplier;
+            $value->user;
         }
 
         array_push($data, array(

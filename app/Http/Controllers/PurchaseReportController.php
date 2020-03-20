@@ -167,7 +167,8 @@ class PurchaseReportController extends Controller
                 'total_cost' => $datum->total_cost,
                 'total_sell' => $datum->total_sell,
                 'date' => date('d-m-Y', strtotime($datum->created_at)),
-                'supplier' => $datum->supplier['name']
+                'supplier' => $datum->supplier['name'],
+                'received_by' => $datum->user['name']
             ));
         }
 
