@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\CurrentStock;
+use App\Customer;
 use App\Sale;
 use App\SalesCredit;
 use App\SalesDetail;
@@ -163,27 +164,41 @@ class SaleReturnController extends Controller
         $stock->quantity += $request['rtn_qty'];
         $newqty = $request['bought_qty'] - $request['rtn_qty'];
 
-//IF Partial return the values are re-calculated
+
+        //IF Partial return the values are re-calculated
         if ($newqty != 0) {
+            $original_amount = $details->amount;
             $status = 5;
             $details->price = ($details->price / $details->quantity) * ($newqty);
             $details->vat = ($details->vat / $details->quantity) * ($newqty);
             $details->amount = ($details->amount / $details->quantity) * ($newqty);
             $details->discount = ($details->discount / $newqty) * ($newqty);
             $details->quantity = $newqty;
+
+            if ($creditID) {
+                $returned_amount = $original_amount - $details->amount;
+                $credit_sale = Sale::find($request['sale_id']);
+                $re_sum_total_credit = $credit_sale->customer['total_credit'] - $returned_amount;
+                $customer = Customer::find($credit_sale->customer_id);
+                $customer->total_credit = $re_sum_total_credit;
+                $customer->save();
+            }
+
         } else {
             $status = 3;
             $details->discount = 0;
+
+            if ($creditID) {
+                $credit_sale = Sale::find($request['sale_id']);
+                $re_sum_total_credit = $credit_sale->customer['total_credit'] - $details->amount;
+                $customer = Customer::find($credit_sale->customer_id);
+                $customer->total_credit = $re_sum_total_credit;
+                $customer->save();
+            }
         }
         $details->status = $status;
         $details->updated_by = Auth::User()->id;
 
-// if($creditID){
-// dd('this is credit');
-// }
-// else{
-// dd('this is not credit');
-// }
 
         $details->save();
         $stock->save();
