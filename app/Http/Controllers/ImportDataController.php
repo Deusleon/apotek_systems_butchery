@@ -4,27 +4,21 @@ namespace App\Http\Controllers;
 
 
 use App\Category;
-use App\CommonFunctions;
 use App\CurrentStock;
-use App\Customer;
+use App\GoodsReceiving;
 use App\PriceCategory;
+use App\PriceList;
 use App\Product;
-use App\Sale;
-use App\SalesDetail;
+use App\StockTracking;
 use App\Store;
 use App\Supplier;
-use App\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Response;
 use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDateObject;
-
-
-ini_set('max_execution_time', 500);
-set_time_limit(500);
-ini_set('memory_limit', '512M');
-
 
 class ImportDataController extends Controller
 {
@@ -41,76 +35,41 @@ class ImportDataController extends Controller
     public function recordImport(Request $request)
     {
         $pending_to_save = array();
-        $all_products = array();
-
-        $products = Product::all();
-        $commonFunction = new CommonFunctions();
-
-        foreach ($products as $product) {
-            array_push($all_products, array(
-                'id' => $product->id,
-                'name' => $product->name
-            ));
-        }
-
         if ($request->file('file')) {
             $excel_raw_data = Excel::toArray(null, request()->file('file'));
-
 
             $loop_count = 1;
             foreach ($excel_raw_data as $raw_data) {
                 unset($raw_data[0]);
-
                 foreach ($raw_data as $data) {
                     $loop_count++;
-                    $data[1] = preg_replace('/[^\d.]/', '', $data[1]);
                     $data[2] = preg_replace('/[^\d.]/', '', $data[2]);
                     $data[3] = preg_replace('/[^\d.]/', '', $data[3]);
+                    $data[4] = preg_replace('/[^\d.]/', '', $data[4]);
 
                     try {
-                        if ($data[7] != null) {
-                            $excelDate = ExcelDateObject::excelToDateTimeObject($data[7]);
+                        if ($data[5] != null) {
+                            $excelDate = ExcelDateObject::excelToDateTimeObject($data[5]);
                             $excel_date = $excelDate->format('Y-m-d');
                         } else {
                             $excel_date = null;
                         }
-                        if (is_numeric($data[1]) && is_numeric($data[2]) && is_numeric($data[3])) {
+                        if (is_numeric($data[2]) && is_numeric($data[3]) && is_numeric($data[4])) {
 
-                            /*stock_id*/
-//                            $product_id = Product::where('name',$data[0])->value('id');
-
-                            $returned_ = $commonFunction->search($all_products, 'name', $data[0]);
-
-                            if ($returned_ != []) {
-                                $product_id = $returned_[0]['id'];
-                            }
-
-
-//                            $product_id = DB::table('inv_products')
-//                                ->whereRaw('CAST(name AS UNSIGNED) = "'.$test.'"')
-//                                ->value('id');
-//
-
-                            $stock_id = CurrentStock::where('product_id', $product_id)->value('id');
-
-                            /*customer id*/
-                            $customer_id = Customer::whereRaw('name like "' . $data[5] . '"')->value('id');
-
-                            /*user_id*/
-                            $user_id = User::whereRaw('name like "' . $data[6] . '"')->value('id');
+                            /*check category name if exists*/
+                            $category_id = Category::where('name', $data[7])->value('id');
 
                             array_push($pending_to_save, array(
-                                'price_category_id' => 1,
-                                'receipt_number' => $data[4],
+                                'name' => $data[1],
+                                'category_id' => $request->category_id,
+                                'price_category_id' => $request->price_category_id,
+                                'store_id' => $request->store_id,
+                                'unit_price' => $data[2],
+                                'sell_price' => $data[3],
+                                'quantity' => $data[4],
                                 'date' => $excel_date,
-                                'created_by' => $user_id,
-                                'customer_id' => $customer_id,
-                                'stock_id' => $stock_id,
-                                'quantity' => $data[1],
-                                'sell_price' => $data[2],
-                                'amount' => $data[1] * $data[2],
-                                'vat' => 0,
-                                'discount' => 0
+                                'barcode' => $data[6],
+                                'category_ids' => $category_id
                             ));
                         } else {
                             if ($data[1] != null) {
@@ -123,7 +82,6 @@ class ImportDataController extends Controller
                         }
 
                     } catch (Exception $e) {
-                        dd($e);
                         $pending_to_save = [];
                         session()->flash("alert-danger", "Date format error!");
                         return back();
@@ -132,40 +90,76 @@ class ImportDataController extends Controller
                 }
             }
 
-
-            /*group by receipt no*/
-            $grouped_by_receipt_no = array();
-            foreach ($pending_to_save as $val) {
-                if (array_key_exists('receipt_number', $val)) {
-                    $grouped_by_receipt_no[$val['receipt_number']][] = $val;
-                }
-            }
-
-
             /*save the data*/
-            foreach ($grouped_by_receipt_no as $key => $data) {
-                /*sale save*/
-                $sale = new Sale;
-                $sale->receipt_number = $key;
-                $sale->customer_id = $data[0]['customer_id'];
-                $sale->date = $data[0]['date'];
-                $sale->created_by = $data[0]['created_by'];
-                $sale->price_category_id = $data[0]['price_category_id'];
-                $sale->save();
+            DB::statement('ALTER TABLE inv_products AUTO_INCREMENT = 100000;');
+            foreach ($pending_to_save as $data) {
+                //save in product
+                $product = new Product;
+                $product->name = $data['name'];
+                $product->category_id = $data['category_ids'];
+                $product->barcode = $data['barcode'];
 
-                /*save sale detail*/
-                foreach ($data as $datum) {
-                    $sale_detail = new SalesDetail;
-                    $sale_detail->sale_id = $sale->id;
-                    $sale_detail->stock_id = $datum['stock_id'];
-                    $sale_detail->quantity = $datum['quantity'];
-                    $sale_detail->price = $datum['sell_price'];
-                    $sale_detail->vat = $datum['vat'];
-                    $sale_detail->amount = $datum['amount'];
-                    $sale_detail->discount = $datum['discount'];
-                    $sale_detail->save();
+                try {
+                    $product->save();
+                } catch (Exception $e) {
+                    /*truncate all the data*/
+                    DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+                    GoodsReceiving::truncate();
+                    PriceList::truncate();
+                    StockTracking::truncate();
+                    CurrentStock::truncate();
+                    Product::truncate();
+                    DB::statement('ALTER TABLE inv_products AUTO_INCREMENT = 100000;');
+                    DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+                    $pending_to_save = [];
+                    session()->flash("alert-danger", $data['name'] . " has duplicate record!");
+                    return back();
                 }
 
+                //save incoming
+                $incoming = new GoodsReceiving;
+                $incoming->product_id = $product->id;
+                $incoming->quantity = $data['quantity'];
+                $incoming->supplier_id = $request->supplier_id;
+                $incoming->expire_date = $data['date'];
+                $incoming->unit_cost = $data['unit_price'];
+                $incoming->total_cost = $data['quantity'] * $data['unit_price'];
+                $incoming->total_sell = $data['quantity'] * $data['sell_price'];
+                $incoming->sell_price = $data['sell_price'];
+                $incoming->created_by = Auth::user()->id;
+                $incoming->item_profit = $data['quantity'] * ($data['sell_price'] - $data['unit_price']);
+                $incoming->save();
+
+                /*current_stock*/
+                $current_stock = new CurrentStock;
+                $current_stock->product_id = $product->id;
+                $current_stock->quantity = $data['quantity'];
+                $current_stock->unit_cost = $data['unit_price'];
+                $current_stock->expiry_date = $data['date'];
+                $current_stock->store_id = $request->store_id;
+                $current_stock->created_by = Auth::user()->id;
+                $current_stock->save();
+
+                /*sales price*/
+                $sales_price = new PriceList;
+                $sales_price->stock_id = $current_stock->id;
+                $sales_price->price = $data['sell_price'];
+                $sales_price->price_category_id = $request->price_category_id;
+                $sales_price->status = 1;
+                $sales_price->created_at = date('Y-m-d H:m:s');
+                $sales_price->save();
+
+                /*stock tracking*/
+                $tracking = new StockTracking;
+                $tracking->stock_id = $current_stock->id;
+                $tracking->product_id = $product->id;
+                $tracking->quantity = $data['quantity'];
+                $tracking->out_mode = 'Stock Taking';
+                $tracking->store_id = $request->store_id;
+                $tracking->updated_by = Auth::user()->id;
+                $tracking->updated_at = date('Y-m-d');
+                $tracking->movement = 'IN';
+                $tracking->save();
 
             }
 
@@ -181,7 +175,7 @@ class ImportDataController extends Controller
         $headers = array(
             'Content-Type: application/csv',
         );
-        return Response::download($file, 'import_data_template.csv', $headers);
+        return Response::download($file, 'import_data_template.xlsx', $headers);
     }
 
 

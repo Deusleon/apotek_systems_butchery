@@ -46,9 +46,9 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="price-category">Price Category</label>
+                                <label for="price-category">Price Category <font color="red">*</font></label>
                                 <select id="price-category-name" name="price_category_id"
-                                        class="js-example-basic-single form-control drop">
+                                        class="js-example-basic-single form-control drop" required>
                                     <option value="" selected="true" disabled="disabled">Select Category...</option>
                                     @foreach($price_categories as $pc)
                                         <option value="{{$pc->id}}">{{$pc->name}}</option>
@@ -58,9 +58,9 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="store">Store</label>
+                                <label for="store">Store <font color="red">*</font></label>
                                 <select id="store-name" name="store_id"
-                                        class="js-example-basic-single form-control drop">
+                                        class="js-example-basic-single form-control drop" required>
                                     <option value="" selected="true" disabled="disabled">Select store</option>
                                     @foreach($stores as $store)
                                         <option value="{{$store->id}}">
@@ -71,9 +71,9 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label for="supplier">Supplier</label>
+                                <label for="supplier">Supplier <font color="red">*</font></label>
                                 <select id="supplier-name" name="supplier_id"
-                                        class="js-example-basic-single form-control drop">
+                                        class="js-example-basic-single form-control drop" required>
                                     <option value="" selected="true" disabled="disabled">Select Supplier...</option>
                                     @foreach($suppliers as $sp)
                                         <option value="{{$sp->id}}">{{$sp->name}}</option>
