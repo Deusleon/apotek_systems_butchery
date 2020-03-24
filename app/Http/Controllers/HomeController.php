@@ -82,9 +82,7 @@ class HomeController extends Controller
         }
 
         $todaySales = DB::table('sale_details')
-            ->whereRaw('date(sold_at) = date(now())')
-            ->wherenull('status')
-            ->orwhere('status', '!=', 3)
+            ->whereRaw('date(sold_at) = date(now()) and (status != 3 or status is null)')
             ->sum('amount');
 
         $totalDailySales = DB::table('sale_details')

@@ -10,6 +10,8 @@ class User extends Authenticatable
 {
     use Notifiable, HasRoles;
 
+    protected $connection = 'apotek_updated';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -36,6 +38,12 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->connection = session()->get('db_connection');
+    }
 
     public function stockTracking()
     {

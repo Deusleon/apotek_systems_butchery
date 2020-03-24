@@ -60,6 +60,10 @@
                                     </span>
                         @enderror
                     </div>
+                    <div class="input-group mb-4">
+                        <input id="facility" type="text"
+                               class="form-control" name="facility" required placeholder="facility">
+                    </div>
                     <div class="form-group text-left">
                         <div class="checkbox checkbox-fill d-inline">
                             <input class="form-check-input" type="checkbox" name="remember"
