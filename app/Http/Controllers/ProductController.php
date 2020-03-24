@@ -99,9 +99,9 @@ class ProductController extends Controller
     {
 
         $columns = array(
-            0 => 'name',
+            0 => 'inv_products.name',
             1 => 'category_id',
-            2 => 'category_id',
+            2 => 'inv_products.created_at',
             3 => 'created_at',
         );
 
@@ -122,8 +122,12 @@ class ProductController extends Controller
         } else {
             $search = $request->input('search.value');
 
-            $products = Product::where('id', 'LIKE', "%{$search}%")
-                ->orWhere('name', 'LIKE', "%{$search}%")
+            $products = Product::select('inv_products.name', 'category_id', 'status', 'inv_products.id', 'barcode'
+                , 'indication', 'dosage', 'generic_name', 'purchase_uom', 'sales_uom', 'standard_uom', 'min_quantinty',
+                'max_quantinty', 'sub_category_id', 'created_at')
+                ->join('inv_categories', 'inv_categories.id', '=', 'inv_products.category_id')
+                ->orWhere('inv_products.name', 'LIKE', "%{$search}%")
+                ->orWhere('inv_categories.name', 'LIKE', "%{$search}%")
                 ->orWhere('barcode', 'LIKE', "%{$search}%")
                 ->orWhere('created_at', 'LIKE', "%{$search}%")
                 ->Where('status', '1')
@@ -132,8 +136,12 @@ class ProductController extends Controller
                 ->orderBy($order, $dir)
                 ->get();
 
-            $totalFiltered = Product::where('id', 'LIKE', "%{$search}%")
-                ->orWhere('name', 'LIKE', "%{$search}%")
+            $totalFiltered = Product::select('inv_products.name', 'category_id', 'status', 'inv_products.id', 'barcode'
+                , 'indication', 'dosage', 'generic_name', 'purchase_uom', 'sales_uom', 'standard_uom', 'min_quantinty',
+                'max_quantinty', 'sub_category_id', 'created_at')
+                ->join('inv_categories', 'inv_categories.id', '=', 'inv_products.category_id')
+                ->orWhere('inv_products.name', 'LIKE', "%{$search}%")
+                ->orWhere('inv_categories.name', 'LIKE', "%{$search}%")
                 ->orWhere('barcode', 'LIKE', "%{$search}%")
                 ->orWhere('created_at', 'LIKE', "%{$search}%")
                 ->Where('status', '1')

@@ -808,6 +808,12 @@ $('#products').select2({
                     $.each(result, function (detail, name) {
                         $('#products').append($('<option>', {value: detail, text: name}));
                     });
+
+                    if (Object.keys(result).length === 2) {
+                        $("#products").children().removeAttr("selected");
+                        $("#products").children().eq(1).attr('selected', 'selected').change();
+                    }
+
                 }
             });
         }

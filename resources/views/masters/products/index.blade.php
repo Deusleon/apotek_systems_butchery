@@ -309,12 +309,12 @@
                     if (row_data.min !== null) {
                         $('#edit').find('.modal-body #min_stock_edit').val(numberWithCommas(row_data.min));
                     } else {
-                        $('#edit').find('.modal-body #min_stock_edit').val(row_data.min);
+                        $('#edit').find('.modal-body #min_stock_edit').val('');
                     }
                     if (row_data.max !== null) {
                         $('#edit').find('.modal-body #max_stock_edit').val(numberWithCommas(row_data.max));
                     } else {
-                        $('#edit').find('.modal-body #max_stock_edit').val(row_data.max);
+                        $('#edit').find('.modal-body #max_stock_edit').val('');
                     }
                     $('#edit').find('.modal-body #dosage_edit').val(row_data.dosage);
                     $('#edit').find('.modal-body #indication_edit').val(row_data.indication);

@@ -236,6 +236,7 @@ class SaleController extends Controller
                 ->where('store_id', $default_store_id)
                 ->select('inv_products.id as id', 'name', 'barcode')
                 ->where('name', 'LIKE', "%{$request->word}%")
+                ->orwhere('barcode', 'LIKE', "%{$request->word}%")
                 ->groupBy('product_id')
                 ->limit(100)
                 ->get();

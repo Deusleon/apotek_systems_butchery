@@ -48,9 +48,14 @@ class LocationController extends Controller
     {
         $location = Location::find($request->id);
         $location->name = $request->name;
-        $location->save();
-        session()->flash("alert-success", "Location Updated successfully!");
-        return back();
+        try {
+            $location->save();
+            session()->flash("alert-success", "Location Updated successfully!");
+            return back();
+        } catch (Exception $exception) {
+            session()->flash("alert-danger", "Location Name Exists!");
+            return back();
+        }
     }
 
 }
