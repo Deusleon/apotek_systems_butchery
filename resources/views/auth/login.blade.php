@@ -62,7 +62,12 @@
                     </div>
                     <div class="input-group mb-4">
                         <input id="facility" type="text"
-                               class="form-control" name="facility" required placeholder="facility">
+                               class="form-control" name="facility" required placeholder="business name">
+                    </div>
+                    <div style="margin-top: -6%;">
+                        @if($errors->any())
+                            <span style="margin-left: -45%"><font color="red">{{$errors->first()}}</font></span>
+                        @endif
                     </div>
                     <div class="form-group text-left">
                         <div class="checkbox checkbox-fill d-inline">

@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mysql'),
+    'default' => env('DB_CONNECTION_2', 'softlink'),
 
     /*
     |--------------------------------------------------------------------------
@@ -43,8 +43,29 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
+        /*ours*/
+        'softlink' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB_HOST_2', '127.0.0.1'),
+            'port' => env('DB_PORT_2', '3306'),
+            'database' => env('DB_CONNECTION_2', 'forge'),
+            'username' => env('DB_USERNAME_2', 'forge'),
+            'password' => env('DB_PASSWORD_2', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
         /*apotek_inventory*/
-        'apotek_inventory' => [
+        'Apotek_Inventory' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
@@ -65,7 +86,7 @@ return [
         ],
 
         /*apotek_updated*/
-        'apotek_updated' => [
+        'Apotek_Updated' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
             'host' => env('DB_HOST_1', '127.0.0.1'),
@@ -86,14 +107,14 @@ return [
         ],
 
         /*great_tyre*/
-        'great_tyre' => [
+        'GREAT_TYRES' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST_2', '127.0.0.1'),
-            'port' => env('DB_PORT_2', '3306'),
-            'database' => env('DB_CONNECTION_2', 'forge'),
-            'username' => env('DB_USERNAME_2', 'forge'),
-            'password' => env('DB_PASSWORD_2', ''),
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'great_tyre',
+            'username' => 'root',
+            'password' => '',
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',

@@ -31,7 +31,6 @@ class UserController extends Controller
             'password' => 'required|string|min:6|confirmed',
         ]);
 
-
         $user = new User;
         $user->name = $request->name;
         $user->position = $request->position;
@@ -39,6 +38,7 @@ class UserController extends Controller
         $user->mobile = $request->mobile;
         $user->status = '-1';
         $user->password = Hash::make($request->password);
+        $user->facility = DB::connection()->getDatabaseName();
         $user->save();
 
         $user->syncRoles($request->role);

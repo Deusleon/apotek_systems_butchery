@@ -20,8 +20,6 @@ class DBConnectionMiddleware
     {
         if (Auth::check()) {
             $config = Config::get('database.connections.' . session()->get('db_connection'));
-            $config['database'] = session()->get('db_connection');
-            $config['password'] = "";
             config()->set('database.default', session()->get('db_connection'));
             config()->set('database.connections.' . session()->get('db_connection'), $config);
         }
