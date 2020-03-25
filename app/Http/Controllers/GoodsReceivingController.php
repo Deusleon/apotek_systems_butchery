@@ -50,6 +50,46 @@ class GoodsReceivingController extends Controller
                 'current_stock', 'item_stocks', 'invoices', 'batch_setting', 'invoice_setting', 'back_date', 'expire_date')));
     }
 
+    public function allProductToReceive()
+    {
+        $max_prices = array();
+
+        $products = Product::select('id', 'name')
+            ->where('status', '=', 1)
+            ->groupBy('id', 'name')
+            ->get();
+
+        foreach ($products as $product) {
+
+            $data = CurrentStock::where('product_id', $product->id)
+                ->orderBy('id', 'desc')
+                ->first();
+
+            if ($data != null) {
+                array_push($max_prices, array(
+                    'product_name' => $data->product['name'],
+                    'unit_cost' => $data->unit_cost,
+                    'selling_price' => $data->price,
+                    'id' => $data->id,
+                    'product_id' => $data->product_id
+                ));
+            } else {
+                array_push($max_prices, array(
+                    'product_name' => $product->name,
+                    'unit_cost' => null,
+                    'selling_price' => null,
+                    'id' => null,
+                    'product_id' => $product->id
+                ));
+            }
+
+        }
+        $sort_column = array_column($max_prices, 'product_name');
+        array_multisort($sort_column, SORT_ASC, $max_prices);
+
+        return $max_prices;
+
+    }
 
     public function getItemPrice(Request $request)
 
@@ -369,47 +409,6 @@ class GoodsReceivingController extends Controller
 
     }
 
-    public function allProductToReceive()
-    {
-        $max_prices = array();
-
-        $products = Product::select('id', 'name')
-            ->where('status', '=', 1)
-            ->groupBy('id', 'name')
-            ->get();
-
-        foreach ($products as $product) {
-
-            $data = CurrentStock::where('product_id', $product->id)
-                ->orderBy('id', 'desc')
-                ->first();
-
-            if ($data != null) {
-                array_push($max_prices, array(
-                    'product_name' => $data->product['name'],
-                    'unit_cost' => $data->unit_cost,
-                    'selling_price' => $data->price,
-                    'id' => $data->id,
-                    'product_id' => $data->product_id
-                ));
-            } else {
-                array_push($max_prices, array(
-                    'product_name' => $product->name,
-                    'unit_cost' => null,
-                    'selling_price' => null,
-                    'id' => null,
-                    'product_id' => $product->id
-                ));
-            }
-
-        }
-        $sort_column = array_column($max_prices, 'product_name');
-        array_multisort($sort_column, SORT_ASC, $max_prices);
-
-        return $max_prices;
-
-    }
-
     public function filterInvoice(Request $request)
     {
         if ($request->ajax()) {
@@ -421,6 +420,26 @@ class GoodsReceivingController extends Controller
         }
     }
 
+    public function filterPrice(Request $request)
+    {
+
+        if ($request->ajax()) {
+            $invoices = GoodsReceiving::select('sell_price as unit_cost')
+                ->where('inv_incoming_stock.supplier_id', $request->supplier_id)
+                ->where('product_id', $request->product_id)
+                ->orderby('inv_incoming_stock.id', 'desc')
+                ->first();
+
+            if ($invoices == null) {
+                $invoices = GoodsReceiving::select('sell_price as unit_cost')
+                    ->where('product_id', $request->product_id)
+                    ->orderby('inv_incoming_stock.id', 'desc')
+                    ->first();
+            }
+
+            return json_decode($invoices, true);
+        }
+    }
 
 }
 

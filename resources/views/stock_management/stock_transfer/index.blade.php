@@ -56,7 +56,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="tab-pane fade show active" id="new_sale" role="tabpanel" aria-labelledby="new_sale-tab">
-                    <form id="transfer" method="post"
+                    <form id="transfer" method="post" target="_blank"
                           enctype="multipart/form-data">
                         @csrf()
                         <div class="row">

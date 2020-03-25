@@ -61,7 +61,7 @@
                     </div>
                 </div>
                 <div class="table-responsive" id="purchases">
-                    <table id="fixed-header" class="display table nowrap table-striped table-hover"
+                    <table id="fixed-header-2" class="display table nowrap table-striped table-hover"
                            style="width:100%">
                         <thead>
                         <tr>
@@ -71,6 +71,7 @@
                             <th>Amount</th>
                             <th>Status</th>
                             <th>Action</th>
+                            <th hidden>id</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -104,6 +105,7 @@
                                         </button>
                                     </td>
                                 @endif
+                                <td hidden>{{$order->id}}</td>
                             </tr>
                         @endforeach
                         </tbody>
@@ -328,6 +330,7 @@
             routes: {
                 goodsreceiving: '{{route('receiving-price-category')}}',
                 filterBySupplier: '{{route('filter-invoice')}}',
+                filterPrice: '{{route('filter-price')}}',
                 itemFormSave: '{{route('goods-receiving.itemReceive')}}',
                 orderFormSave: '{{route('goods-receiving.orderReceive')}}'
 

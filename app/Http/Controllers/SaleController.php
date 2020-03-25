@@ -228,18 +228,24 @@ class SaleController extends Controller
         if ($request->ajax()) {
             $output = [];
             $output[""] = "Select Product";
-            $products = PriceList::where('price_category_id', $request->price_category_id)
-                ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
-                ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
-                ->where('quantity', '>', 0)
-                ->where('inv_products.status', '=', 1)
-                ->where('store_id', $default_store_id)
-                ->select('inv_products.id as id', 'name', 'barcode')
-                ->where('name', 'LIKE', "%{$request->word}%")
-                ->orwhere('barcode', 'LIKE', "%{$request->word}%")
-                ->groupBy('product_id')
-                ->limit(100)
-                ->get();
+
+            if ($request->word != null) {
+                $products = PriceList::where('price_category_id', $request->price_category_id)
+                    ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
+                    ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                    ->where('quantity', '>', 0)
+                    ->where('inv_products.status', '=', 1)
+                    ->where('store_id', $default_store_id)
+                    ->select('inv_products.id as id', 'name', 'barcode')
+                    ->where('name', 'LIKE', "%{$request->word}%")
+                    ->orwhere('barcode', 'LIKE', "%{$request->word}%")
+                    ->groupBy('product_id')
+                    ->limit(100)
+                    ->get();
+            } else {
+                $products = [];
+            }
+
 
             $count = count($products);
             if ($count <= 0) {
@@ -255,10 +261,15 @@ class SaleController extends Controller
                     ->orderBy('stock_id', 'desc')
                     ->where('product_id', $product->id)
                     ->first('price');
+
                 $quantity = CurrentStock::where('product_id', $product->id)
                     ->where('store_id', $default_store_id)
                     ->sum('quantity');
-                $output["$product->name#@$latest->price#@$product->id#@$quantity"] = $product->name;
+                if ($latest != null) {
+                    $output["$product->name#@$latest->price#@$product->id#@$quantity"] = $product->name;
+                } else {
+                    $output[""] = "No Products Found";
+                }
             }
             return $output;
         }

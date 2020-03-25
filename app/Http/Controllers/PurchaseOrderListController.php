@@ -42,9 +42,9 @@ class PurchaseOrderListController extends Controller
         return $data;
     }
 
-    public function printOrder(Request $request)
+    public function printOrder($order_no)
     {
-        $order_details = OrderDetail::where('order_id', $request->order_no)->get();
+        $order_details = OrderDetail::where('order_id', $order_no)->get();
         $sub_total = 0;
         $vat = 0;
         $total = 0;

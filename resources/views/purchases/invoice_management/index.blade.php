@@ -125,8 +125,9 @@
             $('#edit').find('.modal-body #balance_edit').val(formatMoney(data.remain_balance));
             $('#edit').find('.modal-body #period_edit').val(data.grace_period);
             $('#edit').find('.modal-body #received_status_edit').val(data.received_status);
-            $('#edit').find('.modal-body #due_date_edit').val(data.payment_due_date);
+            $('#edit').find('.modal-body #due_date_edit').val(moment(data.payment_due_date).format('D-M-YYYY'));
             $('#edit').find('.modal-body #remarks_edit').val(data.remarks);
+
         });
 
         $('#invoice_data_table tbody').on('click', '#dtl_btn', function () {

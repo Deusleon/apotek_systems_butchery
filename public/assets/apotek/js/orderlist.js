@@ -26,8 +26,15 @@ var order_history_datatable = $('#order_history_datatable').DataTable({
             }
         },
         {
-            data: "action",
-            defaultContent: "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm' size='2'/><button id='print_btn' class='btn btn-secondary btn-rounded btn-sm'><span class='fa fa-print' aria-hidden='true'></span> Print</button><input type='button' value='Cancel' id='cancel_btn' class='btn btn-danger btn-rounded btn-sm' size='2' />"
+            data: "status", render: function (status) {
+                if (status === "2" || status === "3") {
+                    return "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm' size='2'/><button id='print_btn' class='btn btn-secondary btn-rounded btn-sm'><span class='fa fa-print' aria-hidden='true'></span> Print</button>";
+                } else if (status === "Cancelled") {
+                    return "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm' size='2'/><button id='print_btn' class='btn btn-secondary btn-rounded btn-sm'><span class='fa fa-print' aria-hidden='true'></span> Print</button><span class='badge badge-warning badge-lg'>Cancelled</span>";
+                } else {
+                    return "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm' size='2'/><button id='print_btn' class='btn btn-secondary btn-rounded btn-sm'><span class='fa fa-print' aria-hidden='true'></span> Print</button><input type='button' value='Cancel' id='cancel_btn' class='btn btn-danger btn-rounded btn-sm' size='2' />";
+                }
+            }
         }
     ], aaSorting: [[2, "desc"]]
 });

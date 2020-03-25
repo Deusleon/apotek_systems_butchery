@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\CurrentStock;
 use App\Setting;
+use App\Store;
 use Illuminate\Support\Facades\DB;
 use PDF;
 
@@ -17,6 +18,15 @@ class InventoryCountSheetController extends Controller
 
     public function generateInventoryCountSheetPDF()
     {
+        /*get default store*/
+        $default_store = Setting::where('id', 122)->value('value');
+        $stores = Store::where('name', $default_store)->first();
+
+        if ($stores != null) {
+            $default_store_id = $stores->id;
+        } else {
+            $default_store_id = 1;
+        }
 
         $pharmacy['name'] = Setting::where('id', 100)->value('value');
         $pharmacy['address'] = Setting::where('id', 106)->value('value');
@@ -26,6 +36,7 @@ class InventoryCountSheetController extends Controller
         $data = array();
         $current_stocks = CurrentStock::select(DB::raw('product_id'), 'store_id', 'shelf_number',
             DB::raw('sum(quantity) as quantity_on_hand'))
+            ->where('store_id', $default_store_id)
             ->groupby('product_id', 'store_id')
             ->get();
 

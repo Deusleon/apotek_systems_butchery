@@ -59,6 +59,10 @@ var cart_table = $('#cart_table').DataTable({
     ]
 });
 
+var order_table = $('#fixed-header-2').DataTable({
+    aaSorting: [[6, 'desc']]
+});
+
 $('#cart_table tbody').on('click', '#edit_btn', function () {
     var quantity;
     if (edit_btn_set === 0) {
@@ -109,6 +113,13 @@ $('#cart_table tbody').on('click', '#delete_btn', function () {
 
 
 });
+
+
+$('#fixed-header-2 tbody').on('click', '#receive_order_btn', function () {
+    var index = order_table.row($(this).parents('tr')).index();
+    var data = order_table.row($(this).parents('tr')).data();
+});
+
 
 function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
     try {
@@ -306,6 +317,23 @@ $('#items_table tbody').on('click', '#receive_btn', function () {
     var index = items_table.row($(this).parents('tr')).index();
     remove_row_index = index;
     var data = items_table.row($(this).parents('tr')).data();
+
+    $.ajax({
+        url: config.routes.filterPrice,
+        type: "get",
+        dataType: "json",
+        data: {
+            product_id: data[0],
+            supplier_id: data[6]
+        },
+        success: function (data) {
+            $('#receive').find('.modal-body #sell_price_i').val(formatMoney(data.unit_cost));
+        },
+        complete: function () {
+            // $('#loading').hide();
+        }
+    });
+
     $('#receive').modal('show');
     $('#receive').find('.modal-body #rec_qty').val(numberWithCommas(data[2]));
     $('#receive').find('.modal-body #name_of_item').val(data[1]);

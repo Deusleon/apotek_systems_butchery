@@ -117,7 +117,7 @@ function filterByStore(data, data1) {
     var to_val = data1;
 
     var ajaxurl = config.routes.stockTransferFilterDetail;
-    $('#loading').show();
+    // $('#loading').show();
     $.ajax({
         url: ajaxurl,
         type: "get",
@@ -134,7 +134,7 @@ function filterByStore(data, data1) {
 
         },
         complete: function () {
-            $('#loading').hide();
+            // $('#loading').hide();
         }
     });
 }
@@ -145,7 +145,7 @@ function filterByStoreRePrint(data, data1) {
 
 
     var ajaxurl = config.routes.stockTransferFilter;
-    $('#loading').show();
+    // $('#loading').show();
     $.ajax({
         url: ajaxurl,
         type: "get",
@@ -161,7 +161,7 @@ function filterByStoreRePrint(data, data1) {
 
         },
         complete: function () {
-            $('#loading').hide();
+            // $('#loading').hide();
         }
     });
 }
@@ -310,7 +310,7 @@ function showStockTransfer(data, data1, data2) {
     var to_val = data2;
 
     var ajaxurl = config.routes.stockTransferShow;
-    $('#loading').show();
+    // $('#loading').show();
     $.ajax({
         url: ajaxurl,
         type: "get",
@@ -327,7 +327,7 @@ function showStockTransfer(data, data1, data2) {
 
         },
         complete: function () {
-            $('#loading').hide();
+            // $('#loading').hide();
         }
     });
 }
@@ -339,7 +339,7 @@ function updateStockTransfer(data, data1, data2) {
     var to_val = data2;
 
     var ajaxurl = config.routes.stockTransferUpdate;
-    $('#loading').show();
+    // $('#loading').show();
     $.ajax({
         url: ajaxurl,
         type: "get",
@@ -354,7 +354,7 @@ function updateStockTransfer(data, data1, data2) {
 
         },
         complete: function () {
-            $('#loading').hide();
+            // $('#loading').hide();
         }
     });
 }

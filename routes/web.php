@@ -104,7 +104,7 @@ Route::middleware(["auth"])->group(function () {
     Route::get('purchases/order-history', 'PurchaseOrderListController@index')->name('order-history.index');
     Route::post('purchases/cancel-order', 'PurchaseOrderListController@destroy')->name('cancel-order.destroy');
     Route::get('purchases/order-date', 'PurchaseOrderListController@getOrderHistory')->name('getOrderHistory');
-    Route::post('purchases/print-order', 'PurchaseOrderListController@printOrder')->name('printOrder');
+    Route::get('purchases/print-order/{id}/Purchase Order', 'PurchaseOrderListController@printOrder')->name('printOrder');
     Route::get('ipurchases/print-order/pdfgen/{order_no}', 'PurchaseOrderListController@reprintPurchaseOrder')->name('purchase-order-pdf-gen');
 
     //Invoice management routes
@@ -128,6 +128,7 @@ Route::middleware(["auth"])->group(function () {
     Route::get('purchases/goods-receiving.item-receive', 'GoodsReceivingController@itemReceive')->name('goods-receiving.itemReceive');
     Route::get('purchases/supplier/select/filter-invoice', 'GoodsReceivingController@filterInvoice')->name('filter-invoice');
     Route::get('purchases/goods-receiving.order-receive', 'GoodsReceivingController@orderReceive')->name('goods-receiving.orderReceive');
+    Route::get('purchases/supplier/select/filter-price', 'GoodsReceivingController@filterPrice')->name('filter-price');
 
     //Configurations Routes
     Route::get('/settings', 'ConfigurationsController@index')->name('configurations.index');

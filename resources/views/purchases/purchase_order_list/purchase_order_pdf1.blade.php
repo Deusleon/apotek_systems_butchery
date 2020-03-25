@@ -72,7 +72,7 @@
 
 <h4 align="center">{{$pharmacy['name']}}</h4>
 <h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
-<h4 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h4>
+<h4 align="center" style="margin-top: -2%">{{$pharmacy['phone']}}</h4>
 
 <h2 align="center" style="margin-top: -2%">Purchase Order</h2>
 <div class="row" style="margin-top: 10%;">
@@ -96,7 +96,7 @@
             <thead>
             <tr style="background: #1f273b; color: white;">
                 <th align="left">Product Name</th>
-                <th align="right">Quantity</th>
+                <th align="center">Quantity</th>
                 <th align="right">Price</th>
                 <th align="right">VAT</th>
                 <th align="right">Amount</th>
@@ -133,7 +133,7 @@
         </div>
         <div align="right"
              style="margin-top: -10%; padding-top: 1%; padding-left: 1%">{{number_format($data->max('vats'),2)}}</div>
-        <div style="margin-left: 70%;width: 29.6%;background: #f2f2f2;margin-top: 2%; padding: 1%"><b>Total: </b>
+        <div style="margin-left: 70%;width: 29.6%;background: #f2f2f2;margin-top: 2%; padding: 1%"><b>Total Amount: </b>
         </div>
         <div align="right"
              style="margin-top: -10%; padding-top: 1%; padding-left: 1%">{{number_format($data->max('total'),2)}}</div>
