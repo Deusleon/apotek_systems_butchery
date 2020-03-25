@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION_2', 'softlink'),
+    'default' => env('DB_CONNECTION', 'softlink'),
 
     /*
     |--------------------------------------------------------------------------
@@ -47,27 +47,6 @@ return [
         'softlink' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST_2', '127.0.0.1'),
-            'port' => env('DB_PORT_2', '3306'),
-            'database' => env('DB_CONNECTION_2', 'forge'),
-            'username' => env('DB_USERNAME_2', 'forge'),
-            'password' => env('DB_PASSWORD_2', ''),
-            'unix_socket' => env('DB_SOCKET', ''),
-            'charset' => 'utf8mb4',
-            'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'strict' => false,
-            'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
-        ],
-
-        /*apotek_inventory*/
-        'Apotek_Inventory' => [
-            'driver' => 'mysql',
-            'url' => env('DATABASE_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_CONNECTION', 'forge'),
@@ -85,15 +64,36 @@ return [
             ]) : [],
         ],
 
+        /*apotek_inventory*/
+        'Apotek_Inventory' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'apotek_inventory',
+            'username' => 'root',
+            'password' => '',
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
         /*apotek_updated*/
         'Apotek_Updated' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST_1', '127.0.0.1'),
-            'port' => env('DB_PORT_1', '3306'),
-            'database' => env('DB_CONNECTION_1', 'forge'),
-            'username' => env('DB_USERNAME_1', 'forge'),
-            'password' => env('DB_PASSWORD_1', ''),
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'apotek_updated',
+            'username' => 'root',
+            'password' => '',
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',

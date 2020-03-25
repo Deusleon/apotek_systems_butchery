@@ -38,7 +38,6 @@ class UserController extends Controller
         $user->mobile = $request->mobile;
         $user->status = '-1';
         $user->password = Hash::make($request->password);
-        $user->facility = DB::connection()->getDatabaseName();
         $user->save();
 
         $user->syncRoles($request->role);
