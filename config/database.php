@@ -43,7 +43,7 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
-        /*ours*/
+        /*ours both online and offline*/
         'softlink' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
@@ -64,36 +64,17 @@ return [
             ]) : [],
         ],
 
-        /*apotek_inventory*/
-        'Apotek_Inventory' => [
-            'driver' => 'mysql',
-            'url' => env('DATABASE_URL'),
-            'host' => '127.0.0.1',
-            'port' => '3306',
-            'database' => 'apotek_inventory',
-            'username' => 'root',
-            'password' => '',
-            'unix_socket' => env('DB_SOCKET', ''),
-            'charset' => 'utf8mb4',
-            'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'strict' => false,
-            'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
-        ],
+        /*online only*/
 
-        /*apotek_updated*/
-        'Apotek_Updated' => [
+        /*godwin malapa*/
+        'malapa' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
             'host' => '127.0.0.1',
             'port' => '3306',
-            'database' => 'apotek_updated',
+            'database' => 'godwin_malapa',
             'username' => 'root',
-            'password' => '',
+            'password' => 'Apotek@dba1',
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
@@ -105,27 +86,74 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
+        /*godwin malapa end*/
 
-        /*great_tyre*/
-        'GREAT_TYRES' => [
-            'driver' => 'mysql',
-            'url' => env('DATABASE_URL'),
-            'host' => '127.0.0.1',
-            'port' => '3306',
-            'database' => 'great_tyre',
-            'username' => 'root',
-            'password' => '',
-            'unix_socket' => env('DB_SOCKET', ''),
-            'charset' => 'utf8mb4',
-            'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'strict' => false,
-            'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
-        ],
+        /*online only end*/
+
+        /*offline only*/
+//        /*apotek_inventory*/
+//        'Apotek_Inventory' => [
+//            'driver' => 'mysql',
+//            'url' => env('DATABASE_URL'),
+//            'host' => '127.0.0.1',
+//            'port' => '3306',
+//            'database' => 'apotek_inventory',
+//            'username' => 'root',
+//            'password' => '',
+//            'unix_socket' => env('DB_SOCKET', ''),
+//            'charset' => 'utf8mb4',
+//            'collation' => 'utf8mb4_unicode_ci',
+//            'prefix' => '',
+//            'prefix_indexes' => true,
+//            'strict' => false,
+//            'engine' => null,
+//            'options' => extension_loaded('pdo_mysql') ? array_filter([
+//                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+//            ]) : [],
+//        ],
+//
+//        /*apotek_updated*/
+//        'Apotek_Updated' => [
+//            'driver' => 'mysql',
+//            'url' => env('DATABASE_URL'),
+//            'host' => '127.0.0.1',
+//            'port' => '3306',
+//            'database' => 'apotek_updated',
+//            'username' => 'root',
+//            'password' => '',
+//            'unix_socket' => env('DB_SOCKET', ''),
+//            'charset' => 'utf8mb4',
+//            'collation' => 'utf8mb4_unicode_ci',
+//            'prefix' => '',
+//            'prefix_indexes' => true,
+//            'strict' => false,
+//            'engine' => null,
+//            'options' => extension_loaded('pdo_mysql') ? array_filter([
+//                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+//            ]) : [],
+//        ],
+//
+//        /*great_tyre*/
+//        'GREAT_TYRES' => [
+//            'driver' => 'mysql',
+//            'url' => env('DATABASE_URL'),
+//            'host' => '127.0.0.1',
+//            'port' => '3306',
+//            'database' => 'great_tyre',
+//            'username' => 'root',
+//            'password' => '',
+//            'unix_socket' => env('DB_SOCKET', ''),
+//            'charset' => 'utf8mb4',
+//            'collation' => 'utf8mb4_unicode_ci',
+//            'prefix' => '',
+//            'prefix_indexes' => true,
+//            'strict' => false,
+//            'engine' => null,
+//            'options' => extension_loaded('pdo_mysql') ? array_filter([
+//                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+//            ]) : [],
+//        ],
+        /*offline only end*/
 
         'pgsql' => [
             'driver' => 'pgsql',
@@ -187,7 +215,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'predis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
         ],
 
         'default' => [
