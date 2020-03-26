@@ -418,6 +418,52 @@
             }
         });
     });
+
+    var xs;
+
+    $(document).ready(function () {
+        try {
+            xs = page_no;
+        } catch (e) {
+            console.log('error')
+        }
+    });
+
+    $('.pcoded-main-container').on('click', function () {
+
+        if (xs) {
+            var xs_flag = 0;//default
+
+            if (xs_flag === 0) {
+                if ($('#sale_paid').is(':focus')) {
+                    xs_flag = 1;//disable
+                }
+
+                if ($('#sale_discount').is(':focus')) {
+                    xs_flag = 1; //disable
+                }
+
+                if ($('#cash_sale_date').is(':focus')) {
+                    xs_flag = 1;
+                }
+
+            }
+
+            if (xs_flag === 0) {
+                setTimeout(function () {
+                    $('input[name="input_products_b"]').focus()
+                }, 30);
+            }
+
+            $('#cash_sale_date').on('change', function () {
+                setTimeout(function () {
+                    $('input[name="input_products_b"]').focus()
+                }, 30);
+            });
+
+        }
+    });
+
 </script>
 
 @stack("page_scripts")

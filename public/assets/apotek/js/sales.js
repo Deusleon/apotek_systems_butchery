@@ -320,7 +320,11 @@ $('#deselect-all').on('click', function () {
             return false;
         }
     }
-    // deselect();
+
+    setTimeout(function () {
+        $('input[name="input_products_b"]').focus()
+    }, 30);
+
 });
 
 $('#deselect-all-credit-sale').on('click', function () {
@@ -615,11 +619,11 @@ function deselect1() {
     // document.getElementById("credit_sales_form").reset();
     $('#price_category').val('').change();
     $('#customer').val('').change();
-    try{
+    try {
         document.getElementById("sale_paid").value = 0;
         document.getElementById("sale_discount").value = 0;
         document.getElementById("remark").value = '';
-    }catch (e) {
+    } catch (e) {
         console.log('cancel_error');
     }
     sub_total = 0;
@@ -1060,6 +1064,11 @@ $('#sales_form').on('submit', function (e) {
     }
 
     saveCashSale();
+
+    setTimeout(function () {
+        $('input[name="input_products_b"]').focus()
+    }, 30);
+
 });
 
 function saveCashSale() {

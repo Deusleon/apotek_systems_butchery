@@ -248,6 +248,8 @@
     @include('partials.notification')
     <script type="text/javascript">
 
+        var page_no = 1;//sales page
+
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -272,6 +274,7 @@
         };
 
         $(document).ready(function () {
+
             var sale_type_id = localStorage.getItem('sale_type');
             $('#products_b').toggleSelect2(false);
 
@@ -288,6 +291,12 @@
                 }, 30);
             });
 
+        });
+
+        $('#customer_id').on('change', function () {
+            setTimeout(function () {
+                $('input[name="input_products_b"]').focus()
+            }, 30);
         });
 
         //setup before functions
