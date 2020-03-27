@@ -63,6 +63,8 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
+        /*ours both online and offline*/
+
 
         /*online only*/
 
@@ -87,6 +89,50 @@ return [
             ]) : [],
         ],
         /*godwin malapa end*/
+
+        /*demo*/
+        'demo' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'demo_inventory',
+            'username' => 'root',
+            'password' => 'Apotek@dba1',
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+        /*demo end*/
+
+        /*fahari*/
+        'fahari' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'fahari',
+            'username' => 'root',
+            'password' => 'Apotek@dba1',
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+        /*fahari end*/
 
         /*online only end*/
 
