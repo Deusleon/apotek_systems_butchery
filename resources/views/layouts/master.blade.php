@@ -447,6 +447,14 @@
                     xs_flag = 1;
                 }
 
+                if ($('#edit_quantity').is(':focus')) {
+                    xs_flag = 1;
+                }
+
+                if ($('#edit_price').is(':focus')) {
+                    xs_flag = 1;
+                }
+
             }
 
             if (xs_flag === 0) {
