@@ -360,7 +360,11 @@ $('#deselect-all-quote').on('click', function () {
             return false;
         }
     }
-    // deselect();
+
+    setTimeout(function () {
+        $('input[name="input_products_b"]').focus()
+    }, 30);
+
 });
 
 function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {

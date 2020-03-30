@@ -23,6 +23,13 @@
             float: left;
             width: 45%;
         }
+
+        #input_products_b {
+            position: absolute;
+            opacity: 0;
+            z-index: 1;
+        }
+
     </style>
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
@@ -145,12 +152,21 @@
                         <div class="col-md-12">
                             <div class="form-group">
                                 <label>Remarks</label>
-                                <textarea name="remark" class="form-control"></textarea>
+                                <textarea name="remark" id="remark" class="form-control"></textarea>
                             </div>
 
                         </div>
                     </div>
                     <hr>
+
+                    {{--barcode input boxes--}}
+                    <select id="products_b">
+                        <option value="" disabled selected style="display:none;">Select Product</option>
+                    </select>
+                    <input type="text" id="input_products_b" name="input_products_b"
+                           value=""/>
+                    {{--end barcode input boxes--}}
+
                     <div class="row">
                         <div class="col-md-6"></div>
                         <div class="col-md-6">
@@ -218,6 +234,8 @@
     @include('partials.notification')
     <script type="text/javascript">
 
+        var page_no = 1;//sales page
+
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -232,6 +250,59 @@
                 filterProductByWord: '{{route('filter-product-by-word')}}'
             }
         };
+
+
+        /*hide barcode search*/
+        $.fn.toggleSelect2 = function (state) {
+            return this.each(function () {
+                $.fn[state ? 'show' : 'hide'].apply($(this).next('.select2-container'));
+            });
+        };
+
+        $(document).ready(function () {
+
+            var sale_type_id = localStorage.getItem('sale_type');
+            $('#products_b').toggleSelect2(false);
+
+            if (sale_type_id) {
+                $('#products_b').select2('close');
+                setTimeout(function () {
+                    $('input[name="input_products_b"]').focus()
+                }, 30);
+            }
+
+            $('#price_category').on('change', function () {
+                setTimeout(function () {
+                    $('input[name="input_products_b"]').focus()
+                }, 30);
+            });
+
+        });
+
+        $('#customer_id').on('change', function () {
+            setTimeout(function () {
+                $('input[name="input_products_b"]').focus()
+            }, 30);
+        });
+
+        //setup before functions
+        var typingTimer;                //timer identifier
+        var doneTypingInterval = 500;  //time in ms (5 seconds)
+
+        //on keyup, start the countdown
+        $('#input_products_b').keyup(function () {
+            clearTimeout(typingTimer);
+            if ($('#input_products_b').val()) {
+                typingTimer = setTimeout(doneTyping, doneTypingInterval);
+            }
+        });
+
+        function doneTyping() {
+            $("#products_b").data('select2').$dropdown.find("input").val(document.getElementById('input_products_b').value).trigger('keyup');
+            $('#products_b').select2('close');
+            document.getElementById('input_products_b').value = '';
+        }
+
 
         $(document).ready(function () {
             $('#sale_quotes-Table').DataTable({
