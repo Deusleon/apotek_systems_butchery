@@ -340,7 +340,11 @@ $('#deselect-all-credit-sale').on('click', function () {
             return false;
         }
     }
-    // deselect();
+
+    setTimeout(function () {
+        $('input[name="input_products_b"]').focus()
+    }, 30);
+
 });
 
 $('#deselect-all-quote').on('click', function () {
