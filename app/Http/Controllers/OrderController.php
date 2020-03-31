@@ -99,6 +99,10 @@ class OrderController extends Controller
                 ));
 
             }
+
+            $sort_column = array_column($max_prices, 'name');
+            array_multisort($sort_column, SORT_ASC, $max_prices);
+
             return $max_prices;
 
         }

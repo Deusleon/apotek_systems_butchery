@@ -188,6 +188,7 @@ class SaleController extends Controller
             ->where('store_id', $default_store_id)
             ->select('inv_products.id as id', 'name', 'barcode')
             ->groupBy('product_id')
+            ->orderby('name', 'asc')
             ->limit(100)
             ->get();
 
@@ -210,6 +211,7 @@ class SaleController extends Controller
                 ->sum('quantity');
             $output["$product->name#@$latest->price#@$product->id#@$quantity"] = $product->name;
         }
+
         return $output;
     }
 
