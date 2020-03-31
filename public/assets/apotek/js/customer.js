@@ -19,7 +19,7 @@ $('#edit').on('show.bs.modal', function (event) {
     modal.find('.modal-body #id_edit').val(button.data('id'));
     modal.find('.modal-body #name_edit').val(button.data('name'));
     modal.find('.modal-body #address_edit').val(button.data('address'));
-    modal.find('.modal-body #credit_input_edit').val(button.data('credit_limit'));
+    modal.find('.modal-body #credit_input_edit').val(formatMoney(button.data('credit_limit')));
     modal.find('.modal-body #phone_edit').val(button.data('phone'));
     modal.find('.modal-body #email_edit').val(button.data('email'));
     modal.find('.modal-body #tin_edit').val(button.data('tin'));
@@ -138,4 +138,21 @@ function validateMobile(input, errorMsg, validMsg, action) {
 
 // on keyup / change flag: reset
     input.addEventListener('change', reset);
+}
+
+
+function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
+    try {
+        decimalCount = Math.abs(decimalCount);
+        decimalCount = isNaN(decimalCount) ? 2 : decimalCount;
+
+        const negativeSign = amount < 0 ? "-" : "";
+
+        let i = parseInt(amount = Math.abs(Number(amount) || 0).toFixed(decimalCount)).toString();
+        let j = (i.length > 3) ? i.length % 3 : 0;
+
+        return negativeSign + (j ? i.substr(0, j) + thousands : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) + (decimalCount ? decimal + Math.abs(amount - i).toFixed(decimalCount).slice(2) : "");
+    } catch (e) {
+        console.log(e)
+    }
 }

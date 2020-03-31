@@ -463,6 +463,30 @@
                     xs_flag = 1;
                 }
 
+                if ($('#name').is(':focus')) {
+                    xs_flag = 1;
+                }
+
+                if ($('#email').is(':focus')) {
+                    xs_flag = 1;
+                }
+
+                if ($('#phone-number').is(':focus')) {
+                    xs_flag = 1;
+                }
+
+                if ($('#address').is(':focus')) {
+                    xs_flag = 1;
+                }
+
+                if ($('#tin').is(':focus')) {
+                    xs_flag = 1;
+                }
+
+                if ($('#credit_input').is(':focus')) {
+                    xs_flag = 1;
+                }
+
             }
 
             if (xs_flag === 0) {

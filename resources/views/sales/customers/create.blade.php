@@ -47,7 +47,7 @@
                                 <label for="code" class="col-md-4 col-form-label text-md-right">Address</label>
                                 <div class="col-md-8">
                                     <textarea type="text" class="form-control" rows="1" name="address"
-                                              aria-describedby="emailHelp"
+                                              aria-describedby="emailHelp" id="address"
                                               placeholder="Enter Address"></textarea>
                                 </div>
                             </div>
@@ -55,7 +55,7 @@
                                 <label for="code" class="col-md-4 col-form-label text-md-right">TIN</label>
                                 <div class="col-md-8">
                                     <input type="text" class="form-control" id="tin" name="tin"
-                                           placeholder="Enter TIN" required>
+                                           placeholder="Enter TIN">
                                 </div>
                             </div>
                             <div class="form-group row">
