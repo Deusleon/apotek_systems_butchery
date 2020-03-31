@@ -154,7 +154,7 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
-        /*fahari end*/
+        /*sandr end*/
 
         /*online only end*/
 
