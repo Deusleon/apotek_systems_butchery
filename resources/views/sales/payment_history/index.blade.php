@@ -58,12 +58,14 @@
                             </thead>
                             <tbody>
                             @foreach($payments as $payment)
-                                <tr>
-                                    <td>{{$payment->name}}</td>
-                                    <td>{{date('d-m-Y', strtotime($payment->created_at))}}</td>
-                                    <td>{{number_format($payment->paid_amount,2)}}</td>
-                                    @endforeach
-                                </tr>
+                                @if($payment->paid_amount != 0)
+                                    <tr>
+                                        <td>{{$payment->name}}</td>
+                                        <td>{{date('d-m-Y', strtotime($payment->created_at))}}</td>
+                                        <td>{{number_format($payment->paid_amount,2)}}</td>
+                                    </tr>
+                                @endif
+                            @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -144,9 +146,15 @@
                             document.getElementById('main_table').style.display = 'none';
                             document.getElementById('filter_history').style.display = 'block';
 
+                            data = data.filter(function (el) {
+                                return Number(el.paid_amount) !== Number(0);
+                            });
+
                             payment_history_filter_table.clear();
                             payment_history_filter_table.rows.add(data);
                             payment_history_filter_table.draw();
+
+
                         }
                     });
 
