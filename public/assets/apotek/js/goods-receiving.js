@@ -190,7 +190,7 @@ function valuesCollection(qty) {
     document.getElementById("received_cart").value = item_receiveds;
 
     edit_btn_set = 0;
-    if (edit_btn_set === 0){
+    if (edit_btn_set === 0) {
         $('#edit_btn').click();
         edit_btn_set = 1;
     }
@@ -474,13 +474,21 @@ function saveInvoiceForm() {
                 notify('Item received successfully', 'top', 'right', 'success');
                 document.getElementById('buy_price').value = '0';
                 document.getElementById('sell_price_id').value = '0';
-                document.getElementById('expire_date_21').value = '';
+                try {
+                    document.getElementById('expire_date_21').value = '';
+                } catch (e) {
+
+                }
                 deselect();
             } else {
                 notify('Item name exists', 'top', 'right', 'danger');
                 document.getElementById('buy_price').value = '0';
                 document.getElementById('sell_price_id').value = '0';
-                document.getElementById('expire_date_21').value = '';
+                try {
+                    document.getElementById('expire_date_21').value = '';
+                } catch (e) {
+
+                }
                 deselect();
             }
         }
