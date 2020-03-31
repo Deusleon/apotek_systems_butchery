@@ -123,7 +123,7 @@
         </div>
     </div>
 </div>
-</body>
+
 
 <script type="text/php">
     if ( isset($pdf) ) {
@@ -142,7 +142,12 @@
      }
 
 
+
 </script>
+
+
+</body>
+
 
 </html>
 

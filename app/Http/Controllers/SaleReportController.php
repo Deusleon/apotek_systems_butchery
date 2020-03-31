@@ -12,8 +12,8 @@ use App\SalesDetail;
 use App\SalesReturn;
 use App\Setting;
 use App\User;
-use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use PDF;
 
 ini_set('max_execution_time', 500);
@@ -123,15 +123,9 @@ class SaleReportController extends Controller
         $from = date('Y-m-d', strtotime($from));
         $to = date('Y-m-d', strtotime($to));
 
-        $sale_detail = SalesDetail::
-//        whereNotIn('sale_id', DB::table('sales_credits')->pluck('sale_id'))
-        join('sales', 'sales.id', '=', 'sales_details.sale_id')
+        $sale_detail = SalesDetail::join('sales', 'sales.id', '=', 'sales_details.sale_id')
             ->whereBetween(DB::raw('date(date)'), [$from, $to])
-            ->wherenull('status')
-            ->orwhere('status', '!=', 3)
-            //            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
-//            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
-//            ->where('status','!=',3)
+            ->whereRaw('(status != 3 or status is null)')
             ->get();
 
         $sales = array();
@@ -230,15 +224,10 @@ class SaleReportController extends Controller
                 DB::raw('date(date) as dates'), DB::raw('created_by'), DB::raw('name'))
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
             ->whereBetween(DB::raw('date(date)'), [$from, $to])
-            //            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
-//            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
-            ->wherenull('sales_details.status')
-            ->orwhere('sales_details.status', '!=', 3)
+            ->whereRaw('(sales_details.status != 3 or sales_details.status is null)')
             ->join('users', 'users.id', '=', 'sales.created_by')
-//            ->whereNotIn('sale_id', DB::table('sales_credits')->pluck('sale_id'))
             ->groupby('dates')
             ->orderby('dates', 'desc')
-//            ->groupby('dates', 'created_by')
             ->get();
 
         $sale_detail_to_pdf = array();
@@ -269,8 +258,6 @@ class SaleReportController extends Controller
         $sale_detail = SalesDetail::join('sales_credits', 'sales_credits.sale_id', '=', 'sales_details.sale_id')
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
             ->whereBetween(DB::raw('date(date)'), [$from, $to])
-            //            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
-//            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
             ->get();
 
         $sales = array();
@@ -333,8 +320,6 @@ class SaleReportController extends Controller
                 DB::raw('date(date) as dates'), DB::raw('sales.created_by'), DB::raw('name'))
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
             ->whereBetween(DB::raw('date(date)'), [$from, $to])
-//            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
-//            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
             ->join('users', 'users.id', '=', 'sales.created_by')
             ->groupby('dates', 'created_by')
             ->get();
@@ -367,8 +352,6 @@ class SaleReportController extends Controller
         $payments = SalesCredit::join('sales', 'sales.id', '=', 'sales_credits.sale_id')
             ->join('customers', 'customers.id', '=', 'sales.customer_id')
             ->whereBetween(DB::raw('date(sales_credits.created_at)'), [$from, $to])
-//            ->where(DB::Raw("DATE_FORMAT(sales_credits.created_at,'%m/%d/%Y')"), '>=', $from)
-//            ->where(DB::Raw("DATE_FORMAT(sales_credits.created_at,'%m/%d/%Y')"), '<=', $to)
             ->where('paid_amount', '>', 0)
             ->get();
         return $payments;
@@ -382,8 +365,6 @@ class SaleReportController extends Controller
 
         $data = json_decode(Sale::join('sales_credits', 'sales_credits.sale_id', '=', 'sales.id')
             ->whereBetween(DB::raw('date(sales_credits.created_at)'), [$from, $to])
-//            ->where(DB::Raw("DATE_FORMAT(sales_credits.created_at,'%m/%d/%Y')"), '>=', $from)
-//            ->where(DB::Raw("DATE_FORMAT(sales_credits.created_at,'%m/%d/%Y')"), '<=', $to)
             ->join('customers', 'customers.id', '=', 'sales.customer_id')
             ->where('customer_id', $customer_id)
 // ->where('paid_amount','>',0)
@@ -425,6 +406,9 @@ class SaleReportController extends Controller
             ));
 
         }
+
+        $sort_column = array_column($max_prices, 'name');
+        array_multisort($sort_column, SORT_ASC, $max_prices);
 
         return $max_prices;
 

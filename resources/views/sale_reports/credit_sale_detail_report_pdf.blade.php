@@ -242,10 +242,10 @@
             </div>
         </div>
         <hr>
-@endforeach
-</body>
+    @endforeach
 
-<script type="text/php">
+
+    <script type="text/php">
     if ( isset($pdf) ) {
         $x = 280;
         $y = 820;
@@ -262,7 +262,12 @@
      }
 
 
-</script>
+
+
+    </script>
+
+
+</body>
 
 </html>
 

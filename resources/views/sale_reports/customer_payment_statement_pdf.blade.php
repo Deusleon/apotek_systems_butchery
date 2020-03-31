@@ -211,8 +211,9 @@
             --}}
 
         <hr>
-@endforeach
-</body>
+    @endforeach
+
+</div>
 
 <script type="text/php">
     if ( isset($pdf) ) {
@@ -231,7 +232,12 @@
      }
 
 
+
+
 </script>
+
+
+</body>
 
 </html>
 
