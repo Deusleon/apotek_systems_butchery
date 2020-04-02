@@ -321,9 +321,9 @@ $('#deselect-all').on('click', function () {
         }
     }
 
-    setTimeout(function () {
-        $('input[name="input_products_b"]').focus()
-    }, 30);
+    // setTimeout(function () {
+    //     $('input[name="input_products_b"]').focus()
+    // }, 30);
 
 });
 
@@ -341,9 +341,9 @@ $('#deselect-all-credit-sale').on('click', function () {
         }
     }
 
-    setTimeout(function () {
-        $('input[name="input_products_b"]').focus()
-    }, 30);
+    // setTimeout(function () {
+    //     $('input[name="input_products_b"]').focus()
+    // }, 30);
 
 });
 
@@ -361,9 +361,9 @@ $('#deselect-all-quote').on('click', function () {
         }
     }
 
-    setTimeout(function () {
-        $('input[name="input_products_b"]').focus()
-    }, 30);
+    // setTimeout(function () {
+    //     $('input[name="input_products_b"]').focus()
+    // }, 30);
 
 });
 
@@ -563,9 +563,10 @@ function valueCollection() {
 
     if (product === '') {
         product = document.getElementById("products").value;
-        setTimeout(function () {
-            $('input[name="input_products_b"]').focus()
-        }, 30);
+        document.getElementById("products").value = "";
+        // setTimeout(function () {
+        //     $('input[name="input_products_b"]').focus()
+        // }, 30);
     }
 
     if (product) {
@@ -835,13 +836,13 @@ $('#products').select2({
                         $('#products').append($('<option>', {value: detail, text: name}));
                     });
 
-                    if (Object.keys(result).length === 2) {
-                        $("#products").children().removeAttr("selected");
-                        $("#products").children().eq(1).attr('selected', 'selected').change();
-                        $("#products").data('select2').$dropdown.find("input").val('');
-                    } else if (Object.keys(result).length === 1) {
-                        $("#products").data('select2').$dropdown.find("input").val('');
-                    }
+                    // if (Object.keys(result).length === 2) {
+                    //     $("#products").children().removeAttr("selected");
+                    //     $("#products").children().eq(1).attr('selected', 'selected').change();
+                    //     $("#products").data('select2').$dropdown.find("input").val('');
+                    // } else if (Object.keys(result).length === 1) {
+                    //     $("#products").data('select2').$dropdown.find("input").val('');
+                    // }
 
                 }
             });
@@ -871,13 +872,13 @@ $('#products_b').select2({
                         $('#products_b').append($('<option>', {value: detail, text: name}));
                     });
 
-                    if (Object.keys(result).length === 2) {
-                        $("#products_b").children().removeAttr("selected");
-                        $("#products_b").children().eq(1).attr('selected', 'selected').change();
-                        $("#products_b").data('select2').$dropdown.find("input").val('');
-                    } else if (Object.keys(result).length === 1) {
-                        $("#products_b").data('select2').$dropdown.find("input").val('');
-                    }
+                    // if (Object.keys(result).length === 2) {
+                    //     $("#products_b").children().removeAttr("selected");
+                    //     $("#products_b").children().eq(1).attr('selected', 'selected').change();
+                    //     $("#products_b").data('select2').$dropdown.find("input").val('');
+                    // } else if (Object.keys(result).length === 1) {
+                    //     $("#products_b").data('select2').$dropdown.find("input").val('');
+                    // }
 
                 }
             });
@@ -1073,9 +1074,9 @@ $('#sales_form').on('submit', function (e) {
 
     saveCashSale();
 
-    setTimeout(function () {
-        $('input[name="input_products_b"]').focus()
-    }, 30);
+    // setTimeout(function () {
+    //     $('input[name="input_products_b"]').focus()
+    // }, 30);
 
 });
 

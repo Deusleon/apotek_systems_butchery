@@ -431,77 +431,77 @@
 
     $('.pcoded-main-container').on('click', function () {
 
-        if (xs) {
-            var xs_flag = 0;//default
-
-            if (xs_flag === 0) {
-                if ($('#sale_paid').is(':focus')) {
-                    xs_flag = 1;//disable
-                }
-
-                if ($('#sale_discount').is(':focus')) {
-                    xs_flag = 1; //disable
-                }
-
-                if ($('#cash_sale_date').is(':focus')) {
-                    xs_flag = 1;
-                }
-
-                if ($('#credit_sale_date').is(':focus')) {
-                    xs_flag = 1;
-                }
-
-                if ($('#edit_quantity').is(':focus')) {
-                    xs_flag = 1;
-                }
-
-                if ($('#edit_price').is(':focus')) {
-                    xs_flag = 1;
-                }
-
-                if ($('#remark').is(':focus')) {
-                    xs_flag = 1;
-                }
-
-                if ($('#name').is(':focus')) {
-                    xs_flag = 1;
-                }
-
-                if ($('#email').is(':focus')) {
-                    xs_flag = 1;
-                }
-
-                if ($('#phone-number').is(':focus')) {
-                    xs_flag = 1;
-                }
-
-                if ($('#address').is(':focus')) {
-                    xs_flag = 1;
-                }
-
-                if ($('#tin').is(':focus')) {
-                    xs_flag = 1;
-                }
-
-                if ($('#credit_input').is(':focus')) {
-                    xs_flag = 1;
-                }
-
-            }
-
-            if (xs_flag === 0) {
-                setTimeout(function () {
-                    $('input[name="input_products_b"]').focus()
-                }, 30);
-            }
-
-            $('#cash_sale_date').on('change', function () {
-                setTimeout(function () {
-                    $('input[name="input_products_b"]').focus()
-                }, 30);
-            });
-
-        }
+        // if (xs) {
+        //     var xs_flag = 0;//default
+        //
+        //     if (xs_flag === 0) {
+        //         if ($('#sale_paid').is(':focus')) {
+        //             xs_flag = 1;//disable
+        //         }
+        //
+        //         if ($('#sale_discount').is(':focus')) {
+        //             xs_flag = 1; //disable
+        //         }
+        //
+        //         if ($('#cash_sale_date').is(':focus')) {
+        //             xs_flag = 1;
+        //         }
+        //
+        //         if ($('#credit_sale_date').is(':focus')) {
+        //             xs_flag = 1;
+        //         }
+        //
+        //         if ($('#edit_quantity').is(':focus')) {
+        //             xs_flag = 1;
+        //         }
+        //
+        //         if ($('#edit_price').is(':focus')) {
+        //             xs_flag = 1;
+        //         }
+        //
+        //         if ($('#remark').is(':focus')) {
+        //             xs_flag = 1;
+        //         }
+        //
+        //         if ($('#name').is(':focus')) {
+        //             xs_flag = 1;
+        //         }
+        //
+        //         if ($('#email').is(':focus')) {
+        //             xs_flag = 1;
+        //         }
+        //
+        //         if ($('#phone-number').is(':focus')) {
+        //             xs_flag = 1;
+        //         }
+        //
+        //         if ($('#address').is(':focus')) {
+        //             xs_flag = 1;
+        //         }
+        //
+        //         if ($('#tin').is(':focus')) {
+        //             xs_flag = 1;
+        //         }
+        //
+        //         if ($('#credit_input').is(':focus')) {
+        //             xs_flag = 1;
+        //         }
+        //
+        //     }
+        //
+        //     if (xs_flag === 0) {
+        //         setTimeout(function () {
+        //             $('input[name="input_products_b"]').focus()
+        //         }, 30);
+        //     }
+        //
+        //     $('#cash_sale_date').on('change', function () {
+        //         setTimeout(function () {
+        //             $('input[name="input_products_b"]').focus()
+        //         }, 30);
+        //     });
+        //
+        // }
     });
 
 </script>

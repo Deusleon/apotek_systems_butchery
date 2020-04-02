@@ -264,44 +264,44 @@
             var sale_type_id = localStorage.getItem('sale_type');
             $('#products_b').toggleSelect2(false);
 
-            if (sale_type_id) {
-                $('#products_b').select2('close');
-                setTimeout(function () {
-                    $('input[name="input_products_b"]').focus()
-                }, 30);
-            }
-
-            $('#price_category').on('change', function () {
-                setTimeout(function () {
-                    $('input[name="input_products_b"]').focus()
-                }, 30);
-            });
+            // if (sale_type_id) {
+            //     $('#products_b').select2('close');
+            //     setTimeout(function () {
+            //         $('input[name="input_products_b"]').focus()
+            //     }, 30);
+            // }
+            //
+            // $('#price_category').on('change', function () {
+            //     setTimeout(function () {
+            //         $('input[name="input_products_b"]').focus()
+            //     }, 30);
+            // });
 
         });
 
-        $('#customer_id').on('change', function () {
-            setTimeout(function () {
-                $('input[name="input_products_b"]').focus()
-            }, 30);
-        });
+        // $('#customer_id').on('change', function () {
+        //     setTimeout(function () {
+        //         $('input[name="input_products_b"]').focus()
+        //     }, 30);
+        // });
 
-        //setup before functions
-        var typingTimer;                //timer identifier
-        var doneTypingInterval = 500;  //time in ms (5 seconds)
-
-        //on keyup, start the countdown
-        $('#input_products_b').keyup(function () {
-            clearTimeout(typingTimer);
-            if ($('#input_products_b').val()) {
-                typingTimer = setTimeout(doneTyping, doneTypingInterval);
-            }
-        });
-
-        function doneTyping() {
-            $("#products_b").data('select2').$dropdown.find("input").val(document.getElementById('input_products_b').value).trigger('keyup');
-            $('#products_b').select2('close');
-            document.getElementById('input_products_b').value = '';
-        }
+        // //setup before functions
+        // var typingTimer;                //timer identifier
+        // var doneTypingInterval = 500;  //time in ms (5 seconds)
+        //
+        // //on keyup, start the countdown
+        // $('#input_products_b').keyup(function () {
+        //     clearTimeout(typingTimer);
+        //     if ($('#input_products_b').val()) {
+        //         typingTimer = setTimeout(doneTyping, doneTypingInterval);
+        //     }
+        // });
+        //
+        // function doneTyping() {
+        //     $("#products_b").data('select2').$dropdown.find("input").val(document.getElementById('input_products_b').value).trigger('keyup');
+        //     $('#products_b').select2('close');
+        //     document.getElementById('input_products_b').value = '';
+        // }
 
 
         $(document).ready(function () {
