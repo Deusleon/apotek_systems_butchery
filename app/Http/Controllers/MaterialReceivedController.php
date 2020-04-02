@@ -6,9 +6,9 @@ use App\GoodsReceiving;
 use App\Product;
 use App\Setting;
 use App\Supplier;
-use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use View;
 
 class MaterialReceivedController extends Controller
@@ -37,7 +37,11 @@ class MaterialReceivedController extends Controller
         $total_sellprice = $quantity * $update_material->sell_price;
         $profit = $total_sellprice - $total_buyprice;
 
-        $update_material->expire_date = date('Y-m-d', strtotime($request->expire_date_edit));
+        if ($request->expire_date_edit) {
+            $update_material->expire_date = date('Y-m-d', strtotime($request->expire_date_edit));
+        } else {
+            $update_material->expire_date = null;
+        }
         $update_material->quantity = $quantity;
         $update_material->unit_cost = $unit_buy_price;
         $update_material->total_cost = $total_buyprice;
@@ -64,57 +68,161 @@ class MaterialReceivedController extends Controller
 
     public function getMaterialsReceived(Request $request)
     {
-        $from = $request->date[0];
-        $to = $request->date[1];
-        $total_bp = 0;
-        $total_sp = 0;
-        $total_pf = 0;
-        $data = array();
-        $material_received = GoodsReceiving::where(DB::Raw("DATE_FORMAT(created_at,'%m/%d/%Y')"), '>=', $from)
-            ->where(DB::Raw("DATE_FORMAT(created_at,'%m/%d/%Y')"), '<=', $to)
-            ->orderby('id', 'DESC')
-            ->get();
+
+        $columns = array(
+            0 => 'inv_products.name',
+            1 => 'inv_products.name',
+            2 => 'quantity',
+            3 => 'unit_cost',
+            4 => 'expire_date',
+            5 => 'total_cost',
+            6 => 'inv_incoming_stock.created_at',
+            7 => 'users.name',
+            8 => 'inv_products.name'
+        );
+
+        $from = date('Y-m-d', strtotime($request->date[0]));
+        $to = date('Y-m-d', strtotime($request->date[1]));
 
         if ($request->supplier_id) {
-            $material_received = GoodsReceiving::where(DB::Raw("DATE_FORMAT(created_at,'%m/%d/%Y')"), '>=', $from)
-                ->where(DB::Raw("DATE_FORMAT(created_at,'%m/%d/%Y')"), '<=', $to)
+            $totalData = GoodsReceiving::select('inv_incoming_stock.id', 'product_id', 'quantity', 'unit_cost', 'total_cost',
+                'expire_date', 'inv_incoming_stock.created_at', 'supplier_id', 'created_by')
+                ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
+                ->join('users', 'users.id', '=', 'inv_incoming_stock.created_by')
+                ->whereBetween(DB::raw('date(inv_incoming_stock.created_at)'), [$from, $to])
                 ->where('supplier_id', $request->supplier_id)
                 ->orderby('id', 'DESC')
-                ->get();
-        }
-        if ($request->product_id) {
-            $material_received = GoodsReceiving::where(DB::Raw("DATE_FORMAT(created_at,'%m/%d/%Y')"), '>=', $from)
-                ->where(DB::Raw("DATE_FORMAT(created_at,'%m/%d/%Y')"), '<=', $to)
-                ->where('product_id', $request->product_id)
+                ->count();
+        } else {
+            $totalData = GoodsReceiving::select('inv_incoming_stock.id', 'product_id', 'quantity', 'unit_cost', 'total_cost',
+                'expire_date', 'inv_incoming_stock.created_at', 'supplier_id', 'created_by')
+                ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
+                ->join('users', 'users.id', '=', 'inv_incoming_stock.created_by')
+                ->whereBetween(DB::raw('date(inv_incoming_stock.created_at)'), [$from, $to])
                 ->orderby('id', 'DESC')
-                ->get();
-        }
-        if (($request->product_id) && ($request->supplier_id)) {
-            $material_received = GoodsReceiving::where(DB::Raw("DATE_FORMAT(created_at,'%m/%d/%Y')"), '>=', $from)
-                ->where(DB::Raw("DATE_FORMAT(created_at,'%m/%d/%Y')"), '<=', $to)
-                ->where('product_id', $request->product_id)
-                ->where('supplier_id', $request->supplier_id)
-                ->orderby('id', 'DESC')
-                ->get();
+                ->count();
         }
 
-        foreach ($material_received as $material) {
-            $total_bp = $total_bp + $material->total_cost;
-            $total_sp = $total_sp + $material->sell_price;
-            $total_pf = $total_pf + $material->item_profit;
+        $totalFiltered = $totalData;
+
+        $limit = $request->input('length');
+        $start = $request->input('start');
+        $order = $columns[$request->input('order.0.column')];
+        $dir = $request->input('order.0.dir');
+
+        if (empty($request->input('search.value'))) {
+            if ($request->supplier_id) {
+                $material_received = GoodsReceiving::select('inv_incoming_stock.id', 'product_id', 'quantity', 'unit_cost', 'total_cost',
+                    'expire_date', 'inv_incoming_stock.created_at', 'supplier_id', 'created_by')
+                    ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
+                    ->join('users', 'users.id', '=', 'inv_incoming_stock.created_by')
+                    ->whereBetween(DB::raw('date(inv_incoming_stock.created_at)'), [$from, $to])
+                    ->where('supplier_id', $request->supplier_id)
+                    ->offset($start)
+                    ->limit($limit)
+                    ->orderBy($order, $dir)
+                    ->get();
+            } else {
+                $material_received = GoodsReceiving::select('inv_incoming_stock.id', 'product_id', 'quantity', 'unit_cost', 'total_cost',
+                    'expire_date', 'inv_incoming_stock.created_at', 'supplier_id', 'created_by')
+                    ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
+                    ->join('users', 'users.id', '=', 'inv_incoming_stock.created_by')
+                    ->whereBetween(DB::raw('date(inv_incoming_stock.created_at)'), [$from, $to])
+                    ->offset($start)
+                    ->limit($limit)
+                    ->orderBy($order, $dir)
+                    ->get();
+            }
+        } else {
+            $search = $request->input('search.value');
+
+            if ($request->supplier_id) {
+                $material_received = GoodsReceiving::select('inv_incoming_stock.id', 'product_id', 'quantity', 'unit_cost', 'total_cost',
+                    'expire_date', 'inv_incoming_stock.created_at', 'supplier_id', 'created_by')
+                    ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
+                    ->join('users', 'users.id', '=', 'inv_incoming_stock.created_by')
+                    ->whereBetween(DB::raw('date(inv_incoming_stock.created_at)'), [$from, $to])
+                    ->where('inv_products.name', 'LIKE', "%{$search}%")
+                    ->orwhere('quantity', 'LIKE', "%{$search}%")
+                    ->orwhere('unit_cost', 'LIKE', "%{$search}%")
+                    ->orwhere('expire_date', 'LIKE', "%{$search}%")
+                    ->orwhere('total_cost', 'LIKE', "%{$search}%")
+                    ->orwhere(DB::raw('date(inv_incoming_stock.created_at)'), 'LIKE', "%{$search}%")
+                    ->orwhere('users.name', 'LIKE', "%{$search}%")
+                    ->where('supplier_id', $request->supplier_id)
+                    ->offset($start)
+                    ->limit($limit)
+                    ->orderBy($order, $dir)
+                    ->get();
+
+                $totalFiltered = GoodsReceiving::select('inv_incoming_stock.id', 'product_id', 'quantity', 'unit_cost', 'total_cost',
+                    'expire_date', 'inv_incoming_stock.created_at', 'supplier_id', 'created_by')
+                    ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
+                    ->join('users', 'users.id', '=', 'inv_incoming_stock.created_by')
+                    ->whereBetween(DB::raw('date(inv_incoming_stock.created_at)'), [$from, $to])
+                    ->where('inv_products.name', 'LIKE', "%{$search}%")
+                    ->orwhere('quantity', 'LIKE', "%{$search}%")
+                    ->orwhere('unit_cost', 'LIKE', "%{$search}%")
+                    ->orwhere('expire_date', 'LIKE', "%{$search}%")
+                    ->orwhere('total_cost', 'LIKE', "%{$search}%")
+                    ->orwhere(DB::raw('date(inv_incoming_stock.created_at)'), 'LIKE', "%{$search}%")
+                    ->orwhere('users.name', 'LIKE', "%{$search}%")
+                    ->where('supplier_id', $request->supplier_id)
+                    ->count();
+
+            } else {
+                $material_received = GoodsReceiving::select('inv_incoming_stock.id', 'product_id', 'quantity', 'unit_cost', 'total_cost',
+                    'expire_date', 'inv_incoming_stock.created_at', 'supplier_id', 'created_by')
+                    ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
+                    ->join('users', 'users.id', '=', 'inv_incoming_stock.created_by')
+                    ->whereBetween(DB::raw('date(inv_incoming_stock.created_at)'), [$from, $to])
+                    ->where('inv_products.name', 'LIKE', "%{$search}%")
+                    ->orwhere('quantity', 'LIKE', "%{$search}%")
+                    ->orwhere('unit_cost', 'LIKE', "%{$search}%")
+                    ->orwhere('expire_date', 'LIKE', "%{$search}%")
+                    ->orwhere('total_cost', 'LIKE', "%{$search}%")
+                    ->orwhere(DB::raw('date(inv_incoming_stock.created_at)'), 'LIKE', "%{$search}%")
+                    ->orwhere('users.name', 'LIKE', "%{$search}%")
+                    ->offset($start)
+                    ->limit($limit)
+                    ->orderBy($order, $dir)
+                    ->get();
+
+                $totalFiltered = GoodsReceiving::select('inv_incoming_stock.id', 'product_id', 'quantity', 'unit_cost', 'total_cost',
+                    'expire_date', 'inv_incoming_stock.created_at', 'supplier_id', 'created_by')
+                    ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
+                    ->join('users', 'users.id', '=', 'inv_incoming_stock.created_by')
+                    ->whereBetween(DB::raw('date(inv_incoming_stock.created_at)'), [$from, $to])
+                    ->where('inv_products.name', 'LIKE', "%{$search}%")
+                    ->orwhere('quantity', 'LIKE', "%{$search}%")
+                    ->orwhere('unit_cost', 'LIKE', "%{$search}%")
+                    ->orwhere('expire_date', 'LIKE', "%{$search}%")
+                    ->orwhere('total_cost', 'LIKE', "%{$search}%")
+                    ->orwhere(DB::raw('date(inv_incoming_stock.created_at)'), 'LIKE', "%{$search}%")
+                    ->orwhere('users.name', 'LIKE', "%{$search}%")
+                    ->count();
+
+            }
+
         }
 
-        foreach ($material_received as $value) {
-            $value->product;
-            $value->supplier;
-            $value->user;
+        $data = array();
+        if (!empty($material_received)) {
+            foreach ($material_received as $value) {
+                $value->product;
+                $value->supplier;
+                $value->user;
+
+            }
         }
 
-        array_push($data, array(
-            $material_received, $total_bp, $total_sp, $total_pf
-        ));
+        $json_data = array(
+            "draw" => intval($request->input('draw')),
+            "recordsTotal" => intval($totalData),
+            "recordsFiltered" => intval($totalFiltered),
+            "data" => $material_received
+        );
 
-//        $data = json_decode($material_received, true);
-        return $data;
+        echo json_encode($json_data);
     }
 }

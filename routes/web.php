@@ -116,7 +116,7 @@ Route::middleware(["auth"])->group(function () {
 
     //Material received routes
     Route::get('purchases/material-received', 'MaterialReceivedController@index')->name('material-received.index');
-    Route::get('purchases/materials', 'MaterialReceivedController@getMaterialsReceived')->name('getMaterialsReceived');
+    Route::post('purchases/materials', 'MaterialReceivedController@getMaterialsReceived')->name('getMaterialsReceived');
     Route::post('purchases/material/edit', 'MaterialReceivedController@update')->name('material.edit');
     Route::post('purchases/material/delete', 'MaterialReceivedController@destroy')->name('material.delete');
 
