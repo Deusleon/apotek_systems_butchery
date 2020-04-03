@@ -456,6 +456,7 @@ $('#myFormId').on('submit', function (e) {
         return false;
     }
 
+    $('#save_id').attr('disabled', true);
     saveInvoiceForm();
 
 });
@@ -491,6 +492,8 @@ function saveInvoiceForm() {
                 }
                 deselect();
             }
+
+            $('#save_id').attr('disabled', false);
         }
     });
 }
@@ -509,6 +512,11 @@ function saveOrderReceiveForm() {
                 notify('Order received successfully', 'top', 'right', 'success');
                 items_table.row(remove_row_index).remove().draw();
                 $('#receive').modal('hide');
+                $('#save_btn').attr('disabled', false);
+
+            } else {
+                $('#receive').modal('hide');
+                $('#save_btn').attr('disabled', false);
             }
         }
     });
@@ -526,6 +534,7 @@ $('#order_reveice').on('submit', function (e) {
         return false;
     }
 
+    $('#save_btn').attr('disabled', true);
     saveOrderReceiveForm();
 
 });

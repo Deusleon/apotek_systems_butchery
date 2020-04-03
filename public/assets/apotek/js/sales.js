@@ -1072,11 +1072,10 @@ $('#sales_form').on('submit', function (e) {
         return false;
     }
 
+    $('#save_btn').attr('disabled', true);
+
     saveCashSale();
 
-    // setTimeout(function () {
-    //     $('input[name="input_products_b"]').focus()
-    // }, 30);
 
 });
 
@@ -1092,9 +1091,11 @@ function saveCashSale() {
         success: function (data) {
             window.open(data.redirect_to);
             triggerSaleType();
+            $('#save_btn').attr('disabled', false);
         }, complete: function () {
             notify('Sale recorded successfully', 'top', 'right', 'success');
             deselect();
+            $('#save_btn').attr('disabled', false);
         }, timeout: 20000
     });
 }
@@ -1108,6 +1109,8 @@ $('#credit_sales_form').on('submit', function (e) {
         notify('Credit sale list empty', 'top', 'right', 'warning');
         return false;
     }
+
+    $('#save_btn').attr('disabled', true);
 
     saveCreditSale();
 
@@ -1126,6 +1129,8 @@ function saveCreditSale() {
             notify('Credit sale recorded successfully', 'top', 'right', 'success');
             deselect1();
             window.open(data.redirect_to);
+            $('#save_btn').attr('disabled', false);
+
         }
     });
 }
@@ -1139,6 +1144,8 @@ $('#quote_sale_form').on('submit', function (e) {
         notify('Sale quote list empty', 'top', 'right', 'warning');
         return false;
     }
+
+    $('#save_btn').attr('disabled', true);
 
     saveQuoteForm();
 
@@ -1157,6 +1164,7 @@ function saveQuoteForm() {
             notify('Quote recorded successfully', 'top', 'right', 'success');
             deselectQuote();
             window.open(data.redirect_to);
+            $('#save_btn').attr('disabled', false);
         }
     });
 
