@@ -1,8 +1,9 @@
 <li class="nav-item"><a href="{{route('home')}}" class="nav-link"><span class="pcoded-micon">
     <i class="fas fa-tachometer-alt"></i></span><span class="pcoded-mtext">Dashboard</span></a>
 </li>
-@can('View Sales Management')
-    <li class="nav-item pcoded-hasmenu">
+
+<li class="nav-item pcoded-hasmenu">
+    @can('View Sales Management')
         <a href="#!" class="nav-link"><span class="pcoded-micon"><i class="fas fa-money-check-alt"></i></span>
             <span class="pcoded-mtext">Sales</span>
         </a>
@@ -38,8 +39,8 @@
                 <li class=""><a href="{{route('customers.index')}}" class="">Customers</a></li>
             @endcan
         </ul>
-    </li>
-@endcan
+    @endcan
+</li>
 
 
 <li class="nav-item pcoded-hasmenu">
@@ -153,7 +154,7 @@
 <li class="nav-item pcoded-hasmenu">
     @can('View User Management')
         <a href="#!" class="nav-link"><span class="pcoded-micon"><i class="fas fa-users"></i></span>
-            <span class="pcoded-mtext">Users</span>
+            <daspan class="pcoded-mtext">Users</daspan>
         </a>
         <ul class="pcoded-submenu">
             @can('View Roles')
