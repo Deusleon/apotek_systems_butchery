@@ -3,43 +3,41 @@
 </li>
 
 <li class="nav-item pcoded-hasmenu">
-    @can('View Sales Management')
+    @if(auth()->user()->can('View Sales Management'))
         <a href="#!" class="nav-link"><span class="pcoded-micon"><i class="fas fa-money-check-alt"></i></span>
             <span class="pcoded-mtext">Sales</span>
         </a>
         <ul class="pcoded-submenu">
-            @can('Cash Sales')
+            @if(auth()->user()->can('Cash Sales'))
                 <li class=""><a href="{{route('cash-sales.cashSale')}}" class="">Point of Sale</a></li>
-            @endcan
-            @can('Credit Sales')
+            @endif
+            @if(auth()->user()->can('Credit Sales'))
                 <li class=""><a href="{{route('credit-sales.creditSale')}}" class="">Credit Sales</a></li>
-            @endcan
-            @can('View Sales History')
+            @endif
+            @if(auth()->user()->can('View Sales History'))
                 <li class=""><a href="{{route('sale-histories.SalesHistory')}}" class="">Sales History</a></li>
-            @endcan
-            @can('Sales Quotes')
+            @endif
+            @if(auth()->user()->can('Sales Quotes'))
                 <li class=""><a href="{{route('sale-quotes.index')}}" class="">Sales Quotes</a></li>
-            @endcan
-            @can('Sales Return')
+            @endif
+            @if(auth()->user()->can('Sales Return'))
                 <li class=""><a href="{{route('sale-returns.index')}}" class="">Sales Return</a></li>
-            @endcan
-            @can('Sales Return Approval')
+            @endif
+            @if(auth()->user()->can('Sales Return Approval'))
                 <li class=""><a href="{{route('sale-returns-approval.getSalesReturn')}}" class="">Returns Approval</a>
                 </li>
-            @endcan
-        <!--  This is no longer used as Credit Tracking is also used for Payment -->
-        <!--  <li class=""><a href="{{route('credit-payments.getCreditsCustomers')}}" class="">Credits Payment</a></li> -->
-            @can('View Credit Tracking')
+            @endif
+            @if(auth()->user()->can('View Credit Tracking'))
                 <li class=""><a href="{{route('credits-tracking.creditsTracking')}}" class="">Credit Tracking</a></li>
-            @endcan
-            @can('View Sales History')
+            @endif
+            @if(auth()->user()->can('View Sales History'))
                 <li class=""><a href="{{route('payments.getPaymentsHistory')}}" class="">Payment History</a></li>
-            @endcan
-            @can('View Customers')
+            @endif
+            @if(auth()->user()->can('View Customers'))
                 <li class=""><a href="{{route('customers.index')}}" class="">Customers</a></li>
-            @endcan
+            @endif
         </ul>
-    @endcan
+    @endif
 </li>
 
 
