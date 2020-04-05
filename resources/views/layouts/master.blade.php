@@ -165,7 +165,7 @@
 
 <!-- [ Header ] start -->
 <header class="navbar pcoded-header navbar-expand-lg navbar-light">
-    @if(auth()->user()->can('View Sales Management'))
+    @if(auth()->user()->hasPermissionTo(100))
         <p>yes</p>
     @else
         <p>no</p>
