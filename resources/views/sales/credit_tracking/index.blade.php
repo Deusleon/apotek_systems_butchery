@@ -80,9 +80,9 @@
 
                     <div class="row" id="detail">
                         <hr>
-                        @can('Credit Payment')
+                        @if(auth()->user()->checkPermission('Credit Payment'))
                             <div id="can_pay"></div>
-                        @endcan
+                        @endif
                         <div class="table teble responsive" style="width: 100%;">
                             <table id="credit_payment_table" class="display table nowrap table-striped table-hover"
                                    style="width:100%">

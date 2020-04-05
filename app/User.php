@@ -87,12 +87,13 @@ class User extends Authenticatable
         return $this->hasMany(GoodsReceiving::class, 'created_by');
     }
 
-    public function checkPermission($permission_id)
+    public function checkPermission($permission_name)
     {
 
         $permission = DB::table('role_has_permissions')
             ->join('model_has_roles', 'model_has_roles.role_id', '=', 'role_has_permissions.role_id')
-            ->where('permission_id', $permission_id)
+            ->join('permissions', 'permissions.id', '=', 'role_has_permissions.permission_id')
+            ->where('permissions.name', $permission_name)
             ->where('model_id', Auth::user()->id)
             ->get();
 

@@ -70,14 +70,14 @@
 
                         </div>
                         <div class="col-md-4">
-                            @can('Manage Stock Transfer')
+                            @if(auth()->user()->checkPermission('Manage Stock Transfer'))
                                 <a href="{{ route('stock-transfer.index') }}">
                                     <button style="float: right;margin-bottom: 2%;" type="button"
                                             class="btn btn-secondary btn-sm">
                                         New Transfer
                                     </button>
                                 </a>
-                            @endcan
+                            @endif
                         </div>
                     </div>
                     <form id="transfer" method="post" enctype="multipart/form-data">
@@ -139,12 +139,12 @@
                                             <td>
                                                 @if($all_transfer->status == 1)
                                                     <span class='badge badge-warning'>Pending</span>
-                                                    @can('Transfer Acknowledgement')
+                                                    @if(auth()->user()->checkPermission('Transfer Acknowledgement'))
                                                         <a href="{{route('stock-transfer-acknowledge.index')}}"
                                                            class="label btn-success text-white f-12 btn-rounded">
                                                             Acknowledge
                                                         </a>
-                                                    @endcan
+                                                    @endif
                                                 @else
                                                     <span class='badge badge-success'>Completed</span>
                                                 @endif

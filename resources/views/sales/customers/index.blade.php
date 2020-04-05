@@ -30,13 +30,13 @@
         <div class="card-block">
             <div class="col-sm-12">
                 <div class="tab-content" id="myTabContent">
-                    @can('Manage Customers')
+                    @if(auth()->user()->checkPermission('Manage Customers'))
                         <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-sm btn-secondary"
                                 data-toggle="modal"
                                 data-target="#create">
                             Add Customer
                         </button>
-                    @endcan
+                    @endif
                     <div class="table-responsive">
                         <table id="fixed-header" class="display table nowrap table-striped table-hover"
                                style="width:100%">
@@ -47,9 +47,9 @@
                                 <th>Credit Limit</th>
                                 <th>Phone</th>
                                 <!-- <th>Email</th> -->
-                                @can('Manage Customers')
+                                @if(auth()->user()->checkPermission('Manage Customers'))
                                     <th>Action</th>
-                                @endcan
+                                @endif
 
                             </tr>
                             </thead>
@@ -69,7 +69,7 @@
                                     @endif
 
                                      --}}
-                                    @can('Manage Customers')
+                                    @if(auth()->user()->checkPermission('Manage Customers'))
                                         <td>
                                             <a href="#">
                                                 <button class="btn btn-sm btn-rounded btn-primary"
@@ -96,7 +96,7 @@
                                                 </button>
                                             </a>
                                         </td>
-                                    @endcan
+                                    @endif
                                     @endforeach
                                 </tr>
                             </tbody>

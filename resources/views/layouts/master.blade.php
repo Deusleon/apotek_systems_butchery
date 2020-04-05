@@ -191,7 +191,7 @@
         <ul class="navbar-nav ml-auto">
             <li>
                 <div class="dropdown">
-                    @can('View Settings')
+                    @if(auth()->user()->checkPermission('View Settings'))
                         <dfn data-info="This is the default store, where all activities will be based on."><a
                                 href="{{route('configurations.index')}}"> @if(session()->get('store') !== "Please Set Store")
                                     <span class="badge badge-info">Welcome, {{session()->get('store')}}</span> @else
@@ -203,7 +203,7 @@
                                     <span class="badge badge-info">Welcome, {{session()->get('store')}}</span> @else
                                     <span
                                         class="badge badge-danger">Please Set Default Store</span> @endif</a></dfn>
-                    @endcan
+                    @endif
                 </div>
             </li>
             <li>

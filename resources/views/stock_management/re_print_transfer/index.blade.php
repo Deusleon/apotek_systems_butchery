@@ -129,11 +129,11 @@
                                             <button id='show-info' class='btn btn-sm btn-rounded btn-success'
                                                     type='button'>Show
                                             </button>
-                                            @can('View Stock Transfer Re-Print')
+                                            @if(auth()->user()->checkPermission('View Stock Transfer Re-Print'))
                                                 <button id='print' class='btn btn-sm btn-rounded btn-secondary'><span
                                                         class='fa fa-print' aria-hidden='true'></span>Print
                                                 </button>
-                                            @endcan
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach

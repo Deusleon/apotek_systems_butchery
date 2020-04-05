@@ -78,14 +78,14 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
-                                @can('Add Expenses')
+                                @if(auth()->user()->checkPermission('Add Expenses'))
                                     <button style="float: right;margin-bottom: 7%;" type="button"
                                             class="btn btn-secondary btn-sm"
                                             data-toggle="modal"
                                             data-target="#create">
                                         Add Expense
                                     </button>
-                                @endcan
+                                @endif
                             </div>
                         </div>
                     </div>

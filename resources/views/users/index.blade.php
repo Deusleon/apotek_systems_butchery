@@ -24,12 +24,12 @@
 
 
             <div class="card-body">
-                @can('Manage Users')
+                @if(auth()->user()->checkPermission('Manage Users'))
                     <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-secondary btn-sm"
                             data-toggle="modal" data-target="#register">
                         Add User
                     </button>
-                @endcan
+                @endif
                 <div class="table-responsive">
                     <table id="fixed-header" class="display table nowrap table-striped table-hover" style="width:100%">
                         <thead>
@@ -40,9 +40,9 @@
                             <th>Role</th>
                             <th>Position</th>
                             <th>Status</th>
-                            @can('Manage Users')
+                            @if(auth()->user()->checkPermission('Manage Users'))
                                 <th>Actions</th>
-                            @endcan
+                            @endif
                         </tr>
                         </thead>
                         <tbody>
@@ -65,7 +65,7 @@
                                     @endif
                                 </td>
 
-                                @can('Manage Users')
+                                @if(auth()->user()->checkPermission('Manage Users'))
                                     <td style='white-space: nowrap'>
                                         <a href="#">
                                             <button class="btn btn-primary btn-sm btn-rounded"
@@ -96,8 +96,23 @@
                                                 </button>
                                             </a>
                                         @endif
+
+                                        <div class="btn-group">
+                                            <button type="button" class="btn" data-toggle="dropdown"
+                                                    aria-haspopup="true" aria-expanded="false">
+                                                <i class="feather icon-more-horizontal"></i>
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                <a id="reset_btn" href="{{ route('password.reset.admin') }}">
+                                                    <button class="dropdown-item "><span
+                                                            class="feather feather icon-unlock"></span> Reset Password
+                                                    </button>
+                                                </a>
+                                            </div>
+                                        </div>
+
                                     </td>
-                                @endcan
+                                @endif
                             </tr>
                         @endforeach
 
@@ -189,6 +204,7 @@
 
 
         });
+
     </script>
 
 @endpush

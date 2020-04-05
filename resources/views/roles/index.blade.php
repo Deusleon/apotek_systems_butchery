@@ -24,22 +24,22 @@
 
 
             <div class="card-body">
-                @can('Manage Roles')
+                @if(auth()->user()->checkPermission('Manage Roles'))
                     <a href="{{route('roles.create')}}">
                         <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-secondary btn-sm">
                             Add Role
                         </button>
                     </a>
-                @endcan
+                @endif
                 <div class="table-responsive">
                     <table id="fixed-header" class="display table nowrap table-striped table-hover" style="width:100%">
                         <thead>
                         <tr>
                             <th>Name</th>
                             <th>Description</th>
-                            @can('Manage Roles')
+                            @if(auth()->user()->checkPermission('Manage Roles'))
                                 <th>Actions</th>
-                            @endcan
+                            @endif
                         </tr>
                         </thead>
                         <tbody>
@@ -47,7 +47,7 @@
                             <tr>
                                 <td>{{$role->name}}</td>
                                 <td>{{$role->description}}</td>
-                                @can('Manage Roles')
+                                @if(auth()->user()->checkPermission('Manage Roles'))
                                     <td>
                                         <a href="{{route('roles.edit',$role->id)}}">
                                             <button class="btn btn-primary btn-rounded btn-sm" type="button">Edit
@@ -60,7 +60,7 @@
                                             </button>
                                         </a>
                                     </td>
-                                @endcan
+                                @endif
                             </tr>
                         @endforeach
 

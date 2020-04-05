@@ -157,9 +157,9 @@
                             <th>Quantity</th>
                             <th>Expire Date</th>
                             <th>Batch No</th>
-                            @can('Stock Adjustment')
+                            @if(auth()->user()->checkPermission('Stock Adjustment'))
                                 <th>Actions</th>
-                            @endcan
+                            @endif
                         </tr>
                         </thead>
                         <tbody></tbody>
@@ -350,13 +350,13 @@
                     },
                     {'data': 'expiry_date'},
                     {'data': 'batch_number'},
-                        @can('Stock Adjustment')
+                        @if(auth()->user()->checkPermission('Stock Adjustment'))
                     {
                         'data': 'action',
                         defaultContent: "<div><button id='edits' class='btn btn-sm btn-rounded btn-primary' type='button'>Edit</button><button id='adjust' class='btn btn-sm btn-rounded btn-secondary' type='button'>Adjust</button></div>"
 
                     }
-                    @endcan
+                    @endif
 
                 ]
             })
