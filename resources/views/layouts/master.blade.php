@@ -165,7 +165,11 @@
 
 <!-- [ Header ] start -->
 <header class="navbar pcoded-header navbar-expand-lg navbar-light">
-    <p>{{auth()->user()->getAuthIdentifier()}}</p>
+    @if(auth()->user()->can('View Sales Management'))
+        <p>yes</p>
+    @else
+        <p>no</p>
+    @endif
     <div class="m-header">
         <a class="mobile-menu" id="mobile-collapse1" href="#!"><span></span></a>
         <a href="index.html" class="b-brand">
