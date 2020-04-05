@@ -97,20 +97,23 @@
                                             </a>
                                         @endif
 
-                                        {{--                                        <div class="btn-group">--}}
-                                        {{--                                            <button type="button" class="btn" data-toggle="dropdown"--}}
-                                        {{--                                                    aria-haspopup="true" aria-expanded="false">--}}
-                                        {{--                                                <i class="feather icon-more-horizontal"></i>--}}
-                                        {{--                                            </button>--}}
-                                        {{--                                            <div class="dropdown-menu">--}}
-                                        {{--                                                <a id="reset_btn" href="{{ route('password.reset.admin') }}">--}}
-                                        {{--                                                    <button class="dropdown-item "><span--}}
-                                        {{--                                                            class="feather feather icon-unlock"></span> Reset Password--}}
-                                        {{--                                                    </button>--}}
-                                        {{--                                                </a>--}}
-                                        {{--                                            </div>--}}
-                                        {{--                                        </div>--}}
-
+                                        @if(auth()->user()->isAdmin('admin'))
+                                            <div class="btn-group">
+                                                <button type="button" class="btn" data-toggle="dropdown"
+                                                        aria-haspopup="true" aria-expanded="false">
+                                                    <i class="feather icon-more-horizontal"></i>
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    <a id="reset_btn"
+                                                       href="{{ route('password.reset.admin', $user->email) }}">
+                                                        <button class="dropdown-item "><span
+                                                                class="feather feather icon-unlock"></span> Reset
+                                                            Password
+                                                        </button>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        @endif
                                     </td>
                                 @endif
                             </tr>

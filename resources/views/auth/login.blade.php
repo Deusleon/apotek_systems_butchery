@@ -52,7 +52,7 @@
                     <div class="input-group mb-4">
                         <input id="password" type="password"
                                class="form-control @error('password') is-invalid @enderror" name="password" required
-                               autocomplete="current-password" placeholder="password">
+                               autocomplete="current-password" placeholder="Password">
 
                         @error('password')
                         <span class="invalid-feedback" role="alert">
@@ -62,7 +62,7 @@
                     </div>
                     <div class="input-group mb-4">
                         <input id="facility" type="text"
-                               class="form-control" name="facility" required placeholder="business name">
+                               class="form-control" name="facility" required placeholder="Business Name">
                     </div>
                     {{--                    <div style="margin-top: -6%;">--}}
                     {{--                        @if($errors->any())--}}
@@ -85,7 +85,8 @@
 
                     @if (Route::has('password.request'))
 
-                        <p class="mb-2 text-muted">Forgot password? <a href="{{ route('password.request') }}">Reset</a>
+                        {{--                        {{ route('password.request') }}--}}
+                        <p class="mb-2 text-muted">Forgot password? <a href="#">Reset</a>
                         </p>
 
                     @endif

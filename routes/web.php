@@ -349,6 +349,8 @@ Route::middleware(["auth"])->group(function () {
     Route::post('user-profile/update', 'UserController@updateProfile')->name("update-profile");
     Route::get('users/search', 'UserController@search')->name("users.search");
     Route::post('users/user-role-id', 'UserController@getRoleID')->name('getRoleID');
+    Route::get('users/password-reset/{email}', 'UserController@passwordReset')->name("password.reset.admin");
+    Route::post('users/password-reset/update', 'UserController@passwordResetUpdate')->name("password.admin.update");
 
 
     /*file import route*/

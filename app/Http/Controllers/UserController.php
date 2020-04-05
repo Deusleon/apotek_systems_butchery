@@ -102,5 +102,21 @@ class UserController extends Controller
         return $data[0]->id;
     }
 
+    public function passwordReset($email)
+    {
+        $token = csrf_token();
+        return view('auth.passwords.admin_reset', compact('token', 'email'));
+    }
+
+    public function passwordResetUpdate(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        session()->flash("alert-success", "User password reset successfully!");
+        return redirect()->route('users.index');
+    }
+
 
 }

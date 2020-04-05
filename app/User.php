@@ -104,4 +104,20 @@ class User extends Authenticatable
         }
     }
 
+    public function isAdmin($role_name)
+    {
+
+        $role = DB::table('roles')
+            ->join('model_has_roles', 'model_has_roles.role_id', 'roles.id')
+            ->where('roles.name', $role_name)
+            ->where('model_id', Auth::user()->id)
+            ->get();
+
+        if ($role->isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
 }
