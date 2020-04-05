@@ -165,6 +165,7 @@
 
 <!-- [ Header ] start -->
 <header class="navbar pcoded-header navbar-expand-lg navbar-light">
+    <p>{{auth()->user()->getAuthIdentifier()}}</p>
     <div class="m-header">
         <a class="mobile-menu" id="mobile-collapse1" href="#!"><span></span></a>
         <a href="index.html" class="b-brand">
