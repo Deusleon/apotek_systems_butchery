@@ -165,11 +165,11 @@
 
 <!-- [ Header ] start -->
 <header class="navbar pcoded-header navbar-expand-lg navbar-light">
-    @if(auth()->user()->checkPermission(100))
-        <p>yes</p>
-    @else
-        <p>no</p>
-    @endif
+    {{--    @if(auth()->user()->checkPermission(100))--}}
+    {{--        <p>yes</p>--}}
+    {{--    @else--}}
+    {{--        <p>no</p>--}}
+    {{--    @endif--}}
     <div class="m-header">
         <a class="mobile-menu" id="mobile-collapse1" href="#!"><span></span></a>
         <a href="index.html" class="b-brand">

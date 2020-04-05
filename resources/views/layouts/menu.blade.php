@@ -3,12 +3,12 @@
 </li>
 
 <li class="nav-item pcoded-hasmenu">
-    @if(auth()->user()->can('View Sales Management'))
+    @if(auth()->user()->checkPermission(100))
         <a href="#!" class="nav-link"><span class="pcoded-micon"><i class="fas fa-money-check-alt"></i></span>
             <span class="pcoded-mtext">Sales</span>
         </a>
         <ul class="pcoded-submenu">
-            @if(auth()->user()->can('Cash Sales'))
+            @if(auth()->user()->checkPermission(101))
                 <li class=""><a href="{{route('cash-sales.cashSale')}}" class="">Point of Sale</a></li>
             @endif
             @if(auth()->user()->can('Credit Sales'))
