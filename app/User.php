@@ -4,6 +4,8 @@ namespace App;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
@@ -83,6 +85,22 @@ class User extends Authenticatable
     public function goodsReceiving()
     {
         return $this->hasMany(GoodsReceiving::class, 'created_by');
+    }
+
+    public function checkPermission($permission_id)
+    {
+
+        $permission = DB::table('role_has_permissions')
+            ->join('model_has_roles', 'model_has_roles.role_id', '=', 'role_has_permissions.role_id')
+            ->where('permission_id', $permission_id)
+            ->where('model_id', Auth::user()->id)
+            ->get();
+
+        if ($permission->isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }

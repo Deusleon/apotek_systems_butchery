@@ -165,7 +165,7 @@
 
 <!-- [ Header ] start -->
 <header class="navbar pcoded-header navbar-expand-lg navbar-light">
-    @if(auth()->user()->hasPermissionTo(100))
+    @if(auth()->user()->checkPermission(100))
         <p>yes</p>
     @else
         <p>no</p>
