@@ -95,7 +95,7 @@
                         <div class="col-md-4">
                             <div id="range">
                                 <label for="filter">Date<font color="red">*</font></label>
-                                <input type="text" class="form-control" name="date_range" id="daterange"/>
+                                <input type="text" class="form-control" name="date_range" id="daterange" readonly/>
                             </div>
                             <div id="price_category" style="display: none">
                                 <label for="product">Price Category<font color="red">*</font></label>

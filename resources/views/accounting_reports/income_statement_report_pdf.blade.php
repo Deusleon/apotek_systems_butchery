@@ -6,7 +6,11 @@
     <style>
 
         body {
-            /*font-size: 30px;*/
+            font-size: 12px;
+        }
+
+        * {
+            font-family: Verdana, Arial, sans-serif;
         }
 
         table, th, td {
@@ -75,76 +79,134 @@
             font-weight: normal;
         }
 
+        .full-row {
+            width: 100%;
+            padding-left: 3%;
+            padding-right: 2%;
+        }
+
+        .col-50 {
+            display: inline-block;
+            font-size: 13px;
+            width: 50%;
+        }
+
+        .col-25 {
+            display: inline-block;
+            font-size: 13px;
+            width: 25%;
+        }
+
+        .col-35 {
+            display: inline-block;
+            font-size: 13px;
+            width: 35%;
+        }
+
+        .col-15 {
+            display: inline-block;
+            font-size: 13px;
+            width: 15%;
+        }
+
     </style>
 
 </head>
 <body>
 
-<h4 align="center">{{$pharmacy['name']}}</h4>
-<h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
-<h2 align="center" style="margin-top: -2%">Income Statement Report</h2>
-<div class="row" style="margin-top: 10%;">
-    <div class="col-md-12">
-        <table id="table-detail-main">
-            <tr>
-                <td style="background: #1f273b; color: white"><b>From
-                        Date:</b> {{date('d-m-Y',strtotime($data->first()->from))}}</td>
-                <td style="background: #1f273b; color: white"><b>To
-                        Date:</b> {{date('d-m-Y',strtotime($data->first()->to))}}</td>
-            </tr>
-        </table>
-        <table id="table-detail" align="center">
-            <!-- loop the product names here -->
-            <thead>
-            <tr style="background: #1f273b; color: white;">
-                <th>Sales</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tr>
-                <td align="right">Sale Amount</td>
-                <td align="right">{{number_format($data->last()->total_sell,2)}}</td>
-            </tr>
-        </table>
-        <hr>
-        <div style="margin-left: 70%;width: 29.6%;background: #f2f2f2;margin-top: 2%; padding: 1%"><b>Total Sell: </b>
+<div class="row" style="padding-top: -2%">
+    <h1 align="center">{{$pharmacy['name']}}</h1>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
+    <h2 align="center" style="margin-top: -1%">Income Statement Report</h2>
+    <div class="row" style="margin-top: 10%;">
+        <div class="col-md-12">
+            <table id="table-detail-main">
+                <tr>
+                    <td style="background: #1f273b; color: white"><b>From
+                            Date:</b> {{date('d-m-Y',strtotime($data->first()->from))}}</td>
+                    <td style="background: #1f273b; color: white"><b>To
+                            Date:</b> {{date('d-m-Y',strtotime($data->first()->to))}}</td>
+                </tr>
+            </table>
+            <table id="table-detail" align="center">
+                <!-- loop the product names here -->
+                <thead>
+                <tr style="background: #1f273b; color: white;">
+                    <th>Sales</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tr>
+                    <td align="right">Sale Amount</td>
+                    <td align="right">{{number_format($data->last()->total_sell,2)}}</td>
+                </tr>
+            </table>
+            <hr>
+
+            <div class="full-row" style="padding-top: 1%">
+                <div class="col-35">
+                    <div class="full-row">
+                    </div>
+
+                </div>
+                <div class="col-15"></div>
+                <div class="col-25"></div>
+                <div class="col-25">
+                    <div class="full-row">
+                        <div class="col-50" align="left"><b>Total Sell: </b></div>
+                        <div class="col-50"
+                             align="right">{{number_format($data->last()->total_sell,2)}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <table id="table-detail-1" align="center">
+                <!-- loop the product names here -->
+                <thead>
+                <tr style="background: #1f273b; color: white;">
+                    <th>Cost of Sales</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tr>
+                    <td align="right">Buy Amount</td>
+                    <td align="right">{{number_format($data->last()->total_buy,2)}}</td>
+                </tr>
+            </table>
+            <hr>
+
+            <div class="full-row" style="padding-top: 1%">
+                <div class="col-35">
+                    <div class="full-row">
+                    </div>
+
+                </div>
+                <div class="col-15"></div>
+                <div class="col-25"></div>
+                <div class="col-25">
+                    <div class="full-row">
+                        <div class="col-50" align="left"><b>Total Buy: </b></div>
+                        <div class="col-50"
+                             align="right">{{number_format($data->last()->total_buy,2)}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <hr style="margin-top: 3%">
+            <table id="table-detail-2" align="center">
+                <!-- loop the product names here -->
+                <tr>
+                    <td align="right">Net Income (Total Sell - Total Buy - Expenses)</td>
+                    <td align="right">{{number_format(($data->last()->total_sell) - ($data->last()->total_buy) - ($data->last()->expense_amount),2)}}</td>
+                </tr>
+            </table>
         </div>
-        <div align="right"
-             style="margin-top: -10%; padding-top: 1%; padding-left: 1%">
-            {{number_format($data->last()->total_sell,2)}}</div>
 
-
-        <table id="table-detail-1" align="center">
-            <!-- loop the product names here -->
-            <thead>
-            <tr style="background: #1f273b; color: white;">
-                <th>Cost of Sales</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tr>
-                <td align="right">Buy Amount</td>
-                <td align="right">{{number_format($data->last()->total_buy,2)}}</td>
-            </tr>
-        </table>
-        <hr>
-        <div style="margin-left: 70%;width: 29.6%;background: #f2f2f2;margin-top: 2%; padding: 1%"><b>Total Buy: </b>
-        </div>
-        <div align="right"
-             style="margin-top: -10%; padding-top: 1%; padding-left: 1%">
-            {{number_format($data->last()->total_buy,2)}}</div>
-
-        <hr style="margin-top: 3%">
-        <table id="table-detail-2" align="center">
-            <!-- loop the product names here -->
-            <tr>
-                <td align="right">Net Income (Total Sell - Total Buy - Expenses)</td>
-                <td align="right">{{number_format(($data->last()->total_sell) - ($data->last()->total_buy) - ($data->last()->expense_amount),2)}}</td>
-            </tr>
-        </table>
     </div>
-
 </div>
+
 
 <script type="text/php">
     if ( isset($pdf) ) {

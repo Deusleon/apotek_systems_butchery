@@ -104,7 +104,8 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Date</label>
-                                    <input type="text" name="expire_dates" class="form-control" id="receive_date2">
+                                    <input type="text" name="expire_dates" class="form-control" id="receive_date2"
+                                           readonly>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -138,7 +139,8 @@
                                 <div class="form-group">
 
                                     <label>Date</label>
-                                    <input type="text" name="expire_date" class="form-control" id="receive_date">
+                                    <input type="text" name="expire_date" class="form-control" id="receive_date"
+                                           readonly>
                                 </div>
                             </div>
                             <div class="col-md-2">
