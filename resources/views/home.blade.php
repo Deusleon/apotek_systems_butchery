@@ -17,6 +17,36 @@
             height: 400px;
         }
 
+        #daily_purchase {
+            width: 100%;
+            height: 500px;
+        }
+
+        #monthly_purchase {
+            width: 100%;
+            height: 400px;
+        }
+
+        #purchase_by_category {
+            width: 100%;
+            height: 400px;
+        }
+
+        #daily_expense {
+            width: 100%;
+            height: 500px;
+        }
+
+        #monthly_expense {
+            width: 100%;
+            height: 400px;
+        }
+
+        #expense_by_category {
+            width: 100%;
+            height: 400px;
+        }
+
         .container {
             max-width: 900px;
             margin: 0 auto;
@@ -77,10 +107,19 @@
                 <a class="nav-link" data-toggle="pill" href="#pills-stock" role="tab" aria-selected="false">Stock
                     Summary</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="pill" href="#pills-purchase" role="tab" aria-selected="false">Purchase
+                    Summary</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="pill" href="#pills-expense" role="tab" aria-selected="false">Expense
+                    Summary</a>
+            </li>
 
         </ul>
 
         <div class="tab-content" id="pills-tabContent">
+            {{-- Tab 1 --}}
             <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
                 {{-- row 1 start --}}
                 <div class="row">
@@ -92,7 +131,7 @@
                                 <div class="row d-flex align-items-center">
                                     <div class="col-9">
                                         <h3 class="f-w-300 d-flex align-items-center m-b-0">
-                                            Tshs {{ number_format($avgDailySales, 2) }}</h3>
+                                            Tshs {{ number_format($pharmacy_data['avgDailySales'], 2) }}</h3>
                                     </div>
                                 </div>
 
@@ -109,13 +148,13 @@
                                 <div class="row d-flex align-items-center">
                                     <div class="col-9">
                                         <h3 class="f-w-300 d-flex align-items-center  m-b-0">
-                                            @if ($todaySales > $avgDailySales)
+                                            @if ($pharmacy_data['todaySales'] > $pharmacy_data['avgDailySales'])
                                                 <i class="feather icon-arrow-up text-c-green f-30 m-r-10"></i>
                                             @else
                                                 <i class="feather icon-arrow-down text-c-red f-30 m-r-10"></i>
                                             @endif
 
-                                            Tshs {{ number_format($todaySales, 2) }}
+                                            Tshs {{ number_format($pharmacy_data['todaySales'], 2) }}
 
                                         </h3>
                                     </div>
@@ -135,7 +174,7 @@
                                 <div class="row d-flex align-items-center">
                                     <div class="col-9">
                                         <h3 class="f-w-300 d-flex align-items-center  m-b-0">
-                                            Tshs {{ number_format($avgDailySales * 30,2) }}</h3>
+                                            Tshs {{ number_format($pharmacy_data['avgDailySales'] * 30,2) }}</h3>
                                     </div>
 
                                 </div>
@@ -168,8 +207,7 @@
                 </div>
 
             </div>
-            {{-- /Tab 1 --}}
-
+            {{-- end Tab 1 --}}
 
             {{-- Tab 2 --}}
             <div class="tab-pane fade" id="pills-stock" role="tabpanel" aria-labelledby="pills-stock-tab">
@@ -290,10 +328,189 @@
 
                 </div>
             </div>
-            {{-- row ends --}}
+            {{-- end Tab 2 --}}
+
+            {{-- Tab 3 --}}
+            <div class="tab-pane fade" id="pills-purchase" role="tabpanel" aria-labelledby="pills-purchase-tab">
+                {{--                 row 1 start--}}
+                <div class="row">
+                    <!-- [ Today purchase section ] start -->
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card">
+                            <div class="card-block">
+                                <h6 class="mb-4">Average Daily Purchases</h6>
+                                <div class="row d-flex align-items-center">
+                                    <div class="col-9">
+                                        <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                            Tshs {{ number_format($purchase_data['avgDailyPurchases'], 2) }}</h3>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ Today purchase section ] end -->
+
+                    <!-- [ This week purchase section ] start -->
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card">
+                            <div class="card-block">
+                                <h6 class="mb-4">Today Purchases</h6>
+                                <div class="row d-flex align-items-center">
+                                    <div class="col-9">
+                                        <h3 class="f-w-300 d-flex align-items-center  m-b-0">
+                                            @if ($purchase_data['todayPurchases'] > $purchase_data['avgDailyPurchases'])
+                                                <i class="feather icon-arrow-up text-c-green f-30 m-r-10"></i>
+                                            @else
+                                                <i class="feather icon-arrow-down text-c-red f-30 m-r-10"></i>
+                                            @endif
+
+                                            Tshs {{ number_format($purchase_data['todayPurchases'], 2) }}
+
+                                        </h3>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ This week  purchase section ] end -->
+
+                    <!-- [ This month purchase section ] start -->
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card">
+                            <div class="card-block">
+                                <h6 class="mb-4">Average Monthly Purchases</h6>
+                                <div class="row d-flex align-items-center">
+                                    <div class="col-9">
+                                        <h3 class="f-w-300 d-flex align-items-center  m-b-0">
+                                            Tshs {{ number_format($purchase_data['avgDailyPurchases'] * 30,2) }}</h3>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ this month  purchase section ] end -->
+
+                </div>
+                {{--                 row 1 end--}}
+
+
+                {{--                 row 2 start--}}
+                <div class="row">
+                    <div class="col-md-12 col-xl-12">
+                        <div id='monthly_purchase'></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-xl-12">
+                        <div id='purchase_by_category'></div>
+                    </div>
+                </div>
+
+                {{--                 row 3 start--}}
+                <div class="row">
+                    <div id='daily_purchase'></div>
+                </div>
+
+            </div>
+            {{-- end Tab 3 --}}
+
+            {{-- Tab 4 --}}
+            <div class="tab-pane fade" id="pills-expense" role="tabpanel" aria-labelledby="pills-expense-tab">
+                {{--                 row 1 start--}}
+                <div class="row">
+                    <!-- [ Today expense section ] start -->
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card">
+                            <div class="card-block">
+                                <h6 class="mb-4">Average Daily Expenses</h6>
+                                <div class="row d-flex align-items-center">
+                                    <div class="col-9">
+                                        <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                            Tshs {{ number_format($expense_data['avgDailyExpenses'], 2) }}</h3>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ Today expense section ] end -->
+
+                    <!-- [ This week expense section ] start -->
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card">
+                            <div class="card-block">
+                                <h6 class="mb-4">Today Expenses</h6>
+                                <div class="row d-flex align-items-center">
+                                    <div class="col-9">
+                                        <h3 class="f-w-300 d-flex align-items-center  m-b-0">
+                                            @if ($expense_data['todayExpenses'] > $expense_data['avgDailyExpenses'])
+                                                <i class="feather icon-arrow-up text-c-green f-30 m-r-10"></i>
+                                            @else
+                                                <i class="feather icon-arrow-down text-c-red f-30 m-r-10"></i>
+                                            @endif
+
+                                            Tshs {{ number_format($expense_data['todayExpenses'], 2) }}
+
+                                        </h3>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ This week  expense section ] end -->
+
+                    <!-- [ This month expense section ] start -->
+                    <div class="col-md-6 col-xl-4">
+                        <div class="card">
+                            <div class="card-block">
+                                <h6 class="mb-4">Average Monthly Expenses</h6>
+                                <div class="row d-flex align-items-center">
+                                    <div class="col-9">
+                                        <h3 class="f-w-300 d-flex align-items-center  m-b-0">
+                                            Tshs {{ number_format($expense_data['avgDailyExpenses'] * 30,2) }}</h3>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- [ this month  expense section ] end -->
+
+                </div>
+                {{--                 row 1 end--}}
+
+
+                {{--                 row 2 start--}}
+                <div class="row">
+                    <div class="col-md-12 col-xl-12">
+                        <div id='monthly_expense'></div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-xl-12">
+                        <div id='expense_by_category'></div>
+                    </div>
+                </div>
+
+                {{--                 row 3 start--}}
+                <div class="row">
+                    <div id='daily_expense'></div>
+                </div>
+
+            </div>
+            {{-- end Tab 4 --}}
 
         </div>
-        {{-- /Tab 2 --}}
 
     </div>
     </div>
@@ -419,214 +636,223 @@
 
     </script>
 
-
     <script>
+        $(document).ready(function () {
 
-        $('#fast_moving').DataTable({
-            searching: true,
-            bPaginate: true,
+            totalByMonthChart(@json(($pharmacy_data['total_monthly'])), "Total Sales By Month", "monthly_sales");
+            totalByMonthChart(@json(($purchase_data['total_monthly'])), "Total Purchases By Month", "monthly_purchase");
+            totalByMonthChart(@json(($expense_data['total_monthly'])), "Total Expenses By Month", "monthly_expense");
+
+            byCategoryChart(@json($pharmacy_data['salesByCategory']), "Total Sales By Category", "sales_by_category");
+            byCategoryChart(@json($purchase_data['purchasesByCategory']), "Total Purchases By Category", "purchase_by_category");
+            byCategoryChart(@json($expense_data['expensesByCategory']), "Total Expenses By Category", "expense_by_category");
+
+            totalDailyChart(@json($pharmacy_data['totalDailySales']), "Total Daily Sales", "daily_sales");
+            totalDailyChart(@json($purchase_data['totalDailyPurchases']), "Total Daily Purchases", "daily_purchase");
+            totalDailyChart(@json($expense_data['totalDailyExpenses']), "Total Daily Expenses", "daily_expense");
         });
-
-
-        // Themes begin
-        am4core.useTheme(am4themes_animated);
-        // Themes end
-
-        // Create chart instance
-        var chart = am4core.create("daily_sales", am4charts.XYChart);
-
-        // Add data
-        chart.data = @json($totalDailySales);
-
-        // Set input format for the dates
-        chart.dateFormatter.inputDateFormat = "dd-MM-yyyy";
-
-        // Create axes
-        var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
-        var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-
-        //title
-        var title = chart.titles.create();
-        title.text = "Total Daily Sales";
-        title.fontSize = 16;
-        title.marginBottom = 15;
-
-        // Create series
-        var series = chart.series.push(new am4charts.LineSeries());
-        series.dataFields.valueY = "value";
-        series.dataFields.dateX = "date";
-        series.tooltipText = "{value}";
-        series.strokeWidth = 2;
-        series.minBulletDistance = 5;
-        series.fillOpacity = 0.3;
-
-
-        // Drop-shaped tooltips
-        series.tooltip.background.cornerRadius = 20;
-        series.tooltip.background.strokeOpacity = 0;
-        series.tooltip.pointerOrientation = "vertical";
-        series.tooltip.label.minWidth = 40;
-        series.tooltip.label.minHeight = 40;
-        series.tooltip.label.textAlign = "middle";
-        series.tooltip.label.textValign = "middle";
-
-        // Make bullets grow on hover
-        var bullet = series.bullets.push(new am4charts.CircleBullet());
-        bullet.circle.strokeWidth = 2;
-        bullet.circle.radius = 4;
-        bullet.circle.fill = am4core.color("#fff");
-
-        var bullethover = bullet.states.create("hover");
-        bullethover.properties.scale = 1.3;
-
-        // Make a panning cursor
-        chart.cursor = new am4charts.XYCursor();
-        chart.cursor.behavior = "panXY";
-        chart.cursor.xAxis = dateAxis;
-        chart.cursor.snapToSeries = series;
-
-        // Create vertical scrollbar and place it before the value axis
-        chart.scrollbarY = new am4core.Scrollbar();
-        chart.scrollbarY.parent = chart.leftAxesContainer;
-        chart.scrollbarY.toBack();
-
-        // Create a horizontal scrollbar with previe and place it underneath the date axis
-        chart.scrollbarX = new am4charts.XYChartScrollbar();
-        chart.scrollbarX.series.push(series);
-        chart.scrollbarX.parent = chart.bottomAxesContainer;
-
-        chart.events.on("ready", function () {
-            dateAxis.zoom({start: 0.79, end: 1});
-        });
-
     </script>
 
-    <!-- Total MOnthly Sales chart -->
     <script>
-        am4core.ready(function () {
+        function totalByMonthChart(data, chart_title, chart_id) {
+            am4core.ready(function () {
 
+                // Themes begin
+                am4core.useTheme(am4themes_animated);
+                // Themes end
+
+                // Create chart instance
+                var chart = am4core.create(chart_id, am4charts.XYChart);
+                chart.scrollbarX = new am4core.Scrollbar();
+
+                // Add data
+                chart.data = data;
+
+
+                //title
+                var title = chart.titles.create();
+                title.text = chart_title;
+                title.fontSize = 16;
+                title.marginBottom = 15;
+                // Create axes
+                var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+                categoryAxis.dataFields.category = "month";
+                categoryAxis.renderer.grid.template.location = 0;
+                categoryAxis.renderer.minGridDistance = 30;
+                categoryAxis.renderer.labels.template.horizontalCenter = "right";
+                categoryAxis.renderer.labels.template.verticalCenter = "middle";
+                categoryAxis.renderer.labels.template.rotation = 270;
+                categoryAxis.tooltip.disabled = true;
+                categoryAxis.renderer.minHeight = 110;
+
+                var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+                valueAxis.renderer.minWidth = 50;
+
+                // Create series
+                var series = chart.series.push(new am4charts.ColumnSeries());
+                series.sequencedInterpolation = true;
+                series.dataFields.valueY = "amount";
+                series.dataFields.categoryX = "month";
+                series.tooltipText = "[{categoryX}: bold]{valueY}[/]";
+                series.columns.template.strokeWidth = 0;
+
+                series.tooltip.pointerOrientation = "vertical";
+
+                series.columns.template.column.cornerRadiusTopLeft = 10;
+                series.columns.template.column.cornerRadiusTopRight = 10;
+                series.columns.template.column.fillOpacity = 0.8;
+
+                // on hover, make corner radiuses bigger
+                var hoverState = series.columns.template.column.states.create("hover");
+                hoverState.properties.cornerRadiusTopLeft = 0;
+                hoverState.properties.cornerRadiusTopRight = 0;
+                hoverState.properties.fillOpacity = 1;
+
+                series.columns.template.adapter.add("fill", function (fill, target) {
+                    return chart.colors.getIndex(target.dataItem.index);
+                });
+
+                // Cursor
+                chart.cursor = new am4charts.XYCursor();
+
+            });
+        }
+
+        function byCategoryChart(data, chart_title, chart_id) {
+            am4core.ready(function () {
+
+                // Themes begin
+                am4core.useTheme(am4themes_animated);
+                // Themes end
+
+                // Create chart instance
+                var chart = am4core.create(chart_id, am4charts.PieChart);
+
+                // Add and configure Series
+                var pieSeries = chart.series.push(new am4charts.PieSeries());
+                pieSeries.dataFields.value = "amount";
+                pieSeries.dataFields.category = "category";
+
+                // Let's cut a hole in our Pie chart the size of 30% the radius
+                chart.innerRadius = am4core.percent(30);
+
+                //title
+                var title = chart.titles.create();
+                title.text = chart_title;
+                title.fontSize = 16;
+                title.marginBottom = 15;
+
+                // Put a thick white border around each Slice
+                pieSeries.slices.template.stroke = am4core.color("#fff");
+                pieSeries.slices.template.strokeWidth = 2;
+                pieSeries.slices.template.strokeOpacity = 1;
+                pieSeries.slices.template
+                    // change the cursor on hover to make it apparent the object can be interacted with
+                    .cursorOverStyle = [
+                    {
+                        "property": "cursor",
+                        "value": "pointer"
+                    }
+                ];
+
+                pieSeries.alignLabels = true;
+                pieSeries.labels.template.bent = true;
+                pieSeries.labels.template.radius = 3;
+                pieSeries.labels.template.padding(0, 0, 0, 0);
+
+                pieSeries.ticks.template.disabled = false;
+
+                // Create a base filter effect (as if it's not there) for the hover to return to
+                var shadow = pieSeries.slices.template.filters.push(new am4core.DropShadowFilter);
+                shadow.opacity = 0;
+
+                // Create hover state
+                var hoverState = pieSeries.slices.template.states.getKey("hover"); // normally we have to create the hover state, in this case it already exists
+
+                // Slightly shift the shadow and make it more prominent on hover
+                var hoverShadow = hoverState.filters.push(new am4core.DropShadowFilter);
+                hoverShadow.opacity = 0.7;
+                hoverShadow.blur = 5;
+
+
+                chart.data = data;
+
+            });
+        }
+
+        function totalDailyChart(data, chart_title, chart_id) {
             // Themes begin
             am4core.useTheme(am4themes_animated);
             // Themes end
 
             // Create chart instance
-            var chart = am4core.create("monthly_sales", am4charts.XYChart);
-            chart.scrollbarX = new am4core.Scrollbar();
+            var chart = am4core.create(chart_id, am4charts.XYChart);
 
             // Add data
-            chart.data = @json($totalMonthlySales);
+            chart.data = data;
 
+            // Set input format for the dates
+            chart.dateFormatter.inputDateFormat = "dd-MM-yyyy";
+
+            // Create axes
+            var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+            var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
 
             //title
             var title = chart.titles.create();
-            title.text = "Total Sales By Month";
+            title.text = chart_title;
             title.fontSize = 16;
             title.marginBottom = 15;
-            // Create axes
-            var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
-            categoryAxis.dataFields.category = "month";
-            categoryAxis.renderer.grid.template.location = 0;
-            categoryAxis.renderer.minGridDistance = 30;
-            categoryAxis.renderer.labels.template.horizontalCenter = "right";
-            categoryAxis.renderer.labels.template.verticalCenter = "middle";
-            categoryAxis.renderer.labels.template.rotation = 270;
-            categoryAxis.tooltip.disabled = true;
-            categoryAxis.renderer.minHeight = 110;
-
-            var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-            valueAxis.renderer.minWidth = 50;
 
             // Create series
-            var series = chart.series.push(new am4charts.ColumnSeries());
-            series.sequencedInterpolation = true;
-            series.dataFields.valueY = "amount";
-            series.dataFields.categoryX = "month";
-            series.tooltipText = "[{categoryX}: bold]{valueY}[/]";
-            series.columns.template.strokeWidth = 0;
+            var series = chart.series.push(new am4charts.LineSeries());
+            series.dataFields.valueY = "value";
+            series.dataFields.dateX = "date";
+            series.tooltipText = "{value}";
+            series.strokeWidth = 2;
+            series.minBulletDistance = 5;
+            series.fillOpacity = 0.3;
 
+
+            // Drop-shaped tooltips
+            series.tooltip.background.cornerRadius = 20;
+            series.tooltip.background.strokeOpacity = 0;
             series.tooltip.pointerOrientation = "vertical";
+            series.tooltip.label.minWidth = 40;
+            series.tooltip.label.minHeight = 40;
+            series.tooltip.label.textAlign = "middle";
+            series.tooltip.label.textValign = "middle";
 
-            series.columns.template.column.cornerRadiusTopLeft = 10;
-            series.columns.template.column.cornerRadiusTopRight = 10;
-            series.columns.template.column.fillOpacity = 0.8;
+            // Make bullets grow on hover
+            var bullet = series.bullets.push(new am4charts.CircleBullet());
+            bullet.circle.strokeWidth = 2;
+            bullet.circle.radius = 4;
+            bullet.circle.fill = am4core.color("#fff");
 
-            // on hover, make corner radiuses bigger
-            var hoverState = series.columns.template.column.states.create("hover");
-            hoverState.properties.cornerRadiusTopLeft = 0;
-            hoverState.properties.cornerRadiusTopRight = 0;
-            hoverState.properties.fillOpacity = 1;
+            var bullethover = bullet.states.create("hover");
+            bullethover.properties.scale = 1.3;
 
-            series.columns.template.adapter.add("fill", function (fill, target) {
-                return chart.colors.getIndex(target.dataItem.index);
-            });
-
-            // Cursor
+            // Make a panning cursor
             chart.cursor = new am4charts.XYCursor();
+            chart.cursor.behavior = "panXY";
+            chart.cursor.xAxis = dateAxis;
+            chart.cursor.snapToSeries = series;
 
-        }); // end am4core.ready()
-    </script>
+            // Create vertical scrollbar and place it before the value axis
+            chart.scrollbarY = new am4core.Scrollbar();
+            chart.scrollbarY.parent = chart.leftAxesContainer;
+            chart.scrollbarY.toBack();
 
-    <!-- Sales by Category -->
-    <script>
-        am4core.ready(function () {
+            // Create a horizontal scrollbar with previe and place it underneath the date axis
+            chart.scrollbarX = new am4charts.XYChartScrollbar();
+            chart.scrollbarX.series.push(series);
+            chart.scrollbarX.parent = chart.bottomAxesContainer;
 
-            // Themes begin
-            am4core.useTheme(am4themes_animated);
-            // Themes end
+            chart.events.on("ready", function () {
+                dateAxis.zoom({start: 0.79, end: 1});
+            });
+        }
 
-            // Create chart instance
-            var chart = am4core.create("sales_by_category", am4charts.PieChart);
-
-            // Add and configure Series
-            var pieSeries = chart.series.push(new am4charts.PieSeries());
-            pieSeries.dataFields.value = "amount";
-            pieSeries.dataFields.category = "category";
-
-            // Let's cut a hole in our Pie chart the size of 30% the radius
-            chart.innerRadius = am4core.percent(30);
-
-            //title
-            var title = chart.titles.create();
-            title.text = "Total Sales By Product Category";
-            title.fontSize = 16;
-            title.marginBottom = 15;
-
-            // Put a thick white border around each Slice
-            pieSeries.slices.template.stroke = am4core.color("#fff");
-            pieSeries.slices.template.strokeWidth = 2;
-            pieSeries.slices.template.strokeOpacity = 1;
-            pieSeries.slices.template
-                // change the cursor on hover to make it apparent the object can be interacted with
-                .cursorOverStyle = [
-                {
-                    "property": "cursor",
-                    "value": "pointer"
-                }
-            ];
-
-            pieSeries.alignLabels = true;
-            pieSeries.labels.template.bent = true;
-            pieSeries.labels.template.radius = 3;
-            pieSeries.labels.template.padding(0, 0, 0, 0);
-
-            pieSeries.ticks.template.disabled = false;
-
-            // Create a base filter effect (as if it's not there) for the hover to return to
-            var shadow = pieSeries.slices.template.filters.push(new am4core.DropShadowFilter);
-            shadow.opacity = 0;
-
-            // Create hover state
-            var hoverState = pieSeries.slices.template.states.getKey("hover"); // normally we have to create the hover state, in this case it already exists
-
-            // Slightly shift the shadow and make it more prominent on hover
-            var hoverShadow = hoverState.filters.push(new am4core.DropShadowFilter);
-            hoverShadow.opacity = 0.7;
-            hoverShadow.blur = 5;
-
-
-            chart.data = @json($salesByCategory);
-
-        }); // end am4core.ready()
     </script>
 
 @endpush

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\CommonFunctions;
 use App\CurrentStock;
+use App\Expense;
+use App\GoodsReceiving;
 use App\SalesDetail;
 use App\Setting;
 use App\Store;
@@ -78,6 +80,56 @@ class HomeController extends Controller
 
         $expired = CurrentStock::where('quantity', '>', 0)->whereRaw('expiry_date <  date(now())')->count();
 
+        $pharmacy_data = $this->pharmacyDashboard();
+        $purchase_data = $this->purchaseDashboard();
+        $expense_data = $this->expenseDashboard();
+
+        return view('home', compact('outOfStock', 'outOfStockList', 'expired', 'fast_moving', 'pharmacy_data'
+            , 'purchase_data', 'expense_data'));
+
+    }
+
+    private function fastMovingCalculation($test)
+    {
+        /*grouped data*/
+        $ungrouped_result = [];
+        $grouped_result = [];
+        foreach ($test as $value) {
+            array_push($ungrouped_result, array(
+                'receipt_number' => $value->receipt_number,
+                'product_id' => $value->product_id,
+                'product_name' => $value->product_name,
+                'occurrence' => $value->occurrence
+            ));
+        }
+
+        foreach ($ungrouped_result as $val) {
+            if (array_key_exists('receipt_number', $val)) {
+                $grouped_result[$val['receipt_number']][] = $val;
+            }
+        }
+
+        $sum_by_product_name = array();
+        $sum_by_key = new CommonFunctions();
+        foreach ($grouped_result as $value) {
+            foreach ($value as $item) {
+                $index = $sum_by_key->sumByKey($item['product_name'], $sum_by_product_name, 'product_name');
+                if ($index < 0) {
+                    $sum_by_product_name[] = $item;
+                } else {
+                    $sum_by_product_name[$index]['occurrence'] += $item['occurrence'];
+                }
+            }
+        }
+
+        return $sum_by_product_name;
+
+    }
+
+    private function pharmacyDashboard()
+    {
+        $data = array();
+
         $totalSales = SalesDetail::sum('amount');
 
         $days = DB::table('sale_details')
@@ -117,10 +169,103 @@ class HomeController extends Controller
             ->groupBy('category')
             ->get();
 
+        $data['avgDailySales'] = $avgDailySales;
+        $data['todaySales'] = $todaySales;
+        $data['totalDailySales'] = $totalDailySales;
+        $data['salesByCategory'] = $salesByCategory;
+        $data['total_monthly'] = $totalMonthlySales;
 
-// dd($salesByCategory);
-        return view('home', compact('outOfStock', 'outOfStockList', 'expired', 'avgDailySales', 'todaySales', 'totalDailySales',
-            'totalMonthlySales', 'salesByCategory', 'fast_moving'));
+
+        return $data;
+
+    }
+
+    private function purchaseDashboard()
+    {
+        $data = array();
+
+        $totalPurchases = GoodsReceiving::sum('total_cost');
+
+        $days = GoodsReceiving::select(DB::raw('date(created_at)'))
+            ->distinct()
+            ->get();
+
+        if ($days->count() == 0) {
+            $avgDailyPurchases = 0;
+        } else {
+            $avgDailyPurchases = $totalPurchases / $days->count();
+        }
+
+        $todayPurchases = GoodsReceiving::whereRaw('date(created_at) = date(now())')
+            ->sum('total_cost');
+
+        $totalDailyPurchase = GoodsReceiving::select(DB::raw('date(created_at) date, sum(total_cost) value'))
+            ->groupBy(DB::raw('date(created_at)'))
+            ->limit('60')
+            ->get();
+
+        $totalMonthlyPurchases = GoodsReceiving::select(DB::raw("DATE_FORMAT(created_at, '%b %y') month,sum(total_cost) amount"))
+            ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y%m')"))
+            ->get();
+
+        $purchasesByCategory = GoodsReceiving::select(DB::raw("(inv_categories.name) category,sum(total_cost) amount"))
+            ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
+            ->join('inv_categories', 'inv_categories.id', '=', 'inv_products.category_id')
+            ->groupBy('inv_products.category_id')
+            ->get();
+
+        $data['avgDailyPurchases'] = $avgDailyPurchases;
+        $data['todayPurchases'] = $todayPurchases;
+        $data['totalDailyPurchases'] = $totalDailyPurchase;
+        $data['purchasesByCategory'] = $purchasesByCategory;
+        $data['total_monthly'] = $totalMonthlyPurchases;
+
+
+        return $data;
+
+    }
+
+    private function expenseDashboard()
+    {
+        $data = array();
+
+        $totalExpenses = Expense::sum('amount');
+
+        $days = Expense::select(DB::raw('date(created_at)'))
+            ->distinct()
+            ->get();
+
+        if ($days->count() == 0) {
+            $avgDailyExpenses = 0;
+        } else {
+            $avgDailyExpenses = $totalExpenses / $days->count();
+        }
+
+        $todayExpenses = Expense::whereRaw('date(created_at) = date(now())')
+            ->sum('amount');
+
+        $totalDailyExpenses = Expense::select(DB::raw('date(created_at) date, sum(amount) value'))
+            ->groupBy(DB::raw('date(created_at)'))
+            ->limit('60')
+            ->get();
+
+        $totalMonthlyExpenses = Expense::select(DB::raw("DATE_FORMAT(created_at, '%b %y') month,sum(amount) amount"))
+            ->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y%m')"))
+            ->get();
+
+        $expensesByCategory = Expense::select(DB::raw("(acc_expense_categories.name) category,sum(amount) amount"))
+            ->join('acc_expense_categories', 'acc_expense_categories.id', '=', 'acc_expenses.expense_category_id')
+            ->groupBy('acc_expense_categories.name')
+            ->get();
+
+        $data['avgDailyExpenses'] = $avgDailyExpenses;
+        $data['todayExpenses'] = $todayExpenses;
+        $data['totalDailyExpenses'] = $totalDailyExpenses;
+        $data['expensesByCategory'] = $expensesByCategory;
+        $data['total_monthly'] = $totalMonthlyExpenses;
+
+
+        return $data;
 
     }
 
@@ -407,43 +552,6 @@ class HomeController extends Controller
             auth()->user()->unreadNotifications->where('id', $id)->markAsRead();
             return 'marked_read';
         }
-
-    }
-
-    private function fastMovingCalculation($test)
-    {
-        /*grouped data*/
-        $ungrouped_result = [];
-        $grouped_result = [];
-        foreach ($test as $value) {
-            array_push($ungrouped_result, array(
-                'receipt_number' => $value->receipt_number,
-                'product_id' => $value->product_id,
-                'product_name' => $value->product_name,
-                'occurrence' => $value->occurrence
-            ));
-        }
-
-        foreach ($ungrouped_result as $val) {
-            if (array_key_exists('receipt_number', $val)) {
-                $grouped_result[$val['receipt_number']][] = $val;
-            }
-        }
-
-        $sum_by_product_name = array();
-        $sum_by_key = new CommonFunctions();
-        foreach ($grouped_result as $value) {
-            foreach ($value as $item) {
-                $index = $sum_by_key->sumByKey($item['product_name'], $sum_by_product_name, 'product_name');
-                if ($index < 0) {
-                    $sum_by_product_name[] = $item;
-                } else {
-                    $sum_by_product_name[$index]['occurrence'] += $item['occurrence'];
-                }
-            }
-        }
-
-        return $sum_by_product_name;
 
     }
 
