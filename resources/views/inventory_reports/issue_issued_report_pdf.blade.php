@@ -10,7 +10,11 @@
         }
 
         body {
-            /*font-size: 24px;*/
+            font-size: 12px;
+        }
+
+        * {
+            font-family: Verdana, Arial, sans-serif;
         }
 
         table, th, td {
@@ -67,39 +71,43 @@
 </head>
 <body>
 
-<h4 align="center">{{$pharmacy['name']}}</h4>
-<h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
-<h5 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h5>
-<h2 align="center" style="margin-top: -2%">Issue Issued Report</h2>
-<div class="row" style="margin-top: 10%;">
-    <div class="col-md-12">
-        <table id="table-detail" align="center">
-            <!-- loop the product names here -->
-            <thead>
-            <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                <th>Code</th>
-                <th>Product Name</th>
-                <th>Issue Qty</th>
-                <th>Issue No</th>
-                <th>Issued By</th>
-                <th>Issued Date</th>
-                <th>Issued To</th>
-            </tr>
-            </thead>
-            @foreach($data as $item)
-                <tr>
-                    <td>{{$item->currentStock['product']['id']}}</td>
-                    <td>{{$item->currentStock['product']['name']}}</td>
-                    <td align="right">
-                        <div style="margin-right: 50%">{{floatval($item->quantity)}}</div>
-                    </td>
-                    <td align="">{{$item->issue_no}}</td>
-                    <td>{{$item->user['name']}}</td>
-                    <td align="" style="font-size: 0.8em">{{date('Y-m-d',strtotime($item->created_at))}}</td>
-                    <td align="">{{$item->issueLocation['name']}}</td>
+<div class="row" style="padding-top: -2%">
+    <h1 align="center">{{$pharmacy['name']}}</h1>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
+    <h2 align="center" style="margin-top: -1%">Issue Issued Report</h2>
+
+    <div class="row" style="margin-top: 10%;">
+        <div class="col-md-12">
+            <table id="table-detail" align="center">
+                <!-- loop the product names here -->
+                <thead>
+                <tr style="background: #1f273b; color: white;">
+                    <th>Code</th>
+                    <th>Product Name</th>
+                    <th>Issue Qty</th>
+                    <th>Issue No</th>
+                    <th>Issued By</th>
+                    <th>Issued Date</th>
+                    <th>Issued To</th>
                 </tr>
-            @endforeach
-        </table>
+                </thead>
+                @foreach($data as $item)
+                    <tr>
+                        <td>{{$item->currentStock['product']['id']}}</td>
+                        <td>{{$item->currentStock['product']['name']}}</td>
+                        <td align="right">
+                            <div style="margin-right: 50%">{{floatval($item->quantity)}}</div>
+                        </td>
+                        <td align="">{{$item->issue_no}}</td>
+                        <td>{{$item->user['name']}}</td>
+                        <td align="">{{date('Y-m-d',strtotime($item->created_at))}}</td>
+                        <td align="">{{$item->issueLocation['name']}}</td>
+                    </tr>
+                @endforeach
+            </table>
+        </div>
     </div>
 </div>
 
@@ -118,6 +126,7 @@
 
 
      }
+
 
 </script>
 

@@ -6,11 +6,11 @@
     <style>
 
         body {
-            /*font-size: 30px;*/
+            font-size: 12px;
         }
 
         * {
-            /*font-family: Verdana, Arial, sans-serif;*/
+            font-family: Verdana, Arial, sans-serif;
         }
 
         table, th, td {
@@ -76,50 +76,55 @@
 </head>
 <body>
 
-<h4 align="center">{{$pharmacy['name']}}</h4>
-<h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
-<h5 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h5>
-<h2 align="center" style="margin-top: -2%">Product Ledger Report</h2>
-<div class="row" style="margin-top: 10%;">
-    <div class="col-md-12">
-        <table id="table-detail-main">
-            <tr>
-                <td style="background: #1f273b; color: white"><b>Product Name:</b> {{$data[0]['name']}}</td>
-            </tr>
-        </table>
-        <table id="table-detail" align="center">
-            <!-- loop the product names here -->
-            {{--            @foreach($data as $datas => $dat)--}}
-            {{--                <tr>--}}
-            {{--                    <td style="border: none" colspan="5"><b>Product Name:</b> {{$datas}}</td>--}}
-            {{--                </tr>--}}
-            <thead>
-            <tr style="background: #1f273b; color: white">
-                <th>Transaction Date</th>
-                <th style="text-align: center">Transaction Method</th>
-                <th style="text-align: center">Received</th>
-                <th style="text-align: center">Outgoing</th>
-                <th style="text-align: center">Balance</th>
-            </tr>
-            </thead>
-            @foreach($data as $item)
-                <tr>
-                    <td>{{$item['date']}}</td>
-                    <td>{{$item['method']}}</td>
-                    <td style="text-align: right;">
-                        <div style="margin-right: 50%">{{number_format($item['received'])}}</div>
-                    </td>
-                    <td style="text-align: right;">
-                        <div style="margin-right: 50%">{{number_format($item['outgoing'])}}</div>
-                    </td>
-                    <td style="text-align: right;">{{number_format($item['balance'])}}</td>
-                </tr>
-            @endforeach
-            {{--            @endforeach--}}
-        </table>
-    </div>
+<div class="row" style="padding-top: -2%">
+    <h1 align="center">{{$pharmacy['name']}}</h1>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
+    <h2 align="center" style="margin-top: -1%">Product Ledger Report</h2>
 
+    <div class="row" style="margin-top: 10%;">
+        <div class="col-md-12">
+            <table id="table-detail-main">
+                <tr>
+                    <td style="background: #1f273b; color: white"><b>Product Name:</b> {{$data[0]['name']}}</td>
+                </tr>
+            </table>
+            <table id="table-detail" align="center">
+                <!-- loop the product names here -->
+                {{--            @foreach($data as $datas => $dat)--}}
+                {{--                <tr>--}}
+                {{--                    <td style="border: none" colspan="5"><b>Product Name:</b> {{$datas}}</td>--}}
+                {{--                </tr>--}}
+                <thead>
+                <tr style="background: #1f273b; color: white">
+                    <th>Transaction Date</th>
+                    <th style="text-align: center">Transaction Method</th>
+                    <th style="text-align: center">Received</th>
+                    <th style="text-align: center">Outgoing</th>
+                    <th style="text-align: center">Balance</th>
+                </tr>
+                </thead>
+                @foreach($data as $item)
+                    <tr>
+                        <td>{{$item['date']}}</td>
+                        <td>{{$item['method']}}</td>
+                        <td style="text-align: right;">
+                            <div style="margin-right: 50%">{{number_format($item['received'])}}</div>
+                        </td>
+                        <td style="text-align: right;">
+                            <div style="margin-right: 50%">{{number_format($item['outgoing'])}}</div>
+                        </td>
+                        <td style="text-align: right;">{{number_format($item['balance'])}}</td>
+                    </tr>
+                @endforeach
+                {{--            @endforeach--}}
+            </table>
+        </div>
+
+    </div>
 </div>
+
 <script type="text/php">
 
     if ( isset($pdf) ) {
@@ -136,6 +141,7 @@
 
 
      }
+
 
 </script>
 </body>

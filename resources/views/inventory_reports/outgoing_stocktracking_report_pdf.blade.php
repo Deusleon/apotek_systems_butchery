@@ -6,7 +6,11 @@
     <style>
 
         body {
-            /*font-size: 0.9em;*/
+            font-size: 12px;
+        }
+
+        * {
+            font-family: Verdana, Arial, sans-serif;
         }
 
         table, th, td {
@@ -63,37 +67,41 @@
 </head>
 <body>
 
-<h4 align="center">{{$pharmacy['name']}}</h4>
-<h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
-<h5 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h5>
-<h2 align="center" style="margin-top: -2%">Outgoing Stock Tracking Report</h2>
-<div class="row" style="margin-top: 10%;">
-    <div class="col-md-12">
-        <table id="table-detail" align="center">
-            <!-- loop the product names here -->
-            <thead>
-            <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                <th>Code</th>
-                <th>Product Name</th>
-                <th>Method Out</th>
-                <th>Quantity</th>
-                <th>User</th>
-                <th>Date</th>
-            </tr>
-            </thead>
-            @foreach($data as $item)
-                <tr>
-                    <td>{{$item->currentStock['product']['id']}}</td>
-                    <td>{{$item->currentStock['product']['name']}}</td>
-                    <td style="font-size: 0.7em">{{$item->out_mode}}</td>
-                    <td align="right">
-                        <div style="margin-right: 50%">{{number_format($item->quantity)}}</div>
-                    </td>
-                    <td>{{$item->user['name']}}</td>
-                    <td style="font-size: 0.7em">{{date('d-m-Y',strtotime($item->updated_at))}}</td>
+<div class="row" style="padding-top: -2%">
+    <h1 align="center">{{$pharmacy['name']}}</h1>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
+    <h2 align="center" style="margin-top: -1%">Outgoing Stock Tracking Report</h2>
+
+    <div class="row" style="margin-top: 10%;">
+        <div class="col-md-12">
+            <table id="table-detail" align="center">
+                <!-- loop the product names here -->
+                <thead>
+                <tr style="background: #1f273b; color: white;">
+                    <th>Code</th>
+                    <th>Product Name</th>
+                    <th>Method Out</th>
+                    <th>Quantity</th>
+                    <th>User</th>
+                    <th>Date</th>
                 </tr>
-            @endforeach
-        </table>
+                </thead>
+                @foreach($data as $item)
+                    <tr>
+                        <td>{{$item->currentStock['product']['id']}}</td>
+                        <td>{{$item->currentStock['product']['name']}}</td>
+                        <td>{{$item->out_mode}}</td>
+                        <td align="right">
+                            <div style="margin-right: 50%">{{number_format($item->quantity)}}</div>
+                        </td>
+                        <td>{{$item->user['name']}}</td>
+                        <td>{{date('d-m-Y',strtotime($item->updated_at))}}</td>
+                    </tr>
+                @endforeach
+            </table>
+        </div>
     </div>
 </div>
 

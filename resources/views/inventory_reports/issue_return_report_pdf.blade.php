@@ -11,8 +11,13 @@
 
 
         body {
-            /*font-size: 24px;*/
+            font-size: 12px;
         }
+
+        * {
+            font-family: Verdana, Arial, sans-serif;
+        }
+
 
         table, th, td {
             /*border: 1px solid black;*/
@@ -68,49 +73,53 @@
 </head>
 <body>
 
-<h4 align="center">{{$pharmacy['name']}}</h4>
-<h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
-<h5 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h5>
-<h2 align="center" style="margin-top: -2%">Issue Return Report</h2>
-<div class="row" style="margin-top: 10%;">
-    <div class="col-md-12">
-        <table id="table-detail" align="center">
-            <!-- loop the product names here -->
-            <thead>
-            <tr style="background: #1f273b; color: white; font-size: 0.8em">
-                <th>Code</th>
-                <th>Product Name</th>
-                <th>Issue Qty</th>
-                <th>Returned Qty</th>
-                <th>Return Value</th>
-                <th>Returned By</th>
-                <th>Issue No</th>
-                <th>Issued To</th>
-                <th>Issued Date</th>
-                <th>Return Date</th>
-                <th>Reason</th>
-            </tr>
-            </thead>
-            @foreach($data as $item)
-                <tr>
-                    <td>{{$item->issue['currentStock']['product']['id']}}</td>
-                    <td>{{$item->issue['currentStock']['product']['name']}}</td>
-                    <td align="right">
-                        <div style="margin-right: 50%">{{floatval($item->issue_qty)}}</div>
-                    </td>
-                    <td align="right">
-                        <div style="margin-right: 50%">{{floatval($item->return_qty)}}</div>
-                    </td>
-                    <td align="right">{{$item->return_value}}</td>
-                    <td align="">{{$item->user['name']}}</td>
-                    <td align="">{{$item->issue['issue_no']}}</td>
-                    <td align="">{{$item->issue['issueLocation']['name']}}</td>
-                    <td align="" style="font-size: 0.7em">{{date('Y-m-d',strtotime($item->issed_at))}}</td>
-                    <td align="" style="font-size: 0.7em">{{date('Y-m-d',strtotime($item->returned_at))}}</td>
-                    <td align="">{{$item->Reason}}</td>
+<div class="row" style="padding-top: -2%">
+    <h1 align="center">{{$pharmacy['name']}}</h1>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
+    <h2 align="center" style="margin-top: -1%">Issue Return Report</h2>
+
+    <div class="row" style="margin-top: 10%;">
+        <div class="col-md-12">
+            <table id="table-detail" align="center">
+                <!-- loop the product names here -->
+                <thead>
+                <tr style="background: #1f273b; color: white;">
+                    <th>Code</th>
+                    <th>Product Name</th>
+                    <th>Issue Qty</th>
+                    <th>Returned Qty</th>
+                    <th>Return Value</th>
+                    <th>Returned By</th>
+                    <th>Issue No</th>
+                    <th>Issued To</th>
+                    <th>Issued Date</th>
+                    <th>Return Date</th>
+                    <th>Reason</th>
                 </tr>
-            @endforeach
-        </table>
+                </thead>
+                @foreach($data as $item)
+                    <tr>
+                        <td>{{$item->issue['currentStock']['product']['id']}}</td>
+                        <td>{{$item->issue['currentStock']['product']['name']}}</td>
+                        <td align="right">
+                            <div style="margin-right: 50%">{{floatval($item->issue_qty)}}</div>
+                        </td>
+                        <td align="right">
+                            <div style="margin-right: 50%">{{floatval($item->return_qty)}}</div>
+                        </td>
+                        <td align="right">{{$item->return_value}}</td>
+                        <td align="">{{$item->user['name']}}</td>
+                        <td align="">{{$item->issue['issue_no']}}</td>
+                        <td align="">{{$item->issue['issueLocation']['name']}}</td>
+                        <td align="">{{date('Y-m-d',strtotime($item->issed_at))}}</td>
+                        <td align="">{{date('Y-m-d',strtotime($item->returned_at))}}</td>
+                        <td align="">{{$item->Reason}}</td>
+                    </tr>
+                @endforeach
+            </table>
+        </div>
     </div>
 </div>
 

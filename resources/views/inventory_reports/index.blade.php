@@ -172,7 +172,7 @@
                                     <label for="stock-issue-date">Date<font color="red">*</font></label>
                                     <div id="issue_date" style="border: 2px solid white; border-radius: 6px;">
                                         <input type="text" name="issue_date" class="form-control"
-                                               id="d_auto_912" autocomplete="off">
+                                               id="d_auto_912" autocomplete="off" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -197,7 +197,7 @@
                                     <label for="stock-transfer-date">Date<font color="red">*</font></label>
                                     <div id="transfer_date" style="border: 2px solid white; border-radius: 6px;">
                                         <input type="text" name="transfer_date" class="form-control"
-                                               id="d_auto_9121" autocomplete="off">
+                                               id="d_auto_9121" autocomplete="off" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -235,7 +235,7 @@
                                     <label for="stock-adjustment-date">Date<font color="red">*</font></label>
                                     <div id="date" style="border: 2px solid white; border-radius: 6px;">
                                         <input type="text" name="adjustment_date" class="form-control"
-                                               id="d_auto_91" autocomplete="off">
+                                               id="d_auto_91" autocomplete="off" readonly>
                                     </div>
                                 </div>
                             </div>

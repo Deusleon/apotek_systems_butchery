@@ -6,7 +6,11 @@
     <style>
 
         body {
-            /*font-size: 30px;*/
+            font-size: 12px;
+        }
+
+        * {
+            font-family: Verdana, Arial, sans-serif;
         }
 
         table, th, td {
@@ -63,39 +67,43 @@
 </head>
 <body>
 
-<h4 align="center">{{$pharmacy['name']}}</h4>
-<h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
-<h5 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h5>
-<h2 align="center" style="margin-top: -2%">Expiry Products Report</h2>
-<div class="row" style="margin-top: 10%;">
-    <div class="col-md-12">
-        <table id="table-detail" align="center">
-            <!-- loop the product names here -->
-            <thead>
-            <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                <th>Code</th>
-                <th>Product Name</th>
-                <th>Batch No</th>
-                <th>Date</th>
-                <th>Quantity</th>
-            </tr>
-            </thead>
-            @foreach($data as $item)
-                <tr>
-                    <td>{{$item->product['id']}}</td>
-                    <td>{{$item->product['name']}}</td>
-                    <td align="">{{$item->batch_number}}</td>
-                    @if($item->expiry_date === null)
-                        <td align="" style="font-size: 0.7em"></td>
-                    @else
-                        <td align="" style="font-size: 0.7em">{{date('d-m-Y',strtotime($item->expiry_date))}}</td>
-                    @endif
-                    <td align="right">
-                        <div style="margin-right: 50%">{{number_format($item->quantity)}}</div>
-                    </td>
+<div class="row" style="padding-top: -2%">
+    <h1 align="center">{{$pharmacy['name']}}</h1>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
+    <h2 align="center" style="margin-top: -1%">Expiry Products Report</h2>
+
+    <div class="row" style="margin-top: 10%;">
+        <div class="col-md-12">
+            <table id="table-detail" align="center">
+                <!-- loop the product names here -->
+                <thead>
+                <tr style="background: #1f273b; color: white;">
+                    <th>Code</th>
+                    <th>Product Name</th>
+                    <th>Batch No</th>
+                    <th>Date</th>
+                    <th>Quantity</th>
                 </tr>
-            @endforeach
-        </table>
+                </thead>
+                @foreach($data as $item)
+                    <tr>
+                        <td>{{$item->product['id']}}</td>
+                        <td>{{$item->product['name']}}</td>
+                        <td align="">{{$item->batch_number}}</td>
+                        @if($item->expiry_date === null)
+                            <td align="" style="font-size: 0.7em"></td>
+                        @else
+                            <td align="">{{date('d-m-Y',strtotime($item->expiry_date))}}</td>
+                        @endif
+                        <td align="right">
+                            <div style="margin-right: 50%">{{number_format($item->quantity)}}</div>
+                        </td>
+                    </tr>
+                @endforeach
+            </table>
+        </div>
     </div>
 </div>
 
@@ -114,6 +122,7 @@
 
 
      }
+
 
 
 

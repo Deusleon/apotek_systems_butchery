@@ -11,8 +11,11 @@
 
 
         body {
-            /*font-size: 23px;*/
-            /*transform: rotate(-90deg);*/
+            font-size: 12px;
+        }
+
+        * {
+            font-family: Verdana, Arial, sans-serif;
         }
 
         table, th, td {
@@ -76,61 +79,67 @@
 </head>
 <body>
 
-<h4 align="center">{{$pharmacy['name']}}</h4>
-<h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
-<h5 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h5>
-<h2 align="center" style="margin-top: -2%">Stock Transfer Status Report</h2>
-<h4 align="center" style="margin-top: -2%">
-    @if($data[0]->status == 2)
-        Completed Transfers
-    @else
-        Pending Transfers
-    @endif
-</h4>
-<div class="row" style="margin-top: 10%;">
-    <div class="col-md-12">
-        <table id="table-detail-main">
-            <tr>
-                <td style="background: #1f273b; color: white"><b>From
-                        Date:</b> {{date('d-m-Y',strtotime($data[0]['from']))}}
-                </td>
-                <td style="background: #1f273b; color: white"><b>To
-                        Date:</b> {{date('d-m-Y',strtotime($data[0]['to']))}}
-                </td>
-            </tr>
-        </table>
-        <table id="table-detail" align="center">
-            <!-- loop the product names here -->
-            <thead>
-            <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                <th>Code</th>
-                <th>Product Name</th>
-                <th>Transfer No</th>
-                <th>Transferred Qty</th>
-                <th>Accepted Qty</th>
-                <th>From</th>
-                <th>To</th>
-                <th>Date</th>
-            </tr>
-            </thead>
-            @foreach($data as $item)
+<div class="row" style="padding-top: -2%">
+
+    <h1 align="center">{{$pharmacy['name']}}</h1>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
+    <h2 align="center" style="margin-top: -1%">Stock Transfer Status Report</h2>
+    <h4 align="center" style="margin-top: -2%">
+        @if($data[0]->status == 2)
+            Completed Transfers
+        @else
+            Pending Transfers
+        @endif
+    </h4>
+    <div class="row" style="margin-top: 10%;">
+        <div class="col-md-12">
+            <table id="table-detail-main">
                 <tr>
-                    <td>{{$item->currentStock['product']['id']}}</td>
-                    <td>{{$item->currentStock['product']['name']}}</td>
-                    <td align="">{{$item->transfer_no}}</td>
-                    <td align="right">
-                        <div style="margin-right: 50%">{{number_format($item->transfer_qty)}}</div>
+                    <td style="background: #1f273b; color: white"><b>From
+                            Date:</b> {{date('d-m-Y',strtotime($data[0]['from']))}}
                     </td>
-                    <td align="right">
-                        <div style="margin-right: 50%">{{number_format($item->accepted_qty)}}</div>
+                    <td style="background: #1f273b; color: white"><b>To
+                            Date:</b> {{date('d-m-Y',strtotime($data[0]['to']))}}
                     </td>
-                    <td align="">{{$item->fromStore['name']}}</td>
-                    <td align="">{{$item->toStore['name']}}</td>
-                    <td align="" style="font-size: 0.8em">{{date('d-m-Y',strtotime($item->created_at))}}</td>
                 </tr>
-            @endforeach
-        </table>
+            </table>
+            <table id="table-detail" align="center">
+                <!-- loop the product names here -->
+                <thead>
+                <tr style="background: #1f273b; color: white;">
+                    <th>Code</th>
+                    <th>Product Name</th>
+                    <th>Transfer No</th>
+                    <th>Transferred Qty</th>
+                    <th>Accepted Qty</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Date</th>
+                </tr>
+                </thead>
+                @foreach($data as $item)
+                    <tr>
+                        <td>{{$item->currentStock['product']['id']}}</td>
+                        <td>{{$item->currentStock['product']['name']}}</td>
+                        <td align="">{{$item->transfer_no}}</td>
+                        <td align="right">
+                            <div style="margin-right: 50%">{{number_format($item->transfer_qty)}}</div>
+                        </td>
+                        <td align="right">
+                            <div style="margin-right: 50%">{{number_format($item->accepted_qty)}}</div>
+                        </td>
+                        <td align="">{{$item->fromStore['name']}}</td>
+                        <td align="">{{$item->toStore['name']}}</td>
+                        <td align="">{{date('d-m-Y',strtotime($item->created_at))}}</td>
+                    </tr>
+                @endforeach
+            </table>
+        </div>
     </div>
+
+
 </div>
 
 <script type="text/php">
