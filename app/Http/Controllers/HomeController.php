@@ -6,12 +6,11 @@ use App\CommonFunctions;
 use App\CurrentStock;
 use App\SalesDetail;
 use App\Setting;
-use App\StockTracking;
 use App\Store;
-use DB;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 
@@ -57,14 +56,25 @@ class HomeController extends Controller
         $outOfStock = $outOfStock->count();
         $outOfStockList = CurrentStock::where('quantity', 0)->groupby('product_id')->get();
 
-        $fast_moving = StockTracking::select(DB::raw('sum(quantity) as quantity'), 'product_id', 'stock_id', 'updated_at')
-            ->whereRaw('month(updated_at) = month(now())')
-            ->where('movement', 'OUT')
-            ->where('out_mode', 'Cash Sales')
-            ->orderby('quantity', 'desc')
-            ->groupby('product_id')
+        $fast_moving = DB::table('sale_details')->select('receipt_number', 'product_name',
+            DB::raw('count(product_name) as occurrence'), 'product_id')
+            ->whereRaw('date(sold_at) >= date(now()) - interval 90 day')
+            ->groupBy('receipt_number', 'product_name')
             ->get();
-        $fast_moving = $fast_moving->count();
+
+        $fast_moving = $this->fastMovingCalculation($fast_moving);
+
+        if ($fast_moving != []) {
+            $moving_item = 0;
+            foreach ($fast_moving as $moving) {
+                $moving_item = $moving_item + $moving['occurrence'];
+            }
+
+            $fast_moving = $moving_item;
+
+        } else {
+            $fast_moving = 0;
+        }
 
         $expired = CurrentStock::where('quantity', '>', 0)->whereRaw('expiry_date <  date(now())')->count();
 
@@ -215,6 +225,7 @@ class HomeController extends Controller
                 $nestedData['batch_number'] = $adjustment->batch_number;
                 $nestedData['code'] = $adjustment->product['name'];
                 $nestedData['product_id'] = $adjustment->product['id'];
+                $nestedData['category'] = $adjustment->product['category']['name'];
 
                 $data[] = $nestedData;
 
@@ -235,20 +246,19 @@ class HomeController extends Controller
     {
         $columns = array(
             0 => 'product_id',
-            1 => 'product_id',
-            2 => 'batch_number'
+            1 => 'product_name',
+            2 => 'occurrence'
         );
 
-
-        $totalData = StockTracking::select(DB::raw('sum(quantity) as quantity'), 'stock_id', 'product_id', 'stock_id', 'updated_at')
-            ->whereRaw('month(updated_at) = month(now())')
-            ->where('movement', 'OUT')
-            ->where('out_mode', 'Cash Sales')
-            ->orderby('quantity', 'desc')
-            ->groupby('product_id')
+        $totalData = DB::table('sale_details')->select('receipt_number', 'product_name',
+            DB::raw('count(product_name) as occurrence'), 'product_id')
+            ->whereRaw('date(sold_at) >= date(now()) - interval 90 day')
+            ->groupBy('receipt_number', 'product_name')
             ->get();
 
-        $totalFiltered = $totalData->count();
+        $sum_by_product_name = $this->fastMovingCalculation($totalData);
+
+        $totalFiltered = sizeof($sum_by_product_name);
 
         $limit = $request->input('length');
         $start = $request->input('start');
@@ -256,61 +266,46 @@ class HomeController extends Controller
         $dir = $request->input('order.0.dir');
 
         if (empty($request->input('search.value'))) {
-            $fast_moving = StockTracking::select(DB::raw('sum(quantity) as quantity'), 'stock_id', 'product_id', 'stock_id', 'updated_at')
-                ->whereRaw('month(updated_at) = month(now())')
-                ->where('movement', 'OUT')
-                ->where('out_mode', 'Cash Sales')
-                ->orderby('quantity', 'desc')
-                ->groupby('product_id')
-                ->offset($start)
-                ->limit($limit)
+            $fast_moving = DB::table('sale_details')->select('receipt_number', 'product_name',
+                DB::raw('count(product_name) as occurrence'), 'product_id')
+                ->whereRaw('date(sold_at) >= date(now()) - interval 90 day')
+                ->groupBy('receipt_number', 'product_name')
                 ->orderBy($order, $dir)
                 ->get();
         } else {
             $search = $request->input('search.value');
 
-            $fast_moving = StockTracking::select(DB::raw('sum(quantity) as quantity'), 'stock_id', 'product_id', 'stock_id', 'updated_at')
-                ->join('inv_products', 'inv_products.id', '=', 'inv_stock_tracking.product_id')
-                ->whereRaw('month(updated_at) = month(now())')
-                ->where('movement', 'OUT')
-                ->where('out_mode', 'Cash Sales')
-                ->orderby('quantity', 'desc')
-                ->orWhere('name', 'LIKE', "%{$search}%")
-                ->groupby('product_id')
-                ->offset($start)
-                ->limit($limit)
+            $fast_moving = DB::table('sale_details')->select('receipt_number', 'product_name',
+                DB::raw('count(product_name) as occurrence'), 'product_id')
+                ->whereRaw('date(sold_at) >= date(now()) - interval 90 day')
+                ->orWhere('product_name', 'LIKE', "%{$search}%")
+                ->groupBy('receipt_number', 'product_name')
                 ->orderBy($order, $dir)
                 ->get();
 
-            $totalFiltered = StockTracking::select(DB::raw('sum(quantity) as quantity'), 'stock_id', 'product_id', 'stock_id', 'updated_at')
-                ->join('inv_products', 'inv_products.id', '=', 'inv_stock_tracking.product_id')
-                ->whereRaw('month(updated_at) = month(now())')
-                ->where('movement', 'OUT')
-                ->where('out_mode', 'Cash Sales')
-                ->orderby('quantity', 'desc')
-                ->orWhere('name', 'LIKE', "%{$search}%")
-                ->groupby('product_id')
+            $totalFiltered = DB::table('sale_details')->select('receipt_number', 'product_name',
+                DB::raw('count(product_name) as occurrence'), 'product_id')
+                ->whereRaw('date(sold_at) >= date(now()) - interval 90 day')
+                ->orWhere('product_name', 'LIKE', "%{$search}%")
+                ->groupBy('receipt_number', 'product_name')
                 ->get();
-            $totalFiltered = $totalFiltered->count();
+
+            $sum_by_product_name = $this->fastMovingCalculation($totalFiltered);
+            $totalFiltered = sizeof($sum_by_product_name);
         }
 
         $data = array();
         if (!empty($fast_moving)) {
-            foreach ($fast_moving as $adjustment) {
-
-                $nestedData['name'] = $adjustment->currentStock['product']['name'];
-                $nestedData['product_id'] = $adjustment->product_id;
-                $nestedData['quantity'] = $adjustment->quantity;
-
-
-                $data[] = $nestedData;
-
-            }
+            $sum_by_product_name = $this->fastMovingCalculation($fast_moving);
+            $data = $sum_by_product_name;
         }
+
+        $sort_column = array_column($data, 'occurrence');
+        array_multisort($sort_column, SORT_DESC, $data);
 
         $json_data = array(
             "draw" => intval($request->input('draw')),
-            "recordsTotal" => intval($totalData->count()),
+            "recordsTotal" => intval(sizeof($sum_by_product_name)),
             "recordsFiltered" => intval($totalFiltered),
             "data" => $data
         );
@@ -412,6 +407,43 @@ class HomeController extends Controller
             auth()->user()->unreadNotifications->where('id', $id)->markAsRead();
             return 'marked_read';
         }
+
+    }
+
+    private function fastMovingCalculation($test)
+    {
+        /*grouped data*/
+        $ungrouped_result = [];
+        $grouped_result = [];
+        foreach ($test as $value) {
+            array_push($ungrouped_result, array(
+                'receipt_number' => $value->receipt_number,
+                'product_id' => $value->product_id,
+                'product_name' => $value->product_name,
+                'occurrence' => $value->occurrence
+            ));
+        }
+
+        foreach ($ungrouped_result as $val) {
+            if (array_key_exists('receipt_number', $val)) {
+                $grouped_result[$val['receipt_number']][] = $val;
+            }
+        }
+
+        $sum_by_product_name = array();
+        $sum_by_key = new CommonFunctions();
+        foreach ($grouped_result as $value) {
+            foreach ($value as $item) {
+                $index = $sum_by_key->sumByKey($item['product_name'], $sum_by_product_name, 'product_name');
+                if ($index < 0) {
+                    $sum_by_product_name[] = $item;
+                } else {
+                    $sum_by_product_name[$index]['occurrence'] += $item['occurrence'];
+                }
+            }
+        }
+
+        return $sum_by_product_name;
 
     }
 

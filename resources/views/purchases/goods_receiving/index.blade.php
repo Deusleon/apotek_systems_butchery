@@ -281,7 +281,7 @@
                                 <div class="form-group" style="padding-top: 10px">
                                     <label>Purchase Date <font color="red">*</font></label>
                                     <input type="text" name="purchase_date" class="form-control" id="purchase_date"
-                                           autocomplete="off" required="true">
+                                           autocomplete="off" readonly required="true">
                                 </div>
                             </div>
                         </div>

@@ -242,7 +242,7 @@
                                 <tr>
                                     <th>Product Code</th>
                                     <th>Product</th>
-                                    <th>Batch Number</th>
+                                    <th>Category</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -259,7 +259,7 @@
                                 <tr>
                                     <th>Product Code</th>
                                     <th>Product</th>
-                                    <th>Quantity</th>
+                                    <th>Sold Times</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -345,7 +345,7 @@
                 'columns': [
                     {'data': 'product_id'},
                     {'data': 'name'},
-                    {'data': 'batch_number'}
+                    {'data': 'category'}
                 ],
                 'searching': false
 
@@ -375,8 +375,8 @@
                 },
                 'columns': [
                     {'data': 'product_id'},
-                    {'data': 'name'},
-                    {'data': 'quantity'}
+                    {'data': 'product_name'},
+                    {'data': 'occurrence'}
                 ],
                 'searching': false
 
