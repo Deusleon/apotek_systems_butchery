@@ -9,7 +9,11 @@
         }
 
         body {
-            /*font-size: 30px;*/
+            font-size: 12px;
+        }
+
+        * {
+            font-family: Verdana, Arial, sans-serif;
         }
 
         table, th, td {
@@ -73,61 +77,66 @@
 </head>
 <body>
 
-<h4 align="center">{{$pharmacy['name']}}</h4>
-<h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
-<h2 align="center" style="margin-top: -2%">Invoice Summary Report</h2>
-<div class="row" style="margin-top: 10%;">
-    <div class="col-md-12">
+<div class="row" style="padding-top: -2%">
+    <h1 align="center">{{$pharmacy['name']}}</h1>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
+    <h2 align="center" style="margin-top: -1%">Invoice Summary Report</h2>
 
-        <table id="table-detail-main">
-            <tr>
-                <td style="background: #1f273b; color: white"><b>From
-                        Date:</b> {{date('d-m-Y',strtotime($data[0]['dates'][0]))}}</td>
-                <td style="background: #1f273b; color: white"><b>To
-                        Date:</b> {{date('d-m-Y',strtotime($data[0]['dates'][1]))}}</td>
-            </tr>
-        </table>
+    <div class="row" style="margin-top: 10%;">
+        <div class="col-md-12">
 
-        <table id="table-detail" align="center">
-            <!-- loop the product names here -->
-            <thead>
-            <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                <th style="text-align: center">Invoice No.</th>
-                <th style="text-align: center">Supplier</th>
-                <th style="text-align: center">Invoice Date</th>
-                <th style="text-align: center">Invoice Amount</th>
-                <th style="text-align: center">Paid amount</th>
-                <th style="text-align: center">Balance</th>
-                <th style="text-align: center">Grace Period</th>
-                <th style="text-align: center">Due Date</th>
-                <th style="text-align: center">Status</th>
-
-
-            </tr>
-            </thead>
-            @foreach($data as $item)
+            <table id="table-detail-main">
                 <tr>
-                    <td>{{$item->invoice_no}}</td>
-                    <td>{{$item->supplier['name']}}</td>
-                    <td>{{date('d-m-Y',strtotime($item->invoice_date))}}</td>
-                    <td align="right">{{number_format($item->invoice_amount,2)}}</td>
-                    <td align="right">{{number_format($item->paid_amount,2)}}</td>
-                    <td align="right">{{number_format($item->remain_balance,2)}}</td>
-                    <td align="right">
-                        <div style="margin-right: 50%"></div>{{$item->grace_period}}
-                    </td>
-                    <td style="font-size: 0.9em">{{date('d-m-Y',strtotime($item->payment_due_date))}}</td>
-                    <td style="font-size: 0.8em">{{$item->received_status}}</td>
+                    <td style="background: #1f273b; color: white"><b>From
+                            Date:</b> {{date('d-m-Y',strtotime($data[0]['dates'][0]))}}</td>
+                    <td style="background: #1f273b; color: white"><b>To
+                            Date:</b> {{date('d-m-Y',strtotime($data[0]['dates'][1]))}}</td>
                 </tr>
-            @endforeach
-        </table>
+            </table>
+
+            <table id="table-detail" align="center">
+                <!-- loop the product names here -->
+                <thead>
+                <tr style="background: #1f273b; color: white;">
+                    <th style="text-align: center">Invoice No.</th>
+                    <th style="text-align: center">Supplier</th>
+                    <th style="text-align: center">Invoice Date</th>
+                    <th style="text-align: center">Invoice Amount</th>
+                    <th style="text-align: center">Paid amount</th>
+                    <th style="text-align: center">Balance</th>
+                    <th style="text-align: center">Grace Period</th>
+                    <th style="text-align: center">Due Date</th>
+                    <th style="text-align: center">Status</th>
+
+
+                </tr>
+                </thead>
+                @foreach($data as $item)
+                    <tr>
+                        <td>{{$item->invoice_no}}</td>
+                        <td>{{$item->supplier['name']}}</td>
+                        <td>{{date('d-m-Y',strtotime($item->invoice_date))}}</td>
+                        <td align="right">{{number_format($item->invoice_amount,2)}}</td>
+                        <td align="right">{{number_format($item->paid_amount,2)}}</td>
+                        <td align="right">{{number_format($item->remain_balance,2)}}</td>
+                        <td align="right">
+                            <div style="margin-right: 50%"></div>{{$item->grace_period}}
+                        </td>
+                        <td style="font-size: 0.9em">{{date('d-m-Y',strtotime($item->payment_due_date))}}</td>
+                        <td>{{$item->received_status}}</td>
+                    </tr>
+                @endforeach
+            </table>
+        </div>
     </div>
 </div>
 
 <script type="text/php">
     if ( isset($pdf) ) {
-        $x = 280;
-        $y = 820;
+        $x = 400;
+        $y = 560;
         $text = "{PAGE_NUM} of {PAGE_COUNT} pages";
         $font = null;
         $size = 10;
@@ -136,11 +145,9 @@
         $char_space = 0.0;  //  default
         $angle = 0.0;   //  default
         $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
+
+
      }
-
-
-
-
 
 </script>
 
