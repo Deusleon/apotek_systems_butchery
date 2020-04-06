@@ -4,6 +4,10 @@
     <title>Customer Payment Statement</title>
     <style>
 
+        body {
+            font-size: 12px;
+        }
+
         * {
             font-family: Verdana, Arial, sans-serif;
         }
@@ -82,11 +86,13 @@
     </div>
 </div>
 <div class="row" style="padding-top: -2%">
-    <h4 align="center">{{$pharmacy['name']}}</h4>
-    <h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
-    <h2 align="center" style="margin-top: -2%">{{ucfirst($customer).' '.'Credit Payment Statement'}}</h2>
-    <h5 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h5>
-    <h4 align="center" style="margin-top: -2%">{{$pharmacy['date_range']}}</h4>
+    <h1 align="center">{{$pharmacy['name']}}</h1>
+    <h3 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['address']}}</h3>
+    <h3 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['phone']}}</h3>
+    <h3 align="center"
+        style="font-weight: normal;margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
+    <h2 align="center" style="margin-top: -1%">{{ucfirst($customer).' '.'Credit Payment Statement'}}</h2>
+    <h4 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['date_range']}}</h4>
 
     @foreach($data as $datas => $dat)
 

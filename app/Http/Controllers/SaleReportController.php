@@ -37,12 +37,13 @@ class SaleReportController extends Controller
         $date_range = explode("-", $request->date_range);
         $from = trim($date_range[0]);
         $to = trim($date_range[1]);
-        $receipt_size = Setting::where('id', 119)->value('value');
         $pharmacy['name'] = Setting::where('id', 100)->value('value');
         $pharmacy['logo'] = Setting::where('id', 105)->value('value');
         $pharmacy['address'] = Setting::where('id', 106)->value('value');
-        $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
+        $pharmacy['email'] = Setting::where('id', 108)->value('value');
+        $pharmacy['website'] = Setting::where('id', 109)->value('value');
         $pharmacy['phone'] = Setting::where('id', 107)->value('value');
+        $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
         $pharmacy['date_range'] = "From" . " " . date('j M, Y', strtotime($from)) . " " . "To" . " " . date('j M, Y', strtotime($to));
 
         switch ($request->report_option) {

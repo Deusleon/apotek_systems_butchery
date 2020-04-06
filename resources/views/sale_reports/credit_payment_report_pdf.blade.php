@@ -6,7 +6,11 @@
     <style>
 
         body {
-            /*font-size: 30px;*/
+            font-size: 12px;
+        }
+
+        * {
+            font-family: Verdana, Arial, sans-serif;
         }
 
         table, th, td {
@@ -35,16 +39,31 @@
         #table-detail {
             /*border-spacing: 5px;*/
             width: 100%;
-            margin-top: -10%;
-            /*border: 1px solid #FFFFFF;*/
+            /*margin-top: 2%;*/
+        }
+
+        #table-detail-1 {
+            width: 100%;
+            margin-top: 3%;
+        }
+
+        #table-detail-2 {
+            width: 100%;
+            margin-top: 0%;
+        }
+
+        #table-detail-main {
+            width: 103%;
+            margin-top: 2%;
+            margin-bottom: -2%;
             border-collapse: collapse;
         }
 
-        #table-detail tr {
+        #table-detail tr > {
             line-height: 13px;
         }
 
-        tr:nth-child(even) {
+        #table-detail tr:nth-child(even) {
             background-color: #f2f2f2;
         }
 
@@ -71,6 +90,7 @@
             max-height: 160px;
         }
 
+
     </style>
 
 </head>
@@ -85,13 +105,15 @@
     </div>
 </div>
 <div class="row" style="padding-top: -2%">
-    <h4 align="center">{{$pharmacy['name']}}</h4>
-    <h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
-    <h2 align="center" style="margin-top: -2%">Credit Payment Report</h2>
-    <h5 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h5>
-    <h4 align="center" style="margin-top: -2%">{{$pharmacy['date_range']}}</h4>
+    <h1 align="center">{{$pharmacy['name']}}</h1>
+    <h3 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['address']}}</h3>
+    <h3 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['phone']}}</h3>
+    <h3 align="center"
+        style="font-weight: normal;margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
+    <h2 align="center" style="margin-top: -1%">Credit Payment Report</h2>
+    <h4 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['date_range']}}</h4>
 
-    <div class="row" style="margin-top: 10%;">
+    <div class="row" style="margin-top: 2%;">
         <div class="col-md-12">
             <table id="table-detail" align="center">
                 <thead>

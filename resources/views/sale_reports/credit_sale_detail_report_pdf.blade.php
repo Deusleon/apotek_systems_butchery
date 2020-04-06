@@ -4,6 +4,10 @@
     <title>Credit Sale Details Report</title>
     <style>
 
+        body {
+            font-size: 12px;
+        }
+
         * {
             font-family: Verdana, Arial, sans-serif;
         }
@@ -82,45 +86,16 @@
     </div>
 </div>
 <div class="row" style="padding-top: -2%">
-    <h4 align="center">{{$pharmacy['name']}}</h4>
-    <h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
-    <h2 align="center" style="margin-top: -2%">Credit Sales Details Report</h2>
-    <h5 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h5>
-    <h4 align="center" style="margin-top: -2%">{{$pharmacy['date_range']}}</h4>
-@foreach($data as $datas => $dat)
-    <!-- <div class="full-row" style="padding-top: 2%">
-<div class="col-25">
-<div class="full-row">
-<div class="col-50" align="left"><b>Sold By: </b></div>
-<div class="col-50" align="right">{{$dat[0]['sold_by']}}</div>
-</div>
-</div>
-<div class="col-50"></div>
-<div class="col-25">
-<div class="full-row">
-<div class="col-50" align="left"><b>TIN #: </b></div>
-<div class="col-50" align="right">{{$pharmacy['tin_number']}}</div>
-</div>
-</div>
-</div> -->
-    <!-- <div class="full-row" style="padding-top: -5%">
-<div class="col-25">
-<div class="full-row">
-<div class="col-50" align="left"><b>Sale Date:</b></div>
-<div class="col-50" align="right">{{date('j M, Y', strtotime($dat[0]['created_at']))}}</div>
-</div>
-</div>
-<div class="col-50"></div>
-<div class="col-25">
-<div class="full-row">
-<div class="col-50" align="left"><b>Recept #: </b></div>
-<div class="col-50" align="right">{{$datas}}</div>
-</div>
-</div>
-</div>
-</div> -->
+    <h1 align="center">{{$pharmacy['name']}}</h1>
+    <h3 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['address']}}</h3>
+    <h3 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['phone']}}</h3>
+    <h3 align="center"
+        style="font-weight: normal;margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
+    <h2 align="center" style="margin-top: -1%">Credit Sales Details Report</h2>
+    <h4 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['date_range']}}</h4>
 
-        <div class="row" style="margin-top: 13%">
+    @foreach($data as $datas => $dat)
+        <div class="row" style="margin-top: 15%">
             <table class="table table-sm" id="table-detail" align="center">
                 <tr>
                     <th align="left">SN</th>
@@ -260,6 +235,7 @@
 
 
      }
+
 
 
 

@@ -5,7 +5,11 @@
     <style>
 
         body {
-            /*font-size: 30px;*/
+            font-size: 12px;
+        }
+
+        * {
+            font-family: Verdana, Arial, sans-serif;
         }
 
         table, th, td {
@@ -55,7 +59,7 @@
         }
 
         #table-detail tr > {
-            /*line-height: 13px;*/
+            line-height: 13px;
         }
 
         #table-detail tr:nth-child(even) {
@@ -99,11 +103,12 @@
     </div>
 </div>
 <div class="row" style="padding-top: -2%">
-    <h4 align="center">{{$pharmacy['name']}}</h4>
-    <h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
-    <h2 align="center" style="margin-top: -2%">Cash Sales Details Report</h2>
-    <h5 align="center" style="margin-top: -2%">Phone: {{$pharmacy['phone']}}</h5>
-    <h4 align="center" style="margin-top: -2%">{{$pharmacy['date_range']}}</h4>
+    <h1 align="center">{{$pharmacy['name']}}</h1>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
+    <h2 align="center" style="margin-top: -1%">Cash Sales Details Report</h2>
+    <h4 align="center" style="margin-top: -1%">{{$pharmacy['date_range']}}</h4>
     @foreach($data[0][0] as $key => $dat)
         {{--        {{$pharmacy['tin_number']}} {{date('j M, Y', strtotime($dat[0]['created_at']))}}--}}
         <table id="table-detail-main">
@@ -220,8 +225,6 @@
 
 </div>
 
-</body>
-
 <script type="text/php">
     if ( isset($pdf) ) {
         $x = 280;
@@ -239,7 +242,10 @@
      }
 
 
+
 </script>
+
+</body>
 
 </html>
 
