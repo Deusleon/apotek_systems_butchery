@@ -2,6 +2,18 @@
 
 @section('page_css')
     <style>
+
+        #zoom:hover {
+            -ms-transform: scale(1.02); /* IE 9 */
+            -webkit-transform: scale(1.02); /* Safari 3-8 */
+            transform: scale(1.02);
+        }
+
+        #zoom {
+            transition: transform .2s;
+            height: 45vh;
+        }
+
         #daily_sales {
             width: 100%;
             height: 500px;
@@ -82,6 +94,7 @@
     </style>
 @endsection
 
+@if(Gate::check('View Dashboard'))
 @section('content-title')
     Dashboard
 
@@ -856,3 +869,7 @@
     </script>
 
 @endpush
+
+@else
+    @include('home_welcome')
+@endif
