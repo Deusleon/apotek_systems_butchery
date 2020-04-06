@@ -129,6 +129,7 @@ Route::middleware(["auth"])->group(function () {
     Route::get('purchases/supplier/select/filter-invoice', 'GoodsReceivingController@filterInvoice')->name('filter-invoice');
     Route::get('purchases/goods-receiving.order-receive', 'GoodsReceivingController@orderReceive')->name('goods-receiving.orderReceive');
     Route::get('purchases/supplier/select/filter-price', 'GoodsReceivingController@filterPrice')->name('filter-price');
+    Route::post('purchases/purchase-order/list', 'GoodsReceivingController@purchaseOrderList')->name('purchase-order-list');
 
     //Configurations Routes
     Route::get('/settings', 'ConfigurationsController@index')->name('configurations.index');

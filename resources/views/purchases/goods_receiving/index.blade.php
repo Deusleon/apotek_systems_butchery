@@ -60,7 +60,21 @@
                         </button>
                     </div>
                 </div>
+
+                <div class="form-group row">
+                    <div class="col-md-6"></div>
+                    <div class="col-md-3" style="margin-left: 2.5%" id="dates_1">
+                        <label style="margin-left: 80%" for="filter" class="col-form-label text-md-right">Date:</label>
+                    </div>
+                    <div class="col-md-3" id="dates" style="margin-left: -3.4%">
+                        <input style="width: 103.4%;" type="text" autocomplete="off" class="form-control"
+                               id="daterange"/>
+                    </div>
+
+                </div>
+
                 <div class="table-responsive" id="purchases">
+
                     <table id="fixed-header-2" class="display table nowrap table-striped table-hover"
                            style="width:100%">
                         <thead>
@@ -337,6 +351,86 @@
             }
         };
 
+
+        function getPurchaseHistory() {
+            var range = document.getElementById('daterange').value;
+            range = range.split('-');
+
+            $("#fixed-header-2").dataTable().fnDestroy();
+
+            $('#fixed-header-2').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": '{{route('purchase-order-list')}}',
+                    "dataType": "json",
+                    "type": "post",
+                    "cache": false,
+                    "data": {
+                        _token: "{{csrf_token()}}",
+                        range: range
+                    }
+                },
+                "columns": [
+                    {'data': 'order_number'},
+                    {'data': 'supplier.name'},
+                    {
+                        'data': 'ordered_at', render: function (date) {
+                            return moment(date).format('D-M-YYYY');
+                        }
+                    },
+
+                    {
+                        'data': 'total_amount', render: function (cost) {
+                            return formatMoney(cost);
+                        }
+                    },
+                    {
+                        'data': 'status', render: function (status) {
+                            if (Number(status) === 1) {
+                                return "<span class='badge badge-secondary'>Pending</span>"
+                            } else if (Number(status) === 2) {
+                                return "<span class='badge badge-info'>Partial Received</span>"
+                            } else if (Number(status) === 3) {
+                                return "<span class='badge badge-success'>Received</span>"
+                            }
+                        }
+                    },
+                    {
+                        'data': "status", render: function (status) {
+                            if (Number(status) === 3) {
+                                return "<button type='button' id='preview_order' class='btn btn-sm btn-rounded btn-info'>Preview Order</button>"
+                            } else {
+                                return "<button type='button' id='receive_order' class='btn btn-sm btn-rounded btn-secondary'>Receive Order</button>"
+                            }
+                        }
+
+                    },
+                    {'data': 'id'},
+                ],
+                'columnDefs': [
+                    {
+                        'targets': 6,
+                        'visible': false
+                    }
+                ]
+
+            });
+
+
+        }
+
+        $('#fixed-header-2 tbody').on('click', '#preview_order', function () {
+            var row_data = $('#fixed-header-2').DataTable().row($(this).parents('tr')).data();
+            orderReceive(row_data.details, row_data.supplier_id);
+        });
+
+        $('#fixed-header-2 tbody').on('click', '#receive_order', function () {
+            var row_data = $('#fixed-header-2').DataTable().row($(this).parents('tr')).data();
+            orderReceive(row_data.details, row_data.supplier_id);
+        });
+
+
         $(document).ready(function () {
             resetForms();
         });
@@ -444,6 +538,36 @@
 
         $('#invoice_ids').select2({
             dropdownParent: $("#receive")
+        });
+
+    </script>
+
+    <script type="text/javascript">
+        $(function () {
+
+            var start = moment();
+            var end = moment();
+
+            function cb(start, end) {
+                $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            }
+
+            $('#daterange').daterangepicker({
+                startDate: moment().startOf('month'),
+                endDate: end,
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                    'This Year': [moment().startOf('year'), moment()]
+                }
+            }, cb);
+
+            cb(start, end);
+
         });
 
     </script>

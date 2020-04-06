@@ -59,9 +59,6 @@ var cart_table = $('#cart_table').DataTable({
     ]
 });
 
-var order_table = $('#fixed-header-2').DataTable({
-    aaSorting: [[6, 'desc']]
-});
 
 $('#cart_table tbody').on('click', '#edit_btn', function () {
     var quantity;
@@ -113,13 +110,6 @@ $('#cart_table tbody').on('click', '#delete_btn', function () {
 
 
 });
-
-
-$('#fixed-header-2 tbody').on('click', '#receive_order_btn', function () {
-    var index = order_table.row($(this).parents('tr')).index();
-    var data = order_table.row($(this).parents('tr')).data();
-});
-
 
 function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
     try {
@@ -273,6 +263,9 @@ function orderReceive(items, supplier) {
     received = "<span class='badge badge-success'>Received</span>";
     var receive_cart = [];
     document.getElementById('purchases').style.display = 'none';
+    document.getElementById('dates').style.display = 'none';
+    document.getElementById('dates_1').style.display = 'none';
+
     order_items = [];
     items.forEach(function (item) {
         var item_data = [];
@@ -306,7 +299,11 @@ function orderReceive(items, supplier) {
 
     $('#cancel').on('click', function () {
         receive_cart = [];
+        getPurchaseHistory();
         document.getElementById('purchases').style.display = 'block';
+        document.getElementById('dates').style.display = 'block';
+        document.getElementById('dates_1').style.display = 'block';
+
         document.getElementById('items').style.display = 'none';
     });
 
@@ -536,6 +533,11 @@ $('#order_reveice').on('submit', function (e) {
 
     $('#save_btn').attr('disabled', true);
     saveOrderReceiveForm();
+
+});
+
+$('#daterange').change(function () {
+    getPurchaseHistory();
 
 });
 

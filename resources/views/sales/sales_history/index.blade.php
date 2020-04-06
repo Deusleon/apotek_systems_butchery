@@ -45,10 +45,6 @@
                     <div class="col-md-3" style="margin-left: -3.4%">
                         <input style="width: 103.4%;" type="text" class="form-control" id="daterange"/>
                     </div>
-                    {{--                    <div class="form-group col-md-6">--}}
-                    {{--                        <label for="Seach">Search</label>--}}
-                    {{--                        <input type="text" class="form-control" id="searching" placeholder="Search"/>--}}
-                    {{--                    </div>--}}
 
                 </div>
                 <form id="sale_receipt_reprint" action="{{route('sale-reprint-receipt')}}" method="post"

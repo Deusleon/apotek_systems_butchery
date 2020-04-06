@@ -441,6 +441,91 @@ class GoodsReceivingController extends Controller
         }
     }
 
+    public function purchaseOrderList(Request $request)
+    {
+        $columns = array(
+            0 => 'order_number',
+            1 => 'inv_suppliers.name',
+            2 => 'ordered_at',
+            3 => 'total_amount',
+            4 => 'status',
+            5 => 'status'
+        );
+
+        $from = $request->range[0];
+        $to = $request->range[1];
+
+
+        $totalData = Order::where('status', '<=', '3')
+            ->whereBetween(DB::raw('date(ordered_at)'),
+                [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
+            ->orderby('id', 'DESC')
+            ->count();
+
+        $totalFiltered = $totalData;
+
+        $limit = $request->input('length');
+        $start = $request->input('start');
+        $order = $columns[$request->input('order.0.column')];
+        $dir = $request->input('order.0.dir');
+
+        if (empty($request->input('search.value'))) {
+            $orders = Order::where('status', '<=', '3')
+                ->join('inv_suppliers', 'inv_suppliers.id', '=', 'orders.supplier_id')
+                ->whereBetween(DB::raw('date(ordered_at)'),
+                    [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
+                ->offset($start)
+                ->limit($limit)
+                ->orderBy($order, $dir)
+                ->get();
+        } else {
+            $search = $request->input('search.value');
+
+            $orders = Order::where('status', '<=', '3')
+                ->join('inv_suppliers', 'inv_suppliers.id', '=', 'orders.supplier_id')
+                ->whereBetween(DB::raw('date(ordered_at)'),
+                    [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
+                ->where('order_number', 'LIKE', "%{$search}%")
+                ->orwhere('total_amount', 'LIKE', "%{$search}%")
+                ->orWhere(DB::raw('inv_suppliers.name'), 'LIKE', "%{$search}%")
+                ->orWhere(DB::raw('date(ordered_at)'), 'LIKE', "%{$search}%")
+                ->offset($start)
+                ->limit($limit)
+                ->orderBy($order, $dir)
+                ->get();
+
+            $totalFiltered = Order::where('status', '<=', '3')
+                ->join('inv_suppliers', 'inv_suppliers.id', '=', 'orders.supplier_id')
+                ->whereBetween(DB::raw('date(ordered_at)'),
+                    [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
+                ->where('order_number', 'LIKE', "%{$search}%")
+                ->orwhere('total_amount', 'LIKE', "%{$search}%")
+                ->orWhere(DB::raw('inv_suppliers.name'), 'LIKE', "%{$search}%")
+                ->orWhere(DB::raw('date(ordered_at)'), 'LIKE', "%{$search}%")
+                ->count();
+        }
+
+        $data = array();
+        if (!empty($orders)) {
+            foreach ($orders as $order) {
+
+                $order->supplier;
+                $order->details;
+                $order->orderDetail;
+
+            }
+        }
+
+        $json_data = array(
+            "draw" => intval($request->input('draw')),
+            "recordsTotal" => intval($totalData),
+            "recordsFiltered" => intval($totalFiltered),
+            "data" => $orders
+        );
+
+        echo json_encode($json_data);
+    }
+
 }
 
 
