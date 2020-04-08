@@ -544,15 +544,6 @@
                             }
                             @endif
 
-                        ],
-                        'columnDefs': [
-                            {
-                                'targets': [1],
-                                'visible': false
-                            }, {
-                                "targets": [4],
-                                "orderable": false
-                            }
                         ]
                     });
 
