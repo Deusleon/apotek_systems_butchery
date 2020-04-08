@@ -535,7 +535,6 @@
                     var table = $('#fixed-header2').DataTable({
                         'columns': [
                             {'data': 'name'},
-                            {"data": "barcode"},
                             {'data': 'category'},
                             {'data': 'date'},
                                 @if(auth()->user()->checkPermission('Manage Products'))
