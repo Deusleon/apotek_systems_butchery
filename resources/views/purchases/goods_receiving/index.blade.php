@@ -85,6 +85,7 @@
                             <th>Amount</th>
                             <th>Status</th>
                             <th>Action</th>
+                            <th>id</th>
                         </tr>
                         </thead>
                         <tbody></tbody>
@@ -328,7 +329,8 @@
 
             $("#fixed-header-2").dataTable().fnDestroy();
 
-            $('#fixed-header-2').DataTable({
+
+            var order_list_table = $('#fixed-header-2').DataTable({
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
@@ -375,10 +377,18 @@
                             }
                         }
 
-                    }
-                ], 'aaSorting': [[2, 'desc']]
+                    },
+                    {'data': 'id'}
+                ], 'aaSorting': [[6, 'desc']],
 
             });
+
+            //hide the first column
+            try {
+                order_list_table.column(6).visible(false);
+            } catch (e) {
+
+            }
 
 
         }
@@ -457,11 +467,13 @@
         $(function () {
             var start = moment();
             var end = moment();
+            var date = new Date();
+            var tomorrow = new Date(date.getFullYear(), date.getMonth(), (date.getDate() + 1));
 
             $('#expire_date_21').daterangepicker({
                 singleDatePicker: true,
                 showDropdowns: true,
-                minDate: start,
+                minDate: tomorrow,
                 autoUpdateInput: false,
                 locale: {
                     format: 'DD-M-YYYY'
@@ -470,7 +482,7 @@
         });
 
         $('input[name="expire_date"]').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('MM/DD/YYYY'));
+            $(this).val(picker.startDate.format('DD-MM-YYYY'));
         });
 
         $('input[name="expire_date"]').on('cancel.daterangepicker', function (ev, picker) {

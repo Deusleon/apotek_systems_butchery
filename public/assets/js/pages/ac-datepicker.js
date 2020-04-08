@@ -40,7 +40,7 @@ $(document).ready(function () {
     var end = new Date(date.getFullYear(), date.getMonth(), (date.getDate() + 1));
 
     $('#expire_date_1').datepicker({
-        format: "yyyy-mm-dd",
+        format: "dd-mm-yyyy",
         startDate: tomorrow,
         autoclose: true,
         changeYear: true
