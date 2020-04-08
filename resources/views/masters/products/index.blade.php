@@ -87,9 +87,9 @@
                                 <th>Product Name</th>
                                 <th>Category</th>
                                 <th>Created at</th>
-                                @can('Manage Products')
+                                @if(auth()->user()->checkPermission('Manage Products'))
                                     <th>Actions</th>
-                                @endcan
+                                @endif
                             </tr>
                             </thead>
                         </table>
@@ -103,12 +103,11 @@
                             <thead>
                             <tr>
                                 <th>Product Name</th>
-                                <th hidden>Barcode</th>
                                 <th>Category</th>
                                 <th>Created at</th>
-                                @can('Manage Products')
+                                @if(auth()->user()->checkPermission('Manage Products'))
                                     <th>Actions</th>
-                                @endcan
+                                @endif
                             </tr>
                             </thead>
 
