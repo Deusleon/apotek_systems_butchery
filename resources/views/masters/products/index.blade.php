@@ -54,14 +54,14 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
-                                @can('Manage Products')
+                                @if(auth()->user()->checkPermission('Manage Products'))
                                     <button style="float: right;margin-bottom: 7%;" type="button"
                                             class="btn btn-secondary btn-sm"
                                             data-toggle="modal"
                                             data-target="#create">
                                         Add Product
                                     </button>
-                                @endcan
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -130,9 +130,9 @@
                                 <th>Product Name</th>
                                 <th>Category</th>
                                 <th>Created at</th>
-                                @can('Manage Products')
+                                @if(auth()->user()->checkPermission('Manage Products'))
                                     <th>Actions</th>
-                                @endcan
+                                @endif
                             </tr>
                             </thead>
                             <tbody>
@@ -177,12 +177,12 @@
                             {"data": "name"},
                             {"data": "category"},
                             {"data": "date"},
-                                @can('Manage Products')
+                                @if(auth()->user()->checkPermission('Manage Products'))
                             {
                                 "data": "action",
                                 defaultContent: "<button type='button' id='shows' class='btn btn-sm btn-rounded btn-success'>Show</button><button type='button' id='edits' class='btn btn-sm btn-rounded btn-primary'>Edit</button><button type='button' id='deletes' class='btn btn-sm btn-rounded btn-danger'>Delete</button>"
                             }
-                            @endcan
+                            @endif
                         ],
 
                     });
@@ -210,12 +210,12 @@
                             {"data": "name"},
                             {"data": "category"},
                             {"data": "date"},
-                                @can('Manage Products')
+                                @if(auth()->user()->checkPermission('Manage Products'))
                             {
                                 "data": "action",
                                 defaultContent: "<button type='button' id='show-active' class='btn btn-sm btn-rounded btn-success'>Show</button><button type='button' id='edit-active' class='btn btn-sm btn-rounded btn-primary'>Edit</button><button type='button' id='delete-active' class='btn btn-sm btn-rounded btn-danger'>Delete</button>"
                             }
-                            @endcan
+                            @endif
                         ],
 
                     });
@@ -539,12 +539,12 @@
                             {"data": "barcode"},
                             {'data': 'category'},
                             {'data': 'date'},
-                                @can('Manage Products')
+                                @if(auth()->user()->checkPermission('Manage Products'))
                             {
                                 'data': "action",
                                 defaultContent: "<button type='button' id='activate' class='btn btn-sm btn-rounded btn-success'>Activate</button>"
                             }
-                            @endcan
+                            @endif
 
                         ],
                         'columnDefs': [
