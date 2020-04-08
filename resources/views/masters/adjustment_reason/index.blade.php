@@ -17,30 +17,30 @@
             <div class="col-sm-12">
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                        @can('Manage Adjustment Reasons')
+                        @if(auth()->user()->checkPermission('Manage Adjustment Reasons'))
                             <button style="float: right;margin-bottom: 2%;" type="button"
                                     class="btn btn-secondary btn-sm"
                                     data-toggle="modal"
                                     data-target="#exampleModalCenter">
                                 Add Reason
                             </button>
-                        @endcan
+                        @endif
                         <div class="table-responsive">
                             <table id="fixed-header" class="display table nowrap table-striped table-hover"
                                    style="width:100%">
                                 <thead>
                                 <tr>
                                     <th>Reason</th>
-                                    @can('Manage Adjustment Reasons')
+                                    @if(auth()->user()->checkPermission('Manage Adjustment Reasons'))
                                         <th>Actions</th>
-                                    @endcan
+                                    @endif
                                 </tr>
                                 </thead>
                                 <tbody>
                                 @foreach($adjustment as $adjustments)
                                     <tr>
                                         <td>{{$adjustments->reason}}</td>
-                                        @can('Manage Adjustment Reasons')
+                                        @if(auth()->user()->checkPermission('Manage Adjustment Reasons'))
                                             <td>
                                                 <a href="#">
                                                     <button class="btn btn-sm btn-rounded btn-primary"
@@ -60,7 +60,7 @@
                                                     </button>
                                                 </a>
                                             </td>
-                                        @endcan
+                                        @endif
                                     </tr>
                                 @endforeach
                                 </tbody>

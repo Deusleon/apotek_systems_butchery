@@ -22,13 +22,13 @@
         <div class="card">
             <div class="card-body">
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                    @can('Manage Stores')
+                    @if(auth()->user()->checkPermission('Manage Stores'))
                         <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-secondary btn-sm"
                                 data-toggle="modal"
                                 data-target="#create">
                             Add Store
                         </button>
-                    @endcan
+                    @endif
 
                     <div class="table-responsive">
                         <table id="fixed-header" class="display table nowrap table-striped table-hover"
@@ -36,9 +36,9 @@
                             <thead>
                             <tr>
                                 <th>Name</th>
-                                @can('Manage Stores')
+                                @if(auth()->user()->checkPermission('Manage Stores'))
                                     <th>Actions</th>
-                                @endcan
+                                @endif
                             </tr>
                             </thead>
                             <tbody>
@@ -48,7 +48,7 @@
                                     @foreach($stores as $store)
 
                                         <td>{{$store->name}}</td>
-                                        @can('Manage Stores')
+                                        @if(auth()->user()->checkPermission('Manage Stores'))
                                             <td>
                                                 <a href="#">
                                                     <button class="btn btn-sm btn-rounded btn-primary"
@@ -67,7 +67,7 @@
                                                     </button>
                                                 </a>
                                             </td>
-                                        @endcan
+                                        @endif
                                 </tr>
                                 @endforeach
                             @endif

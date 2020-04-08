@@ -15,14 +15,14 @@
             <div class="col-sm-12">
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                        @can('Manage Product Subcategories')
+                        @if(auth()->user()->checkPermission('Manage Product Subcategories'))
                             <button style="float: right;margin-bottom: 2%;" type="button"
                                     class="btn btn-secondary btn-sm"
                                     data-toggle="modal"
                                     data-target="#create">
                                 Add Subcategory
                             </button>
-                        @endcan
+                        @endif
                         <div class="table-responsive">
                             <table id="fixed-header" class="display table nowrap table-striped table-hover"
                                    style="width:100%">
@@ -30,9 +30,9 @@
                                 <tr>
                                     <th>Category</th>
                                     <th>Subcategory</th>
-                                    @can('Manage Product Subcategories')
+                                    @if(auth()->user()->checkPermission('Manage Product Subcategories'))
                                         <th>Actions</th>
-                                    @endcan
+                                    @endif
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -43,7 +43,7 @@
 
                                             <td>{{$subcategory->category['name']}}</td>
                                             <td>{{$subcategory->name}}</td>
-                                            @can('Manage Product Subcategories')
+                                            @if(auth()->user()->checkPermission('Manage Product Subcategories'))
                                                 <td>
                                                     <a href="#">
                                                         <button class="btn btn-sm btn-rounded btn-primary"
@@ -64,7 +64,7 @@
                                                         </button>
                                                     </a>
                                                 </td>
-                                            @endcan
+                                            @endif
                                     </tr>
                                     @endforeach
                                 @endif

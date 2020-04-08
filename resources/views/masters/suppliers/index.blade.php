@@ -19,14 +19,14 @@
             <div class="col-sm-12">
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                        @can('Manage Suppliers')
+                        @if(auth()->user()->checkPermission('Manage Suppliers'))
                             <button style="float: right;margin-bottom: 2%;" type="button"
                                     class="btn btn-secondary btn-sm"
                                     data-toggle="modal"
                                     data-target="#create">
                                 Add Supplier
                             </button>
-                        @endcan
+                        @endif
                         <div class="table-responsive">
                             <table id="fixed-header" class="display table nowrap table-striped table-hover"
                                    style="width:100%">
@@ -37,9 +37,9 @@
                                     <th>Phone</th>
                                     <th>Email</th>
                                     <th>Address</th>
-                                    @can('Manage Suppliers')
+                                    @if(auth()->user()->checkPermission('Manage Suppliers'))
                                         <th>Action</th>
-                                    @endcan
+                                    @endif
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -50,7 +50,7 @@
                                         <td>{{$supplier->mobile}}</td>
                                         <td>{{$supplier->email}}</td>
                                         <td>{{$supplier->address}}</td>
-                                        @can('Manage Suppliers')
+                                        @if(auth()->user()->checkPermission('Manage Suppliers'))
                                             <td>
                                                 <a href="#">
                                                     <button class="btn btn-sm btn-rounded btn-primary"
@@ -75,7 +75,7 @@
                                                     </button>
                                                 </a>
                                             </td>
-                                        @endcan
+                                        @endif
                                     </tr>
                                 @endforeach
                                 </tbody>
