@@ -40,8 +40,8 @@
                                     <div id="method" style="border: 2px solid white; border-radius: 6px;">
                                         <select id="payment_method" name="payment_method" class="form-control"
                                                 required="true">
-                                            <option selected="true" value="0" disabled="disabled">Select method</option>
-                                            <option value="1">CASH</option>
+                                            {{--                                            <option selected="true" value="0" disabled="disabled">Select method</option>--}}
+                                            <option value="1" selected="true">CASH</option>
                                             {{--                                            <option value="2">BILL</option>--}}
                                         </select>
                                     </div>

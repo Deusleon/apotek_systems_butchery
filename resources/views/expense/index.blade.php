@@ -8,12 +8,12 @@
 @endsection
 
 @section('content-title')
-    Expense
+    Expenses
 @endsection
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#"> Expenses / Expense </a></li>
+    <li class="breadcrumb-item"><a href="#"> Expenses / Expenses </a></li>
 @endsection
 
 @section("content")
@@ -83,7 +83,7 @@
                                             class="btn btn-secondary btn-sm"
                                             data-toggle="modal"
                                             data-target="#create">
-                                        Add Expense
+                                        Add Expenses
                                     </button>
                                 @endif
                             </div>
@@ -118,8 +118,8 @@
                                 <th>Expense Category</th>
                                 <th>Description</th>
                                 <th>Amount</th>
-                                <th>Payment Method</th>
-                                <th>User</th>
+                                {{--                                <th>Payment Method</th>--}}
+                                {{--                                <th>User</th>--}}
                                 <th>Action</th>
                             </tr>
                             </thead>
@@ -159,8 +159,8 @@
                         return formatMoney(amount);
                     }
                 },
-                {'data': 'payment_method'},
-                {'data': 'user'},
+                // {'data': 'payment_method'},
+                // {'data': 'user'},
                 {
                     'data': 'action',
                     defaultContent: "<button class='btn btn-primary btn-rounded btn-sm' type='button' id='edit_btn'>Edit</button><button class='btn btn-danger btn-rounded btn-sm' type='button' id='delete_btn'>Delete</button>"
