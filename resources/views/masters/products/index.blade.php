@@ -85,7 +85,6 @@
                             <thead>
                             <tr>
                                 <th>Product Name</th>
-                                <th hidden>Barcode</th>
                                 <th>Category</th>
                                 <th>Created at</th>
                                 @can('Manage Products')
@@ -129,7 +128,6 @@
                             <thead>
                             <tr>
                                 <th>Product Name</th>
-                                <th hidden>Barcode</th>
                                 <th>Category</th>
                                 <th>Created at</th>
                                 @can('Manage Products')
@@ -177,7 +175,6 @@
                         },
                         "columns": [
                             {"data": "name"},
-                            {"data": "barcode"},
                             {"data": "category"},
                             {"data": "date"},
                                 @can('Manage Products')
@@ -187,15 +184,6 @@
                             }
                             @endcan
                         ],
-                        'columnDefs': [
-                            {
-                                'targets': [1],
-                                'visible': false
-                            }, {
-                                "targets": [4],
-                                "orderable": false
-                            }
-                        ]
 
                     });
 
@@ -220,7 +208,6 @@
                         },
                         "columns": [
                             {"data": "name"},
-                            {"data": "barcode"},
                             {"data": "category"},
                             {"data": "date"},
                                 @can('Manage Products')
@@ -230,15 +217,6 @@
                             }
                             @endcan
                         ],
-                        'columnDefs': [
-                            {
-                                'targets': [1],
-                                'visible': false
-                            }, {
-                                "targets": [4],
-                                "orderable": false
-                            }
-                        ]
 
                     });
 
