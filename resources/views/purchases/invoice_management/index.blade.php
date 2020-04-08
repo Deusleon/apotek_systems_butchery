@@ -1,7 +1,7 @@
 @extends("layouts.master")
 
 @section('content-title')
-    Invoices
+    Invoice Management
 
 @endsection
 
@@ -81,6 +81,7 @@
                             <th>Balance</th>
                             <th>Due Date</th>
                             <th>Action</th>
+                            <th>Id</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -337,6 +338,13 @@
                 {
                     data: "action",
                     defaultContent: "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm' size='2'/><input type='button' value='Edit' id='edit_btn' class='btn btn-primary btn-rounded btn-sm' size='2' />"
+                },
+                {data: "id"}
+            ], aaSorting: [[7, 'asc']],
+            columnDefs: [
+                {
+                    targets: 7,
+                    visible: false
                 }
             ]
         });
@@ -369,10 +377,26 @@
                 return false;
             }
 
+            /*check invoice amount*/
+            let invoice_amount = document.getElementById('amount_id').value;
+            if (Number(invoice_amount) === Number(0)) {
+                notify('Invoice amount cannot be 0', 'top', 'right', 'warning');
+                return false;
+            }
+
+
         });
 
         $('#supplier').select2({
             dropdownParent: $('#create')
+        });
+
+        $('#supplier').on('change', function () {
+            document.getElementById('supplier_warning').style.display = 'none';
+        });
+
+        $('#received_status').on('change', function () {
+            document.getElementById('status_warning').style.display = 'none';
         });
 
         $("#period_id").select2({

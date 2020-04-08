@@ -19,14 +19,14 @@
                                         <label for="code">Invoice Number</label><font color="red">*</font>
                                         <input type="text" class="form-control" id="invoice_number"
                                                name="invoice_number" aria-describedby="emailHelp"
-                                               required="true">
+                                               required="true" autocomplete="off">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="code">Invoice Date</label><font color="red">*</font>
                                         <input type="text" class="form-control" id="d_auto" name="invoice_date"
-                                               aria-describedby="emailHelp"
+                                               aria-describedby="emailHelp" readonly
                                                autocomplete="off" required="true">
                                     </div>
                                 </div>
@@ -41,7 +41,7 @@
                                                 <option value="{{$supplier->id}}">{{$supplier->name}}</option>
                                             @endforeach
                                         </select>
-                                        <span id="supplier_warning" style="display: none; color: red; font-size: 0.9em">supplier required</span>
+                                        <span id="supplier_warning" style="display: none; color: red; font-size: 0.9em">Supplier required</span>
                                     </div>
                                 </div>
                             </div>
@@ -113,7 +113,7 @@
                                             <option>All Received</option>
                                             <option>Partial Received</option>
                                         </select>
-                                        <span id="status_warning" style="display: none; color: red; font-size: 0.9em">status required</span>
+                                        <span id="status_warning" style="display: none; color: red; font-size: 0.9em">Status required</span>
                                     </div>
                                 </div>
                             </div>
