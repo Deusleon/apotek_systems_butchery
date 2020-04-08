@@ -163,33 +163,6 @@
 
             <script>
 
-                $("#fixed-header2").dataTable().fnDestroy();
-                var table = $('#fixed-header2').DataTable({
-                    'columns': [
-                        {'data': 'name'},
-                        {"data": "barcode"},
-                        {'data': 'category'},
-                        {'data': 'date'},
-                            @can('Manage Products')
-                        {
-                            'data': "action",
-                            defaultContent: "<button type='button' id='activate' class='btn btn-sm btn-rounded btn-success'>Activate</button>"
-                        }
-                        @endcan
-
-                    ],
-                    'columnDefs': [
-                        {
-                            'targets': [1],
-                            'visible': false
-                        }, {
-                            "targets": [4],
-                            "orderable": false
-                        }
-                    ]
-                });
-
-
                 $(document).ready(function () {
                     $("#fixed-header1").dataTable().fnDestroy();
                     var table_main = $('#fixed-header1').DataTable({
@@ -578,7 +551,35 @@
 
                 }
 
+
                 function bindStatusFilterData(data) {
+
+                    $("#fixed-header2").dataTable().fnDestroy();
+                    var table = $('#fixed-header2').DataTable({
+                        'columns': [
+                            {'data': 'name'},
+                            {"data": "barcode"},
+                            {'data': 'category'},
+                            {'data': 'date'},
+                                @can('Manage Products')
+                            {
+                                'data': "action",
+                                defaultContent: "<button type='button' id='activate' class='btn btn-sm btn-rounded btn-success'>Activate</button>"
+                            }
+                            @endcan
+
+                        ],
+                        'columnDefs': [
+                            {
+                                'targets': [1],
+                                'visible': false
+                            }, {
+                                "targets": [4],
+                                "orderable": false
+                            }
+                        ]
+                    });
+
                     table.clear();
                     table.rows.add(data);
                     table.draw();
