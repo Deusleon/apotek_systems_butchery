@@ -163,6 +163,7 @@
 
             <script>
 
+                $("#fixed-header2").dataTable().fnDestroy();
                 var table = $('#fixed-header2').DataTable({
                     'columns': [
                         {'data': 'name'},
@@ -190,6 +191,7 @@
 
 
                 $(document).ready(function () {
+                    $("#fixed-header1").dataTable().fnDestroy();
                     var table_main = $('#fixed-header1').DataTable({
                         "processing": true,
                         "serverSide": true,
