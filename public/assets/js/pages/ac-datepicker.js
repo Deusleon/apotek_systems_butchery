@@ -22,44 +22,49 @@ $(document).ready(function () {
         changeYear: true
     });
 
-     $('#due_date').datepicker({
+    $('#due_date').datepicker({
         autoclose: true,
         todayHighlight: true,
         format: 'yyyy-mm-dd',
         changeYear: true
     });
-     $('#expire_d').datepicker({
-        autoclose: true,
-        todayHighlight: true,
-        format: 'yyyy-mm-dd',
-        changeYear: true
-    });
-        $('#expire_date_1').datepicker({
-        autoclose: true,
-        todayHighlight: true,
-        format: 'yyyy-mm-dd',
-        changeYear: true
-    });
-         $('#expire_date_2').datepicker({
+    $('#expire_d').datepicker({
         autoclose: true,
         todayHighlight: true,
         format: 'yyyy-mm-dd',
         changeYear: true
     });
 
-     $('#credit_sale_date').datepicker({
+    var date = new Date();
+    var tomorrow = new Date(date.getFullYear(), date.getMonth(), (date.getDate() + 1));
+    var end = new Date(date.getFullYear(), date.getMonth(), (date.getDate() + 1));
+
+    $('#expire_date_1').datepicker({
+        format: "yyyy-mm-dd",
+        startDate: tomorrow,
+        autoclose: true,
+        changeYear: true
+    });
+    $('#expire_date_2').datepicker({
         autoclose: true,
         todayHighlight: true,
         format: 'yyyy-mm-dd',
         changeYear: true
     });
-       $('#cash_sale_date').datepicker({
+
+    $('#credit_sale_date').datepicker({
         autoclose: true,
         todayHighlight: true,
         format: 'yyyy-mm-dd',
         changeYear: true
     });
-        $('#rec_d').datepicker({
+    $('#cash_sale_date').datepicker({
+        autoclose: true,
+        todayHighlight: true,
+        format: 'yyyy-mm-dd',
+        changeYear: true
+    });
+    $('#rec_d').datepicker({
         autoclose: true,
         todayHighlight: true,
         format: 'yyyy-mm-dd',
@@ -105,9 +110,9 @@ $(document).ready(function () {
         todayHighlight: true,
         format: 'yyyy-mm-dd',
         changeYear: true
-    }).on('change', function(){
+    }).on('change', function () {
         $('.datepicker').hide();
-    }).attr('readonly','readonly');
+    }).attr('readonly', 'readonly');
 
 
     $('#d_disable').datepicker({

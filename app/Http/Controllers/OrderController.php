@@ -78,7 +78,7 @@ class OrderController extends Controller
         if ($request->ajax()) {
             $max_prices = array();
             $current_stock = Product::where('status', 1)
-                ->limit(10)
+                ->limit(500)
                 ->get();
 
             foreach ($current_stock as $stock) {
@@ -90,6 +90,15 @@ class OrderController extends Controller
                     ->where('product_id', $stock->id)
                     ->orderBy('inv_incoming_stock.id', 'desc')
                     ->first('unit_cost');
+
+                if ($data === null) {
+                    $data = GoodsReceiving::select('unit_cost', 'product_id')
+                        ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
+                        ->where('inv_products.status', 1)
+                        ->where('product_id', $stock->id)
+                        ->orderBy('inv_incoming_stock.id', 'desc')
+                        ->first('unit_cost');
+                }
 
                 array_push($max_prices, array(
                     'name' => $stock->name,

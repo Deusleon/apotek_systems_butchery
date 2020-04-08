@@ -73,15 +73,9 @@ $('#cart_table tbody').on('change', '#edit_quantity', function () {
     var row_data = cart_table.row($(this).parents('tr')).data();
     var index = cart_table.row($(this).parents('tr')).index();
     row_data[1] = numberWithCommas(document.getElementById("edit_quantity").value);
-    // row_data[1] = parseFloat(document.getElementById("edit_price").value.replace(/\,/g, ''), 10);
     row_data[2] = document.getElementById("edit_price").value;
-    // default_cart[index][1] = Number(row_data[1]);
     quantity = Number(row_data[1]);
 
-
-    // row_data[1] = formatMoney(row_data[1]);
-    // row_data[3] = formatMoney(default_cart[index][1] * quantity * tax);
-    // row_data[4] = formatMoney(default_cart[index][1] * quantity * (1 + tax));
     cart[index] = row_data;
     discount();
     cart_table.clear();
@@ -332,6 +326,7 @@ $('#order_form').on('submit', function () {
     var check_cart_to_array = JSON.parse(cart);
 
     var price = "price";
+    var quantity = 'quantity';
 
     for (var key in check_cart_to_array) {
 
@@ -339,6 +334,15 @@ $('#order_form').on('submit', function () {
             //present
             if (parseFloat(check_cart_to_array[key][price]) === Number(0)) {
                 notify(check_cart_to_array[key].item_name + ' price cannot be 0 ', 'top', 'right', 'warning');
+                // $('#from_id').prop('disabled', true);
+                return false;
+            }
+        }
+
+        if (check_cart_to_array[key].hasOwnProperty(quantity)) {
+            //present
+            if (parseFloat(check_cart_to_array[key][quantity]) === Number(0)) {
+                notify(check_cart_to_array[key].item_name + ' quantity cannot be 0 ', 'top', 'right', 'warning');
                 // $('#from_id').prop('disabled', true);
                 return false;
             }

@@ -29,9 +29,6 @@
                                 <label for="code">Invoice #</label>
                                 <select name="invoice" class="form-control" id="invoice_ids">
                                     <option value="" selected="true" disabled>Select Option</option>
-                                    {{--                                    @foreach($invoices as $invoice)--}}
-                                    {{--                                        <option value="{{$invoice->id}}">{{$invoice->invoice_no}}</option>--}}
-                                    {{--                                    @endforeach--}}
                                 </select>
                             </div>
                         </div>

@@ -299,12 +299,12 @@ function orderReceive(items, supplier) {
 
     $('#cancel').on('click', function () {
         receive_cart = [];
-        getPurchaseHistory();
         document.getElementById('purchases').style.display = 'block';
         document.getElementById('dates').style.display = 'block';
         document.getElementById('dates_1').style.display = 'block';
-
         document.getElementById('items').style.display = 'none';
+
+        getPurchaseHistory();
     });
 
 }
@@ -376,7 +376,7 @@ function orderamountCheck() {
     if (Number(sell_price_parse) < Number(unit_price_parse)) {
 
         $('#save_btn').prop('disabled', true);
-        $('div.amount_error').text('Cannot be less than Buy Price');
+        $('div.amount_error').text('Selling Price Should be greater than Zero');
     } else if (sell_price_parse == unit_price_parse) {
         $('#save_btn').prop('disabled', true);
         $('div.amount_error').text('Cannot be equal to Buy Price');
@@ -519,6 +519,7 @@ function saveOrderReceiveForm() {
     });
 }
 
+
 $('#order_reveice').on('submit', function (e) {
     e.preventDefault();
     var unit_price = document.getElementById('pr_id').value;
@@ -532,6 +533,18 @@ $('#order_reveice').on('submit', function (e) {
     }
 
     $('#save_btn').attr('disabled', true);
+
+    if (config.vals.expire_date === "YES" && Number(a) === Number(1)) {
+        let date_check = document.getElementById('expire_date_1').value;
+
+        if (date_check === '') {
+            notify('Expire date is required', 'top', 'right', 'warning');
+            $('#save_btn').attr('disabled', false);
+            return false;
+        }
+
+    }
+
     saveOrderReceiveForm();
 
 });

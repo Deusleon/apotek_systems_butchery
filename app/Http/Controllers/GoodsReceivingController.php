@@ -449,7 +449,8 @@ class GoodsReceivingController extends Controller
             2 => 'ordered_at',
             3 => 'total_amount',
             4 => 'status',
-            5 => 'status'
+            5 => 'status',
+            6 => 'id'
         );
 
         $from = $request->range[0];
@@ -471,6 +472,8 @@ class GoodsReceivingController extends Controller
 
         if (empty($request->input('search.value'))) {
             $orders = Order::where('status', '<=', '3')
+                ->select('orders.id', 'order_number', 'supplier_id', 'ordered_by', 'ordered_at', 'received_by', 'received_at'
+                    , 'Comment', 'status', 'total_vat', 'total_amount')
                 ->join('inv_suppliers', 'inv_suppliers.id', '=', 'orders.supplier_id')
                 ->whereBetween(DB::raw('date(ordered_at)'),
                     [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
@@ -482,6 +485,8 @@ class GoodsReceivingController extends Controller
             $search = $request->input('search.value');
 
             $orders = Order::where('status', '<=', '3')
+                ->select('orders.id', 'order_number', 'supplier_id', 'ordered_by', 'ordered_at', 'received_by', 'received_at'
+                    , 'Comment', 'status', 'total_vat', 'total_amount')
                 ->join('inv_suppliers', 'inv_suppliers.id', '=', 'orders.supplier_id')
                 ->whereBetween(DB::raw('date(ordered_at)'),
                     [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
@@ -495,6 +500,8 @@ class GoodsReceivingController extends Controller
                 ->get();
 
             $totalFiltered = Order::where('status', '<=', '3')
+                ->select('orders.id', 'order_number', 'supplier_id', 'ordered_by', 'ordered_at', 'received_by', 'received_at'
+                    , 'Comment', 'status', 'total_vat', 'total_amount')
                 ->join('inv_suppliers', 'inv_suppliers.id', '=', 'orders.supplier_id')
                 ->whereBetween(DB::raw('date(ordered_at)'),
                     [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
