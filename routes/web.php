@@ -285,6 +285,8 @@ Route::middleware(["auth"])->group(function () {
 
     Route::get('current-stock/stock-detail', 'CurrentStockController@currentStockDetail')->name('current-stock-detail');
 
+    Route::get('current-stock/stock-detail-pricing', 'CurrentStockController@currentStockPricing')->name('current-pricing');
+
     Route::get('current-stock/stock-price-category', 'PriceListController@priceCategory')->name('sale-price-category');
 
     Route::get('inventory-management/stock-transfer-save', 'StockTransferController@store')->name('stock-transfer-save');

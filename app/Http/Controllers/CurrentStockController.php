@@ -74,14 +74,21 @@ class CurrentStockController extends Controller
                 $prices->price = str_replace(',', '', $request->sell_price);
                 $prices->price_category_id = $request->store_name;
 
-                $stock = CurrentStock::find($request->id);
-                $stock->product_id = $request->product_id;
-                $stock->expiry_date = $request->expiry_date;
-                $stock->batch_number = $request->batch_number;
-                $stock->unit_cost = str_replace(',', '', $request->unit_cost);
-                $stock->quantity = str_replace(',', '', $request->quantity);
-                $stock->store_id = $request->store_id;
-                $stock->shelf_number = $request->shelf_number;
+                if ($request->page_pricing != null) {
+                    $stock = CurrentStock::find($request->stock_id);
+                    $stock->product_id = $request->product_id;
+                    $stock->unit_cost = str_replace(',', '', $request->unit_cost);
+                } else {
+                    $stock = CurrentStock::find($request->id);
+                    $stock->product_id = $request->product_id;
+                    $stock->expiry_date = $request->expiry_date;
+                    $stock->batch_number = $request->batch_number;
+                    $stock->unit_cost = str_replace(',', '', $request->unit_cost);
+                    $stock->quantity = str_replace(',', '', $request->quantity);
+                    $stock->store_id = $request->store_id;
+                    $stock->shelf_number = $request->shelf_number;
+                }
+
                 $stock->save();
                 $prices->save();
 
@@ -94,16 +101,22 @@ class CurrentStockController extends Controller
                 $prices->status = 1;
                 $prices->created_at = date('Y-m-d');
 
-                $stock = CurrentStock::find($request->id);
-                $stock->product_id = $request->product_id;
-                $stock->expiry_date = $request->expiry_date;
-                $stock->batch_number = $request->batch_number;
-                $stock->unit_cost = str_replace(',', '', $request->unit_cost);
-                $stock->quantity = str_replace(',', '', $request->quantity);
-                $stock->store_id = $request->store_id;
-                $stock->shelf_number = $request->shelf_number;
+                if ($request->page_pricing != null) {
+                    $stock = CurrentStock::find($request->stock_id);
+                    $stock->product_id = $request->product_id;
+                    $stock->unit_cost = str_replace(',', '', $request->unit_cost);
+                } else {
+                    $stock = CurrentStock::find($request->id);
+                    $stock->product_id = $request->product_id;
+                    $stock->expiry_date = $request->expiry_date;
+                    $stock->batch_number = $request->batch_number;
+                    $stock->unit_cost = str_replace(',', '', $request->unit_cost);
+                    $stock->quantity = str_replace(',', '', $request->quantity);
+                    $stock->store_id = $request->store_id;
+                    $stock->shelf_number = $request->shelf_number;
+                }
 
-//                dd($request->sales_id);
+
                 $stock->save();
                 $prices->save();
             }
@@ -120,14 +133,21 @@ class CurrentStockController extends Controller
             $prices->status = 1;
             $prices->created_at = date('Y-m-d');
 
-            $stock = CurrentStock::find($request->id);
-            $stock->product_id = $request->product_id;
-            $stock->expiry_date = $request->expiry_date;
-            $stock->batch_number = $request->batch_number;
-            $stock->unit_cost = str_replace(',', '', $request->unit_cost);
-            $stock->quantity = str_replace(',', '', $request->quantity);
-            $stock->store_id = $request->store_id;
-            $stock->shelf_number = $request->shelf_number;
+            if ($request->page_pricing != null) {
+                $stock = CurrentStock::find($request->stock_id);
+                $stock->product_id = $request->product_id;
+                $stock->unit_cost = str_replace(',', '', $request->unit_cost);
+            } else {
+                $stock = CurrentStock::find($request->id);
+                $stock->product_id = $request->product_id;
+                $stock->expiry_date = $request->expiry_date;
+                $stock->batch_number = $request->batch_number;
+                $stock->unit_cost = str_replace(',', '', $request->unit_cost);
+                $stock->quantity = str_replace(',', '', $request->quantity);
+                $stock->store_id = $request->store_id;
+                $stock->shelf_number = $request->shelf_number;
+            }
+
 
             $stock->save();
             $prices->save();
@@ -189,6 +209,24 @@ class CurrentStockController extends Controller
 
             foreach ($current_stock as $item) {
                 $item->product;
+            }
+
+            return json_decode($current_stock, true);
+        }
+    }
+
+    public function currentStockPricing(Request $request)
+    {
+
+        if ($request->ajax()) {
+
+            $current_stock = CurrentStock::where('product_id', '=', $request->get("val"))
+                ->where('store_id', $request->store_id)
+                ->orderby('id', 'desc')
+                ->first();
+
+            if ($current_stock != null) {
+                $current_stock->product;
             }
 
             return json_decode($current_stock, true);

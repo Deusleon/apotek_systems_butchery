@@ -56,7 +56,7 @@
                             <div class="form-group">
                                 <label for="store_name">Price Category<span style="color: red; ">*</span></label>
                                 <select name="store_name" class="form-control" id="category"
-                                        required onchange="priceCategory()">
+                                        required onchange="priceCategory(0)">
                                     <option name="store_name" id="price_category"
                                             disabled selected readonly>
                                     </option>

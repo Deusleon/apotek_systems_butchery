@@ -176,6 +176,7 @@
     </div>
     </div>
     @include('stock_management.current_stock.edit')
+    @include('stock_management.current_stock.pricing')
     @include('stock_management.current_stock.show')
     @include('stock_management.current_stock.create')
     @include('stock_management.current_stock.stock_detail')
@@ -194,6 +195,7 @@
     <script>
 
         var role = 0;
+        let page_pricing_flag = 0;
 
         $('#stock_status_id').on('change', function (e) {
             stockStatus();
@@ -248,7 +250,7 @@
                     },
                     {
                         "data": "action",
-                        defaultContent: "<div><button id='detail' class='btn btn-sm btn-rounded btn-success' type='button'>Details</button></div>"
+                        defaultContent: "<div><button id='detail' class='btn btn-sm btn-rounded btn-success' type='button'>Details</button><button id='pricing' class='btn btn-sm btn-rounded btn-primary' type='button'>Pricing</button></div>"
                     }
                 ]
 
@@ -286,7 +288,7 @@
                     },
                     {
                         "data": "action",
-                        defaultContent: "<div><button id='details' class='btn btn-sm btn-rounded btn-success' type='button'>Details</button></div>"
+                        defaultContent: "<div><button id='details' class='btn btn-sm btn-rounded btn-success' type='button'>Details</button><button id='pricing_' class='btn btn-sm btn-rounded btn-primary' type='button'>Pricing</button></div>"
                     }
                 ]
 
@@ -374,11 +376,25 @@
             loadInStock();
         }
 
-        function priceCategory() {
-            var category = document.getElementById("category");
-            var category_id = category.options[category.selectedIndex].value;
-            var stock_id = document.getElementById("stock_id").value;
-            var product_id = document.getElementById("product_id").value;
+        function priceCategory(page) {
+            var category;
+            var category_id;
+            var stock_id;
+            var product_id;
+            if (Number(page) !== Number(0)) {
+                page_pricing_flag = 1;
+                category = document.getElementById("category_");
+                category_id = category.options[category.selectedIndex].value;
+                stock_id = document.getElementById("stock_id_").value;
+                product_id = document.getElementById("product_id_").value;
+            } else {
+                page_pricing_flag = 0;
+                category = document.getElementById("category");
+                category_id = category.options[category.selectedIndex].value;
+                stock_id = document.getElementById("stock_id").value;
+                product_id = document.getElementById("product_id").value;
+            }
+
 
             /*
              * make ajax call to get the price depending to the price category
@@ -395,17 +411,32 @@
                     product_id: product_id
                 },
                 success: function (data) {
-                    if (data.length === 0) {
-                        $("#sell_price_edit").val(formatMoney(0));
-                    } else {
-                        $("#sell_price_edit").val(formatMoney(data[0]['price']));
-                        $("#sales_id").val(data[0]['id']);
-                        if (data[0]['stock_id'] !== null) {
-                            $("#stock_id").val(data[0]['stock_id']);
+                    if (Number(page_pricing_flag) !== Number(0)) {
+                        if (data.length === 0) {
+                            $("#sell_price_edit_").val(formatMoney(0));
                         } else {
-                            console.log('null');
+                            $("#sell_price_edit_").val(formatMoney(data[0]['price']));
+                            $("#sales_id_").val(data[0]['id']);
+                            if (data[0]['stock_id'] !== null) {
+                                $("#stock_id_").val(data[0]['stock_id']);
+                            } else {
+                                console.log('null');
+                            }
+                        }
+                    } else {
+                        if (data.length === 0) {
+                            $("#sell_price_edit").val(formatMoney(0));
+                        } else {
+                            $("#sell_price_edit").val(formatMoney(data[0]['price']));
+                            $("#sales_id").val(data[0]['id']);
+                            if (data[0]['stock_id'] !== null) {
+                                $("#stock_id").val(data[0]['stock_id']);
+                            } else {
+                                console.log('null');
+                            }
                         }
                     }
+
                 },
                 complete: function () {
                     // $('#loading').hide();
@@ -417,16 +448,30 @@
         $(document).ready(function () {
             var table_main = $('#fixed-header-main').DataTable();
 
-            $('#tbody1').on('click', 'button', function () {
+            $('#tbody1').on('click', '#detail', function () {
                 var data = table_main.row($(this).parents('tr')).data();
                 retriveStockDetail(data.product_id);
             });
+            $('#tbody1').on('click', '#details', function () {
+                var data = table_main.row($(this).parents('tr')).data();
+                retriveStockDetail(data.product_id);
+            });
+
+            $('#tbody1').on('click', '#pricing_', function () {
+                var data = table_main.row($(this).parents('tr')).data();
+                retrivePricing(data.product_id);
+
+            });
+
         });
 
-        $('#tbody').on('click', 'button', function () {
+        $('#tbody').on('click', '#detail', function () {
             var data = $('#fixed-header1').DataTable().row($(this).parents('tr')).data();
-
             retriveStockDetail(data.product_id);
+        });
+        $('#tbody').on('click', '#pricing', function () {
+            var data = $('#fixed-header1').DataTable().row($(this).parents('tr')).data();
+            retrivePricing(data.product_id);
         });
 
 
@@ -474,7 +519,7 @@
 
             var ajaxurl = '{{route('current-stock-detail')}}';
 
-            $('#loading').show();
+            // $('#loading').show();
             $.ajax({
                 url: ajaxurl,
                 type: "get",
@@ -484,6 +529,7 @@
                     store_id: value_es_id
                 },
                 success: function (data) {
+
                     document.getElementById("tbody1").style.display = 'none';
                     document.getElementById("tbody").style.display = 'none';
                     document.getElementById("tbody_stock_status").style.display = 'block';
@@ -491,11 +537,43 @@
 
                 },
                 complete: function () {
-                    $('#loading').hide();
+                    // $('#loading').hide();
                 }
             });
         }
 
+        function retrivePricing(data) {
+            var val = data;
+
+            var es_id = document.getElementById("stores_id");
+            var value_es_id = es_id.options[es_id.selectedIndex].value;
+
+            var ajaxurl = '{{route('current-pricing')}}';
+
+            // $('#loading').show();
+            $.ajax({
+                url: ajaxurl,
+                type: "get",
+                dataType: "json",
+                data: {
+                    val: val,
+                    store_id: value_es_id
+                },
+                success: function (data) {
+                    popPricingModel(data);
+                }
+            });
+        }
+
+        function popPricingModel(data) {
+            $('#price_modal').modal('show');
+            $('#price_modal').find('.modal-body #name_edit').val(data.product.name);
+            $('#price_modal').find('.modal-body #unit_cost_edit_').val(formatMoney(data.unit_cost));
+            $('#price_modal').find('.modal-body #sell_price_edit_').val('');
+            $('#category_').val('');
+            $('#price_modal').find('.modal-body #product_id_').val(data.product_id);
+            $('#price_modal').find('.modal-body #stock_id_').val(data.id);
+        }
 
         function bindDetailData(data) {
             table_detail.clear();
@@ -535,10 +613,18 @@
             var s_p = document.getElementById('sell_price_edit').value;
             document.getElementById('sell_price_edit').value = formatMoney(s_p);
         });
+        $('#sell_price_edit_').on('change', function () {
+            var s_p = document.getElementById('sell_price_edit_').value;
+            document.getElementById('sell_price_edit_').value = formatMoney(s_p);
+        });
 
         $('#unit_cost_edit').on('change', function () {
             var s_p = document.getElementById('unit_cost_edit').value;
             document.getElementById('unit_cost_edit').value = formatMoney(s_p);
+        });
+        $('#unit_cost_edit_').on('change', function () {
+            var s_p = document.getElementById('unit_cost_edit_').value;
+            document.getElementById('unit_cost_edit_').value = formatMoney(s_p);
         });
 
         $('#update_stock').on('submit', function () {
