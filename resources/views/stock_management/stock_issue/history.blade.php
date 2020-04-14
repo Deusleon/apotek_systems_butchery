@@ -127,12 +127,12 @@
                                             <td>{{$issue->currentStock['product']['name']}}</td>
                                             <td align="right">
                                                 <div style="margin-right: 50%">
-                                                    {{number_format(floatval($issue->quantity))}}
+                                                    {{number_format(floatval($issue->quantity),2)}}
                                                 </div>
                                             </td>
                                             <td align="right">
                                                 <div style="margin-right: 50%">
-                                                    {{number_format(floatval($issue->return_qty))}}
+                                                    {{number_format(floatval($issue->return_qty),2)}}
                                                 </div>
                                             </td>
                                             <td>

@@ -14,7 +14,11 @@ var cart_table = $('#fixed-header1').DataTable({
     },
     'columns': [
         {title: "Product Name"},
-        {title: "Quantity on Hand"},
+        {
+            title: "Quantity on Hand", render: function (data) {
+                return numberWithCommas(data);
+            }
+        },
         {title: "Buy Price "},
         {title: "Sell Price"},
         {title: "Stock Id"},

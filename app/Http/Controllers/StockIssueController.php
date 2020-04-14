@@ -6,8 +6,10 @@ use App\CommonFunctions;
 use App\CurrentStock;
 use App\Location;
 use App\PriceList;
+use App\Setting;
 use App\StockIssue;
 use App\StockTracking;
+use App\Store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -28,6 +30,58 @@ class StockIssueController extends Controller
             'issues' => $stock_issues,
             'locations' => $locations
         ]);
+
+    }
+
+    public function maxBuyPricePlusQuantity()
+    {
+        /*get default store*/
+        $default_store = Setting::where('id', 122)->value('value');
+        $stores = Store::where('name', $default_store)->first();
+
+        if ($stores != null) {
+            $default_store_id = $stores->id;
+        } else {
+            $default_store_id = 1;
+        }
+
+        $max_prices = array();
+
+        $products = PriceList::where('price_category_id', 1)
+            ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
+            ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+            ->where('quantity', '>', 0)
+            ->where('inv_current_stock.store_id', $default_store_id)
+            ->where('inv_products.status', '=', 1)
+            ->select('inv_products.id as id', 'name')
+            ->groupBy('product_id')
+            ->get();
+
+        foreach ($products as $product) {
+            $data = PriceList::select('stock_id', 'price')->where('price_category_id', 1)
+                ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
+                ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                ->orderBy('stock_id', 'desc')
+                ->where('inv_current_stock.store_id', $default_store_id)
+                ->where('product_id', $product->id)
+                ->first('price');
+
+            $quantity = CurrentStock::where('product_id', $product->id)
+                ->where('inv_current_stock.store_id', $default_store_id)
+                ->sum('quantity');
+
+            array_push($max_prices, array(
+                'product_name' => $data->currentStock['product']['name'],
+                'unit_cost' => $data->currentStock['unit_cost'],
+                'selling_price' => $data->price,
+                'quantity' => $quantity,
+                'id' => $data->stock_id,
+                'product_id' => $product->id
+            ));
+
+        }
+
+        return $max_prices;
 
     }
 
@@ -313,49 +367,10 @@ class StockIssueController extends Controller
 
     }
 
-
     public function regenerateStockIssuePDF(Request $request)
     {
 
         return redirect()->route('stock-issue-pdf-gen', strval($request->issue_nos));
-
-    }
-
-    public function maxBuyPricePlusQuantity()
-    {
-        $max_prices = array();
-
-        $products = PriceList::where('price_category_id', 1)
-            ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
-            ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
-            ->where('quantity', '>', 0)
-            ->where('inv_products.status', '=', 1)
-            ->select('inv_products.id as id', 'name')
-            ->groupBy('product_id')
-            ->get();
-
-        foreach ($products as $product) {
-            $data = PriceList::select('stock_id', 'price')->where('price_category_id', 1)
-                ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
-                ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
-                ->orderBy('stock_id', 'desc')
-                ->where('product_id', $product->id)
-                ->first('price');
-
-            $quantity = CurrentStock::where('product_id', $product->id)->sum('quantity');
-
-            array_push($max_prices, array(
-                'product_name' => $data->currentStock['product']['name'],
-                'unit_cost' => $data->currentStock['unit_cost'],
-                'selling_price' => $data->price,
-                'quantity' => $quantity,
-                'id' => $data->stock_id,
-                'product_id' => $product->id
-            ));
-
-        }
-
-        return $max_prices;
 
     }
 

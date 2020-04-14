@@ -183,86 +183,86 @@ Route::middleware(["auth"])->group(function () {
 
 
     /*Current Stock routes*/
-    Route::resource('inventory-management/current-stock', 'CurrentStockController')->only([
+    Route::resource('inventory/current-stock', 'CurrentStockController')->only([
         'index', 'update'
     ]);
-    Route::post('inventory-management/current-stock/in-stock',
+    Route::post('inventory/current-stock/in-stock',
         'CurrentStockController@allInStock')->name('all-in-stock');
 
     /*stock adjustment routes*/
-    Route::resource('inventory-management/stock-adjustment', 'StockAdjustmentController')->only([
+    Route::resource('inventory/stock-adjustment', 'StockAdjustmentController')->only([
         'index', 'store', 'update', 'destroy'
     ]);
 
-    Route::post('inventory-management/stock-adjustment/all',
+    Route::post('inventory/stock-adjustment/all',
         'StockAdjustmentController@allAdjustments')->name('all-adjustments');
 
 
     /*price list route*/
-    Route::resource('inventory-management/price-list', 'PriceListController')->only([
+    Route::resource('inventory/price-list', 'PriceListController')->only([
         'index', 'store', 'update', 'destroy'
     ]);
 
-    Route::post('inventory-management/price-list/all',
+    Route::post('inventory/price-list/all',
         'PriceListController@allPriceList')->name('all-price-list');
 
     /*Stock transfer routes*/
-    Route::resource('inventory-management/stock-transfer', 'StockTransferController')->only([
+    Route::resource('inventory/stock-transfer', 'StockTransferController')->only([
         'index', 'store', 'update', 'destroy'
     ]);
 
-    Route::get('inventory-management/stock-transfer-history', 'StockTransferController@stockTransferHistory')->name('stock-transfer-history');
+    Route::get('inventory/stock-transfer-history', 'StockTransferController@stockTransferHistory')->name('stock-transfer-history');
 
-    Route::get('inventory-management/stock-transfer-filter-by-store', 'StockTransferController@filterByStore')->name('filter-by-store');
+    Route::get('inventory/stock-transfer-filter-by-store', 'StockTransferController@filterByStore')->name('filter-by-store');
 
-    Route::get('inventory-management/stock-transfer-filter-by-word', 'StockTransferController@filterByWord')->name('filter-by-word');
+    Route::get('inventory/stock-transfer-filter-by-word', 'StockTransferController@filterByWord')->name('filter-by-word');
 
     /*Stock transfer acknowledge routes*/
-    Route::resource('inventory-management/stock-transfer-acknowledge', 'StockTransferAcknowledgeController')->only([
+    Route::resource('inventor/stock-transfer-acknowledge', 'StockTransferAcknowledgeController')->only([
         'index', 'store', 'update', 'destroy'
     ]);
 
     /*Re print transfer routes*/
-    Route::resource('inventory-management/stock-transfer-reprint', 'RePrintTransferController')->only(['index']);
+    Route::resource('inventory/stock-transfer-reprint', 'RePrintTransferController')->only(['index']);
 
     /*Re print stock issue*/
-    Route::resource('inventory-management/stock-issue-reprint', 'RePrintIssueController')->only(['index']);
+    Route::resource('inventory/stock-issue-reprint', 'RePrintIssueController')->only(['index']);
 
     /*Stock issue routes*/
-    Route::resource('inventory-management/stock-issue', 'StockIssueController')->only([
+    Route::resource('inventory/stock-issue', 'StockIssueController')->only([
         'index', 'store', 'update', 'destroy'
     ]);
 
-    Route::get('inventory-management/stock-issue-history', 'IssueReturnController@issueHistory')
+    Route::get('inventory/stock-issue-history', 'IssueReturnController@issueHistory')
         ->name('stock-issue-history');
 
     /*Stock issue return routes*/
-    Route::resource('inventory-management/stock-issue-return', 'IssueReturnController')->only([
+    Route::resource('inventory/stock-issue-return', 'IssueReturnController')->only([
         'index', 'store'
     ]);
 
     /*product ledger routes*/
-    Route::resource('inventory-management/product-ledger', 'ProductLedgerController')->only([
+    Route::resource('inventory/product-ledger', 'ProductLedgerController')->only([
         'index'
     ]);
 
     /*daily stock count routes*/
-    Route::resource('inventory-management/daily-stock-count', 'DailyStockCountController')->only([
+    Route::resource('inventory/daily-stock-count', 'DailyStockCountController')->only([
         'index'
     ]);
 
     /*outgoingstock routes*/
-    Route::resource('inventory-management/out-going-stock', 'OutGoingStockController')->only([
+    Route::resource('inventory/out-going-stock', 'OutGoingStockController')->only([
         'index'
     ]);
 
     /*expense routes*/
-    Route::resource('expense-management/expense', 'ExpenseController')->only([
+    Route::resource('expenses/expense', 'ExpenseController')->only([
         'index', 'store', 'update', 'destroy'
     ]);
 
     /*inventory report routes*/
-    Route::get('inventory-management/inventory-report', 'InventoryReportController@index')->name('inventory-report-index');
+    Route::get('inventory/inventory-report', 'InventoryReportController@index')->name('inventory-report-index');
 
     /*accounting report routes*/
     Route::get('accounting-management/accounting-report', 'AccountingReportController@index')->name('accounting-report-index');
@@ -279,7 +279,7 @@ Route::middleware(["auth"])->group(function () {
 
 
     /*filters route with ajax*/
-    Route::get('inventory-management/myitems', 'CurrentStockController@filter')->name('myitems');
+    Route::get('inventory/myitems', 'CurrentStockController@filter')->name('myitems');
 
     Route::get('price/price-history', 'PriceListController@priceHistory')->name('price-history');
 
@@ -289,31 +289,31 @@ Route::middleware(["auth"])->group(function () {
 
     Route::get('current-stock/stock-price-category', 'PriceListController@priceCategory')->name('sale-price-category');
 
-    Route::get('inventory-management/stock-transfer-save', 'StockTransferController@store')->name('stock-transfer-save');
+    Route::get('inventory/stock-transfer-save', 'StockTransferController@store')->name('stock-transfer-save');
 
-    Route::get('inventory-management/stock-transfer-filter', 'StockTransferAcknowledgeController@transferFilter')->name('stock-transfer-filter');
+    Route::get('inventory/stock-transfer-filter', 'StockTransferAcknowledgeController@transferFilter')->name('stock-transfer-filter');
 
-    Route::get('inventory-management/stock-transfer-filter-detail', 'StockTransferAcknowledgeController@transferFilterDetailComplete')->name('stock-transfer-filter-detail');
+    Route::get('inventory/stock-transfer-filter-detail', 'StockTransferAcknowledgeController@transferFilterDetailComplete')->name('stock-transfer-filter-detail');
 
-    Route::get('inventory-management/stock-transfer-complete', 'StockTransferAcknowledgeController@stockTransferComplete')->name('stock-transfer-complete');
+    Route::get('inventory/stock-transfer-complete', 'StockTransferAcknowledgeController@stockTransferComplete')->name('stock-transfer-complete');
 
-    Route::get('inventory-management/stock-transfer-filter-by-date', 'StockTransferController@filterTransferByDate')->name('stock-transfer-filter-date');
+    Route::get('inventory/stock-transfer-filter-by-date', 'StockTransferController@filterTransferByDate')->name('stock-transfer-filter-date');
 
-    Route::get('inventory-management/stock-transfer-show', 'StockTransferAcknowledgeController@stockTransferShow')->name('stock-transfer-show');
+    Route::get('inventory/stock-transfer-show', 'StockTransferAcknowledgeController@stockTransferShow')->name('stock-transfer-show');
 
-    Route::get('inventory-management/stock-issue-show', 'StockIssueController@stockIssueShow')->name('stock-issue-show');
+    Route::get('inventory/stock-issue-show', 'StockIssueController@stockIssueShow')->name('stock-issue-show');
 
-    Route::get('inventory-management/stock-issue-show-reprint', 'StockIssueController@stockIssueShowReprint')->name('stock-issue-show-reprint');
+    Route::get('inventory/stock-issue-show-reprint', 'StockIssueController@stockIssueShowReprint')->name('stock-issue-show-reprint');
 
-    Route::get('inventory-management/stock-issue-filter', 'StockIssueController@stockIssueFilter')->name('stock-issue-filter');
+    Route::get('inventory/stock-issue-filter', 'StockIssueController@stockIssueFilter')->name('stock-issue-filter');
 
-    Route::get('inventory-management/product-ledger-filter', 'ProductLedgerController@showProductLedger')->name('product-ledger-show');
+    Route::get('inventory/product-ledger-filter', 'ProductLedgerController@showProductLedger')->name('product-ledger-show');
 
-    Route::get('inventory-management/out-going-stock-filter', 'OutGoingStockController@showOutStock')->name('outgoing-stock-show');
+    Route::get('inventory/out-going-stock-filter', 'OutGoingStockController@showOutStock')->name('outgoing-stock-show');
 
-    Route::get('inventory-management/daily-stock-count-filter', 'DailyStockCountController@showDailyStockFilter')->name('daily-stock-count-filter');
+    Route::get('inventory/daily-stock-count-filter', 'DailyStockCountController@showDailyStockFilter')->name('daily-stock-count-filter');
 
-    Route::get('expense-management/expense-date-filter', 'ExpenseController@filterExpenseDate')->name('expense-date-filter');
+    Route::get('expenses/expense-date-filter', 'ExpenseController@filterExpenseDate')->name('expense-date-filter');
 
     Route::get('inventory-report/inventory-report-filter', 'InventoryReportController@reportOption')->name('inventory-report-filter');
 
@@ -321,17 +321,17 @@ Route::middleware(["auth"])->group(function () {
 
 
     /*Pdf generator routes*/
-    Route::get('inventory-management/stock-transfer/pdfgen/{transfer_no}', 'StockTransferController@generateStockTransferPDF')->name('stock-transfer-pdf-gen');
+    Route::get('inventory/stock-transfer/pdfgen/{transfer_no}', 'StockTransferController@generateStockTransferPDF')->name('stock-transfer-pdf-gen');
 
-    Route::post('inventory-management/stock-transfer/pdfregen', 'StockTransferController@regenerateStockTransferPDF')->name('stock-transfer-pdf-regen');
+    Route::post('inventor/stock-transfer/pdfregen', 'StockTransferController@regenerateStockTransferPDF')->name('stock-transfer-pdf-regen');
 
-    Route::get('inventory-management/stock-issue/pdfgen/{issue_no}', 'StockIssueController@generateStockIssuePDF')->name('stock-issue-pdf-gen');
+    Route::get('inventory/stock-issue/pdfgen/{issue_no}', 'StockIssueController@generateStockIssuePDF')->name('stock-issue-pdf-gen');
 
-    Route::post('inventory-management/stock-issue/pdfregen', 'StockIssueController@regenerateStockIssuePDF')->name('stock-issue-pdf-regen');
+    Route::post('inventory/stock-issue/pdfregen', 'StockIssueController@regenerateStockIssuePDF')->name('stock-issue-pdf-regen');
 
-    Route::post('inventory-management/daily-stock-count/pdfgen', 'DailyStockCountController@generateDailyStockCountPDF')->name('daily-stock-count-pdf-gen');
+    Route::post('inventory/daily-stock-count/pdfgen', 'DailyStockCountController@generateDailyStockCountPDF')->name('daily-stock-count-pdf-gen');
 
-    Route::get('inventory-management/inventory-count-sheet/Inventory Count Sheet', 'InventoryCountSheetController@generateInventoryCountSheetPDF')->name('inventory-count-sheet-pdf-gen');
+    Route::get('inventory/inventory-count-sheet/Inventory Count Sheet', 'InventoryCountSheetController@generateInventoryCountSheetPDF')->name('inventory-count-sheet-pdf-gen');
 
     //user roles
     Route::get('user-roles', 'RoleController@index')->name('roles.index');
