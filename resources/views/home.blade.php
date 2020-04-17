@@ -121,11 +121,11 @@
                     Summary</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" data-toggle="pill" href="#pills-purchase" role="tab" aria-selected="false">Purchase
+                <a class="nav-link" data-toggle="pill" href="#pills-purchase" role="tab" aria-selected="false">Purchases
                     Summary</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" data-toggle="pill" href="#pills-expense" role="tab" aria-selected="false">Expense
+                <a class="nav-link" data-toggle="pill" href="#pills-expense" role="tab" aria-selected="false">Expenses
                     Summary</a>
             </li>
 
