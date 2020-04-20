@@ -457,7 +457,6 @@ class SaleReportController extends Controller
         }
 
         $sale_detail = SalesDetail::select(DB::Raw("sum(amount) as amount"), 'sale_id')
-            ->whereNotIn('sale_id', DB::table('sales_credits')->pluck('sale_id'))
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
             ->whereBetween(DB::Raw("date(date)"), [$date[0], $date[1]])
             ->groupby('sale_id')
