@@ -457,17 +457,6 @@ class SaleReportController extends Controller
             array_push($dates_only, $dates->date);
         }
 
-        rsort($dates_only);
-
-        $y = [];
-        $clength = count($dates_only);
-        for ($x = 0; $x < $clength; $x++) {
-            array_push($y, $dates_only[$x]);
-        }
-
-        $dates_only = $y;
-
-
         $sale_detail = SalesDetail::select(DB::Raw("sum(amount) as amount"), 'sale_id')
             ->whereNotIn('sale_id', DB::table('sales_credits')->pluck('sale_id'))
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
@@ -485,6 +474,7 @@ class SaleReportController extends Controller
             ));
 
         }
+        dd($initial);
 
         $data_by_key_user = [];
         $data_by_key_user_date = [];
