@@ -67,13 +67,7 @@ class HomeController extends Controller
         $fast_moving = $this->fastMovingCalculation($fast_moving);
 
         if ($fast_moving != []) {
-            $moving_item = 0;
-            foreach ($fast_moving as $moving) {
-                $moving_item = $moving_item + $moving['occurrence'];
-            }
-
-            $fast_moving = $moving_item;
-
+            $fast_moving = sizeof($fast_moving);
         } else {
             $fast_moving = 0;
         }
