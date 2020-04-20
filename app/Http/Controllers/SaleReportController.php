@@ -106,6 +106,7 @@ class SaleReportController extends Controller
             case 12:
                 $dates = explode(" - ", $request->date_range);
                 $data = $this->salesComparison($dates);
+                dd($data);
                 if ($data == []) {
                     return response()->view('error_pages.pdf_zero_data');
                 }
