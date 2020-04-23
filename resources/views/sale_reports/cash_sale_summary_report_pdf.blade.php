@@ -101,7 +101,7 @@
                 <th align="center">Amount</th>
                 <th align="center">Sold By</th>
             </tr>
-
+            <?php $x = 0; ?>
             @foreach($data as $item)
                 <tr>
                     <td align="center">{{date('d-m-Y',strtotime($item['date']))}}</td>
@@ -110,8 +110,27 @@
                     </td>
                     <td align="center">{{$item['sold_by']}}</td>
                 </tr>
+                <?php $x += $item['sub_total'];?>
+
             @endforeach
         </table>
+
+        <div class="full-row" style="padding-top: 1%">
+            <div class="col-35">
+                <div class="full-row">
+                </div>
+
+            </div>
+            <div class="col-15"></div>
+            <div class="col-25"></div>
+            <div class="col-25">
+                <div class="full-row">
+                    <div class="col-50" align="left"><b>Total </b></div>
+                    <div class="col-50"
+                         align="right">{{number_format($x,2)}}</div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <script type="text/php">

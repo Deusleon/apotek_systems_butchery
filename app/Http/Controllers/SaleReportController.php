@@ -235,7 +235,11 @@ class SaleReportController extends Controller
 
         foreach ($sale_detail as $item) {
             $value = $item->amount - $item->discount;
-            $vat_percent = $item->vat / $item->price;
+            if ($item->price != 0) {
+                $vat_percent = $item->vat / $item->price;
+            } else {
+                $vat_percent = 0;
+            }
             $sub_total = ($value / (1 + $vat_percent));
 
             array_push($sale_detail_to_pdf, array(

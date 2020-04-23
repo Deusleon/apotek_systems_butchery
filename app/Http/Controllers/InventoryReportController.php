@@ -337,7 +337,7 @@ class InventoryReportController extends Controller
 
     private function outOfStockReport()
     {
-        $out_of_stock = CurrentStock::where('quantity', '<=', 0)
+        $out_of_stock = CurrentStock::where('quantity', 0)
             ->groupby('product_id')
             ->get();
 
