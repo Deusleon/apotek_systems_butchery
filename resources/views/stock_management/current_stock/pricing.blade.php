@@ -41,7 +41,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="exampleFormControlSelect1">Buying Price</label>
-                                <input type="text" class="form-control" id="unit_cost_edit_"
+                                <input type="text" class="form-control" id="unit_cost_edit_1"
                                        name="unit_cost" onkeypress="return isNumberKey(event,this)"
                                        placeholder="" value="{{ old('unit_cost') }}">
                             </div>

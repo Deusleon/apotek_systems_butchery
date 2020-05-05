@@ -30,7 +30,7 @@
             @if(auth()->user()->checkPermission('View Credit Tracking'))
                 <li class=""><a href="{{route('credits-tracking.creditsTracking')}}" class="">Credit Tracking</a></li>
             @endif
-            @if(auth()->user()->checkPermission('View Sales History'))
+            @if(auth()->user()->checkPermission('View Payment History'))
                 <li class=""><a href="{{route('payments.getPaymentsHistory')}}" class="">Payment History</a></li>
             @endif
             @if(auth()->user()->checkPermission('View Customers'))

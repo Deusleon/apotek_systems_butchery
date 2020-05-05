@@ -102,7 +102,13 @@
 
             <script>
                 $('#fixed-header-main').DataTable({
-                    aaSorting: [[1, "desc"]]
+                    columnDefs: [
+                        {
+                            type: 'date',
+                            targets: [1]
+                        }
+                    ],
+                    order: [[1, "desc"]]
                 });
 
                 let payment_history_filter_table = $('#fixed-header-filter').DataTable({
@@ -118,7 +124,15 @@
                                 return formatMoney(amount);
                             }
                         }
-                    ], aaSorting: [[1, "desc"]]
+                    ],
+                    columnDefs: [
+                        {
+                            type: 'date',
+                            targets: [1]
+                        }
+                    ],
+                    order: [[1, "desc"]],
+                    // aaSorting: [[1, "desc"]]
                 });
 
                 function filterPaymentHistory() {

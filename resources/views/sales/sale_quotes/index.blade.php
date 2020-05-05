@@ -193,6 +193,7 @@
                             <th>Discount</th>
                             <th>Amount</th>
                             <th>Action</th>
+                            <th hidden>id</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -217,6 +218,7 @@
                                             </button>
                                         </a>
                                     </td>
+                                    <td hidden>{{$quote->id}}</td>
                             </tr>
                             @endforeach
                         @endif
@@ -308,7 +310,8 @@
             $('#sale_quotes-Table').DataTable({
                 language: {
                     emptyTable: "No Sales Quote Data Available in the Table"
-                }, aaSorting: [[0, 'desc']]
+                },
+                aaSorting: [[7, 'desc']]
             });
         });
 

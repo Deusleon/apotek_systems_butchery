@@ -568,7 +568,7 @@
         function popPricingModel(data) {
             $('#price_modal').modal('show');
             $('#price_modal').find('.modal-body #name_edit').val(data.product.name);
-            $('#price_modal').find('.modal-body #unit_cost_edit_').val(formatMoney(data.unit_cost));
+            $('#price_modal').find('.modal-body #unit_cost_edit_1').val(formatMoney(data.unit_cost));
             $('#price_modal').find('.modal-body #sell_price_edit_').val('');
             $('#category_').val('');
             $('#price_modal').find('.modal-body #product_id_').val(data.product_id);
@@ -622,9 +622,9 @@
             var s_p = document.getElementById('unit_cost_edit').value;
             document.getElementById('unit_cost_edit').value = formatMoney(s_p);
         });
-        $('#unit_cost_edit_').on('change', function () {
-            var s_p = document.getElementById('unit_cost_edit_').value;
-            document.getElementById('unit_cost_edit_').value = formatMoney(s_p);
+        $('#unit_cost_edit_1').on('change', function () {
+            var s_p = document.getElementById('unit_cost_edit_1').value;
+            document.getElementById('unit_cost_edit_1').value = formatMoney(s_p);
         });
 
         $('#update_stock').on('submit', function () {
