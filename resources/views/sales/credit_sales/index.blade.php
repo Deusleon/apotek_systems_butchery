@@ -220,6 +220,8 @@
                                     <input type="hidden" id="credit_sale" name="credit" value="Yes">
                                     <input type="hidden" id="order_cart" name="cart">
                                     <input type="hidden" value="{{$vat}}" id="vat">
+                                    <input type="hidden" value="{{$fixed_price}}" id="fixed_price">
+                                    <input type="hidden" value="{{$enable_discount}}" id="enable_discount">
                                 </div>
                             @endif
                             <hr>
@@ -318,6 +320,7 @@
     <script type="text/javascript">
 
         var page_no = 1;//sales page
+        var normal_search = 0;//search by word
 
         $.ajaxSetup({
             headers: {
@@ -336,6 +339,16 @@
             }
         };
 
+        /*normal product search box*/
+        $('#products').on('select2:open', function (e) {
+            // select2 is opened, handle event
+            normal_search = 1;
+        });
+        $('#products').on('select2:close', function (e) {
+            // select2 is opened, handle event
+            normal_search = 0;
+        });
+
         /*hide barcode search*/
         $.fn.toggleSelect2 = function (state) {
             return this.each(function () {
@@ -348,50 +361,50 @@
             var sale_type_id = localStorage.getItem('sale_type');
             $('#products_b').toggleSelect2(false);
 
-            // if (sale_type_id) {
-            //     $('#products_b').select2('close');
-            //     setTimeout(function () {
-            //         $('input[name="input_products_b"]').focus()
-            //     }, 30);
-            // }
-            //
-            // $('#price_category').on('change', function () {
-            //     setTimeout(function () {
-            //         $('input[name="input_products_b"]').focus()
-            //     }, 30);
-            // });
+            if (sale_type_id) {
+                $('#products_b').select2('close');
+                setTimeout(function () {
+                    $('input[name="input_products_b"]').focus()
+                }, 30);
+            }
+
+            $('#price_category').on('change', function () {
+                setTimeout(function () {
+                    $('input[name="input_products_b"]').focus()
+                }, 30);
+            });
 
         });
 
-        // $('#customer').on('change', function () {
-        //     setTimeout(function () {
-        //         $('input[name="input_products_b"]').focus()
-        //     }, 30);
-        // });
-        //
-        // $('#grace_period').on('change', function () {
-        //     setTimeout(function () {
-        //         $('input[name="input_products_b"]').focus()
-        //     }, 30);
-        // });
+        $('#customer').on('change', function () {
+            setTimeout(function () {
+                $('input[name="input_products_b"]').focus()
+            }, 30);
+        });
 
-        // //setup before functions
-        // var typingTimer;                //timer identifier
-        // var doneTypingInterval = 500;  //time in ms (5 seconds)
-        //
-        // //on keyup, start the countdown
-        // $('#input_products_b').keyup(function () {
-        //     clearTimeout(typingTimer);
-        //     if ($('#input_products_b').val()) {
-        //         typingTimer = setTimeout(doneTyping, doneTypingInterval);
-        //     }
-        // });
-        //
-        // function doneTyping() {
-        //     $("#products_b").data('select2').$dropdown.find("input").val(document.getElementById('input_products_b').value).trigger('keyup');
-        //     $('#products_b').select2('close');
-        //     document.getElementById('input_products_b').value = '';
-        // }
+        $('#grace_period').on('change', function () {
+            setTimeout(function () {
+                $('input[name="input_products_b"]').focus()
+            }, 30);
+        });
+
+        //setup before functions
+        var typingTimer;                //timer identifier
+        var doneTypingInterval = 500;  //time in ms (5 seconds)
+
+        //on keyup, start the countdown
+        $('#input_products_b').keyup(function () {
+            clearTimeout(typingTimer);
+            if ($('#input_products_b').val()) {
+                typingTimer = setTimeout(doneTyping, doneTypingInterval);
+            }
+        });
+
+        function doneTyping() {
+            $("#products_b").data('select2').$dropdown.find("input").val(document.getElementById('input_products_b').value).trigger('keyup');
+            $('#products_b').select2('close');
+            document.getElementById('input_products_b').value = '';
+        }
 
     </script>
 

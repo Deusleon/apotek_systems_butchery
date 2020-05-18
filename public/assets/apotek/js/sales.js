@@ -14,9 +14,14 @@ let discount_enable;
 
 try {
     fixed_price = document.getElementById("fixed_price").value;
-    discount_enable = document.getElementById('enable_discount').value;
 } catch (e) {
     console.log('fixed_price_not_found')
+}
+
+try {
+    discount_enable = document.getElementById('enable_discount').value;
+} catch (e) {
+    console.log('discount error');
 }
 
 
@@ -321,9 +326,9 @@ $('#deselect-all').on('click', function () {
         }
     }
 
-    // setTimeout(function () {
-    //     $('input[name="input_products_b"]').focus()
-    // }, 30);
+    setTimeout(function () {
+        $('input[name="input_products_b"]').focus()
+    }, 30);
 
 });
 
@@ -341,9 +346,9 @@ $('#deselect-all-credit-sale').on('click', function () {
         }
     }
 
-    // setTimeout(function () {
-    //     $('input[name="input_products_b"]').focus()
-    // }, 30);
+    setTimeout(function () {
+        $('input[name="input_products_b"]').focus()
+    }, 30);
 
 });
 
@@ -361,9 +366,9 @@ $('#deselect-all-quote').on('click', function () {
         }
     }
 
-    // setTimeout(function () {
-    //     $('input[name="input_products_b"]').focus()
-    // }, 30);
+    setTimeout(function () {
+        $('input[name="input_products_b"]').focus()
+    }, 30);
 
 });
 
@@ -386,6 +391,8 @@ function discount() {
     } else {
         sale_discount = 0;
     }
+
+    console.log(sale_discount);
 
     var sub_total, total_vat, total = 0;
     if (cart[0]) {
@@ -564,9 +571,9 @@ function valueCollection() {
     if (product === '') {
         product = document.getElementById("products").value;
         document.getElementById("products").value = "";
-        // setTimeout(function () {
-        //     $('input[name="input_products_b"]').focus()
-        // }, 30);
+        setTimeout(function () {
+            $('input[name="input_products_b"]').focus()
+        }, 30);
     }
 
     if (product) {
@@ -653,35 +660,6 @@ function deselectQuote() {
     default_cart = [];
     discount();
 }
-
-function rePopulateSelect2() {
-    $("#price_category option").remove();
-    $('#price_category').append($('<option>', {
-        value: '',
-        text: 'Select Type',
-        selected: true,
-        disabled: true
-    }));
-    $.each(JSON.parse(category_option), function (id, detail) {
-        var datas = [detail.id];
-        $('#price_category').append($('<option>', {value: datas, text: detail.name}));
-    });
-}
-
-function rePopulateSelect2Customer() {
-    $("#customer_id option").remove();
-    $('#customer_id').append($('<option>', {
-        value: '',
-        text: 'Select Customer',
-        selected: true,
-        disabled: true
-    }));
-    $.each(JSON.parse(customer_option), function (id, detail) {
-        var datas = [detail.id];
-        $('#customer_id').append($('<option>', {value: datas, text: detail.name}));
-    });
-}
-
 
 function saleReturn(items, sale_id) {
     var return_cart = [];
@@ -836,14 +814,6 @@ $('#products').select2({
                         $('#products').append($('<option>', {value: detail, text: name}));
                     });
 
-                    // if (Object.keys(result).length === 2) {
-                    //     $("#products").children().removeAttr("selected");
-                    //     $("#products").children().eq(1).attr('selected', 'selected').change();
-                    //     $("#products").data('select2').$dropdown.find("input").val('');
-                    // } else if (Object.keys(result).length === 1) {
-                    //     $("#products").data('select2').$dropdown.find("input").val('');
-                    // }
-
                 }
             });
         }
@@ -872,13 +842,22 @@ $('#products_b').select2({
                         $('#products_b').append($('<option>', {value: detail, text: name}));
                     });
 
-                    // if (Object.keys(result).length === 2) {
-                    //     $("#products_b").children().removeAttr("selected");
-                    //     $("#products_b").children().eq(1).attr('selected', 'selected').change();
-                    //     $("#products_b").data('select2').$dropdown.find("input").val('');
-                    // } else if (Object.keys(result).length === 1) {
-                    //     $("#products_b").data('select2').$dropdown.find("input").val('');
-                    // }
+                    if (Object.keys(result).length === 2) {
+                        $("#products_b").children().removeAttr("selected");
+                        $("#products_b").children().eq(1).attr('selected', 'selected').change();
+                        $("#products_b").data('select2').$dropdown.find("input").val('');
+                    } else if (Object.keys(result).length === 1) {
+                        $("#products_b").data('select2').$dropdown.find("input").val('');
+                        setTimeout(function () {
+                            $('input[name="input_products_b"]').focus()
+                        }, 30);
+                        notify('Product not found', 'top', 'right', 'info');
+
+                    } else {
+                        setTimeout(function () {
+                            $('input[name="input_products_b"]').focus()
+                        }, 30);
+                    }
 
                 }
             });

@@ -1,6 +1,6 @@
     var cart=[];
     var default_cart=[];
-    var order_cart=[];  
+    var order_cart = [];
 
     var cart_table= $('#cart_table').DataTable({
         searching: false,
@@ -18,18 +18,18 @@
     } );
 
     function discount(){
-      sale_dicount = document.getElementById("sale_discount").value; 
-      var sub_total,total_vat,total = 0; 
+        sale_dicount = document.getElementById("sale_discount").value;
+        var sub_total, total_vat, total = 0;
       if (cart[0]){
         cart.forEach(function(item, index, arr){
         sub_total += parseFloat(item[1].replace(/\,/g,''), 10);
-        total_vat += parseFloat(item[3].replace(/\,/g,''), 10); 
+            total_vat += parseFloat(item[3].replace(/\,/g, ''), 10);
         total += parseFloat(item[4].replace(/\,/g,''), 10);
-        })
+        });
         total=total-sale_dicount;
         sub_total=total/1.18;
-        total_vat= total-sub_total;  
-      } 
+          total_vat = total - sub_total;
+      }
         document.getElementById("id_vat").value = total_vat;
         document.getElementById("sale_discount").value = sale_dicount;
         document.getElementById("total_price").value =total;
@@ -37,7 +37,7 @@
         document.getElementById("total").value = formatMoney(total);
         document.getElementById("sub_total").value =  formatMoney(sub_total);
     }
-   
+
 
     function val() {
     var item=[];
@@ -77,13 +77,13 @@
 
     }
 
-     
+
     function deselect(){
     sub_total=0;
     total=0;
     discount();
     cart=[];
-    order_cart=[]; 
+        order_cart = [];
     stringified_cart=JSON.stringify( order_cart );
     document.getElementById("total").value = formatMoney(total);
     document.getElementById("sub_total").value =  formatMoney(sub_total);
@@ -91,7 +91,7 @@
     cart_table.clear();
     cart_table.rows.add(cart);
     cart_table.draw();
-    } 
+    }
 
     $('#cart_table tbody').on( 'click', '#edit_btn', function () {
     var row_data =  cart_table.row( $(this).parents('tr') ).data();
@@ -131,10 +131,10 @@
     var index =  cart_table.row( $(this).parents('tr') ).index();
     var price = parseFloat(cart[index][1].replace(/\,/g,''), 10);
     var unit_total = parseFloat(cart[index][4].replace(/\,/g,''), 10);
-    order_cart.splice(index, 1); 
+        order_cart.splice(index, 1);
     stringified_cart=JSON.stringify( order_cart );
     document.getElementById("order_cart").value =  stringified_cart;
-    cart.splice(index, 1); 
+        cart.splice(index, 1);
     discount();
     cart_table.clear();
     cart_table.rows.add(cart);
@@ -143,7 +143,7 @@
 
     $('#deselect-all').on('click', function() {
            deselect();
-        }); 
+    });
 
     function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
     try {
@@ -159,11 +159,10 @@
     } catch (e) {
     console.log(e)
     }
-    };
-
+    }
     $('#view-quote-details').on('show.bs.modal', function (event) {
-      var button = $(event.relatedTarget)
-      var modal = $(this)
+        var button = $(event.relatedTarget);
+        var modal = $(this);
       var items = button.data('item');
       var details = [];
       items.forEach(function(item){
@@ -174,13 +173,13 @@
         item_data.push(item.vat);
         item_data.push(item.amount);
         details.push(item_data);
-      })
+      });
        showQuoteDetails(details);
-    }); 
+    });
 
     $('#view-sale-details').on('show.bs.modal', function (event) {
-      var button = $(event.relatedTarget)
-      var modal = $(this)
+        var button = $(event.relatedTarget);
+        var modal = $(this);
       var items = button.data('item');
       var details = [];
       items.forEach(function(item){
@@ -191,9 +190,9 @@
         item_data.push(item.vat);
         item_data.push(item.amount);
         details.push(item_data);
-      })
+      });
        showSaleDetails(details);
-     });   
+    });
 
 
      function showQuoteDetails(details){
@@ -209,7 +208,7 @@
                 { title: "VAT" },
                 { title: "Amount" }
             ]
-        } ); 
+          });
         details_table.destroy();
         details_table.clear();
         details_table.rows.add(details);
@@ -231,7 +230,7 @@
             { title: "Amount" },
              { title: "Action",defaultContent: "<input type='button' value='Return' id='rtn_btn' class='btn btn-warning btn-rounded btn-sm'/>"}
         ]
-    } ); 
+      });
 
     sale_details_table.destroy();
     sale_details_table.clear();
