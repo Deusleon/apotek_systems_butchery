@@ -17,7 +17,7 @@
                             <th>To</th>
                             <th>Product Name</th>
                             <th>Quantity</th>
-                            <th>Remarks</th>
+                            {{--                            <th>Remarks</th>--}}
                         </tr>
                         </thead>
                         <tbody>

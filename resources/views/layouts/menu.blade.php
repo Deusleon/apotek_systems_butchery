@@ -54,7 +54,7 @@
                 <li class=""><a href="{{ route('price-list.index') }}" class="">Price List</a></li>
             @endif
             @if(auth()->user()->checkPermission('View Stock Adjustment'))
-                <li class=""><a href="{{ route('stock-adjustment.index') }}" class="">Adjustment History</a></li>
+                <li class=""><a href="{{ route('adjustment-history.index') }}" class="">Adjustment History</a></li>
             @endif
             @if(auth()->user()->checkPermission('View Outgoing Stock'))
                 <li class=""><a href="{{ route('out-going-stock.index') }}" class="">Outgoing Stock</a></li>

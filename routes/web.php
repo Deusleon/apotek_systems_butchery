@@ -190,7 +190,7 @@ Route::middleware(["auth"])->group(function () {
         'CurrentStockController@allInStock')->name('all-in-stock');
 
     /*stock adjustment routes*/
-    Route::resource('inventory/stock-adjustment', 'StockAdjustmentController')->only([
+    Route::resource('inventory/adjustment-history', 'StockAdjustmentController')->only([
         'index', 'store', 'update', 'destroy'
     ]);
 
@@ -211,7 +211,9 @@ Route::middleware(["auth"])->group(function () {
         'index', 'store', 'update', 'destroy'
     ]);
 
-    Route::get('inventory/stock-transfer-history', 'StockTransferController@stockTransferHistory')->name('stock-transfer-history');
+    Route::post('inventory/stock-transfer_1', 'StockTransferController@storeTransfer')->name('stock_transfer.store');
+
+    Route::get('inventory/stock-transfer_', 'StockTransferController@stockTransferHistory')->name('stock-transfer-history');
 
     Route::get('inventory/stock-transfer-filter-by-store', 'StockTransferController@filterByStore')->name('filter-by-store');
 

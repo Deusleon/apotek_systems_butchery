@@ -34,7 +34,7 @@ var table_stock_detail = $('#fixed-header2').DataTable({
                 return numberWithCommas(data);
             }
         },
-        {'data': 'remarks'}
+        // {'data': 'remarks'}
     ]
 
 });
@@ -42,7 +42,8 @@ var table_stock_detail = $('#fixed-header2').DataTable({
 var table_re_print1 = $('#fixed-header-re-print').DataTable({
     searching: true,
     bPaginate: true,
-    bInfo: true
+    bInfo: true,
+    aaSorting: [[3, 'asc']]
 });
 
 //reprint stock tranfer table
@@ -51,15 +52,15 @@ var table_re_print = $('#fixed-header-re-print1').DataTable({
     'columns': [
         {'data': 'transfer_no'},
         {'data': 'date'},
-        {
-            'data': 'transfer_qty', render: function (data) {
-                return numberWithCommas(data);
-            }
-        },
+        // {
+        //     'data': 'transfer_qty', render: function (data) {
+        //         return numberWithCommas(data);
+        //     }
+        // },
         {
             'data': 'action',
             defaultContent: "<div class='row'><button id='show-infos' class='btn btn-sm btn-rounded btn-success' type='button'>Show</button><button id='prints' class='btn btn-sm btn-rounded btn-secondary'><span class='fa fa-print' aria-hidden='true'></span>Print</button></div>"
-        }
+        },
     ]
 });
 

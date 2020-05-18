@@ -7,7 +7,11 @@
 
     <style>
         body {
-            /*font-size: 30px;*/
+            font-size: 12px;
+        }
+
+        * {
+            font-family: Verdana, Arial, sans-serif;
         }
 
         table, th, td {
@@ -85,9 +89,11 @@
 
 </head>
 <body>
-<h4 align="center">{{$pharmacy['name']}}</h4>
-<h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
-<h2 align="center" style="margin-top: -2%">Stock Transfer</h2>
+<h1 align="center">{{$pharmacy['name']}}</h1>
+<h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
+<h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
+<h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
+<h2 align="center" style="margin-top: -1%">Stock Transfer</h2>
 
 {{--<div class="topcorner">--}}
 {{--    <p>{{$transfer_detail['transfer_no']}}</p>--}}

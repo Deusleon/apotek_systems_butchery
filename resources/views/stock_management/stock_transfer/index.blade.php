@@ -56,8 +56,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="tab-pane fade show active" id="new_sale" role="tabpanel" aria-labelledby="new_sale-tab">
-                    <form id="transfer" method="post" target="_blank"
-                          enctype="multipart/form-data">
+                    <form id="transfer" enctype="multipart/form-data">
                         @csrf()
                         <div class="row">
                             <div class="col-md-3">
@@ -185,7 +184,8 @@
         var config = {
             routes: {
                 filterByStore: '{{route('filter-by-store')}}',
-                filterByWord: '{{route('filter-by-word')}}'
+                filterByWord: '{{route('filter-by-word')}}',
+                stockTransferSave: '{{route('stock_transfer.store')}}'
 
             }
         };

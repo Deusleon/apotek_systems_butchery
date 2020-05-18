@@ -97,7 +97,7 @@
                         </div>
 
                         <div id="tbody" style="display: none;" class="table-responsive">
-                            <table style="table-layout:fixed; width: 97% !important;" id="fixed-header1"
+                            <table id="fixed-header1"
                                    class="display table nowrap table-striped table-hover"
                                    style="width:100%">
 
@@ -116,7 +116,7 @@
                         </div>
 
                         <div id="tbody-main" style="display: block;" class="table-responsive">
-                            <table style="table-layout:fixed; width: 97% !important;" id="fixed-header-main"
+                            <table id="fixed-header-main"
                                    class="display table nowrap table-striped table-hover"
                                    style="width:100%">
 

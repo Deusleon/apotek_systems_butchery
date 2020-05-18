@@ -228,7 +228,8 @@ $('#deselect-all').on('click', function () {
     deselect();
 });
 
-$('#transfer').on('submit', function () {
+$('#transfer').on('submit', function (e) {
+    e.preventDefault();
 
     var check_cart = document.getElementById("order_cart").value;
 
@@ -311,11 +312,31 @@ $('#transfer').on('submit', function () {
     /*enable from select option*/
     $('#from_id').prop('disabled', false);
 
-
     // window.open('#', '_blank');
     // window.open(this.href, '_self');
-
+    saveStockTransfer();
 });
+
+function saveStockTransfer() {
+    var form = $('#transfer').serialize();
+
+    $.ajax({
+        url: config.routes.stockTransferSave,
+        type: "post",
+        dataType: "json",
+        cache: "false",
+        data: form,
+        success: function (data) {
+            window.open(data.redirect_to);
+            // triggerSaleType();
+            $('#transfer_preview').attr('disabled', false);
+        }, complete: function () {
+            notify('Stock transfer successfully', 'top', 'right', 'success');
+            deselect();
+            $('#transfer_preview').attr('disabled', false);
+        }, timeout: 20000
+    });
+}
 
 
 $('#to_id').prop('disabled', true);

@@ -19,7 +19,7 @@
 
                         </div>
                     @endif
-                    <form id="adjust_form" action="{{route('stock-adjustment.store')}}" method="post">
+                    <form id="adjust_form" action="{{route('adjustment-history.store')}}" method="post">
                         @csrf()
                         <div class="modal-body">
                             <div class="row">

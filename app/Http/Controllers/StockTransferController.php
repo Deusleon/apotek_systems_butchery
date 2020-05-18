@@ -32,8 +32,19 @@ class StockTransferController extends Controller
 
     }
 
+    public function storeTransfer(Request $request)
+    {
+        if ($request->ajax()) {
+            $transfer_no = $this->store($request);
+            return response()->json([
+                'redirect_to' => route('stock-transfer-pdf-gen', strval($transfer_no))
+            ]);
+        }
+    }
+
     public function store(Request $request)
     {
+
         /*get default store*/
         $default_store = Setting::where('id', 122)->value('value');
         $stores = Store::where('name', $default_store)->first();
@@ -134,8 +145,8 @@ class StockTransferController extends Controller
 
 
         //redirect to the pdf part
-        return redirect()->route('stock-transfer-pdf-gen', strval($transfer_no));
-
+//        return redirect()->route('stock-transfer-pdf-gen', strval($transfer_no));
+        return strval($transfer_no);
     }
 
     public function transferNumberAutoGen()
@@ -220,7 +231,7 @@ class StockTransferController extends Controller
 
     public function stockTransferHistory()
     {
-        $all_transfers = StockTransfer::orderby('status', 'ASC')->get();
+        $all_transfers = StockTransfer::orderby('created_at', 'desc')->get();
 
         return view('stock_management.stock_transfer.history')->with([
             'transfers' => $all_transfers

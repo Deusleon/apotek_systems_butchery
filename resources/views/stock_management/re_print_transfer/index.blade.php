@@ -115,8 +115,9 @@
                                 <tr>
                                     <th>Transfer #</th>
                                     <th>Date</th>
-                                    <th>Quantity</th>
+                                    {{--                                    <th>Quantity</th>--}}
                                     <th>Action</th>
+                                    <th hidden>id</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -124,7 +125,7 @@
                                     <tr>
                                         <td>{{$transfer['transfer_no']}}</td>
                                         <td>{{$transfer['date']}}</td>
-                                        <td>{{number_format(floatval($transfer['quantity']))}}</td>
+                                        {{--                                        <td>{{number_format(floatval($transfer['quantity']))}}</td>--}}
                                         <td>
                                             <button id='show-info' class='btn btn-sm btn-rounded btn-success'
                                                     type='button'>Show
@@ -135,6 +136,7 @@
                                                 </button>
                                             @endif
                                         </td>
+                                        <td hidden>{{$transfer['id']}}</td>
                                     </tr>
                                 @endforeach
                                 </tbody>
@@ -152,7 +154,7 @@
                                 <tr>
                                     <th>Transfer #</th>
                                     <th>Date</th>
-                                    <th>Quantity</th>
+                                    {{--                                    <th>Quantity</th>--}}
                                     <th>Action</th>
                                 </tr>
                                 </thead>
