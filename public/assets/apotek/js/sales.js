@@ -392,7 +392,6 @@ function discount() {
         sale_discount = 0;
     }
 
-    console.log(sale_discount);
 
     var sub_total, total_vat, total = 0;
     if (cart[0]) {
