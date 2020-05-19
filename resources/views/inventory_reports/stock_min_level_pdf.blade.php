@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Expiry Product Report</title>
+    <title>Stock Below Minimum Level Report</title>
 
     <style>
 
@@ -72,7 +72,7 @@
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
-    <h2 align="center" style="margin-top: -1%">Expiry Products Report</h2>
+    <h2 align="center" style="margin-top: -1%">Stock Below Minimum Level Report</h2>
 
     <div class="row" style="margin-top: 10%;">
         <div class="col-md-12">
@@ -82,23 +82,19 @@
                 <tr style="background: #1f273b; color: white;">
                     <th>Code</th>
                     <th>Product Name</th>
-                    <th>Batch No</th>
-                    <th>Date</th>
-                    <th>Quantity</th>
+                    <th>Min. Quantity</th>
+                    <th>Available Quantity</th>
                 </tr>
                 </thead>
                 @foreach($data as $item)
                     <tr>
-                        <td>{{$item->product['id']}}</td>
-                        <td>{{$item->product['name']}}</td>
-                        <td align="">{{$item->batch_number}}</td>
-                        @if($item->expiry_date === null)
-                            <td align="" style="font-size: 0.7em"></td>
-                        @else
-                            <td align="">{{date('d-m-Y',strtotime($item->expiry_date))}}</td>
-                        @endif
+                        <td>{{$item->id}}</td>
+                        <td>{{$item->name}}</td>
                         <td align="right">
-                            <div style="margin-right: 50%">{{number_format($item->quantity)}}</div>
+                            <div style="margin-right: 50%">{{number_format($item->min_quantinty)}}</div>
+                        </td>
+                        <td align="right">
+                            <div style="margin-right: 50%">{{number_format($item->qty)}}</div>
                         </td>
                     </tr>
                 @endforeach
@@ -122,6 +118,7 @@
 
 
      }
+
 
 </script>
 

@@ -83,6 +83,8 @@
                                             <option value="7">Stock Adjustment Report</option>
                                             <option value="8">Stock Issue Report</option>
                                             <option value="9">Stock Transfer Report</option>
+                                            <option value="10">Stock Above Maximum Level Report</option>
+                                            <option value="11">Stock Below Minimum Level Report</option>
                                         </select>
                                     </div>
                                 </div>

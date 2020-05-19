@@ -202,9 +202,108 @@ class InventoryReportController extends Controller
                     $this->splitPdf($data_og, $view, $output);
                     break;
                 }
+            case 10:
+                $data_og = $this->stockMaxLevel();
+                if ($data_og == []) {
+                    return response()->view('error_pages.pdf_zero_data');
+                }
+                $view = 'inventory_reports.stock_max_level_pdf';
+                $output = 'stock_max_level.pdf';
+                $this->splitPdf($data_og, $view, $output);
+                break;
+            case 11:
+                $data_og = $this->stockMinLevel();
+                if ($data_og == []) {
+                    return response()->view('error_pages.pdf_zero_data');
+                }
+                $view = 'inventory_reports.stock_min_level_pdf';
+                $output = 'stock_min_level.pdf';
+                $this->splitPdf($data_og, $view, $output);
+                break;
 
             default:
         }
+    }
+
+    private function currentStockByStoreReport($store)
+    {
+        $current_stocks = CurrentStock::where('store_id', $store)->get();
+        $stores = Store::all();
+        $ungrouped_result = array();
+        $grouped_result = array();
+
+
+        foreach ($current_stocks as $current_stock) {
+            array_push($ungrouped_result, array(
+                'product_id' => $current_stock->product['id'],
+                'store' => $current_stock->store['name'],
+                'name' => $current_stock->product['name'],
+                'expiry_date' => $current_stock->expiry_date,
+                'quantity' => $current_stock->quantity,
+                'batch_number' => $current_stock->batch_number,
+                'shelf_no' => $current_stock->shelf_number
+            ));
+        }
+
+//        foreach ($ungrouped_result as $val) {
+//            if (array_key_exists('store', $val)) {
+//                $grouped_result[$val['store']][] = $val;
+//            }
+//        }
+
+        return $ungrouped_result;
+    }
+
+    public function splitPdf($data_og, $view, $output_file)
+    {
+
+        $pharmacy['name'] = Setting::where('id', 100)->value('value');
+        $pharmacy['address'] = Setting::where('id', 106)->value('value');
+        $pharmacy['phone'] = Setting::where('id', 107)->value('value');
+        $pharmacy['email'] = Setting::where('id', 108)->value('value');
+        $pharmacy['website'] = Setting::where('id', 109)->value('value');
+        $pharmacy['logo'] = Setting::where('id', 105)->value('value');
+        $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
+
+        $pdfs = new PDFMerger();
+//        $pharmacy = GeneralSetting::all();
+        $count = 0;
+
+        if ($data_og instanceof Collection) {
+            /*if collection then chunk*/
+            $datas = $data_og->chunk(500);
+            ob_end_clean();
+            (new FPDF)->AddPage();
+        } else {
+            /*chunk the array*/
+            $datas = array_chunk($data_og, 500);
+            ob_end_clean();
+            (new FPDF)->AddPage();
+        }
+
+        foreach ($datas as $data) {
+            $count = $count + 1;
+            $pdf = PDF::loadView($view,
+                compact('data', 'pharmacy'));
+            $output = $pdf->output();
+            Storage::put('pdfs/pdf' . $count . '.pdf', $output);
+
+        }
+
+
+        /*load files to merge*/
+        $pdf_files = Storage::files('pdfs');
+        if (sizeof($pdf_files) != 0) {
+            foreach ($pdf_files as $pdf_file) {
+                $pdfs->addPDF(Storage::path($pdf_file), 'all');
+
+            }
+            $pdfs->merge('stream', $output_file);
+            Storage::delete(Storage::files('pdfs'));
+
+        }
+
+
     }
 
     private function currentStockReport($category)
@@ -239,35 +338,6 @@ class InventoryReportController extends Controller
 
         return $ungrouped_result;
 
-    }
-
-    private function currentStockByStoreReport($store)
-    {
-        $current_stocks = CurrentStock::where('store_id', $store)->get();
-        $stores = Store::all();
-        $ungrouped_result = array();
-        $grouped_result = array();
-
-
-        foreach ($current_stocks as $current_stock) {
-            array_push($ungrouped_result, array(
-                'product_id' => $current_stock->product['id'],
-                'store' => $current_stock->store['name'],
-                'name' => $current_stock->product['name'],
-                'expiry_date' => $current_stock->expiry_date,
-                'quantity' => $current_stock->quantity,
-                'batch_number' => $current_stock->batch_number,
-                'shelf_no' => $current_stock->shelf_number
-            ));
-        }
-
-//        foreach ($ungrouped_result as $val) {
-//            if (array_key_exists('store', $val)) {
-//                $grouped_result[$val['store']][] = $val;
-//            }
-//        }
-
-        return $ungrouped_result;
     }
 
     private function productDetailReport($category)
@@ -322,6 +392,69 @@ class InventoryReportController extends Controller
 //        }
 
         return $ungrouped_result;
+
+    }
+
+    protected function sumProductFilterTotal($ledger, $current_stock)
+    {
+        $total = 0;
+        $toMainView = array();
+
+        //check if the ledger has data
+        if (!isset($ledger[0])) {
+            //data not found empty search
+            array_push($toMainView, array(
+                'date' => '-',
+                'name' => '-',
+                'method' => '-',
+                'received' => '-',
+                'outgoing' => '-',
+                'balance' => '-'
+            ));
+        }
+
+
+        //loop and perform addition on ins and outs to get the balance
+        foreach ($current_stock as $value) {
+
+            foreach ($ledger as $key) {
+
+
+                if ($value->product_id == $key->product_id) {
+
+                    $total = $total + $key->received + $key->outgoing; // 0 + -20 + 0
+
+                    if ($key->date == null) {
+
+                        array_push($toMainView, array(
+                            'date' => date('Y-m-d', strtotime($key->date)),
+                            'name' => $key->product_name,
+                            'method' => $key->method,
+                            'received' => $key->received,
+                            'outgoing' => $key->outgoing,
+                            'balance' => $total
+                        ));
+
+                    } else {
+
+                        array_push($toMainView, array(
+                            'date' => date('Y-m-d', strtotime($key->date)),
+                            'name' => $key->product_name,
+                            'method' => $key->method,
+                            'received' => $key->received,
+                            'outgoing' => $key->outgoing,
+                            'balance' => $total
+                        ));
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        return $toMainView;
 
     }
 
@@ -392,35 +525,6 @@ class InventoryReportController extends Controller
         return $to_pdf;
     }
 
-    private function stockTransferReport($dates)
-    {
-        $transfers = StockTransfer::whereBetween(DB::raw('date(created_at)'),
-            [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))])
-            ->get();
-
-        foreach ($transfers as $transfer) {
-            $transfer->from = $dates[0];
-            $transfer->to = $dates[1];
-        }
-
-        return $transfers;
-    }
-
-    private function stockTransferStatusReport($status, $dates)
-    {
-        $transfers = StockTransfer::whereBetween(DB::raw('date(created_at)'),
-            [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))])
-            ->where('status', $status)
-            ->get();
-
-        foreach ($transfers as $transfer) {
-            $transfer->from = $dates[0];
-            $transfer->to = $dates[1];
-        }
-
-        return $transfers;
-    }
-
     private function stockIssueReport($issue_date)
     {
         $to_pdf = array();
@@ -477,120 +581,83 @@ class InventoryReportController extends Controller
 
     }
 
-    protected function sumProductFilterTotal($ledger, $current_stock)
+    private function stockTransferReport($dates)
     {
-        $total = 0;
-        $toMainView = array();
+        $transfers = StockTransfer::whereBetween(DB::raw('date(created_at)'),
+            [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))])
+            ->get();
 
-        //check if the ledger has data
-        if (!isset($ledger[0])) {
-            //data not found empty search
-            array_push($toMainView, array(
-                'date' => '-',
-                'name' => '-',
-                'method' => '-',
-                'received' => '-',
-                'outgoing' => '-',
-                'balance' => '-'
-            ));
+        foreach ($transfers as $transfer) {
+            $transfer->from = $dates[0];
+            $transfer->to = $dates[1];
         }
 
+        return $transfers;
+    }
 
-        //loop and perform addition on ins and outs to get the balance
-        foreach ($current_stock as $value) {
+    private function stockTransferStatusReport($status, $dates)
+    {
+        $transfers = StockTransfer::whereBetween(DB::raw('date(created_at)'),
+            [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))])
+            ->where('status', $status)
+            ->get();
 
-            foreach ($ledger as $key) {
+        foreach ($transfers as $transfer) {
+            $transfer->from = $dates[0];
+            $transfer->to = $dates[1];
+        }
 
+        return $transfers;
+    }
 
-                if ($value->product_id == $key->product_id) {
+    private function stockMaxLevel()
+    {
+        $stock_max = [];
 
-                    $total = $total + $key->received + $key->outgoing; // 0 + -20 + 0
+        $stocks = CurrentStock::select('product_id', DB::raw('sum(quantity) as qty'))
+            ->groupby('product_id')
+            ->get();
 
-                    if ($key->date == null) {
-
-                        array_push($toMainView, array(
-                            'date' => date('Y-m-d', strtotime($key->date)),
-                            'name' => $key->product_name,
-                            'method' => $key->method,
-                            'received' => $key->received,
-                            'outgoing' => $key->outgoing,
-                            'balance' => $total
-                        ));
-
-                    } else {
-
-                        array_push($toMainView, array(
-                            'date' => date('Y-m-d', strtotime($key->date)),
-                            'name' => $key->product_name,
-                            'method' => $key->method,
-                            'received' => $key->received,
-                            'outgoing' => $key->outgoing,
-                            'balance' => $total
-                        ));
-
-                    }
-
-                }
-
+        foreach ($stocks as $stock) {
+            $product = Product::select('id', 'name', 'max_quantinty')
+                ->where('id', $stock->product_id)
+                ->where('max_quantinty', '<', $stock->qty)
+                ->first();
+            if ($product) {
+                $product->qty = $stock->qty;
+                $stock_max[] = $product;
             }
 
         }
 
-        return $toMainView;
+        return $stock_max;
+
 
     }
 
-    public function splitPdf($data_og, $view, $output_file)
+    private function stockMinLevel()
     {
+        $stock_max = [];
 
-        $pharmacy['name'] = Setting::where('id', 100)->value('value');
-        $pharmacy['address'] = Setting::where('id', 106)->value('value');
-        $pharmacy['phone'] = Setting::where('id', 107)->value('value');
-        $pharmacy['email'] = Setting::where('id', 108)->value('value');
-        $pharmacy['website'] = Setting::where('id', 109)->value('value');
-        $pharmacy['logo'] = Setting::where('id', 105)->value('value');
-        $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
+        $stocks = CurrentStock::select('product_id', DB::raw('sum(quantity) as qty'))
+            ->groupby('product_id')
+            ->get();
 
-        $pdfs = new PDFMerger();
-//        $pharmacy = GeneralSetting::all();
-        $count = 0;
-
-        if ($data_og instanceof Collection) {
-            /*if collection then chunk*/
-            $datas = $data_og->chunk(500);
-            ob_end_clean();
-            (new FPDF)->AddPage();
-        } else {
-            /*chunk the array*/
-            $datas = array_chunk($data_og, 500);
-            ob_end_clean();
-            (new FPDF)->AddPage();
-        }
-
-        foreach ($datas as $data) {
-            $count = $count + 1;
-            $pdf = PDF::loadView($view,
-                compact('data', 'pharmacy'));
-            $output = $pdf->output();
-            Storage::put('pdfs/pdf' . $count . '.pdf', $output);
-
-        }
-
-
-        /*load files to merge*/
-        $pdf_files = Storage::files('pdfs');
-        if (sizeof($pdf_files) != 0) {
-            foreach ($pdf_files as $pdf_file) {
-                $pdfs->addPDF(Storage::path($pdf_file), 'all');
-
+        foreach ($stocks as $stock) {
+            $product = Product::select('id', 'name', 'min_quantinty')
+                ->where('id', $stock->product_id)
+                ->where('min_quantinty', '>', $stock->qty)
+                ->first();
+            if ($product) {
+                $product->qty = $stock->qty;
+                $stock_max[] = $product;
             }
-            $pdfs->merge('stream', $output_file);
-            Storage::delete(Storage::files('pdfs'));
 
         }
+
+        return $stock_max;
 
 
     }
-
 
 }
