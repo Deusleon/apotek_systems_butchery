@@ -220,16 +220,49 @@ class CurrentStockController extends Controller
 
         if ($request->ajax()) {
 
-            $current_stock = CurrentStock::where('product_id', '=', $request->get("val"))
-                ->where('store_id', $request->store_id)
-                ->orderby('id', 'desc')
-                ->first();
+            if ($request->bulk_adjust) {
 
-            if ($current_stock != null) {
-                $current_stock->product;
+                $max_prices = [];
+                $current_stock = PriceList::select('stock_id', 'price')
+                    ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
+                    ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                    ->orderBy('stock_id', 'desc')
+                    ->where('product_id', $request->get("val"))
+                    ->where('store_id', $request->store_id)
+                    ->first('price');
+
+                $quantity = CurrentStock::where('product_id', $request->get("val"))
+                    ->where('store_id', $request->store_id)
+                    ->sum('quantity');
+
+                array_push($max_prices, array(
+                    'name' => $current_stock->currentStock['product']['name'],
+                    'unit_cost' => $current_stock->currentStock['unit_cost'],
+                    'price' => $current_stock->price,
+                    'quantity' => $quantity,
+                    'stock_id' => $current_stock->stock_id,
+                    'product_id' => $request->get("val")
+                ));
+
+
+                return $max_prices;
+
+
+            } else {
+                $current_stock = CurrentStock::where('product_id', '=', $request->get("val"))
+                    ->where('store_id', $request->store_id)
+                    ->orderby('id', 'desc')
+                    ->first();
+
+                if ($current_stock != null) {
+                    $current_stock->product;
+                }
+
+                return json_decode($current_stock, true);
+
             }
 
-            return json_decode($current_stock, true);
+
         }
     }
 

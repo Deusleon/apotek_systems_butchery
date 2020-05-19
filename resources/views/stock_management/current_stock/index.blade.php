@@ -177,6 +177,7 @@
     </div>
     @include('stock_management.current_stock.edit')
     @include('stock_management.current_stock.pricing')
+    @include('stock_management.current_stock.bulk_adjust')
     @include('stock_management.current_stock.show')
     @include('stock_management.current_stock.create')
     @include('stock_management.current_stock.stock_detail')
@@ -250,7 +251,7 @@
                     },
                     {
                         "data": "action",
-                        defaultContent: "<div><button id='detail' class='btn btn-sm btn-rounded btn-success' type='button'>Details</button><button id='pricing' class='btn btn-sm btn-rounded btn-primary' type='button'>Pricing</button></div>"
+                        defaultContent: "<div><button id='detail' class='btn btn-sm btn-rounded btn-success' type='button'>Details</button><button id='pricing' class='btn btn-sm btn-rounded btn-primary' type='button'>Pricing</button><button id='bulk_adjust' class='btn btn-sm btn-rounded btn-secondary' type='button'>Bulk Adjust</button></div>"
                     }
                 ]
 
@@ -288,7 +289,7 @@
                     },
                     {
                         "data": "action",
-                        defaultContent: "<div><button id='details' class='btn btn-sm btn-rounded btn-success' type='button'>Details</button><button id='pricing_' class='btn btn-sm btn-rounded btn-primary' type='button'>Pricing</button></div>"
+                        defaultContent: "<div><button id='details' class='btn btn-sm btn-rounded btn-success' type='button'>Details</button><button id='pricing_' class='btn btn-sm btn-rounded btn-primary' type='button'>Pricing</button><button id='bulk_adjust_' class='btn btn-sm btn-rounded btn-secondary' type='button'>Bulk Adjust</button></div>"
                     }
                 ]
 
@@ -463,15 +464,27 @@
 
             });
 
+            $('#tbody1').on('click', '#bulk_adjust_', function () {
+                var data = table_main.row($(this).parents('tr')).data();
+                retrivePricing(data.product_id, 'bulk_adjust');
+
+            });
+
         });
 
         $('#tbody').on('click', '#detail', function () {
             var data = $('#fixed-header1').DataTable().row($(this).parents('tr')).data();
             retriveStockDetail(data.product_id);
         });
+
         $('#tbody').on('click', '#pricing', function () {
             var data = $('#fixed-header1').DataTable().row($(this).parents('tr')).data();
             retrivePricing(data.product_id);
+        });
+
+        $('#tbody').on('click', '#bulk_adjust', function () {
+            var data = $('#fixed-header1').DataTable().row($(this).parents('tr')).data();
+            retrivePricing(data.product_id, 'bulk_adjust');
         });
 
 
@@ -542,7 +555,7 @@
             });
         }
 
-        function retrivePricing(data) {
+        function retrivePricing(data, bulk_adjust) {
             var val = data;
 
             var es_id = document.getElementById("stores_id");
@@ -557,10 +570,15 @@
                 dataType: "json",
                 data: {
                     val: val,
-                    store_id: value_es_id
+                    store_id: value_es_id,
+                    bulk_adjust: bulk_adjust
                 },
                 success: function (data) {
-                    popPricingModel(data);
+                    if (bulk_adjust) {
+                        popAdjustModel(data);
+                    } else {
+                        popPricingModel(data);
+                    }
                 }
             });
         }
@@ -573,6 +591,15 @@
             $('#category_').val('');
             $('#price_modal').find('.modal-body #product_id_').val(data.product_id);
             $('#price_modal').find('.modal-body #stock_id_').val(data.id);
+        }
+
+        function popAdjustModel(data) {
+            $('#bulk_adjust_modal').modal('show');
+            $('#bulk_adjust_modal').find('.modal-body #name_edit_bulk').val(data[0].name);
+            $('#bulk_adjust_modal').find('.modal-body #quantity_in_edit_bulk').val(numberWithCommas(data[0].quantity));
+            $('#bulk_adjust_modal').find('.modal-body #unit_cost_edit_bulk').val(formatMoney(data[0].unit_cost));
+            $('#bulk_adjust_modal').find('.modal-body #stock_id_bulk').val(data[0].stock_id);
+            $('#bulk_adjust_modal').find('.modal-body #product_id_bulk').val(data[0].product_id);
         }
 
         function bindDetailData(data) {
@@ -648,10 +675,8 @@
         });
 
         $('#adjust_form').on('submit', function () {
-            var type = document.getElementById('type');
-            var type_value = type.options[type.selectedIndex].value;
-            var reason = document.getElementById('reason');
-            var reason_value = reason.options[reason.selectedIndex].value;
+            // var type = document.getElementById('type').value;
+            var type_value = document.getElementById('type').value;
 
             /*check for less or high quantity*/
             var to_adjust = document.getElementById('quantity_edit_').value;
@@ -663,35 +688,47 @@
                 if (Number(to_adjust) > Number(quantity_in)) {
                     notify('Quantity exceeds available stock', 'top', 'right', 'warning');
                     document.getElementById('quantity_edit_').value = to_adjust;
-                    document.getElementById('quantity_edit_').style.borderColor = 'red';
                     return false;
                 }
-                document.getElementById('quantity_edit_').style.borderColor = 'none';
             }
 
-            document.getElementById('quantity_edit_').style.borderColor = 'none';
+        });
 
-            /*check required fields*/
-            if (Number(type_value) === 0 && Number(reason_value) === 0) {
-                document.getElementById('reason_border').style.borderColor = 'red';
-                document.getElementById('type_border').style.borderColor = 'red';
-                return false;
-            } else if (Number(type_value) !== 0 && Number(reason_value) === 0) {
-                document.getElementById('reason_border').style.borderColor = 'red';
-                document.getElementById('type_border').style.borderColor = 'white';
-                return false;
-            } else if (Number(type_value) === 0 && Number(reason_value) !== 0) {
-                document.getElementById('reason_border').style.borderColor = 'white';
-                document.getElementById('type_border').style.borderColor = 'red';
-                return false;
+        $('#adjust_form_').on('submit', function () {
+            // var type = document.getElementById('type').value;
+            var type_value = document.getElementById('type_bulk').value;
+
+            /*check for less or high quantity*/
+            var to_adjust = document.getElementById('quantity_edit_bulk').value;
+            var quantity_in = document.getElementById('quantity_in_edit_bulk').value;
+
+            quantity_in = parseFloat(quantity_in.replace(/\,/g, ''), 10);
+
+            if (type_value === 'Negative') {
+                if (Number(to_adjust) > Number(quantity_in)) {
+                    notify('Quantity exceeds available stock', 'top', 'right', 'warning');
+                    document.getElementById('quantity_edit_bulk').value = to_adjust;
+                    return false;
+                }
             }
-            document.getElementById('reason_border').style.borderColor = 'white';
-            document.getElementById('type_border').style.borderColor = 'white';
 
         });
 
         $(document).ready(calculate());
         $(document).ready(formatMoney());
+
+        function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
+            try {
+                decimalCount = Math.abs(decimalCount);
+                decimalCount = isNaN(decimalCount) ? 2 : decimalCount;
+                const negativeSign = amount < 0 ? "-" : "";
+                let i = parseInt(amount = Math.abs(Number(amount) || 0).toFixed(decimalCount)).toString();
+                let j = (i.length > 3) ? i.length % 3 : 0;
+                return negativeSign + (j ? i.substr(0, j) + thousands : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) + (decimalCount ? decimal + Math.abs(amount - i).toFixed(decimalCount).slice(2) : "");
+            } catch (e) {
+
+            }
+        }
 
         function numberWithCommas(digit) {
             return String(parseFloat(digit)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");

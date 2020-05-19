@@ -152,7 +152,6 @@
 
         $('#tbody').on('click', '#shows', function () {
             var row_data = $('#fixed-header1').DataTable().row($(this).parents('tr')).data();
-            console.log(row_data);
             $('#show').find('.modal-body #name_edit').val(row_data.name);
             $('#show').find('.modal-body #quantity_edit').val(numberWithCommas(row_data.quantity_adjusted));
             $('#show').find('.modal-body #reason_edit').val(row_data.reason);

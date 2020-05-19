@@ -55,18 +55,45 @@ class StockAdjustmentController extends Controller
 
         if ($request->type == "Negative") {
 
-            foreach ($current_stock as $item) {
+            if ($request->bulk) {
+                $quantity_adjust = str_replace(',', '', $request->quantity);
 
-                if ($item->product_id == $request->product_id && $item->id == $request->id) {
-                    $match_field = ['id' => $item->id, 'product_id' => $request->product_id];
-                    $sub = $item->quantity - $quantity;
-                    $deduct = CurrentStock::where($match_field)->first();
-                    $deduct->quantity = $sub;
-                    $deduct->save();
+                $stocks = CurrentStock::where('product_id', $request->product_id)
+                    ->where('store_id', $default_store_id)
+                    ->where('quantity', '>', 0)
+                    ->get();
+
+                foreach ($stocks as $stock) {
+
+                    if ($quantity_adjust <= $stock->quantity) {
+                        $qty = $quantity_adjust;
+                        $stock->quantity -= $qty;
+                        $stock->created_by = Auth::User()->id;
+                        $quantity_adjust -= $qty;
+                    } else {
+                        $qty = $stock->quantity;
+                        $stock->quantity = 0;
+                        $stock->created_by = Auth::User()->id;
+                        $quantity_adjust -= $qty;
+                    }
+
+                    $stock->save();
+                }
+
+            } else {
+                foreach ($current_stock as $item) {
+
+                    if ($item->product_id == $request->product_id && $item->id == $request->id) {
+                        $match_field = ['id' => $item->id, 'product_id' => $request->product_id];
+                        $sub = $item->quantity - $quantity;
+                        $deduct = CurrentStock::where($match_field)->first();
+                        $deduct->quantity = $sub;
+                        $deduct->save();
+                    }
                 }
             }
 
-            /*save in stock tracking as IN*/
+            /*save in stock tracking as OUT*/
             $stock_tracking = new StockTracking;
             $stock_tracking->stock_id = $request->id;
             $stock_tracking->product_id = $request->product_id;
