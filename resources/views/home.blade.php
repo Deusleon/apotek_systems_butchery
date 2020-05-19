@@ -94,7 +94,7 @@
     </style>
 @endsection
 
-@if(Gate::check('View Dashboard'))
+@if(auth()->user()->checkPermission('View Dashboard'))
 @section('content-title')
     Dashboard
 
