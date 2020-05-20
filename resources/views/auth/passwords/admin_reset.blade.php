@@ -85,6 +85,8 @@
 <script src="{{asset("assets/js/pcoded.min.js")}}"></script>
 <!-- notification Js -->
 <script src="{{asset("assets/plugins/notification/js/bootstrap-growl.min.js")}}"></script>
+<script src="{{asset("assets/apotek/js/notification.js")}}"></script>
+
 
 <script>
     $('#new-password-confirm').on('change', function () {
@@ -92,6 +94,7 @@
         let confirm_pwd = document.getElementById('new-password-confirm').value;
 
         if (String(new_pwd) !== String(confirm_pwd)) {
+            notify('Password do not match', 'top', 'right', 'warning');
             $('#save_btn').prop('disabled', true);
         } else {
             $('#save_btn').prop('disabled', false);
