@@ -792,31 +792,31 @@ $("#sale_paid").on('change', function (evt) {
 });
 
 $('#products').select2({
-    language: {
-        noResults: function () {
-            var search_input = $("#products").data('select2').$dropdown.find("input").val();
-            var price_category = document.getElementById('price_category');
-            var price_category_id = price_category.options[price_category.selectedIndex].value;
 
-            /*make ajax call for more*/
-            $.ajax({
-                url: config.routes.filterProductByWord,
-                type: "get",
-                dataType: "json",
-                data: {
-                    word: search_input,
+    ajax: {
+            url: config.routes.filterProductByWord,
+            type: "get",
+            delay: 100,
+            dataType: "json",
+            data: function (params) {
+                var price_category = document.getElementById('price_category');
+                var price_category_id = price_category.options[price_category.selectedIndex].value;
+                var query = {
+                    word: params.term || ' ',
                     price_category_id: price_category_id
-                },
-                success: function (result) {
-                    $("#products option").remove();
-                    $.each(result, function (detail, name) {
-                        $('#products').append($('<option>', {value: detail, text: name}));
-                    });
-
                 }
-            });
-        }
-    }
+                return query;
+            },
+            processResults: function (data, page) {
+                data = Object.keys(data).reduce(function (array, key) {
+                    array.push({ id: key, text: data[key] });
+                    return array;
+                }, []);
+                return {
+                    results: data
+                }
+            }
+        },
 });
 
 $('#products_b').select2({

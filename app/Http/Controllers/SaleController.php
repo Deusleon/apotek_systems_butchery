@@ -242,7 +242,7 @@ class SaleController extends Controller
                     ->where('name', 'LIKE', "%{$request->word}%")
                     ->orwhere('barcode', 'LIKE', "%{$request->word}%")
                     ->groupBy('product_id')
-                    ->limit(100)
+                    ->limit(20)
                     ->get();
             } else {
                 $products = [];
