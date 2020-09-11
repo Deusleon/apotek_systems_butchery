@@ -231,22 +231,18 @@ class SaleController extends Controller
             $output = [];
             $output[""] = "Select Product";
 
-            if ($request->word != null) {
-                $products = PriceList::where('price_category_id', $request->price_category_id)
-                    ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
-                    ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
-                    ->where('quantity', '>', 0)
-                    ->where('inv_products.status', '=', 1)
-                    ->where('store_id', $default_store_id)
-                    ->select('inv_products.id as id', 'name', 'barcode')
-                    ->where('name', 'LIKE', "%{$request->word}%")
-                    ->orwhere('barcode', 'LIKE', "%{$request->word}%")
-                    ->groupBy('product_id')
-                    ->limit(20)
-                    ->get();
-            } else {
-                $products = [];
-            }
+            $products = PriceList::where('price_category_id', $request->price_category_id)
+                ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
+                ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                ->where('quantity', '>', 0)
+                ->where('inv_products.status', '=', 1)
+                ->where('store_id', $default_store_id)
+                ->select('inv_products.id as id', 'name', 'barcode')
+                ->where('name', 'LIKE', "%{$request->word}%")
+                ->orwhere('barcode', 'LIKE', "%{$request->word}%")
+                ->groupBy('product_id')
+                ->limit(20)
+                ->get();
 
 
             $count = count($products);
