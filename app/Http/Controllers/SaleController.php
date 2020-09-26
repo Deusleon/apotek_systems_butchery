@@ -237,7 +237,7 @@ class SaleController extends Controller
                 ->where('quantity', '>', 0)
                 ->where('inv_products.status', '=', 1)
                 ->where('store_id', $default_store_id)
-                ->select('inv_products.id as id', 'name', 'barcode')
+                ->select('inv_products.id as id', 'name', 'barcode','inv_products.type')
                 ->where('name', 'LIKE', "%{$request->word}%")
                 ->orwhere('barcode', 'LIKE', "%{$request->word}%")
                 ->groupBy('product_id')
@@ -264,7 +264,7 @@ class SaleController extends Controller
                     ->where('store_id', $default_store_id)
                     ->sum('quantity');
                 if ($latest != null) {
-                    $output["$product->name#@$latest->price#@$product->id#@$quantity"] = $product->name;
+                    $output["$product->name#@$latest->price#@$product->id#@$quantity#@$product->type"] = $product->name;
                 } else {
                     $output[""] = "No Products Found";
                 }
@@ -329,16 +329,20 @@ class SaleController extends Controller
             foreach ($cart as $bought) {
                 $bought['quantity'] = str_replace(',', '', $bought['quantity']);
                 if ($bought['quantity'] > 0) {
-                    $unit_discount = (($bought['amount'] / $total) * $discount) / $bought['quantity'];
+                    $unit_discount = (($bought['amount'] / ($total ?: 1)) * $discount) / $bought['quantity'];
                     $unit_price = $bought['price'];
-                    $stocks = CurrentStock::where('product_id', $bought['product_id'])
+                    $stocks = CurrentStock::with('product')->where('product_id', $bought['product_id'])
                         ->where('store_id', $default_store_id)
                         ->where('quantity', '>', 0)
                         ->get();
 
                     foreach ($stocks as $stock) {
-
-                        if ($bought['quantity'] <= $stock->quantity) {
+                        if($stock->product->type == 'consumable'){
+                            $qty = $bought['quantity'];
+                            $price = $unit_price * $qty;
+                            $sale_discount = $unit_discount * $qty;
+                            $bought['quantity'] -= $qty;
+                        }elseif ($bought['quantity'] <= $stock->quantity) {
                             $qty = $bought['quantity'];
                             $price = $unit_price * $qty;
                             $sale_discount = $unit_discount * $qty;

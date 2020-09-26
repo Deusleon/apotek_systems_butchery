@@ -66,6 +66,7 @@ class ProductController extends Controller
         $product->indication = $request->indication;
         $product->dosage = $request->dosage;
         $product->status = $request->status;
+        $product->type = $request->product_type;
         $product->min_quantinty = str_replace(',', '', $request->min_stock);
         $product->max_quantinty = str_replace(',', '', $request->max_stock);
         try {
@@ -122,7 +123,7 @@ class ProductController extends Controller
         } else {
             $search = $request->input('search.value');
 
-            $products = Product::select('inv_products.name', 'category_id', 'status', 'inv_products.id', 'barcode'
+            $products = Product::select('inv_products.name', 'type', 'category_id', 'status', 'inv_products.id', 'barcode'
                 , 'indication', 'dosage', 'generic_name', 'purchase_uom', 'sales_uom', 'standard_uom', 'min_quantinty',
                 'max_quantinty', 'sub_category_id', 'created_at')
                 ->join('inv_categories', 'inv_categories.id', '=', 'inv_products.category_id')
@@ -155,6 +156,7 @@ class ProductController extends Controller
 //                $edit =  route('posts.edit',$post->id);
 
                 if ($product->status != 0) {
+                    $nestedData['type'] = $product->type;
                     $nestedData['name'] = $product->name;
                     $nestedData['category'] = $product->category['name'];
                     $nestedData['status'] = $product->status;
@@ -168,7 +170,7 @@ class ProductController extends Controller
                     $nestedData['standard'] = $product->standard_uom;
                     $nestedData['min'] = $product->min_quantinty;
                     $nestedData['max'] = $product->max_quantinty;
-                    $nestedData['sub_category'] = $product->subCategory['name'];
+                    $nestedData['sub_category'] = $product->subCategory['name']?? '';
                     $nestedData['category_id'] = $product->category_id;
                     $nestedData['sub_category_id'] = $product->sub_category_id;
                     $nestedData['date'] = date('Y-m-d', strtotime($product->created_at));
@@ -216,6 +218,7 @@ class ProductController extends Controller
             $product->purchase_uom = $request->purchaseUoM;
             $product->indication = $request->indication;
             $product->dosage = $request->dosage;
+            $product->type = $request->product_type;
             $product->status = 1;
             $product->min_quantinty = str_replace(',', '', $request->min_stock);
             $product->max_quantinty = str_replace(',', '', $request->max_stock);

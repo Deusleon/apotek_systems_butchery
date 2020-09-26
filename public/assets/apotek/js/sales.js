@@ -77,14 +77,16 @@ var cart_table = $('#cart_table').DataTable({
         {title: "VAT"},
         {title: "Amount"},
         {title: "Stock Qty"},
-        {title: "productID"},
+        { title: "productID" },
+        { title: "Product Type" },
+
         {
             title: "Action",
             defaultContent: "<div><input type='button' value='Edit' id='edit_btn' class='btn btn-info btn-rounded btn-sm'/><input type='button' value='Delete' id='delete_btn' class='btn btn-danger btn-rounded btn-sm'/></div>"
         }
     ]
 });
-cart_table.columns([5, 6]).visible(false);//this columns are just for manipulations
+cart_table.columns([5, 6,7]).visible(false);//this columns are just for manipulations
 var details_table = $('#details_table').DataTable({
     searching: true,
     bPaginate: false,
@@ -228,7 +230,12 @@ $('#cart_table tbody').on('change', '#edit_quantity', function () {
     if (Number(parseFloat(row_data[1].replace(/\,/g, ''), 10)) < 1) {
         row_data[1] = 1
     }
-    dif = row_data[5] - row_data[1].toString().replace(/,/g, '');
+
+    if (row_data[7] == 'consumable') {
+        dif = 1;
+    } else {
+        dif = row_data[5] - row_data[1].toString().replace(/,/g, '');
+    }
 
     if ($('#quotes_page').length) {//Qoutes has no maximum quantity
         row_data[2] = formatMoney(parseFloat(row_data[2].replace(/\,/g, ''), 10));
@@ -277,7 +284,11 @@ if (fixed_price === "NO") {
         if (Number(parseFloat(row_data[1].replace(/\,/g, ''), 10)) < 1) {
             row_data[1] = 1
         }
-        dif = row_data[5] - row_data[1].toString().replace(/,/g, '');
+        if (row_data[7] == 'consumable') {
+            dif = 1;
+        } else {
+            dif = row_data[5] - row_data[1].toString().replace(/,/g, '');
+        }
 
         if ($('#quotes_page').length) {//Qoutes has no maximum quantity
             row_data[2] = formatMoney(parseFloat(row_data[2].replace(/\,/g, ''), 10));
@@ -581,6 +592,7 @@ function valueCollection() {
         var price = Number(selected_fields[1]);
         var productID = Number(selected_fields[2]);
         var qty = Number(selected_fields[3]);
+        var product_type = selected_fields[4] || '';
         var vat = Number((price * tax).toFixed(2));
         var unit_total = Number(price + vat);
         var quantity = 1;
@@ -591,6 +603,7 @@ function valueCollection() {
         item.push(formatMoney(unit_total));
         item.push(qty);
         item.push(productID);
+        item.push(product_type);
         cart_data.push(formatMoney(price));
         cart_data.push(formatMoney(vat));
         cart_data.push(formatMoney(unit_total));

@@ -72,6 +72,18 @@
                                    onkeypress="return isNumberKey(event,this)">
                         </div>
                     </div>
+
+                    <div class="form-group row">
+                        <label for="product_type" class="col-md-4 col-form-label text-md-right">Type <font color="red">*
+                            </font></label>
+                        <div class="col-md-8">
+                            <select name="product_type" class="form-control" id="product_type" required>
+                                <option selected value="stockable">Stockable</option>
+                                <option value="consumable">Consumable</option>
+                            </select>
+                        </div>
+                    </div>
+                    
                     <div class="col-md-4" hidden>
                         <div class="form-group">
                             <label for="status">Status</label>

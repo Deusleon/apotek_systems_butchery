@@ -86,6 +86,7 @@
                             <tr>
                                 <th>Product Name</th>
                                 <th>Category</th>
+                                <th>Type</th>
                                 <th>Created at</th>
                                 @if(auth()->user()->checkPermission('Manage Products'))
                                     <th>Actions</th>
@@ -104,6 +105,7 @@
                             <tr>
                                 <th>Product Name</th>
                                 <th>Category</th>
+                                <th>Type</th>
                                 <th>Created at</th>
                                 @if(auth()->user()->checkPermission('Manage Products'))
                                     <th>Actions</th>
@@ -128,6 +130,7 @@
                             <tr>
                                 <th>Product Name</th>
                                 <th>Category</th>
+                                <th>Type</th>
                                 <th>Created at</th>
                                 @if(auth()->user()->checkPermission('Manage Products'))
                                     <th>Actions</th>
@@ -175,6 +178,11 @@
                         "columns": [
                             {"data": "name"},
                             {"data": "category"},
+                            {"data": "type", render: function(type){
+                                if(type){
+                                   return type.charAt(0).toUpperCase() + type.slice(1);
+                                }
+                            }, defaultContent:'Stockable'},
                             {"data": "date"},
                                 @if(auth()->user()->checkPermission('Manage Products'))
                             {
@@ -208,6 +216,11 @@
                         "columns": [
                             {"data": "name"},
                             {"data": "category"},
+                            {"data": "type", render: function(type){
+                                if(type){
+                                   return type.charAt(0).toUpperCase() + type.slice(1);
+                                }
+                            }, defaultContent:'Stockable'},
                             {"data": "date"},
                                 @if(auth()->user()->checkPermission('Manage Products'))
                             {
@@ -257,6 +270,7 @@
                     $('#edit').find('.modal-body #sub_categories').val(row_data.sub_category_id);
                     $('#edit').find('.modal-body #standard_edit').val(row_data.standard);
                     $('#edit').find('.modal-body #sale_edit').val(row_data.sale);
+                    $('#edit').find('.modal-body #product_type').val(row_data.type??'stockable');
                     $('#edit').find('.modal-body #purchase_edit').val(row_data.purchase);
                     if (row_data.min !== null) {
                         $('#edit').find('.modal-body #min_stock_edit').val(numberWithCommas(row_data.min));
@@ -316,6 +330,7 @@
                     $('#edit').find('.modal-body #min_stock_edit').val(row_data.min);
                     $('#edit').find('.modal-body #max_stock_edit').val(row_data.max);
                     $('#edit').find('.modal-body #dosage_edit').val(row_data.dosage);
+                    $('#edit').find('.modal-body #product_type').val(row_data.type?? 'stockable');
                     $('#edit').find('.modal-body #indication_edit').val(row_data.indication);
                     $('#edit').modal('show');
                 });
@@ -536,6 +551,11 @@
                         'columns': [
                             {'data': 'name'},
                             {'data': 'category'},
+                            {"data": "type", render: function(type){
+                                if(type){
+                                   return type.charAt(0).toUpperCase() + type.slice(1);
+                                }
+                            }, defaultContent:'Stockable'},
                             {'data': 'date'},
                                 @if(auth()->user()->checkPermission('Manage Products'))
                             {
