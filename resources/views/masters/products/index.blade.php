@@ -244,6 +244,7 @@
                     $('#show').find('.modal-body #standard_edit').val(row_data.standard);
                     $('#show').find('.modal-body #sale_edit').val(row_data.sale);
                     $('#show').find('.modal-body #purchase_edit').val(row_data.purchase);
+                    $('#show').find('.modal-body #product_type').val(row_data.type??'stockable');
                     if (row_data.min !== null) {
                         $('#show').find('.modal-body #min_stock_edit').val(numberWithCommas(row_data.min));
                     } else {
@@ -311,6 +312,7 @@
                     $('#show').find('.modal-body #min_stock_edit').val(row_data.min);
                     $('#show').find('.modal-body #max_stock_edit').val(row_data.max);
                     $('#show').find('.modal-body #dosage_edit').val(row_data.dosage);
+                    $('#show').find('.modal-body #product_type').val(row_data.type??'stockable');
                     $('#show').find('.modal-body #indication_edit').val(row_data.indication);
                     $('#show').modal('show');
                 });

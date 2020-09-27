@@ -62,6 +62,14 @@
                         </div>
                     </div>
 
+                    <div class="form-group row" style="margin-top: -2%">
+                        <label for="code" class="col-md-5 col-form-label text-md-right">Product Type:</label>
+                        <div class="col-md-7">
+                            <input type="text" readonly class="form-control-plaintext" id="product_type" name="product_type"
+                                value="">
+                        </div>
+                    </div>
+
                     <input type="hidden" name="id" id="id">
                 </div>
                 <div class="modal-footer">
