@@ -79,7 +79,7 @@
                         <div class="col-md-8">
                             <select name="product_type" class="form-control" id="product_type" required>
                                 <option selected value="stockable">Stockable</option>
-                                <option value="consumable">Consumable</option>
+                                <option value="consumable">Service</option>
                             </select>
                         </div>
                     </div>

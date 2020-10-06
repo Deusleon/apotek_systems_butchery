@@ -179,8 +179,10 @@
                             {"data": "name"},
                             {"data": "category"},
                             {"data": "type", render: function(type){
-                                if(type){
-                                   return type.charAt(0).toUpperCase() + type.slice(1);
+                                if(type == 'consumable'){
+                                   return 'Service';
+                                }else{
+                                    return 'Stockable'
                                 }
                             }, defaultContent:'Stockable'},
                             {"data": "date"},
@@ -244,7 +246,7 @@
                     $('#show').find('.modal-body #standard_edit').val(row_data.standard);
                     $('#show').find('.modal-body #sale_edit').val(row_data.sale);
                     $('#show').find('.modal-body #purchase_edit').val(row_data.purchase);
-                    $('#show').find('.modal-body #product_type').val(row_data.type??'stockable');
+                    $('#show').find('.modal-body #product_type').val(row_data.type == 'consumable'?'Service':'Stockable');
                     if (row_data.min !== null) {
                         $('#show').find('.modal-body #min_stock_edit').val(numberWithCommas(row_data.min));
                     } else {
