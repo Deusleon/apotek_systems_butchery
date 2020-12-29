@@ -161,7 +161,7 @@ class StockAdjustmentController extends Controller
             0 => 'stock_id',
             1 => 'type',
             2 => 'quantity',
-            3 => 'created_at',
+            3 => 'inv_stock_adjustments.created_at',
             4 => 'reason',
             5 => 'stock_id',
         );
@@ -191,7 +191,7 @@ class StockAdjustmentController extends Controller
         } else {
             $search = $request->input('search.value');
 
-            $adjustments = StockAdjustment::where('type', 'LIKE', "%{$search}%")
+            $adjustments = StockAdjustment::where('inv_stock_adjustments.type', 'LIKE', "%{$search}%")
                 ->join('inv_current_stock', 'inv_current_stock.id', '=', 'inv_stock_adjustments.stock_id')
                 ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                 ->orWhere('stock_id', 'LIKE', "%{$search}%")
@@ -204,7 +204,7 @@ class StockAdjustmentController extends Controller
                 ->orderBy($order, $dir)
                 ->get();
 
-            $totalFiltered = StockAdjustment::where('type', 'LIKE', "%{$search}%")
+            $totalFiltered = StockAdjustment::where('inv_stock_adjustments.type', 'LIKE', "%{$search}%")
                 ->join('inv_current_stock', 'inv_current_stock.id', '=', 'inv_stock_adjustments.stock_id')
                 ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                 ->orWhere('stock_id', 'LIKE', "%{$search}%")
