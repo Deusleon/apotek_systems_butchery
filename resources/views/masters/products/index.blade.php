@@ -200,6 +200,10 @@
 
                     });
 
+                    $('#create').on('hide.bs.modal', function(){
+                        table_main.draw();
+                    });
+
                 });
 
                 function loadActive() {
