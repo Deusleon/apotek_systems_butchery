@@ -49,35 +49,39 @@
         <div class="card">
             <div class="card-body">
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                    <div class="row">
-                        <div class="col-md-9">
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                @if(auth()->user()->checkPermission('Manage Products'))
-                                    <button style="float: right;margin-bottom: 7%;" type="button"
-                                            class="btn btn-secondary btn-sm"
-                                            data-toggle="modal"
-                                            data-target="#create">
-                                        Add Product
-                                    </button>
-                                @endif
-                            </div>
-                        </div>
+                    <div class="d-flex justify-content-end align-items-end">
+                            @if(auth()->user()->checkPermission('Manage Products'))
+                                <button type="button"
+                                        class="btn btn-secondary btn-sm mr-0 mb-3"
+                                        data-toggle="modal"
+                                        data-target="#create">
+                                    Add Product
+                                </button>
+                            @endif
                     </div>
-                    <div class="form-group row">
-                        <div class="col-md-6" style="margin-left: 2%">
-
-                        </div>
+                    <div class="row justify-content-end align-items-end mb-3">
                         <label for="status" style="margin-right: -2.5%" class="col-md-3 col-form-label text-md-right">Status:</label>
                         <div class="col-md-3">
-                            <select name="status-filter" class="js-example-basic-single form-control"
-                                    id="status-filter" onchange="statusCheck()">
+                            <select name="status-filter" class="js-example-basic-single form-control mr-0" id="status-filter"
+                                onchange="statusCheck()">
                                 <option value="1">Active</option>
                                 <option value="0">Inactive</option>
                             </select>
                         </div>
                     </div>
+                    {{-- <div class="row no-gutters">
+                        <div class="col-md-6" style="margin-left: 2%">
+
+                        </div>
+                        <label for="status" style="margin-right: -2.5%" class="col-md-3 col-form-label text-md-right">Status:</label>
+                        <div class="col-md-3">
+                            <select name="status-filter" class="js-example-basic-single form-control mr-0"
+                                    id="status-filter" onchange="statusCheck()">
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                        </div>
+                    </div> --}}
 
                     <div id="product-table" class="table-responsive">
                         <table id="fixed-header1" class="display table nowrap table-striped table-hover"
