@@ -359,11 +359,11 @@ Route::middleware(["auth"])->group(function () {
 
 
     /*file import route*/
-    Route::resource('file/import', 'ImportDataController')->only([
+    Route::resource('/masters/import', 'ImportDataController')->only([
         'index'
     ]);
-    Route::post('file/import/record-import', 'ImportDataController@recordImport')->name('record-import');
-    Route::get('file/import/record-import', 'ImportDataController@getImportTemplate')->name('import-template');
+    Route::post('/masters/import/record-import', 'ImportDataController@recordImport')->name('record-import');
+    Route::get('/masters/import/record-import', 'ImportDataController@getImportTemplate')->name('import-template');
 
 });
 
