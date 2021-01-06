@@ -38,11 +38,9 @@
                                 {{--                                       data-mask="9999 999 999"--}}
                                 {{--                                       pattern="^0\d{3}[\-]\d{3}[\-]\d{3}$" title="Eg:0777-777-777" required>--}}
                                 <input type="text" class="form-control"
-                                       id="phone_edit" name="phone" required style="width: 134%;">
+                                       id="phone_edit" name="phone" required style="width: 127%;">
                                 <span id="valid-msg" class="hide"></span>
-                                <br>
                                 <span id="error-msg" class="text text-danger"></span>
-                                <br>
                                 <span class="text-danger">
                                     <strong id="phone_1-error"></strong>
                                 </span>

@@ -21,7 +21,7 @@
                     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                         @if(auth()->user()->checkPermission('Manage Suppliers'))
                             <button style="float: right;margin-bottom: 2%;" type="button"
-                                    class="btn btn-secondary btn-sm"
+                                    class="btn btn-secondary btn-sm mr-0"
                                     data-toggle="modal"
                                     data-target="#create">
                                 Add Supplier
@@ -147,7 +147,7 @@
                     customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
                         return "e.g. " + selectedCountryPlaceholder;
                     },
-                    initialCountry: "auto",
+                    initialCountry: "tz",
                     geoIpLookup: function (callback) {
                         $.get('https://ipinfo.io', function () {
                         }, "jsonp").always(function (resp) {
@@ -164,7 +164,7 @@
                     customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
                         return "e.g. " + selectedCountryPlaceholder;
                     },
-                    initialCountry: "auto",
+                    initialCountry: "tz",
                     geoIpLookup: function (callback) {
                         $.get('https://ipinfo.io', function () {
                         }, "jsonp").always(function (resp) {
@@ -220,7 +220,7 @@
                     customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
                         return "e.g. " + selectedCountryPlaceholder;
                     },
-                    initialCountry: "auto",
+                    initialCountry: "tz",
                     geoIpLookup: function (callback) {
                         $.get('https://ipinfo.io', function () {
                         }, "jsonp").always(function (resp) {
@@ -237,7 +237,7 @@
                     customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
                         return "e.g. " + selectedCountryPlaceholder;
                     },
-                    initialCountry: "auto",
+                    initialCountry: "tz",
                     geoIpLookup: function (callback) {
                         $.get('https://ipinfo.io', function () {
                         }, "jsonp").always(function (resp) {

@@ -39,11 +39,9 @@
                                 {{--                                       pattern="^0\d{3}[\-]\d{3}[\-]\d{3}$"--}}
                                 {{--                                       title="Eg:0777-777-777" required="true">--}}
                                 <input type="text" class="form-control"
-                                       id="phone_edits" name="mobile" required style="width: 134%;">
+                                       id="phone_edits" name="mobile" required style="width: 127%;">
                                 <span id="valid-msgs" class="hide"></span>
-                                <br>
                                 <span id="error-msgs" class="text text-danger"></span>
-                                <br>
                                 <span class="text-danger">
                                     <strong id="phone_1-error"></strong>
                                 </span>
