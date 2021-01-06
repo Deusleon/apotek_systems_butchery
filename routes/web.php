@@ -8,6 +8,9 @@ Route::get('/', 'HomeController@login')->name('login');
 Route::get('/changePassword', 'HomeController@showChangePasswordForm')->name('changePasswordForm');
 Route::post('/changePassword', 'HomeController@changePassword')->name('changePassword');
 
+Route::get('/profile', 'ProfileController@index')->name('showProfile');
+Route::post('/updateProfileImage', 'ProfileController@updateProfileImage')->name('updateProfileImage');
+
 
 Auth::routes(['register' => false]);
 

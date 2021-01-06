@@ -265,14 +265,14 @@
                         </form>
                         <ul class="pro-body">
                             {{-- <li><a href="#!" class="dropdown-item"><i class="feather icon-settings"></i> Settings</a></li> --}}
-                            {{--                                <li><a href="#!" class="dropdown-item"><i class="feather icon-user"></i> Profile</a></li>--}}
                             {{--                                <li><a href="message.html" class="dropdown-item"><i class="feather icon-mail"></i> My Messages</a></li>--}}
+                            <li><a href="{{route('showProfile')}}" class="dropdown-item"><i class="feather icon-user"></i> Profile</a></li>
                             <li><a href="{{route('changePasswordForm')}}" class="dropdown-item"><i
                                         class="feather icon-x-circle"></i> Change Password</a></li>
                             <li><a href="{{ route('logout') }}" class="dropdown-item"
                                    onclick="event.preventDefault();
                                     document.getElementById('logout-form').submit();">
-                                    <i class="feather icon-lock"></i> Lock Screen</a>
+                                    <i class="feather icon-log-out"></i> Logout</a>
                             </li>
                         </ul>
                     </div>
