@@ -6,6 +6,7 @@ var set_button = 0;
 var tax = Number(document.getElementById("vats").value);
 
 var cart_table = $('#cart_table').DataTable({
+    ordering: false,
     searching: false,
     bPaginate: false,
     bInfo: false,
@@ -250,6 +251,7 @@ function val() {
     var cart_data = [];
     product = document.getElementById("select_id").value;
     document.getElementById("select_id").value = "";
+    console.log(product);
     var selected_fields = product.split(',');
     var item_name = selected_fields[0];
     var price = Number(selected_fields[1]);
@@ -268,7 +270,7 @@ function val() {
     cart_data.push(quantity);
     cart_data.push(formatMoney(unit_total));
     default_cart.push(cart_data);
-    cart.push(item);
+    cart.unshift(item);
     discount();
     cart_table.clear();
     cart_table.rows.add(cart);

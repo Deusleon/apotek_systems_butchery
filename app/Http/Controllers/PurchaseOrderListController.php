@@ -7,6 +7,7 @@ use App\OrderDetail;
 use DB;
 use Illuminate\Http\Request;
 use View;
+use Carbon\Carbon;
 
 class PurchaseOrderListController extends Controller
 {
@@ -29,10 +30,10 @@ class PurchaseOrderListController extends Controller
     public function getOrderHistory(Request $request)
     {
 
-        $from = $request->date[0];
-        $to = $request->date[1];
-        $order_history = Order::where(DB::Raw("DATE_FORMAT(ordered_at,'%m/%d/%Y')"), '>=', $from)
-            ->where(DB::Raw("DATE_FORMAT(ordered_at,'%m/%d/%Y')"), '<=', $to)->get();
+
+        $from = Carbon::parse($request->date[0]);
+        $to =  Carbon::parse($request->date[1]);
+        $order_history = Order::whereBetween('ordered_at', [$from, $to])->get();
         foreach ($order_history as $value) {
             $value->supplier;
             $value->details;
