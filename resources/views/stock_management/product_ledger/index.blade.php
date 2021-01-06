@@ -83,10 +83,11 @@
                             <thead>
                             <tr>
                                 <th>Date</th>
-                                <th>Product Name</th>
+                                <th>Description</th>
                                 <th>Quantity</th>
                                 <th>Balance</th>
                                 <th>Movement</th>
+                                <th>User</th>
                             </tr>
                             </thead>
                             <tbody>

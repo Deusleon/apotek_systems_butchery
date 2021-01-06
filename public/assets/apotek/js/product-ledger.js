@@ -3,11 +3,12 @@ var table_ledger_filter = $('#fixed-header-ledger').DataTable({
     bPaginate: true,
     bInfo: true,
     'columns': [
-        {'data': 'date'},
-        {'data': 'name'},
-        {'data': 'quantity'},
-        {'data': 'balance'},
-        {'data': 'movement'}
+        { 'data': 'date' },
+        { 'data': 'method' },
+        { 'data': 'quantity' },
+        { 'data': 'balance' },
+        { 'data': 'movement' },
+        { 'data': 'user' }
     ]
 });
 

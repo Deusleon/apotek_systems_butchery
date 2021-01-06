@@ -58,6 +58,7 @@ class ProductLedgerController extends Controller
                 //return products only
                 $ledger = DB::table('product_ledger')
                     ->select(DB::raw('*'), DB::raw('(received + outgoing) as quantity'))
+                    ->join('users', 'users.id', '=', 'product_ledger.user')
                     ->where('store_id', $default_store_id)
                     ->where('product_id', $request->product_id)
                     ->get();
@@ -71,15 +72,17 @@ class ProductLedgerController extends Controller
                 //previous row
                 $previous_ledger = DB::table('product_ledger')
                     ->select(DB::raw('*'), DB::raw('(received + outgoing) as quantity'))
+                    ->join('users', 'users.id', '=', 'product_ledger.user')
                     ->where('product_id', $request->product_id)
                     ->where('date', '<', $request->date)
-                    ->orderby('id', 'desc')
+                    ->orderby('product_ledger.id', 'desc')
                     ->limit('1');
 
                 // $previous_ledger[0]['quantity'] = 80;
 
                 $current_ledger = DB::table('product_ledger')
                     ->select(DB::raw('*'), DB::raw('(received + outgoing) as quantity'))
+                    ->join('users', 'users.id', '=', 'product_ledger.user')
                     ->where('product_id', $request->product_id)
                     ->whereBetween('date', [$request->date, date('Y-m-d')]);
 
@@ -116,10 +119,12 @@ class ProductLedgerController extends Controller
                         array_push($toMainView, array(
                             'date' => $key->date,
                             'name' => $key->product_name,
+                            'method' => $key->method,
                             'quantity' => $key->quantity,
                             'movement' => $key->movement,
                             'product_id' => $key->product_id,
-                            'balance' => $total
+                            'balance' => $total,
+                            'user' => $key->name
                         ));
 
                     } else {
@@ -127,10 +132,12 @@ class ProductLedgerController extends Controller
                         array_push($toMainView, array(
                             'date' => date('Y-m-d', strtotime($key->date)),
                             'name' => $key->product_name,
+                            'method' => $key->method,
                             'quantity' => $key->quantity,
                             'movement' => $key->movement,
                             'product_id' => $key->product_id,
-                            'balance' => $total
+                            'balance' => $total,
+                            'user' => $key->name
                         ));
 
                     }
@@ -187,10 +194,12 @@ class ProductLedgerController extends Controller
                 array_push($toMainView, array(
                     'date' => '-',
                     'name' => '-',
+                    'method' => '-',
                     'quantity' => '-',
                     'movement' => '-',
                     'product_id' => '-',
-                    'balance' => '-'
+                    'balance' => '-',
+                    'user' => '-'
                 ));
 
             }
@@ -211,10 +220,12 @@ class ProductLedgerController extends Controller
                             array_push($toMainView, array(
                                 'date' => $key->date,
                                 'name' => $key->product_name,
+                                'method' => $key->method,
                                 'quantity' => $key->quantity,
                                 'movement' => $key->movement,
                                 'product_id' => $key->product_id,
-                                'balance' => $total
+                                'balance' => $total,
+                                'user' => $key->name
                             ));
 
                         } else {
@@ -222,10 +233,12 @@ class ProductLedgerController extends Controller
                             array_push($toMainView, array(
                                 'date' => date('Y-m-d', strtotime($key->date)),
                                 'name' => $key->product_name,
+                                'method' => $key->method,
                                 'quantity' => $key->quantity,
                                 'movement' => $key->movement,
                                 'product_id' => $key->product_id,
-                                'balance' => $total
+                                'balance' => $total,
+                                'user' => $key->name
                             ));
 
                         }
