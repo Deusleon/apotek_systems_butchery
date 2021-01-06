@@ -50,7 +50,7 @@ var cart_table = $('#cart_table').DataTable({
     bInfo: false,
     data: cart,
     columns: [
-        {title: "Item Name"},
+        {title: "Product Name"},
         {title: "Quantity"},
         {
             title: "Action",
