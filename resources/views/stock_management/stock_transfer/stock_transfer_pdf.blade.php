@@ -139,7 +139,7 @@
                 <tr>
                     <td>{{ $transfer->currentStock['product']['name'] }}</td>
                     <td align="right">
-                        <div style="margin-right: 50%">{{ floatval($transfer->transfer_qty) }}</div>
+                        <div style="margin-right: 50%">{{ number_format($transfer->transfer_qty) }}</div>
                     </td>
                 </tr>
             @endforeach
