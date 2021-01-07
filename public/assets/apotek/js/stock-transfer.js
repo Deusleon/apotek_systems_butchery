@@ -112,7 +112,7 @@ function rePopulateSelect2() {
     }));
     $.each(option_data, function (id, detail) {
 
-        var datas = [detail.product.name, detail.quantity, detail.product_id, detail.stock_id];
+        var datas = JSON.stringify([detail.product.name, detail.quantity, detail.product_id, detail.stock_id]);
 
         $('#select_id').append($('<option>', {value: datas, text: detail.product.name}));
     });
@@ -130,7 +130,7 @@ function val() {
     var product = document.getElementById("select_id").value;
     // rePopulateSelect2();
     $('#select_id').val('');
-    var selected_fields = product.split(',');
+    var selected_fields = JSON.parse(product);
     var item_name = selected_fields[0];
     var price = Number(selected_fields[1]);
     var product_id = Number(selected_fields[2]);
@@ -367,7 +367,7 @@ function filterTransferByStore() {
             }));
             $.each(data, function (id, detail) {
 
-                var datas = [detail.product.name, detail.quantity, detail.product_id, detail.stock_id];
+                var datas = JSON.stringify([detail.product.name, detail.quantity, detail.product_id, detail.stock_id]);
 
                 $('#select_id').append($('<option>', {value: datas, text: detail.product.name}));
             });
@@ -404,7 +404,7 @@ $('#select_id').select2({
                     }));
                     $.each(data, function (id, detail) {
 
-                        var datas = [detail.product.name, detail.quantity, detail.product_id, detail.stock_id];
+                        var datas = JSON.stringify([detail.product.name, detail.quantity, detail.product_id, detail.stock_id]);
 
                         $('#select_id').append($('<option>', {value: datas, text: detail.product.name}));
                     });
