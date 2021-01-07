@@ -132,7 +132,10 @@ class StockTransferAcknowledgeController extends Controller
 
         $stock_update = CurrentStock::find($request->stock_id);
 
-        $remain_stock = $request->quantity_trn - $request->quantity_rcvd;
+        $transfered_quantity = (int)str_replace(',','',$request->quantity_trn);
+        $received_quantity = (int)str_replace(',','',$request->quantity_rcvd);
+
+        $remain_stock =  $transfered_quantity  - $received_quantity;
         $present_stock = $stock_update->quantity + $remain_stock;
 
         $stock_update->quantity = $present_stock;
