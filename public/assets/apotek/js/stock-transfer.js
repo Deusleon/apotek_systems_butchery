@@ -153,9 +153,15 @@ function val() {
 
 
 function deselect() {
-    calculateCart();
     cart = [];
     default_cart = [];
+    calculateCart();
+
+    $('#remarks').val('');
+    $('#to_id').val(0).change();
+    $('#from_id').val(0).change();
+    $('#select_id').prop('disabled', true);
+
     var stringified_cart = JSON.stringify(cart);
     document.getElementById("order_cart").value = stringified_cart;
     cart_table.clear();
@@ -319,6 +325,7 @@ $('#transfer').on('submit', function (e) {
 
 function saveStockTransfer() {
     var form = $('#transfer').serialize();
+    $('#transfer_preview').attr('disabled', true);
 
     $.ajax({
         url: config.routes.stockTransferSave,
@@ -329,7 +336,6 @@ function saveStockTransfer() {
         success: function (data) {
             window.open(data.redirect_to);
             // triggerSaleType();
-            $('#transfer_preview').attr('disabled', false);
         }, complete: function () {
             notify('Stock transfer successfully', 'top', 'right', 'success');
             deselect();
@@ -344,6 +350,11 @@ $('#select_id').prop('disabled', true);
 
 function filterTransferByStore() {
     var from = document.getElementById('from_id');
+
+    if (!from.value || from.value == 0) {
+        return;
+    }
+
     var from_id = from.options[from.selectedIndex].value;
 
     /*ajax filter by store*/
