@@ -231,7 +231,7 @@ class StockTransferController extends Controller
 
     public function stockTransferHistory()
     {
-        $all_transfers = StockTransfer::orderby('created_at', 'desc')->get();
+        $all_transfers = StockTransfer::select(DB::raw('*, SUM(transfer_qty) as quantity, SUM(accepted_qty) as received_quantity, COUNT(*) as total_products , MIN(status) as status'))->orderBy('created_at', 'Desc')->groupBy('transfer_no')->get();
 
         return view('stock_management.stock_transfer.history')->with([
             'transfers' => $all_transfers

@@ -114,7 +114,7 @@
                                     <tr>
                                         <th>Transfer #</th>
                                         <th>Date</th>
-                                        <th>Product Name</th>
+                                        <th>Total Products</th>
                                         <th>Transferred Qty</th>
                                         <th>Received Qty</th>
                                         <th>Status</th>
@@ -125,15 +125,15 @@
                                         <tr>
                                             <td>{{$all_transfer->transfer_no}}</td>
                                             <td>{{date('d-m-Y', strtotime($all_transfer->created_at))}}</td>
-                                            <td>{{$all_transfer->currentStock['product']['name']}}</td>
+                                            <td>{{$all_transfer->total_products}}</td>
                                             <td align="right">
                                                 <div style="margin-right: 50%">
-                                                    {{number_format(floatval($all_transfer->transfer_qty))}}
+                                                    {{number_format(floatval($all_transfer->quantity))}}
                                                 </div>
                                             </td>
                                             <td align="right">
                                                 <div style="margin-right: 50%">
-                                                    {{number_format(floatval($all_transfer->accepted_qty))}}
+                                                    {{number_format(floatval($all_transfer->received_quantity))}}
                                                 </div>
                                             </td>
                                             <td>
