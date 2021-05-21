@@ -181,6 +181,10 @@
             </div>
             <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
 
+                <div class="d-flex justify-content-end mb-2 align-items-center">
+                    <label class="mr-2" for="">Date:</label>
+                    <input type="text" id="date_range" class="form-control w-auto" onchange="getQuotes()">
+                </div>
                 <div class="table-responsive" id="sales">
                     <table id="sale_quotes-Table" class="display table nowrap table-striped table-hover"
                            style="width:100%">
@@ -193,36 +197,10 @@
                             <th>Discount</th>
                             <th>Amount</th>
                             <th>Action</th>
-                            <th hidden>id</th>
+                            <th>id</th>
                         </tr>
                         </thead>
                         <tbody>
-                        @if($count>0)
-                            <tr>
-                                @foreach($sale_quotes as $quote)
-                                    <td>{{date('d-m-Y', strtotime($quote->date))}}</td>
-                                    <td>{{$quote->cost->name}}</td>
-                                    <td>{{number_format($quote->cost->sub_total,2)}}</td>
-                                    <td>{{number_format($quote->cost->vat,2)}}</td>
-                                    <td>{{number_format($quote->cost->discount,2)}}</td>
-                                    <td>{{number_format($quote->cost->amount - $quote->cost->discount,2)}}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-rounded btn-success" type="button"
-                                                onclick="quoteDetails('{{$quote->remark}}',{{$quote->details}})"
-                                                id="quote_details">Show
-                                        </button>
-                                        <a href="{{route('receiptReprint',$quote->id)}}" target="_blank">
-                                            <button class="btn btn-sm btn-rounded btn-secondary" type="button"><span
-                                                    class='fa fa-print' aria-hidden='true'></span>
-                                                Print
-                                            </button>
-                                        </a>
-                                    </td>
-                                    <td hidden>{{$quote->id}}</td>
-                            </tr>
-                            @endforeach
-                        @endif
-
                         </tbody>
                     </table>
                 </div>
@@ -244,6 +222,8 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
+
+        let quotes_table = null;
 
         var config = {
             token: '{{ csrf_token() }}',
@@ -315,15 +295,107 @@
             document.getElementById('input_products_b').value = '';
         }
 
+        function getQuotes(){
+            $.ajax({
+                url: "{{route('sale-quotes.get-quotes')}}",
+                dataType: "json",
+                data: {
+                    date: $('#date_range').val()
+                },
+                type: 'GET',
+                success: function(data){
+                    quotes_table.clear();
+                    quotes_table.rows.add(data)
+                    quotes_table.draw();
+                }
+            });
+        }
 
         $(document).ready(function () {
-            $('#sale_quotes-Table').DataTable({
+            
+            $(function () {
+
+                var start = moment();
+                var end = moment();
+
+                function cb(start, end) {
+                    $('#date_range span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                }
+
+                $('#date_range').daterangepicker({
+                    startDate: start,
+                    endDate: end,
+                    ranges: {
+                        'Today': [moment(), moment()],
+                        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                        'This Month': [moment().startOf('month'), moment().endOf('month')],
+                        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                        'This Year': [moment().startOf('year'), moment()]
+                    }
+                }, cb);
+
+                cb(start, end);
+
+            });
+            
+            
+            quotes_table = $('#sale_quotes-Table').DataTable({
+                columns:[
+                    {
+                        data: 'date', 
+                        render: function(date){
+                            return moment(date).format('DD-MM-YYYY');
+                        }
+                    },
+                    {data: 'cost.name'},
+                    {data: 'cost.sub_total', render: function(data){
+                        return formatMoney(data);
+                    }},
+                    {data: 'cost.vat', render: function(data){
+                        return formatMoney(data);
+                    }},
+                    {data: 'cost.discount', render: function(data){
+                        return formatMoney(data);
+                    }},
+                    {data: 'cost', render: function(cost){
+                        return formatMoney(Number(cost.amount) - Number(cost.discount));
+                    }},
+                    {data: null, render: function(data, type, row){
+                        let receipt_url = '{{route('receiptReprint','receipt_id')}}';
+                        receipt_url = receipt_url.replace('receipt_id', row.id);
+                        return `
+                                <button class="btn btn-sm btn-rounded btn-success" type="button"
+                                        onclick='showQuoteDetails(event)'
+                                        id="quote_details">Show
+                                </button>
+
+                                <a href="${receipt_url}" target="_blank">
+                                    <button class="btn btn-sm btn-rounded btn-secondary" type="button"><span
+                                            class='fa fa-print' aria-hidden='true'></span>
+                                        Print
+                                    </button>
+                                </a>
+                        `;
+                    }},
+                    {data: 'id'},
+                ],
                 language: {
                     emptyTable: "No Sales Quote Data Available in the Table"
                 },
-                aaSorting: [[7, 'desc']]
+                aaSorting: [[7, 'desc']],
+                columnDefs: [
+                    {targets:[7], visible:false}
+                ]
             });
         });
+
+
+        function showQuoteDetails(event){
+            let data = quotes_table.row($(event.target).parents('tr')).data();
+            quoteDetails(data.remark, data.details);
+        }
 
         //Maintain the current Pill on reload
         $(function () {
