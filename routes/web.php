@@ -133,6 +133,8 @@ Route::middleware(["auth"])->group(function () {
     Route::get('purchases/goods-receiving.order-receive', 'GoodsReceivingController@orderReceive')->name('goods-receiving.orderReceive');
     Route::get('purchases/supplier/select/filter-price', 'GoodsReceivingController@filterPrice')->name('filter-price');
     Route::post('purchases/purchase-order/list', 'GoodsReceivingController@purchaseOrderList')->name('purchase-order-list');
+    Route::get('pharmacy/purchases/loading-invoice-item-price', 'GoodsReceivingController@getInvoiceItemPrice')->name('receiving-item-prices');//receiving-item-prices
+    Route::get('pharmacy/purchases/goods-receiving.invoice-item-receive', 'GoodsReceivingController@invoiceitemReceive')->name('goods-receiving.invoiceitemReceive');
 
     //Configurations Routes
     Route::get('/settings', 'ConfigurationsController@index')->name('configurations.index');

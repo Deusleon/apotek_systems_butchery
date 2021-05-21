@@ -562,3 +562,448 @@ function numberWithCommas(digit) {
     return String(parseFloat(digit)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
+
+//INVOICE RECEIVING
+
+function goodReceivingFilterInvoiceBySupplier() {
+    var supplier = document.getElementById('good_receiving_supplier_ids');
+    var supplier_id = supplier.options[supplier.selectedIndex].value;
+
+    /*ajax filter invoice by supplier*/
+    $.ajax({
+        url: config.routes.filterBySupplier,
+        type: "get",
+        dataType: "json",
+        data: {
+            supplier_id: supplier_id
+        },
+        success: function(data) {
+            $('#goodreceving_invoice_id').prop('disabled', false);
+            $("#goodreceving_invoice_id option").remove();
+            $('#goodreceving_invoice_id').append($('<option>', {
+                value: '',
+                text: 'Select Invoice...',
+                disabled: true,
+                selected: true
+            }));
+            $.each(data, function(id, detail) {
+                var datas = [detail.id];
+
+                $('#goodreceving_invoice_id').append($('<option>', { value: datas, text: detail.invoice_no }));
+            });
+        },
+        complete: function() {
+            // $('#loading').hide();
+        }
+    });
+
+}
+
+// InvoiceCartTable
+var invoicecart_table = $('#invoicecart_table').DataTable({
+    searching: false,
+    bPaginate: false,
+    bInfo: false,
+    columns: [
+        { title: "Item Name", data: 'name' },
+        { title: "Quantity", data: 'quantity' },
+        { title: "Buy Price", data: 'buying_price' },
+        { title: "Sell Price", data: 'selling_price' },
+        { title: "Expire  Date", data: 'expire_date' },
+        {
+            title: "Action",
+            defaultContent: "<div><input type='button' value='Edit' id='edit_btn' class='btn btn-info btn-rounded btn-sm'/><input type='button' value='Delete' id='delete_btn' class='btn btn-danger btn-rounded btn-sm'/></div>"
+        }
+    ]
+});
+
+$('#invoicecart_table tbody').on('click', '#edit_btn', function() {
+    let quantity, buying_price, selling_price, expire_date;
+    if (edit_btn_set === 0) {
+        var row_data = invoicecart_table.row($(this).parents('tr')).data();
+        var index = invoicecart_table.row($(this).parents('tr')).index();
+        quantity = row_data.quantity;
+        console.log(row_data.selling_price);
+        buying_price = row_data.buying_price.toString().replace(',', '');
+        selling_price = row_data.selling_price.toString().replace(',', '');
+        expire_date = row_data.expire_date;
+        let tommorow = moment().add(1, 'days').format("YYYY-MM-DD");
+        console.log(tommorow);
+        console.log(expire_date);
+        row_data.quantity = `<input style='width: 90%' type='text' class='form-control inventedAction' id='edit_quantity' value=${quantity}  required/>`;
+        row_data.buying_price = `<input style='width: 90%' type='text' class='form-control inventedAction' id='edit_buying_price' onchange='invoiceamountCheck()'  value=${buying_price}  required/>`;
+        row_data.selling_price = `<input style='width: 90%' type='text' class='form-control inventedAction' id='edit_selling_price' onchange='invoiceamountCheck()'  value=${selling_price}  required/>`;
+        row_data.expire_date = `<input style='width: 90%' type='date' class='form-control inventedAction' min="${tommorow}" id='edit_expire_date' value=${selling_price} required/>`;
+        invoice_cart[index] = row_data;
+        invoicecart_table.clear();
+        invoicecart_table.rows.add(invoice_cart);
+        invoicecart_table.draw();
+
+        edit_btn_set = 1;
+
+    }
+
+});
+
+
+$('#invoicecart_table tbody').on('change', 'input.inventedAction', function() {
+    edit_btn_set = 0;
+    var row_data = invoicecart_table.row($(this).parents('tr')).data();
+    var index = invoicecart_table.row($(this).parents('tr')).index();
+
+    row_data.quantity = document.getElementById("edit_quantity").value;
+    row_data.buying_price =  document.getElementById("edit_buying_price").value;
+    row_data.selling_price = document.getElementById("edit_selling_price").value;
+    row_data.expire_date = document.getElementById("edit_expire_date").value;
+
+    invoice_cart[index] = row_data;
+    invoicecart_table.clear();
+    invoicecart_table.rows.add(invoice_cart);
+    invoicecart_table.draw();
+
+    invoice_cart_receiveds = JSON.stringify(invoice_cart);
+    document.getElementById("invoice_received_cart").value = invoice_cart_receiveds;
+    console.log(invoice_cart_receiveds);
+
+    totalCostCalculated();
+
+});
+
+$('#invoicecart_table tbody').on('click', '#delete_btn', function() {
+    edit_btn_set = 0;
+    var index = invoicecart_table.row($(this).parents('tr')).index();
+    invoice_cart.splice(index, 1);
+    invoicecart_table.clear();
+    invoicecart_table.rows.add(invoice_cart);
+    invoicecart_table.draw();
+
+    invoice_cart_receiveds = JSON.stringify(invoice_cart);
+    document.getElementById("invoice_received_cart").value = invoice_cart_receiveds;
+    console.log(invoice_cart_receiveds);
+    totalCostCalculated();
+    // enable Price Category DropDown If there is no product in the Invoice_cart
+    if (invoice_cart.length === 0) {
+        var disabled = $("#invoiceprice_category").attr('disabled');
+        if (disabled) {
+            $("#invoiceprice_category").removeAttr('disabled');
+        }
+    }
+
+});
+
+$("#invoiceselected-product").on("change", function() {
+
+    let supplier = document.getElementById('good_receiving_supplier_ids');
+    let supplier_id = supplier.options[supplier.selectedIndex].value;
+
+    if(supplier_id === ""){
+
+        notify('Please Select Supplier', 'top', 'right', 'danger');
+        $('#invoiceselected-product option').prop('selected', function() {
+            return this.defaultSelected;
+        });
+
+    } else {
+
+        var disabled = $("#invoiceprice_category").attr('disabled');
+        if (disabled === undefined) {
+            $("#invoiceprice_category").attr('disabled', 'disabled');
+        }
+
+        invoicevaluesCollection();
+    }
+
+
+
+});
+
+
+var invoice_item_received = {};
+var invoice_cart_received = [];
+
+function invoicevaluesCollection(qty) {
+
+    qty = (qty || 1);
+    var item = {};
+    product = document.getElementById("invoiceselected-product").value;
+    if(!product){
+        return;
+    }
+
+    var selected_fields = product.split('#@');
+    // console.log(selected_fields)
+    var item_name = selected_fields[0];
+    var product_id = selected_fields[1];
+    let selling_price = 0;
+    let buying_price = 0;
+
+    /*set the global variable*/
+    product_ids = product_id;
+    selected_name = item_name;
+    invoice_item_received.name = selected_fields[0];
+    invoice_item_received.id = selected_fields[1];
+    invoice_item_received.quantity = qty;
+    document.getElementById("pr_id").value = formatMoney(selected_fields[2]);
+
+
+    // Get Prices Depend On Category
+    var price_category = document.getElementById("invoiceprice_category").value;
+    var e = document.getElementById("good_receiving_supplier_ids");
+    var supplier_id = e.options[e.selectedIndex].value;
+
+    function updatePrice(data) {
+        // Format Buying And Selling Prices if there is no data returned
+        buying_price = formatMoney(data.length !== 0 ? data[0]['unit_cost'] : 0);
+        selling_price = formatMoney(data.length !== 0 ? data[0]['price'] : 0);
+        item.name = item_name;
+        item.id = product_id;
+        item.quantity = qty;
+        item.selling_price = selling_price;
+        item.buying_price = buying_price;
+        item.expire_date = '';
+
+
+        if (invoice_cart.some(function(element) {
+                return element.id == item.id;
+            })) {
+            console.log('element id = item id');
+            invoice_cart = invoice_cart.map(function(element) {
+                if (element.id == item.id) {
+                    element.quantity = +element.quantity + item.quantity;
+                    invoice_item_received.quantity = element.quantity;
+                }
+                return element;
+            })
+            totalCostCalculated();
+        } else {
+            console.log('element id != item id');
+            invoice_cart.push(item)
+            totalCostCalculated();
+        }
+        invoicecart_table.clear();
+        invoicecart_table.rows.add(invoice_cart);
+        invoicecart_table.draw();
+        // totalCostCalculated(selling_price, buying_price, qty );
+        // For Ajax Call on Save A Form
+        invoice_cart_received = invoice_cart;
+        invoice_cart_receiveds = JSON.stringify(invoice_cart_received);
+        document.getElementById("invoice_received_cart").value = invoice_cart_receiveds;
+        document.getElementById("price_category_for_all").value = price_category;
+        console.log(invoice_cart_receiveds);
+    }
+
+    getInvoiceItemPrice(product_id, price_category, supplier_id, updatePrice);
+
+
+}
+
+function getInvoiceItemPrice(product_id, price_category, supplier_id, call_back) {
+
+    $.ajax({
+        url: config.routes.invoiceItemPrice,
+        type: "get",
+        dataType: "json",
+        data: {
+            'product_id': product_id,
+            'price_category': price_category,
+            'supplier_id': supplier_id
+        },
+        success: function(data) {
+
+            if (call_back && typeof call_back == 'function') {
+                call_back(data);
+                $('#invoiceselected-product').val('').change();
+                return;
+            }
+
+            if (data.length === 0) {
+                /*empty*/
+                $("#sell_price_id").val(formatMoney('0'));
+                $("#buy_price").val(formatMoney('0'));
+            } else {
+                $("#buy_price").val(formatMoney(data[0]['unit_cost']));
+                $("#sell_price_id").val(formatMoney(data[0]['price']));
+            }
+            $('#invoiceselected-product').val('').change();
+        }
+
+    });
+}
+
+function totalCostCalculated(){
+    var  sub_total = 0;
+    var  total_buying_price = 0;
+    var  total_selling_price = 0;
+    var  selling_price = 0;
+    var  buying_price = 0;
+    var  price_selling_for_single_item = 0;
+    var  price_buying_for_single_item = 0;
+
+    console.log(invoice_cart);
+    invoice_cart.forEach(function (item) {
+        selling_price = parseFloat(item.selling_price.replace(/\,/g, ''), 10);
+        buying_price = parseFloat(item.buying_price.replace(/\,/g, ''), 10);
+        price_selling_for_single_item = (selling_price * item.quantity);
+        price_buying_for_single_item = (buying_price * item.quantity);
+
+        total_selling_price += price_selling_for_single_item;
+        total_buying_price += price_buying_for_single_item;
+
+     });
+
+    sub_total = (total_selling_price - total_buying_price);
+
+    document.getElementById("total_selling_price").value = formatMoney(total_selling_price);
+    document.getElementById("total_buying_price").value = formatMoney(total_buying_price);
+    document.getElementById("sub_total").value = formatMoney(sub_total);
+}
+
+function filterReceivingInvoiceBySupplier() {
+    var supplier = document.getElementById('good_receiving_supplier_ids');
+    var supplier_id = supplier.options[supplier.selectedIndex].value;
+
+    /*ajax filter invoice by supplier*/
+    $.ajax({
+        url: config.routes.filterBySupplier,
+        type: "get",
+        dataType: "json",
+        data: {
+            supplier_id: supplier_id
+        },
+        success: function(data) {
+            $('#invoice_id').prop('disabled', false);
+            $("#invoice_id option").remove();
+            $('#invoice_id').append($('<option>', {
+                value: '',
+                text: 'Select Invoice...',
+                disabled: true,
+                selected: true
+            }));
+            $.each(data, function(id, detail) {
+                var datas = [detail.id];
+
+                $('#invoice_id').append($('<option>', { value: datas, text: detail.invoice_no }));
+            });
+        },
+        complete: function() {
+            // $('#loading').hide();
+        }
+    });
+
+}
+
+
+
+function saveInvoiceForm() {
+    var form = $('#myFormId').serialize();
+
+    $.ajax({
+        url: config.routes.itemFormSave,
+        type: "get",
+        dataType: "json",
+        cache: "false",
+        data: form,
+        success: function(data) {
+            if (data[0].message === 'success') {
+                notify('Item received successfully', 'top', 'right', 'success');
+                document.getElementById('buy_price').value = '0';
+                document.getElementById('sell_price_id').value = '0';
+                document.getElementById('expire_date_21').value = '';
+                deselect();
+            } else {
+                notify('Item name exists', 'top', 'right', 'danger');
+                document.getElementById('buy_price').value = '0';
+                document.getElementById('sell_price_id').value = '0';
+                document.getElementById('expire_date_21').value = '';
+                deselect();
+            }
+        }
+    });
+}
+
+
+$('#invoiceFormId').on('submit', function(e) {
+    e.preventDefault();
+
+    var cart_data = document.getElementById("invoice_received_cart").value;
+
+    console.log(cart_data);
+    let total_buying_price = 0;
+    let total_selling_price = 0;
+
+    if (cart_data === '') {
+        notify('Item receive list is empty', 'top', 'right', 'warning');
+        return false;
+    }
+
+    var item_cart = JSON.parse(cart_data);
+
+    if (item_cart.length === 0) {
+        notify('Item receive list is empty', 'top', 'right', 'warning');
+        return false;
+    }
+
+    invoice_cart.forEach(function (item) {
+
+        total_buying_price += Number(item.buying_price);
+        total_selling_price += Number(item.selling_price);
+    });
+
+    // Check for the profit
+    if(total_buying_price >= total_selling_price) {
+        $('#invoicesave_id').prop('disabled', true);
+        notify('Cannot be less than or equal to Buy Price', 'top', 'right', 'warning');
+    }
+
+    invoicesaveInvoiceForm();
+
+});
+
+function invoicesaveInvoiceForm() {
+    var form = $('#invoiceFormId').serialize();
+
+    $.ajax({
+        url: config.routes.invoiceFormSave,
+        type: "get",
+        dataType: "json",
+        cache: "false",
+        data: form,
+        success: function(data) {
+            if (data[0].message === 'success') {
+                notify('Item received successfully', 'top', 'right', 'success');
+                invoicecart_table.clear();
+                invoicecart_table.draw();
+                invoice_cart = [];
+                invoice_cart_receiveds = [];
+                $('#good_receiving_supplier_ids').val('').change();
+                try{
+                    document.getElementById('store_id').value = '';
+                    document.getElementById('goodreceving_invoice_id').value = '';
+                    document.getElementById("invoicing_batch_n").value = '';
+                    document.getElementById('invoiceselected-product').value = ''
+                    document.getElementById('invoicing_purchase_date').value = '';
+                    document.getElementById('store_id').value = '';
+                    // $('#invoicing_purchase_date').val('').change();
+                    console.log($('#invoicing_purchase_date').value);
+                    document.getElementById("total_selling_price").value = '0.00';
+                    document.getElementById("total_buying_price").value = '0.00';
+                    document.getElementById("sub_total").value = '0.00';
+                    deselect();
+                } catch (e) {
+                    console.log(e)
+                }
+            } else {
+                notify('Invoice exists', 'top', 'right', 'danger');
+                invoicecart_table.clear();
+                invoicecart_table.draw();
+                invoice_cart = [];
+                invoice_cart_receiveds = [];
+                $('#good_receiving_supplier_ids').val('').change();
+                document.getElementById('store_id').value = '';
+                document.getElementById('invoiceselected-product').value = '';
+                document.getElementById('invoice_price_category').value = '';
+                deselect();
+            }
+        }
+    });
+}
