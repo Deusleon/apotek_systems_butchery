@@ -116,7 +116,7 @@
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['name']}}</h3>
     <h5 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h5>
     <h5 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h5>
-    <h5 align="center" style="margin-top: -1%">{{$pharmacy['tin_number']}}</h5>
+    <h5 align="center" style="margin-top: -1%">Tin: {{$pharmacy['tin_number']}}</h5>
 
     @foreach($data as $datas => $dat)
         <table id="table-detail-main">
