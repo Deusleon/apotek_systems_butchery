@@ -69,7 +69,7 @@ class CommonFunctions
 
         if ($save_flag === 0 || $save_flag !== 0) {
             /*truncate*/
-            DB::table('notifications')->truncate();
+            DB::table('notifications')->delete();
             /*send notification*/
             User::find($id)->notify(new StockNotification);
             /*retrieve sent notification*/
