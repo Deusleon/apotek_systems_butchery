@@ -395,14 +395,13 @@ class AccountingReportController extends Controller
                 ->select('inv_products.id as id', 'name', 'price', 'stock_id')
                 ->first('price');
 
-
             array_push($raw_prices_data, array(
-                'stock_id' => $product->stock_id,
+                'stock_id' => $product->stock_id ?? '',
                 'sales_details_id' => $detail->sales_details_id,
                 'sale_id' => $detail->sale_id,
                 'quantity' => $detail->quantity,
-                'buy_price' => $product->currentStock['unit_cost'],
-                'total_buy' => $product->currentStock['unit_cost'] * $detail->quantity,
+                'buy_price' => $product->currentStock->unit_cost ?? 0.00,
+                'total_buy' => $product->currentStock['unit_cost'] ?? 0.00 * $detail->quantity,
                 'date' => $detail->dates
             ));
 
@@ -512,19 +511,18 @@ class AccountingReportController extends Controller
                 ->select('inv_products.id as id', 'name', 'price', 'stock_id')
                 ->first('price');
 
-
-            array_push($raw_prices_data, array(
-                'name' => $product->currentStock['product']['name'],
-                'quantity' => $detail->quantity,
-                'buy_price' => $product->currentStock['unit_cost'],
-                'sell_price' => $product->price,
-                'sold_amount' => $sub_total,
-                'amount' => $detail->quantity * $product->price,
-                'profit' => ($detail->quantity * $product->price) -
-                    ($product->currentStock['unit_cost'] * $detail->quantity),
-                'capital_invested' => $product->currentStock['unit_cost'] * $detail->quantity,
-                'date' => $detail->dates
-            ));
+                array_push($raw_prices_data, array(
+                    'name' => $product->name ?? '',
+                    'quantity' => $detail->quantity,
+                    'buy_price' => $product->currentStock->unit_cost ?? 0.00,
+                    'sell_price' => $product->price ?? 0.00,
+                    'sold_amount' => $sub_total,
+                    'amount' => $detail->quantity * ($product->price ?? 0.00),
+                    'profit' => ($detail->quantity * ($product->price ?? 0.00)) -
+                        (($product->currentStock['unit_cost'] ?? 0.00) * $detail->quantity),
+                    'capital_invested' => ($product->currentStock['unit_cost'] ?? 0.00) * $detail->quantity,
+                    'date' => $detail->dates
+                ));
 
         }
 
