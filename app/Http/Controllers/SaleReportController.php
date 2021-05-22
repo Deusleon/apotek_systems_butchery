@@ -269,6 +269,9 @@ class SaleReportController extends Controller
         $grouped_sales = array();
         foreach ($sale_detail as $item) {
             $amount = $item->amount - $item->discount;
+            if ($item->price == 0) {
+                $item->price = 1;
+            }
             $vat_percent = $item->vat / $item->price;//Here VAT % is calculated.
             $sub_total = ($amount / (1 + $vat_percent));
             $vat = $amount - $sub_total;
@@ -289,7 +292,7 @@ class SaleReportController extends Controller
                 'sold_by' => $item->sale['user']['name'],
                 'customer' => $item->sale['customer']['name'],
                 'created_at' => date('Y-m-d', strtotime($item->sale['date']))
-            ));
+            ));           
         }
 
 
