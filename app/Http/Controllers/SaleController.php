@@ -31,7 +31,7 @@ class SaleController extends Controller
 
 
         $price_category = PriceCategory::orderBy('id', 'ASC')->get();
-        $customers = Customer::orderBy('id', 'ASC')->get();
+        $customers = Customer::orderBy('name', 'ASC')->get();
         $current_stock = CurrentStock::all();
         return View::make('sales.cash_sales.index')
             ->with(compact('customers'))
@@ -49,7 +49,7 @@ class SaleController extends Controller
         $enable_discount = Setting::where('id', 111)->value('value');
 
         $price_category = PriceCategory::orderBy('id', 'ASC')->get();
-        $customers = Customer::orderBy('id', 'ASC')->get();
+        $customers = Customer::orderBy('name', 'ASC')->get();
         $current_stock = CurrentStock::all();
         return View::make('sales.credit_sales.index')
             ->with(compact('customers'))

@@ -49,6 +49,11 @@
                    role="tab" aria-controls="new_quotes" aria-selected="false">Order Receiving
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link text-uppercase" id="quotes_invoicelist-tab" data-toggle="pill"
+                   href="#invoice-receiving" role="tab"
+                   aria-controls="quotes_list" aria-selected="true">Invoice Receiving</a>
+            </li>
         </ul>
         <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade" id="order-receive" role="tabpanel" aria-labelledby="new_quotes-tab">
@@ -287,10 +292,165 @@
                     </div>
                 </form>
             </div>
+            <div class="tab-pane fade" id="invoice-receiving" role="tabpanel"
+                 aria-labelledby="quotes_invoicelist-tab">
+                <form name="item" id="invoiceFormId">
+                    @csrf()
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="code">Supplier Name <font color="red">*</font></label>
+                                <select name="supplier" class="js-example-basic-single form-control"
+                                        id="good_receiving_supplier_ids" required="true" onchange="goodReceivingFilterInvoiceBySupplier()">
+                                    <option selected="true" value="" disabled="disabled">Select Supplier...</option>
+                                    @foreach($suppliers as $supplier)
+                                        <option value="{{$supplier->id}}">{{$supplier->name}}</option>
+                                    @endforeach
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="code">Store <font color="red">*</font></label>
+                                <select name="store" class="js-example-basic-single form-control"
+                                        id="store_id" required="true" onchange="filterInvoiceBySupplier()">
+                                    <option selected="true" value="" disabled="disabled">Select Store...</option>
+                                    @foreach($stores as $store)
+                                        <option
+                                            value="{{$store->id}}" {{$default_store_id === $store->id  ? 'selected' : ''}}>{{$store->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="code">Products <font color="red">*</font></label>
+                                <select id="invoiceselected-product" class="js-example-basic-single form-control">
+                                    <option selected="true" value="" disabled="disabled">Select Product...</option>
+                                    @foreach($current_stock as $stock)
+                                        <option
+                                            value="{{$stock['product_name'].'#@'.$stock['product_id'].'#@'.$stock['unit_cost']}}">{{$stock['product_name']}}</option>
+                                    @endforeach
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                @if($invoice_setting === 'YES')
+                                    <label for="code">Invoice # <font color="red">*</font></label>
+                                    <select name="invoice_no" class="form-control js-example-basic-single"
+                                            id="goodreceving_invoice_id" required>
+                                        <option selected="true" value="" disabled="disabled">Select Invoice..</option>
+                                    </select>
+                                @else
+                                    <label for="code">Invoice #</label>
+                                    <select name="invoice_no" class="form-control js-example-basic-single"
+                                            id="goodreceving_invoice_id">
+                                        <option selected="true" value="" disabled="disabled">Select Invoice..</option>
+
+                                    </select>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                @if($batch_setting === 'YES')
+                                    <label for="code">Batch # <font color="red">*</font></label>
+                                    <input type="text" name="batch_number" class="form-control" id="invoicing_batch_n"
+                                           required="true" value="{{session('batch_number')}}"/>
+                                @else
+                                    <label for="code">Batch #</label>
+                                    <input type="text" name="batch_number" class="form-control" id="invoicing_batch_n"
+                                           value="{{session('batch_number')}}"/>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="detail">
+                        <hr>
+                        <div class="table teble responsive" style="width: 100%;">
+                            <table id="invoicecart_table" class="table nowrap table-striped table-hover" width="100%"></table>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group" style="padding-top: 10px">
+                                <div style="width: 99%">
+                                    <label for="invoiceprice_category">Price Category <font color="red">*</font></label>
+                                    <select name="price_category" class="form-control"
+                                            id="invoiceprice_category" required="true" onchange="priceByCategory()">
+                                        @foreach($price_categories as $price_category)
+                                            <option value="{{$price_category->id}}">{{$price_category->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        @if($back_date=="YES")
+                            <div class="col-md-3">
+                                <div class="form-group" style="padding-top: 10px">
+                                    <label>Purchase Date <font color="red">*</font></label>
+                                    <input type="text" name="purchase_date" class="form-control" id="invoicing_purchase_date"
+                                            autocomplete="off" required="true">
+
+                                </div>
+                            </div>
+                        @endif
+                        <div class="col-md-3"></div>
+                        <div class="col-md-3">
+                            <div class="row">
+                                <label class="col-md-6 col-form-label text-md-right"><b>Total Buy:</b></label>
+                                <div class="col-md-6" style="display: flex; justify-content: flex-end">
+                                    <input type="text" id="total_buying_price"
+                                        class="form-control-plaintext text-md-right" readonly value="0.00"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-md-6 col-form-label text-md-right"><b>Total Sell :</b></label>
+                                <div class="col-md-6" style="display: flex; justify-content: flex-end">
+                                    <input type="text" id="total_selling_price"
+                                        class="form-control-plaintext text-md-right" readonly value="0.00"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-md-6 col-form-label text-md-right"><b>Total Profit:</b></label>
+                                <div class="col-md-6" style="display: flex; justify-content: flex-end">
+                                    <input type="text" id="sub_total"
+                                        class="form-control-plaintext text-md-right" readonly value="0.00"/>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <input type="hidden" id="invoice_received_cart" name="cart">
+                    <input type="hidden" name="invoice_price_category" id="price_category_for_all">
+                    <input type="hidden" name="" id="buy">
+                    <input type="hidden" name="batch_setting" id="batch_setting" value="{{$batch_setting}}">
+                    <input type="hidden" name="invoice_setting" id="invoice_setting" value="{{$invoice_setting}}">
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="btn-group" style="float: right;">
+                                <button type="button" class="btn btn-danger" id="cancel-all" onclick="resetForms()">
+                                    Clear
+                                </button>
+                                <button id="invoicesave_id"
+                                        class="btn btn-primary">Save
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
     @include('purchases.goods_receiving.receive')
+    @include('purchases.goods_receiving.editselectedproduct')
 @endsection
 @push("page_scripts")
     @include('partials.notification')
@@ -306,112 +466,56 @@
             }
         });
 
-        console.log();
+        var datas = @json($orders);
+
+        let order_id = localStorage.getItem("order_id");
+
+        datas = datas.filter(function (data) {
+            return data.id == order_id;
+        });
+
+        if (datas.length != 0) {
+            localStorage.setItem("items", JSON.stringify(datas[0].details));
+        }
+        // console.log(datas[0].details);
 
         var config = {
-            vals: {
-                expire_date: @json($expire_date)
-            },
             routes: {
                 goodsreceiving: '{{route('receiving-price-category')}}',
+                invoiceItemPrice: '{{route('receiving-item-prices')}}',
                 filterBySupplier: '{{route('filter-invoice')}}',
                 filterPrice: '{{route('filter-price')}}',
                 itemFormSave: '{{route('goods-receiving.itemReceive')}}',
-                orderFormSave: '{{route('goods-receiving.orderReceive')}}'
+                orderFormSave: '{{route('goods-receiving.orderReceive')}}',
+                invoiceFormSave: '{{route('goods-receiving.invoiceitemReceive')}}',
+                goodReceivingFilterInvoiceBySupplier: '{{route('filter-invoice')}}',
 
             }
         };
-
-
-        function getPurchaseHistory() {
-            var range = document.getElementById('daterange').value;
-            range = range.split('-');
-
-            $("#fixed-header-2").dataTable().fnDestroy();
-
-
-            var order_list_table = $('#fixed-header-2').DataTable({
-                "processing": true,
-                "serverSide": true,
-                "ajax": {
-                    "url": '{{route('purchase-order-list')}}',
-                    "dataType": "json",
-                    "type": "post",
-                    "cache": false,
-                    "data": {
-                        _token: "{{csrf_token()}}",
-                        range: range
-                    }
-                },
-                "columns": [
-                    {'data': 'order_number'},
-                    {'data': 'supplier.name'},
-                    {
-                        'data': 'ordered_at', render: function (date) {
-                            return moment(date).format('D-M-YYYY');
-                        }
-                    },
-
-                    {
-                        'data': 'total_amount', render: function (cost) {
-                            return formatMoney(cost);
-                        }
-                    },
-                    {
-                        'data': 'status', render: function (status) {
-                            if (Number(status) === 1) {
-                                return "<span class='badge badge-secondary'>Pending</span>"
-                            } else if (Number(status) === 2) {
-                                return "<span class='badge badge-info'>Partial Received</span>"
-                            } else if (Number(status) === 3) {
-                                return "<span class='badge badge-success'>Received</span>"
-                            }
-                        }
-                    },
-                    {
-                        'data': "status", render: function (status) {
-                            if (Number(status) === 3) {
-                                return "<button type='button' id='preview_order' class='btn btn-sm btn-rounded btn-info'>Preview Order</button>"
-                            } else {
-                                return "<button type='button' id='receive_order' class='btn btn-sm btn-rounded btn-secondary'>Receive Order</button>"
-                            }
-                        }
-
-                    },
-                    {'data': 'id'}
-                ], 'aaSorting': [[6, 'desc']],
-
-            });
-
-            //hide the first column
-            try {
-                order_list_table.column(6).visible(false);
-            } catch (e) {
-
-            }
-
-
-        }
-
-        $('#fixed-header-2 tbody').on('click', '#preview_order', function () {
-            var row_data = $('#fixed-header-2').DataTable().row($(this).parents('tr')).data();
-            orderReceive(row_data.details, row_data.supplier_id);
-        });
-
-        $('#fixed-header-2 tbody').on('click', '#receive_order', function () {
-            var row_data = $('#fixed-header-2').DataTable().row($(this).parents('tr')).data();
-            orderReceive(row_data.details, row_data.supplier_id);
-        });
-
 
         $(document).ready(function () {
             resetForms();
         });
 
         function resetForms() {
+            invoicecart_table.clear();
+            invoicecart_table.draw();
+            invoice_cart = [];
+            invoice_cart_receiveds = [];
             document.getElementById('myFormId').reset();
-            document.getElementById("selected-product").value = '';
+            try {
+                document.getElementById("selected-product").value = '';
+                document.getElementById("invoicing_batch_n").value = '';
+                document.getElementById("invoicing_purchase_date").value = '';
+                document.getElementById("total_selling_price").value = '0.00';
+                document.getElementById("total_buying_price").value = '0.00';
+                document.getElementById("sub_total").value = '0.00';
+            } catch (e) {
+                // console.log(e)
+             }
+            
             $('#supplier_ids').val('').change();
+            $('#good_receiving_supplier_ids').val('').change();
             $('#invoice_id').val('').change();
         }
 
@@ -427,6 +531,44 @@
             }
         }
 
+        var b = 1;
+
+        function findchecked() {
+            b = -b;
+            if (b < 1) {
+                document.getElementById("expire_date_1").setAttribute('disabled', false);
+            } else {
+                document.getElementById("expire_date_1").removeAttribute('disabled');
+                $('#expire_date_1').prop('readonly', true);
+            }
+        }
+
+        function invoiceamountCheck() {
+
+            var unit_price = document.getElementById('edit_buying_price').value;
+            var sell_price = document.getElementById('edit_selling_price').value;
+            var unit_price_parse = (parseFloat(unit_price.replace(/\,/g, ''), 10));
+            var sell_price_parse = (parseFloat(sell_price.replace(/\,/g, ''), 10));
+
+            document.getElementById('edit_selling_price').value = formatMoney(parseFloat(sell_price.replace(/\,/g, ''), 10));
+            document.getElementById('edit_buying_price').value = formatMoney(parseFloat(unit_price.replace(/\,/g, ''), 10));
+
+            if (Number(sell_price_parse) < Number(unit_price_parse) && Number(sell_price_parse) !== Number(0)
+                && Number(unit_price_parse) !== Number(0)) {
+
+                $('#invoicesave_id').prop('disabled', true);
+                notify('Cannot be less than Buy Price', 'top', 'right', 'warning');
+            } else if (Number(sell_price_parse) === Number(unit_price_parse)) {
+                $('#invoicesave_id').prop('disabled', true);
+                notify('Cannot be equal to Buy Price', 'top', 'right', 'warning');
+            } else {
+
+                $('#invoicesave_id').prop('disabled', false);
+                $('div.amount_error').text('');
+
+            }
+
+        }
         function amountCheck() {
 
             var unit_price = document.getElementById('buy_price').value;
@@ -467,13 +609,11 @@
         $(function () {
             var start = moment();
             var end = moment();
-            var date = new Date();
-            var tomorrow = new Date(date.getFullYear(), date.getMonth(), (date.getDate() + 1));
 
             $('#expire_date_21').daterangepicker({
                 singleDatePicker: true,
                 showDropdowns: true,
-                minDate: tomorrow,
+                minDate: start,
                 autoUpdateInput: false,
                 locale: {
                     format: 'DD-M-YYYY'
@@ -481,12 +621,19 @@
             });
         });
 
-        $('input[name="expire_date"]').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('DD-MM-YYYY'));
-        });
+        $(function () {
+            var start = moment();
+            var end = moment();
 
-        $('input[name="expire_date"]').on('cancel.daterangepicker', function (ev, picker) {
-            $(this).val('');
+            $('#expire_date_1').daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                minDate: start,
+                autoUpdateInput: false,
+                locale: {
+                    format: 'DD-M-YYYY'
+                }
+            });
         });
 
         $(function () {
@@ -503,6 +650,32 @@
             });
         });
 
+        $(function () {
+            var start = moment();
+            var end = moment();
+
+            $('#invoicing_purchase_date').daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                autoUpdateInput: false,
+                locale: {
+                    format: 'DD-M-YYYY'
+                }
+            });
+        });
+
+        // $("datetimepicker2").datepicker({ changeYear: true, dateFormat: 'dd/mm/yy', showOn: 'none', showButtonPanel: true,  minDate:'0d' });
+
+        //Expire Date
+        $('input[name="expire_date"]').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('MM/DD/YYYY'));
+        });
+
+        $('input[name="expire_date"]').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+        });
+
+        //Purchase Date
         $('input[name="purchase_date"]').on('apply.daterangepicker', function (ev, picker) {
             $(this).val(picker.startDate.format('DD-MM-YYYY'));
         });
@@ -511,38 +684,34 @@
             $(this).val('');
         });
 
-        $('#invoice_ids').select2({
-            dropdownParent: $("#receive")
+        //Invoice Expire Date
+        $('input[name="edit_expire_date"]').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('MM/DD/YYYY'));
         });
 
-    </script>
+        $('input[name="edit_expire_date"]').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+        });
 
-    <script type="text/javascript">
-        $(function () {
+        //invoicing_purchase_date
+        $('input[name="invoicing_purchase_date"]').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD-MM-YYYY'));
+        });
 
-            var start = moment();
-            var end = moment();
+        $('input[name="invoicing_purchase_date"]').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+        });
 
-            function cb(start, end) {
-                $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-            }
+        $('input[name="invoicing_purchase_date"]').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD-MM-YYYY'));
+        });
 
-            $('#daterange').daterangepicker({
-                startDate: moment().startOf('month'),
-                endDate: end,
-                ranges: {
-                    'Today': [moment(), moment()],
-                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                    'This Month': [moment().startOf('month'), moment().endOf('month')],
-                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-                    'This Year': [moment().startOf('year'), moment()]
-                }
-            }, cb);
+        $('input[name="invoicing_purchase_date"]').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+        });
 
-            cb(start, end);
-
+        $('#invoice_ids').select2({
+            dropdownParent: $("#receive")
         });
 
     </script>

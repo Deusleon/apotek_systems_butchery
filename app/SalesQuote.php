@@ -22,7 +22,7 @@ class SalesQuote extends Model
         return $this->hasOne('App\SalesQuoteDetail','quote_id')
                 ->join('sales_quotes', 'sales_quotes.id', '=', 'sales_quote_details.quote_id')
                 ->join('price_categories', 'price_categories.id', '=', 'sales_quotes.price_category_id')
-                ->select('name',DB::raw('COALESCE(sum(discount),0.00) as discount'),
+                ->select('sales_quotes.id', 'quote_id', 'name',DB::raw('COALESCE(sum(discount),0.00) as discount'),
                 	     DB::raw('COALESCE(sum(price),0.00) as sub_total'),
                 	     DB::raw('COALESCE(sum(vat),0.00) as vat'),
                 	     DB::raw('COALESCE(sum(amount),0.00) as amount')

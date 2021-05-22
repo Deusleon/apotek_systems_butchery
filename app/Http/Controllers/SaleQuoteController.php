@@ -36,6 +36,19 @@ class SaleQuoteController extends Controller
             ->with(compact('current_stock'))->with(compact('enable_discount'));
     }
 
+    public function getQuotes(Request $request)
+    {
+        $date_range = explode('-', $request->date);
+        $from = date('Y-m-d', strtotime(trim($date_range[0])));
+        $to = date('Y-m-d', strtotime(trim($date_range[1])));
+        $sale_quotes = SalesQuote::with(['cost'])->orderBy('id', 'DESC')->whereBetween(DB::raw("DATE(`date`)"), [$from, $to])->get();
+        foreach($sale_quotes as $sale_quote){
+            $sale_quote->details;
+        }
+        return response()->json($sale_quotes, 200);
+    }
+
+
     public function storeQuote(Request $request)
     {
         if ($request->ajax()) {

@@ -133,6 +133,8 @@ Route::middleware(["auth"])->group(function () {
     Route::get('purchases/goods-receiving.order-receive', 'GoodsReceivingController@orderReceive')->name('goods-receiving.orderReceive');
     Route::get('purchases/supplier/select/filter-price', 'GoodsReceivingController@filterPrice')->name('filter-price');
     Route::post('purchases/purchase-order/list', 'GoodsReceivingController@purchaseOrderList')->name('purchase-order-list');
+    Route::get('pharmacy/purchases/loading-invoice-item-price', 'GoodsReceivingController@getInvoiceItemPrice')->name('receiving-item-prices');//receiving-item-prices
+    Route::get('pharmacy/purchases/goods-receiving.invoice-item-receive', 'GoodsReceivingController@invoiceitemReceive')->name('goods-receiving.invoiceitemReceive');
 
     //Configurations Routes
     Route::get('/settings', 'ConfigurationsController@index')->name('configurations.index');
@@ -168,6 +170,7 @@ Route::middleware(["auth"])->group(function () {
     //Sales Quotes routes
     Route::get('sales/sales-quotes', 'SaleQuoteController@index')->name('sale-quotes.index');
     Route::post('sales/sales-quotes', 'SaleQuoteController@store')->name('sale-quotes.store');
+    Route::get('sales/sales-quotes/get-quotes', 'SaleQuoteController@getQuotes')->name('sale-quotes.get-quotes');
     Route::get('sales/sales-quotes/receipt', 'SaleQuoteController@getQuoteReceipt')->name('getQuoteReceipt');
     Route::post('sales/sales-quotes/save', 'SaleQuoteController@storeQuote')->name('storeQuote');
     Route::get('sales/sales-quotes/receipt-reprint/{quote_id}', 'SaleQuoteController@receiptReprint')->name('receiptReprint');

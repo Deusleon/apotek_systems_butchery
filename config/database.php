@@ -76,7 +76,7 @@ return [
             'port' => '3306',
             'database' => 'godwin_malapa',
             'username' => env('DB_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD', ''), 
+            'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
@@ -96,7 +96,7 @@ return [
             'url' => env('DATABASE_URL'),
             'host' => '127.0.0.1',
             'port' => '3306',
-            'database' => 'demo_inventory',
+            'database' => 'apotek_system',
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
@@ -243,7 +243,7 @@ return [
             ]) : [],
         ],
         /*roia end*/
-        
+
         /*eternity*/
         'eternity' => [
             'driver' => 'mysql',
