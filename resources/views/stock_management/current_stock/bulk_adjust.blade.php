@@ -48,7 +48,7 @@
                                     <div class="form-group">
                                         <label for="quantity">Quantity to Adjust<span
                                                 style="color: red; ">*</span></label>
-                                        <input type="number" class="form-control" id="quantity_edit_bulk"
+                                        <input type="number" step="0.1" class="form-control" id="quantity_edit_bulk"
                                                oninput="calculateBulk()"
                                                name="quantity" required>
                                     </div>
