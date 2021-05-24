@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use App\User;
+use DB;
 
 class LoginController extends Controller
 {
@@ -33,7 +33,7 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
-        $company = User::where('business_name',$request->facility)->first();
+        $company = DB::table('users')->where('business_name',$request->facility)->first();
 
         if ($company != null){
                 session()->put('db_connection', $company->connection);
