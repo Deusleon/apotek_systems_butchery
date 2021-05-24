@@ -227,7 +227,7 @@ $('#cart_table tbody').on('change', '#edit_quantity', function () {
 
 
     // row_data[1] = Number((document.getElementById("edit_quantity").value));
-    if (Number(parseFloat(row_data[1].replace(/\,/g, ''), 10)) < 1) {
+    if (Number(parseFloat(row_data[1].replace(/\,/g, ''), 10)) < 0) {
         row_data[1] = 1
     }
 
