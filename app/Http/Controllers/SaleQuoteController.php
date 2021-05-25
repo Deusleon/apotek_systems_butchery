@@ -148,6 +148,7 @@ class SaleQuoteController extends Controller
             $sub_total = ($amount / (1 + $vat_percent));
             $vat = $amount - $sub_total;
             $sn++;
+
             array_push($sales, array(
                 'receipt_number' => $item->quote['quote_number'],
                 'name' => $item->product['name'],
@@ -163,7 +164,7 @@ class SaleQuoteController extends Controller
                 'total_vat' => ($item->quote['cost']['vat']),
                 'sold_by' => $item->quote['user']['name'],
                 'customer' => $item->quote['customer']['name'],
-                'customer_tin' => $item->sale['customer']['tin'],
+                'customer_tin' => $item->quote->customer->tin,
                 'created_at' => date('Y-m-d', strtotime($item->quote['date']))
             ));
         }

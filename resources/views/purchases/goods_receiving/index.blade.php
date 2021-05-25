@@ -39,23 +39,182 @@
     </style>
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
+            
             <li class="nav-item">
-                <a class="nav-link active text-uppercase" id="quotes_list-tab" data-toggle="pill"
-                   href="#item-receive" role="tab"
-                   aria-controls="quotes_list" aria-selected="true">Product Receiving</a>
+                <a class="nav-link active text-uppercase" id="quotes_invoicelist-tab" data-toggle="pill"
+                   href="#invoice-receiving" role="tab"
+                   aria-controls="quotes_list" aria-selected="true">Invoice Receiving</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link text-uppercase" id="new_quotes-tab" data-toggle="pill" href="#order-receive"
                    role="tab" aria-controls="new_quotes" aria-selected="false">Order Receiving
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link text-uppercase" id="quotes_invoicelist-tab" data-toggle="pill"
-                   href="#invoice-receiving" role="tab"
-                   aria-controls="quotes_list" aria-selected="true">Invoice Receiving</a>
-            </li>
+            <!-- <li class="nav-item">
+                <a class="nav-link  text-uppercase" id="quotes_list-tab" data-toggle="pill"
+                   href="#item-receive" role="tab"
+                   aria-controls="quotes_list" aria-selected="true">Product Receiving</a>
+            </li> -->
+            
         </ul>
         <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="invoice-receiving" role="tabpanel"
+                 aria-labelledby="quotes_invoicelist-tab">
+                <form name="item" id="invoiceFormId">
+                    @csrf()
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="code">Supplier Name <font color="red">*</font></label>
+                                <select name="supplier" class="js-example-basic-single form-control"
+                                        id="good_receiving_supplier_ids" required="true" onchange="goodReceivingFilterInvoiceBySupplier()">
+                                    <option selected="true" value="" disabled="disabled">Select Supplier...</option>
+                                    @foreach($suppliers as $supplier)
+                                        <option value="{{$supplier->id}}">{{$supplier->name}}</option>
+                                    @endforeach
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label for="code">Store <font color="red">*</font></label>
+                                <select name="store" class="js-example-basic-single form-control"
+                                        id="store_id" required="true" onchange="filterInvoiceBySupplier()">
+                                    <option selected="true" value="" disabled="disabled">Select Store...</option>
+                                    @foreach($stores as $store)
+                                        <option
+                                            value="{{$store->id}}" {{$default_store_id === $store->id  ? 'selected' : ''}}>{{$store->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="code">Products <font color="red">*</font></label>
+                                <select id="invoiceselected-product" class="js-example-basic-single form-control">
+                                    <option selected="true" value="" disabled="disabled">Select Product...</option>
+                                    @foreach($current_stock as $stock)
+                                        <option
+                                            value="{{$stock['product_name'].'#@'.$stock['product_id'].'#@'.$stock['unit_cost']}}">{{$stock['product_name']}}</option>
+                                    @endforeach
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                @if($invoice_setting === 'YES')
+                                    <label for="code">Invoice # <font color="red">*</font></label>
+                                    <select name="invoice_no" class="form-control js-example-basic-single"
+                                            id="goodreceving_invoice_id" required>
+                                        <option selected="true" value="" disabled="disabled">Select Invoice..</option>
+                                    </select>
+                                @else
+                                    <label for="code">Invoice #</label>
+                                    <select name="invoice_no" class="form-control js-example-basic-single"
+                                            id="goodreceving_invoice_id">
+                                        <option selected="true" value="" disabled="disabled">Select Invoice..</option>
+
+                                    </select>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                @if($batch_setting === 'YES')
+                                    <label for="code">Batch # <font color="red">*</font></label>
+                                    <input type="text" name="batch_number" class="form-control" id="invoicing_batch_n"
+                                           required="true" value="{{session('batch_number')}}"/>
+                                @else
+                                    <label for="code">Batch #</label>
+                                    <input type="text" name="batch_number" class="form-control" id="invoicing_batch_n"
+                                           value="{{session('batch_number')}}"/>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="detail">
+                        <hr>
+                        <div class="table teble responsive" style="width: 100%;">
+                            <table id="invoicecart_table" class="table nowrap table-striped table-hover" width="100%"></table>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group" style="padding-top: 10px">
+                                <div style="width: 99%">
+                                    <label for="invoiceprice_category">Price Category <font color="red">*</font></label>
+                                    <select name="price_category" class="form-control"
+                                            id="invoiceprice_category" required="true" onchange="priceByCategory()">
+                                        @foreach($price_categories as $price_category)
+                                            <option value="{{$price_category->id}}">{{$price_category->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            @if($back_date=="YES")
+                                <div class="form-group" style="padding-top: 10px">
+                                    <label>Purchase Date <font color="red">*</font></label>
+                                    <input type="text" name="purchase_date" class="form-control" id="invoicing_purchase_date"
+                                            autocomplete="off" required="true">
+
+                                </div>
+                            @endif
+                        </div>
+                        
+                        <div class="col-md-3"></div>
+                        <div class="col-md-3">
+                            <div class="row">
+                                <label class="col-md-6 col-form-label text-md-right"><b>Total Buy :</b></label>
+                                <div class="col-md-6" style="display: flex; justify-content: flex-end">
+                                    <input type="text" id="total_buying_price"
+                                        class="form-control-plaintext text-md-right" readonly value="0.00"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-md-6 col-form-label text-md-right"><b>Total Sell :</b></label>
+                                <div class="col-md-6" style="display: flex; justify-content: flex-end">
+                                    <input type="text" id="total_selling_price"
+                                        class="form-control-plaintext text-md-right" readonly value="0.00"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-md-6 col-form-label text-md-right"><b>Total Profit :</b></label>
+                                <div class="col-md-6" style="display: flex; justify-content: flex-end">
+                                    <input type="text" id="sub_total"
+                                        class="form-control-plaintext text-md-right" readonly value="0.00"/>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <input type="hidden" id="invoice_received_cart" name="cart">
+                    <input type="hidden" id="expire_date_enabler" value = "{{$expire_date}}">
+                    <input type="hidden" name="invoice_price_category" id="price_category_for_all">
+                    <input type="hidden" name="" id="buy">
+                    <input type="hidden" name="batch_setting" id="batch_setting" value="{{$batch_setting}}">
+                    <input type="hidden" name="invoice_setting" id="invoice_setting" value="{{$invoice_setting}}">
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="btn-group" style="float: right;">
+                                <button type="button" class="btn btn-danger" id="cancel-all" onclick="resetForms()">
+                                    Clear
+                                </button>
+                                <button id="invoicesave_id"
+                                        class="btn btn-primary">Save
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
             <div class="tab-pane fade" id="order-receive" role="tabpanel" aria-labelledby="new_quotes-tab">
                 <div class="table-responsive" id="items" style="display: none;">
                     {{--                    <h4>Ordered Products List</h4>--}}
@@ -97,7 +256,7 @@
                     </table>
                 </div>
             </div>
-            <div class="tab-pane fade show active" id="item-receive" role="tabpanel"
+            <div class="tab-pane fade" id="item-receive" role="tabpanel"
                  aria-labelledby="quotes_list-tab">
                 <form name="item" id="myFormId">
                     @csrf()
@@ -292,160 +451,7 @@
                     </div>
                 </form>
             </div>
-            <div class="tab-pane fade" id="invoice-receiving" role="tabpanel"
-                 aria-labelledby="quotes_invoicelist-tab">
-                <form name="item" id="invoiceFormId">
-                    @csrf()
-                    <div class="row">
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <label for="code">Supplier Name <font color="red">*</font></label>
-                                <select name="supplier" class="js-example-basic-single form-control"
-                                        id="good_receiving_supplier_ids" required="true" onchange="goodReceivingFilterInvoiceBySupplier()">
-                                    <option selected="true" value="" disabled="disabled">Select Supplier...</option>
-                                    @foreach($suppliers as $supplier)
-                                        <option value="{{$supplier->id}}">{{$supplier->name}}</option>
-                                    @endforeach
-                                </select>
-
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <label for="code">Store <font color="red">*</font></label>
-                                <select name="store" class="js-example-basic-single form-control"
-                                        id="store_id" required="true" onchange="filterInvoiceBySupplier()">
-                                    <option selected="true" value="" disabled="disabled">Select Store...</option>
-                                    @foreach($stores as $store)
-                                        <option
-                                            value="{{$store->id}}" {{$default_store_id === $store->id  ? 'selected' : ''}}>{{$store->name}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label for="code">Products <font color="red">*</font></label>
-                                <select id="invoiceselected-product" class="js-example-basic-single form-control">
-                                    <option selected="true" value="" disabled="disabled">Select Product...</option>
-                                    @foreach($current_stock as $stock)
-                                        <option
-                                            value="{{$stock['product_name'].'#@'.$stock['product_id'].'#@'.$stock['unit_cost']}}">{{$stock['product_name']}}</option>
-                                    @endforeach
-                                </select>
-
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                @if($invoice_setting === 'YES')
-                                    <label for="code">Invoice # <font color="red">*</font></label>
-                                    <select name="invoice_no" class="form-control js-example-basic-single"
-                                            id="goodreceving_invoice_id" required>
-                                        <option selected="true" value="" disabled="disabled">Select Invoice..</option>
-                                    </select>
-                                @else
-                                    <label for="code">Invoice #</label>
-                                    <select name="invoice_no" class="form-control js-example-basic-single"
-                                            id="goodreceving_invoice_id">
-                                        <option selected="true" value="" disabled="disabled">Select Invoice..</option>
-
-                                    </select>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                @if($batch_setting === 'YES')
-                                    <label for="code">Batch # <font color="red">*</font></label>
-                                    <input type="text" name="batch_number" class="form-control" id="invoicing_batch_n"
-                                           required="true" value="{{session('batch_number')}}"/>
-                                @else
-                                    <label for="code">Batch #</label>
-                                    <input type="text" name="batch_number" class="form-control" id="invoicing_batch_n"
-                                           value="{{session('batch_number')}}"/>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row" id="detail">
-                        <hr>
-                        <div class="table teble responsive" style="width: 100%;">
-                            <table id="invoicecart_table" class="table nowrap table-striped table-hover" width="100%"></table>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="form-group" style="padding-top: 10px">
-                                <div style="width: 99%">
-                                    <label for="invoiceprice_category">Price Category <font color="red">*</font></label>
-                                    <select name="price_category" class="form-control"
-                                            id="invoiceprice_category" required="true" onchange="priceByCategory()">
-                                        @foreach($price_categories as $price_category)
-                                            <option value="{{$price_category->id}}">{{$price_category->name}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        @if($back_date=="YES")
-                            <div class="col-md-3">
-                                <div class="form-group" style="padding-top: 10px">
-                                    <label>Purchase Date <font color="red">*</font></label>
-                                    <input type="text" name="purchase_date" class="form-control" id="invoicing_purchase_date"
-                                            autocomplete="off" required="true">
-
-                                </div>
-                            </div>
-                        @endif
-                        <div class="col-md-3"></div>
-                        <div class="col-md-3">
-                            <div class="row">
-                                <label class="col-md-6 col-form-label text-md-right"><b>Total Buy:</b></label>
-                                <div class="col-md-6" style="display: flex; justify-content: flex-end">
-                                    <input type="text" id="total_buying_price"
-                                        class="form-control-plaintext text-md-right" readonly value="0.00"/>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <label class="col-md-6 col-form-label text-md-right"><b>Total Sell :</b></label>
-                                <div class="col-md-6" style="display: flex; justify-content: flex-end">
-                                    <input type="text" id="total_selling_price"
-                                        class="form-control-plaintext text-md-right" readonly value="0.00"/>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <label class="col-md-6 col-form-label text-md-right"><b>Total Profit:</b></label>
-                                <div class="col-md-6" style="display: flex; justify-content: flex-end">
-                                    <input type="text" id="sub_total"
-                                        class="form-control-plaintext text-md-right" readonly value="0.00"/>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <input type="hidden" id="invoice_received_cart" name="cart">
-                    <input type="hidden" name="invoice_price_category" id="price_category_for_all">
-                    <input type="hidden" name="" id="buy">
-                    <input type="hidden" name="batch_setting" id="batch_setting" value="{{$batch_setting}}">
-                    <input type="hidden" name="invoice_setting" id="invoice_setting" value="{{$invoice_setting}}">
-                    <hr>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="btn-group" style="float: right;">
-                                <button type="button" class="btn btn-danger" id="cancel-all" onclick="resetForms()">
-                                    Clear
-                                </button>
-                                <button id="invoicesave_id"
-                                        class="btn btn-primary">Save
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
+            
         </div>
     </div>
 
@@ -502,8 +508,8 @@
             invoicecart_table.draw();
             invoice_cart = [];
             invoice_cart_receiveds = [];
-            document.getElementById('myFormId').reset();
             try {
+                document.getElementById('myFormId').reset();
                 document.getElementById("selected-product").value = '';
                 document.getElementById("invoicing_batch_n").value = '';
                 document.getElementById("invoicing_purchase_date").value = '';
@@ -514,6 +520,7 @@
                 // console.log(e)
              }
             
+            $('#store_id').val('').change();
             $('#supplier_ids').val('').change();
             $('#good_receiving_supplier_ids').val('').change();
             $('#invoice_id').val('').change();

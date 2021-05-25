@@ -143,11 +143,24 @@ var sale_list_Table = $('#sale_list_Table').DataTable({
 });
 
 $("#products").on('change', function () {
-    valueCollection();
+    let customer_id = document.getElementById("customer_id").value;
+    console.log(customer_id);
+    if(customer_id !== '') {
+        valueCollection();
+    } else {
+        notify('Select Customer First', 'top', 'right', 'warning');
+    }
+    
 });
 
 $("#products_b").on('change', function () {
-    valueCollection();
+    let customer_id = document.getElementById("customer_id").value;
+    console.log(customer_id);
+    if(customer_id !== '') {
+        valueCollection();
+    } else {
+        notify('Select Customer First', 'top', 'right', 'warning');
+    }
 });
 
 $("#customer").on('change', function () {

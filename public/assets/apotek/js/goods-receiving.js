@@ -604,6 +604,8 @@ var invoicecart_table = $('#invoicecart_table').DataTable({
     searching: false,
     bPaginate: false,
     bInfo: false,
+    order: false,
+    ordering: false,
     columns: [
         { title: "Item Name", data: 'name' },
         { title: "Quantity", data: 'quantity' },
@@ -616,6 +618,12 @@ var invoicecart_table = $('#invoicecart_table').DataTable({
         }
     ]
 });
+
+var expire_date_enabler = document.getElementById("expire_date_enabler").value;
+console.log(expire_date_enabler);
+if(expire_date_enabler === "NO") {
+    invoicecart_table.column(4).visible(false);
+}
 
 $('#invoicecart_table tbody').on('click', '#edit_btn', function() {
     let quantity, buying_price, selling_price, expire_date;
@@ -633,7 +641,10 @@ $('#invoicecart_table tbody').on('click', '#edit_btn', function() {
         row_data.quantity = `<input style='width: 90%' type='text' class='form-control inventedAction' id='edit_quantity' value=${quantity}  required/>`;
         row_data.buying_price = `<input style='width: 90%' type='text' class='form-control inventedAction' id='edit_buying_price' onchange='invoiceamountCheck()'  value=${buying_price}  required/>`;
         row_data.selling_price = `<input style='width: 90%' type='text' class='form-control inventedAction' id='edit_selling_price' onchange='invoiceamountCheck()'  value=${selling_price}  required/>`;
-        row_data.expire_date = `<input style='width: 90%' type='date' class='form-control inventedAction' min="${tommorow}" id='edit_expire_date' value=${selling_price} required/>`;
+        if(expire_date_enabler === "YES") {
+            row_data.expire_date = `<input style='width: 90%' type='date' class='form-control inventedAction' min="${tommorow}" id='edit_expire_date' value=${selling_price} required/>`;
+        }
+        
         invoice_cart[index] = row_data;
         invoicecart_table.clear();
         invoicecart_table.rows.add(invoice_cart);
@@ -654,7 +665,10 @@ $('#invoicecart_table tbody').on('change', 'input.inventedAction', function() {
     row_data.quantity = document.getElementById("edit_quantity").value;
     row_data.buying_price =  document.getElementById("edit_buying_price").value;
     row_data.selling_price = document.getElementById("edit_selling_price").value;
-    row_data.expire_date = document.getElementById("edit_expire_date").value;
+    
+    if(expire_date_enabler === "YES") {
+        row_data.expire_date = document.getElementById("edit_expire_date").value;
+    }
 
     invoice_cart[index] = row_data;
     invoicecart_table.clear();
@@ -663,7 +677,7 @@ $('#invoicecart_table tbody').on('change', 'input.inventedAction', function() {
 
     invoice_cart_receiveds = JSON.stringify(invoice_cart);
     document.getElementById("invoice_received_cart").value = invoice_cart_receiveds;
-    console.log(invoice_cart_receiveds);
+    // console.log(invoice_cart_receiveds);
 
     totalCostCalculated();
 
@@ -679,7 +693,7 @@ $('#invoicecart_table tbody').on('click', '#delete_btn', function() {
 
     invoice_cart_receiveds = JSON.stringify(invoice_cart);
     document.getElementById("invoice_received_cart").value = invoice_cart_receiveds;
-    console.log(invoice_cart_receiveds);
+    // console.log(invoice_cart_receiveds);
     totalCostCalculated();
     // enable Price Category DropDown If there is no product in the Invoice_cart
     if (invoice_cart.length === 0) {
@@ -777,7 +791,7 @@ function invoicevaluesCollection(qty) {
             totalCostCalculated();
         } else {
             console.log('element id != item id');
-            invoice_cart.push(item)
+            invoice_cart.unshift(item)
             totalCostCalculated();
         }
         invoicecart_table.clear();
@@ -789,7 +803,7 @@ function invoicevaluesCollection(qty) {
         invoice_cart_receiveds = JSON.stringify(invoice_cart_received);
         document.getElementById("invoice_received_cart").value = invoice_cart_receiveds;
         document.getElementById("price_category_for_all").value = price_category;
-        console.log(invoice_cart_receiveds);
+        // console.log(invoice_cart_receiveds);
     }
 
     getInvoiceItemPrice(product_id, price_category, supplier_id, updatePrice);
@@ -839,7 +853,7 @@ function totalCostCalculated(){
     var  price_selling_for_single_item = 0;
     var  price_buying_for_single_item = 0;
 
-    console.log(invoice_cart);
+    // console.log(invoice_cart);
     invoice_cart.forEach(function (item) {
         selling_price = parseFloat(item.selling_price.replace(/\,/g, ''), 10);
         buying_price = parseFloat(item.buying_price.replace(/\,/g, ''), 10);
@@ -988,6 +1002,7 @@ function invoicesaveInvoiceForm() {
                     document.getElementById("total_selling_price").value = '0.00';
                     document.getElementById("total_buying_price").value = '0.00';
                     document.getElementById("sub_total").value = '0.00';
+                    $('#store_id').val('').change();
                     deselect();
                 } catch (e) {
                     console.log(e)

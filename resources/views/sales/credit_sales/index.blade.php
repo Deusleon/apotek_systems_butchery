@@ -409,7 +409,7 @@
     </script>
 
     <script src="{{asset("assets/apotek/js/notification.js")}}"></script>
-    <script src="{{asset("assets/apotek/js/sales.js")}}"></script>
+    <script src="{{asset("assets/apotek/js/sales/credit.js")}}"></script>
     <script src="{{asset("assets/apotek/js/customer.js")}}"></script>
     <script
         src="{{asset("assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js")}}"></script>
