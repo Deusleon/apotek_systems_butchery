@@ -27,10 +27,13 @@
                                         required onchange="priceCategory(1)">
                                     <option name="store_name" value="" id="price_category"
                                             disabled selected readonly>
+                                            {{$default_sale_type_name}}
                                     </option>
                                     @foreach($price_categories as $price_category)
-                                        <option value="{{$price_category->id}}">
-                                            {{ $price_category->name }}</option>
+                                        <!-- <option value="{{$price_category->id}}">
+                                            {{ $price_category->name }}</option> -->
+                                        <option
+                                            value="{{$price_category->id}}" {{$default_sale_type === $price_category->id  ? 'selected' : ''}}>{{$price_category->name}}</option>
                                     @endforeach
                                 </select>
                             </div>

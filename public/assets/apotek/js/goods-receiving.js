@@ -224,6 +224,9 @@ function deselect() {
     cart_table.rows.add(cart);
     cart_table.draw();
     document.getElementById("received_cart").value = JSON.stringify(cart);
+    document.getElementById("total_selling_price").value = '0.00';
+    document.getElementById("total_buying_price").value = '0.00';
+    document.getElementById("sub_total").value = '0.00';
 
 }
 
@@ -870,6 +873,12 @@ function totalCostCalculated(){
     document.getElementById("total_selling_price").value = formatMoney(total_selling_price);
     document.getElementById("total_buying_price").value = formatMoney(total_buying_price);
     document.getElementById("sub_total").value = formatMoney(sub_total);
+
+    //Check For Profit
+    if(total_buying_price > total_selling_price) {
+        $('#invoicesave_id').prop('disabled', true);
+        // notify('Cannot be less than or equal to Buy Price', 'top', 'right', 'warning');
+    }
 }
 
 function filterReceivingInvoiceBySupplier() {
@@ -941,9 +950,9 @@ $('#invoiceFormId').on('submit', function(e) {
 
     var cart_data = document.getElementById("invoice_received_cart").value;
 
-    console.log(cart_data);
-    let total_buying_price = 0;
-    let total_selling_price = 0;
+    // console.log(cart_data);
+    // let total_buying_price = 0;
+    // let total_selling_price = 0;
 
     if (cart_data === '') {
         notify('Item receive list is empty', 'top', 'right', 'warning');
@@ -957,17 +966,17 @@ $('#invoiceFormId').on('submit', function(e) {
         return false;
     }
 
-    invoice_cart.forEach(function (item) {
+    // invoice_cart.forEach(function (item) {
 
-        total_buying_price += Number(item.buying_price);
-        total_selling_price += Number(item.selling_price);
-    });
+    //     total_buying_price += Number(item.buying_price);
+    //     total_selling_price += Number(item.selling_price);
+    // });
 
-    // Check for the profit
-    if(total_buying_price >= total_selling_price) {
-        $('#invoicesave_id').prop('disabled', true);
-        notify('Cannot be less than or equal to Buy Price', 'top', 'right', 'warning');
-    }
+    // // Check for the profit
+    // if(total_buying_price >= total_selling_price) {
+    //     $('#invoicesave_id').prop('disabled', true);
+    //     notify('Cannot be less than or equal to Buy Price', 'top', 'right', 'warning');
+    // }
 
     invoicesaveInvoiceForm();
 
@@ -991,18 +1000,10 @@ function invoicesaveInvoiceForm() {
                 invoice_cart_receiveds = [];
                 $('#good_receiving_supplier_ids').val('').change();
                 try{
-                    document.getElementById('store_id').value = '';
                     document.getElementById('goodreceving_invoice_id').value = '';
                     document.getElementById("invoicing_batch_n").value = '';
                     document.getElementById('invoiceselected-product').value = ''
                     document.getElementById('invoicing_purchase_date').value = '';
-                    document.getElementById('store_id').value = '';
-                    // $('#invoicing_purchase_date').val('').change();
-                    console.log($('#invoicing_purchase_date').value);
-                    document.getElementById("total_selling_price").value = '0.00';
-                    document.getElementById("total_buying_price").value = '0.00';
-                    document.getElementById("sub_total").value = '0.00';
-                    $('#store_id').val('').change();
                     deselect();
                 } catch (e) {
                     console.log(e)

@@ -81,11 +81,15 @@
                                 <label for="code">Store <font color="red">*</font></label>
                                 <select name="store" class="js-example-basic-single form-control"
                                         id="store_id" required="true" onchange="filterInvoiceBySupplier()">
-                                    <option selected="true" value="" disabled="disabled">Select Store...</option>
+                                    <!-- <option selected="true" value="" disabled="disabled">{{$default_store_name}}</option>
                                     @foreach($stores as $store)
                                         <option
                                             value="{{$store->id}}" {{$default_store_id === $store->id  ? 'selected' : ''}}>{{$store->name}}</option>
-                                    @endforeach
+                                    @endforeach -->
+                                    <option selected="true" value="{{$default_store_id}}"
+                                         readonly>
+                                            {{$default_store_name}}
+                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -520,7 +524,7 @@
                 // console.log(e)
              }
             
-            $('#store_id').val('').change();
+            // $('#store_id').val('').change();
             $('#supplier_ids').val('').change();
             $('#good_receiving_supplier_ids').val('').change();
             $('#invoice_id').val('').change();

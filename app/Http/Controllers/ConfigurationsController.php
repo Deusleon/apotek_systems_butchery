@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\PriceCategory;
 use App\Setting;
 use App\Store;
 use Auth;
@@ -17,6 +18,7 @@ class ConfigurationsController extends Controller
         /*return default store*/
         $default_store = Setting::where('id', 122)->value('value');
         $stores = Store::where('name', $default_store)->first();
+        $sale_types = PriceCategory::all();
 
         if ($stores != null) {
             $default_store_id = $stores->name;
@@ -30,6 +32,7 @@ class ConfigurationsController extends Controller
 
         return View::make('configurations.index')
             ->with(compact('configurations'))
+            ->with(compact('sale_types'))
             ->with(compact('store'));
     }
 

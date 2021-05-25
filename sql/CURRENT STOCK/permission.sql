@@ -1,0 +1,1 @@
+INSERT INTO `permissions` (`id`, `name`, `guard_name`, `created_at`, `updated_at`) VALUES (NULL, 'Manage Current Stock', 'web', NULL, NULL);

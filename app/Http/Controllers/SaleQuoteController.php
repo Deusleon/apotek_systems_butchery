@@ -22,7 +22,18 @@ class SaleQuoteController extends Controller
         $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
         $enable_discount = Setting::where('id', 111)->value('value');
 
-        $price_category = PriceCategory::orderBy('id', 'ASC')->get();
+        /*get default Price Category*/
+        $default_sale_type = Setting::where('id', 125)->value('value');
+        $sale_type = PriceCategory::where('name', $default_sale_type)->first();
+
+        if ($sale_type != null) {
+            $default_sale_type = $sale_type->id;
+        } else {
+            $default_sale_type = PriceCategory::first()->value('id');
+        }
+
+
+        $price_category = PriceCategory::all();
         $sale_quotes = SalesQuote::orderBy('id', 'DESC')->get();
         $customers = Customer::orderBy('id', 'ASC')->get();
         $current_stock = CurrentStock::all();
@@ -32,7 +43,7 @@ class SaleQuoteController extends Controller
             ->with(compact('count'))
             ->with(compact('sale_quotes'))
             ->with(compact('customers'))
-            ->with(compact('price_category'))
+            ->with(compact('price_category'))->with(compact('default_sale_type'))
             ->with(compact('current_stock'))->with(compact('enable_discount'));
     }
 

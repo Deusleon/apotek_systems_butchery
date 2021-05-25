@@ -117,7 +117,9 @@
                         <tr>
                             <th>Product Name</th>
                             <th>Quantity</th>
+                            @if(auth()->user()->checkPermission('Manage Current Stock'))
                             <th>Actions</th>
+                            @endif
                         </tr>
                         </thead>
                     </table>
@@ -287,10 +289,12 @@
                             return numberWithCommas(data);
                         }
                     },
+                    @if(auth()->user()->checkPermission('Manage Current Stock'))
                     {
                         "data": "action",
                         defaultContent: "<div><button id='details' class='btn btn-sm btn-rounded btn-success' type='button'>Details</button><button id='pricing_' class='btn btn-sm btn-rounded btn-primary' type='button'>Pricing</button><button id='bulk_adjust_' class='btn btn-sm btn-rounded btn-secondary' type='button'>Bulk Adjust</button></div>"
                     }
+                    @endif
                 ]
 
             });

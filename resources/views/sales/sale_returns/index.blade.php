@@ -72,7 +72,7 @@
                             <tr>
                                 <th>Receipt #</th>
                                 <th>Date</th>
-                                <th>Sale Type</th>
+                                <th>Customer</th>
                                 <th>Sub Total</th>
                                 <th>VAT</th>
                                 <th>Discount</th>
@@ -181,7 +181,7 @@
                             return moment(date).format('D-M-YYYY');
                         }
                     },
-                    {'data': 'cost.name'},
+                    {'data': 'customer.name'},
                     {
                         'data': 'cost', render: function (cost) {
                             return formatMoney(((cost.amount - cost.discount) / (1 + (cost.vat / cost.sub_total))));

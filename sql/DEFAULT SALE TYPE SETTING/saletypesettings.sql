@@ -1,0 +1,1 @@
+INSERT INTO `settings` (`id`, `name`, `display_name`, `value`, `updated_by`, `updated_at`) VALUES (NULL, 'defaulr_sale_type', 'Default Sale Type', 'RETAIL', '12', NULL);

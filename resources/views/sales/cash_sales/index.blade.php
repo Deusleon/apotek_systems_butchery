@@ -41,7 +41,9 @@
                                     <select id="price_category" class="js-example-basic-single form-control" required>
                                         <option value="" selected="true" disabled>Select Type</option>
                                         @foreach($price_category as $price)
-                                            <option value="{{$price->id}}">{{$price->name}}</option>
+                                            <!-- <option value="{{$price->id}}">{{$price->name}}</option> -->
+                                            <option
+                                                value="{{$price->id}}" {{$default_sale_type === $price->id  ? 'selected' : ''}}>{{$price->name}}</option>
                                         @endforeach
                                     </select>
                                 </div>

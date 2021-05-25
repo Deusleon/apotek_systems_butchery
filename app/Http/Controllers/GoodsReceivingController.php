@@ -28,7 +28,7 @@ class GoodsReceivingController extends Controller
         $invoice_setting = Setting::where('id', 115)->value('value');/*invoice setting*/
 
         /*get default store*/
-        $default_store = Setting::where('id', 128)->value('value');
+        $default_store = Setting::where('id', 122)->value('value');
         $stores = Store::where('name', $default_store)->first();
 
         if ($stores != null) {
@@ -36,6 +36,7 @@ class GoodsReceivingController extends Controller
         } else {
             $default_store_id = 1;
         }
+        $default_store_name = Store::where('id', $default_store_id)->value('name');
 
         $back_date = Setting::where('id', 114)->value('value');
         $expire_date = Setting::where('id', 123)->value('value');
@@ -58,7 +59,7 @@ class GoodsReceivingController extends Controller
 
         return View::make('purchases.goods_receiving.index',
             (compact('orders', 'order_details', 'suppliers',
-                'order_receiving', 'price_categories','stores', 'default_store_id',
+                'order_receiving', 'price_categories','stores', 'default_store_id', 'default_store_name',
                 'current_stock', 'item_stocks', 'invoices', 'batch_setting', 'invoice_setting', 'back_date', 'expire_date')));
     }
 
@@ -630,7 +631,7 @@ class GoodsReceivingController extends Controller
         if ($request->ajax()) {
 
             $cart = json_decode($request->cart, true);
-            // dd($request);
+            dd($request);
 
             $default_store_id = $request->store;
 

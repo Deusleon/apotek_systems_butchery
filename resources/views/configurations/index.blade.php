@@ -299,6 +299,9 @@
                 case 124:
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="back_date"><option value="YES">YES</option><option value="NO">NO</option></select>';
                     break;
+                case 125:
+                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="saletype">   @foreach($sale_types as $sale_type)<option value="{{$sale_type->name}}">{{$sale_type->name}}</option>@endforeach</select>';
+                    break;
                 default:
                 // code block
             }
@@ -346,6 +349,9 @@
 
             if ($('#support_multi_store').length) {
                 document.getElementById('support_multi_store').value = data[2];
+            }
+            if ($('#saletype').length) {
+                document.getElementById('saletype').value = data[2];
             }
 
         });

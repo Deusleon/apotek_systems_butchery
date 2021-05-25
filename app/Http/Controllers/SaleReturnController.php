@@ -101,6 +101,7 @@ class SaleReturnController extends Controller
 
                 $sale->cost;
                 $sale->details;
+                $sale->customer;
 
             }
         }
