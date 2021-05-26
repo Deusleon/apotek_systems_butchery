@@ -665,8 +665,8 @@ $('#invoicecart_table tbody').on('change', 'input.inventedAction', function() {
     var index = invoicecart_table.row($(this).parents('tr')).index();
 
     row_data.quantity = document.getElementById("edit_quantity").value;
-    row_data.buying_price =  document.getElementById("edit_buying_price").value;
-    row_data.selling_price = document.getElementById("edit_selling_price").value;
+    row_data.buying_price =  formatMoney(document.getElementById("edit_buying_price").value);
+    row_data.selling_price = formatMoney(document.getElementById("edit_selling_price").value);
     
     if(expire_date_enabler === "YES") {
         row_data.expire_date = document.getElementById("edit_expire_date").value;
