@@ -640,7 +640,7 @@ $('#invoicecart_table tbody').on('click', '#edit_btn', function() {
         let tommorow = moment().add(1, 'days').format("YYYY-MM-DD");
         console.log(tommorow);
         console.log(expire_date);
-        row_data.quantity = `<input style='width: 90%' type='text' class='form-control inventedAction' id='edit_quantity' value=${quantity}  required/>`;
+        row_data.quantity = `<input style='width: 90%' type='text' class='form-control' id='invoice_edit_quantity' value=${quantity}  required/>`;
         row_data.buying_price = `<input style='width: 90%' type='text' class='form-control inventedAction' id='edit_buying_price' onchange='invoiceamountCheck()'  value=${buying_price}  required/>`;
         row_data.selling_price = `<input style='width: 90%' type='text' class='form-control inventedAction' id='edit_selling_price' onchange='invoiceamountCheck()'  value=${selling_price}  required/>`;
         if(expire_date_enabler === "YES") {
@@ -664,9 +664,35 @@ $('#invoicecart_table tbody').on('change', 'input.inventedAction', function() {
     var row_data = invoicecart_table.row($(this).parents('tr')).data();
     var index = invoicecart_table.row($(this).parents('tr')).index();
 
-    row_data.quantity = document.getElementById("edit_quantity").value;
+    row_data.quantity = document.getElementById("invoice_edit_quantity").value;
     row_data.buying_price =  document.getElementById("edit_buying_price").value;
     row_data.selling_price = document.getElementById("edit_selling_price").value;
+    
+    if(expire_date_enabler === "YES") {
+        row_data.expire_date = document.getElementById("edit_expire_date").value;
+    }
+
+    invoice_cart[index] = row_data;
+    invoicecart_table.clear();
+    invoicecart_table.rows.add(invoice_cart);
+    invoicecart_table.draw();
+
+    invoice_cart_receiveds = JSON.stringify(invoice_cart);
+    document.getElementById("invoice_received_cart").value = invoice_cart_receiveds;
+    // console.log(invoice_cart_receiveds);
+
+    totalCostCalculated();
+
+});
+
+$('#invoicecart_table tbody').on('change', '#invoice_edit_quantity', function () {
+    edit_btn_set = 0;
+    var row_data = invoicecart_table.row($(this).parents('tr')).data();
+    var index = invoicecart_table.row($(this).parents('tr')).index();
+
+    row_data.quantity = document.getElementById("invoice_edit_quantity").value;
+    row_data.buying_price =  formatMoney(document.getElementById("edit_buying_price").value);
+    row_data.selling_price = formatMoney(document.getElementById("edit_selling_price").value);
     
     if(expire_date_enabler === "YES") {
         row_data.expire_date = document.getElementById("edit_expire_date").value;
