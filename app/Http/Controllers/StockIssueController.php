@@ -57,7 +57,7 @@ class StockIssueController extends Controller
             ->get();
 
         foreach ($products as $product) {
-            $data = PriceList::select('stock_id', 'price')->where('price_category_id', 1)
+            $data = PriceList::select('stock_id', 'price')
                 ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
                 ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                 ->orderBy('stock_id', 'desc')
@@ -70,8 +70,8 @@ class StockIssueController extends Controller
                 ->sum('quantity');
 
             array_push($max_prices, array(
-                'product_name' => $data->currentStock['product']['name'] ?? '',
-                'unit_cost' => $data->currentStock['unit_cost'] ?? null,
+                'product_name' => $data->currentStock['product']['name'],
+                'unit_cost' => $data->currentStock['unit_cost'],
                 'selling_price' => $data->price,
                 'quantity' => $quantity,
                 'id' => $data->stock_id,
