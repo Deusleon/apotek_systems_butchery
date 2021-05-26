@@ -631,7 +631,7 @@ class GoodsReceivingController extends Controller
         if ($request->ajax()) {
 
             $cart = json_decode($request->cart, true);
-            dd($request);
+            // dd($request);
 
             $default_store_id = $request->store;
 

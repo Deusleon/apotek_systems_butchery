@@ -878,6 +878,8 @@ function totalCostCalculated(){
     if(total_buying_price > total_selling_price) {
         $('#invoicesave_id').prop('disabled', true);
         // notify('Cannot be less than or equal to Buy Price', 'top', 'right', 'warning');
+    } else {
+        $('#invoicesave_id').prop('disabled', false);
     }
 }
 

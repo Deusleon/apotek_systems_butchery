@@ -570,8 +570,8 @@
                 $('#invoicesave_id').prop('disabled', true);
                 notify('Cannot be less than Buy Price', 'top', 'right', 'warning');
             } else if (Number(sell_price_parse) === Number(unit_price_parse)) {
-                $('#invoicesave_id').prop('disabled', true);
-                notify('Cannot be equal to Buy Price', 'top', 'right', 'warning');
+                // $('#invoicesave_id').prop('disabled', true);
+                // notify('Cannot be equal to Buy Price', 'top', 'right', 'warning');
             } else {
 
                 $('#invoicesave_id').prop('disabled', false);
