@@ -771,7 +771,7 @@ $('#items_table tbody').on('click', '#rtn_btn', function () {
     document.getElementById('save_btn').style.display = 'block';
     $('#sale-return').on('change', '#rtn_qty', function () {
         var quantity = document.getElementById('rtn_qty').value;
-        if (quantity > data[2] || quantity < 0) {
+        if (Number(quantity) > Number(data[2]) || Number(quantit) < 0) {
             document.getElementById('save_btn').disabled = 'true';
             document.getElementById('qty_error').style.display = 'block';
             $('#sale-return').find('.modal-body #qty_error').text('Maximum quantity is ' + data[2]);
