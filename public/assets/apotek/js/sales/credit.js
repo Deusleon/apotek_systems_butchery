@@ -143,7 +143,7 @@ var sale_list_Table = $('#sale_list_Table').DataTable({
 });
 
 $("#products").on('change', function () {
-    let customer_id = document.getElementById("customer_id").value;
+    let customer_id = document.getElementById("customer").value;
     console.log(customer_id);
     if(customer_id !== '') {
         valueCollection();
@@ -154,7 +154,7 @@ $("#products").on('change', function () {
 });
 
 $("#products_b").on('change', function () {
-    let customer_id = document.getElementById("customer_id").value;
+    let customer_id = document.getElementById("customer").value;
     console.log(customer_id);
     if(customer_id !== '') {
         valueCollection();
@@ -634,7 +634,7 @@ function deselect() {
     // document.getElementById("sales_form").reset();
     // rePopulateSelect2();
     // rePopulateSelect2Customer();
-    // $('#customer_id').val('').change();
+    $('#customer_id').val('').change();
     if (discount_enable === "YES") {
         document.getElementById('sale_discount').value = 0.0;
     }
@@ -771,7 +771,7 @@ $('#items_table tbody').on('click', '#rtn_btn', function () {
     document.getElementById('save_btn').style.display = 'block';
     $('#sale-return').on('change', '#rtn_qty', function () {
         var quantity = document.getElementById('rtn_qty').value;
-        if (Number(quantity) > Number(data[2]) || Number(quantit) < 0) {
+        if (quantity > data[2] || quantity < 0) {
             document.getElementById('save_btn').disabled = 'true';
             document.getElementById('qty_error').style.display = 'block';
             $('#sale-return').find('.modal-body #qty_error').text('Maximum quantity is ' + data[2]);

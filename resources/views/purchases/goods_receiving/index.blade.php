@@ -71,6 +71,8 @@
                                     <option selected="true" value="" disabled="disabled">Select Supplier...</option>
                                     @foreach($suppliers as $supplier)
                                         <option value="{{$supplier->id}}">{{$supplier->name}}</option>
+                                        <!-- <option
+                                                value="{{$supplier->id}}" {{$default_supplier->id === $supplier->id  ? 'selected' : ''}}>{{$supplier->name}}</option> -->
                                     @endforeach
                                 </select>
 
@@ -570,8 +572,8 @@
                 $('#invoicesave_id').prop('disabled', true);
                 notify('Cannot be less than Buy Price', 'top', 'right', 'warning');
             } else if (Number(sell_price_parse) === Number(unit_price_parse)) {
-                $('#invoicesave_id').prop('disabled', true);
-                notify('Cannot be equal to Buy Price', 'top', 'right', 'warning');
+                // $('#invoicesave_id').prop('disabled', true);
+                // notify('Cannot be equal to Buy Price', 'top', 'right', 'warning');
             } else {
 
                 $('#invoicesave_id').prop('disabled', false);

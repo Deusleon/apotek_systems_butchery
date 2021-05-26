@@ -607,7 +607,6 @@ var invoicecart_table = $('#invoicecart_table').DataTable({
     searching: false,
     bPaginate: false,
     bInfo: false,
-    order: false,
     ordering: false,
     columns: [
         { title: "Item Name", data: 'name' },
@@ -794,7 +793,7 @@ function invoicevaluesCollection(qty) {
             totalCostCalculated();
         } else {
             console.log('element id != item id');
-            invoice_cart.unshift(item)
+            invoice_cart.push(item)
             totalCostCalculated();
         }
         invoicecart_table.clear();
@@ -878,6 +877,8 @@ function totalCostCalculated(){
     if(total_buying_price > total_selling_price) {
         $('#invoicesave_id').prop('disabled', true);
         // notify('Cannot be less than or equal to Buy Price', 'top', 'right', 'warning');
+    } else {
+        $('#invoicesave_id').prop('disabled', false);
     }
 }
 
