@@ -45,6 +45,7 @@ class GoodsReceivingController extends Controller
             ->get();
         $order_details = OrderDetail::all();
         $suppliers = Supplier::all();
+        $default_supplier = Supplier::first();
         $item_stocks = GoodsReceiving::all();
         $current_stock = $this->allProductToReceive();
         $price_categories = PriceCategory::all();
@@ -58,7 +59,7 @@ class GoodsReceivingController extends Controller
             ->groupBy('order_details.id');
 
         return View::make('purchases.goods_receiving.index',
-            (compact('orders', 'order_details', 'suppliers',
+            (compact('orders', 'order_details', 'suppliers', 'default_supplier',
                 'order_receiving', 'price_categories','stores', 'default_store_id', 'default_store_name',
                 'current_stock', 'item_stocks', 'invoices', 'batch_setting', 'invoice_setting', 'back_date', 'expire_date')));
     }

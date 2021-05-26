@@ -42,6 +42,7 @@ class SaleController extends Controller
 
         $price_category = PriceCategory::all();
         $customers = Customer::orderBy('name', 'ASC')->get();
+        $default_customer = Customer::where('name', 'CASH')->value('id');
         $current_stock = CurrentStock::all();
         return View::make('sales.cash_sales.index')
             ->with(compact('customers'))
@@ -49,6 +50,7 @@ class SaleController extends Controller
             ->with(compact('current_stock'))->with(compact('enable_discount'))
             ->with(compact('back_date'))->with(compact('enable_paid'))
             ->with(compact('default_sale_type'))
+            ->with(compact('default_customer'))
             ->with(compact('vat'))->with(compact('fixed_price'));
     }
 

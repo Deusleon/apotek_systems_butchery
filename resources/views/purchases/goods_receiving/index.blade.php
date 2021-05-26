@@ -71,6 +71,8 @@
                                     <option selected="true" value="" disabled="disabled">Select Supplier...</option>
                                     @foreach($suppliers as $supplier)
                                         <option value="{{$supplier->id}}">{{$supplier->name}}</option>
+                                        <!-- <option
+                                                value="{{$supplier->id}}" {{$default_supplier->id === $supplier->id  ? 'selected' : ''}}>{{$supplier->name}}</option> -->
                                     @endforeach
                                 </select>
 

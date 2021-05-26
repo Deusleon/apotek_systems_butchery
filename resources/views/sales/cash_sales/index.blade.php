@@ -61,9 +61,11 @@
                                     <label for="code">Customer Name </label>
                                     <select name="customer_id" id="customer_id"
                                             class="js-example-basic-single form-control">
-                                        <option value="" selected="true" disabled>Select Customer</option>
+                                        <option value="" disabled>Select Customer</option>
                                         @foreach($customers as $customer)
-                                            <option value="{{$customer->id}}">{{$customer->name}}</option>
+                                            <!-- <option value="{{$customer->id}}">{{$customer->name}}</option> -->
+                                            <option
+                                                value="{{$customer->id}}" {{$default_customer === $customer->id  ? 'selected' : ''}}>{{$customer->name}}</option>
                                         @endforeach
                                     </select>
                                 </div>
