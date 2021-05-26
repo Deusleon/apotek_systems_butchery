@@ -31,7 +31,7 @@
                                 color="red">*</font></label>
                         <div class="col-md-8">
                             <input type="number" class="form-control"
-                                   name="quantity" value="" min="1" id="rtn_qty"
+                                   name="quantity" value="" min="0.1" step="0.01" id="rtn_qty"
                                    placeholder="Enter quantity" required>
                             <div class="text text-danger" id="qty_error"></div>
                         </div>
