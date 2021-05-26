@@ -634,7 +634,7 @@ function deselect() {
     // document.getElementById("sales_form").reset();
     // rePopulateSelect2();
     // rePopulateSelect2Customer();
-    $('#customer_id').val('').change();
+    // $('#customer_id').val('').change();
     if (discount_enable === "YES") {
         document.getElementById('sale_discount').value = 0.0;
     }
