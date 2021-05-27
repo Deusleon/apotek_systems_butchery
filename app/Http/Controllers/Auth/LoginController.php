@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use DB;
+use Illuminate\Support\Facades\Redirect;
 
 class LoginController extends Controller
 {
