@@ -78,24 +78,7 @@
 
                             </div>
                         </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <label for="code">Store <font color="red">*</font></label>
-                                <select name="store" class="js-example-basic-single form-control"
-                                        id="store_id" required="true" onchange="filterInvoiceBySupplier()">
-                                    <!-- <option selected="true" value="" disabled="disabled">{{$default_store_name}}</option>
-                                    @foreach($stores as $store)
-                                        <option
-                                            value="{{$store->id}}" {{$default_store_id === $store->id  ? 'selected' : ''}}>{{$store->name}}</option>
-                                    @endforeach -->
-                                    <option selected="true" value="{{$default_store_id}}"
-                                         readonly>
-                                            {{$default_store_name}}
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label for="code">Products <font color="red">*</font></label>
                                 <select id="invoiceselected-product" class="js-example-basic-single form-control">
@@ -176,21 +159,21 @@
                         <div class="col-md-3"></div>
                         <div class="col-md-3">
                             <div class="row">
-                                <label class="col-md-6 col-form-label text-md-right"><b>Total Buy :</b></label>
+                                <label class="col-md-6 col-form-label text-md-right"><b>Total Buy:</b></label>
                                 <div class="col-md-6" style="display: flex; justify-content: flex-end">
                                     <input type="text" id="total_buying_price"
                                         class="form-control-plaintext text-md-right" readonly value="0.00"/>
                                 </div>
                             </div>
                             <div class="row">
-                                <label class="col-md-6 col-form-label text-md-right"><b>Total Sell :</b></label>
+                                <label class="col-md-6 col-form-label text-md-right"><b>Total Sell:</b></label>
                                 <div class="col-md-6" style="display: flex; justify-content: flex-end">
                                     <input type="text" id="total_selling_price"
                                         class="form-control-plaintext text-md-right" readonly value="0.00"/>
                                 </div>
                             </div>
                             <div class="row">
-                                <label class="col-md-6 col-form-label text-md-right"><b>Total Profit :</b></label>
+                                <label class="col-md-6 col-form-label text-md-right"><b>Total Profit:</b></label>
                                 <div class="col-md-6" style="display: flex; justify-content: flex-end">
                                     <input type="text" id="sub_total"
                                         class="form-control-plaintext text-md-right" readonly value="0.00"/>
@@ -201,6 +184,7 @@
                     </div>
 
                     <input type="hidden" id="invoice_received_cart" name="cart">
+                    <input type="hidden" name="store" id="store_id" value = "{{$default_store_id}}">
                     <input type="hidden" id="expire_date_enabler" value = "{{$expire_date}}">
                     <input type="hidden" name="invoice_price_category" id="price_category_for_all">
                     <input type="hidden" name="" id="buy">
@@ -528,7 +512,7 @@
             
             // $('#store_id').val('').change();
             $('#supplier_ids').val('').change();
-            $('#good_receiving_supplier_ids').val('').change();
+            // $('#good_receiving_supplier_ids').val('').change();
             $('#invoice_id').val('').change();
         }
 

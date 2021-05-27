@@ -118,9 +118,9 @@
                                 <th>Expense Category</th>
                                 <th>Description</th>
                                 <th>Amount</th>
-                                {{--                                <th>Payment Method</th>--}}
-                                {{--                                <th>User</th>--}}
+                                @if(auth()->user()->checkPermission('Manage Expenses'))
                                 <th>Action</th>
+                                @endif
                             </tr>
                             </thead>
                             <tbody>
@@ -161,10 +161,12 @@
                 },
                 // {'data': 'payment_method'},
                 // {'data': 'user'},
+                @if(auth()->user()->checkPermission('Manage Expenses'))
                 {
                     'data': 'action',
                     defaultContent: "<button class='btn btn-primary btn-rounded btn-sm' type='button' id='edit_btn'>Edit</button><button class='btn btn-danger btn-rounded btn-sm' type='button' id='delete_btn'>Delete</button>"
                 }
+                @endif
 
             ], aaSorting: [[0, "desc"]]
 

@@ -118,7 +118,7 @@ function validateMobile(input, errorMsg, validMsg, action) {
         reset();
         if (input.value.trim()) {
             if (iti.isValidNumber()) {
-                $('#save_btn').prop('disabled', false);
+                $('#customer_save_btn').prop('disabled', false);
                 $('#edit_btn').prop('disabled', false);
                 validMsg.classList.remove("hide");
                 document.getElementById('phone-number').value = iti.getNumber();
@@ -127,7 +127,7 @@ function validateMobile(input, errorMsg, validMsg, action) {
                 }
             } else {
                 input.classList.add("error");
-                $('#save_btn').prop('disabled', true);
+                $('#customer_save_btn').prop('disabled', true);
                 $('#edit_btn').prop('disabled', true);
                 var errorCode = iti.getValidationError();
                 errorMsg.innerHTML = errorMap[errorCode];

@@ -149,6 +149,10 @@ $("#products").on('change', function () {
         valueCollection();
     } else {
         notify('Select Customer First', 'top', 'right', 'warning');
+
+        $('#products option').prop('selected', function() {
+            return this.defaultSelected;
+        });
     }
     
 });
@@ -160,6 +164,10 @@ $("#products_b").on('change', function () {
         valueCollection();
     } else {
         notify('Select Customer First', 'top', 'right', 'warning');
+
+        $('#products_b option').prop('selected', function() {
+            return this.defaultSelected;
+        });
     }
 });
 

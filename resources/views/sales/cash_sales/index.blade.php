@@ -33,6 +33,17 @@
             <div class="col-sm-12">
                 <div class="tab-content" id="myTabContent">
                     <form id="sales_form">
+                        @if (auth()->user()->checkPermission('Manage Customers'))
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button style="float: right;margin-bottom: 2%;" type="button"
+                                        class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#create"> Add
+                                        New Customer
+                                    </button>
+                                </div>
+
+                            </div>
+                        @endif
                         @csrf()
                         <div class="row">
                             <div class="col-md-3">
@@ -246,7 +257,7 @@
         </div>
     </div>
 
-
+@include('sales.customers.create')
 @endsection
 @push("page_scripts")
     @include('partials.notification')
@@ -336,6 +347,7 @@
     </script>
     <script src="{{asset("assets/apotek/js/notification.js")}}"></script>
     <script src="{{asset("assets/apotek/js/sales.js")}}"></script>
+    <script src="{{ asset('assets/apotek/js/customer.js') }}"></script>
     <script src="{{asset("assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js")}}"></script>
     <script src="{{asset("assets/js/pages/ac-datepicker.js")}}"></script>
 

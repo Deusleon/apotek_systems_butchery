@@ -251,10 +251,12 @@
                             return numberWithCommas(data);
                         }
                     },
+                    @if(auth()->user()->checkPermission('Manage Current Stock'))
                     {
                         "data": "action",
                         defaultContent: "<div><button id='detail' class='btn btn-sm btn-rounded btn-success' type='button'>Details</button><button id='pricing' class='btn btn-sm btn-rounded btn-primary' type='button'>Pricing</button><button id='bulk_adjust' class='btn btn-sm btn-rounded btn-secondary' type='button'>Bulk Adjust</button></div>"
                     }
+                    @endif
                 ]
 
             });

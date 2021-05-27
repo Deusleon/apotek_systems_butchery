@@ -690,7 +690,7 @@ $('#invoicecart_table tbody').on('change', '#invoice_edit_quantity', function ()
     var row_data = invoicecart_table.row($(this).parents('tr')).data();
     var index = invoicecart_table.row($(this).parents('tr')).index();
 
-    row_data.quantity = document.getElementById("invoice_edit_quantity").value;
+    row_data.quantity = numberWithCommas(document.getElementById("invoice_edit_quantity").value);
     row_data.buying_price =  formatMoney(document.getElementById("edit_buying_price").value);
     row_data.selling_price = formatMoney(document.getElementById("edit_selling_price").value);
     
@@ -763,9 +763,9 @@ $("#invoiceselected-product").on("change", function() {
 var invoice_item_received = {};
 var invoice_cart_received = [];
 
-function invoicevaluesCollection(qty) {
+function invoicevaluesCollection() {
 
-    qty = (qty || 1);
+    let invoice_qty = 1;
     var item = {};
     product = document.getElementById("invoiceselected-product").value;
     if(!product){
@@ -784,7 +784,7 @@ function invoicevaluesCollection(qty) {
     selected_name = item_name;
     invoice_item_received.name = selected_fields[0];
     invoice_item_received.id = selected_fields[1];
-    invoice_item_received.quantity = qty;
+    invoice_item_received.quantity = invoice_qty;
     document.getElementById("pr_id").value = formatMoney(selected_fields[2]);
 
 
@@ -799,7 +799,7 @@ function invoicevaluesCollection(qty) {
         selling_price = formatMoney(data.length !== 0 ? data[0]['price'] : 0);
         item.name = item_name;
         item.id = product_id;
-        item.quantity = qty;
+        item.quantity = invoice_qty;
         item.selling_price = selling_price;
         item.buying_price = buying_price;
         item.expire_date = '';
@@ -885,8 +885,9 @@ function totalCostCalculated(){
     invoice_cart.forEach(function (item) {
         selling_price = parseFloat(item.selling_price.replace(/\,/g, ''), 10);
         buying_price = parseFloat(item.buying_price.replace(/\,/g, ''), 10);
-        price_selling_for_single_item = (selling_price * item.quantity);
-        price_buying_for_single_item = (buying_price * item.quantity);
+        let item_quantity = item.quantity.toString().replace(',', '');
+        price_selling_for_single_item = (selling_price * item_quantity);
+        price_buying_for_single_item = (buying_price * item_quantity);
 
         total_selling_price += price_selling_for_single_item;
         total_buying_price += price_buying_for_single_item;
@@ -1025,7 +1026,7 @@ function invoicesaveInvoiceForm() {
                 invoicecart_table.draw();
                 invoice_cart = [];
                 invoice_cart_receiveds = [];
-                $('#good_receiving_supplier_ids').val('').change();
+                // $('#good_receiving_supplier_ids').val('').change();
                 try{
                     document.getElementById('goodreceving_invoice_id').value = '';
                     document.getElementById("invoicing_batch_n").value = '';

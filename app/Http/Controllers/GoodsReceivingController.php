@@ -638,7 +638,7 @@ class GoodsReceivingController extends Controller
 
             foreach($cart as $single_item){
                 // dd($single_item);
-                $quantity = $single_item['quantity'];
+                $quantity = str_replace(',', '', $single_item['quantity']);
                 $item_product_id = str_replace(',', '', $single_item['id']);
                 $unit_sell_price = str_replace(',', '', $single_item['selling_price']);
                 // dd($unit_sell_price);
@@ -662,7 +662,7 @@ class GoodsReceivingController extends Controller
                     } else {
                         $update_stock->expiry_date = null;
                     }
-                    $update_stock->quantity = $single_item['quantity'];
+                    $update_stock->quantity = $quantity;
                     $update_stock->unit_cost = str_replace(',', '', $single_item['buying_price']);
                     $update_stock->store_id = $default_store_id;
                     $update_stock->save();
@@ -676,7 +676,7 @@ class GoodsReceivingController extends Controller
                     } else {
                         $stock->expiry_date = null;
                     }
-                    $stock->quantity = $single_item['quantity'];
+                    $stock->quantity = $quantity;
                     $stock->unit_cost = str_replace(',', '', $single_item['buying_price']);
                     $stock->store_id = $default_store_id;
                     $stock->save();
@@ -688,7 +688,7 @@ class GoodsReceivingController extends Controller
                 $stock_tracking = new StockTracking;
                 $stock_tracking->stock_id = $overal_stock_id;
                 $stock_tracking->product_id = $single_item['id'];
-                $stock_tracking->quantity = $single_item['quantity'];
+                $stock_tracking->quantity = $quantity;
                 $stock_tracking->store_id = $default_store_id;
                 $stock_tracking->updated_by = Auth::user()->id;
                 $stock_tracking->out_mode = 'New Product Purchase';
@@ -716,7 +716,7 @@ class GoodsReceivingController extends Controller
                 } else {
                     $incoming_stock->expire_date = null;
                 }
-                $incoming_stock->quantity = $single_item['quantity'];
+                $incoming_stock->quantity = $quantity;
                 $incoming_stock->unit_cost = str_replace(',', '', $single_item['buying_price']);
                 $incoming_stock->total_cost = $total_buyprice;
                 $incoming_stock->total_sell = $total_sellprice;
