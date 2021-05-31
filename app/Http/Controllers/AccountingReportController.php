@@ -340,9 +340,8 @@ class AccountingReportController extends Controller
                 DB::raw('date(date) as dates'))
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
             ->whereBetween(DB::raw('date(date)'), [$date[0], $date[1]])
-           ->where('sales_details.status', '!=', 3)
+            ->where('sales_details.status', '!=', 3)
             ->join('users', 'users.id', '=', 'sales.created_by')
-            ->whereNotIn('sale_id', DB::table('sales_credits')->pluck('sale_id'))
             ->groupby(DB::Raw('date(date)'))
             ->get();
 
@@ -377,9 +376,8 @@ class AccountingReportController extends Controller
                 DB::raw('date(date) as dates'))
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
             ->whereBetween(DB::raw('date(date)'), [$date[0], $date[1]])
-           ->where('sales_details.status', '!=', 3)
+            ->where('sales_details.status', '!=', 3)
             ->join('users', 'users.id', '=', 'sales.created_by')
-            ->whereNotIn('sale_id', DB::table('sales_credits')->pluck('sale_id'))
             ->get();
 
         /*both price and sell price*/
@@ -395,15 +393,18 @@ class AccountingReportController extends Controller
                 ->select('inv_products.id as id', 'name', 'price', 'stock_id')
                 ->first('price');
 
-            array_push($raw_prices_data, array(
-                'stock_id' => $product->stock_id ?? '',
-                'sales_details_id' => $detail->sales_details_id,
-                'sale_id' => $detail->sale_id,
-                'quantity' => $detail->quantity,
-                'buy_price' => $product->currentStock->unit_cost ?? 0.00,
-                'total_buy' => $product->currentStock['unit_cost'] ?? 0.00 * $detail->quantity,
-                'date' => $detail->dates
-            ));
+
+            if ($product) {
+                array_push($raw_prices_data, array(
+                    'stock_id' => $product->stock_id,
+                    'sales_details_id' => $detail->sales_details_id,
+                    'sale_id' => $detail->sale_id,
+                    'quantity' => $detail->quantity,
+                    'buy_price' => $product->currentStock['unit_cost'],
+                    'total_buy' => $product->currentStock['unit_cost'] * $detail->quantity,
+                    'date' => $detail->dates
+                ));
+            }
 
         }
 
