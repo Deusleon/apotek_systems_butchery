@@ -38,6 +38,21 @@ class CurrentStockController extends Controller
             ->get();
 
 
+        /*get default Price Category*/
+        $default_sale_type = Setting::where('id', 125)->value('value');
+        $sale_type = PriceCategory::where('name', $default_sale_type)->first();
+        
+
+        if ($sale_type != null) {
+            $default_sale_type = $sale_type->id;
+            // return $default_sale_type;
+        } else {
+            $default_sale_type = PriceCategory::first()->value('id');
+        }
+
+
+        $default_sale_type_name = PriceCategory::where('id', $default_sale_type)->value('name');
+        // return $default_sale_type_name;
         $stock_detail = CurrentStock::all();
         $price_Category = PriceCategory::all();
         $products = Product::all();
@@ -52,6 +67,8 @@ class CurrentStockController extends Controller
             'products' => $products,
             'categories' => $categories,
             'reasons' => $adjustment_reason,
+            'default_sale_type' => $default_sale_type,
+            'default_sale_type_name' => $default_sale_type_name,
             'price_categories' => $price_Category,
             'sale_prices' => $sale_price,
             'default_store_id' => $default_store_id

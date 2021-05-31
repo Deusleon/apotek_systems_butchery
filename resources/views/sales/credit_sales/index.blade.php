@@ -47,15 +47,17 @@
                 <div class="tab-content" id="myTabContent">
                     <form id="credit_sales_form">
                         @csrf()
-                        <div class="row">
-                            <div class="col-md-12">
-                                <button style="float: right;margin-bottom: 2%;" type="button"
-                                        class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#create"> Add
-                                    New Customer
-                                </button>
-                            </div>
+                        @if(auth()->user()->checkPermission('Manage Customers'))
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button style="float: right;margin-bottom: 2%;" type="button"
+                                            class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#create"> Add
+                                        New Customer
+                                    </button>
+                                </div>
 
-                        </div>
+                            </div>
+                        @endif
 
                         <div id="sale-panel">
                             <div class="row">
@@ -66,7 +68,9 @@
                                                 required>
                                             <option value="">Select Type</option>
                                             @foreach($price_category as $price)
-                                                <option value="{{$price->id}}">{{$price->name}}</option>
+                                                <!-- <option value="{{$price->id}}">{{$price->name}}</option> -->
+                                                <option
+                                                value="{{$price->id}}" {{$default_sale_type === $price->id  ? 'selected' : ''}}>{{$price->name}}</option>
                                             @endforeach
                                         </select>
                                     </div>

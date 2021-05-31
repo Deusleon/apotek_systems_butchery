@@ -60,7 +60,7 @@
                             <tr>
                                 <th>Receipt #</th>
                                 <th>Date</th>
-                                <th>Sale Type</th>
+                                <th>Customer</th>
                                 <th>Sub Total</th>
                                 <th>VAT</th>
                                 <th>Discount</th>
@@ -110,6 +110,91 @@
             }
         });
 
+        // function getHistory() {
+        //     var range = document.getElementById('daterange').value;
+        //     range = range.split('-');
+
+        //     $("#sale_history_table").dataTable().fnDestroy();
+
+        //     $('#sale_history_table').DataTable({
+        //         "processing": true,
+        //         "serverSide": true,
+        //         "ajax": {
+        //             "url": config.routes.getSalesHistory,
+        //             "dataType": "json",
+        //             "type": "post",
+        //             "cache": false,
+        //             "data": {
+        //                 _token: "{{csrf_token()}}",
+        //                 range: range
+        //             }
+        //         },
+        //         "columns": [
+        //             {'data': 'receipt_number'},
+        //             {
+        //                 'data': 'date', render: function (date) {
+        //                     return moment(date).format('D-M-YYYY');
+        //                 }
+        //             },
+        //             {'data': 'cost', render: function (cost) {
+        //                     if(cost) {
+        //                         return cost.name
+        //                     }
+        //                     return '';
+        //                 }},
+        //             {'data': 'cost', render: function (cost) {
+        //                     if(cost) {
+        //                         return cost.currency
+        //                     }
+        //                     return '';
+        //                 }},
+        //             {
+        //                 'data': 'cost', render: function (cost) {
+        //                     if(cost) {
+        //                         return formatMoney(((cost.amount - cost.discount) / (1 + (cost.vat / cost.sub_total))));
+        //                     }
+        //                     return '';
+        //                 }
+        //             },
+
+        //             {
+        //                 'data': 'cost', render: function (cost) {
+        //                     if(cost) {
+        //                     return formatMoney(((cost.amount - cost.discount) * (cost.vat / cost.sub_total)));
+        //                     }
+        //                     return '';
+        //                 }
+        //             },
+        //             {
+        //                 'data': 'cost', render: function (cost) {
+        //                     if(cost) {
+        //                         return formatMoney(cost.discount);
+        //                     }
+        //                     return '';
+        //                 }
+        //             },
+        //             {
+        //                 'data': 'cost', render: function (cost) {
+        //                     if(cost) {
+        //                         return formatMoney(((cost.amount - cost.discount)));    
+        //                     }
+        //                     return '';
+        //                 }
+        //             },
+        //             {
+        //                 'data': "action",
+        //                 defaultContent: "<button type='button' id='sale_details' class='btn btn-sm btn-rounded btn-success'>Show</button><button type='submit' id='sale_receipt_reprint' class='btn btn-sm btn-rounded btn-secondary'><span class='fa fa-print' aria-hidden='true'></span>Print</button>"
+        //             }
+        //         ], aaSorting: [[1, 'desc']],
+        //         "columnDefs": [
+        //             {"orderable": false, "targets": [3, 4, 5, 6, 7]}
+        //         ]
+
+        //     });
+
+
+        // }
+
         function getHistory() {
             var range = document.getElementById('daterange').value;
             range = range.split('-');
@@ -136,26 +221,45 @@
                             return moment(date).format('D-M-YYYY');
                         }
                     },
-                    {'data': 'cost.name'},
-                    {
-                        'data': 'cost', render: function (cost) {
-                            return formatMoney(((cost.amount - cost.discount) / (1 + (cost.vat / cost.sub_total))));
+                    // {'data': 'customer.name'},
+                    {'data': 'customer', render: function (customer) {
+                            if(customer) {
+                                return customer.name
+                            }
+                            return '';
+                        }
+                    },
+
+                    {   'data': 'cost', render: function (cost) {
+                            if(cost) {
+                                return formatMoney(((cost.amount - cost.discount) / (1 + (cost.vat / cost.sub_total))));
+                            }
+                            return '';
                         }
                     },
 
                     {
                         'data': 'cost', render: function (cost) {
+                            if(cost) {
                             return formatMoney(((cost.amount - cost.discount) * (cost.vat / cost.sub_total)));
-                        }
-                    },
-                    {
-                        'data': 'cost.discount', render: function (discount) {
-                            return formatMoney(discount);
+                            }
+                            return '';
                         }
                     },
                     {
                         'data': 'cost', render: function (cost) {
-                            return formatMoney(((cost.amount - cost.discount)));
+                            if(cost) {
+                                return formatMoney(cost.discount);
+                            }
+                            return '';
+                        }
+                    },
+                    {
+                        'data': 'cost', render: function (cost) {
+                            if(cost) {
+                                return formatMoney(((cost.amount - cost.discount)));    
+                            }
+                            return '';
                         }
                     },
                     {

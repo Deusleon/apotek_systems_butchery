@@ -72,7 +72,7 @@
                             <tr>
                                 <th>Receipt #</th>
                                 <th>Date</th>
-                                <th>Sale Type</th>
+                                <th>Customer</th>
                                 <th>Sub Total</th>
                                 <th>VAT</th>
                                 <th>Discount</th>
@@ -154,7 +154,6 @@
     </script>
 
     <script type="text/javascript">
-
         function getSales() {
             var range = document.getElementById('sold_date').value;
             range = range.split('-');
@@ -181,16 +180,28 @@
                             return moment(date).format('D-M-YYYY');
                         }
                     },
-                    {'data': 'cost.name'},
+                    {'data': 'customer', render: function (customer) {
+                            if(customer) {
+                                return customer.name
+                            }
+                            return '';
+                        }
+                    },
                     {
                         'data': 'cost', render: function (cost) {
-                            return formatMoney(((cost.amount - cost.discount) / (1 + (cost.vat / cost.sub_total))));
+                            if(cost) {
+                                return formatMoney(((cost.amount - cost.discount) / (1 + (cost.vat / cost.sub_total))));
+                            }
+                                return '';
                         }
                     },
 
                     {
                         'data': 'cost', render: function (cost) {
-                            return formatMoney(((cost.amount - cost.discount) * (cost.vat / cost.sub_total)));
+                            if(cost) {
+                                return formatMoney(((cost.amount - cost.discount) * (cost.vat / cost.sub_total)));
+                            }
+                                return '';
                         }
                     },
                     {
@@ -200,7 +211,10 @@
                     },
                     {
                         'data': 'cost', render: function (cost) {
-                            return formatMoney(((cost.amount - cost.discount)));
+                            if(cost) {
+                                return formatMoney(((cost.amount - cost.discount)));
+                            }
+                                return '';
                         }
                     },
                     {

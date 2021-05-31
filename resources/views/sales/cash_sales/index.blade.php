@@ -33,6 +33,17 @@
             <div class="col-sm-12">
                 <div class="tab-content" id="myTabContent">
                     <form id="sales_form">
+                        @if (auth()->user()->checkPermission('Manage Customers'))
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button style="float: right;margin-bottom: 2%;" type="button"
+                                        class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#create"> Add
+                                        New Customer
+                                    </button>
+                                </div>
+
+                            </div>
+                        @endif
                         @csrf()
                         <div class="row">
                             <div class="col-md-3">
@@ -41,7 +52,9 @@
                                     <select id="price_category" class="js-example-basic-single form-control" required>
                                         <option value="" selected="true" disabled>Select Type</option>
                                         @foreach($price_category as $price)
-                                            <option value="{{$price->id}}">{{$price->name}}</option>
+                                            <!-- <option value="{{$price->id}}">{{$price->name}}</option> -->
+                                            <option
+                                                value="{{$price->id}}" {{$default_sale_type === $price->id  ? 'selected' : ''}}>{{$price->name}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -59,9 +72,11 @@
                                     <label for="code">Customer Name </label>
                                     <select name="customer_id" id="customer_id"
                                             class="js-example-basic-single form-control">
-                                        <option value="" selected="true" disabled>Select Customer</option>
+                                        <option value="" disabled>Select Customer</option>
                                         @foreach($customers as $customer)
-                                            <option value="{{$customer->id}}">{{$customer->name}}</option>
+                                            <!-- <option value="{{$customer->id}}">{{$customer->name}}</option> -->
+                                            <option
+                                                value="{{$customer->id}}" {{$default_customer === $customer->id  ? 'selected' : ''}}>{{$customer->name}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -242,7 +257,7 @@
         </div>
     </div>
 
-
+@include('sales.customers.create')
 @endsection
 @push("page_scripts")
     @include('partials.notification')
@@ -332,6 +347,7 @@
     </script>
     <script src="{{asset("assets/apotek/js/notification.js")}}"></script>
     <script src="{{asset("assets/apotek/js/sales.js")}}"></script>
+    <script src="{{ asset('assets/apotek/js/customer.js') }}"></script>
     <script src="{{asset("assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js")}}"></script>
     <script src="{{asset("assets/js/pages/ac-datepicker.js")}}"></script>
 

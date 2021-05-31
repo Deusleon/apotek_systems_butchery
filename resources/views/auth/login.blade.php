@@ -39,7 +39,7 @@
                     </div>
 
                     <h3 class="mb-4">Login</h3>
-                    <div class="input-group mb-3">
+                    <div class="input-group mb-4">
                         <input id="email" type="email" class="form-control @error('email') is-invalid @enderror"
                                name="email" value="{{ old('email') }}" required placeholder="Email" autofocus>
 

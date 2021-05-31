@@ -29,15 +29,28 @@ class SaleController extends Controller
         $enable_discount = Setting::where('id', 111)->value('value');
         $enable_paid = Setting::where('id', 112)->value('value');
 
+        /*get default Price Category*/
+        $default_sale_type = Setting::where('id', 125)->value('value');
+        $sale_type = PriceCategory::where('name', $default_sale_type)->first();
 
-        $price_category = PriceCategory::orderBy('id', 'ASC')->get();
+        if ($sale_type != null) {
+            $default_sale_type = $sale_type->id;
+        } else {
+            $default_sale_type = PriceCategory::first()->value('id');
+        }
+
+
+        $price_category = PriceCategory::all();
         $customers = Customer::orderBy('name', 'ASC')->get();
+        $default_customer = Customer::where('name', 'CASH')->value('id');
         $current_stock = CurrentStock::all();
         return View::make('sales.cash_sales.index')
             ->with(compact('customers'))
             ->with(compact('price_category'))
             ->with(compact('current_stock'))->with(compact('enable_discount'))
             ->with(compact('back_date'))->with(compact('enable_paid'))
+            ->with(compact('default_sale_type'))
+            ->with(compact('default_customer'))
             ->with(compact('vat'))->with(compact('fixed_price'));
     }
 
@@ -48,7 +61,18 @@ class SaleController extends Controller
         $fixed_price = Setting::where('id', 124)->value('value');
         $enable_discount = Setting::where('id', 111)->value('value');
 
-        $price_category = PriceCategory::orderBy('id', 'ASC')->get();
+        /*get default Price Category*/
+        $default_sale_type = Setting::where('id', 125)->value('value');
+        $sale_type = PriceCategory::where('name', $default_sale_type)->first();
+
+        if ($sale_type != null) {
+            $default_sale_type = $sale_type->id;
+        } else {
+            $default_sale_type = PriceCategory::first()->value('id');
+        }
+
+
+        $price_category = PriceCategory::all();
         $customers = Customer::orderBy('name', 'ASC')->get();
         $current_stock = CurrentStock::all();
         return View::make('sales.credit_sales.index')
@@ -56,6 +80,7 @@ class SaleController extends Controller
             ->with(compact('price_category'))
             ->with(compact('back_date'))
             ->with(compact('current_stock'))->with(compact('enable_discount'))
+            ->with(compact('default_sale_type'))
             ->with(compact('vat'))->with(compact('fixed_price'));
     }
 
@@ -582,6 +607,7 @@ class SaleController extends Controller
 
                 $sale->cost;
                 $sale->details;
+                $sale->customer;
 
             }
         }

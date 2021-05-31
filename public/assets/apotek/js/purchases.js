@@ -6,10 +6,10 @@ var set_button = 0;
 var tax = Number(document.getElementById("vats").value);
 
 var cart_table = $('#cart_table').DataTable({
-    ordering: false,
     searching: false,
     bPaginate: false,
     bInfo: false,
+    ordering: false,
     data: cart,
     columns: [
         {title: "Product Name"},
@@ -73,6 +73,13 @@ $('#cart_table tbody').on('change', '#edit_quantity', function () {
     set_button = 0;
     var row_data = cart_table.row($(this).parents('tr')).data();
     var index = cart_table.row($(this).parents('tr')).index();
+
+    if (document.getElementById("edit_quantity").value === '' || document.getElementById("edit_quantity").value === '0' ) {
+        edit_btn_set = 1;
+        notify('Quantity is required', 'top', 'right', 'warning');
+        return false;
+    }
+    
     row_data[1] = numberWithCommas(document.getElementById("edit_quantity").value);
     row_data[2] = document.getElementById("edit_price").value;
     quantity = Number(row_data[1]);
