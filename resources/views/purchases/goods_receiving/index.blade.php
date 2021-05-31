@@ -131,7 +131,7 @@
                     </div>
                     <hr>
                     <div class="row">
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="form-group" style="padding-top: 10px">
                                 <div style="width: 99%">
                                     <label for="invoiceprice_category">Price Category <font color="red">*</font></label>
@@ -157,7 +157,7 @@
                         </div>
                         
                         <div class="col-md-3"></div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div class="row">
                                 <label class="col-md-6 col-form-label text-md-right"><b>Total Buy:</b></label>
                                 <div class="col-md-6" style="display: flex; justify-content: flex-end">

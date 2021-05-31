@@ -219,7 +219,7 @@ $('#cart_table tbody').on('change', '#edit_quantity', function () {
     var row_data = cart_table.row($(this).parents('tr')).data();
     var index = cart_table.row($(this).parents('tr')).index();
 
-    if (document.getElementById("edit_quantity").value === '') {
+    if (document.getElementById("edit_quantity").value === '' || document.getElementById("edit_quantity").value === '0') {
         edit_btn_set = 1;
         notify('Quantity is required', 'top', 'right', 'warning');
         return false;
