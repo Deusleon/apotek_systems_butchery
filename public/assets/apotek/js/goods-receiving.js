@@ -644,20 +644,22 @@ $('#invoicecart_table tbody').on('click', '#edit_btn', function() {
         buying_price = row_data.buying_price.toString().replace(',', '');
         selling_price = row_data.selling_price.toString().replace(',', '');
         expire_date = row_data.expire_date;
-        let tommorow = moment().add(1, 'days').format("YYYY-MM-DD");
+        let tommorow = moment().add(1, 'days').format("DD-M-YYYY");
         console.log(tommorow);
         console.log(expire_date);
         row_data.quantity = `<input style='width: 90%' type='text' class='form-control' id='invoice_edit_quantity' value=${quantity}  required/>`;
         row_data.buying_price = `<input style='width: 90%' type='text' class='form-control inventedAction' id='edit_buying_price' onchange='invoiceamountCheck()'  value=${buying_price}  required/>`;
         row_data.selling_price = `<input style='width: 90%' type='text' class='form-control inventedAction' id='edit_selling_price' onchange='invoiceamountCheck()'  value=${selling_price}  required/>`;
+
         if(expire_date_enabler === "YES") {
-            row_data.expire_date = `<input style='width: 90%' type='date' class='form-control' min="${tommorow}" id='edit_expire_date' value=${expire_date} required/>`;
+            row_data.expire_date = `<input style='width: 90%' type='date' class='form-control' id='edit_expire_date' min="${tommorow}" value=${expire_date} autocomplete="off" required/>`;
         }
-        
+        console.log(row_data.expire_date);
         invoice_cart[index] = row_data;
         invoicecart_table.clear();
         invoicecart_table.rows.add(invoice_cart);
         invoicecart_table.draw();
+
 
         edit_btn_set = 1;
 
@@ -670,13 +672,28 @@ $('#invoicecart_table tbody').on('change', 'input.inventedAction', function() {
     edit_btn_set = 0;
     var row_data = invoicecart_table.row($(this).parents('tr')).data();
     var index = invoicecart_table.row($(this).parents('tr')).index();
-
+    console.log(row_data);
     row_data.quantity = document.getElementById("invoice_edit_quantity").value;
     row_data.buying_price =  document.getElementById("edit_buying_price").value;
     row_data.selling_price = document.getElementById("edit_selling_price").value;
+    console.log(document.getElementById("invoice_edit_quantity").value);
+    console.log(document.getElementById("edit_buying_price").value);
+    console.log(document.getElementById("edit_selling_price").value);
+    console.log(document.getElementById("edit_expire_date").value);
     
     if(expire_date_enabler === "YES") {
-        row_data.expire_date = document.getElementById("edit_expire_date").value;
+        let tommorow = moment().add(1, 'days').format("DD-M-YYYY");
+        let expire_date = moment().format("DD-M-YYYY");
+        let check_expire_date =  `<input style='width: 90%' type='date' class='form-control' id='edit_expire_date' min="${tommorow}" value=${expire_date} autocomplete="off" required/>`;
+        console.log(check_expire_date);
+        if ( row_data.expire_date == check_expire_date ) {
+
+            row_data.expire_date = expire_date;
+        } else {
+
+            row_data.expire_date = document.getElementById("edit_expire_date").value;
+        }
+        
     }
 
     invoice_cart[index] = row_data;
@@ -708,7 +725,18 @@ $('#invoicecart_table tbody').on('change', '#invoice_edit_quantity', function ()
     row_data.selling_price = formatMoney(document.getElementById("edit_selling_price").value);
     
     if(expire_date_enabler === "YES") {
-        row_data.expire_date = document.getElementById("edit_expire_date").value;
+        let tommorow = moment().add(1, 'days').format("DD-M-YYYY");
+        let expire_date = moment().format("DD-M-YYYY");
+        let check_expire_date =  `<input style='width: 90%' type='date' class='form-control' id='edit_expire_date' min="${tommorow}" value=${expire_date} autocomplete="off" required/>`;
+        console.log(check_expire_date);
+        if ( row_data.expire_date == check_expire_date ) {
+
+            row_data.expire_date = expire_date;
+        } else {
+
+            row_data.expire_date = document.getElementById("edit_expire_date").value;
+        }
+        
     }
 
     invoice_cart[index] = row_data;
@@ -724,12 +752,24 @@ $('#invoicecart_table tbody').on('change', '#invoice_edit_quantity', function ()
 
 });
 
+
 if(expire_date_enabler === "YES") {
+
 
     $('#invoicecart_table tbody').on('change', '#edit_expire_date', function () {
         edit_btn_set = 0;
         var row_data = invoicecart_table.row($(this).parents('tr')).data();
         var index = invoicecart_table.row($(this).parents('tr')).index();
+        let check_expire_date = moment().format("DD-M-YYYY");
+
+        if ( document.getElementById("edit_expire_date").value == check_expire_date ) {
+
+            $('#invoicesave_id').attr('disabled', true);
+        } else {
+
+            $('#invoicesave_id').attr('disabled', false);
+        }
+        
 
         row_data.expire_date = document.getElementById("edit_expire_date").value;
         row_data.quantity = numberWithCommas(document.getElementById("invoice_edit_quantity").value);
@@ -817,7 +857,7 @@ function invoicevaluesCollection() {
     var product_id = selected_fields[1];
     let selling_price = 0;
     let buying_price = 0;
-    let expire_date = moment().format("YYYY-MM-DD");
+    let expire_date = moment().format("DD-M-YYYY");
 
     /*set the global variable*/
     product_ids = product_id;
@@ -1034,20 +1074,28 @@ $('#invoiceFormId').on('submit', function(e) {
     }
 
      //Check for Expire Date
-    //  let check_expire_date = moment().format("YYYY-MM-DD");
+     let check_expire_date = moment().format("DD-M-YYYY");
 
-    //  invoice_cart.every(item => {
- 
-    //      if( item.expire_date == check_expire_date ) {
-    //          notify('Please specify a valid expire date of each item', 'top', 'right', 'warning');
-    //          $('#invoicesave_id').attr('disabled', true);
-    //          return false;
-    //      }
-    //  });
 
-    $('#invoicesave_id').attr('disabled', true);
+    for (i = 0; i < invoice_cart.length; i++) {
 
-    invoicesaveInvoiceForm();
+        if( invoice_cart[i].expire_date == check_expire_date ) { 
+
+            console.log("invalid date");
+                notify('Please specify a valid expire date of each item', 'top', 'right', 'warning');
+                $('#invoicesave_id').attr('disabled', true);
+                break;
+        }
+
+        if (i === (invoice_cart.length -1)) {
+            console.log("valid date continue");
+            $('#invoicesave_id').attr('disabled', true);
+
+            invoicesaveInvoiceForm();
+            
+        }
+
+    }
 
 });
 

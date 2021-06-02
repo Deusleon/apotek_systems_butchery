@@ -15,7 +15,7 @@ class InvoiceController extends Controller
     //
     public function index()
     {
-        $invoices = Invoice::orderBy('id', 'DESC')->get();
+        $invoices = Invoice::orderBy('invoice_date', 'DESC')->get();
 
         $suppliers = Supplier::orderBy('name', 'ASC')->get();
 
@@ -85,6 +85,7 @@ class InvoiceController extends Controller
         $to = $request->date[1];
         $invoice_history = Invoice::where(DB::Raw("DATE_FORMAT(created_at,'%m/%d/%Y')"), '>=', $from)
             ->where(DB::Raw("DATE_FORMAT(created_at,'%m/%d/%Y')"), '<=', $to)
+            ->orderBy('invoice_date', 'DESC')
             ->get();
 
         foreach ($invoice_history as $value) {

@@ -34,11 +34,13 @@
 
                     </div>
                     <div class="col-md-3">
-                        <button style="float: right; margin-right: -0.3%" type="button" class="btn btn-secondary btn-sm"
-                                data-toggle="modal"
-                                data-target="#create">
-                            Add New Invoice
-                        </button>
+                        @if(auth()->user()->checkPermission('Manage Invoice'))
+                            <button style="float: right; margin-right: -0.3%" type="button" class="btn btn-secondary btn-sm"
+                                    data-toggle="modal"
+                                    data-target="#create">
+                                Add New Invoice
+                            </button>
+                        @endif
                     </div>
                 </div>
 
@@ -314,6 +316,7 @@
             searching: true,
             bPaginate: true,
             bInfo: true,
+            ordering: false,
             columns: [
 
                 {data: 'invoice_no'},
@@ -337,8 +340,13 @@
 
                 {
                     data: "action",
-                    defaultContent: "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm' size='2'/><input type='button' value='Edit' id='edit_btn' class='btn btn-primary btn-rounded btn-sm' size='2' />"
-                },
+                    defaultContent: "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm' size='2'/>" + 
+                    "@if(auth()->user()->checkPermission('Manage Invoice'))" +
+                        "<input type='button' value='Edit' id='edit_btn' class='btn btn-primary btn-rounded btn-sm' size='2' />" +
+                    "@endif"
+                }
+                // 
+                ,
                 {data: "id"}
             ], aaSorting: [[7, 'asc']],
             columnDefs: [
@@ -360,18 +368,30 @@
             var status = document.getElementById('received_status');
             var status_id = status.options[status.selectedIndex].value;
 
+            var check_invoice_date = document.getElementById('d_auto').value;
+            console.log('check_invoice_date');
+
             if (Number(supplier_id) === 0) {
                 document.getElementById('supplier_warning').style.display = 'block';
                 document.getElementById('period_warning').style.display = 'none';
                 document.getElementById('status_warning').style.display = 'none';
+                document.getElementById('date_warning').style.display = 'none';
                 return false;
             } else if (Number(period_id) < 0) {
                 document.getElementById('period_warning').style.display = 'block';
                 document.getElementById('supplier_warning').style.display = 'none';
                 document.getElementById('status_warning').style.display = 'none';
+                document.getElementById('date_warning').style.display = 'none';
                 return false;
             } else if (Number(status_id) === 0) {
                 document.getElementById('status_warning').style.display = 'block';
+                document.getElementById('supplier_warning').style.display = 'none';
+                document.getElementById('period_warning').style.display = 'none';
+                document.getElementById('date_warning').style.display = 'none';
+                return false;
+            } else if (check_invoice_date === '') {
+                document.getElementById('date_warning').style.display = 'block';
+                document.getElementById('status_warning').style.display = 'none';
                 document.getElementById('supplier_warning').style.display = 'none';
                 document.getElementById('period_warning').style.display = 'none';
                 return false;
@@ -397,6 +417,10 @@
 
         $('#received_status').on('change', function () {
             document.getElementById('status_warning').style.display = 'none';
+        });
+
+        $('#d_auto').on('change', function () {
+            document.getElementById('date_warning').style.display = 'none';
         });
 
         $("#period_id").select2({

@@ -91,7 +91,7 @@ class MaterialReceivedController extends Controller
                 ->join('users', 'users.id', '=', 'inv_incoming_stock.created_by')
                 ->whereBetween(DB::raw('date(inv_incoming_stock.created_at)'), [$from, $to])
                 ->where('supplier_id', $request->supplier_id)
-                ->orderby('id', 'DESC')
+                ->orderby('created_at', 'DESC')
                 ->count();
         } else {
             $totalData = GoodsReceiving::select('inv_incoming_stock.id', 'product_id', 'quantity', 'unit_cost', 'total_cost',
@@ -99,7 +99,7 @@ class MaterialReceivedController extends Controller
                 ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
                 ->join('users', 'users.id', '=', 'inv_incoming_stock.created_by')
                 ->whereBetween(DB::raw('date(inv_incoming_stock.created_at)'), [$from, $to])
-                ->orderby('id', 'DESC')
+                ->orderby('created_at', 'DESC')
                 ->count();
         }
 
@@ -120,7 +120,8 @@ class MaterialReceivedController extends Controller
                     ->where('supplier_id', $request->supplier_id)
                     ->offset($start)
                     ->limit($limit)
-                    ->orderBy($order, $dir)
+                    // ->orderBy($order, $dir)
+                    ->orderby('created_at', 'DESC')
                     ->get();
             } else {
                 $material_received = GoodsReceiving::select('inv_incoming_stock.id', 'product_id', 'quantity', 'unit_cost', 'total_cost',
@@ -130,7 +131,8 @@ class MaterialReceivedController extends Controller
                     ->whereBetween(DB::raw('date(inv_incoming_stock.created_at)'), [$from, $to])
                     ->offset($start)
                     ->limit($limit)
-                    ->orderBy($order, $dir)
+                    // ->orderBy($order, $dir)
+                    ->orderby('created_at', 'DESC')
                     ->get();
             }
         } else {
@@ -152,7 +154,8 @@ class MaterialReceivedController extends Controller
                     ->where('supplier_id', $request->supplier_id)
                     ->offset($start)
                     ->limit($limit)
-                    ->orderBy($order, $dir)
+                    // ->orderBy($order, $dir)
+                    ->orderby('created_at', 'DESC')
                     ->get();
 
                 $totalFiltered = GoodsReceiving::select('inv_incoming_stock.id', 'product_id', 'quantity', 'unit_cost', 'total_cost',
@@ -185,7 +188,8 @@ class MaterialReceivedController extends Controller
                     ->orwhere('users.name', 'LIKE', "%{$search}%")
                     ->offset($start)
                     ->limit($limit)
-                    ->orderBy($order, $dir)
+                    // ->orderBy($order, $dir)
+                    ->orderby('created_at', 'DESC')
                     ->get();
 
                 $totalFiltered = GoodsReceiving::select('inv_incoming_stock.id', 'product_id', 'quantity', 'unit_cost', 'total_cost',
@@ -200,6 +204,7 @@ class MaterialReceivedController extends Controller
                     ->orwhere('total_cost', 'LIKE', "%{$search}%")
                     ->orwhere(DB::raw('date(inv_incoming_stock.created_at)'), 'LIKE', "%{$search}%")
                     ->orwhere('users.name', 'LIKE', "%{$search}%")
+                    ->orderby('created_at', 'DESC')
                     ->count();
 
             }

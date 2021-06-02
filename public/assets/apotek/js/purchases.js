@@ -23,19 +23,9 @@ var cart_table = $('#cart_table').DataTable({
             title: "Action",
             defaultContent: "<div><input type='button' value='Edit' id='edit_btn' class='btn btn-info btn-rounded btn-sm'/><input type='button' value='Delete' id='delete_btn' class='btn btn-danger btn-rounded btn-sm'/></div>"
         }
-    ], "columnDefs": [
-        {
-            "targets": [5],
-            "visible": false,
-            "searchable": false
-        }, {
-            "targets": [6],
-            "visible": false,
-            "searchable": false
-        }
     ]
-
 });
+cart_table.columns([5, 6]).visible(false);
 
 $('#cart_table tbody').on('click', '#edit_btn', function () {
     var quantity;
