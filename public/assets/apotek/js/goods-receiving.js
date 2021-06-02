@@ -1122,7 +1122,7 @@ function invoicesaveInvoiceForm() {
                     document.getElementById('goodreceving_invoice_id').value = '';
                     document.getElementById("invoicing_batch_n").value = '';
                     document.getElementById('invoiceselected-product').value = ''
-                    document.getElementById('invoicing_purchase_date').value = '';
+                    $('#invoicing_purchase_date').val('');
                     deselect();
                 } catch (e) {
                     console.log(e)
