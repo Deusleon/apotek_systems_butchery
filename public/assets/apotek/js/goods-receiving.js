@@ -773,7 +773,9 @@ if(expire_date_enabler === "YES") {
         
 
         row_data.expire_date = document.getElementById("edit_expire_date").value;
-        row_data.quantity = numberWithCommas(document.getElementById("invoice_edit_quantity").value);
+        console.log(document.getElementById("invoice_edit_quantity").value);
+        row_data.quantity =document.getElementById("invoice_edit_quantity").value;
+        console.log(row_data.quantity);
         row_data.buying_price =  formatMoney(document.getElementById("edit_buying_price").value);
         row_data.selling_price = formatMoney(document.getElementById("edit_selling_price").value);
 
