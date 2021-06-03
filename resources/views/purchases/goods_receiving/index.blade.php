@@ -662,6 +662,21 @@
             });
         });
 
+        $(function () {
+            var start = moment();
+            var end = moment();
+
+            $('#edit_expire_date').daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                minDate: +0,
+                autoUpdateInput: false,
+                locale: {
+                    format: 'DD-M-YYYY'
+                }
+            });
+        });
+
         // $("datetimepicker2").datepicker({ changeYear: true, dateFormat: 'dd/mm/yy', showOn: 'none', showButtonPanel: true,  minDate:'0d' });
 
         //Expire Date
@@ -689,6 +704,14 @@
         });
 
         $('input[name="invoicing_purchase_date"]').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+        });
+
+        $('input[name="edit_expire_date"]').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD-MM-YYYY'));
+        });
+
+        $('input[name="edit_expire_date"]').on('cancel.daterangepicker', function (ev, picker) {
             $(this).val('');
         });
 

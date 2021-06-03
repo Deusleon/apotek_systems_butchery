@@ -644,7 +644,7 @@ $('#invoicecart_table tbody').on('click', '#edit_btn', function() {
         buying_price = row_data.buying_price.toString().replace(',', '');
         selling_price = row_data.selling_price.toString().replace(',', '');
         expire_date = row_data.expire_date;
-        let tommorow = moment().add(1, 'days').format("DD-M-YYYY");
+        let tommorow = moment().add(1, 'days').format("YYYY-MM-DD");
         console.log(tommorow);
         console.log(expire_date);
         row_data.quantity = `<input style='width: 90%' type='text' class='form-control' id='invoice_edit_quantity' value=${quantity}  required/>`;
@@ -652,7 +652,7 @@ $('#invoicecart_table tbody').on('click', '#edit_btn', function() {
         row_data.selling_price = `<input style='width: 90%' type='text' class='form-control inventedAction' id='edit_selling_price' onchange='invoiceamountCheck()'  value=${selling_price}  required/>`;
 
         if(expire_date_enabler === "YES") {
-            row_data.expire_date = `<input style='width: 90%' type='date' class='form-control' id='edit_expire_date' min="${tommorow}" value=${expire_date} autocomplete="off" required/>`;
+            row_data.expire_date = `<input style='width: 90%' type='date' class='form-control' id='edit_expire_date' min="${tommorow}" value="${expire_date}" required/>`;
         }
         console.log(row_data.expire_date);
         invoice_cart[index] = row_data;
@@ -666,6 +666,7 @@ $('#invoicecart_table tbody').on('click', '#edit_btn', function() {
     }
 
 });
+
 
 
 $('#invoicecart_table tbody').on('change', 'input.inventedAction', function() {
@@ -682,9 +683,9 @@ $('#invoicecart_table tbody').on('change', 'input.inventedAction', function() {
     console.log(document.getElementById("edit_expire_date").value);
     
     if(expire_date_enabler === "YES") {
-        let tommorow = moment().add(1, 'days').format("DD-M-YYYY");
-        let expire_date = moment().format("DD-M-YYYY");
-        let check_expire_date =  `<input style='width: 90%' type='date' class='form-control' id='edit_expire_date' min="${tommorow}" value=${expire_date} autocomplete="off" required/>`;
+        let tommorow = moment().add(1, 'days').format("YYYY-MM-DD");
+        let expire_date = '';
+        let check_expire_date =  `<input style='width: 90%' type='date' class='form-control' id='edit_expire_date' min="${tommorow}" value=${expire_date} required/>`;
         console.log(check_expire_date);
         if ( row_data.expire_date == check_expire_date ) {
 
@@ -725,9 +726,9 @@ $('#invoicecart_table tbody').on('change', '#invoice_edit_quantity', function ()
     row_data.selling_price = formatMoney(document.getElementById("edit_selling_price").value);
     
     if(expire_date_enabler === "YES") {
-        let tommorow = moment().add(1, 'days').format("DD-M-YYYY");
-        let expire_date = moment().format("DD-M-YYYY");
-        let check_expire_date =  `<input style='width: 90%' type='date' class='form-control' id='edit_expire_date' min="${tommorow}" value=${expire_date} autocomplete="off" required/>`;
+        let tommorow = moment().add(1, 'days').format("YYYY-MM-DD");
+        let expire_date = '';
+        let check_expire_date =  `<input style='width: 90%' type='date' class='form-control' id='edit_expire_date' min="${tommorow}" value=${expire_date} required/>`;
         console.log(check_expire_date);
         if ( row_data.expire_date == check_expire_date ) {
 
@@ -760,7 +761,7 @@ if(expire_date_enabler === "YES") {
         edit_btn_set = 0;
         var row_data = invoicecart_table.row($(this).parents('tr')).data();
         var index = invoicecart_table.row($(this).parents('tr')).index();
-        let check_expire_date = moment().format("DD-M-YYYY");
+        let check_expire_date = moment().format("YYYY-MM-DD");
 
         if ( document.getElementById("edit_expire_date").value == check_expire_date ) {
 
@@ -857,7 +858,7 @@ function invoicevaluesCollection() {
     var product_id = selected_fields[1];
     let selling_price = 0;
     let buying_price = 0;
-    let expire_date = moment().format("DD-M-YYYY");
+    let expire_date = moment().format("YYYY-MM-DD");
 
     /*set the global variable*/
     product_ids = product_id;
@@ -882,7 +883,7 @@ function invoicevaluesCollection() {
         item.quantity = invoice_qty;
         item.selling_price = selling_price;
         item.buying_price = buying_price;
-        item.expire_date = expire_date;
+        item.expire_date = '';
 
 
         if (invoice_cart.some(function(element) {
@@ -1074,7 +1075,7 @@ $('#invoiceFormId').on('submit', function(e) {
     }
 
      //Check for Expire Date
-     let check_expire_date = moment().format("DD-M-YYYY");
+     let check_expire_date = moment().format("YYYY-MM-DD");
 
 
     for (i = 0; i < invoice_cart.length; i++) {
