@@ -185,7 +185,7 @@
 
                     <input type="hidden" id="invoice_received_cart" name="cart">
                     <input type="hidden" name="store" id="store_id" value = "{{$default_store_id}}">
-                    <input type="hidden" id="expire_date_enabler" value = "{{$expire_date}}">
+                    <input type="hidden" name="expire_date" id="expire_date_enabler" value = "{{$expire_date}}">
                     <input type="hidden" name="invoice_price_category" id="price_category_for_all">
                     <input type="hidden" name="" id="buy">
                     <input type="hidden" name="batch_setting" id="batch_setting" value="{{$batch_setting}}">
@@ -657,6 +657,22 @@
                 autoUpdateInput: false,
                 locale: {
                     format: 'DD-M-YYYY'
+                },
+                drops: "up"
+            });
+        });
+
+        $(function () {
+            var start = moment();
+            var end = moment();
+
+            $('#edit_expire_date').daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                minDate: +0,
+                autoUpdateInput: false,
+                locale: {
+                    format: 'DD-M-YYYY'
                 }
             });
         });
@@ -681,14 +697,6 @@
             $(this).val('');
         });
 
-        //Invoice Expire Date
-        $('input[name="edit_expire_date"]').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('MM/DD/YYYY'));
-        });
-
-        $('input[name="edit_expire_date"]').on('cancel.daterangepicker', function (ev, picker) {
-            $(this).val('');
-        });
 
         //invoicing_purchase_date
         $('input[name="invoicing_purchase_date"]').on('apply.daterangepicker', function (ev, picker) {
@@ -699,13 +707,14 @@
             $(this).val('');
         });
 
-        $('input[name="invoicing_purchase_date"]').on('apply.daterangepicker', function (ev, picker) {
+        $('input[name="edit_expire_date"]').on('apply.daterangepicker', function (ev, picker) {
             $(this).val(picker.startDate.format('DD-MM-YYYY'));
         });
 
-        $('input[name="invoicing_purchase_date"]').on('cancel.daterangepicker', function (ev, picker) {
+        $('input[name="edit_expire_date"]').on('cancel.daterangepicker', function (ev, picker) {
             $(this).val('');
         });
+
 
         $('#invoice_ids').select2({
             dropdownParent: $("#receive")
@@ -713,7 +722,9 @@
 
     </script>
 
-    <script src="{{asset("assets/apotek/js/goods-receiving.js")}}"></script>
     <script src="{{asset("assets/apotek/js/notification.js")}}"></script>
+    <script src="{{asset("assets/apotek/js/goods-receiving.js")}}"></script>
+    <script src="{{asset("assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js")}}"></script>
+    <script src="{{asset("assets/js/pages/ac-datepicker.js")}}"></script>
 
 @endpush

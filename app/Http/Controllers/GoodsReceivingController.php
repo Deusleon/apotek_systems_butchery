@@ -191,7 +191,7 @@ class GoodsReceivingController extends Controller
         }
 
         if ($request->ajax()) {
-
+            // dd($request);
             $cart = json_decode($request->cart, true);
 
             $quantity = $cart['quantity'];
@@ -657,8 +657,12 @@ class GoodsReceivingController extends Controller
                     $update_stock = CurrentStock::find($current_stock->first()->id);
                     $update_stock->batch_number = $request->batch_number;
 
-                    if ($request->expire_date != null) {
+                    if ($request->expire_date == "YES") {
+                        if ($single_item['expire_date'] != null) {
                         $update_stock->expiry_date = date('Y-m-d', strtotime($single_item['expire_date']));
+                        } else {
+                            $update_stock->expiry_date = null;    
+                        }
                     } else {
                         $update_stock->expiry_date = null;
                     }
@@ -671,8 +675,14 @@ class GoodsReceivingController extends Controller
                     $stock = new CurrentStock;
                     $stock->product_id = $item_product_id;
                     $stock->batch_number = $request->batch_number;
-                    if ($request->expire_date != null) {
-                        $stock->expiry_date = date('Y-m-d', strtotime($single_item['expire_date']));
+                    if ($request->expire_date == "YES") {
+
+                        if ($single_item['expire_date'] != null) {
+                            $stock->expiry_date = date('Y-m-d', strtotime($single_item['expire_date']));
+                        } else {
+                            $stock->expiry_date = null;    
+                        }
+
                     } else {
                         $stock->expiry_date = null;
                     }
@@ -711,8 +721,14 @@ class GoodsReceivingController extends Controller
                 $incoming_stock->supplier_id = $request->supplier;
                 $incoming_stock->invoice_no = $request->invoice_no;
                 $incoming_stock->batch_number = $request->batch_number;
-                if ($request->expire_date != null) {
-                    $incoming_stock->expire_date = date('Y-m-d',strtotime($single_item['expire_date']));
+                if ($request->expire_date == "YES") {
+
+                    if ($single_item['expire_date'] != null) {
+                        $incoming_stock->expire_date = date('Y-m-d', strtotime($single_item['expire_date']));
+                    } else {
+                        $incoming_stock->expire_date = null;    
+                    }
+
                 } else {
                     $incoming_stock->expire_date = null;
                 }

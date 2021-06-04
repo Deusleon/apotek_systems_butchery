@@ -502,6 +502,10 @@
                     xs_flag = 1;
                 }
 
+                if ($('#edit_expire_date').is(':focus')) {
+                    xs_flag = 1;
+                }
+
             }
 
             if (xs_flag === 0) {

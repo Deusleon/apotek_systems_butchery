@@ -64,6 +64,7 @@
     <script type="text/javascript">
 
         var config = {
+            managePurchaseHistory : '{{auth()->user()->hasPermissionTo('Manage Purchase Order History')}}',
             routes: {
                 getOrderHistory: '{{route('getOrderHistory')}}'
 

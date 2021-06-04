@@ -29,6 +29,7 @@
                                         <input type="text" class="form-control" id="date_edit" name="invoice_date"
                                                aria-describedby="emailHelp"
                                                autocomplete="off" required="true" onchange="editdueDate()">
+                                        <span id="date_warning" style="display: none; color: red; font-size: 0.9em">Invoice Date required</span>
                                     </div>
                                 </div>
                                 <div class="col-md-4">

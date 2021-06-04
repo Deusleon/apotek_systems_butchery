@@ -85,7 +85,7 @@
                         @endforeach
                     </select>
                 </div>
-
+                <input type="hidden" id="expire_date_enabler" value = "{{$expire_date}}">
                 <div id="tbody1" class="table-responsive">
                     <table id="received_material_table" class="display table nowrap table-striped table-hover"
                            style="width:100%">
@@ -221,7 +221,7 @@
 
                 $("#received_material_table").dataTable().fnDestroy();
 
-                $('#received_material_table').DataTable({
+                var received_material_table = $('#received_material_table').DataTable({
                     "processing": true,
                     "serverSide": true,
                     "ajax": {
@@ -251,7 +251,7 @@
                         },
                         {
                             data: 'expire_date', render: function (expire_date) {
-                                var date = moment(expire_date).format('DD-MM-Y');
+                                var date = moment(expire_date).format('DD-MM-YYYY');
                                 if (date === 'Invalid date') {
                                     return '';
                                 }
@@ -283,25 +283,11 @@
 
                 });
 
-                {{--$.ajax({--}}
-                {{--    url: '{{route('getMaterialsReceived')}}',--}}
-                {{--    data: {--}}
-                {{--        "_token": '{{ csrf_token() }}',--}}
-                {{--        "product_id": product_id,--}}
-                {{--        "supplier_id": supplier_id,--}}
-                {{--        "date": date--}}
-                {{--    },--}}
-                {{--    type: 'get',--}}
-                {{--    dataType: 'json',--}}
-                {{--    success: function (data) {--}}
-                {{--        received_material_table.clear();--}}
-                {{--        received_material_table.rows.add(data[0][0]);--}}
-                {{--        received_material_table.draw();--}}
-                {{--    },--}}
-                {{--    complete: function () {--}}
-                {{--        // $('#loading').hide();--}}
-                {{--    }--}}
-                {{--});--}}
+                var expire_date_enabler = document.getElementById("expire_date_enabler").value;
+                console.log(expire_date_enabler);
+                if(expire_date_enabler === "NO") {
+                    received_material_table.column(4).visible(false);
+                }
             }
         }
 
