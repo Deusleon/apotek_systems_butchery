@@ -512,6 +512,7 @@ class AccountingReportController extends Controller
                 ->select('inv_products.id as id', 'name', 'price', 'stock_id')
                 ->first('price');
 
+            if ($product) {
                 array_push($raw_prices_data, array(
                     'name' => $product->name ?? '',
                     'quantity' => $detail->quantity,
@@ -524,6 +525,7 @@ class AccountingReportController extends Controller
                     'capital_invested' => ($product->currentStock['unit_cost'] ?? 0.00) * $detail->quantity,
                     'date' => $detail->dates
                 ));
+            }
 
         }
 

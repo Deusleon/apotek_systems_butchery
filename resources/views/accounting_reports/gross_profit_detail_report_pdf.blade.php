@@ -153,7 +153,7 @@
                             <td align="right">{{number_format($item['buy_price'],2)}}</td>
                             <td align="right">{{number_format($item['sell_price'],2)}}</td>
                             <td align="right">
-                                <div style="margin-right: 50%">{{number_format($item['quantity'])}}</div>
+                                <div style="margin-right: 50%">{{number_format($item['quantity'],2)}}</div>
                             </td>
                             <td align="right">{{number_format($item['amount'],2)}}</td>
                             <td align="right">{{number_format($item['profit'],2)}}</td>
