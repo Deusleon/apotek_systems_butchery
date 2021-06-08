@@ -33,7 +33,7 @@ class PurchaseOrderListController extends Controller
 
         $from = Carbon::parse($request->date[0]);
         $to =  Carbon::parse($request->date[1]);
-        $order_history = Order::whereBetween('ordered_at', [$from, $to])->get();
+        $order_history = Order::whereBetween('ordered_at', [$from, $to])->orderByDesc('ordered_at')->get();
         foreach ($order_history as $value) {
             $value->supplier;
             $value->details;

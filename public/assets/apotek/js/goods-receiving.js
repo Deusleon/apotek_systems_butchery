@@ -230,7 +230,7 @@ function deselect() {
     cart_table.clear();
     cart_table.rows.add(cart);
     cart_table.draw();
-    document.getElementById("received_cart").value = JSON.stringify(cart);
+    // document.getElementById("received_cart").value = JSON.stringify(cart);
     document.getElementById("total_selling_price").value = '0.00';
     document.getElementById("total_buying_price").value = '0.00';
     document.getElementById("sub_total").value = '0.00';
@@ -309,12 +309,16 @@ function orderReceive(items, supplier) {
 
     $('#cancel').on('click', function () {
         receive_cart = [];
+        localStorage.setItem("back", 'back');
+        localStorage.setItem("items", JSON.stringify(''));
+        localStorage.setItem("supplier", '');
+        
         document.getElementById('purchases').style.display = 'block';
         document.getElementById('dates').style.display = 'block';
         document.getElementById('dates_1').style.display = 'block';
         document.getElementById('items').style.display = 'none';
 
-        getPurchaseHistory();
+        // getPurchaseHistory();
     });
 
 }
@@ -560,7 +564,7 @@ $('#order_reveice').on('submit', function (e) {
 });
 
 $('#daterange').change(function () {
-    getPurchaseHistory();
+    // getPurchaseHistory();
 
 });
 
@@ -1125,7 +1129,7 @@ function invoicesaveInvoiceForm() {
                     document.getElementById('goodreceving_invoice_id').value = '';
                     document.getElementById("invoicing_batch_n").value = '';
                     document.getElementById('invoiceselected-product').value = ''
-                    $('#invoicing_purchase_date').val('');
+                    // $('#invoicing_purchase_date').val('');
                     deselect();
                 } catch (e) {
                     console.log(e)

@@ -39,12 +39,12 @@ $(document).ready(function () {
     var tomorrow = new Date(date.getFullYear(), date.getMonth(), (date.getDate() + 1));
     var end = new Date(date.getFullYear(), date.getMonth(), (date.getDate() + 1));
 
-    $('#expire_date_1').datepicker({
-        format: "dd-mm-yyyy",
-        startDate: tomorrow,
-        autoclose: true,
-        changeYear: true
-    });
+    // $('#expire_date_1').datepicker({
+    //     format: "dd-mm-yyyy",
+    //     startDate: tomorrow,
+    //     autoclose: true,
+    //     changeYear: true
+    // });
     $('#expire_date_2').datepicker({
         autoclose: true,
         todayHighlight: true,

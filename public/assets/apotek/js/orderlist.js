@@ -12,6 +12,7 @@ var order_history_datatable = $('#order_history_datatable').DataTable({
     searching: true,
     bPaginate: true,
     bInfo: true,
+    ordering: false,
     columns: [
         {data: 'order_number'},
         {data: 'supplier.name'},

@@ -97,6 +97,7 @@ class SaleController extends Controller
 
         $payments = SalesCredit::join('sales', 'sales.id', '=', 'sales_credits.sale_id')
             ->join('customers', 'customers.id', '=', 'sales.customer_id')
+            ->orderByDesc('created_at')
             ->get();
         return view('sales.payment_history.index', compact('payments', 'customers'));
     }

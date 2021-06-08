@@ -57,15 +57,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach($payments as $payment)
-                                @if($payment->paid_amount != 0)
-                                    <tr>
-                                        <td>{{$payment->name}}</td>
-                                        <td>{{date('d-m-Y', strtotime($payment->created_at))}}</td>
-                                        <td>{{number_format($payment->paid_amount,2)}}</td>
-                                    </tr>
-                                @endif
-                            @endforeach
+                            
                             </tbody>
                         </table>
                     </div>
@@ -108,7 +100,7 @@
                             targets: [1]
                         }
                     ],
-                    order: [[1, "desc"]]
+                    ordering: false
                 });
 
                 let payment_history_filter_table = $('#fixed-header-filter').DataTable({
@@ -131,7 +123,7 @@
                             targets: [1]
                         }
                     ],
-                    order: [[1, "desc"]],
+                    ordering: false,
                     // aaSorting: [[1, "desc"]]
                 });
 
@@ -177,9 +169,18 @@
 
                 $(function () {
 
+                    var start = moment();
+                    var end = moment();
+
+                    function cb(start, end) {
+                        $('#receive_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                    }
+
                     $('#sales_date').daterangepicker({
                         startDate: moment().startOf('month'),
-                        autoUpdateInput: false,
+                        endDate: moment().endOf('month'),
+                        autoUpdateInput: true,
+
                         ranges: {
                             'Today': [moment(), moment()],
                             'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -189,7 +190,8 @@
                             'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
                             'This Year': [moment().startOf('year'), moment()]
                         }
-                    });
+                    }, cb);
+                    cb(start, end);
 
                     $('input[name="date_of_sale"]').on('apply.daterangepicker', function (ev, picker) {
                         $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
