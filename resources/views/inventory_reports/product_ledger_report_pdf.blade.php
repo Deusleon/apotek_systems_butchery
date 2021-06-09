@@ -110,12 +110,12 @@
                         <td>{{$item['date']}}</td>
                         <td>{{$item['method']}}</td>
                         <td style="text-align: right;">
-                            <div style="margin-right: 50%">{{number_format($item['received'])}}</div>
+                            <div style="margin-right: 50%">{{number_format($item['received']), 2}}</div>
                         </td>
                         <td style="text-align: right;">
-                            <div style="margin-right: 50%">{{number_format($item['outgoing'])}}</div>
+                            <div style="margin-right: 50%">{{number_format($item['outgoing'], 2)}}</div>
                         </td>
-                        <td style="text-align: right;">{{number_format($item['balance'])}}</td>
+                        <td style="text-align: right;">{{number_format($item['balance'], 2)}}</td>
                     </tr>
                 @endforeach
                 {{--            @endforeach--}}
