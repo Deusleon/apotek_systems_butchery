@@ -61,6 +61,7 @@ class ProductLedgerController extends Controller
                     ->join('users', 'users.id', '=', 'product_ledger.user')
                     ->where('store_id', $default_store_id)
                     ->where('product_id', $request->product_id)
+                    ->orderBy('product_ledger.id', 'DESC')
                     ->get();
 
                 $results = $this->sumProductFilterTotals($ledger, $current_stock);
@@ -84,6 +85,7 @@ class ProductLedgerController extends Controller
                     ->select(DB::raw('*'), DB::raw('(received + outgoing) as quantity'))
                     ->join('users', 'users.id', '=', 'product_ledger.user')
                     ->where('product_id', $request->product_id)
+                    ->orderBy('product_ledger.id', 'DESC')
                     ->whereBetween('date', [$request->date, date('Y-m-d')]);
 
                 $ledger = $previous_ledger->union($current_ledger)->get();
