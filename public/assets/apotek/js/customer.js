@@ -77,7 +77,7 @@ function validateMobile(input, errorMsg, validMsg, action) {
             customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
                 return "e.g. " + selectedCountryPlaceholder;
             },
-            initialCountry: "auto",
+            initialCountry: "tz",
             geoIpLookup: function (callback) {
                 $.get('https://ipinfo.io', function () {
                 }, "jsonp").always(function (resp) {
@@ -94,7 +94,7 @@ function validateMobile(input, errorMsg, validMsg, action) {
             customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
                 return "e.g. " + selectedCountryPlaceholder;
             },
-            initialCountry: "auto",
+            initialCountry: "tz",
             geoIpLookup: function (callback) {
                 $.get('https://ipinfo.io', function () {
                 }, "jsonp").always(function (resp) {

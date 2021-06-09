@@ -242,7 +242,41 @@
                             <th>id</th>
                         </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody>
+                        @foreach($orders as $order)
+                            <tr>
+                                <td> {{$order->order_number}}</td>
+                                <td> {{$order->supplier['name']}}</td>
+                                <td>{{date('M d, Y',strtotime($order->ordered_at))}}</td>
+                                <td> {{number_format($order->total_amount,2)}}</td>
+                                <td>
+                                    @if ($order->status == '1')
+                                        <span class='badge badge-secondary'>Pending</span>
+                                    @elseif($order->status == '2')
+                                        <span class='badge badge-info'>Partial Received</span>
+                                    @elseif($order->status == '3')
+                                        <span class='badge badge-success'>Received</span>
+                                    @endif
+                                </td>
+                                @if($order->status == '3')
+                                    <td>
+                                        <button class="btn btn-sm btn-rounded btn-info"
+                                                onclick="orderReceive({{$order->details}})"
+                                        >Preview Order
+                                        </button>
+                                    </td>
+                                @else
+                                    <td>
+                                        <button id="receive_order_btn" class="btn btn-sm btn-rounded btn-warning"
+                                                onclick="orderReceive({{$order->details}},{{$order->supplier['id']}})"
+                                        >Receive Order
+                                        </button>
+                                    </td>
+                                @endif
+                                <td hidden>{{$order->id}}</td>
+                            </tr>
+                        @endforeach
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -476,6 +510,9 @@
         // console.log(datas[0].details);
 
         var config = {
+            vals: {
+                expire_date: @json($expire_date)
+            },
             routes: {
                 goodsreceiving: '{{route('receiving-price-category')}}',
                 invoiceItemPrice: '{{route('receiving-item-prices')}}',

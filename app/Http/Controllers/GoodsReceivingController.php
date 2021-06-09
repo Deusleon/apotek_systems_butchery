@@ -426,6 +426,7 @@ class GoodsReceivingController extends Controller
     public function filterInvoice(Request $request)
     {
         if ($request->ajax()) {
+            dd($request);
             $invoices = Invoice::select('invoice_no', 'id')
                 ->where('supplier_id', $request->supplier_id)
                 ->get();

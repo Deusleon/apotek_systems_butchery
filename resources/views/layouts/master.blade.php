@@ -34,6 +34,9 @@
           rel="stylesheet">
     <link href="{{asset("assets/plugins/daterangepicker-master/css/daterangepicker.css")}}" rel="stylesheet">
 
+    <link href="{{asset("assets/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css")}}"
+          rel="stylesheet">
+
     @yield("page_css")
 
 

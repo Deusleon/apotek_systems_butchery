@@ -55,18 +55,19 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 @if($expire_date === "YES")
-                                    <label for="batch_number">Expire Date</label>
-                                    <input type="text" name="expire_date" class="form-control" id="expire_date_1"
-                                           autocomplete="off">
+                                    <label for="expire_date">Expire Date</label>
+                                    <!-- <input type="text" name="expire_date" class="form-control" id="expire_date_1"
+                                            autocomplete="off"> -->
+                                    <input type="text" name = "expire_date" class="form-control" id="expire_date_1">
                                     <div class="form-group form-check">
                                         <input type="checkbox" class="form-check-input" id="expire_check_id"
-                                               style="padding:10px" value="true" onchange="findchecked()">
+                                                style="padding:10px" value="true" onchange="findchecked()">
                                         <label class="form-check-label" for="expire_check">No Expire Date</label>
                                     </div>
                                 @else
                                     <label for="batch_number">Expire Date</label>
                                     <input type="text" name="expire_date" class="form-control" id="expire_date_1"
-                                           autocomplete="off" readonly disabled>
+                                            autocomplete="off" readonly disabled>
                                 @endif
                             </div>
                         </div>

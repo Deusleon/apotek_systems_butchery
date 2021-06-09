@@ -291,57 +291,6 @@
             }
         }
 
-        // var received_material_table = $('#received_material_table').DataTable({
-        //     searching: true,
-        //     bPaginate: true,
-        //     bInfo: false,
-        //     columns: [
-        //         {data: 'id'},
-        //         {data: 'product.name'},
-        //         {
-        //             data: 'quantity', render: function (data) {
-        //                 return numberWithCommas(parseFloat(data));
-        //             }
-        //         },
-        //         {
-        //             data: 'unit_cost', render: function (unit_cost) {
-        //                 return formatMoney(unit_cost)
-        //             }
-        //         },
-        //         {
-        //             data: 'expire_date', render: function (expire_date) {
-        //                 var date = moment(expire_date).format('DD-MM-Y');
-        //                 if (date === 'Invalid date') {
-        //                     return '';
-        //                 }
-        //                 return date;
-        //             }
-        //         },
-        //         {
-        //             data: 'total_cost', render: function (total_cost) {
-        //                 return formatMoney(total_cost)
-        //             }
-        //         },
-        //         {
-        //             data: 'created_at', render: function (date) {
-        //                 return moment(date).format('DD-MM-Y');
-        //             }
-        //         },
-        //         {data: 'user.name'},
-        //         {
-        //             data: 'action',
-        //             defaultContent: "<div><input type='button' value='Edit' id='edit_btn' class='btn btn-info btn-rounded btn-sm'/><input type='button' value='Delete' id='delete_btn' class='btn btn-danger btn-rounded btn-sm'/></div>"
-        //         }
-        //     ],
-        //     "columnDefs": [
-        //         {
-        //             "targets": [0],
-        //             "visible": false
-        //         }
-        //     ],
-        //     "order": [[0, "desc"]]
-        // });
-
         $('#expire_date_edit').keydown(function (event) {
             return false;
         });
