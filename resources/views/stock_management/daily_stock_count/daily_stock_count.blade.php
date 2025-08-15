@@ -93,10 +93,18 @@
 
 </head>
 <body>
-
-<h4 align="center">{{$pharmacy['name']}}</h4>
-<h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
-<h2 align="center" style="margin-top: -2%">Daily Stock Count</h2>
+<div class="row">
+    <div id="container"  align="center">
+        @if($pharmacy['logo'])
+            <div class="logo-container">
+                <img src="{{public_path('fileStore/logo/'.$pharmacy['logo'])}}"/>
+            </div>
+        @endif
+    </div>
+</div>
+<h3 align="center" style="margin-top: 2%">Daily Stock Count</h3>
+<h3 align="center" style="margin-top: 2%">{{$pharmacy['name']}}</h3>
+<h6 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h6>
 
 <div class="row" style="margin-top: 10%">
     <div class="col-md-12">
@@ -104,8 +112,10 @@
             <thead>
             <tr style="background: #1f273b; color: white;">
                 <th>Product Name</th>
-                <th>Sold Quantity</th>
-                <th>Quantity On Hand</th>
+                <th>Brand</th>
+                <th>Pack Size</th>
+                <th>Sold Qty</th>
+                <th>QOH</th>
             </tr>
             </thead>
 
@@ -113,11 +123,13 @@
             @foreach($data as $datas)
                 <tr>
                     <td>{{ $datas['product_name']}}</td>
+                    <td>{{ $datas['brand'] ?? 'N/A'}}</td>
+                    <td>{{ $datas['pack_size'] ?? 'N/A'}}</td>
                     <td align="right">
-                        <div style="margin-right: 50%">{{number_format($datas['quantity_sold'])}}</div>
+                        <div style="margin-right: 50%">{{ number_format($datas['quantity_sold'],0) }}</div>
                     </td>
                     <td align="right">
-                        <div style="margin-right: 50%">{{number_format($datas['quantity_on_hand'])}}</div>
+                        <div style="margin-right: 50%">{{ number_format($datas['quantity_on_hand'],0) }}</div>
                     </td>
                 </tr>
             @endforeach

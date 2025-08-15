@@ -24,7 +24,7 @@ class AccountingReportController extends Controller
     public function index()
     {
         $price_categories = PriceCategory::all();
-        $stores = Store::all();
+        $stores = Store::where('name','<>','ALL')->get();
         return view('accounting_reports.index', compact('price_categories', 'stores'));
     }
 
@@ -319,7 +319,7 @@ class AccountingReportController extends Controller
         $date[0] = date('Y-m-d', strtotime($dates[0]));
         $date[1] = date('Y-m-d', strtotime($dates[1]));
 
-        /*sale date only*/
+        /*Sales Date only*/
         $user_sales_date = Sale::select(DB::Raw("date(date) as date"))
             ->whereBetween(DB::Raw("date(date)"), [$date[0], $date[1]])
             ->orderby('id', 'asc')->groupby(DB::Raw("date(date)"))->get();

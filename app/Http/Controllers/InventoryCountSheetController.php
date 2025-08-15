@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\CurrentStock;
 use App\Setting;
 use App\Store;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use PDF;
 
@@ -19,7 +20,7 @@ class InventoryCountSheetController extends Controller
     public function generateInventoryCountSheetPDF()
     {
         /*get default store*/
-        $default_store = Setting::where('id', 122)->value('value');
+        $default_store = Auth::user()->store->name ?? 'Default Store';
         $stores = Store::where('name', $default_store)->first();
 
         if ($stores != null) {

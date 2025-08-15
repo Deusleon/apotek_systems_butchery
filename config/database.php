@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'softlink'),
+    'default' => env('DB_CONNECTION', 'demo'),
 
     /*
     |--------------------------------------------------------------------------
@@ -43,13 +43,12 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
-        /*ours both online and offline*/
-        'softlink' => [
+        'mysql' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_CONNECTION', 'forge'),
+            'database' => env('DB_DATABASE', 'apotek_systems_dbms'),
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
@@ -63,8 +62,48 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
-        /*ours both online and offline*/
 
+        /*ours both online and offline*/
+        'softlink' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => env('DB_DATABASE', ''),
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+	/*ours both online and offline*/
+//Tanzanite
+	'tanzanite'=>[
+		'driver' =>'mysql',
+		'url' =>env( 'DATABASE_URL'),
+		'host' => '127.0.0.1',
+		'port' =>'3306',
+		'database' =>'tanzanite',
+		'username' =>env('DB_USERNAME','root'),
+		'password' =>env('DB_PASSWORD',''),
+		'unix_socket' =>env('DB_SOCKET', ''),
+		'charset' => 'utf8mb4',
+		'collation' => 'utf8mb4_unicode_ci',
+		'prefix' =>'',
+		'prefix_indexes' =>true,
+		'strict' =>false,
+		'engine' => null,
+		'options' => extension_loaded('pdo_mysql') ? array_filter([
+			PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+		]) : [],
+	],
 
         /*online only*/
 
@@ -95,8 +134,8 @@ return [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
             'host' => '127.0.0.1',
-            'port' => '3306',
-            'database' => 'demo_inventory',
+            'port' =>  env('DB_PORT', '3306'),
+            'database' => env('DB_DATABASE', 'apotek_systems_dbms'),
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
@@ -461,7 +500,141 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
-        /*SIKAFU end*/
+	/*SIKAFU end*/
+
+	/*CL_Pharmaceuticals*/
+        'cl_pharmaceuticals' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'clpharmaceuticals',
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+        /*CL_Pharmaceutics end*/
+
+	/*ELISEC*/
+        'elisec' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'elisec',
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+	/*ELISEC  end*/
+
+	/*NAS Mobile*/
+        'nasmobile' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'nasmobile',
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+	/*NAS Mobile  end*/
+
+	/*ginabuza*/
+        'ginabuza' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'ginabuza',
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+	/*ginabuza end*/
+
+	/*ginambezi*/
+        'ginambezi' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'ginambezi',
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+        /*ginambezi end*/
+
+
+	/*gayapharmacy*/
+        'gayapharmacy' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'gayapharmacy',
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+	/*gayapharmacy end*/
+
 
         /*online only end*/
 

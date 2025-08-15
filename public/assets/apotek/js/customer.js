@@ -1,6 +1,6 @@
 //Create Modal
 $('#create').on('show.bs.modal', function () {
-    var input = document.querySelector("#phone-number");
+    var input = document.querySelector("#phone");
     var errorMsg = document.querySelector("#error-msg");
     var validMsg = document.querySelector("#valid-msg");
     validateMobile(input, errorMsg, validMsg);

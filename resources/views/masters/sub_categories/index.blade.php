@@ -6,7 +6,7 @@
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#">Masters / Product Subcategories</a></li>
+    <li class="breadcrumb-item"><a href="#">General / Product Subcategories</a></li>
 @endsection
 
 @section("content")

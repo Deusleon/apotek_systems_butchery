@@ -50,6 +50,25 @@
     </style>
 
     <div class="col-sm-12">
+        <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link text-uppercase" id="daily-stock-tablist" data-toggle="pill"
+                   href="{{ url('inventory/daily-stock-count') }}" role="tab"
+                   aria-controls="stock_adjustment" aria-selected="true">Daily Stock Count</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active text-uppercase" id="outgoing-stock-tablist" data-toggle="pill"
+                   href="{{ url('inventory/out-going-stock') }}" role="tab"
+                   aria-controls="stock_list" aria-selected="false">Outgoing Stock
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-uppercase" id="count-sheet-tablist"
+                   href="{{ url('inventory/inventory-count-sheet/Inventory Count Sheet') }}" role="tab"
+                   aria-controls="stock_list" aria-selected="false" target="_blank">Inventory Count Sheet
+                </a>
+            </li>
+        </ul>
         <div class="card">
             <div class="card-body">
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
@@ -137,6 +156,18 @@
             </script>
 
             <script src="{{asset("assets/apotek/js/outgoing-stock.js")}}"></script>
+
+            <script>
+                $(document).ready(function() {
+                    // Listen for the click event on the Transfer History tab
+                    $('#daily-stock-tablist').on('click', function(e) {
+                        e.preventDefault(); // Prevent default tab switching behavior
+                        var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
+                        window.location.href = redirectUrl; // Redirect to the URL
+                    });
+
+                });
+            </script>
 
 
     @endpush

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 
 class LoginController extends Controller
@@ -34,14 +34,17 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
-        $company = DB::table('users')->where('business_name',$request->facility)->first();
 
-        if ($company != null){
-                session()->put('db_connection', $company->connection);
-        }else {
-                session()->flash('alert-warning','user created successfully!');
-                return Redirect::back()->withErrors(['Business name not found']);
-        }
+//        $company = DB::table('users')->where('business_name',$request->facility)->first();
+//
+//        if ($company != null){
+//                session()->put('db_connection', $company->connection);
+//        }else {
+//                session()->flash('alert-warning','user created successfully!');
+//                return Redirect::back()->withErrors(['Business name not found']);
+//        }
+
+        session()->put('db_connection', 'demo');
 
         $this->validateLogin($request);
 

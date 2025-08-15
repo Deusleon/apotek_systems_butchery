@@ -56,25 +56,29 @@
         <div class="card">
             <div class="card-body">
                 <div class="tab-pane fade show active" id="new_sale" role="tabpanel" aria-labelledby="new_sale-tab">
-                    <form id="transfer" enctype="multipart/form-data">
-                        @csrf()
+                    <form id="transfer" method="POST" enctype="multipart/form-data">
+                        @csrf
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
+
                                     <label for="code">From</label>
                                     <div id="border" style="border: 2px solid white; border-radius: 6px;">
                                         <select id="from_id" name="from_id"
-                                                class="js-example-basic-single form-control drop"
-                                                onchange="filterTransferByStore()">
-                                            <option selected="true" value="0" disabled="disabled">Select store...
+                                                class="js-example-basic-single form-control drop">
+                                            <option selected="true" value="0" disabled="disabled">Select branch...
                                             </option>
+
                                             @foreach($stores as $store)
                                                 <option value="{{$store->id}}">{{$store->name}}</option>
                                             @endforeach
+
+
+
                                         </select>
                                     </div>
 
-                                    <span id="from_danger" style="display: none; color: red">Please choose store</span>
+                                    <span id="from_danger" style="display: none; color: red">Please choose branch</span>
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -82,25 +86,33 @@
                                     <label for="code">To</label>
                                     <div id="to_border" style="border: 2px solid white; border-radius: 6px;">
                                         <select id="to_id" name="to_id"
-                                                class="js-example-basic-single form-control drop">
-                                            <option selected="true" value="0" disabled="disabled">Select store..
+                                                class="js-example-basic-single form-control drop" disabled>
+                                            <option selected="true" value="0" >Select branch..
                                             </option>
-                                            @foreach($stores as $store)
-                                                <option value="{{$store->id}}">{{$store->name}}</option>
-                                            @endforeach
+                                            @if(Auth::user()->checkPermission('Manage All Branches'))
+                                                @foreach($stores as $store)
+                                                    <option value="{{$store->id}}">{{$store->name}}</option>
+                                                @endforeach
+                                            @endif
+
+                                            @if(!Auth::user()->checkPermission('Manage All Branches'))
+                                                @foreach($stores as $store)
+                                                    <option value="{{$store->id}}" {{ $store->id == Auth::user()->store_id ? 'selected' : '' }}>{{$store->name}}</option>
+                                                @endforeach
+                                            @endif
                                         </select>
                                     </div>
-                                    <span id="to_danger" style="display: none; color: red">Please choose store</span>
+                                    <span id="to_danger" style="display: none; color: red">Please choose branch</span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="code">Products</label>
-                                    <select id="select_id" class="form-control">
-                                        <option selected="true" disabled="disabled" value="">Select Product</option>
+                                    <select id="select_id" class="form-control" disabled>
+                                    <option selected="true" value="" disabled>Select product...</option>
                                         @foreach($products as $stock)
                                             <option
-                                                value="{{$stock->product['name'].','.$stock->quantity.','.$stock->product_id.','.$stock->stock_id}}">{{$stock->product['name']}}</option>
+                                                value="{{$stock->product['name'].' '.$stock->product['pack_size'].','.$stock->quantity.','.$stock->product_id.','.$stock->stock_id}}">{{$stock->product['name']}} {{$stock->product['pack_size']}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -126,6 +138,13 @@
                                 <textarea type="text" class="form-control" id="remarks" name="remark"
                                           maxlength="100"></textarea>
                             </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                <label for="evidence" class="form-label"><span style="color: red;">* </span>Evidence</label>
+                                <input type="file"  class="form-control" id="evidence" name="evidence">
+                                </div>
+                            </div>
                         </div>
                         <hr>
                         <div class="row">
@@ -140,7 +159,7 @@
                                     </a>
                                     <button class="btn btn-warning" id="deselect-all">Clear</button>
                                     <button id="transfer_preview" class="btn btn-secondary">
-                                        <span class="fa fa-print" aria-hidden="true"></span> Transfer & Preview
+                                         Transfer
                                     </button>
                                 </div>
                             </div>
@@ -148,7 +167,6 @@
 
 
                     </form>
-
                 </div>
             </div>
         </div>
@@ -161,24 +179,33 @@
 @push("page_scripts")
 
     @include('partials.notification')
+
+
+
+
     <script src="{{asset("assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js")}}"></script>
     <script src="{{asset("assets/js/pages/ac-datepicker.js")}}"></script>
-
+    <script src="{{asset("assets/apotek/js/stock-transfer.js")}}"></script>
+    <script src="{{asset("assets/apotek/js/notification.js")}}"></script>
 
     <script type="text/javascript">
 
         //dropdown in one remove in another
-        var $drops = $('.drop'),
-            $options = $drops.eq(1).children().clone();
+        //dropdown in one remove in another
+        var $from = $('#from_id');
+        var $to = $('#to_id');
+        var $to_options = $to.html();
 
-        $drops.change(function () {
-            var $other = $drops.not(this),
-                otherVal = $other.val(),
-                newVal = $(this).val(),
-                $opts = $options.clone().filter(function () {
-                    return this.value !== newVal;
-                });
-            $other.html($opts).val(otherVal);
+        $from.on('change', function () {
+            // Trigger product filtering
+            filterTransferByStore();
+
+            // Update 'To' dropdown options
+            var selected_from = $(this).val();
+            $to.html($to_options);
+            if (selected_from !== '0') {
+                $to.find('option[value="' + selected_from + '"]').remove();
+            }
         });
 
         var config = {
@@ -191,8 +218,55 @@
         };
 
     </script>
-    <script src="{{asset("assets/apotek/js/stock-transfer.js")}}"></script>
-    <script src="{{asset("assets/apotek/js/notification.js")}}"></script>
+
+    <script>
+        $(document).ready(function() {
+            // The product list will now populate only after a 'From' branch is selected.
+        });
+
+        function filterTransferByStore() {
+            var from_id = $('#from_id').val();
+
+            /*ajax filter by store*/
+            $('#loading').show();
+            $.ajax({
+                url: config.routes.filterByStore,
+                type: "get",
+                dataType: "json",
+                data: {
+                    from_id: from_id
+                },
+                success: function (data) {
+                    option_data = data;
+                    $('#to_id').prop('disabled', false);
+                    $('#select_id').prop('disabled', false);
+                    $("#select_id option").remove();
+                    $('#select_id').append($('<option>', {
+                        value: '',
+                        text: 'Select Product...',
+                        selected: true,
+                        disabled: true
+                    }));
+                    $.each(data, function (id, detail) {
+                        var displayText = detail.name + ' ' + detail.pack_size;
+                        var valueData = displayText + ',' + detail.quantity + ',' + detail.product_id + ',' + detail.stock_id;
+
+                        $('#select_id').append($('<option>', {
+                            value: valueData,
+                            text: displayText
+                        }));
+                    });
+                },
+                complete: function () {
+                    $('#loading').hide();
+                }
+            });
+
+        }
+
+
+    </script>
+
 
 
 @endpush

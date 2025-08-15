@@ -2,19 +2,33 @@
 
 namespace App;
 
-use App\Category as category;
-use App\CurrentStock as currentStock;
-use App\OrderDetail as orderDetail;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
     protected $table = 'inv_products';
-    protected $fillable = ['name'];
+    protected $fillable = [
+        'name',
+        'barcode',
+        'brand',
+        'pack_size',
+        'category_id',
+        'sub_category_id',
+        'generic_name',
+        'standard_uom',
+        'sales_uom',
+        'purchase_uom',
+        'indication',
+        'dosage',
+        'min_quantinty',
+        'max_quantinty',
+        'type',
+        'status'
+    ];
 
     public function category()
     {
-        return $this->belongsTo(category::class);
+        return $this->belongsTo(Category::class);
     }
 
     public function subCategory()
@@ -24,12 +38,12 @@ class Product extends Model
 
     public function currentStock()
     {
-        return $this->hasMany(currentStock::class, 'product_id');
+        return $this->hasMany(CurrentStock::class, 'product_id');
     }
 
     public function orderDetail()
     {
-        return $this->hasMany(orderDetail::class, 'product_id');
+        return $this->hasMany(OrderDetail::class, 'product_id');
     }
 
     public function order()
@@ -51,5 +65,4 @@ class Product extends Model
     {
         return $this->hasMany(SalesQuoteDetail::class, 'product_id');
     }
-
 }

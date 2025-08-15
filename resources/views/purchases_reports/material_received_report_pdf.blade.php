@@ -148,7 +148,7 @@
                         <td>{{$item->product['id']}}</td>
                         <td>{{$item->product['name']}}</td>
                         <td align="right">
-                            <div style="margin-right: 50%">{{number_format($item->quantity,2)}}</div>
+                            <div style="margin-right: 50%">{{number_format($item->quantity,0)}}</div>
                         </td>
                         <td align="right">{{number_format($item->unit_cost,2)}}</td>
                         <td align="right">{{number_format($item->sell_price,2)}}</td>

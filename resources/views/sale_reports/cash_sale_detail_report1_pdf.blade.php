@@ -134,7 +134,7 @@
                 <tr>
                     <td align="left">{{$loop->iteration}}</td>
                     <td align="left">{{$item['name']}}</td>
-                    <td align="right">{{$item['quantity']}}</td>
+                    <td align="right">{{number_format($item['quantity'],0)}}</td>
                     <td align="right">{{number_format($item['price']/$item['quantity'],2)}}</td>
                     {{--                    <td align="right">{{number_format($item['sub_total'],2)}}</td>--}}
                     {{--                    <td align="right">{{number_format($item['discount'],2)}}</td>--}}

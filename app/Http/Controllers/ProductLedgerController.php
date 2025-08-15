@@ -6,6 +6,7 @@ use App\Setting;
 use App\Store;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ProductLedgerController extends Controller
@@ -14,7 +15,7 @@ class ProductLedgerController extends Controller
 
     public function index()
     {
-        $default_store = Setting::where('id', 122)->value('value');
+        $default_store = Auth::user()->store->name ?? 'Default Store';
         $stores = Store::where('name', $default_store)->first();
 
         if ($stores != null) {
@@ -38,7 +39,7 @@ class ProductLedgerController extends Controller
     {
 
         if ($request->ajax()) {
-            $default_store = Setting::where('id', 122)->value('value');
+            $default_store = Auth::user()->store->name ?? 'Default Store';
             $stores = Store::where('name', $default_store)->first();
 
             if ($stores != null) {
@@ -159,9 +160,7 @@ class ProductLedgerController extends Controller
         $total = 0;
         $toMainView = array();
 
-//        dd($ledger);
-
-        $default_store = Setting::where('id', 122)->value('value');
+        $default_store = Auth::user()->store->name ?? 'Default Store';
         $stores = Store::where('name', $default_store)->first();
 
         if ($stores != null) {

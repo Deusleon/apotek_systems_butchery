@@ -16,12 +16,13 @@ class RoleController extends Controller
         $roles = Role::get();
         $permissions = Permission::get();
 
+
         return view("roles.index", compact("roles", "permissions"));
     }
 
     public function create()
     {
-        $permissions = Permission::get();
+        $permissions = Permission::get()->groupBy('category')->sortKeys();
         return view("roles.create", compact("permissions"));
     }
 
@@ -50,7 +51,7 @@ class RoleController extends Controller
         $role = Role::find($id);
 
         $AssignedPermissions = DB::select("SELECT permission_id id FROM role_has_permissions where role_id = " . $id . "");
-        $permissionsAll = Permission::get();
+        $permissionsAll = Permission::get()->groupBy('category')->sortKeys();
 
         $permissionsAssigned = [];
         foreach ($AssignedPermissions as $p) {

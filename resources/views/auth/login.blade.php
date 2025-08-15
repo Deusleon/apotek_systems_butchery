@@ -33,7 +33,7 @@
             <div class="card-body text-center">
 
                 <form method="POST" action="{{ route('login') }}">
-                    @csrf
+                    @CSRF
                     <div class="mb-4">
                         <i class="feather icon-unlock auth-icon"></i>
                     </div>
@@ -62,7 +62,7 @@
                     </div>
                     <div class="input-group mb-4">
                         <input id="facility" type="text"
-                               class="form-control" name="facility" required placeholder="Business Name">
+                               class="form-control" name="facility" required placeholder="Business Name" value="demo" hidden>
                     </div>
                     {{--                    <div style="margin-top: -6%;">--}}
                     {{--                        @if($errors->any())--}}

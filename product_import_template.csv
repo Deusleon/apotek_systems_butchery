@@ -1,0 +1,2 @@
+Product Name*,Brand*,Pack Size*,Unit*,Min Stock*,Max Stock*,Barcode,Category,Type (stockable/consumable),"Status (1=active, 0=inactive)"
+Sample Product,Sample Brand,100 tablets,tablets,10,100,1234567890,Medicine,stockable,1

@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<?php
+
+use App\Store;
+use Illuminate\Support\Facades\Auth;
+
+$all_stores = Store::all();
+
+$store_id = Auth::user()->store_id;
+
+?>
+
 <head>
     <title>APOTEk System</title>
 
@@ -8,6 +19,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <!-- Favicon icon -->
+{{--    <link rel="shortcut icon" type="image/x-icon" href="{{asset("fileStore/php6J3S8Q.png")}}">--}}
     <link rel="shortcut icon" type="image/x-icon" href="{{asset("APOTEk2.ico")}}">
     <!-- range slider -->
     <link rel="stylesheet" href="{{asset("/assets/plugins/range-slider/css/bootstrap-slider.min.css")}}">
@@ -135,6 +147,43 @@
             left: 30px;
         }
 
+        .alert-top-right {
+            position: fixed;
+            top: 20px; /* Adjust this value to move the alert up or down */
+            right: 20px; /* Adjust this value to move the alert left or right */
+            z-index: 9999; /* Ensures the alert is above other content */
+            width: auto;
+            max-width: 400px; /* Increased width for better readability */
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Adds a shadow for better visibility */
+            border-radius: 8px;
+            border: none;
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-top-right .close {
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .alert-top-right .close:hover {
+            opacity: 1;
+        }
+
+        .alert-top-right i {
+            margin-right: 8px;
+        }
+
     </style>
 
 
@@ -157,6 +206,7 @@
         </div>
         <div class="navbar-content scroll-div">
             <ul class="nav pcoded-inner-navbar">
+
 
                 @include('layouts.menu')
 
@@ -191,7 +241,24 @@
             </li>
 
         </ul>
+
         <ul class="navbar-nav ml-auto">
+            <li>
+                @if(auth()->user()->checkPermission('Manage All Branches'))
+                            <div class="form-group" style=" width: 200px!important;; /* Adjust width as needed */
+             max-width: 100%; /* Ensures responsiveness */
+             text-overflow: ellipsis; /* Handle overflow gracefully */">
+                                <select name="store_id" id="store_id"
+                                        class="js-example-basic-single form-control">
+                                    <option value="" disabled>Select Branch</option>
+                                    @foreach($all_stores as $customer)
+                                        <option value="{{$customer->id}}" {{$customer->id === (Auth::user()->store->id ?? 0)  ? 'selected' : ''}}>{{$customer->name}}</option>
+                                    @endforeach
+
+                                </select>
+                            </div>
+                @endif
+            </li>
             <li>
                 <div class="dropdown">
                     @if(auth()->user()->checkPermission('View Settings'))
@@ -273,8 +340,7 @@
                             <li><a href="{{route('changePasswordForm')}}" class="dropdown-item"><i
                                         class="feather icon-x-circle"></i> Change Password</a></li>
                             <li><a href="{{ route('logout') }}" class="dropdown-item"
-                                   onclick="event.preventDefault();
-                                    document.getElementById('logout-form').submit();">
+                                   >
                                     <i class="feather icon-log-out"></i> Logout</a>
                             </li>
                         </ul>
@@ -346,6 +412,56 @@
                     <!-- [ Main Content ] start -->
                     <div class="row">
                         <!-- [ static-layout ] start -->
+                        
+                        <!-- Session Messages -->
+                        @if(session('success'))
+                            <div class="col-12">
+                                <div class="alert alert-success alert-dismissible fade show alert-top-right" role="alert">
+                                    <i class="feather icon-check-circle"></i>
+                                    <strong>Success!</strong> {{ session('success') }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            </div>
+                        @endif
+
+                        @if(session('error'))
+                            <div class="col-12">
+                                <div class="alert alert-danger alert-dismissible fade show alert-top-right" role="alert">
+                                    <i class="feather icon-alert-circle"></i>
+                                    <strong>Error!</strong> {{ session('error') }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            </div>
+                        @endif
+
+                        @if(session('warning'))
+                            <div class="col-12">
+                                <div class="alert alert-warning alert-dismissible fade show alert-top-right" role="alert">
+                                    <i class="feather icon-alert-triangle"></i>
+                                    <strong>Warning!</strong> {{ session('warning') }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            </div>
+                        @endif
+
+                        @if(session('info'))
+                            <div class="col-12">
+                                <div class="alert alert-info alert-dismissible fade show alert-top-right" role="alert">
+                                    <i class="feather icon-info"></i>
+                                    <strong>Info!</strong> {{ session('info') }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            </div>
+                        @endif
+                        
                     @yield("content")
                     <!-- [ static-layout ] end -->
                     </div>
@@ -396,9 +512,37 @@
 {{-- custom java scripts for the page --}}
 
 <script src="{{asset("assets/apotek/js/scheduling.js")}}"></script>
-
+<script src="{{asset("assets/apotek/js/notification.js")}}"></script>
 <script>
 
+
+    $(document).ready(function() {
+        $('#store_id').change(function() {
+            var selectedStoreId = $(this).val();
+
+            if (selectedStoreId) {
+                $.ajax({
+                    url: '{{ route('change_store') }}', // Replace with your actual endpoint
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ store_id: selectedStoreId }),
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include CSRF token if using Laravel
+                    },
+                    success: function(data) {
+                        // Handle the data returned from the server
+                        console.log(data);
+                        notify('alert-success','Store changed successfully!');
+                        window.location.href = window.location.href;
+                        // Update the UI based on the returned data
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX error:', status, error);
+                    }
+                });
+            }
+        });
+    });
     var config = {
         token: '{{ csrf_token() }}',
         routes: {
@@ -408,7 +552,58 @@
 
     $(document).ready(function () {
         setInterval(checkStock, 120000)
+        
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+        
+        // Handle alert close button
+        $('.alert .close').on('click', function() {
+            $(this).closest('.alert').fadeOut('slow');
+        });
     });
+
+    // Toast notification function
+    function showToast(message, type = 'success') {
+        const alertClass = type === 'success' ? 'alert-success' : 
+                          type === 'error' ? 'alert-danger' : 
+                          type === 'warning' ? 'alert-warning' : 'alert-info';
+        
+        const icon = type === 'success' ? 'feather icon-check-circle' : 
+                    type === 'error' ? 'feather icon-alert-circle' : 
+                    type === 'warning' ? 'feather icon-alert-triangle' : 'feather icon-info';
+        
+        const title = type === 'success' ? 'Success!' : 
+                     type === 'error' ? 'Error!' : 
+                     type === 'warning' ? 'Warning!' : 'Info!';
+        
+        const toast = $(`
+            <div class="alert ${alertClass} alert-dismissible fade show alert-top-right" role="alert">
+                <i class="${icon}"></i>
+                <strong>${title}</strong> ${message}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        `);
+        
+        $('body').append(toast);
+        
+        // Auto-hide after 5 seconds
+        setTimeout(function() {
+            toast.fadeOut('slow', function() {
+                $(this).remove();
+            });
+        }, 5000);
+        
+        // Handle close button
+        toast.find('.close').on('click', function() {
+            toast.fadeOut('slow', function() {
+                $(this).remove();
+            });
+        });
+    }
 
     $('#mark_as_read').on('click', function () {
         $.ajax({
@@ -525,6 +720,9 @@
 
         }
     });
+
+
+
 
 </script>
 

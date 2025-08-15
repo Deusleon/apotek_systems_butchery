@@ -53,9 +53,21 @@
 
     </style>
     <div class="col-sm-12">
-        <div class="card">
-            <div class="card-body">
-                <div class="tab-pane fade show active" id="new_sale" role="tabpanel" aria-labelledby="new_sale-tab">
+        <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link text-uppercase" id="stock-transfer-tablist" data-toggle="pill"
+                   href="{{ url('inventory/stock-transfer_') }}" role="tab"
+                   aria-controls="stock_transfer" aria-selected="true">Stock Transfer</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active text-uppercase" id="transfer-history-tablist" data-toggle="pill"
+                   href="transfer-history" role="tab"
+                   aria-controls="transfer_history" aria-selected="false">Transfer History
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="transfer-history" role="tabpanel" aria-labelledby="transfer_history-tab">
                     <form id="transfer" action="{{ route('stock-transfer-pdf-regen') }}" method="post"
                           enctype="multipart/form-data" target="_blank">
                         @csrf()
@@ -115,6 +127,8 @@
                                 <tr>
                                     <th>Transfer #</th>
                                     <th>Date</th>
+                                    <th>From</th>
+                                    <th>To</th>
                                     {{--                                    <th>Quantity</th>--}}
                                     <th>Action</th>
                                     <th hidden>id</th>
@@ -125,6 +139,8 @@
                                     <tr>
                                         <td>{{$transfer['transfer_no']}}</td>
                                         <td>{{$transfer['date']}}</td>
+                                        <td>{{$transfer['fromStore']}}</td>
+                                        <td>{{$transfer['toStore']}}</td>
                                         {{--                                        <td>{{number_format(floatval($transfer['quantity']))}}</td>--}}
                                         <td>
                                             <button id='show-info' class='btn btn-sm btn-rounded btn-success'
@@ -154,6 +170,8 @@
                                 <tr>
                                     <th>Transfer #</th>
                                     <th>Date</th>
+                                    <th>From</th>
+                                    <th>To</th>
                                     {{--                                    <th>Quantity</th>--}}
                                     <th>Action</th>
                                 </tr>
@@ -163,9 +181,6 @@
                         </div>
 
                     </form>
-
-                </div>
-            </div>
         </div>
     </div>
 
@@ -206,10 +221,30 @@
             $other.html($opts).val(otherVal);
         });
 
+        // Handle print button click
+        $('#fixed-header-re-print').on('click', '#print', function(e) {
+            e.preventDefault();
+            var row = $(this).closest('tr');
+            var transferNo = row.find('td:first').text();
+            $('#transfer_no').val(transferNo);
+            $('#transfer').submit();
+        });
+
     </script>
 
     <script src="{{asset("assets/apotek/js/stock-transfer-acknowledge.js")}}"></script>
     <script src="{{asset("assets/apotek/js/notification.js")}}"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Listen for the click event on the Transfer History tab
+            $('#stock-transfer-tablist').on('click', function(e) {
+                e.preventDefault(); // Prevent default tab switching behavior
+                var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
+                window.location.href = redirectUrl; // Redirect to the URL
+            });
+        });
+    </script>
 
 
 @endpush

@@ -11,6 +11,8 @@ var table_stock_transfer = $('#fixed-header1').DataTable({
                 return numberWithCommas(data);
             }
         },
+        {'data': 'from_store.name'},
+        {'data': 'to_store.name'},
         {
             'data': 'action',
             defaultContent: "<div class='row'><button id='completed' class='btn btn-sm btn-rounded btn-success' type='button'>Acknowledge</button></div>"
@@ -26,15 +28,17 @@ var table_stock_transfer_list = $('#fixed-header-main').DataTable();
 //show table details
 var table_stock_detail = $('#fixed-header2').DataTable({
     'columns': [
-        {'data': 'from_store.name'},
-        {'data': 'to_store.name'},
-        {'data': 'current_stock.product.name'},
+        {'data': 'product_name'},
         {
             'data': 'transfer_qty', render: function (data) {
                 return numberWithCommas(data);
             }
         },
-        // {'data': 'remarks'}
+        {
+            'data': 'accepted_qty', render: function (data) {
+                return numberWithCommas(data);
+            }
+        }
     ]
 
 });
@@ -52,11 +56,8 @@ var table_re_print = $('#fixed-header-re-print1').DataTable({
     'columns': [
         {'data': 'transfer_no'},
         {'data': 'date'},
-        // {
-        //     'data': 'transfer_qty', render: function (data) {
-        //         return numberWithCommas(data);
-        //     }
-        // },
+        {'data':'from_store.name'},
+        {'data':'to_store.name'},
         {
             'data': 'action',
             defaultContent: "<div class='row'><button id='show-infos' class='btn btn-sm btn-rounded btn-success' type='button'>Show</button><button id='prints' class='btn btn-sm btn-rounded btn-secondary'><span class='fa fa-print' aria-hidden='true'></span>Print</button></div>"
@@ -78,9 +79,9 @@ function storeSelect() {
 
     }
 
-    if (from_id != null || from_id != 0) {
-        $('#to_id').prop('disabled', false);
-    }
+    // if (from_id != null || from_id != 0) {
+    //     $('#to_id').prop('disabled', false);
+    // }
 
     if (from_id === to_id) {
         notify('From and To cannot be the same', 'top', 'right', 'info');
@@ -156,6 +157,8 @@ function filterByStoreRePrint(data, data1) {
             to_val: to_val
         },
         success: function (data) {
+
+            console.log('FilteredData',data);
             document.getElementById('tbodyRePrint1').style.display = 'block';
             document.getElementById('tbodyRePrint').style.display = 'none';
             bindDataRePrint(data);

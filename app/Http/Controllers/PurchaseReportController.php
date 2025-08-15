@@ -38,8 +38,8 @@ class PurchaseReportController extends Controller
 
         return View::make('purchases_reports.index',
             (compact('order_details', 'suppliers', 'orders', 'price_category',
-                'buying_prices', 'current_stock', 'item_stocks', 'invoices', 'pharmacy', 'category',
-                'material_received', 'settings')));
+                 'current_stock', 'invoices', 'category',
+                'material_received')));
     }
 
     protected function reportOption(Request $request)

@@ -13,10 +13,9 @@
                     <table id="fixed-header2" class="display table nowrap table-striped table-hover" style="width:100%">
                         <thead>
                         <tr>
-                            <th>From</th>
-                            <th>To</th>
                             <th>Product Name</th>
-                            <th>Quantity</th>
+                            <th>Transferred Qty</th>
+                            <th>Received Qty</th>
                             {{--                            <th>Remarks</th>--}}
                         </tr>
                         </thead>

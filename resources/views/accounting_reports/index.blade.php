@@ -74,7 +74,7 @@
                                     <select id="report_option" name="report_option" onchange="reportOption()"
                                             class="js-example-basic-single form-control drop" required>
                                         <option selected="true" value="" disabled="disabled">Select report</option>
-                                        <option value="1">Current Stock Value</option>
+                                        <option value="1">Current Stock</option>
                                         <option value="2">Gross Profit Detail</option>
                                         <option value="3">Gross Profit Summary</option>
                                         <option value="4">Expense Report</option>
@@ -97,7 +97,7 @@
                             </div>
                         </div>
                     </div>
-                    {{--current stock value--}}
+                    {{--Current Stock--}}
                     <div id="current-stock-value" style="display: none">
                         <div class="row">
                             <div class="col-md-4">

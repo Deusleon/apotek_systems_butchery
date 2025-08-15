@@ -18,7 +18,7 @@ var cart_table = $('#cart_table').DataTable({
     columns: [
         {title: "Product Name"},
         {
-            title: "Quantity on Hand", render: function (num) {
+            title: "QOH", render: function (num) {
                 return numberWithCommas(num);
             }
         },
@@ -118,7 +118,7 @@ function rePopulateSelect2() {
     });
 }
 
-$('#select_id').on('change', function () {
+$(document).on('change', '#select_id', function () {
     val();
 });
 
@@ -128,9 +128,11 @@ function val() {
     var cart_data = [];
     var sale_product = {};
     var product = document.getElementById("select_id").value;
+    if (!product) return;
+
     // rePopulateSelect2();
     $('#select_id').val('');
-    var selected_fields = JSON.parse(product);
+    var selected_fields = product.split(',');
     var item_name = selected_fields[0];
     var price = Number(selected_fields[1]);
     var product_id = Number(selected_fields[2]);
@@ -142,7 +144,7 @@ function val() {
     item.push(product_id);
     item.push(stock_id);
     cart_data.push(price);
-    cart.push(item);
+    cart.unshift(item);
     default_cart.push(cart_data);
     calculateCart();
     cart_table.clear();
@@ -158,6 +160,7 @@ function deselect() {
     calculateCart();
 
     $('#remarks').val('');
+    $('#evidence').val('');
     $('#to_id').val(0).change();
     $('#from_id').val(0).change();
     $('#select_id').prop('disabled', true);
@@ -203,7 +206,7 @@ $('#cart_table tbody').on('change', '#edit_quantity', function () {
     if (Number(parseFloat(row_data[2].replace(/\,/g, ''), 10)) > Number(row_data[1])) {
         document.getElementById("edit_quantity").style.borderColor = 'red';
         document.getElementById("span_danger").style.display = 'block';
-        $('#span_danger').text('Maximum quantity is ' + numberWithCommas(row_data[1]));
+        $('#span_danger').text('Maximum quantity is ' + Math.floor(row_data[1]));
         row_data[2] = row_data[2];
         $('#transfer_preview').prop('disabled', true);
         return;
@@ -267,6 +270,7 @@ $('#transfer').on('submit', function (e) {
         var to = document.getElementById("to_id");
         var to_id = to.options[to.selectedIndex].value
 
+
     } catch (e) {
         notify('Please select From and To store', 'top', 'right', 'warning');
         $('#from_id').prop('disabled', true);
@@ -324,28 +328,57 @@ $('#transfer').on('submit', function (e) {
 });
 
 function saveStockTransfer() {
-    var form = $('#transfer').serialize();
+    var formData = new FormData($('#transfer')[0]);
+    var errorMessage = false;
     $('#transfer_preview').attr('disabled', true);
 
     $.ajax({
         url: config.routes.stockTransferSave,
-        type: "post",
+        type: "POST",
         dataType: "json",
-        cache: "false",
-        data: form,
-        success: function (data) {
-            window.open(data.redirect_to);
-            // triggerSaleType();
-        }, complete: function () {
-            notify('Stock transfer successfully', 'top', 'right', 'success');
-            deselect();
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            if (response.success) {
+                notify(response.message || 'Stock transferred successfully', 'top', 'right', 'success');
+                
+                // Handle redirect options
+                if (response.redirect_to) {
+                    // Open PDF in new window
+                    window.open(response.redirect_to, '_blank');
+                }
+                
+                if (response.history_url) {
+                    // Redirect to history page after a short delay
+                    setTimeout(function() {
+                        window.location.href = response.history_url;
+                    }, 2000);
+                }
+            } else {
+                notify(response.message || 'Failed to create stock transfer', 'top', 'right', 'danger');
+            }
+        },
+        error: function (xhr, status, error) {
+            errorMessage = true;
+            var message = 'Failed to create stock transfer!';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                message = xhr.responseJSON.message;
+            }
+            notify(message, 'top', 'right', 'danger');
+        },
+        complete: function () {
+            if(errorMessage === false) {
+                deselect();
+            }
             $('#transfer_preview').attr('disabled', false);
-        }, timeout: 20000
+        },
+        timeout: 20000
     });
 }
 
 
-$('#to_id').prop('disabled', true);
+// $('#to_id').prop('disabled', true);
 $('#select_id').prop('disabled', true);
 
 function filterTransferByStore() {

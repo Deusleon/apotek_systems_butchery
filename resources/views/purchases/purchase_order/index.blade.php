@@ -6,7 +6,7 @@
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#">Purchases / Purchase Order</a></li>
+    <li class="breadcrumb-item"><a href="#">Purchasing / Purchase Order</a></li>
 @endsection
 
 
@@ -28,12 +28,31 @@
     <div class="col-sm-12">
         <div class="card-block">
             <div class="col-sm-12">
+                <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active text-uppercase" id="purchase-order-tablist" data-toggle="pill"
+                           href="#purchase-order" role="tab"
+                           aria-controls="purchase_order" aria-selected="true">New</a>
+                    </li>
+                    @if(Auth::user()->checkPermission('View Order List'))
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase" id="order-list-tablist" data-toggle="pill"
+                           href="#order-list" role="tab"
+                           aria-controls="order_list" aria-selected="false">Order List
+                        </a>
+                    </li>
+                    @endif
+                </ul>
                 <div class="tab-content" id="myTabContent">
+                    {{-- Purchase Order Start--}}
+                    <div class="tab-pane fade show active" id="purchase-order" role="tabpanel" aria-labelledby="purchase_order-tab">
                     <form action="{{ route('purchase-order.store') }}" method="post" enctype="multipart/form-data"
                           id="order_form">
                         @csrf()
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-2" hidden>
+                            </div>
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="code">Supplier Name <font color="red">*</font></label>
                                     <select name="supplier" class="js-example-basic-single form-control" id="supplier"
@@ -45,7 +64,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-7">
                                 <div class="form-group">
                                     <label for="code">Products <font color="red">*</font></label>
                                     <select id="select_id" class="form-control">
@@ -131,6 +150,52 @@
                             </div>
                         </div>
                     </form>
+                    </div>
+
+                    {{-- Purchase Order End--}}
+
+                    {{-- Order List Start--}}
+                    <div class="tab-pane fade" id="order-list" role="tabpanel" aria-labelledby="order_list-tab">
+                        <div class="form-group row">
+                            <div class="col-md-6">
+                            </div>
+                            <div class="col-md-3" style="margin-left: 2.5%">
+                                <label for="" class="col-form-label text-md-right"
+                                       style="margin-left: 74.5%">Date:</label>
+                            </div>
+                            <div class="col-md-3" style="margin-left: -3.4%;">
+                                <input style="width: 104%;" type="text" name="order_filter" class="form-control"
+                                       onchange="getOrderHistory()"
+                                       id="date_filter">
+                            </div>
+                        </div>
+                        <div id="purchases">
+
+                            <table id="order_history_datatable" class="display table nowrap table-striped table-hover"
+                                   style="width:100%">
+                                <thead>
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Supplier</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+
+                            <div hidden>
+                                <a target="_blank" id="order_no"></a>
+                            </div>
+
+                        </div>
+                        @include('purchases.purchase_order_list.delete')
+                        @include('purchases.purchase_order_list.details')
+                    </div>
+                    {{-- Order List End--}}
+
                 </div>
 
             </div>
@@ -154,8 +219,37 @@
         };
     </script>
 
+
+
     <script src="{{asset("assets/apotek/js/purchases.js")}}"></script>
     <script src="{{asset("assets/apotek/js/notification.js")}}"></script>
+
+    {{--  Order List  --}}
+    <script src="{{asset("assets/apotek/js/orderlist.js")}}"></script>
+
+    <script type="text/javascript">
+
+        var config2 = {
+            managePurchaseHistory : '{{auth()->user()->hasPermissionTo('View Purchase Order')}}',
+            routes: {
+                getOrderHistory: '{{route('getOrderHistory')}}'
+
+            }
+        };
+
+        $('#order_history_datatable tbody').on('click', '#print_btn', function () {
+            var data = order_history_datatable.row($(this).parents('tr')).data();
+
+            let url = '{{route('printOrder','id','Purchase Order')}}';
+            url = url.replace('id', data.details[0].order_id);
+            let a = document.getElementById('order_no');
+            a.href = url;
+            a.click();
+        });
+
+    </script>
+
+
 
 
 @endpush

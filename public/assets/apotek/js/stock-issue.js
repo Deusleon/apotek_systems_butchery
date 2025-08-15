@@ -15,7 +15,7 @@ var cart_table = $('#fixed-header1').DataTable({
     'columns': [
         {title: "Product Name"},
         {
-            title: "Quantity on Hand", render: function (data) {
+            title: "QOH", render: function (data) {
                 return numberWithCommas(data);
             }
         },
@@ -267,7 +267,7 @@ $('#tbody').on('change', '#edit_quantity', function () {
         // order_cart[index].issuedQty = row_data[3];
         document.getElementById("edit_quantity").style.borderColor = 'red';
         document.getElementById("span_danger").style.display = 'block';
-        $('#span_danger').text('Maximum quantity is ' + numberWithCommas(row_data[1]));
+        $('#span_danger').text('Maximum quantity is ' + Math.floor(row_data[1]));
         // delete order_cart[index]['issuedQty'];
         // row_data[7] = formatMoney(parseFloat(default_cart[index][0].replace(/\,/g, ''), 10) *
         //     parseFloat(row_data[6].replace(/\,/g, ''), 10));

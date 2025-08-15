@@ -2,8 +2,8 @@
 
 namespace App;
 
-use DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Sale extends Model
 {
@@ -37,6 +37,11 @@ class Sale extends Model
         return $this->hasMany(SalesDetail::class, 'sales_id');
     }
 
+    public function salesDetails()
+    {
+        return $this->hasMany(SalesDetail::class, 'sales_id');
+    }
+
     public function user()
     {
        return $this->belongsTo(User::class, 'created_by');
@@ -46,5 +51,7 @@ class Sale extends Model
     {
        return $this->belongsTo(Customer::class, 'customer_id');
     }
+
+
 
 }

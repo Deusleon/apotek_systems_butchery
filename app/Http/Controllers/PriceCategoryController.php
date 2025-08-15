@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\PriceCategory;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PriceCategoryController extends Controller
 {
@@ -17,6 +18,13 @@ class PriceCategoryController extends Controller
 
     public function store(Request $request)
     {
+        $existing = PriceCategory::where('name',$request->name)->count();
+
+        if($existing > 0)
+        {
+            session()->flash("alert-danger", "Price Category Name Exists!");
+            return back();
+        }
         try {
             $price_category = new PriceCategory;
             $price_category->name = $request->name;
@@ -34,6 +42,14 @@ class PriceCategoryController extends Controller
     public function update(Request $request)
     {
 
+        $existing = PriceCategory::where('name',$request->name)->count();
+
+        if($existing > 0)
+        {
+            session()->flash("alert-danger", "Price Category Name Exists!");
+            return back();
+        }
+
         $price_category = PriceCategory::find($request->price_category_id);
         $price_category->type = $request->code;
         $price_category->name = $request->name;
@@ -50,6 +66,14 @@ class PriceCategoryController extends Controller
 
     public function destroy(Request $request)
     {
+        $check_existance = DB::table('sales')->where('price_category_id',$request->price_category_id)->count();
+
+        if($check_existance > 0)
+        {
+            session()->flash("alert-danger", "Price Category is in use!");
+            return back();
+        }
+
         try {
             PriceCategory::destroy($request->price_category_id);
             session()->flash("alert-danger", "Price category deleted successfully!");

@@ -99,6 +99,21 @@
                         </div>
 
 
+                        <div class="form-group row">
+                            <label for="role" class="col-md-4 col-form-label text-md-right">{{ __('User Store') }} <font color="red">*</font></label>
+                            <div class="col-md-8">
+                                <select class="form-control select2"  class="form-control" id="store" name="store_id"  data-placeholder="Select Store" required data-width="100%">
+                                    @foreach(getStores() as $role)
+                                        <option value="{{$role->id}}" {{ ($role->id == old('store_id') ? "selected":"") }}>{{$role->name}}</option>
+                                    @endforeach
+                                </select>
+                                <span class="text-danger">
+                                    <strong id="role-error"></strong>
+                                </span>
+                            </div>
+                        </div>
+
+
 
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

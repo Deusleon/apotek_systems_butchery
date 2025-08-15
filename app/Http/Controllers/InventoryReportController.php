@@ -660,4 +660,71 @@ class InventoryReportController extends Controller
 
     }
 
+    public function stockDiscrepancyReport()
+    {
+        $auditLogs = DB::table('stock_adjustment_logs')
+            ->join('inv_products', 'stock_adjustment_logs.product_id', '=', 'inv_products.id')
+            ->join('users', 'stock_adjustment_logs.created_by', '=', 'users.id')
+            ->join('inv_stores', 'stock_adjustment_logs.store_id', '=', 'inv_stores.id')
+            ->select(
+                'stock_adjustment_logs.created_at as date',
+                'inv_products.name as product_name',
+                'stock_adjustment_logs.quantity_before_adjustment',
+                'stock_adjustment_logs.adjustment_quantity',
+                'stock_adjustment_logs.quantity_after_adjustment',
+                'stock_adjustment_logs.adjustment_type',
+                'stock_adjustment_logs.reason',
+                'stock_adjustment_logs.notes',
+                'users.name as created_by',
+                'inv_stores.name as store_name'
+            )
+            ->where('stock_adjustment_logs.source', 'Daily Stock Count')
+            ->orderBy('stock_adjustment_logs.created_at', 'desc')
+            ->get();
+
+        return view('inventory_reports.stock_discrepancy', compact('auditLogs'));
+    }
+
+    public function stockCountAnalytics()
+    {
+        // Total number of scheduled stock counts
+        $totalSchedules = \App\StockCountSchedule::count();
+
+        // Breakdown of schedules by status
+        $schedulesByStatus = \App\StockCountSchedule::select('status', DB::raw('count(*) as count'))
+            ->groupBy('status')
+            ->pluck('count', 'status');
+
+        $pendingSchedules = $schedulesByStatus->get('pending', 0);
+        $completedSchedules = $schedulesByStatus->get('completed', 0);
+        $cancelledSchedules = $schedulesByStatus->get('cancelled', 0);
+
+        // Total number of stock adjustments related to stock counts
+        $totalAdjustments = DB::table('stock_adjustment_logs')
+            ->where('source', 'Daily Stock Count')
+            ->count();
+
+        // Breakdown of adjustments by type (increase/decrease)
+        $adjustmentsByType = DB::table('stock_adjustment_logs')
+            ->select('adjustment_type', DB::raw('SUM(adjustment_quantity) as total_quantity'))
+            ->where('source', 'Daily Stock Count')
+            ->groupBy('adjustment_type')
+            ->pluck('total_quantity', 'adjustment_type');
+
+        $increaseAdjustments = $adjustmentsByType->get('increase', 0);
+        $decreaseAdjustments = $adjustmentsByType->get('decrease', 0);
+
+        // You can add more complex analytics here, e.g., trends over time, top adjusted products, etc.
+
+        return view('inventory_reports.stock_count_analytics', compact(
+            'totalSchedules',
+            'pendingSchedules',
+            'completedSchedules',
+            'cancelledSchedules',
+            'totalAdjustments',
+            'increaseAdjustments',
+            'decreaseAdjustments'
+        ));
+    }
+
 }

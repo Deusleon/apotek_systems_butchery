@@ -7,6 +7,7 @@ use App\GoodsReceiving;
 use App\Product;
 use App\Setting;
 use App\Supplier;
+use App\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,10 +18,11 @@ class OrderController extends Controller
     //
     public function index()
     {
+        $orders = Order::with(['supplier', 'details.product:id,name,pack_size'])->where('status', '!=', '0')->orderBy('ordered_at', 'desc')->get();
         $suppliers = Supplier::orderBy('name', 'ASC')->get();
         $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
         return View::make('purchases.purchase_order.index',
-            compact('suppliers', 'vat'));
+            compact('suppliers', 'vat', 'orders'));
     }
 
     public function store(Request $request)

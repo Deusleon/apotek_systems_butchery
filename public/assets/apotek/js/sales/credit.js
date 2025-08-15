@@ -1,4 +1,5 @@
 var cart = [];//for data displayed.
+var cart_stack = [];//for data displayed.
 var default_cart = [];//for default values.
 var details = [];
 var sale_items = [];
@@ -109,7 +110,7 @@ var credit_payment_table = $('#credit_payment_table').DataTable({
         {data: 'name'},
         {
             data: 'date', render: function (date) {
-                return moment(date).format('D-M-YYYY');
+                return moment(date).format('D-M-YYYY hh:mm:ss');
             }
         },
         {
@@ -149,12 +150,12 @@ $("#products").on('change', function () {
         valueCollection();
     } else {
         notify('Select Customer First', 'top', 'right', 'warning');
-        
+
         $('#products option').prop('selected', function() {
             return this.defaultSelected;
         });
     }
-    
+
 });
 
 $("#products_b").on('change', function () {
@@ -168,7 +169,7 @@ $("#products_b").on('change', function () {
         $('#products_b option').prop('selected', function() {
             return this.defaultSelected;
         });
-        
+
     }
 });
 
@@ -629,9 +630,12 @@ function valueCollection() {
         cart_data.push(formatMoney(price));
         cart_data.push(formatMoney(vat));
         cart_data.push(formatMoney(unit_total));
-        cart.push(item);
         default_cart.push(cart_data);
+        cart.push(item);
         discount();
+        cart_table.clear();
+        cart_table.rows.add(cart);
+        cart_table.draw();
 
 
     }
@@ -783,7 +787,7 @@ $('#items_table tbody').on('click', '#rtn_btn', function () {
         if (quantity > data[2] || quantity < 0) {
             document.getElementById('save_btn').disabled = 'true';
             document.getElementById('qty_error').style.display = 'block';
-            $('#sale-return').find('.modal-body #qty_error').text('Maximum quantity is ' + data[2]);
+            $('#sale-return').find('.modal-body #qty_error').text('Maximum quantity is ' + Math.floor(data[2]));
         } else {
             document.getElementById('qty_error').style.display = 'none';
             $('#save_btn').prop('disabled', false);
@@ -982,7 +986,7 @@ function getCredits() {
             type: 'get',
             dataType: 'json',
             success: function (data) {
-//Remove Pay Button for Balance < 1
+            //Remove Pay Button for Balance < 1
                 data.forEach(function (data) {
                     if (data.balance < 1) {
                         data.action = " <span class='badge badge-success'>Paid</span>";
@@ -1063,7 +1067,7 @@ $('#credit_payment_table tbody').on('click', '#pay_btn', function () {
         if (quantity > data[2]) {
             document.getElementById('save_btn').disabled = 'true';
             document.getElementById('qty_error').style.display = 'block';
-            $('#credit-sale-payment').find('.modal-body #qty_error').text('The maximum quantity is ' + data[2]);
+            $('#credit-sale-payment').find('.modal-body #qty_error').text('The maximum quantity is ' + Math.floor(data[2]));
         } else {
             document.getElementById('qty_error').style.display = 'none';
             $('#save_btn').prop('disabled', false);
@@ -1119,7 +1123,7 @@ $('#credit_sales_form').on('submit', function (e) {
     var cart = document.getElementById("order_cart").value;
 
     if (cart === '' || cart === 'undefined') {
-        notify('Credit sale list empty', 'top', 'right', 'warning');
+        notify('Credit Sales list empty', 'top', 'right', 'warning');
         return false;
     }
 
@@ -1139,7 +1143,7 @@ function saveCreditSale() {
         cache: "false",
         data: form,
         success: function (data) {
-            notify('Credit sale recorded successfully', 'top', 'right', 'success');
+            notify('Credit Sales recorded successfully', 'top', 'right', 'success');
             deselect1();
             window.open(data.redirect_to);
             $('#save_btn').attr('disabled', false);

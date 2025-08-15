@@ -12,4 +12,8 @@ const mix = require('laravel-mix');
  */
 
 mix.js('resources/js/app.js', 'public/js')
-    .sass('resources/sass/app.scss', 'public/css');
+    .sass('resources/sass/app.scss', 'public/css')
+    .version();
+
+// Ensure our StockUpdates component is included
+mix.js('resources/js/components/StockUpdates.js', 'public/js/components');

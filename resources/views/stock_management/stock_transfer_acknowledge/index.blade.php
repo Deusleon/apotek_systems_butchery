@@ -106,6 +106,8 @@
                                     <th>Transfer #</th>
                                     <th>Product Name</th>
                                     <th>Quantity</th>
+                                    <th>From</th>
+                                    <th>To</th>
                                     <th>Action</th>
                                 </tr>
                                 </thead>
@@ -126,6 +128,8 @@
                                     {{--                                    <th>Date</th>--}}
                                     <th>Product Name</th>
                                     <th>Quantity</th>
+                                    <th>From</th>
+                                    <th>To</th>
                                     <th>Action</th>
                                 </tr>
                                 </thead>
@@ -136,6 +140,8 @@
                                         {{--                                        <td>{{date('Y-m-d',strtotime($all_transfer->created_at))}}</td>--}}
                                         <td>{{$all_transfer->currentStock['product']['name']}}</td>
                                         <td>{{number_format(floatval($all_transfer->transfer_qty))}}</td>
+                                        <td>{{$all_transfer->fromStore['name']}}</td>
+                                        <td>{{$all_transfer->toStore['name']}}</td>
                                         <td>
                                             <button id="complete_tran" class="btn btn-sm btn-rounded btn-success"
                                                     data-id="{{$all_transfer->id}}"
@@ -154,6 +160,19 @@
                                 </tbody>
 
                             </table>
+
+                            <div class="row">
+                                <div class="col-md-6"></div>
+                                <div class="col-md-6">
+                                    <div class="btn-group" style="float: right;">
+                                        <a class="btn btn-danger" href="{{ url('inventory/stock-transfer_') }}">Cancel</a>
+                                        <button class="btn btn-primary" id="save_btn"
+                                                type="button"
+                                                data-toggle="modal"
+                                                data-target="#acknowledge_all">Acknowledge All</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                     </form>
@@ -165,6 +184,7 @@
 
 
     @include('stock_management.stock_transfer_acknowledge.complete')
+    @include('stock_management.stock_transfer.acknowledge')
 
 @endsection
 
@@ -212,6 +232,14 @@
             modal.find('.modal-body #from').val(button.data('from'));
             modal.find('.modal-body #to').val(button.data('to'));
             modal.find('.modal-body #transfer_no').val(button.data('transfer_no'));
+        });
+
+        $('#acknowledge_all').on('show.bs.modal', function (event) {
+
+            var modal = $(this);
+            modal.show();
+            var _token = $('input[name="_token"]').val();
+
         });
 
 

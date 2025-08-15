@@ -8,12 +8,12 @@
 @endsection
 
 @section('content-title')
-    Stores
+    Branches
 @endsection
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#"> Masters / Stores </a></li>
+    <li class="breadcrumb-item"><a href="#"> General / Branches </a></li>
 @endsection
 
 @section("content")
@@ -26,7 +26,7 @@
                         <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-secondary btn-sm"
                                 data-toggle="modal"
                                 data-target="#create">
-                            Add Store
+                            Add Branch
                         </button>
                     @endif
 

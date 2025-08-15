@@ -12,17 +12,23 @@ use App\SalesDetail;
 use App\Setting;
 use App\StockTracking;
 use App\Store;
+use Dompdf\Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use PDF;
-use View;
+use Illuminate\Support\Facades\View;
 
 class SaleController extends Controller
 {
 
     public function cashSale()
     {
+        if (!Auth()->user()->checkPermission('View Cash Sales')) {
+            abort(403, 'Access Denied');
+        }
+
         $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
         $back_date = Setting::where('id', 114)->value('value');
         $fixed_price = Setting::where('id', 124)->value('value');
@@ -56,6 +62,10 @@ class SaleController extends Controller
 
     public function creditSale()
     {
+        if (!Auth()->user()->checkPermission('View Credit Sales')) {
+            abort(403, 'Access Denied');
+        }
+
         $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
         $back_date = Setting::where('id', 114)->value('value');
         $fixed_price = Setting::where('id', 124)->value('value');
@@ -73,7 +83,10 @@ class SaleController extends Controller
 
 
         $price_category = PriceCategory::all();
-        $customers = Customer::orderBy('name', 'ASC')->get();
+        //Check customer
+        $customers = Customer::orderBy('name', 'ASC')
+            ->where('payment_term',2)
+            ->get();
         $current_stock = CurrentStock::all();
         return View::make('sales.credit_sales.index')
             ->with(compact('customers'))
@@ -93,7 +106,7 @@ class SaleController extends Controller
 
     public function getPaymentsHistory()
     {
-        $customers = Customer::get();
+        $customers = Customer::orderBy('name', 'asc')->get();
 
         $payments = SalesCredit::join('sales', 'sales.id', '=', 'sales_credits.sale_id')
             ->join('customers', 'customers.id', '=', 'sales.customer_id')
@@ -137,6 +150,13 @@ class SaleController extends Controller
 
     public function CreditSalePayment(Request $request)
     {
+        //Validating amount before submitting
+        if($request->paid_amount>$request->balance)
+        {
+            session()->flash("alert-danger", "Amount paid should not exceed amount owed!");
+            return back();
+        }
+
         $credit = new SalesCredit;
         $customer = Customer::find($request->customer_id);
         $credit->sale_id = $request->sale_id;
@@ -149,6 +169,7 @@ class SaleController extends Controller
         $credit->save();
         $customer->save();
         session()->flash("alert-success", "Payment recorded successfully!");
+        session(['activeTabView' => 'tracking']);
         return back();
 
     }
@@ -186,7 +207,9 @@ class SaleController extends Controller
                 $sale->balance = $outstanding->balance;
                 $sale->total_amount = $amount - $discount;
             }
+
             $data = json_decode($sales, true);
+
             return $data;
         }
     }
@@ -195,7 +218,7 @@ class SaleController extends Controller
     public function selectProducts(Request $request)
     {
         /*get default store*/
-        $default_store = Setting::where('id', 122)->value('value');
+        $default_store = Auth::user()->store->name ?? 'Default Store';
         $stores = Store::where('name', $default_store)->first();
 
         if ($stores != null) {
@@ -211,7 +234,6 @@ class SaleController extends Controller
             ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
             ->where('quantity', '>', 0)
             ->where('inv_products.status', '=', 1)
-            ->where('store_id', $default_store_id)
             ->select('inv_products.id as id', 'name', 'barcode')
             ->groupBy('product_id')
             ->orderby('name', 'asc')
@@ -222,7 +244,7 @@ class SaleController extends Controller
         if ($count <= 0) {
             $output[""] = "No Products Found";
         } else {
-            $output[""] = "Select Product from the List";
+            $output[""] = "Select Product...";
         }
 
         foreach ($products as $product) {
@@ -244,7 +266,7 @@ class SaleController extends Controller
     public function filterProductByWord(Request $request)
     {
         /*get default store*/
-        $default_store = Setting::where('id', 122)->value('value');
+        $default_store = Auth::user()->store->name ?? 'Default Store';
         $stores = Store::where('name', $default_store)->first();
 
         if ($stores != null) {
@@ -262,8 +284,8 @@ class SaleController extends Controller
                 ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                 ->where('quantity', '>', 0)
                 ->where('inv_products.status', '=', 1)
-                ->where('store_id', $default_store_id)
-                ->select('inv_products.id as id', 'name', 'barcode','inv_products.type')
+                ->where('inv_current_stock.store_id', $default_store_id)
+                ->select('inv_products.id as id', 'inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.barcode', 'inv_products.type')
                 ->where('name', 'LIKE', "%{$request->word}%")
                 ->orwhere('barcode', 'LIKE', "%{$request->word}%")
                 ->groupBy('product_id')
@@ -275,7 +297,7 @@ class SaleController extends Controller
             if ($count <= 0) {
                 $output[""] = "No Products Found";
             } else {
-                $output[""] = "Select Product from the List";
+                $output[""] = "Select Product...";
             }
 
             foreach ($products as $product) {
@@ -290,7 +312,7 @@ class SaleController extends Controller
                     ->where('store_id', $default_store_id)
                     ->sum('quantity');
                 if ($latest != null) {
-                    $output["$product->name#@$latest->price#@$product->id#@$quantity#@$product->type"] = $product->name;
+                    $output["$product->name $product->pack_size#@$latest->price#@$product->id#@$quantity#@$product->type"] = $product->name." ".$product->pack_size;
                 } else {
                     $output[""] = "No Products Found";
                 }
@@ -313,7 +335,7 @@ class SaleController extends Controller
     public function store(Request $request)
     {
         /*get default store*/
-        $default_store = Setting::where('id', 122)->value('value');
+        $default_store = Auth::user()->store->name ?? 'Default Store';
         $stores = Store::where('name', $default_store)->first();
 
         if ($stores != null) {
@@ -434,100 +456,118 @@ class SaleController extends Controller
 
     public function receiptReprint(Request $request)
     {
-        $receipt_size = Setting::where('id', 119)->value('value');
-        $pharmacy['name'] = Setting::where('id', 100)->value('value');
-        $pharmacy['logo'] = Setting::where('id', 105)->value('value');
-        $pharmacy['address'] = Setting::where('id', 106)->value('value');
-        $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
-        $pharmacy['phone'] = Setting::where('id', 107)->value('value');
-        $pharmacy['slogan'] = Setting::where('id', 104)->value('value');
-        $pharmacy['vrn_number'] = Setting::where('id', 103)->value('value');
+        try {
+            $receipt_size = Setting::where('id', 119)->value('value');
+            $pharmacy['name'] = Setting::where('id', 100)->value('value');
+            $pharmacy['logo'] = Setting::where('id', 105)->value('value');
+            $pharmacy['address'] = Setting::where('id', 106)->value('value');
+            $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
+            $pharmacy['phone'] = Setting::where('id', 107)->value('value');
+            $pharmacy['slogan'] = Setting::where('id', 104)->value('value');
+            $pharmacy['vrn_number'] = Setting::where('id', 103)->value('value');
+
+            Log::info('PrintSize', ['Size' => $receipt_size]);
 
 
-        $id = Sale::where('receipt_number', $request->reprint_receipt)->value('id');
+            $id = Sale::where('receipt_number', $request->reprint_receipt)->value('id');
 
-        /*check if receipt is credit or not*/
-        $credit_sale = SalesCredit::where('sale_id', $id)->get();
-        $page = null;
-        $paid = null;
-        $balance = null;
-        $remark = null;
-        if ($credit_sale->isEmpty()) {
-            /*not credit*/
-            $page = 1; //normal sale
-        } else {
-            /*credit*/
-            $page = -1; //credit
-            $remarks = SalesCredit::select('remark')
-                ->where('sale_id', $id)
-                ->orderby('id', 'desc')
-                ->first();
-
-            $amounts = SalesCredit::select('sale_id', 'remark', DB::raw('sum(paid_amount) as paid'), DB::raw('sum(balance) as balance'))
-                ->where('sale_id', $id)
-                ->groupby('sale_id')
-                ->first();
-            $paid = $amounts->paid;
-            $balance = $amounts->balance;
-            $remark = $remarks->remark;
-        }
-
-        $sale_detail = SalesDetail::where('sale_id', $id)->get();
-
-        $sales = array();
-        $grouped_sales = array();
-        $sn = 0;
-        foreach ($sale_detail as $item) {
-            $amount = $item->amount - $item->discount;
-            if (intVal($item->vat) === 0) {
-                $vat_percent = 0;
+            /*check if receipt is credit or not*/
+            $credit_sale = SalesCredit::where('sale_id', $id)->get();
+            $page = null;
+            $paid = null;
+            $balance = null;
+            $remark = null;
+            if ($credit_sale->isEmpty()) {
+                /*not credit*/
+                $page = 1; //normal sale
             } else {
-                $vat_percent = $item->vat / $item->price;
+                /*credit*/
+                $page = -1; //credit
+                $remarks = SalesCredit::select('remark')
+                    ->where('sale_id', $id)
+                    ->orderby('id', 'desc')
+                    ->first();
+
+                $amounts = SalesCredit::select('sale_id', 'remark', DB::raw('sum(paid_amount) as paid'), DB::raw('sum(balance) as balance'))
+                    ->where('sale_id', $id)
+                    ->groupby('sale_id')
+                    ->first();
+                $paid = $amounts->paid;
+                $balance = $amounts->balance;
+                $remark = $remarks->remark;
             }
-            $sub_total = ($amount / (1 + $vat_percent));
-            $vat = $amount - $sub_total;
-            $sn++;
-            array_push($sales, array(
-                'receipt_number' => $item->sale['receipt_number'],
-                'name' => $item->currentStock['product']['name'],
-                'sn' => $sn,
-                'quantity' => $item->quantity,
-                'vat' => $vat,
-                'discount' => $item->discount,
-                'discount_total' => $item->sale['cost']['discount'],
-                'price' => $item->price,
-                'amount' => $amount,
-                'sub_total' => $sub_total,
-                'grand_total' => ($item->sale['cost']['amount']) - ($item->sale['cost']['discount']),
-                'total_vat' => ($item->sale['cost']['vat']),
-                'sold_by' => $item->sale['user']['name'],
-                'customer' => $item->sale['customer']['name'],
-                'customer_tin' => $item->sale['customer']['tin'],
-                'paid' => $paid,
-                'balance' => $balance,
-                'remark' => $remark,
-                'created_at' => date('Y-m-d', strtotime($item->sale['date']))
-            ));
-        }
 
+            $sale_detail = SalesDetail::where('sale_id', $id)->get();
 
-        foreach ($sales as $val) {
-            if (array_key_exists('receipt_number', $val)) {
-                $grouped_sales[$val['receipt_number']][] = $val;
+            $sales = array();
+            $grouped_sales = array();
+            $sn = 0;
+            foreach ($sale_detail as $item) {
+                $amount = $item->amount - $item->discount;
+                if (intVal($item->vat) === 0) {
+                    $vat_percent = 0;
+                } else {
+                    $vat_percent = $item->vat / $item->price;
+                }
+                $sub_total = ($amount / (1 + $vat_percent));
+                $vat = $amount - $sub_total;
+                $sn++;
+                array_push($sales, array(
+                    'receipt_number' => $item->sale['receipt_number'],
+                    'name' => $item->currentStock['product']['name'],
+                    'sn' => $sn,
+                    'quantity' => $item->quantity,
+                    'vat' => $vat,
+                    'discount' => $item->discount,
+                    'discount_total' => $item->sale['cost']['discount'],
+                    'price' => $item->price,
+                    'amount' => $amount,
+                    'sub_total' => $sub_total,
+                    'grand_total' => ($item->sale['cost']['amount']) - ($item->sale['cost']['discount']),
+                    'total_vat' => ($item->sale['cost']['vat']),
+                    'sold_by' => $item->sale['user']['name'],
+                    'customer' => $item->sale['customer']['name'],
+                    'customer_tin' => $item->sale['customer']['tin'],
+                    'paid' => $paid,
+                    'balance' => $balance,
+                    'remark' => $remark,
+                    'created_at' => date('Y-m-d', strtotime($item->sale['date']))
+                ));
             }
-        }
 
-        $data = $grouped_sales;
-        if ($receipt_size === 'Thermal Paper') {
-            $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
-                compact('data', 'pharmacy', 'page'));
-            return $pdf->stream($request->reprint_receipt . '.pdf');
-        } else if ($receipt_size === 'A4 / Latter') {
-            $pdf = PDF::loadView('sales.cash_sales.receipt',
-                compact('data', 'pharmacy', 'page'));
-            return $pdf->stream($request->reprint_receipt . '.pdf');
-        } else {
-            echo "<script>window.close();</script>";
+
+            foreach ($sales as $val) {
+                if (array_key_exists('receipt_number', $val)) {
+                    $grouped_sales[$val['receipt_number']][] = $val;
+                }
+            }
+
+            $data = $grouped_sales;
+
+
+            if ($receipt_size == '58mm Thermal Paper') {
+                $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
+                    compact('data', 'pharmacy', 'page'));
+                return $pdf->stream($request->reprint_receipt . '.pdf');
+            } else if ($receipt_size == 'A4 / Letter') {
+                $pdf = PDF::loadView('sales.cash_sales.receipt',
+                    compact('data', 'pharmacy', 'page'));
+                return $pdf->stream($request->reprint_receipt . '.pdf');
+            } else if ($receipt_size == '80mm Thermal Paper') {
+                $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
+                    compact('data', 'pharmacy', 'page'));
+                return $pdf->stream($request->reprint_receipt . '.pdf');
+            } else if ($receipt_size == 'A5 / Half Letter') {
+                $pdf = PDF::loadView('sales.cash_sales.receipt_A5',
+                    compact('data', 'pharmacy', 'page'));
+                return $pdf->stream($request->reprint_receipt . '.pdf');
+            } else {
+                echo "<script>window.close();</script>";
+            }
+
+        }catch (Exception $e)
+        {
+            Log::info("Error",['PrintingError'=>$e]);
         }
 
 
@@ -577,7 +617,8 @@ class SaleController extends Controller
         $dir = $request->input('order.0.dir');
 
         if (empty($request->input('search.value'))) {
-            $sales = Sale::whereBetween(DB::raw('date(date)'),
+            $sales = Sale::with(['customer', 'cost', 'priceCategory'])
+                ->whereBetween(DB::raw('date(date)'),
                 [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
                 ->offset($start)
                 ->limit($limit)
@@ -586,30 +627,48 @@ class SaleController extends Controller
         } else {
             $search = $request->input('search.value');
 
-            $sales = Sale::whereBetween(DB::raw('date(date)'),
-                [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
-                ->where('receipt_number', 'LIKE', "%{$search}%")
-                ->orWhere(DB::raw('date(date)'), 'LIKE', "%{$search}%")
+            $sales = Sale::with(['customer', 'cost', 'priceCategory'])
+                ->join('customers', 'sales.customer_id', '=', 'customers.id')
+                ->whereBetween(DB::raw('date(sales.date)'), [
+                    date('Y-m-d', strtotime($from)),
+                    date('Y-m-d', strtotime($to))
+                ])
+                ->where(function($query) use ($search) {
+                    $query->where('sales.receipt_number', 'LIKE', "%{$search}%")
+                ->orWhere(DB::raw('date(sales.date)'), 'LIKE', "%{$search}%")
+                          ->orWhere('customers.name', 'LIKE', "%{$search}%");
+                })
+                ->select('sales.*') // Select only sales table columns to avoid conflicts
                 ->offset($start)
                 ->limit($limit)
                 ->orderBy($order, $dir)
                 ->get();
 
-            $totalFiltered = Sale::whereBetween(DB::raw('date(date)'),
+            Log::info("SalesData",["Data"=>$sales]);
+
+            $totalFiltered = Sale::join('customers', 'sales.customer_id', '=', 'customers.id')
+                ->whereBetween(DB::raw('date(sales.date)'),
                 [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
-                ->where('receipt_number', 'LIKE', "%{$search}%")
-                ->orWhere(DB::raw('date(date)'), 'LIKE', "%{$search}%")
+                ->where(function($query) use ($search) {
+                    $query->where('sales.receipt_number', 'LIKE', "%{$search}%")
+                          ->orWhere(DB::raw('date(sales.date)'), 'LIKE', "%{$search}%")
+                          ->orWhere('customers.name', 'LIKE', "%{$search}%");
+                })
                 ->count();
         }
 
-        $data = array();
-        if (!empty($sales)) {
+
+        // The relationships are already loaded via eager loading, no need for manual loading
+        // Add action buttons to each sale and enhance cost object with price category name
             foreach ($sales as $sale) {
+            $detailsButton = '<button type="button" id="sale_details" class="btn btn-sm btn-rounded btn-success" data-id="' . $sale->receipt_number . '" data-toggle="modal" data-target="#sale-details">Show</button>';
+            $reprintButton = '<button type="button" id="sale_receipt_reprint" class="btn btn-sm btn-rounded btn-secondary" data-id="' . $sale->receipt_number . '"><span class="fa fa-print" aria-hidden="true"></span> Print</button>';
 
-                $sale->cost;
-                $sale->details;
-                $sale->customer;
+            $sale->action = $detailsButton . ' ' . $reprintButton;
 
+            // Add price category name to cost object if both exist
+            if ($sale->cost && $sale->priceCategory) {
+                $sale->cost->name = $sale->priceCategory->name;
             }
         }
 
@@ -625,12 +684,31 @@ class SaleController extends Controller
 
     }
 
-    public function SalesHistory()
+    public function salesDetailsData(Request $request)
     {
 
+        $data = DB::table('sales')
+            ->join('customers','customers.id','=','sales.customer_id')
+            ->join('sales_details','sales.id','=','sales_details.sale_id')
+            ->join('inv_current_stock','sales_details.stock_id','=','inv_current_stock.id')
+            ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
+            ->select('inv_products.name','sales_details.price','sales_details.quantity','customers.name as customer_name')
+            ->where('sales.receipt_number','=',$request->receipt_number)
+            ->get();
+
+        return $data;
+    }
+
+    public function SalesHistory()
+    {
+        if (!Auth()->user()->checkPermission('View Sales History')) {
+            abort(403, 'Access Denied');
+        }
+
         $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
+        $customers = Customer::orderBy('name', 'ASC')->get();
         return View::make('sales.sales_history.index')
-            ->with(compact('vat'));
+            ->with(compact('vat'))->with(compact('customers'));
     }
 
     public function creditsTracking()
@@ -664,9 +742,11 @@ class SaleController extends Controller
                 ->where('sale_id', $id)
                 ->groupby('sale_id')
                 ->first();
-            $paid = $amounts->paid;
-            $balance = $amounts->balance;
-            $remark = $amounts->remark;
+
+                $paid = $amounts->paid;
+                $balance = $amounts->balance;
+                $remark = $amounts->remark;
+
         }
 
         $sale_detail = SalesDetail::where('sale_id', $id)->get();
@@ -717,7 +797,7 @@ class SaleController extends Controller
 
         $data = $grouped_sales;
 
-        if ($receipt_size === 'Thermal Paper') {
+        if ($receipt_size === '58mm Thermal Paper') {
             if ($page === "-1") {
                 $pdf = PDF::loadView('sales.cash_sales.credit_receipt_thermal',
                     compact('data', 'pharmacy', 'page'));
@@ -728,7 +808,20 @@ class SaleController extends Controller
 
             return $pdf->stream($receipt_no . '.pdf');
 
-        } else if ($receipt_size === 'A4 / Latter') {
+        }
+        else if ($receipt_size === '80mm Thermal Paper') {
+            if ($page === "-1") {
+                $pdf = PDF::loadView('sales.cash_sales.credit_receipt_thermal',
+                    compact('data', 'pharmacy', 'page'));
+            } else {
+                $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
+                    compact('data', 'pharmacy', 'page'));
+            }
+
+            return $pdf->stream($receipt_no . '.pdf');
+
+        }
+        else if ($receipt_size === 'A4 / Letter') {
             if ($page === "-1") {
                 $pdf = PDF::loadView('sales.cash_sales.credit_receipt',
                     compact('data', 'pharmacy', 'page'));
@@ -739,7 +832,21 @@ class SaleController extends Controller
 
             return $pdf->stream($receipt_no . '.pdf');
 
-        } else {
+        }
+        else if ($receipt_size === 'A5 / Half Letter') {
+            if ($page === "-1") {
+                $pdf = PDF::loadView('sales.cash_sales.credit_receipt',
+                    compact('data', 'pharmacy', 'page'));
+            } else {
+                $pdf = PDF::loadView('sales.cash_sales.receipt',
+                    compact('data', 'pharmacy', 'page'));
+            }
+
+            return $pdf->stream($receipt_no . '.pdf');
+
+        }
+
+        else {
             echo "<script>window.close();</script>";
         }
 

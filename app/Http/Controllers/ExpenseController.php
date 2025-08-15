@@ -30,6 +30,7 @@ class ExpenseController extends Controller
         $expense->payment_method_id = $request->payment_method;
         $expense->created_at = date('Y-m-d', strtotime($request->expense_date));
         $expense->updated_by = Auth::user()->id;
+        $expense->store_id = Auth::user()->store_id;
         $expense->save();
 
         session()->flash("alert-success", "Expense added successfully!");
@@ -45,6 +46,7 @@ class ExpenseController extends Controller
         $expense->payment_method_id = $request->payment_method_edit;
         $expense->created_at = date('Y-m-d', strtotime($request->expense_date_edit));
         $expense->updated_by = Auth::user()->id;
+        $expense->store_id = Auth::user()->store_id;
         $expense->save();
 
         session()->flash("alert-success", "Expense updated successfully!");

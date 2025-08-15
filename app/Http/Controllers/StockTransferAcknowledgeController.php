@@ -12,16 +12,21 @@ use App\Store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class StockTransferAcknowledgeController extends Controller
 {
 
 
-    public function index()
+    public function index($transfer_no)
     {
 
-        $stores = Store::all();
-        $all_transfers = StockTransfer::where('status', '=', '1')->get();
+
+        $stores = Store::where('name','<>','ALL')->get();
+        $store_id = Auth::user()->store_id;
+        $all_transfers = StockTransfer::where('status', '=', '1')
+            ->where('transfer_no','=',$transfer_no)
+            ->get();
 
         return view('stock_management.stock_transfer_acknowledge.index')->with([
             'stores' => $stores,
@@ -121,7 +126,7 @@ class StockTransferAcknowledgeController extends Controller
     {
 
         /*get default store*/
-        $default_store = Setting::where('id', 122)->value('value');
+        $default_store = Auth::user()->store[0]->name;
         $stores = Store::where('name', $default_store)->first();
 
         if ($stores != null) {
@@ -196,14 +201,70 @@ class StockTransferAcknowledgeController extends Controller
         $stock_tracking->save();
 
         session()->flash("alert-success", "Transfer updated successfully!");
-        return back();
+
+        $count = StockTransfer::where('transfer_no','=',$request->transfer_no)
+        ->where('status','=','1')->count();
+
+        if($count > 0)
+        {
+            return back();
+        }
+
+        return redirect()->route('stock-transfer-history');
     }
 
-    public function transferFilter(Request $request)
+    public function filterTransfer(Request $request)
     {
 
-        // $transfers = StockTransfer::all();
+        $from = $request->get("from_val");
+        $to = $request->get("to_val");
 
+        if ($request->ajax()) {
+
+
+            $results= StockTransfer::with(['fromStore','toStore'])
+                ->select(DB::raw('*, SUM(transfer_qty) as quantity, SUM(accepted_qty) as received_quantity, COUNT(*) as total_products , MIN(status) as status'))
+                ->orderBy('created_at', 'Desc')
+                ->groupBy('transfer_no')->get();
+            if ($from != 0 && $to != 0) {
+                $results= StockTransfer::with(['fromStore','toStore'])
+                    ->where('from_store','=',$from)
+                    ->where('to_store','=',$to)
+                    ->select(DB::raw('*, SUM(transfer_qty) as quantity, SUM(accepted_qty) as received_quantity, COUNT(*) as total_products , MIN(status) as status'))
+                    ->orderBy('created_at', 'Desc')
+                    ->groupBy('transfer_no')->get();
+            }
+
+            if ($from = 0 && $to != 0) {
+                $results= StockTransfer::with(['fromStore','toStore'])
+                    ->where('to_store','=',$to)
+                    ->select(DB::raw('*, SUM(transfer_qty) as quantity, SUM(accepted_qty) as received_quantity, COUNT(*) as total_products , MIN(status) as status'))
+                    ->orderBy('created_at', 'Desc')
+                    ->groupBy('transfer_no')->get();
+            }
+
+
+            if ($from != 0 && $to = 0) {
+                $results= StockTransfer::with(['fromStore','toStore'])
+                    ->where('from_store','=',$from)
+                    ->select(DB::raw('*, SUM(transfer_qty) as quantity, SUM(accepted_qty) as received_quantity, COUNT(*) as total_products , MIN(status) as status'))
+                    ->orderBy('created_at', 'Desc')
+                    ->groupBy('transfer_no')->get();
+            }
+
+        }
+
+
+        Log::info('FilteredData',['Results'=>$results]);
+
+
+
+        return json_decode($results, true);
+    }
+
+    //Used when filter occurs
+    public function transferFilter(Request $request)
+    {
 
         $from = $request->get("from_val");
         $to = $request->get("to_val");
@@ -213,34 +274,43 @@ class StockTransferAcknowledgeController extends Controller
 
             if ($from != 0 && $to != 0) {
 
-                $results = StockTransfer::select(DB::raw('sum(transfer_qty) as transfer_qty'),
-                    DB::raw('transfer_no'), DB::raw('date_format(created_at,"%d-%m-%Y") as date'))
+                $results = StockTransfer::with(['fromStore','toStore'])
+                    ->select(DB::raw('*,transfer_no,date_format(created_at,"%d-%m-%Y") as date,sum(transfer_qty) as transfer_qty'))
                     ->where('to_store', '=', $to)
                     ->where('from_store', '=', $from)
                     ->groupby('transfer_no')
                     ->orderby('created_at', 'DESC')
                     ->get();
 
+
+
+                Log::info('FilteredData2',['Results'=>$results]);
+
                 return json_decode($results, true);
 
             } else if ($from == 0 && $to != 0) {
 
-                $results = StockTransfer::select(DB::raw('sum(transfer_qty) as transfer_qty'),
-                    DB::raw('transfer_no'), DB::raw('date_format(created_at,"%d-%m-%Y") as date'))
+                $results = StockTransfer::with(['fromStore','toStore'])
+                    ->select(DB::raw('*,transfer_no,date_format(created_at,"%d-%m-%Y") as date,sum(transfer_qty) as transfer_qty'))
+                    ->where('to_store', '=', $to)
                     ->groupby('transfer_no')
                     ->orderby('created_at', 'DESC')
                     ->get();
+
+                Log::info('FilteredData2',['Results'=>$results]);
 
                 return json_decode($results, true);
 
             } else if ($from != 0 && $to == 0) {
 
-                $results = StockTransfer::select(DB::raw('sum(transfer_qty) as transfer_qty'),
-                    DB::raw('transfer_no'), DB::raw('date_format(created_at,"%d-%m-%Y") as date'))
+                $results = StockTransfer::with(['fromStore','toStore'])
+                    ->select(DB::raw('*,transfer_no,date_format(created_at,"%d-%m-%Y") as date,sum(transfer_qty) as transfer_qty'))
                     ->where('from_store', '=', $from)
                     ->groupby('transfer_no')
                     ->orderby('created_at', 'DESC')
                     ->get();
+
+                Log::info('FilteredData2',['Results'=>$results]);
 
                 return json_decode($results, true);
 
@@ -264,41 +334,30 @@ class StockTransferAcknowledgeController extends Controller
         $info = array();
         $products = Product::all();
 
+
         if ($request->ajax()) {
             if ($from != 0 && $to != 0) {
 
-                $results = StockTransfer::where('transfer_no', $transfer_no)->get();
+                $results = StockTransfer::with(['fromStore','toStore'])->
+                    join('inv_current_stock','inv_current_stock.id','=','inv_stock_transfers.stock_id')
+                    ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
+                    ->select('*','inv_products.name as product_name')
+                    ->where('transfer_no', $transfer_no)
+                    ->get();
 
-                foreach ($results as $result) {
-
-                    $result->currentStock['product'];
-
-                    $result->currentStock;
-                    //return to store object
-                    $result->toStore;
-
-                    //return to from store object
-                    $result->fromStore;
-
-                }
+                Log::info('DataLoaded',["Results"=>$results]);
 
                 return json_decode($results, true);
 
             } else {
 
-                $results = StockTransfer::where('transfer_no', $transfer_no)->get();
+                $results = StockTransfer::with(['fromStore','toStore'])->join('inv_current_stock','inv_current_stock.id','=','inv_stock_transfers.stock_id')
+                    ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
+                    ->select('*','inv_products.name as product_name')
+                    ->where('transfer_no', $transfer_no)
+                    ->get();
 
-                foreach ($results as $result) {
-
-                    $result->currentStock['product'];
-
-                    //return to store object
-                    $result->toStore;
-
-                    //return to from store object
-                    $result->fromStore;
-
-                }
+                Log::info('DataLoaded',["Results"=>$results]);
 
                 return json_decode($results, true);
 

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Customer;
-use DB;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -13,12 +13,38 @@ class CustomerController extends Controller
     public function index()
     {
         $customers = Customer::orderBy('id', 'ASC')->get();
+        foreach ($customers as $customer) {
+            $customer_count = DB::table('sales')->where('customer_id',$customer->id)->count();
+
+            if($customer_count > 0)
+            {
+                $customer['active_user'] = "has transactions";
+            }
+
+            if($customer_count == 0)
+            {
+                $customer['active_user'] = "no transactions";
+            }
+
+
+        }
+
         return view('sales.customers.index', compact("customers"));
 
     }
 
     public function store(Request $request)
     {
+
+        if($request->credit_limit>0)
+        {
+            $payment_term = '2';
+        }
+
+        if($request->credit_limit==0)
+        {
+            $payment_term = '1';
+        }
 
         $customer = new Customer;
         $customer->name = $request->name;
@@ -27,6 +53,7 @@ class CustomerController extends Controller
         $customer->phone = $request->phone;
         $customer->email = $request->email;
         $customer->tin = $request->tin;
+        $customer->payment_term = $payment_term;
 
 
         $customer->save();
@@ -58,8 +85,15 @@ class CustomerController extends Controller
     public function destroy(Request $request)
     {
         try {
+            $customer_count = DB::table('sales')->where('customer_id',$request->id)->count();
+
+            if($customer_count > 0)
+            {
+                session()->flash("alert-danger", "Customer has pending transaction!");
+                return back();
+            }
             Customer::find($request->id)->delete();
-            session()->flash("alert-danger", "Customer Deleted successfully!");
+            session()->flash("alert-success", "Customer Deleted successfully!");
             return back();
         } catch (Exception $exception) {
             session()->flash("alert-danger", "Customer in use!");

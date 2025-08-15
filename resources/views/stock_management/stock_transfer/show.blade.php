@@ -1,75 +1,67 @@
-<div class="modal fade" id="show" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">View Stock Transfer</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    @if($errors->any())
-                        <div class="alert alert-danger">
-                            <ul>
-                                @foreach($errors->all() as  $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
+@extends('layouts.master')
 
-                        </div>
-                    @endif
-                    <form action="{{route('stock-transfer.store')}}" method="post">
-                        @csrf()
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="transfer_no">Transfer Number</label>
-                                        <input type="text" class="form-control" id="transfer_no_edit" name="transfer_no"
-                                               aria-describedby="emailHelp" value="{{ $auto_gen }}" readonly>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="name">Product Name</label>
-                                        <select name="name" class="form-control" id="name_edit" readonly>
-                                            @foreach($products as $product)
-                                                <option value="">{{$product->product['name']}}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="from_store">From Store</label>
-                                        <select name="from_store" class="form-control" id="from_store" readonly>
-                                            @foreach($stores as $store)
-                                                <option value="{{$store->id}}">{{$store->name}}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="to_store">To Store</label>
-                                        <select name="to_store" class="form-control" id="to_store" readonly>
-                                            @foreach($stores as $store)
-                                                <option value="{{$store->id}}">{{$store->name}}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="quantity">Quantity</label>
-                                        <input type="number" class="form-control" id="quantity_edit"
-                                               name="quantity"
-                                               placeholder="" readonly>
+@section('page_css')
+    <style>
+        .table td, .table th {
+            padding: .5rem;
+        }
+    </style>
+@endsection
+
+@section('content-title')
+    Stock Transfer Details
+@endsection
+
+@section('content-sub-title')
+    <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="feather icon-home"></i></a></li>
+    <li class="breadcrumb-item"><a href="{{ route('stock-transfer-history') }}">Stock Transfer History</a></li>
+    <li class="breadcrumb-item active">Details</li>
+@endsection
+
+@section('content')
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Transfer Details for #{{ $transfers->first()->transfer_no }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>From Store:</strong> {{ $transfers->first()->fromStore->name }}</p>
+                        <p><strong>To Store:</strong> {{ $transfers->first()->toStore->name }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Transfer Date:</strong> {{ $transfers->first()->created_at->format('d-m-Y') }}</p>
+                        <p><strong>Status:</strong> <span class="badge badge-secondary">{{ $transfers->first()->status_text }}</span></p>
+                    </div>
+                </div>
+                <hr>
+                <h6>Transferred Products</h6>
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity Transferred</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($transfers as $transfer)
+                                <tr>
+                                    <td>{{ $transfer->currentStock->product->name ?? 'N/A' }}</td>
+                                    <td>{{ $transfer->transfer_qty }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4">
+                    <a href="{{ route('stock-transfer-history') }}" class="btn btn-secondary">Back to History</a>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
                                     </div>
                                 </div>
                                 <div class="col-md-6">

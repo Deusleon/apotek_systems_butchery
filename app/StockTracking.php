@@ -10,6 +10,16 @@ class StockTracking extends Model
     protected $table = 'inv_stock_tracking';
     public $timestamps = false;
 
+    protected $fillable = [
+        'stock_id',
+        'product_id',
+        'quantity',
+        'out_mode',
+        'store_id',
+        'created_by',
+        'updated_by'
+    ];
+
     public function currentStock()
     {
         return $this->belongsTo(CurrentStock::class, 'stock_id');

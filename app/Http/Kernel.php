@@ -6,6 +6,7 @@ use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\CheckForMaintenanceMode;
 use App\Http\Middleware\DBConnectionMiddleware;
 use App\Http\Middleware\EncryptCookies;
+use App\Http\Middleware\MainBranchMiddleware;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\TrimStrings;
 use App\Http\Middleware\TrustProxies;
@@ -87,6 +88,8 @@ class Kernel extends HttpKernel
         'db_con' => DBConnectionMiddleware::class,
         'role' => RoleMiddleware::class,
         'permission' => PermissionMiddleware::class,
+        'main_branch' => MainBranchMiddleware::class,
+        'log.upload' => \App\Http\Middleware\LogFileUpload::class,
     ];
 
     /**

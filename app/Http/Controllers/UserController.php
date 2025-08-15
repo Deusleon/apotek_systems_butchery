@@ -2,11 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Setting;
 use App\User;
-use Auth;
+use Dompdf\Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Traits\HasRoles;
 
 
@@ -14,11 +20,64 @@ class UserController extends Controller
 {
     use HasRoles;
 
+
     public function index()
     {
         $users = User::orderBy('name')->get();
 
+
         return view('users.index', compact("users"));
+    }
+
+    public function addPermission(Request $request)
+    {
+
+        $request->validate([
+            'name' => 'required|string|max:50',
+            'category' => 'required',
+        ]);
+
+
+        try{
+
+            DB::table('permissions')
+                ->insert([
+                    'name'=>$request->name,
+                    'guard_name'=>'web',
+                    'created_at'=>now(),
+                    'updated_at'=>now(),
+                    'category'=>$request->category
+                ]);
+
+            Session::flash('success', 'Permission added successfully!');
+
+            return redirect()->back();
+
+        }catch (Exception $e)
+        {
+            Log::error('message',['ErrorAddingPermission'=>$e]);
+
+            Session::flash('error', 'Oops something went wrong!');
+
+            return redirect()->back();
+        }catch (ValidationException $e) {
+
+            Session::flash('danger', $e->errors()[0]);
+
+            return redirect()->back();
+        }
+    }
+
+    public function userActivities()
+    {
+        $activities = DB::table('activity_log')
+            ->join('users','users.id','=','activity_log.causer_id')
+            ->select('users.name','activity_log.subject_type as log_type','activity_log.created_at as log_date',
+                'activity_log.description as data')
+            ->get();
+
+
+        return view('users.activities', compact("activities"));
     }
 
     public function store(Request $request)
@@ -29,6 +88,7 @@ class UserController extends Controller
             'role' => 'required',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
+            'store_id' => 'required'
         ]);
 
         $user = new User;
@@ -36,8 +96,9 @@ class UserController extends Controller
         $user->position = $request->position;
         $user->email = $request->email;
         $user->mobile = $request->mobile;
-        $user->status = '-1';
+        $user->status = '1';
         $user->password = Hash::make($request->password);
+        $user->store_id = $request->store_id;
         $user->save();
 
         $user->syncRoles($request->role);
@@ -52,6 +113,7 @@ class UserController extends Controller
             'name1' => 'required|string|max:100',
             'role1' => 'required',
             'position1' => 'nullable|string|max:50',
+            'store_id' => 'required',
         ]);
 
 
@@ -59,6 +121,7 @@ class UserController extends Controller
         $user->name = $request->name1;
         $user->position = $request->position1;
         $user->mobile = $request->mobile1;
+        $user->store_id = $request->store_id;
         $user->save();
 
         $user->syncRoles($request->role1);
@@ -118,5 +181,39 @@ class UserController extends Controller
         return redirect()->route('users.index');
     }
 
+
+    /**
+     * Log the user out of the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function logout(Request $request)
+    {
+        Artisan::call('optimize:clear');    //Clears the application cache
+//        Artisan::call('cache:clear');    //Clears the application cache
+//        Artisan::call('config:clear');   //Clears the configuration cache
+//        Artisan::call('route:clear');    //Clears the route cache
+//        Artisan::call('view:clear');     //Clears the view cache
+
+        $this->guard()->logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login');
+    }
+
+
+    /**
+     * Get the guard to be used during authentication.
+     *
+     * @return \Illuminate\Contracts\Auth\StatefulGuard
+     */
+    protected function guard()
+    {
+        return \Illuminate\Support\Facades\Auth::guard();
+    }
 
 }

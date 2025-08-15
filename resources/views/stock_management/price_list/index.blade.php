@@ -66,10 +66,28 @@
                         </div>
                         <div class="col-md-3" style="margin-left: -2.6%;">
                             <select name="price_category" class="js-example-basic-single form-control"
-                                    id="price_category" onchange="option()">
+                                    id="price_category">
                                 @foreach($price_categories as $price_category)
                                     <option value="{{$price_category->id}}">{{ $price_category->name }}</option>
                                 @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-md-6" style="margin-left: 2%">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="price_category" class="col-form-label text-md-right"
+                                   style="margin-left: 68%">Type:</label>
+                        </div>
+                        <div class="col-md-3" style="margin-left: -2.6%;">
+                            <select name="type_id" class="js-example-basic-single form-control" id="type_id">
+                                <option readonly value="0" id="store_name_edit" disabled
+                                        selected>Select Type...
+                                </option>
+                                <option name="store_name" value="1" selected >Current</option>
+                                <option name="store_name" value="0">History</option>
                             </select>
                         </div>
                     </div>
@@ -81,16 +99,84 @@
                             <thead>
                             <tr>
                                 <th>Product Name</th>
-                                <th>Buying Price</th>
-                                <th>Selling Price</th>
+                                <th>Brand</th>
+                                <th>Pack Size</th>
+                                <th>Buy Price</th>
+                                <th>Sell Price</th>
+                                <th>Profit%</th>
                                 <th>Action</th>
+                                <th hidden>Category ID</th>
                             </tr>
                             </thead>
                             <tbody>
+                               @foreach ($current_stocks as $stock)
+                                @if($stock->unit_cost>0)
+                                    <tr>
+                                        <td>{{ $stock->product_name ?? '' }}</td>
+                                        <td>{{ $stock->brand ?? '' }}</td>
+                                        <td>{{ $stock->pack_size ?? '' }}</td>
+                                        <td>{{ number_format($stock->unit_cost, 2) }}</td>
+                                        <td>{{ number_format($stock->price, 2) }}</td>
+                                        <td>{{ round($stock->profit, 0) }}%</td>
+                                        <td>
+                                            <div>
+                                                <button id='pricing'
+                                                        class='btn btn-sm btn-rounded btn-primary'
+                                                        type='button'
+                                                        data-toggle="modal" data-target="#edit"
+                                                        data-name='{{ $stock->product_name ?? '' }}'
+                                                        data-unit-cost='{{ $stock->unit_cost ?? '' }}'
+                                                        data-price='{{ $stock->price ?? '' }}'
+                                                        data-id='{{ $stock->id ?? '' }}'
+                                                        data-brand='{{ $stock->brand ?? '' }}'
+                                                        data-pack-size='{{ $stock->pack_size ?? '' }}'
+                                                        data-price-category='{{ $stock->price_category_name ?? '' }}'
+                                                        data-price-category-id='{{ $stock->price_category_id ?? '' }}'>Edit</button>
+                                            </div>
+                                        </td>
+                                        <td hidden>{{ $stock->price_category_id ?? '' }}</td>
+                                    </tr>
+                                @endif
+                            @endforeach
+                            </tbody>
+
+
+                        </table>
+                    </div>
+
+                    <div id="tbody_detailed" class="table-responsive" style="display: none;">
+                        <table id="detailed_body"  class="display table nowrap table-striped table-hover"
+                               style="width: 100%;">
+
+                            <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Buy Price</th>
+                                <th>Sell Price</th>
+                                <th>Purchase Date</th>
+                                <th hidden>Real Time</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            @foreach ($stocks as $stock)
+                                @if($stock->unit_cost>0)
+                                    <tr>
+                                        <td>{{ $stock->name ?? '' }}</td>
+                                        <td>{{ number_format($stock->unit_cost,2) ?? '' }}</td>
+                                        <td>{{ number_format($stock->price,2) ?? '' }}</td>
+                                        <td>{{date('d-m-Y', strtotime($stock->updated_at))}}</td>
+                                        <td hidden>{{ $stock->updated_at ?? '' }}</td>
+
+                                    </tr>
+                                @endif
+                            @endforeach
                             </tbody>
 
                         </table>
                     </div>
+
+
                 </div>
 
 
@@ -104,17 +190,22 @@
                         <thead>
                         <tr>
                             <th>Product Name</th>
-                            <th>Buying Price</th>
-                            <th>Selling Price</th>
+                            <th>Buy Price</th>
+                            <th>Sell Price</th>
                             <th>code</th>
                             <th>Action</th>
                         </tr>
                         </thead>
                         <tbody>
+
                         </tbody>
 
                     </table>
                 </div>
+
+
+
+
             </div>
         </div>
     </div>
@@ -135,65 +226,114 @@
 
     @include('partials.notification')
 
+
+{{--    <script>--}}
+{{--        async function sendGetRequest() {--}}
+{{--            const selectedValue = document.getElementById('price_category').value;--}}
+
+
+
+{{--            try {--}}
+{{--                const response = await fetch(`{{ url('inventory/price-list') }}?price_category=${selectedValue}`);--}}
+
+{{--                if (!response.ok) {--}}
+{{--                    throw new Error('Network response was not ok');--}}
+{{--                }--}}
+
+{{--                console.log('Received Data:', "Returned Succesfully on Server");--}}
+
+{{--                // Process data as needed, e.g., update a table or display results--}}
+{{--            } catch (error) {--}}
+{{--                console.error('Error:', error);--}}
+{{--            }--}}
+{{--        }--}}
+{{--    </script>--}}
+
     <script>
 
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
 
-        $(document).ready(function () {
-            loadPriceList();
-        });
 
-        function loadPriceList() {
-            var e = document.getElementById("price_category");
-            var value = e.options[e.selectedIndex].value;
 
-            $("#fixed-header2").dataTable().fnDestroy();
-            var table_main = $('#fixed-header2').DataTable({
-                "processing": true,
-                "serverSide": true,
-                "ajax": {
-                    "url": "{{ route('all-price-list') }}",
-                    "dataType": "json",
-                    "type": "post",
-                    "cache": false,
-                    "data": {
-                        _token: "{{csrf_token()}}",
-                        price_category: value
-                    }
-                },
-                "columns": [
-                    {"data": "name"},
-                    {
-                        "data": "unit_cost", render: function (unit_cost) {
-                            return formatMoney(unit_cost);
-                        }
-                    },
-                    {
-                        "data": "price", render: function (price) {
-                            return formatMoney(price);
-                        }
-                    },
-                    {
-                        "data": "action",
-                        defaultContent: "<div><button id='detail' data-target='#test' class='btn btn-sm btn-rounded btn-success' type='button'>Price History</button></div>"
-                    }
-                ]
 
-            });
+        // $.ajaxSetup({
+        //     headers: {
+        //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        //     }
+        // });
 
-            $('#tbody1').on('click', '#detail', function () {
-                var data = table_main.row($(this).parents('tr')).data();
+        {{--$(document).ready(function () {--}}
+        {{--    loadPriceList();--}}
+        {{--});--}}
 
-                var e = document.getElementById("price_category");
-                var value = e.options[e.selectedIndex].value;
+        {{--function loadPriceList() {--}}
+        {{--    var e = document.getElementById("price_category");--}}
+        {{--    var value = e.options[e.selectedIndex].value;--}}
 
-                retrivePriceHistory(value, data.product_id);
-            });
-        }
+        {{--    $("#fixed-header2").dataTable().fnDestroy();--}}
+        {{--    var table_main = $('#fixed-header2').DataTable({--}}
+        {{--        "processing": true,--}}
+        {{--        "serverSide": true,--}}
+        {{--        "ajax": {--}}
+        {{--            "url": "{{ route('all-price-list') }}",--}}
+        {{--            "dataType": "json",--}}
+        {{--            "type": "post",--}}
+        {{--            "cache": false,--}}
+        {{--            "data": {--}}
+        {{--                _token: "{{csrf_token()}}",--}}
+        {{--                price_category: value--}}
+        {{--            }--}}
+        {{--        },--}}
+        {{--        "columns": [--}}
+        {{--            {"data": "name"},--}}
+        {{--            {--}}
+        {{--                "data": "unit_cost", render: function (unit_cost) {--}}
+        {{--                    return formatMoney(unit_cost);--}}
+        {{--                }--}}
+        {{--            },--}}
+        {{--            {--}}
+        {{--                "data": "price", render: function (price) {--}}
+        {{--                    return formatMoney(price);--}}
+        {{--                }--}}
+        {{--            },--}}
+        {{--            {--}}
+        {{--                // Calculate profit percentage: ((price - unit_cost) / unit_cost) * 100--}}
+        {{--                "data": null, // Set data to null because calculation is done in render--}}
+        {{--                render: function (data, type, row) {--}}
+        {{--                    let unit_cost = row.unit_cost;--}}
+        {{--                    let price = row.price;--}}
+        {{--                    let profitPercent = ((price - unit_cost) / unit_cost) * 100;--}}
+        {{--                    return profitPercent.toFixed(2) + "%"; // Format as percentage with 2 decimal places--}}
+        {{--                }--}}
+        {{--            },--}}
+        {{--            {--}}
+        {{--                "data": 'action',--}}
+        {{--                defaultContent: "<div><button id='pricing' class='btn btn-sm btn-rounded btn-primary' type='button'>Edit</button></div>",--}}
+        {{--                "render": function (data, type, row) {--}}
+        {{--                    return `<div>--}}
+        {{--                  <button id='pricing'--}}
+        {{--                    class='btn btn-sm btn-rounded btn-primary'--}}
+        {{--                    type='button'--}}
+        {{--                    data-toggle="modal" data-target="#edit"--}}
+        {{--                    data-name='${row.name}'--}}
+        {{--                    data-unit-cost='${row.unit_cost}'--}}
+        {{--                    data-price='${row.price}'--}}
+        {{--                    data-id='${row.id}'>Edit</button>--}}
+        {{--                </div>`;--}}
+        {{--                }--}}
+        {{--            }--}}
+        {{--        ]--}}
+
+        {{--    });--}}
+
+        {{--    $('#tbody1').on('click', '#detail', function () {--}}
+        {{--        var data = table_main.row($(this).parents('tr')).data();--}}
+
+        {{--        var e = document.getElementById("price_category");--}}
+        {{--        var value = e.options[e.selectedIndex].value;--}}
+
+        {{--        retrivePriceHistory(value, data.product_id);--}}
+        {{--    });--}}
+        {{--}--}}
 
 
         $('#tbody1').on('click', '#detail', function () {
@@ -205,36 +345,92 @@
             retrivePriceHistory(value, data.product_id);
         });
 
+        $('#type_id').on('change', function () {
+            console.log("Type Changed")
+            var cat = document.getElementById("type_id");
+            var category = cat.options[cat.selectedIndex].value;
+
+            if(category==="1") {
+                $('#tbody1').show();
+                $('#tbody_detailed').hide();
+
+            }
+
+            if(category==="0")
+            {
+
+                $('#tbody_detailed').show();
+                $('#tbody1').hide();
+                $('#tbody').hide();
+
+
+
+            }
+
+        });
+
+        // $('#edit').on('show.bs.modal', function (event) {
+        //     var button = $(event.relatedTarget);
+        //     var modal = $(this);
+        //
+        //     modal.find('.modal-body #id').val(button.data('id'));
+        //     modal.find('.modal-body #product_id').val(button.data('product_id'));
+        //     modal.find('.modal-body #stock_id').val(button.data('stock_id'));
+        //     modal.find('.modal-body #name_edit').val(button.data('name'));
+        //     modal.find('.modal-body #unit_cost_edit').val(button.data('unit'));
+        //     modal.find('.modal-body #sell_price_edit').val(button.data('sell'));
+        //     modal.find('.modal-body #price_category_edit').val(button.data('category'));
+        //     modal.find('.modal-body #d_auto_4').val(button.data('batch'));
+        //     modal.find('.modal-body #d_auto_5').val(button.data('expiry'));
+        //
+        // });
+
         $('#edit').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
+            var name = button.data('name');
+            var unit_cost_edit = parseFloat(button.data('unit-cost'));
+            var sell_price_edit = parseFloat(button.data('price'));
+            var id = button.data('id');
+            var brand = button.data('brand');
+            var pack_size = button.data('pack-size');
+            var price_category_id = button.data('price-category-id');
+            var price_category = button.data('price-category');
+
             var modal = $(this);
 
-            modal.find('.modal-body #id').val(button.data('id'));
-            modal.find('.modal-body #product_id').val(button.data('product_id'));
-            modal.find('.modal-body #stock_id').val(button.data('stock_id'));
-            modal.find('.modal-body #name_edit').val(button.data('name'));
-            modal.find('.modal-body #unit_cost_edit').val(button.data('unit'));
-            modal.find('.modal-body #sell_price_edit').val(button.data('sell'));
-            modal.find('.modal-body #price_category_edit').val(button.data('category'));
-            modal.find('.modal-body #d_auto_4').val(button.data('batch'));
-            modal.find('.modal-body #d_auto_5').val(button.data('expiry'));
+            modal.find('.modal-body #name').val(name);
+            modal.find('.modal-body #brand_edit').val(brand);
+            modal.find('.modal-body #unit_cost_edit').val(unit_cost_edit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+            modal.find('.modal-body #price_category_edit').val(price_category);
+            modal.find('.modal-body #sell_price_edit').val(sell_price_edit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+            modal.find('.modal-body #pack_size_edit').val(pack_size);
+            modal.find('.modal-body #id').val(id);
+            modal.find('.modal-body #price_category_id').val(price_category_id);
+        });
 
+        $('#editPriceForm').on('submit', function(e) {
+            var unitCostField = $('#unit_cost_edit');
+            var sellPriceField = $('#sell_price_edit');
+
+            var unitCostValue = unitCostField.val().replace(/,/g, '');
+            var sellPriceValue = sellPriceField.val().replace(/,/g, '');
+
+            unitCostField.val(unitCostValue);
+            sellPriceField.val(sellPriceValue);
         });
 
         $('#show').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
             var modal = $(this);
 
-            modal.find('.modal-body #id').text(button.data('id'));
-            modal.find('.modal-body #product_id').text(button.data('product_id'));
-            modal.find('.modal-body #stock_id').text(button.data('stock_id'));
-            modal.find('.modal-body #name_edit').text(button.data('name'));
-            modal.find('.modal-body #unit_cost_edit').text(button.data('unit'));
-            modal.find('.modal-body #sell_price_edit').text(button.data('sell'));
-            modal.find('.modal-body #price_category_edit').text(button.data('category'));
-            modal.find('.modal-body #d_auto_4').text(button.data('batch'));
-            modal.find('.modal-body #d_auto_5').text(button.data('expiry'));
-
+            modal.find('.modal-body #name_edit').val(button.data('name'));
+            modal.find('.modal-body #brand_edit').val(button.data('brand'));
+            modal.find('.modal-body #unit_cost_edit').val(button.data('unit'));
+            modal.find('.modal-body #price_category_edit').val(button.data('category'));
+            modal.find('.modal-body #sell_price_edit').val(button.data('sell'));
+            modal.find('.modal-body #pack_size_edit').val(button.data('pack-size'));
+            modal.find('.modal-body #d_auto_4').val(button.data('batch'));
+            modal.find('.modal-body #d_auto_5').val(button.data('expiry'));
 
         });
 
@@ -373,6 +569,39 @@
             table.draw();
             $('#test').modal('show');
         }
+
+
+        $(document).ready(function () {
+
+            $('#tbody_detailed').hide();
+
+            $('#detailed_body').DataTable({
+                responsive: true,
+                order: [[4, 'desc']]
+            });
+
+            const currentStocks = $('#fixed-header2').DataTable({
+                responsive: true,
+                order: [[0, 'asc']],
+                columnDefs: [
+                    {
+                        targets: 5, // Zero-based index of the hidden column
+                        visible: false, // Hide the column from view
+                        searchable: true, // Allow it to be searchable
+                    },
+                ]
+            });
+
+
+            $('#price_category').on('change', function (e) {
+                e.preventDefault();
+
+                const selectedValue = $(this).val(); // Get the selected dropdown value
+                currentStocks.column(5).search(selectedValue).draw(); // Filter by the hidden column
+            });
+
+        });
+
 
 
     </script>

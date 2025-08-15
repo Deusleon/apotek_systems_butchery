@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 
 class DBConnectionMiddleware
 {
@@ -16,13 +17,21 @@ class DBConnectionMiddleware
      * @param Closure $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
-        if (Auth::check()) {
-            $config = Config::get('database.connections.' . session()->get('db_connection'));
-            config()->set('database.default', session()->get('db_connection'));
-            config()->set('database.connections.' . session()->get('db_connection'), $config);
+        // Dynamically switch the default DB connection for the authenticated user.
+        if (Auth::check() && session()->has('db_connection')) {
+            $connection = session('db_connection');
+
+            // Only switch if the connection is defined in config/database.php
+            if (Config::has("database.connections.$connection")) {
+                Config::set('database.default', $connection);
+
+                // Purge so the new connection config is picked up immediately.
+                DB::purge($connection);
+            }
         }
+
         return $next($request);
     }
 }

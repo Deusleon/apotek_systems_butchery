@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\PriceCategory;
 use App\Setting;
 use App\Store;
-use Auth;
-use File;
+use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
-use View;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
 
 class ConfigurationsController extends Controller
 {
@@ -16,7 +16,7 @@ class ConfigurationsController extends Controller
     public function index()
     {
         /*return default store*/
-        $default_store = Setting::where('id', 122)->value('value');
+        $default_store = optional(Auth::user()->store->first())->name;
         $stores = Store::where('name', $default_store)->first();
         $sale_types = PriceCategory::all();
 

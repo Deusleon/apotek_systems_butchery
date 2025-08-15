@@ -10,12 +10,12 @@
 @endsection
 
 @section('content-title')
-    Settings
+    Configurations
 @endsection
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#"> Settings</a></li>
+    <li class="breadcrumb-item"><a href="#"> General / Configurations</a></li>
 @endsection
 
 @section("content")
@@ -275,7 +275,12 @@
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata"><option value="YES">YES</option><option value="NO">NO</option></select>';
                     break;
                 case 119:
-                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="receipt_size"><option value="Thermal Paper">Thermal Paper</option><option value="A4 / Latter">A4 / Latter</option><option value="None">None</option></select>';
+                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="receipt_size">' +
+                        '<option value="A4 / Letter">A4 / Letter</option>' +
+                        '<option value="A5 / Half Letter">A5 / Half Letter</option>' +
+                        '<option value="80mm Thermal Paper">80mm Thermal Paper</option>' +
+                        '<option value="58mm Thermal Paper">58mm Thermal Paper</option>' +
+                        '<option value="None">None</option></select>';
                     break;
                 case 120:
                     element.setAttribute("type", "number");

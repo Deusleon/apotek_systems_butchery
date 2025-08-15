@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Credit Sale Details Report</title>
+    <title>Credit Sales Details Report</title>
     <style>
 
         body {
@@ -112,7 +112,7 @@
                     <tr>
                         <td align="left">{{$loop->iteration}}</td>
                         <td align="left">{{$item['name']}}</td>
-                        <td align="right">{{$item['quantity']}}</td>
+                        <td align="right">{{number_format($item['quantity'],0)}}</td>
                         <td align="right">{{number_format($item['price']/$item['quantity'],2)}}</td>
                         {{--                        <td align="right">{{number_format($item['sub_total'],2)}}</td>--}}
                         {{--                        <td align="right">{{number_format($item['discount'],2)}}</td>--}}
@@ -144,7 +144,7 @@
         <div class="full-row">
             <div class="col-35">
                 <div class="full-row">
-                    <div class="col-50" align="left"><b>Sale Date:</b></div>
+                    <div class="col-50" align="left"><b>Sales Date:</b></div>
                     <div class="col-50" align="right">{{date('j M, Y', strtotime($dat[0]['created_at']))}}</div>
                 </div>
             </div>

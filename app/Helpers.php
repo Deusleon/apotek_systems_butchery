@@ -10,6 +10,14 @@ function getRoles(){
         ->get();
 }
 
+function getStores()
+{
+    return DB::table('inv_stores')
+        ->select('id','name')
+        ->orderBy('name')
+        ->get();
+}
+
 function getSettings(){
     return Setting::get();
 }

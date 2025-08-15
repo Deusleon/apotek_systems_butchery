@@ -51,17 +51,37 @@
                             </div>
                     </div>
 
-                <div class="form-group row">
-                    @foreach ($permissionsAll as $permission)
-                        <div class="col-sm-4">
-                                <div class="checkbox checkbox-fill d-inline">
-                                    <input type="checkbox" name="permissions[]" id="{{$permission->id}}" value="{{$permission->id}}">
-                                    <label for="{{$permission->id}}" class="cr"> {{$permission->name}}</label>
-                                </div>
+
+                <div class="card">
+                    @foreach ($permissionsAll as $key=>$item)
+                        <h5 class="card-header" style="background-color: #F4F7FA">{{$key ?? ''}}</h5>
+                        <div class="card-body">
+                            <div class="form-group row">
+                                @foreach ($item as $permission)
+                                    <div class="col-sm-4">
+                                        <div class="checkbox checkbox-fill d-inline">
+                                            <input type="checkbox" name="permissions[]" id="{{$permission->id ?? ''}}"
+                                                   value="{{$permission->id ?? ''}}">
+                                            <label for="{{$permission->id ?? ''}}" class="cr"> {{$permission->name ?? ''}}</label>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                     @endforeach
-
                 </div>
+
+{{--                <div class="form-group row">--}}
+{{--                    @foreach ($permissionsAll as $permission)--}}
+{{--                        <div class="col-sm-4">--}}
+{{--                                <div class="checkbox checkbox-fill d-inline">--}}
+{{--                                    <input type="checkbox" name="permissions[]" id="{{$permission->id}}" value="{{$permission->id}}">--}}
+{{--                                    <label for="{{$permission->id}}" class="cr"> {{$permission->name}}</label>--}}
+{{--                                </div>--}}
+{{--                        </div>--}}
+{{--                    @endforeach--}}
+
+{{--                </div>--}}
                 <hr>
                 <div class="form-group row">
                         <div class="col-sm-8"></div>

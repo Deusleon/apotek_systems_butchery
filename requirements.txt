@@ -1,0 +1,305 @@
+# APOTEk System Modifications - Cursor IDE Implementation Prompt
+
+## Overview
+I have an existing APOTEk pharmacy management system that needs specific modifications and enhancements. Please help me implement these changes systematically while maintaining the existing codebase integrity.
+
+## 🎯 Priority Order for Changes
+1. Remove NPK Ratio (All Locations)
+2. Fix Product List Display & CRUD
+3. Enhance Product Import System
+4. Modify Current Stock Management
+5. Implement Stock Transfer System
+6. Add Stock Count Enhancements
+
+---
+
+## 🗑️ CHANGE 1: Remove NPK Ratio Completely
+
+### Requirements:
+- **Remove NPK Ratio** from all locations in the system
+- **Database**: Remove NPK ratio columns from all tables
+- **Views**: Remove NPK ratio from all display screens
+- **Forms**: Remove NPK ratio from all input forms
+- **API**: Remove NPK ratio from all API responses
+- **Reports**: Remove NPK ratio from all reports
+
+### Implementation Tasks:
+```
+Please help me:
+1. Find all database tables containing NPK ratio fields
+2. Create migration to drop NPK ratio columns
+3. Update all Eloquent models to remove NPK ratio attributes
+4. Remove NPK ratio from all Blade templates/React components
+5. Update all form validations to exclude NPK ratio
+6. Remove NPK ratio from API resources and responses
+7. Update all controllers to exclude NPK ratio processing
+8. Remove NPK ratio from all report generators
+9. Update any seeder files that include NPK ratio
+10. Remove NPK ratio from all test files
+```
+
+### Files to Modify:
+- Database migrations
+- Model files
+- Controller files
+- View templates
+- API resources
+- Form requests
+- Test files
+
+---
+
+## 📋 CHANGE 2: Fix Product List Module
+
+### Current Issues:
+- **Pack Size Naming**: Currently shows "sio Pack size" - fix to "Pack Size"
+- **Display Columns**: Must show Product Name, Brand, Pack Size, Category
+- **CRUD Operations**: Ensure Add, Filter, Search, Show, Edit, Delete work perfectly
+
+### Implementation Tasks:
+```
+Please help me:
+1. Fix Pack Size field naming in all locations
+2. Update product list view to show: Product Name, Brand, Pack Size, Category
+3. Test and fix Add Product functionality
+4. Test and fix Edit Product functionality
+5. Test and fix Delete Product functionality
+6. Enhance Search functionality for all displayed fields
+7. Improve Filter functionality with dropdown options
+8. Add proper validation for all CRUD operations
+9. Fix any broken pagination
+10. Update product detail view layout
+```
+
+### Specific Changes:
+- Language files: Fix "sio Pack size" to "Pack Size"
+- Form labels: Update all pack size labels
+- Table headers: Fix column headers
+- Validation messages: Update field names
+
+---
+
+## 📥 CHANGE 3: Enhance Product Import System
+
+### Requirements:
+- **Template Columns**: Brand, Pack Size, Unit, Min Stock, Max Stock
+- **Template Testing**: Ensure 100% validation before import
+- **Naming Standards**: Follow consistent field naming
+- **Branch Selection**: Add "Select Branch" functionality
+
+### Implementation Tasks:
+```
+Please help me:
+1. Update import template to include: Brand, Pack Size, Unit, Min Stock, Max Stock
+2. Add comprehensive validation for import template
+3. Implement branch selection in import process
+4. Add import preview functionality
+5. Enhance error reporting for failed imports
+6. Add import progress tracking
+7. Update import history with more details
+8. Fix any existing import bugs
+9. Add rollback functionality for failed imports
+10. Update import documentation
+```
+
+### Validation Enhancements:
+- Required field validation
+- Data type validation
+- Range validation for stock values
+- Duplicate detection
+- Branch validation
+
+---
+
+## 📊 CHANGE 4: Modify Current Stock Management
+
+### Requirements:
+- **Remove NPK Ratio**: Already covered in Change 1
+- **Display**: Current Stock Value + Pack Size
+- **Price Management**: Add custom vs default price options
+- **Permissions**: Implement current price permission system
+
+### Implementation Tasks:
+```
+Please help me:
+1. Update stock display to show Current Stock Value + Pack Size
+2. Add price management system with custom/default toggle
+3. Implement user permission system for price management
+4. Add price override functionality for authorized users
+5. Update stock calculation methods
+6. Add stock alerts for low inventory
+7. Implement real-time stock updates
+8. Add stock adjustment logging
+9. Update stock reports to exclude NPK ratio
+10. Add price history tracking
+```
+
+### Permission Levels:
+- View stock: All users
+- Edit stock: Store managers
+- Manage prices: Admin only
+- Override prices: Manager+ only
+
+---
+
+## 🔄 CHANGE 5: Implement Stock Transfer System
+
+### Requirements:
+- **Transfer Flow**: From Store to Store with default store binding
+- **Editability**: Store managers can edit transfers
+- **Store Selection**: Not limited to app-only stores
+- **Evidence**: Optional documentation system
+- **Status Workflow**: Created → Assigned → Approved → Acknowledged
+- **Transfer History**: Complete audit trail with approval actions
+
+### Implementation Tasks:
+```
+Please help me:
+1. Create stock transfer module with status workflow
+2. Add transfer creation form with store selection
+3. Implement approval workflow system
+4. Add transfer acknowledgment functionality
+5. Create evidence/documentation upload system
+6. Build transfer history with filtering options
+7. Add email notifications for transfer updates
+8. Create transfer receipt generation
+9. Implement automatic stock adjustments
+10. Add transfer cancellation functionality
+```
+
+### Status Workflow:
+- **Created**: Initial transfer request
+- **Assigned**: Assigned to destination store
+- **Approved**: Management approval required
+- **In Transit**: Transfer in progress
+- **Acknowledged**: Destination confirms receipt
+- **Completed**: Transfer finalized
+
+---
+
+## 📈 CHANGE 6: Stock Count Enhancement
+
+### Requirements:
+- **Include Brand & Pack Size** in stock count reports
+- **Physical vs System** stock comparison
+- **Stock Adjustments** functionality
+
+### Implementation Tasks:
+```
+Please help me:
+1. Update stock count reports to include Brand & Pack Size
+2. Add physical vs system stock comparison
+3. Implement stock adjustment functionality
+4. Add discrepancy reporting
+5. Create stock audit trail
+6. Add batch stock count processing
+7. Update stock count export functionality
+8. Add stock count scheduling
+9. Implement stock count approval workflow
+10. Add stock count analytics
+```
+
+---
+
+## 🛠️ Technical Implementation Guidelines
+
+### Code Modification Approach:
+```
+For each change, please:
+1. Identify existing files that need modification
+2. Show exact code changes (before/after)
+3. Provide new migration files where needed
+4. Update existing test files
+5. Add new test cases for new functionality
+6. Update API documentation
+7. Provide rollback procedures
+8. Include database backup recommendations
+```
+
+### Database Changes:
+```sql
+-- Please provide:
+-- Migration files to remove NPK ratio columns
+-- Migration files for new transfer system tables
+-- Migration files for price management
+-- Migration files for stock count enhancements
+-- Update scripts for existing data
+```
+
+---
+
+## 🧪 Testing Requirements
+
+### Test Updates:
+```
+Please help me:
+1. Update existing tests to remove NPK ratio references
+2. Add tests for new transfer system functionality
+3. Add tests for price management system
+4. Add tests for enhanced import system
+5. Add tests for stock count improvements
+6. Update API tests
+7. Add integration tests for new workflows
+8. Update feature tests for modified CRUD operations
+```
+
+---
+
+## 📋 Implementation Checklist
+
+### Before Starting:
+- [ ] Database backup created
+- [ ] Current code committed to version control
+- [ ] Development environment ready
+- [ ] Test environment prepared
+
+### For Each Change:
+- [ ] Identify affected files
+- [ ] Create migration files
+- [ ] Update model files
+- [ ] Modify controller files
+- [ ] Update view files
+- [ ] Fix API endpoints
+- [ ] Update validation rules
+- [ ] Modify test files
+- [ ] Update documentation
+- [ ] Test functionality
+
+### After Implementation:
+- [ ] Run all tests
+- [ ] Verify no broken functionality
+- [ ] Check database integrity
+- [ ] Validate API responses
+- [ ] Test user workflows
+- [ ] Update deployment scripts
+
+---
+
+## 🚀 Deployment Considerations
+
+### Production Deployment:
+```
+Please provide:
+1. Step-by-step deployment guide
+2. Database migration order
+3. Rollback procedures
+4. Configuration changes needed
+5. Cache clearing requirements
+6. Queue worker updates
+7. Environment variable changes
+8. Asset compilation instructions
+```
+
+---
+
+## 📞 Implementation Support
+
+### When implementing changes:
+- Show exact file locations and line numbers
+- Provide complete code blocks, not snippets
+- Include error handling for new functionality
+- Maintain existing code style and patterns
+- Add proper comments for new code
+- Update relevant documentation
+
+**Question**: Which specific change would you like to start with? Please begin with the highest priority modification and provide the exact code changes needed.

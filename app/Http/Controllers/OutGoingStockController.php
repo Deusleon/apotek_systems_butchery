@@ -6,6 +6,7 @@ use App\Setting;
 use App\StockTracking;
 use App\Store;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OutGoingStockController extends Controller
 {
@@ -22,7 +23,7 @@ class OutGoingStockController extends Controller
         if ($request->ajax()) {
 
             /*get default store*/
-            $default_store = Setting::where('id', 122)->value('value');
+            $default_store = Auth::user()->store->name ?? 'Default Store';
             $stores = Store::where('name', $default_store)->first();
 
             if ($stores != null) {

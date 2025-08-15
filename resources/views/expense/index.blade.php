@@ -13,7 +13,7 @@
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#"> Expenses / Expenses </a></li>
+    <li class="breadcrumb-item"><a href="#"> Accounting / Expenses </a></li>
 @endsection
 
 @section("content")
@@ -73,12 +73,13 @@
             <div class="card-body">
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
 
+ 
                     <div class="row">
                         <div class="col-md-9">
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
-                                @if(auth()->user()->checkPermission('Add Expenses'))
+                                @if(auth()->user()->checkPermission('Manage Expenses'))
                                     <button style="float: right;margin-bottom: 7%;" type="button"
                                             class="btn btn-secondary btn-sm"
                                             data-toggle="modal"

@@ -1,11 +1,11 @@
 @extends("layouts.master")
 
 @section('content-title')
-    Point of Sale
+    Cash Sales
 @endsection
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#">Sales / Point of Sale</a></li>
+    <li class="breadcrumb-item"><a href="#">Sales / Cash Sales</a></li>
 @endsection
 
 
@@ -100,7 +100,7 @@
                                             <label>Discount</label>
                                             <input type="text" onchange="discount()" id="sale_discount"
                                                    class="form-control"
-                                                   value="0"/>
+                                                   value="0.00"/>
                                             <span class="help-inline">
                                           <div class="text text-danger" style="display: none;" id="discount_error">Invalid Discount</div>
                                            </span>
@@ -117,7 +117,7 @@
                                         <div class="col-md-6" style="display: flex; justify-content: flex-end">
                                             <input type="text" id="sub_total"
                                                    class="form-control-plaintext text-md-right"
-                                                   readonly value="0.0"/>
+                                                   readonly value="0.00"/>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -126,7 +126,7 @@
                                         <div class="col-md-6" style="display: flex; justify-content: flex-end">
                                             <input type="text" id="total_vat"
                                                    class="form-control-plaintext text-md-right"
-                                                   readonly value="0.0"/>
+                                                   readonly value="0.00"/>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -134,7 +134,7 @@
                                                 Amount:</b></label>
                                         <div class="col-md-6" style="display: flex; justify-content: flex-end">
                                             <input type="text" id="total" class="form-control-plaintext text-md-right"
-                                                   readonly value="0.0"/>
+                                                   readonly value="0.00"/>
 
                                         </div>
                                     </div>
@@ -148,7 +148,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div style="width: 99%">
-                                        <label>Sale Date<font color="red">*</font></label>
+                                        <label>Sales Date<font color="red">*</font></label>
                                         <input type="text" name="sale_date" class="form-control" id="cash_sale_date"
                                                autocomplete="off" required="true">
                                     </div>
@@ -159,7 +159,7 @@
                                             <label>Discount</label>
                                             <input type="text" onchange="discount()" id="sale_discount"
                                                    class="form-control"
-                                                   value="0"/>
+                                                   value="0.00"/>
                                         </div>
                                         <span class="help-inline">
                                                         <div class="text text-danger" style="display: none;"
@@ -173,7 +173,7 @@
                                         <div class="col-md-6" style="display: flex; justify-content: flex-end">
                                             <input type="text" id="sub_total"
                                                    class="form-control-plaintext text-md-right"
-                                                   readonly value="0.0"/>
+                                                   readonly value="0.00"/>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -182,7 +182,7 @@
                                         <div class="col-md-6" style="display: flex; justify-content: flex-end">
                                             <input type="text" id="total_vat"
                                                    class="form-control-plaintext text-md-right"
-                                                   readonly value="0.0"/>
+                                                   readonly value="0.00"/>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -190,7 +190,7 @@
                                                 Amount:</b></label>
                                         <div class="col-md-6" style="display: flex; justify-content: flex-end">
                                             <input type="text" id="total" class="form-control-plaintext text-md-right"
-                                                   readonly value="0.0"/>
+                                                   readonly value="0.00"/>
 
                                         </div>
                                     </div>
@@ -215,13 +215,13 @@
                                     <div style="width: 99%">
                                         <label><b>Paid</b></label>
                                         <input type="text" onchange="discount()" id="sale_paid" class="form-control"
-                                               value="0"/>
+                                               value="0.00"/>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div style="width: 99%">
                                         <label><b>Change</b></label>
-                                        <input type="text" id="change_amount" class="form-control" value="0" readonly/>
+                                        <input type="text" id="change_amount" class="form-control" value="0.00" readonly/>
                                     </div>
                                 </div>
                             </div>
@@ -276,7 +276,7 @@
         var config = {
             token: '{{ csrf_token() }}',
             routes: {
-                selectProducts: '{{route('selectProducts')}}',
+            selectProducts: '{{route('selectProducts')}}',
                 storeCashSale: '{{route('cash-sales.storeCashSale')}}',
                 filterProductByWord: '{{route('filter-product-by-word')}}'
 
@@ -292,6 +292,29 @@
             // select2 is opened, handle event
             normal_search = 0;
         });
+
+
+        // let isSelecting = false; // Flag to prevent double entry
+        // let normal_search = 0;
+        //
+        // $('#products').on('select2:open', function (e) {
+        //     normal_search = 1;
+        //     isSelecting = false; // Reset flag when select2 opens
+        // });
+        //
+        // $('#products').on('select2:select', function (e) {
+        //     if (isSelecting) {
+        //         return; // Prevent double entry if already selecting
+        //     }
+        //     isSelecting = true; // Set flag to true on selection
+        //     // Handle the selection here, e.g., log or use selected data
+        //     console.log('Product selected:', e.params.data);
+        // });
+        //
+        // $('#products').on('select2:close', function (e) {
+        //     normal_search = 0;
+        //     isSelecting = false; // Reset flag when select2 closes
+        // });
 
         /*hide barcode search*/
         $.fn.toggleSelect2 = function (state) {
@@ -345,10 +368,10 @@
         }
 
     </script>
-    <script src="{{asset("assets/apotek/js/notification.js")}}"></script>
-    <script src="{{asset("assets/apotek/js/sales.js")}}"></script>
-    <script src="{{ asset('assets/apotek/js/customer.js') }}"></script>
-    <script src="{{asset("assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js")}}"></script>
-    <script src="{{asset("assets/js/pages/ac-datepicker.js")}}"></script>
+    <script src="{{asset('assets/apotek/js/notification.js')}}"></script>
+    <script src="{{asset('assets/apotek/js/sales.js')}}"></script>
+    <script src="{{asset('assets/apotek/js/customer.js') }}"></script>
+    <script src="{{asset('assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js')}}"></script>
+    <script src="{{asset('assets/js/pages/ac-datepicker.js')}}"></script>
 
 @endpush

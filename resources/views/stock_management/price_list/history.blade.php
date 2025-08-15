@@ -17,8 +17,8 @@
                             <thead>
                             <tr>
                                 <th>Product Name</th>
-                                <th>Buying Price</th>
-                                <th>Selling Price</th>
+                                <th>Buy Price</th>
+                                <th>Sell Price</th>
                                 <th>Price Category</th>
                                 <th>Batch Number</th>
                             </tr>

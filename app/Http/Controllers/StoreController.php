@@ -6,6 +6,7 @@ use App\Setting;
 use App\Store;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class StoreController extends Controller
 {
@@ -19,39 +20,48 @@ class StoreController extends Controller
 
     public function store(Request $request)
     {
-        try {
-            $store = new Store;
-            $store->name = $request->name;
-            $store->save();
-        } catch (Exception $e) {
-            session()->flash("alert-danger", "Store Name Exists!");
+        $exist = Store::where('name','=',strtoupper($request->name))->count();
+
+        if($exist>0)
+        {
+            session()->flash("alert-danger", "Branch Name Exists!");
             return back();
         }
 
-        session()->flash("alert-success", "Store Added Successfully!");
+        try {
+            $store = new Store;
+            $store->name = strtoupper($request->name);
+            $store->save();
+        } catch (Exception $e) {
+            session()->flash("alert-danger", "Branch Name Exists!");
+            return back();
+        }
+
+        session()->flash("alert-success", "Branch Added Successfully!");
         return back();
     }
 
     public function destroy(Request $request)
     {
+        $default_store = Auth::user()->store->name ?? 'Default Store';
 
-        $default_store = Setting::where('id', 122)->value('value');
+
 
         try {
             $check_store = Store::find($request->id);
 
             if ($default_store === $check_store->name) {
-                session()->flash("alert-danger", "Please change default store in settings!");
+                session()->flash("alert-danger", "Please change default branch in settings!");
                 return back();
             } else {
                 Store::destroy($request->id);
-                session()->flash("alert-danger", "Store Deleted successfully!");
+                session()->flash("alert-danger", "Branch Deleted successfully!");
                 return back();
             }
 
 
         } catch (Exception $exception) {
-            session()->flash("alert-danger", "Store in use!");
+            session()->flash("alert-danger", "Branch in use!");
             return back();
         }
 
@@ -63,10 +73,10 @@ class StoreController extends Controller
         $store->name = $request->name;
         try {
             $store->save();
-            session()->flash("alert-success", "Store Updated Successfully!");
+            session()->flash("alert-success", "Branch Updated Successfully!");
             return back();
         } catch (Exception $exception) {
-            session()->flash("alert-danger", "Store Exists!");
+            session()->flash("alert-danger", "Branch Exists!");
             return back();
         }
 

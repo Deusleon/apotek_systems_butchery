@@ -28,7 +28,7 @@ class GoodsReceivingController extends Controller
         $invoice_setting = Setting::where('id', 115)->value('value');/*invoice setting*/
 
         /*get default store*/
-        $default_store = Setting::where('id', 122)->value('value');
+        $default_store = optional(Auth::user()->store->first())->name;
         $stores = Store::where('name', $default_store)->first();
 
         if ($stores != null) {
@@ -41,7 +41,9 @@ class GoodsReceivingController extends Controller
         $back_date = Setting::where('id', 114)->value('value');
         $expire_date = Setting::where('id', 123)->value('value');
 
-        $orders = Order::where('status', '<=', '3')
+        $orders = Order::with(['details', 'details.product', 'supplier'])
+            ->where('status', '<=', '3')
+            ->orderBy('ordered_at', 'desc')
             ->get();
         $order_details = OrderDetail::all();
         $suppliers = Supplier::all();
@@ -59,16 +61,67 @@ class GoodsReceivingController extends Controller
             ->groupBy('order_details.id');
 
         return View::make('purchases.goods_receiving.index',
-            (compact('orders', 'order_details', 'suppliers', 'default_supplier',
+            (compact('orders', ['order_details', 'suppliers', 'default_supplier',
                 'order_receiving', 'price_categories','stores', 'default_store_id', 'default_store_name',
-                'current_stock', 'item_stocks', 'invoices', 'batch_setting', 'invoice_setting', 'back_date', 'expire_date')));
+                'current_stock', 'item_stocks', 'invoices', 'batch_setting', 'invoice_setting', 'back_date', 'expire_date'])));
+    }
+      
+
+
+
+    public function orderReceiving()
+    {
+        $batch_setting = Setting::where('id', 110)->value('value');
+        $invoice_setting = Setting::where('id', 115)->value('value');
+
+        $default_store = optional(Auth::user()->store->first())->name;
+        $store = Store::where('name', $default_store)->first();
+        $default_store_id = $store ? $store->id : 1;
+        $default_store_name = $store ? $store->name : 'Default Store';
+
+        $back_date = Setting::where('id', 114)->value('value');
+        $expire_date = Setting::where('id', 123)->value('value');
+
+        // Get orders with their related details, products, and suppliers
+        $orders = Order::with([
+            'details' => function ($query) {
+                // Select the original ordered_qty and alias it to quantity for consistency in the view
+                $query->select('order_details.*', 'order_details.ordered_qty as quantity');
+            },
+            'details.product',
+            'supplier'
+        ])->orderBy('id', 'desc')->get();
+
+        // Manually add order_item_id to each detail to ensure it's available in the view
+        foreach ($orders as $order) {
+            foreach ($order->details as $detail) {
+                $detail->order_item_id = $detail->id;
+            }
+        }
+
+        $suppliers = Supplier::all();
+        $price_categories = PriceCategory::all();
+        $stores = Store::all();
+
+        return view('purchases.goods_receiving.order_receiving', compact(
+            'orders',
+            'suppliers',
+            'price_categories',
+            'stores',
+            'default_store_id',
+            'default_store_name',
+            'batch_setting',
+            'invoice_setting',
+            'back_date',
+            'expire_date'
+        ));
     }
 
     public function allProductToReceive()
     {
         $max_prices = array();
 
-        $products = Product::select('id', 'name')
+        $products = Product::select('id', 'name', 'brand', 'pack_size')
             ->where('status', '=', 1)
             ->groupBy('id', 'name')
             ->get();
@@ -82,6 +135,8 @@ class GoodsReceivingController extends Controller
             if ($data != null) {
                 array_push($max_prices, array(
                     'product_name' => $data->product['name'],
+                    'brand'=>$product->brand,
+                    'pack_size'=>$product->pack_size,
                     'unit_cost' => $data->unit_cost,
                     'selling_price' => $data->price,
                     'id' => $data->id,
@@ -90,6 +145,8 @@ class GoodsReceivingController extends Controller
             } else {
                 array_push($max_prices, array(
                     'product_name' => $product->name,
+                    'brand'=>$product->brand,
+                    'pack_size'=>$product->pack_size,
                     'unit_cost' => null,
                     'selling_price' => null,
                     'id' => null,
@@ -181,7 +238,7 @@ class GoodsReceivingController extends Controller
     {
 
         /*get default store*/
-        $default_store = Setting::where('id', 122)->value('value');
+        $default_store = optional(Auth::user()->store->first())->name;
         $stores = Store::where('name', $default_store)->first();
 
         if ($stores != null) {
@@ -295,133 +352,120 @@ class GoodsReceivingController extends Controller
 
     public function orderReceive(Request $request)
     {
-        /*get default store*/
-        $default_store = Setting::where('id', 122)->value('value');
-        $stores = Store::where('name', $default_store)->first();
+        // Use a database transaction to ensure all operations succeed or none do.
+        DB::beginTransaction();
 
-        if ($stores != null) {
-            $default_store_id = $stores->id;
-        } else {
-            $default_store_id = 1;
-        }
+        try {
+            // 1. Validate all incoming data from the form.
+            $validated = $request->validate([
+                'order_id' => 'required|exists:orders,id',
+                'supplier_id' => 'required|exists:inv_suppliers,id',
+                'items' => 'required|array',
+                'items.*.purchase_order_detail_id' => 'required|exists:order_details,id',
+                'items.*.product_id' => 'required|exists:inv_products,id',
+                'items.*.quantity' => 'required|integer|min:1',
+                'items.*.batch_number' => 'nullable|string|max:255',
+                'items.*.expiry_date' => 'nullable|date',
+                'items.*.cost_price' => 'required|numeric|min:0',
+            ]);
 
-        if ($request->ajax()) {
-            $quantity = str_replace(',', '', $request->quantity);
-            $unit_sell_price = str_replace(',', '', $request->sell_price);
-            $unit_buy_price = str_replace(',', '', $request->price);
-            $total_buyprice = $quantity * $unit_buy_price;
-            $total_sellprice = $quantity * $unit_sell_price;
-            $profit = $total_sellprice - $total_buyprice;
+            $order = Order::with('details')->findOrFail($validated['order_id'])->latest()->first();
 
-            $date = date('Y-m-d');
-            /*check if there exists 0 qty of that product*/
-            $current_stock = CurrentStock::where('product_id', $request->product_id)
-                ->where('quantity', '=', 0)
-                ->get();
+            // Prevent processing if already fully received.
+            if ($order->status == '3') { // '3' means 'Received'
+                return response()->json(['message' => 'This order has already been fully received.'], 422);
+            }
 
-            if (!($current_stock->isEmpty())) {
-                //update
-                $update_stock = CurrentStock::find($current_stock->first()->id);
-                $update_stock->batch_number = $request->batch_number;
-                if ($update_stock->expiry_date != null) {
-                    $update_stock->expiry_date = date('Y-m-d', strtotime($request->expire_date));
-                } else {
-                    $update_stock->expiry_date = null;
+            $default_store_id = optional(Auth::user()->store->first())->id ?? 1;
+
+            // 2. Process each item submitted from the modal.
+            foreach ($validated['items'] as $itemData) {
+                // Skip items with no quantity entered.
+                if (empty($itemData['quantity']) || (int)$itemData['quantity'] <= 0) {
+                    continue;
                 }
-                $update_stock->quantity = $quantity;
-                $update_stock->unit_cost = $unit_buy_price;
-                $update_stock->store_id = $default_store_id;
-                $update_stock->save();
-                $overal_stock_id = $update_stock->id;
-            } else {
-                $stock = new CurrentStock;
-                $stock->product_id = $request->product_id;
-                $stock->batch_number = $request->batch_number;
-                if ($stock->expiry_date != null) {
-                    $stock->expiry_date = date('Y-m-d', strtotime($request->expire_date));
-                } else {
-                    $stock->expiry_date = null;
+
+                $received_qty = (int)$itemData['quantity'];
+                $order_detail = OrderDetail::find($itemData['purchase_order_detail_id']);
+
+                // Verify we are not receiving more than the remaining quantity.
+                $remaining_qty = $order_detail->ordered_qty - $order_detail->received_quantity;
+                if ($received_qty > $remaining_qty) {
+                    throw new \Exception("Cannot receive more than the remaining quantity for product ID {$itemData['product_id']}.");
                 }
-                $stock->quantity = $quantity;
-                $stock->unit_cost = $unit_buy_price;
-                $stock->store_id = $default_store_id;
+
+                // Update the received quantity on the original order detail line.
+                $order_detail->received_quantity += $received_qty;
+                $order_detail->save();
+
+                // Create a record for the goods receiving log.
+                $goods_receiving = new GoodsReceiving();
+                $goods_receiving->product_id = $itemData['product_id'];
+                $goods_receiving->supplier_id = $validated['supplier_id'];
+                $goods_receiving->quantity = $received_qty;
+                $goods_receiving->unit_cost = $itemData['cost_price'];
+                $goods_receiving->total_cost = $received_qty * $itemData['cost_price'];
+                $goods_receiving->batch_number = $itemData['batch_number'];
+                $goods_receiving->expire_date = $itemData['expiry_date'] ? date('Y-m-d', strtotime($itemData['expiry_date'])) : null;
+                $goods_receiving->created_by = Auth::id();
+                $goods_receiving->created_at = now();
+                $goods_receiving->save();
+
+                // Update or create the stock record for this batch.
+                $stock = CurrentStock::firstOrNew([
+                    'product_id' => $itemData['product_id'],
+                    'batch_number' => $itemData['batch_number'],
+                    'store_id' => $default_store_id
+                ]);
+
+                $stock->quantity += $received_qty;
+                $stock->unit_cost = $itemData['cost_price'];
+                $stock->expiry_date = $goods_receiving->expire_date;
                 $stock->save();
-                $overal_stock_id = $stock->id;
 
+                // Create a tracking record for the stock movement.
+                StockTracking::create([
+                    'stock_id' => $stock->id,
+                    'product_id' => $itemData['product_id'],
+                    'quantity' => $received_qty,
+                    'store_id' => $default_store_id,
+                    'updated_by' => Auth::id(),
+                    'out_mode' => 'Purchase Order Receiving',
+                    'movement' => 'IN',
+                ]);
             }
 
+            // 3. Update the overall order status after processing all items.
+            $order->refresh(); // Reload the order with updated details
+            $total_ordered = $order->details->sum('ordered_qty');
+            $total_received = $order->details->sum('received_quantity');
 
-            /*insert into stock tracking*/
-            $stock_tracking = new StockTracking;
-            $stock_tracking->stock_id = $overal_stock_id;
-            $stock_tracking->product_id = $request->product_id;
-            $stock_tracking->quantity = $quantity;
-            $stock_tracking->store_id = $default_store_id;
-            $stock_tracking->updated_by = Auth::user()->id;
-            $stock_tracking->out_mode = 'New Product Purchase';
-            $stock_tracking->updated_at = date('Y-m-d');
-            $stock_tracking->movement = 'IN';
-            $stock_tracking->save();
-
-
-            $order_details = OrderDetail::find($request->order_details_id);
-            $order_details->received_by = Auth::user()->id;
-            $order_details->received_at = $date;
-            $order_details->received_qty = $quantity;
-            $order_details->item_status = 'Received';
-            $order_details->save();
-
-            $price = new PriceList;
-            $price->stock_id = $overal_stock_id;
-            $price->price = str_replace(',', '', $request->sell_price);
-            $price->price_category_id = $request->price_category;
-            $price->save();
-
-            $order_id = OrderDetail::where('id', $request->order_details_id)->value('order_id');
-            $number_of_items = OrderDetail::where('order_id', $order_id)->count();
-            $number_of_received_item = OrderDetail::where('order_id', $order_id)
-                ->where('item_status', 'Received')->count();
-
-            $order = Order::find($order_id);
-            $order->received_at = $date;
-            $order->received_by = Auth::user()->id;
-            if ($number_of_items > $number_of_received_item) {
-                $order->status = '2';
-            } else {
-                $order->status = '3';
+            if ($total_received >= $total_ordered) {
+                $order->status = '3'; // '3' = Received
+            } elseif ($total_received > 0) {
+                $order->status = '2'; // '2' = Partial
             }
-
             $order->save();
 
-            $incoming_stock = new GoodsReceiving;
-            $incoming_stock->product_id = $request->product_id;
-            $incoming_stock->supplier_id = $request->supplier_id;
-            $incoming_stock->invoice_no = $request->invoice;
-            $incoming_stock->batch_number = $request->batch_number;
-            if ($request->expire_date != null) {
-                $incoming_stock->expire_date = $request->expire_date;
-            } else {
-                $incoming_stock->expire_date = null;
-            }
-            $incoming_stock->quantity = $quantity;
-            $incoming_stock->unit_cost = str_replace(',', '', $request->price);
-            $incoming_stock->sell_price = str_replace(',', '', $request->sell_price);
-            $incoming_stock->order_details_id = $request->order_details_id;
-            $incoming_stock->created_by = Auth::user()->id;
-            $incoming_stock->total_cost = $total_buyprice;
-            $incoming_stock->total_sell = $total_sellprice;
-            $incoming_stock->item_profit = $profit;
-            $incoming_stock->save();
+            // If all operations were successful, commit the changes to the database.
+            DB::commit();
 
+            session()->flash('alert-success', 'Order received successfully!');
+            return redirect()->back();
 
-            $message = array();
-            array_push($message, array(
-                'message' => 'success'
-            ));
-            return $message;
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            // Return validation errors specifically.
+            return response()->json(['message' => 'Validation failed.', 'errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            // If any other error occurred, roll back the transaction.
+            DB::rollBack();
+            // Return a generic error message for security. Log the actual error.
+            \Log::error('Order Receiving Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine());
+            return response()->json(['message' => 'An unexpected error occurred while processing the order.'], 500);
         }
-
     }
+
 
     public function filterInvoice(Request $request)
     {
@@ -610,6 +654,7 @@ class GoodsReceivingController extends Controller
 
                 array_push($max_prices, array(
                     'name' => $data->currentStock['product']['name'],
+                    'brand' => $currentStock['product']['brand'],
                     'unit_cost' => $buying_price,
                     'price' => $data->price,
                     'quantity' => $quantity,
@@ -662,7 +707,7 @@ class GoodsReceivingController extends Controller
                         if ($single_item['expire_date'] != null) {
                         $update_stock->expiry_date = date('Y-m-d', strtotime($single_item['expire_date']));
                         } else {
-                            $update_stock->expiry_date = null;    
+                            $update_stock->expiry_date = null;
                         }
                     } else {
                         $update_stock->expiry_date = null;
@@ -681,7 +726,7 @@ class GoodsReceivingController extends Controller
                         if ($single_item['expire_date'] != null) {
                             $stock->expiry_date = date('Y-m-d', strtotime($single_item['expire_date']));
                         } else {
-                            $stock->expiry_date = null;    
+                            $stock->expiry_date = null;
                         }
 
                     } else {
@@ -727,7 +772,7 @@ class GoodsReceivingController extends Controller
                     if ($single_item['expire_date'] != null) {
                         $incoming_stock->expire_date = date('Y-m-d', strtotime($single_item['expire_date']));
                     } else {
-                        $incoming_stock->expire_date = null;    
+                        $incoming_stock->expire_date = null;
                     }
 
                 } else {

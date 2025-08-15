@@ -7,94 +7,105 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form id="form_product_edit" action="{{route('products.update','id')}}" method="post">
+            <form id="form_product_edit" action="{{route('products.update', ['product' => ':id'])}}" method="post">
                 @csrf()
                 @method("PUT")
 
                 <div class="modal-body">
-
+                    {{-- Product Name --}}
                     <div class="form-group row">
-                        <label for="product_name" class="col-md-4 col-form-label text-md-right">Product Name <font
-                                color="red">*</font></label>
+                        <label for="name" class="col-md-4 col-form-label text-md-right">
+                            Product Name 
+                        </label>
                         <div class="col-md-8">
-                            <input type="text" class="form-control" id="name_edit" name="name"
-                                   aria-describedby="emailHelp" maxlength="50" minlength="2"
-                                   placeholder="" required value="{{ old('name') }}">
+                            <input type="text" class="form-control" id="name_edit" name="name" maxlength="50"
+                                minlength="2" required value="{{ old('name') }}">
                         </div>
                     </div>
 
+                    {{-- Barcode --}}
                     <div class="form-group row">
                         <label for="barcode" class="col-md-4 col-form-label text-md-right">Barcode</label>
                         <div class="col-md-8">
                             <input type="text" class="form-control" id="barcode_edits" name="barcode"
-                                   placeholder="" value="{{ old('barcode') }}">
+                                value="{{ old('barcode') }}" autocomplete="off">
                         </div>
                     </div>
 
-
+                    {{-- Brand --}}
                     <div class="form-group row">
-                        <label for="exampleFormControlSelect1" class="col-md-4 col-form-label text-md-right">Category
-                            <font color="red">*</font></label>
+                        <label for="brand" class="col-md-4 col-form-label text-md-right">Brand</label>
                         <div class="col-md-8">
-                            <select name="category" class="form-control" id="category_options"
-                                    onchange="editOption()">
-                                <option id="category_edit" disabled selected></option>
-                                @foreach($categories as $cat)
-                                    <option value="{{$cat->id}}">{{ $cat->name }}</option>
+                            <input type="text" class="form-control" id="brand_edits" name="brand"
+                                value="{{ old('brand') }}">
+                        </div>
+                    </div>
+
+                    {{-- Pack Size --}}
+                    <div class="form-group row">
+                        <label for="pack_size" class="col-md-4 col-form-label text-md-right">Pack Size</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="pack_size_edits" name="pack_size"
+                                value="{{ old('pack_size') }}" placeholder="" onkeypress="return isNumberKey(event,this)">
+                        </div>
+                    </div>
+
+                    {{-- Category --}}
+                    <div class="form-group row">
+                        <label for="category" class="col-md-4 col-form-label text-md-right">Category</label>
+                        <div class="col-md-8">
+                            <select name="category" class="form-control" id="category_options" required
+                                onchange="createOption()">
+                                <option selected value="">Select Category</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" {{ old('category') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                                 @endforeach
                             </select>
-                            <span id="category_borders" style="display: none; color: red; font-size: 0.9em">category required</span>
+                            <span id="category_border" style="display: none; color: red; font-size: 0.9em">category
+                                required</span>
                         </div>
                     </div>
 
+                    {{-- Unit of Measure --}}
                     <div class="form-group row">
                         <label for="saleUoM" class="col-md-4 col-form-label text-md-right">Unit of Measure</label>
                         <div class="col-md-8">
-                            <input type="text" class="form-control" id="sale_edit" name="sale_uom"
-                                   placeholder="" value="{{ old('saleUoM') }}" min="1">
+                            <input type="text" class="form-control" id="sale_edit" name="sale_uom" placeholder="eg. Kg, mls"
+                                value="{{ old('sale_uom') }}">
                         </div>
                     </div>
 
+                    {{-- Min Stock --}}
                     <div class="form-group row">
-                        <label for="min_stock" class="col-md-4 col-form-label text-md-right">Min. Stock Quantity</label>
+                        <label for="min_quantinty" class="col-md-4 col-form-label text-md-right">Min. Stock
+                            Quantity</label>
                         <div class="col-md-8">
-                            <input type="text" class="form-control" id="min_stock_edit" name="min_stock"
-                                   placeholder="" value="{{ old('min_stock') }}" min="1"
-                                   onkeypress="return isNumberKey(event,this)">
+                            <input type="text" class="form-control" id="min_stock_edit" name="min_quantinty"
+                                value="{{ old('min_quantinty') }}" onkeypress="return isNumberKey(event,this)">
                         </div>
                     </div>
 
+                    {{-- Max Stock --}}
                     <div class="form-group row">
-                        <label for="max_stock" class="col-md-4 col-form-label text-md-right">Max. Stock Quantity</label>
+                        <label for="max_quantinty" class="col-md-4 col-form-label text-md-right">Max. Stock
+                            Quantity</label>
                         <div class="col-md-8">
-                            <input type="text" class="form-control" id="max_stock_edit" name="max_stock"
-                                   placeholder="" value="{{ old('max_stock') }}" min="1"
-                                   onkeypress="return isNumberKey(event,this)">
+                            <input type="text" class="form-control" id="max_stock_edit" name="max_quantinty"
+                                value="{{ old('max_quantinty') }}" onkeypress="return isNumberKey(event,this)">
                         </div>
                     </div>
-
+                    {{-- Max Stock --}}
                     <div class="form-group row">
-                        <label for="product_type" class="col-md-4 col-form-label text-md-right">Type <font color="red">*
-                            </font></label>
+                        <label for="max_quantinty" class="col-md-4 col-form-label text-md-right">Status</label>
                         <div class="col-md-8">
-                            <select name="product_type" class="form-control" id="product_type" required>
-                                <option selected value="stockable">Stockable</option>
-                                <option value="consumable">Service</option>
+                            <select name="status" class="form-control" id="status_edit" required>
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
                             </select>
                         </div>
                     </div>
-                    
-                    <div class="col-md-4" hidden>
-                        <div class="form-group">
-                            <label for="status">Status</label>
-                            <input type="text" class="form-control" id="status_edit" name="status"
-                                   placeholder="" value="1" readonly>
-                        </div>
-                    </div>
-
 
                     <input type="hidden" name="code" id="code_edit">
-
                     <input type="hidden" name="id" id="id">
                 </div>
 

@@ -1,5 +1,7 @@
 @extends("layouts.master")
 
+
+
 @section('page_css')
     <style>
 
@@ -112,27 +114,69 @@
     <div class="col-sm-12">
 
         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            @if(Auth::user()->checkPermission('View Sales Summary'))
             <li class="nav-item">
                 <a class="nav-link active" data-toggle="pill" href="#pills-home" role="tab" aria-selected="true">Sales
                     Summary</a>
             </li>
+            @endif
+
+            @if(Auth::user()->checkPermission('View Purchasing Summary'))
             <li class="nav-item">
-                <a class="nav-link" data-toggle="pill" href="#pills-stock" role="tab" aria-selected="false">Stock
+                @if(!Auth::user()->checkPermission('View Sales Summary'))
+                <a class="nav-link active" data-toggle="pill" href="#pills-purchase" role="tab" aria-selected="false">Purchasing
                     Summary</a>
+                @endif
+
+                @if(Auth::user()->checkPermission('View Sales Summary'))
+                    <a class="nav-link" data-toggle="pill" href="#pills-purchase" role="tab" aria-selected="false">Purchasing
+                        Summary</a>
+                @endif
+
             </li>
+            @endif
+
+           @if(Auth::user()->checkPermission('View Inventory Summary'))
             <li class="nav-item">
-                <a class="nav-link" data-toggle="pill" href="#pills-purchase" role="tab" aria-selected="false">Purchases
+                @if(!Auth::user()->checkPermission('View Sales Summary') && !Auth::user()->checkPermission('View Purchasing Summary'))
+                <a class="nav-link active" data-toggle="pill" href="#pills-stock" role="tab" aria-selected="false">Inventory
                     Summary</a>
+                @endif
+
+                @if(Auth::user()->checkPermission('View Sales Summary') || Auth::user()->checkPermission('View Purchasing Summary'))
+                    <a class="nav-link" data-toggle="pill" href="#pills-stock" role="tab" aria-selected="false">Inventory
+                        Summary</a>
+                @endif
             </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="pill" href="#pills-expense" role="tab" aria-selected="false">Expenses
-                    Summary</a>
+           @endif
+
+           <li class="nav-item">
+                <a class="nav-link" data-toggle="pill" href="#pills-transport" role="tab" aria-selected="false">Transport Summary</a>
             </li>
 
+            @if(Auth::user()->checkPermission('View Accounting Summary'))
+            <li class="nav-item">
+                @if(!Auth::user()->checkPermission('View Sales Summary') && !Auth::user()->checkPermission('View Purchasing Summary') && !Auth::user()->checkPermission('View Inventory Summary'))
+                <a class="nav-link active" data-toggle="pill" href="#pills-expense" role="tab" aria-selected="false">Accounting
+                    Summary</a>
+                @endif
+
+                @if(Auth::user()->checkPermission('View Sales Summary') || Auth::user()->checkPermission('View Purchasing Summary') || Auth::user()->checkPermission('View Inventory Summary'))
+                    <a class="nav-link" data-toggle="pill" href="#pills-expense" role="tab" aria-selected="false">Accounting
+                        Summary</a>
+                @endif
+
+
+            </li>
+            @endif
+
+           
         </ul>
+
 
         <div class="tab-content" id="pills-tabContent">
             {{-- Tab 1 --}}
+            @if(Auth::user()->checkPermission('View Sales Summary'))
             <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
                 {{-- row 1 start --}}
                 <div class="row">
@@ -220,131 +264,260 @@
                 </div>
 
             </div>
+            @endif
             {{-- end Tab 1 --}}
 
             {{-- Tab 2 --}}
-            <div class="tab-pane fade" id="pills-stock" role="tabpanel" aria-labelledby="pills-stock-tab">
-                {{-- row starts --}}
-                <div class="row">
-                    <div class="col-md-4 col-lg-4 col-sm-4">
+            @if(Auth::user()->checkPermission('View Inventory Summary'))
+                @if(!Auth::user()->checkPermission('View Sales Summary') && !Auth::user()->checkPermission('View Purchasing Summary'))
+                <div class="tab-pane fade show active" id="pills-stock" role="tabpanel" aria-labelledby="pills-stock-tab">
+                    {{-- row starts --}}
+                    <div class="row">
+                        <div class="col-md-4 col-lg-4 col-sm-4">
 
-                        <label>
-                            <input type="radio" name="stock" id="out_of_stock" class="card-input-element"/>
+                            <label>
+                                <input type="radio" name="stock" id="out_of_stock" class="card-input-element"/>
 
-                            <div class="panel panel-default card-input">
-                                <div class="card">
-                                    <div class="card-block">
-                                        <div class="panel-heading"><h5>Out of Stock</h5></div>
-                                        <div class="panel-body">
-                                            <h3 class="text-c-red">{{$outOfStock}}</h3>
+                                <div class="panel panel-default card-input">
+                                    <div class="card">
+                                        <div class="card-block">
+                                            <div class="panel-heading"><h5>Out of Stock</h5></div>
+                                            <div class="panel-body">
+                                                <h3 class="text-c-red">{{$outOfStock}}</h3>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                        </label>
+                            </label>
+                        </div>
+                        <div class="col-md-4 col-lg-4 col-sm-4">
+
+                            <label>
+                                <input type="radio" name="stock" id="below" class="card-input-element"/>
+
+                                <div class="panel panel-default card-input">
+                                    <div class="card">
+                                        <div class="card-block">
+                                            <div class="panel-heading"><h5>Fast Moving</h5></div>
+                                            <div class="panel-body text-c-green">
+                                                <h3 class="text-c-green">{{$fast_moving}}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </label>
+                        </div>
+                        <div class="col-md-4 col-lg-4 col-sm-4">
+
+                            <label>
+                                <input type="radio" name="stock" id="expired" class="card-input-element"/>
+
+                                <div class="panel panel-default card-input">
+                                    <div class="card">
+                                        <div class="card-block">
+                                            <div class="panel-heading"><h5>Expired</h5></div>
+                                            <div class="panel-body text-c-red">
+                                                <h3 class="text-c-red">{{$expired}}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </label>
+                        </div>
                     </div>
-                    <div class="col-md-4 col-lg-4 col-sm-4">
 
-                        <label>
-                            <input type="radio" name="stock" id="below" class="card-input-element"/>
+                    <div class="row">
+                        <!-- [ Out of stock start -->
+                        <div class="col-xl-12 col-md-12">
+                            <div class="table-responsive" style="display: none" id="stock_items_table">
+                                <table id="stock_items"
+                                       class="display table nowrap table-striped table-hover"
+                                       style="width:100%">
+                                    <thead>
+                                    <tr>
+                                        <th>Product Code</th>
+                                        <th>Product</th>
+                                        <th>Category</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
 
-                            <div class="panel panel-default card-input">
-                                <div class="card">
-                                    <div class="card-block">
-                                        <div class="panel-heading"><h5>Fast Moving</h5></div>
-                                        <div class="panel-body text-c-green">
-                                            <h3 class="text-c-green">{{$fast_moving}}</h3>
-                                        </div>
-                                    </div>
-                                </div>
+                                    </tbody>
+                                </table>
                             </div>
 
-                        </label>
-                    </div>
-                    <div class="col-md-4 col-lg-4 col-sm-4">
+                            <div class="table-responsive" style="display: none" id="stock_items_fast_table">
+                                <table id="stock_items_fast"
+                                       class="display table nowrap table-striped table-hover"
+                                       style="width:100%">
+                                    <thead>
+                                    <tr>
+                                        <th>Product Code</th>
+                                        <th>Product</th>
+                                        <th>Sold Times</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
 
-                        <label>
-                            <input type="radio" name="stock" id="expired" class="card-input-element"/>
-
-                            <div class="panel panel-default card-input">
-                                <div class="card">
-                                    <div class="card-block">
-                                        <div class="panel-heading"><h5>Expired</h5></div>
-                                        <div class="panel-body text-c-red">
-                                            <h3 class="text-c-red">{{$expired}}</h3>
-                                        </div>
-                                    </div>
-                                </div>
+                                    </tbody>
+                                </table>
                             </div>
 
-                        </label>
+                            <div class="table-responsive" style="display: none" id="stock_items_expired_table">
+                                <table id="stock_items_expired"
+                                       class="display table nowrap table-striped table-hover"
+                                       style="width:100%">
+                                    <thead>
+                                    <tr>
+                                        <th>Product Code</th>
+                                        <th>Product</th>
+                                        <th>Quantity</th>
+                                        <th>Expiry Date</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+
                     </div>
                 </div>
+                @endif
 
-                <div class="row">
-                    <!-- [ Out of stock start -->
-                    <div class="col-xl-12 col-md-12">
-                        <div class="table-responsive" style="display: none" id="stock_items_table">
-                            <table id="stock_items"
-                                   class="display table nowrap table-striped table-hover"
-                                   style="width:100%">
-                                <thead>
-                                <tr>
-                                    <th>Product Code</th>
-                                    <th>Product</th>
-                                    <th>Category</th>
-                                </tr>
-                                </thead>
-                                <tbody>
+                @if(Auth::user()->checkPermission('View Sales Summary') || Auth::user()->checkPermission('View Purchasing Summary'))
+                    <div class="tab-pane fade" id="pills-stock" role="tabpanel" aria-labelledby="pills-stock-tab">
+                        {{-- row starts --}}
+                        <div class="row">
+                            <div class="col-md-4 col-lg-4 col-sm-4">
 
-                                </tbody>
-                            </table>
+                                <label>
+                                    <input type="radio" name="stock" id="out_of_stock" class="card-input-element"/>
+
+                                    <div class="panel panel-default card-input">
+                                        <div class="card">
+                                            <div class="card-block">
+                                                <div class="panel-heading"><h5>Out of Stock</h5></div>
+                                                <div class="panel-body">
+                                                    <h3 class="text-c-red">{{$outOfStock}}</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </label>
+                            </div>
+                            <div class="col-md-4 col-lg-4 col-sm-4">
+
+                                <label>
+                                    <input type="radio" name="stock" id="below" class="card-input-element"/>
+
+                                    <div class="panel panel-default card-input">
+                                        <div class="card">
+                                            <div class="card-block">
+                                                <div class="panel-heading"><h5>Fast Moving</h5></div>
+                                                <div class="panel-body text-c-green">
+                                                    <h3 class="text-c-green">{{$fast_moving}}</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </label>
+                            </div>
+                            <div class="col-md-4 col-lg-4 col-sm-4">
+
+                                <label>
+                                    <input type="radio" name="stock" id="expired" class="card-input-element"/>
+
+                                    <div class="panel panel-default card-input">
+                                        <div class="card">
+                                            <div class="card-block">
+                                                <div class="panel-heading"><h5>Expired</h5></div>
+                                                <div class="panel-body text-c-red">
+                                                    <h3 class="text-c-red">{{$expired}}</h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </label>
+                            </div>
                         </div>
 
-                        <div class="table-responsive" style="display: none" id="stock_items_fast_table">
-                            <table id="stock_items_fast"
-                                   class="display table nowrap table-striped table-hover"
-                                   style="width:100%">
-                                <thead>
-                                <tr>
-                                    <th>Product Code</th>
-                                    <th>Product</th>
-                                    <th>Sold Times</th>
-                                </tr>
-                                </thead>
-                                <tbody>
+                        <div class="row">
+                            <!-- [ Out of stock start -->
+                            <div class="col-xl-12 col-md-12">
+                                <div class="table-responsive" style="display: none" id="stock_items_table">
+                                    <table id="stock_items"
+                                           class="display table nowrap table-striped table-hover"
+                                           style="width:100%">
+                                        <thead>
+                                        <tr>
+                                            <th>Product Code</th>
+                                            <th>Product</th>
+                                            <th>Category</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
 
-                                </tbody>
-                            </table>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="table-responsive" style="display: none" id="stock_items_fast_table">
+                                    <table id="stock_items_fast"
+                                           class="display table nowrap table-striped table-hover"
+                                           style="width:100%">
+                                        <thead>
+                                        <tr>
+                                            <th>Product Code</th>
+                                            <th>Product</th>
+                                            <th>Sold Times</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="table-responsive" style="display: none" id="stock_items_expired_table">
+                                    <table id="stock_items_expired"
+                                           class="display table nowrap table-striped table-hover"
+                                           style="width:100%">
+                                        <thead>
+                                        <tr>
+                                            <th>Product Code</th>
+                                            <th>Product</th>
+                                            <th>Quantity</th>
+                                            <th>Expiry Date</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+
                         </div>
-
-                        <div class="table-responsive" style="display: none" id="stock_items_expired_table">
-                            <table id="stock_items_expired"
-                                   class="display table nowrap table-striped table-hover"
-                                   style="width:100%">
-                                <thead>
-                                <tr>
-                                    <th>Product Code</th>
-                                    <th>Product</th>
-                                    <th>Quantity</th>
-                                    <th>Expiry Date</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-
-                                </tbody>
-                            </table>
-                        </div>
-
                     </div>
+                @endif
+            @endif
 
-                </div>
-            </div>
             {{-- end Tab 2 --}}
 
             {{-- Tab 3 --}}
-            <div class="tab-pane fade" id="pills-purchase" role="tabpanel" aria-labelledby="pills-purchase-tab">
+            @if(Auth::user()->checkPermission('View Purchasing Summary'))
+                @if(!Auth::user()->checkPermission('View Sales Summary'))
+                <div class="tab-pane fade show active" id="pills-purchase" role="tabpanel" aria-labelledby="pills-purchase-tab">
                 {{--                 row 1 start--}}
                 <div class="row">
                     <!-- [ Today purchase section ] start -->
@@ -431,10 +604,105 @@
                 </div>
 
             </div>
+                @endif
+
+                @if(Auth::user()->checkPermission('View Sales Summary'))
+                    <div class="tab-pane fade" id="pills-purchase" role="tabpanel" aria-labelledby="pills-purchase-tab">
+                        {{--                 row 1 start--}}
+                        <div class="row">
+                            <!-- [ Today purchase section ] start -->
+                            <div class="col-md-6 col-xl-4">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <h6 class="mb-4">Average Daily Purchases</h6>
+                                        <div class="row d-flex align-items-center">
+                                            <div class="col-9">
+                                                <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                                    Tshs {{ number_format($purchase_data['avgDailyPurchases'], 2) }}</h3>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- [ Today purchase section ] end -->
+
+                            <!-- [ This week purchase section ] start -->
+                            <div class="col-md-6 col-xl-4">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <h6 class="mb-4">Today Purchases</h6>
+                                        <div class="row d-flex align-items-center">
+                                            <div class="col-9">
+                                                <h3 class="f-w-300 d-flex align-items-center  m-b-0">
+                                                    @if ($purchase_data['todayPurchases'] > $purchase_data['avgDailyPurchases'])
+                                                        <i class="feather icon-arrow-up text-c-green f-30 m-r-10"></i>
+                                                    @else
+                                                        <i class="feather icon-arrow-down text-c-red f-30 m-r-10"></i>
+                                                    @endif
+
+                                                    Tshs {{ number_format($purchase_data['todayPurchases'], 2) }}
+
+                                                </h3>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- [ This week  purchase section ] end -->
+
+                            <!-- [ This month purchase section ] start -->
+                            <div class="col-md-6 col-xl-4">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <h6 class="mb-4">Average Monthly Purchases</h6>
+                                        <div class="row d-flex align-items-center">
+                                            <div class="col-9">
+                                                <h3 class="f-w-300 d-flex align-items-center  m-b-0">
+                                                    Tshs {{ number_format($purchase_data['avgDailyPurchases'] * 30,2) }}</h3>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- [ this month  purchase section ] end -->
+
+                        </div>
+                        {{--                 row 1 end--}}
+
+
+                        {{--                 row 2 start--}}
+                        <div class="row">
+                            <div class="col-md-12 col-xl-12">
+                                <div id='monthly_purchase'></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 col-xl-12">
+                                <div id='purchase_by_category'></div>
+                            </div>
+                        </div>
+
+                        {{--                 row 3 start--}}
+                        <div class="row">
+                            <div id='daily_purchase'></div>
+                        </div>
+
+                    </div>
+                @endif
+            @endif
+
             {{-- end Tab 3 --}}
 
             {{-- Tab 4 --}}
-            <div class="tab-pane fade" id="pills-expense" role="tabpanel" aria-labelledby="pills-expense-tab">
+            @if(Auth::user()->checkPermission('View Accounting Summary'))
+                @if(!Auth::user()->checkPermission('View Sales Summary') && !Auth::user()->checkPermission('View Purchasing Summary') && !Auth::user()->checkPermission('View Inventory Summary'))
+                    <div class="tab-pane fade show active" id="pills-expense" role="tabpanel" aria-labelledby="pills-expense-tab">
                 {{--                 row 1 start--}}
                 <div class="row">
                     <!-- [ Today expense section ] start -->
@@ -521,7 +789,176 @@
                 </div>
 
             </div>
+                @endif
+
+                @if(Auth::user()->checkPermission('View Sales Summary') || Auth::user()->checkPermission('View Purchasing Summary') || Auth::user()->checkPermission('View Inventory Summary'))
+                    <div class="tab-pane fade" id="pills-expense" role="tabpanel" aria-labelledby="pills-expense-tab">
+                        {{--                 row 1 start--}}
+                        <div class="row">
+                            <!-- [ Today expense section ] start -->
+                            <div class="col-md-6 col-xl-4">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <h6 class="mb-4">Average Daily Expenses</h6>
+                                        <div class="row d-flex align-items-center">
+                                            <div class="col-9">
+                                                <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                                    Tshs {{ number_format($expense_data['avgDailyExpenses'], 2) }}</h3>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- [ Today expense section ] end -->
+
+                            <!-- [ This week expense section ] start -->
+                            <div class="col-md-6 col-xl-4">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <h6 class="mb-4">Today Expenses</h6>
+                                        <div class="row d-flex align-items-center">
+                                            <div class="col-9">
+                                                <h3 class="f-w-300 d-flex align-items-center  m-b-0">
+                                                    @if ($expense_data['todayExpenses'] > $expense_data['avgDailyExpenses'])
+                                                        <i class="feather icon-arrow-up text-c-green f-30 m-r-10"></i>
+                                                    @else
+                                                        <i class="feather icon-arrow-down text-c-red f-30 m-r-10"></i>
+                                                    @endif
+
+                                                    Tshs {{ number_format($expense_data['todayExpenses'], 2) }}
+
+                                                </h3>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- [ This week  expense section ] end -->
+
+                            <!-- [ This month expense section ] start -->
+                            <div class="col-md-6 col-xl-4">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <h6 class="mb-4">Average Monthly Expenses</h6>
+                                        <div class="row d-flex align-items-center">
+                                            <div class="col-9">
+                                                <h3 class="f-w-300 d-flex align-items-center  m-b-0">
+                                                    Tshs {{ number_format($expense_data['avgDailyExpenses'] * 30,2) }}</h3>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- [ this month  expense section ] end -->
+
+                        </div>
+                        {{--                 row 1 end--}}
+
+
+                        {{--                 row 2 start--}}
+                        <div class="row">
+                            <div class="col-md-12 col-xl-12">
+                                <div id='monthly_expense'></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 col-xl-12">
+                                <div id='expense_by_category'></div>
+                            </div>
+                        </div>
+
+                        {{--                 row 3 start--}}
+                        <div class="row">
+                            <div id='daily_expense'></div>
+                        </div>
+
+                    </div>
+                @endif
+            @endif
             {{-- end Tab 4 --}}
+
+            {{-- Tab 5 --}}
+            <div class="tab-pane fade" id="pills-transport" role="tabpanel" aria-labelledby="pills-transport-tab">
+                <div class="row">
+                    <div class="col-md-6 col-xl-3">
+                        <div class="card">
+                            <div class="card-block">
+                                <h6 class="mb-4">Trips</h6>
+                                <div class="row d-flex align-items-center">
+                                    <div class="col-9">
+                                        <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                            {{ number_format($transport_data['total_trips']) }}
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-3">
+                        <div class="card">
+                            <div class="card-block">
+                                <h6 class="mb-4">Revenue</h6>
+                                <div class="row d-flex align-items-center">
+                                    <div class="col-9">
+                                        <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                            Tshs {{ number_format($transport_data['total_revenue'], 2) }}
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-2">
+                        <div class="card">
+                            <div class="card-block">
+                                <h6 class="mb-4">Pending</h6>
+                                <div class="row d-flex align-items-center">
+                                    <div class="col-9">
+                                        <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                            {{ number_format($transport_data['pending_trips']) }}
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-2">
+                        <div class="card">
+                            <div class="card-block">
+                                <h6 class="mb-4">In Transit</h6>
+                                <div class="row d-flex align-items-center">
+                                    <div class="col-9">
+                                        <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                            {{ number_format($transport_data['in_transit_trips']) }}
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-2">
+                        <div class="card">
+                            <div class="card-block">
+                                <h6 class="mb-4">Delivered</h6>
+                                <div class="row d-flex align-items-center">
+                                    <div class="col-9">
+                                        <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                            {{ number_format($transport_data['delivered_trips']) }}
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{-- end Tab 5 --}}
 
         </div>
 
@@ -538,6 +975,7 @@
     <script src="{{asset("assets/plugins/amcharts4/core.js")}}"></script>
     <script src="{{asset("assets/plugins/amcharts4/charts.js")}}"></script>
     <script src="{{asset("assets/plugins/amcharts4/themes/animated.js")}}"></script>
+    <script src="{{asset("assets/apotek/js/notification.js")}}"></script>
 
     <script>
 
@@ -551,6 +989,8 @@
             var a = document.getElementById('out_of_stock');
             a.click();
         });
+
+
 
         $('#out_of_stock').on('click', function () {
 
@@ -866,7 +1306,18 @@
             });
         }
 
+
+
+
+
+
+
     </script>
+
+
+
+
+
 
 @endpush
 

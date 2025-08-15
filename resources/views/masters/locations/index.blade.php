@@ -8,12 +8,12 @@
 @endsection
 
 @section('content-title')
-    Locations
+    Issue Locations
 @endsection
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#"> Masters / Locations </a></li>
+    <li class="breadcrumb-item"><a href="#"> General / Issue Locations </a></li>
 @endsection
 
 @section("content")

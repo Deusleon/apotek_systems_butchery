@@ -218,6 +218,28 @@ class MaterialReceivedController extends Controller
                 $value->supplier;
                 $value->user;
 
+                // Calculate remaining quantity
+                $orderDetailQuery = DB::table('order_details')
+                    ->join('orders', 'order_details.order_id', '=', 'orders.id')
+                    ->where('order_details.product_id', $value->product_id);
+
+                if ($value->supplier_id) {
+                    $orderDetailQuery->where('orders.supplier_id', $value->supplier_id);
+                }
+
+                $orderDetail = $orderDetailQuery->select('order_details.ordered_qty', 'order_details.received_quantity')
+                    ->orderBy('orders.ordered_at', 'desc') // Get the latest order
+                    ->first();
+
+                if ($orderDetail) {
+                    $value->ordered_qty = $orderDetail->ordered_qty;
+                    $value->total_received_qty = $orderDetail->received_quantity;
+                    $value->remaining_qty = $orderDetail->ordered_qty - $orderDetail->received_quantity;
+                } else {
+                    $value->ordered_qty = $value->quantity; // Assume ordered is what was received if no PO
+                    $value->total_received_qty = $value->quantity;
+                    $value->remaining_qty = 0;
+                }
             }
         }
 

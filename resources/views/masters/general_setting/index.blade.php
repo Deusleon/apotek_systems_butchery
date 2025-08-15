@@ -35,7 +35,7 @@
 
 
             <div class="tab-content" id="myTabContent">
-              
+
              <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="details-tab">
                     <form action="{{route('general-settings.updateInfo','id')}}" method="post" enctype="multipart/form-data">
                         @csrf()
@@ -69,7 +69,7 @@
                             <div class="row">
                                 <div class="col-md-6 form-group">
                                         <label for="code">Phone</label>
-                                        <input type="text" class="form-control" id="phone_number" name="phone" 
+                                        <input type="text" class="form-control" id="phone_number" name="phone"
                                        value="{{$setting->phone}}">
                                         <span id="valid-msg" class="hide"></span>
                                         <span id="error-msg" class="text text-danger"></span>
@@ -78,7 +78,7 @@
                                 <div class="col-md-6 form-group">
                                         <label for="code">Email</label>
                                         <input type="text" class="form-control" id="email" name="email"
-                                              
+
                                                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"
                                                title="Eg:info@softlink.tz"
                                                placeholder="Enter your Email" value="{{$setting->email}}">
@@ -88,7 +88,7 @@
                                 <div class="col-md-6 form-group">
                                         <label for="code">Website</label>
                                         <input type="text" class="form-control" id="website" name="website"
-                                              
+
                                                pattern="https?://.+" title="Include http://"
                                                placeholder="Enter your website" value="{{$setting->website}}">
                                 </div>
@@ -102,14 +102,14 @@
                                 <div class="col-md-6 form-group">
                                         <label for="code">Address</label>
                                         <textarea type="text" class="form-control" id="address" name="address"
-                                                 
+
                                                   placeholder="Enter your Address">{{$setting->address}}</textarea>
                                 </div>
 
                                 <div class="col-md-6 form-group">
                                         <label for="code">Slogan</label>
                                         <textarea type="text" class="form-control" id="slogan" name="slogan"
-                                                 
+
                                                   placeholder="Enter your Slogan">{{$setting->slogan}}</textarea>
                                 </div>
                             </div>
@@ -125,7 +125,7 @@
                         @csrf()
                         @method("PUT")
                         <div class="modal-body">
-                         
+
                             <div class="row">
                               @if("$setting->make_batch_number_mandatory"=="Yes")
                                  <div class="col-md-6 form-group">
@@ -199,7 +199,7 @@
                                 </div>
                               @endif
                             </div>
-                           
+
                             <div class="row">
                                 @if($setting->make_invoice_number_mandatory=="Yes")
                               <div class="col-md-6 form-group">
@@ -225,7 +225,7 @@
                                             <input type="checkbox" id="switch-p-6" name="support_multstore" checked>
                                             <label for="switch-p-6" class="cr"></label>
                                         </div>
-                                        <label>Support Multi-Stores</label>
+                                        <label>Support Multi-Branches</label>
                                   </div>
                              @else
                               <div class="col-md-6 form-group">
@@ -233,7 +233,7 @@
                                             <input type="checkbox" id="switch-p-7" name="support_multstore">
                                             <label for="switch-p-7" class="cr"></label>
                                         </div>
-                                        <label>Support Multi-Stores</label>
+                                        <label>Support Multi-Branches</label>
                                   </div>
                              @endif
 
@@ -248,7 +248,7 @@
                                             <option value="Total Cost*Qty">Total Cost*Qty</option>
                                         </select>
                                     </div>
-                          
+
                                     <div class="col-md-6 form-group">
                                         <label for="code" id="store_label">Default Store</label>
                                             <select  class="js-example-basic-single form-control" id="store">
@@ -333,13 +333,15 @@
                                         <label for="code">Receipt Size </label>
                                         <select class="form-control" name="receipt_size">
                                          <option value="A4 / Letter">A4 / Letter</option>
-                                          <option value="Thermal Paper">Thermal Paper</option>
+                                         <option value="A5 / Half Letter">A5 / Half Letter</option>
+                                          <option value="58mm Thermal Paper">58mm Thermal Paper</option>
+                                          <option value="88mm Thermal Paper">88mm Thermal Paper</option>
                                           <option value="None">None</option>
                                           <option selected="{{$setting->receipt_size}}">{{$setting->receipt_size}}</option>
                                         </select>
                                     </div>
                                 </div>
-                              
+
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
@@ -417,7 +419,7 @@
       $('#save_changes').prop('disabled',false);
       validMsg.classList.remove("hide");
       document.getElementById('phone_number').value = iti.getNumber();
-      } 
+      }
       else
       {
       input.classList.add("error");
@@ -438,7 +440,7 @@
    var multstore=document.getElementById('multstore').value;
    if(multstore=="No"){
     a=-1;
-     document.getElementById('store_label').style.color='red';  
+     document.getElementById('store_label').style.color='red';
    $('#store').prop('disabled',true);
    }
    var default_store=document.getElementById('default_store').value;
@@ -449,11 +451,11 @@
        a=-a;
       allowStore(a);
      });
-    
+
    $("#switch-p-7").on('change', function() {
       a=-a;
     allowStore(a);
- 
+
      });
    function allowStore(a){
        if(a>0){
@@ -461,7 +463,7 @@
         $('#store').prop('disabled',false);
      }
      else{
-        document.getElementById('store_label').style.color='red';  
+        document.getElementById('store_label').style.color='red';
         $('#store').prop('disabled',true);
      }
 
@@ -470,7 +472,7 @@
 
 
 //Maintain the current Pill on reload
-$(function() { 
+$(function() {
     $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
         localStorage.setItem('lastPill', $(this).attr('href'));
     });

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Category;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
@@ -18,6 +19,14 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
+        $existing = Category::where('name',$request->name)->count();
+
+        if($existing > 0)
+        {
+            session()->flash("alert-danger", "Product Category Exists!");
+            return back();
+        }
+
         try {
             $category = new Category;
             $category->name = $request->name;
@@ -33,6 +42,13 @@ class CategoryController extends Controller
 
     public function destroy(Request $request)
     {
+        $check_existance = DB::table('inv_products')->where('category_id',$request->id)->count();
+
+        if($check_existance > 0)
+        {
+            session()->flash("alert-danger", "Product Category is in use!");
+            return back();
+        }
         try {
             Category::destroy($request->id);
             session()->flash("alert-danger", "Product Category Deleted successfully!");
@@ -46,6 +62,14 @@ class CategoryController extends Controller
 
     public function update(Request $request, $id)
     {
+        $existing = Category::where('name',$request->name)->count();
+
+        if($existing > 0)
+        {
+            session()->flash("alert-danger", "Product Category Exists!");
+            return back();
+        }
+
         $category = Category::find($request->id);
         $category->name = $request->name;
         try {

@@ -11,6 +11,12 @@
 |
 */
 
+use Illuminate\Support\Facades\Broadcast;
+
 Broadcast::channel('App.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
+});
+
+Broadcast::channel('stock.updates.{storeId}', function ($user, $storeId) {
+    return $user->hasRole('admin') || $user->stores->contains($storeId);
 });

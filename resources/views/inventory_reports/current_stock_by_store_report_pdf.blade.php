@@ -110,7 +110,7 @@
                             <td align="">{{date('d-m-Y',strtotime($item['expiry_date']))}}</td>
                         @endif
                         <td align="right">
-                            <div style="margin-right: 50%">{{number_format($item['quantity'])}}</div>
+                            <div style="margin-right: 50%">{{number_format($item['quantity'],0)}}</div>
                         </td>
                         <td align="">{{$item['batch_number']}}</td>
                         <td align="">{{$item['shelf_no']}}</td>

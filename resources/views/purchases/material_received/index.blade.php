@@ -5,7 +5,7 @@
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#">Purchases /Material Received</a></li>
+    <li class="breadcrumb-item"><a href="#">Purchasing /Material Received</a></li>
 @endsection
 
 
@@ -39,6 +39,25 @@
     </style>
 
     <div class="col-sm-12">
+        <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link text-uppercase" id="invoice-received" data-toggle="pill"
+                   href="{{ route('goods-receiving.index') }}" role="tab"
+                   aria-controls="quotes_list" aria-selected="true">Invoice Receiving</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-uppercase" id="order-received" data-toggle="pill"
+                   href="{{ route('orders-receiving.index') }}"
+                   role="tab" aria-controls="new_quotes" aria-selected="false">Order Receiving
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active text-uppercase" id="material-received" data-toggle="pill"
+                   href="{{ url('purchases/material-received') }}"
+                   role="tab" aria-controls="new_quotes" aria-selected="false">Material Received
+                </a>
+            </li>
+        </ul>
         <div class="card">
             <div class="card-body">
                 <div class="form-group row">
@@ -93,9 +112,10 @@
                         <tr>
                             <th>id</th>
                             <th>Product Name</th>
-                            <th>Quantity</th>
+                            <th>Ordered</th>
+                            <th>Received</th>
+                            <th>Remaining</th>
                             <th>Price</th>
-                            <th>Expire Date</th>
                             <th>Amount</th>
                             <th>Receive Date</th>
                             <th>Received By</th>
@@ -240,22 +260,23 @@
                         {data: 'id'},
                         {data: 'product.name'},
                         {
-                            data: 'quantity', render: function (data) {
+                            data: 'ordered_qty', render: function (data) {
+                                return numberWithCommas(parseFloat(data));
+                            }
+                        },
+                        {
+                            data: 'total_received_qty', render: function (data) {
+                                return numberWithCommas(parseFloat(data));
+                            }
+                        },
+                        {
+                            data: 'remaining_qty', render: function (data) {
                                 return numberWithCommas(parseFloat(data));
                             }
                         },
                         {
                             data: 'unit_cost', render: function (unit_cost) {
                                 return formatMoney(unit_cost)
-                            }
-                        },
-                        {
-                            data: 'expire_date', render: function (expire_date) {
-                                var date = moment(expire_date).format('DD-MM-YYYY');
-                                if (date === 'Invalid date') {
-                                    return '';
-                                }
-                                return date;
                             }
                         },
                         {
@@ -365,6 +386,31 @@
 
         }
 
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            // Listen for the click event on the Transfer History tab
+            // Listen for the click event on the Transfer History tab
+            $('#material-received').on('click', function(e) {
+                e.preventDefault(); // Prevent default tab switching behavior
+                var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
+                window.location.href = redirectUrl; // Redirect to the URL
+            });
+
+            $('#order-received').on('click', function(e) {
+                e.preventDefault(); // Prevent default tab switching behavior
+                var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
+                window.location.href = redirectUrl; // Redirect to the URL
+            });
+
+            $('#invoice-received').on('click', function(e) {
+                e.preventDefault(); // Prevent default tab switching behavior
+                var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
+                window.location.href = redirectUrl; // Redirect to the URL
+            });
+
+        });
     </script>
 
 @endpush

@@ -16,3 +16,12 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// Anthropic API Assistant Routes
+Route::prefix('assistant')->group(function () {
+    Route::get('/test', 'ApiAssistantController@testConnection');
+    Route::post('/message', 'ApiAssistantController@sendMessage');
+    Route::post('/drug-info', 'ApiAssistantController@getDrugInfo');
+    Route::post('/drug-interactions', 'ApiAssistantController@checkDrugInteractions');
+    Route::post('/pharmacy-question', 'ApiAssistantController@askPharmacyQuestion');
+});

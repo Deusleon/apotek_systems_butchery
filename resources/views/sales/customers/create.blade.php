@@ -1,84 +1,84 @@
+<style>
+    .uniform-input {
+        height: calc(2.25rem + 2px) !important;
+    }
+    .iti {
+        width: 100% !important;
+    }
+</style>
 <div class="modal fade" id="create" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
      aria-hidden="true">
-
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalCenterTitle">Add New Customer</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <form action="{{ route('customers.store') }}" method="post">
-                        @csrf()
-                        <div class="modal-body">
-                            <div class="form-group row">
-                                <label for="code" class="col-md-4 col-form-label text-md-right">Name<font
-                                        color="red">*</font></label>
-                                <div class="col-md-8">
-                                    <input type="text" class="form-control" id="name" name="name"
-                                           aria-describedby="emailHelp"
-                                           placeholder="Enter Name" required>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="code" class="col-md-4 col-form-label text-md-right">Email</label>
-                                <div class="col-md-8">
-                                    <input type="text" class="form-control" id="email" name="email"
-                                           pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"
-                                           title="Eg:info@softlink.tz"
-                                           placeholder="Enter Email Address">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="code" class="col-md-4 col-form-label text-md-right">Phone<font
-                                        color="red">*</font></label>
-                                <div class="col-md-8">
-                                    <input type="hidden" id="modal-ID" value="1">
-                                    <input type="text" class="form-control"
-                                           id="phone-number" name="phone" required>
-                                    <span id="valid-msg" class="hide"></span>
-                                    <span id="error-msg" class="text text-danger"></span>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="code" class="col-md-4 col-form-label text-md-right">Address</label>
-                                <div class="col-md-8">
-                                    <textarea type="text" class="form-control" rows="1" name="address"
-                                              aria-describedby="emailHelp" id="address"
-                                              placeholder="Enter Address"></textarea>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="code" class="col-md-4 col-form-label text-md-right">TIN</label>
-                                <div class="col-md-8">
-                                    <input type="text" class="form-control" id="tin" name="tin"
-                                           placeholder="Enter TIN">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="code" class="col-md-4 col-form-label text-md-right">Credit Limit<font
-                                        color="red">*</font></label>
-                                <div class="col-md-8">
-                                    <input type="text" class="form-control" id="credit_input"
-                                           placeholder="Enter Credit Limit" required>
-                                </div>
-                            </div>
-
-                            <input type="hidden" name="credit_limit" id="credit_limit_amount">
-
-                        </div>
-                        <div class="modal-footer">
-
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary" id="customer_save_btn">Save</button>
-
-                        </div>
-                    </form>
+            <form action="{{ route('customers.store') }}" method="post">
+                @csrf()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Add New Customer</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-            </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label for="name" class="col-md-4 col-form-label text-md-right">Name<font color="red">*</font></label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control uniform-input" id="name" name="name"
+                                   value="{{ old('name') }}" required>
+                            @if($errors->has('name'))
+                                <span class="text-danger">{{ $errors->first('name') }}</span>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="email" class="col-md-4 col-form-label text-md-right">Email</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control uniform-input" id="email" name="email"
+                                   pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$"
+                                   title="Eg:info@softlink.tz"
+                                   placeholder="Enter Email Address">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="phone" class="col-md-4 col-form-label text-md-right">Phone<font color="red">*</font></label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control uniform-input" id="phone" name="phone"
+                                   value="{{ old('phone') }}" required data-mask="999999999999">
+                            <span id="valid-msg" class="hide">✓ Valid</span>
+                            <span id="error-msg" class="hide"></span>
+                            @if($errors->has('phone'))
+                                <span class="text-danger">{{ $errors->first('phone') }}</span>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="address" class="col-md-4 col-form-label text-md-right">Address</label>
+                        <div class="col-md-8">
+                            <textarea type="text" class="form-control uniform-input" rows="1" name="address"
+                                      aria-describedby="emailHelp" id="address"
+                                      placeholder="Enter Address"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="tin" class="col-md-4 col-form-label text-md-right">TIN</label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control uniform-input" id="tin" name="tin"
+                                   placeholder="Enter TIN">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="credit_limit" class="col-md-4 col-form-label text-md-right">Credit Limit<font color="red">*</font></label>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control uniform-input" id="credit_limit" name="credit_limit"
+                                   placeholder="Enter Credit Limit" value="0.00" required data-mask="999999999999.99">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="customer_save_btn">Save</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

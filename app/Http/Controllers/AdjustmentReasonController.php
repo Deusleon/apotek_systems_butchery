@@ -16,6 +16,13 @@ class AdjustmentReasonController extends Controller
 
     public function store(Request $request)
     {
+        $existing = AdjustmentReason::where('reason',$request->reason)->count();
+
+        if($existing > 0)
+        {
+            session()->flash("alert-danger", "Reason Exists!");
+            return back();
+        }
         try {
             $adjustment = new AdjustmentReason;
             $adjustment->reason = $request->reason;
@@ -30,6 +37,14 @@ class AdjustmentReasonController extends Controller
 
     public function update(Request $request)
     {
+        $existing = AdjustmentReason::where('reason',$request->name)->count();
+
+        if($existing > 0)
+        {
+            session()->flash("alert-danger", "Reason Exists!");
+            return back();
+        }
+
         $adjustment = AdjustmentReason::find($request->adjustment_id);
         $adjustment->reason = $request->name;
         try {
