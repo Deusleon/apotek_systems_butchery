@@ -309,7 +309,7 @@
                     }
                 });
 
-                // Handle filter changes
+                // Handle filter changes.
                 $('#category-filter, #status-filter').change(function () {
                     table.draw();
                 });
