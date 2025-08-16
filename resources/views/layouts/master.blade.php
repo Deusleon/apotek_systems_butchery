@@ -244,21 +244,32 @@ $store_id = Auth::user()->store_id;
 
         <ul class="navbar-nav ml-auto">
             <li>
-                @if(auth()->user()->checkPermission('Manage All Branches'))
-                            <div class="form-group" style=" width: 200px!important;; /* Adjust width as needed */
-             max-width: 100%; /* Ensures responsiveness */
-             text-overflow: ellipsis; /* Handle overflow gracefully */">
-                                <select name="store_id" id="store_id"
-                                        class="js-example-basic-single form-control">
-                                    <option value="" disabled>Select Branch</option>
-                                    @foreach($all_stores as $customer)
-                                        <option value="{{$customer->id}}" {{$customer->id === (Auth::user()->store->id ?? 0)  ? 'selected' : ''}}>{{$customer->name}}</option>
-                                    @endforeach
+                <div class="form-group" style="width: 200px!important; max-width: 100%; text-overflow: ellipsis;">
+                    <select name="store_id" id="store_id" class="js-example-basic-single form-control">
+                        <option value="" disabled>Select Branch</option>
 
-                                </select>
-                            </div>
-                @endif
+                        @php
+                            $userStore = Auth::user()->store;
+                            $canAccessAll = $userStore->name === 'ALL';
+                        @endphp
+
+                        @if($canAccessAll)
+                            {{-- User registered with ALL → show all stores --}}
+                            @foreach($all_stores as $store)
+                                <option value="{{ $store->id }}" {{ $store->id === ($userStore->id ?? 0) ? 'selected' : '' }}>
+                                    {{ $store->name }}
+                                </option>
+                            @endforeach
+                        @else
+                            {{-- Normal user → show only their registered store --}}
+                            @if($userStore)
+                                <option value="{{ $userStore->id }}" selected>{{ $userStore->name }}</option>
+                            @endif
+                        @endif
+                    </select>
+                </div>
             </li>
+
             <li>
                 <div class="dropdown">
                     @if(auth()->user()->checkPermission('View Settings'))
