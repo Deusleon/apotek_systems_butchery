@@ -32,6 +32,7 @@ class PriceListController extends Controller
                 'inv_products.name as product_name',
                 'inv_products.brand as brand',
                 'inv_products.pack_size as pack_size',
+                'inv_products.sales_uom as sales_uom',
                 'inv_current_stock.unit_cost as unit_cost',
                 'sales_prices.price as price',
                 DB::raw('((sales_prices.price - inv_current_stock.unit_cost) / inv_current_stock.unit_cost) * 100 as profit'),

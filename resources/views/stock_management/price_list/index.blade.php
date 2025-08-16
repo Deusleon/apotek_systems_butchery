@@ -99,8 +99,6 @@
                             <thead>
                             <tr>
                                 <th>Product Name</th>
-                                <th>Brand</th>
-                                <th>Pack Size</th>
                                 <th>Buy Price</th>
                                 <th>Sell Price</th>
                                 <th>Profit%</th>
@@ -112,9 +110,13 @@
                                @foreach ($current_stocks as $stock)
                                 @if($stock->unit_cost>0)
                                     <tr>
-                                        <td>{{ $stock->product_name ?? '' }}</td>
-                                        <td>{{ $stock->brand ?? '' }}</td>
-                                        <td>{{ $stock->pack_size ?? '' }}</td>
+                                        <td>
+                                            {{-- {{ $stock->product_name ?? '' }} --}}
+
+                                            {{ $stock->product_name }}
+                                        {{ $stock->brand ? ' ' . $stock->brand : '' }}
+                                        {{ $stock->pack_size ?? '' }}{{ $stock->sales_uom ?? '' }}
+                                        </td>
                                         <td>{{ number_format($stock->unit_cost, 2) }}</td>
                                         <td>{{ number_format($stock->price, 2) }}</td>
                                         <td>{{ round($stock->profit, 0) }}%</td>

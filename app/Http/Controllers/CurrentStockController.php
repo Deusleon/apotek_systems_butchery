@@ -25,7 +25,7 @@ class CurrentStockController extends Controller
         $stocks = DB::table('inv_current_stock')
             ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
             ->join('inv_categories','inv_products.category_id','=','inv_categories.id')
-            ->select('inv_current_stock.product_id','inv_products.name',
+            ->select('inv_current_stock.product_id','inv_products.name','inv_products.sales_uom',
                 'inv_products.brand', 'inv_products.pack_size',
                 DB::raw('sum(inv_current_stock.quantity) as quantity'),
                 'inv_categories.name as cat_name')
@@ -37,7 +37,7 @@ class CurrentStockController extends Controller
 
         $detailed = DB::table('inv_current_stock')
             ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
-            ->select('inv_current_stock.product_id','inv_products.name',
+            ->select('inv_current_stock.product_id','inv_products.name', 'inv_products.sales_uom', 'inv_current_stock.unit_cost',
                 'inv_products.brand', 'inv_products.pack_size',
                 'inv_current_stock.quantity',
                 'inv_current_stock.batch_number',
@@ -49,7 +49,7 @@ class CurrentStockController extends Controller
         $outstock = DB::table('inv_current_stock')
             ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
             ->select('inv_current_stock.product_id','inv_products.name',
-                'inv_products.brand', 'inv_products.pack_size',
+                'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom',
                 DB::raw('sum(inv_current_stock.quantity) as quantity'),
                 'inv_current_stock.batch_number',
                 'inv_current_stock.expiry_date')
@@ -402,95 +402,6 @@ class CurrentStockController extends Controller
             return response()->json(['message' => 'An error occurred while updating the stock.'], 500);
         }
     }
-    //         if ($prices->price_category_id == $request->store_name) {
-    //             //update
-    //             $prices->stock_id = $request->stock_id;
-    //             $prices->price = str_replace(',', '', $request->sell_price);
-    //             $prices->price_category_id = $request->store_name;
-
-    //             if ($request->page_pricing != null) {
-    //                 $stock = CurrentStock::find($request->stock_id);
-    //                 $stock->product_id = $request->product_id;
-    //                 $stock->unit_cost = str_replace(',', '', $request->unit_cost);
-    //             } else {
-    //                 $stock = CurrentStock::find($request->id);
-    //                 $stock->product_id = $request->product_id;
-    //                 $stock->expiry_date = $request->expiry_date;
-    //                 $stock->batch_number = $request->batch_number;
-    //                 $stock->unit_cost = str_replace(',', '', $request->unit_cost);
-    //                 $stock->quantity = str_replace(',', '', $request->quantity);
-    //                 $stock->store_id = $request->store_id;
-    //                 $stock->shelf_number = $request->shelf_number;
-    //             }
-
-    //             $stock->save();
-    //             $prices->save();
-
-    //         } else {
-    //             //create new
-    //             $prices = new PriceList;
-    //             $prices->stock_id = $request->stock_id;
-    //             $prices->price = str_replace(',', '', $request->sell_price);
-    //             $prices->price_category_id = $request->store_name;
-    //             $prices->status = 1;
-    //             $prices->created_at = date('Y-m-d');
-
-    //             if ($request->page_pricing != null) {
-    //                 $stock = CurrentStock::find($request->stock_id);
-    //                 $stock->product_id = $request->product_id;
-    //                 $stock->unit_cost = str_replace(',', '', $request->unit_cost);
-    //             } else {
-    //                 $stock = CurrentStock::find($request->id);
-    //                 $stock->product_id = $request->product_id;
-    //                 $stock->expiry_date = $request->expiry_date;
-    //                 $stock->batch_number = $request->batch_number;
-    //                 $stock->unit_cost = str_replace(',', '', $request->unit_cost);
-    //                 $stock->quantity = str_replace(',', '', $request->quantity);
-    //                 $stock->store_id = $request->store_id;
-    //                 $stock->shelf_number = $request->shelf_number;
-    //             }
-
-
-    //             $stock->save();
-    //             $prices->save();
-    //         }
-
-
-    //         session()->flash("alert-success", "Stock Detail updated successfully!");
-    //         return back();
-    //     } else {
-
-    //         $prices = new PriceList;
-    //         $prices->stock_id = $request->stock_id;
-    //         $prices->price = str_replace(',', '', $request->sell_price);
-    //         $prices->price_category_id = $request->store_name;
-    //         $prices->status = 1;
-    //         $prices->created_at = date('Y-m-d');
-
-    //         if ($request->page_pricing != null) {
-    //             $stock = CurrentStock::find($request->stock_id);
-    //             $stock->product_id = $request->product_id;
-    //             $stock->unit_cost = str_replace(',', '', $request->unit_cost);
-    //         } else {
-    //             $stock = CurrentStock::find($request->id);
-    //             $stock->product_id = $request->product_id;
-    //             $stock->expiry_date = $request->expiry_date;
-    //             $stock->batch_number = $request->batch_number;
-    //             $stock->unit_cost = str_replace(',', '', $request->unit_cost);
-    //             $stock->quantity = str_replace(',', '', $request->quantity);
-    //             $stock->store_id = $request->store_id;
-    //             $stock->shelf_number = $request->shelf_number;
-    //         }
-
-
-    //         $stock->save();
-    //         $prices->save();
-
-    //         session()->flash("alert-success", "Stock Detail updated successfully!");
-    //         return back();
-    //     }
-
-    // }
 
     public function filter(Request $request)
     {

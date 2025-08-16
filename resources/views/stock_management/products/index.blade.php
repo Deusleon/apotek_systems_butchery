@@ -50,23 +50,23 @@
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                     <div class="row mb-3">
                         <!-- <div class="col-md-6">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="fas fa-download mr-1"></i> Export
-                                    </button>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="{{ route('products.export', ['format' => 'pdf']) }}" target="_blank">
-                                            <i class="far fa-file-pdf text-danger mr-2"></i>PDF
-                                        </a>
-                                        <a class="dropdown-item" href="{{ route('products.export', ['format' => 'excel']) }}">
-                                            <i class="far fa-file-excel text-success mr-2"></i>Excel
-                                        </a>
-                                        <a class="dropdown-item" href="{{ route('products.export', ['format' => 'csv']) }}">
-                                            <i class="fas fa-file-csv text-info mr-2"></i>CSV
-                                        </a>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-download mr-1"></i> Export
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'pdf']) }}" target="_blank">
+                                                <i class="far fa-file-pdf text-danger mr-2"></i>PDF
+                                            </a>
+                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'excel']) }}">
+                                                <i class="far fa-file-excel text-success mr-2"></i>Excel
+                                            </a>
+                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'csv']) }}">
+                                                <i class="fas fa-file-csv text-info mr-2"></i>CSV
+                                            </a>
+                                        </div>
                                     </div>
-                                </div>
-                            </div> -->
+                                </div> -->
                     </div>
                     <div class="row justify-content-end align-items-end mb-3">
                         <!-- Status Filter -->
@@ -281,32 +281,38 @@
                         // {"data": "pack_size"},
                         { "data": "category.name", "defaultContent": "" },
                         @if(auth()->user()->checkPermission('Manage Products'))
-                                    {
+                                            {
                                 "data": "id",
                                 "orderable": false,
                                 "searchable": false,
                                 "render": function (data, type, row) {
                                     return `
-                                                <button type="button" class="btn btn-success btn-sm btn-rounded show-modal">
-                                                    Show
-                                                </button>
-                                                <button type="button" class="btn btn-primary btn-sm btn-rounded" id="edits">
-                                                    Edit
-                                                </button>
-                                                <button type="button" class="btn btn-danger btn-sm btn-rounded" id="deletes">
-                                                    Delete
-                                                </button>
-                                            `;
+                                                        <button type="button" class="btn btn-success btn-sm btn-rounded show-modal">
+                                                            Show
+                                                        </button>
+                                                        <button type="button" class="btn btn-primary btn-sm btn-rounded" id="edits">
+                                                            Edit
+                                                        </button>
+                                                        <button type="button" class="btn btn-danger btn-sm btn-rounded" id="deletes">
+                                                            Delete
+                                                        </button>
+                                                    `;
                                 }
                             }
                         @endif
-                            ],
+                                ],
                     "order": [[0, 'asc']],
                     "pageLength": 10,
                     "drawCallback": function (settings) {
                         // Re-initialize tooltips after table redraw
                         $('[data-toggle="tooltip"]').tooltip();
-                    }
+                        // Fix colspan for empty table message
+                        var api = this.api();
+                        var columnsCount = api.columns().header().length;
+
+                        // Update empty table message colspan
+                        $('#fixed-header1 tbody tr td.dataTables_empty').attr('colspan', columnsCount);
+                    },
                 });
 
                 // Handle filter changes.
