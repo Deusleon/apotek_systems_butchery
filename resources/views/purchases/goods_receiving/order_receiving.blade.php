@@ -132,7 +132,12 @@
                 {
                     "data": "ordered_at",
                     "render": function(data) {
-                        return data ? new Date(data).toLocaleDateString('en-GB') : '';
+                        if (!data) return '';
+                        const date = new Date(data);
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, '0'); // ensure 2 digits
+                        const day = String(date.getDate()).padStart(2, '0');
+                        return `${year}-${month}-${day}`;
                     }
                 },
                 {

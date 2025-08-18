@@ -121,9 +121,9 @@ class GoodsReceivingController extends Controller
     {
         $max_prices = array();
 
-        $products = Product::select('id', 'name', 'brand', 'pack_size')
+        $products = Product::select('id', 'name', 'brand', 'pack_size', 'sales_uom')
             ->where('status', '=', 1)
-            ->groupBy('id', 'name')
+            ->groupBy('id', 'name', 'brand', 'pack_size', 'sales_uom')
             ->get();
 
         foreach ($products as $product) {
@@ -137,6 +137,7 @@ class GoodsReceivingController extends Controller
                     'product_name' => $data->product['name'],
                     'brand'=>$product->brand,
                     'pack_size'=>$product->pack_size,
+                    'sales_uom' => $product->sales_uom,
                     'unit_cost' => $data->unit_cost,
                     'selling_price' => $data->price,
                     'id' => $data->id,
@@ -147,6 +148,7 @@ class GoodsReceivingController extends Controller
                     'product_name' => $product->name,
                     'brand'=>$product->brand,
                     'pack_size'=>$product->pack_size,
+                    'sales_uom' => $product->sales_uom,
                     'unit_cost' => null,
                     'selling_price' => null,
                     'id' => null,

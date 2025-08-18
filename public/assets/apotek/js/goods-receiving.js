@@ -633,7 +633,7 @@ var invoicecart_table = $("#invoicecart_table").DataTable({
     ordering: false,
     columns: [
         {
-            title: "Item Name",
+            title: "Product Name",
             data: null,
             render: function (data, type, row) {
                 // console.log(
@@ -644,7 +644,14 @@ var invoicecart_table = $("#invoicecart_table").DataTable({
                 //     "type:",
                 //     type
                 // );
-                return row.name + " " + row.brand + " " + row.pack_size;
+                return (
+                    (row.name || "") +
+                    " " +
+                    (row.brand || "") +
+                    " " +
+                    (row.pack_size || "") +
+                    (row.sales_uom || "")
+                );
             },
         },
         { title: "Quantity", data: "quantity" },
@@ -895,6 +902,7 @@ function invoicevaluesCollection() {
     var product_id = selected_fields[1];
     var brand = selected_fields[2];
     var pack_size = selected_fields[3];
+    var sales_uom = selected_fields[5] || "";
     let selling_price = 0;
     let buying_price = 0;
     let expire_date = moment().format("YYYY-MM-DD");
@@ -922,6 +930,7 @@ function invoicevaluesCollection() {
         item.id = product_id;
         item.brand = brand;
         item.pack_size = pack_size;
+        item.sales_uom = sales_uom;
         item.quantity = invoice_qty;
         item.selling_price = selling_price;
         item.buying_price = buying_price;

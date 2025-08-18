@@ -156,7 +156,7 @@
             var end = moment();
 
             function cb(start, end) {
-                $('#receive_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                $('#receive_date').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
             }
 
             $('#receive_date').daterangepicker({
@@ -188,20 +188,20 @@
                 showDropdowns: true,
                 autoUpdateInput: false,
                 locale: {
-                    format: 'DD-M-YYYY'
+                    format: 'YYYY-MM-DD'
                 }
             });
         });
 
         $('input[name="expire_date_edit"]').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('DD-MM-YYYY'));
+            $(this).val(picker.startDate.format('YYYY-MM-DD'));
         });
 
         $('input[name="expire_date_edit"]').on('cancel.daterangepicker', function (ev, picker) {
             $(this).val('');
         });
 
-        /*receive date*/
+       /*receive date*/
         $(function () {
             var start = moment();
             var end = moment();
@@ -211,13 +211,13 @@
                 showDropdowns: true,
                 autoUpdateInput: false,
                 locale: {
-                    format: 'DD-M-YYYY'
+                    format: 'YYYY-MM-DD'  // Changed format to Year-Month-Day
                 }
             });
         });
 
         $('input[name="receive_date_edit"]').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('DD-MM-YYYY'));
+            $(this).val(picker.startDate.format('YYYY-MM-DD'));
         });
 
         $('input[name="receive_date_edit"]').on('cancel.daterangepicker', function (ev, picker) {
@@ -258,7 +258,12 @@
                     },
                     "columns": [
                         {data: 'id'},
-                        {data: 'product.name'},
+                        {
+                            data: 'product',
+                            render: function(data) {
+                                return (data.name || '') + ' ' + (data.brand || '') + ' ' + (data.pack_size || '') + (data.sales_uom || '');
+                            }
+                        },
                         {
                             data: 'ordered_qty', render: function (data) {
                                 return numberWithCommas(parseFloat(data));
@@ -286,7 +291,7 @@
                         },
                         {
                             data: 'created_at', render: function (date) {
-                                return moment(date).format('DD-MM-Y');
+                                return moment(date).format('Y-MM-DD');
                             }
                         },
                         {data: 'user.name'},
@@ -323,11 +328,11 @@
             $('#edit').find('.modal-body #quantity_edit').val(numberWithCommas(row_data.quantity));
             $('#edit').find('.modal-body #price_edit').val(formatMoney(row_data.unit_cost));
             if (row_data.expire_date) {
-                $('#edit').find('.modal-body #expire_date_edit').val(moment(row_data.expire_date).format('DD-MM-Y'));
+                $('#edit').find('.modal-body #expire_date_edit').val(moment(row_data.expire_date).format('YYYY-MM-DD'));
             } else {
                 $('#edit').find('.modal-body #expire_date_edit').val('');
             }
-            $('#edit').find('.modal-body #receive_date_edit').val(moment(row_data.created_at).format('D-M-Y'));
+            $('#edit').find('.modal-body #receive_date_edit').val(moment(row_data.created_at).format('YYYY-MM-DD'));
             $('#edit').find('.modal-body #id').val(row_data.id);
             $('#edit').modal('show');
 

@@ -84,20 +84,25 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="code">Products <font color="red">*</font></label>
-                                <select id="invoiceselected-product" class="js-example-basic-single form-control">
+                                <select id="invoiceselected-product" class="js-example-basic-single form-control" style="width: 100%">
                                     <option selected="true" value="" disabled="disabled">Select Product...</option>
                                     @foreach($current_stock as $stock)
                                         <option
-                                            value="{{$stock['product_name'] . '#@' . $stock['product_id'] . '#@' . $stock['brand'] . '#@' . $stock['pack_size'] . '#@' . $stock['unit_cost']}}"
+                                            value="{{ 
+                                                $stock['product_name'] . '#@' . 
+                                                $stock['product_id'] . '#@' . 
+                                                $stock['brand'] . '#@' . 
+                                                $stock['pack_size'] . '#@' . 
+                                                $stock['unit_cost'] . '#@' . 
+                                                $stock['sales_uom']
+                                            }}"
                                             data-brand="{{ $stock['brand'] ?? '' }}"
-                                            data-pack="{{ $stock['pack_size'] ?? '' }}">{{$stock['product_name']." ".$stock['pack_size']}}</option>
+                                            data-pack="{{ $stock['pack_size'] ?? '' }}"
+                                        >
+                                            {{ $stock['product_name'] . ' ' . $stock['brand'] . ' ' . $stock['pack_size'] . $stock['sales_uom'] }}
+                                        </option>
                                     @endforeach
                                 </select>
-
-                                {{-- <script>
-                                    console.log('current_stock from server:', @json($current_stock));
-                                    console.table(@json($current_stock));
-                                </script> --}}
                             </div>
                         </div>
                         <div class="col-md-2">
@@ -388,7 +393,7 @@
                 minDate: start,
                 autoUpdateInput: false,
                 locale: {
-                    format: 'DD-M-YYYY'
+                    format: 'YYYY-MM-DD'
                 }
             });
         });
@@ -403,7 +408,7 @@
                 minDate: start,
                 autoUpdateInput: false,
                 locale: {
-                    format: 'DD-M-YYYY'
+                    format: 'YYYY-MM-DD'
                 }
             });
         });
@@ -417,7 +422,7 @@
                 showDropdowns: true,
                 autoUpdateInput: false,
                 locale: {
-                    format: 'DD-M-YYYY'
+                    format: 'YYYY-MM-DD'
                 }
             });
         });
@@ -431,7 +436,7 @@
                 showDropdowns: true,
                 autoUpdateInput: false,
                 locale: {
-                    format: 'DD-M-YYYY'
+                    format: 'YYYY-MM-DD'
                 },
                 drops: "up"
             });
@@ -447,7 +452,7 @@
                 minDate: +0,
                 autoUpdateInput: false,
                 locale: {
-                    format: 'DD-M-YYYY'
+                    format: 'YYYY-MM-DD'
                 }
             });
         });
@@ -456,7 +461,7 @@
 
         //Expire Date
         $('input[name="expire_date"]').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('MM/DD/YYYY'));
+            $(this).val(picker.startDate.format('YYYY/MM/DD'));
         });
 
         $('input[name="expire_date"]').on('cancel.daterangepicker', function (ev, picker) {
@@ -465,7 +470,7 @@
 
         //Purchase Date
         $('input[name="purchase_date"]').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('DD-MM-YYYY'));
+            $(this).val(picker.startDate.format('YYYY/MM/DD'));
         });
 
         $('input[name="purchase_date"]').on('cancel.daterangepicker', function (ev, picker) {
@@ -475,7 +480,7 @@
 
         //invoicing_purchase_date
         $('input[name="invoicing_purchase_date"]').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('DD-MM-YYYY'));
+            $(this).val(picker.startDate.format('YYYY/MM/DD'));
         });
 
         $('input[name="invoicing_purchase_date"]').on('cancel.daterangepicker', function (ev, picker) {
@@ -483,7 +488,7 @@
         });
 
         $('input[name="edit_expire_date"]').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('DD-MM-YYYY'));
+            $(this).val(picker.startDate.format('YYYY/MM/DD'));
         });
 
         $('input[name="edit_expire_date"]').on('cancel.daterangepicker', function (ev, picker) {

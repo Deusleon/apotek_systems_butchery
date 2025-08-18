@@ -18,7 +18,7 @@ class OrderController extends Controller
     //
     public function index()
     {
-        $orders = Order::with(['supplier', 'details.product:id,name,pack_size'])->where('status', '!=', '0')->orderBy('ordered_at', 'desc')->get();
+        $orders = Order::with(['supplier', 'details.product:id,name,pack_size,brand,sales_uom'])->where('status', '!=', '0')->orderBy('ordered_at', 'desc')->get();
         $suppliers = Supplier::orderBy('name', 'ASC')->get();
         $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
         return View::make('purchases.purchase_order.index',
@@ -103,7 +103,7 @@ class OrderController extends Controller
                 }
 
                 array_push($max_prices, array(
-                    'name' => $stock->name,
+                    'name' => $stock->name . ' ' . ($stock->brand ?? '') . ' ' . ($stock->pack_size ?? '') . ' ' . ($stock->sales_uom ?? ''),
                     'unit_cost' => $data['unit_cost'],
                     'product_id' => $stock->id,
                     'incoming_id' => $data['id']
@@ -141,7 +141,7 @@ class OrderController extends Controller
                     ->first('unit_cost');
 
                 array_push($max_prices, array(
-                    'name' => $stock->name,
+                    'name' => $stock->name . ' ' . ($stock->brand ?? '') . ' ' . ($stock->pack_size ?? '') . ' ' . ($stock->sales_uom ?? ''),
                     'unit_cost' => $data['unit_cost'],
                     'product_id' => $stock->id,
                     'incoming_id' => $data['id']
