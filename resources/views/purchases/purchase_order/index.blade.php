@@ -237,15 +237,33 @@
             }
         };
 
+        // IMPORTANT: Allow printing ONLY when approved
         $('#order_history_datatable tbody').on('click', '#print_btn', function () {
             var data = order_history_datatable.row($(this).parents('tr')).data();
 
+            // If button is disabled in DOM, block immediately (safety)
+            if ($(this).is(':disabled')) {
+                alert('Order must be approved before printing.');
+                return;
+            }
+
+            // Extra safety guard: respect approval in data
+            var isApprovedByClient = !!data.clientApproved; // set by our Approve in modal
+            var isApprovedByBackend = (data.status === '2' || data.status === '3' || data.status === 'Approved');
+
+            if (!(isApprovedByClient || isApprovedByBackend)) {
+                alert('Order must be approved before printing.');
+                return;
+            }
+
+            // ORIGINAL LOGIC (unchanged)
             let url = '{{route('printOrder','id','Purchase Order')}}';
             url = url.replace('id', data.details[0].order_id);
             let a = document.getElementById('order_no');
             a.href = url;
             a.click();
         });
+
 
     </script>
 

@@ -1,5 +1,8 @@
 var details = [];
 var order_items = [];
+// Track currently opened order in the modal
+var currentOrderData = null;
+var currentRowIndex = null;
 
 var order_list_table = $("#order_list_table").DataTable({
     searching: true,
@@ -30,17 +33,45 @@ var order_history_datatable = $("#order_history_datatable").DataTable({
         },
         {
             data: "status",
-            render: function (status) {
-                console.log(config2.managePurchaseHistory);
-                if (status === "2" || status === "3") {
-                    return "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm' size='2'/><button id='print_btn' class='btn btn-secondary btn-rounded btn-sm'><span class='fa fa-print' aria-hidden='true'></span> Print</button>";
-                } else if (status === "Cancelled") {
-                    return "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm' size='2'/><button id='print_btn' class='btn btn-secondary btn-rounded btn-sm'><span class='fa fa-print' aria-hidden='true'></span> Print</button><span class='badge badge-warning badge-lg'>Cancelled</span>";
-                } else if (config2.managePurchaseHistory == 1) {
-                    return "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm' size='2'/><button id='print_btn' class='btn btn-secondary btn-rounded btn-sm'><span class='fa fa-print' aria-hidden='true'></span> Print</button><input type='button' value='Cancel' id='cancel_btn' class='btn btn-danger btn-rounded btn-sm' size='2' />";
-                } else {
-                    return "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm' size='2'/><button id='print_btn' class='btn btn-secondary btn-rounded btn-sm'><span class='fa fa-print' aria-hidden='true'></span> Print</button>";
+            render: function (status, type, row) {
+                // "Approved" state sources:
+                // - Backend flags: status === '2' or status === '3' or status === 'Approved'
+                // - Front-end approval (set by clicking Approve in modal): row.clientApproved === true
+                var isApprovedByBackend =
+                    status === "2" || status === "3" || status === "Approved";
+                var isApprovedByClient = !!row.clientApproved;
+
+                // Cancelled: never printable
+                if (status === "Cancelled") {
+                    return (
+                        "" +
+                        "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm'/> " +
+                        "<button id='print_btn' class='btn btn-secondary btn-rounded btn-sm' disabled>" +
+                        "<span class='fa fa-print' aria-hidden='true'></span> Print" +
+                        "</button> " +
+                        "<span class='badge badge-warning badge-lg'>Cancelled</span>"
+                    );
                 }
+
+                // Approved (backend or client) => print enabled; else disabled
+                if (isApprovedByBackend || isApprovedByClient) {
+                    return (
+                        "" +
+                        "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm'/> " +
+                        "<button id='print_btn' class='btn btn-primary btn-rounded btn-sm'>" +
+                        "<span class='fa fa-print' aria-hidden='true'></span> Print" +
+                        "</button>"
+                    );
+                }
+
+                // Not approved yet => print disabled
+                return (
+                    "" +
+                    "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm'/> " +
+                    "<button id='print_btn' class='btn btn-secondary btn-rounded btn-sm' disabled>" +
+                    "<span class='fa fa-print' aria-hidden='true'></span> Print" +
+                    "</button>"
+                );
             },
         },
     ],
@@ -169,8 +200,10 @@ function getOrderHistory() {
 }
 
 $("#order_history_datatable tbody").on("click", "#dtl_btn", function () {
-    var data = order_history_datatable.row($(this).parents("tr")).data();
-    var index = order_history_datatable.row($(this).parents("tr")).index();
+    var row = order_history_datatable.row($(this).parents("tr"));
+    var data = row.data();
+    currentOrderData = data; // keep reference for Approve/Cancel
+    currentRowIndex = row.index(); // we’ll use this to update the row after approve
     orderDetails(data.details);
     $("#purchases-details").modal("show");
 });
@@ -227,4 +260,55 @@ $("#order_history_datatable tbody").on("click", "#print_btn", function () {
     //     print_data.push(data);
 
     document.getElementById("order_no").value = data.details[0].order_id;
+});
+
+// APPROVE inside modal
+$(document).on("click", "#approve_btn", function () {
+    if (!currentOrderData) return;
+
+    // Mark as client-approved (frontend flag)
+    currentOrderData.clientApproved = true;
+
+    // Update that specific row in the DataTable so Print becomes enabled
+    if (currentRowIndex !== null) {
+        order_history_datatable
+            .row(currentRowIndex)
+            .data(currentOrderData)
+            .draw(false);
+    }
+
+    // Close the details modal
+    $("#purchases-details").modal("hide");
+
+    // OPTIONAL: If you want to persist approval in backend, uncomment this block and point to your route
+    /*
+    $.ajax({
+        url: '/purchase-order/approve', // <-- replace with your real route
+        type: 'POST',
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            id: currentOrderData.id
+        },
+        success: function(resp){
+            // Optionally refresh or reflect new backend status
+        }
+    });
+    */
+});
+
+// CANCEL inside modal (open your existing cancel confirmation modal)
+$(document).on("click", "#cancel_btn_modal", function () {
+    if (!currentOrderData) return;
+
+    // Open the already existing cancel confirm modal and reuse your original population logic
+    $("#cancel-order").modal("show");
+    var message =
+        "Are you sure you want to Cancel Order '" +
+        currentOrderData.order_number +
+        "'?";
+    $("#cancel-order").find(".modal-body #message").text(message);
+    $("#cancel-order").find(".modal-body #delete_id").val(currentOrderData.id);
+
+    // Close details modal while confirmation is shown
+    $("#purchases-details").modal("hide");
 });

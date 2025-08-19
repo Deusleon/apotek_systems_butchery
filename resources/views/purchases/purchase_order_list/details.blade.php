@@ -12,8 +12,22 @@
                        style="width:100%">
                 </table>
             </div>
+            <!-- Modal Footer (ADD THIS) -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <!-- Approve in modal -->
+                <button type="button" id="approve_btn" class="btn btn-primary">
+                    Approve
+                </button>
+
+                <!-- Cancel in modal (opens your existing cancel confirmation modal) -->
+                <button type="button" id="cancel_btn_modal" class="btn btn-danger">
+                    Cancel
+                </button>
+
+                <!-- Close only (optional) -->
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Close
+                </button>
             </div>
         </div>
     </div>
