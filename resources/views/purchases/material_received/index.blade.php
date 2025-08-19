@@ -8,12 +8,11 @@
     <li class="breadcrumb-item"><a href="#">Purchasing /Material Received</a></li>
 @endsection
 
-
 @section("content")
 
     <style>
         .select2-container {
-            width: 103% !important;
+            width: 100% !important;
         }
 
         #loading {
@@ -35,7 +34,36 @@
             left: 50%;
             z-index: 100;
         }
-
+        
+        .filter-controls {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .filter-control label {
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+        
+        @media (max-width: 768px) {
+            .filter-controls {
+                justify-content: flex-start;
+            }
+            
+            .filter-control {
+                flex: 1 0 100%;
+            }
+        }
     </style>
 
     <div class="col-sm-12">
@@ -60,40 +88,25 @@
         </ul>
         <div class="card">
             <div class="card-body">
-                <div class="form-group row">
-                    <div class="col-md-6">
-
-                    </div>
-                    <div class="col-md-3" style="margin-left: 2.5%">
-                        <label style="margin-left: 67%" for=""
-                               class="col-form-label text-md-right">Supplier:</label>
-                    </div>
-                    <div class="col-md-3" style="margin-left: -3.2%;">
+                <div class="filter-controls">
+                    <div class="filter-control">
+                        <label for="supplier" class="col-form-label text-md-right">Supplier:</label>
                         <select class="js-example-basic-single form-control" id="supplier"
-                                onchange="getMaterialsReceived()">
+                                onchange="getMaterialsReceived()" style="min-width: 200px;">
                             <option value="">Select Supplier</option>
                             @foreach($suppliers as $supplier)
                                 <option value="{{$supplier->id}}">{{$supplier->name}}</option>
                             @endforeach
                         </select>
                     </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-md-6">
-
-                    </div>
-                    <div class="col-md-3" style="margin-left: 2.5%">
-                        <label style="margin-left: 78%" for=""
-                               class="col-form-label text-md-right">Date:</label>
-                    </div>
-                    <div class="col-md-3" style="margin-left: -3.4%;">
-                        <input style="width: 104%;" type="text" name="expire_date" class="form-control"
-                               id="receive_date"
-                               onchange="getMaterialsReceived()">
+                    
+                    <div class="filter-control">
+                        <label for="receive_date" class="col-form-label text-md-right">Date:</label>
+                        <input type="text" name="expire_date" class="form-control"
+                               id="receive_date" onchange="getMaterialsReceived()" style="min-width: 250px;">
                     </div>
                 </div>
-                {{--                <div class="row">--}}
-
+                
                 <div class="col-md-4" hidden>
                     <label for="code">Product</label>
                     <select id="received_product"
@@ -104,6 +117,7 @@
                         @endforeach
                     </select>
                 </div>
+                
                 <input type="hidden" id="expire_date_enabler" value = "{{$expire_date}}">
                 <div id="tbody1" class="table-responsive">
                     <table id="received_material_table" class="display table nowrap table-striped table-hover"
@@ -131,8 +145,6 @@
                 <div id="loading">
                     <image id="loading-image" src="{{asset('assets/images/spinner.gif')}}"></image>
                 </div>
-
-
             </div>
         </div>
     </div>
@@ -151,7 +163,7 @@
             }
         });
 
-        $(function () {
+       $(function () {
             var start = moment();
             var end = moment();
 
@@ -163,6 +175,9 @@
                 startDate: moment().startOf('month'),
                 endDate: moment().endOf('month'),
                 autoUpdateInput: true,
+                locale: {
+                    format: 'YYYY/MM/DD'   // 👈 Force consistent format
+                },
                 ranges: {
                     'Today': [moment(), moment()],
                     'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -175,8 +190,8 @@
             }, cb);
 
             cb(start, end);
-
         });
+
 
         //expire date
         $(function () {

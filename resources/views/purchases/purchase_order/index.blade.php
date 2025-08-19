@@ -105,7 +105,7 @@
                                     <label class="col-md-6 col-form-label text-md-right"><b>Sub Total:</b></label>
                                     <div class="col-md-6" style="display: flex; justify-content: flex-end">
                                         <input type="text" id="sub_total" name="sub_total_amount"
-                                               class="form-control-plaintext text-md-right" readonly value="0.0"/>
+                                               class="form-control-plaintext text-md-right" readonly value="0.00"/>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -114,7 +114,7 @@
                                     <div class="col-md-6"
                                          style="float: right; display: flex; justify-content: flex-end">
                                         <input type="text" id="vat" name="vat_total_amount"
-                                               class="form-control-plaintext text-md-right" readonly value="0.0"/>
+                                               class="form-control-plaintext text-md-right" readonly value="0.00"/>
                                     </div>
                                 </div>
 

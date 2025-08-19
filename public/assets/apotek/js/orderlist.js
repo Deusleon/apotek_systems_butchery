@@ -82,6 +82,9 @@ $(function () {
             startDate: start,
             endDate: end,
             autoUpdateInput: true,
+            locale: {
+                format: "YYYY/MM/DD", // <-- Add this line
+            },
             ranges: {
                 Today: [moment(), moment()],
                 Yesterday: [
@@ -113,25 +116,24 @@ function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
         decimalCount = isNaN(decimalCount) ? 2 : decimalCount;
 
         const negativeSign = amount < 0 ? "-" : "";
-
-        let i = parseInt(
-            (amount = Math.abs(Number(amount) || 0).toFixed(decimalCount))
-        ).toString();
-        let j = i.length > 3 ? i.length % 3 : 0;
-
-        return (
-            negativeSign +
-            (j ? i.substr(0, j) + thousands : "") +
-            i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) +
-            (decimalCount
-                ? decimal +
-                  Math.abs(amount - i)
-                      .toFixed(decimalCount)
-                      .slice(2)
-                : "")
+        const absoluteAmount = Math.abs(Number(amount) || 0).toFixed(
+            decimalCount
         );
+
+        // Split integer and decimal parts
+        let [integerPart, decimalPart] = absoluteAmount.split(".");
+
+        // Add thousands separator
+        let i = integerPart;
+        let j = i.length > 3 ? i.length % 3 : 0;
+        let formattedInt =
+            (j ? i.substr(0, j) + thousands : "") +
+            i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands);
+
+        return negativeSign + formattedInt + decimal + decimalPart;
     } catch (e) {
         console.log(e);
+        return "0.00";
     }
 }
 
