@@ -18,25 +18,11 @@
                                 <label for="name" class="col-md-4 col-form-label text-md-right">Product Name</label>
                                 <div class="col-md-8">
                                     <input type="text" class="form-control" name="name" id="name" required
-                                        value="{{ old('product_name') }}">
+                                        value="{{ old('product_name') }}" readonly>
 
                                     <span class="text-danger">
                                         <strong id="name-error1"></strong>
                                     </span>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="name" class="col-md-4 col-form-label text-md-right">Brand</label>
-                                <div class="col-md-8">
-                                    <input type="text" class="form-control" name="brand" id="brand_edit"
-                                        value="{{ old('brand') }}">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label for="name" class="col-md-4 col-form-label text-md-right">Pack Size</label>
-                                <div class="col-md-8">
-                                    <input type="text" class="form-control" name="pack_size" id="pack_size_edit"
-                                        value="{{ old('pack_size') }}">
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -56,16 +42,17 @@
                             <div class="form-group row">
                                 <label for="name" class="col-md-4 col-form-label text-md-right">Price Category</label>
                                 <div class="col-md-8">
-                                    <input type="text" class="form-control" name="price_category" id="price_category_edit"
-                                        value="{{ old('price_category') }}" required autofocus>
+                                    <input type="text" class="form-control" name="price_category" id="price_category"
+                                        value="{{ old('price_category') }}" readonly>
                                 </div>
                             </div>
                         </div>
                 </div>
 
                 <input type="hidden" name="id" id="id">
-                <input type="hidden" name="price_category_id" id="price_category_id">
                 <input type="hidden" name="product_id" id="product_id">
+                <input type="hidden" name="selected_type" id="selected_type">
+                <input type="hidden" name="price_category_id" id="price_category_id">
                 <input type="hidden" name="stock_id" id="stock_id">
 
                 <div class="modal-footer">

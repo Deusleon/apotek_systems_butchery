@@ -75,7 +75,7 @@
                                 <label for="status-filter">Status:</label>
                                 <select name="status-filter" class="js-example-basic-single form-control"
                                     id="status-filter">
-                                    <option value="">All Statuses</option>
+                                    <option value="">All</option>
                                     <option value="1">Active</option>
                                     <option value="0">Inactive</option>
                                 </select>
@@ -87,7 +87,7 @@
                                 <label for="category-filter">Category:</label>
                                 <select name="category-filter" class="js-example-basic-single form-control"
                                     id="category-filter">
-                                    <option value="">All Categories</option>
+                                    <option value="">All</option>
                                     @foreach($categories as $category)
                                         <option value="{{ $category->id }}">{{ $category->name }}</option>
                                     @endforeach

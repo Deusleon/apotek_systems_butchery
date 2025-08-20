@@ -45,6 +45,7 @@
                     <div class="col-md-6">
                         <label for="stock_status" class="col-form-label text-md-right">Status:</label>
                         <select name="stock_status" class="js-example-basic-single form-group" id="stock_status_id">
+                            <option name="store_name" value="all">All</option>
                             <option name="store_name" value="1">In Stock</option>
                             <option name="store_name" value="0">Out Of Stock</option>
                         </select>
@@ -60,8 +61,90 @@
                     </div>
                 </div>
                 <!-- main table -->
-                {{--Summary--}}
-                <div class="table-responsive" id="summary">
+                {{--All Summary--}}
+                <div class="table-responsive" id="all_summary_stocks">
+                    {{--Summary--}}
+                    <table id="all_summary" class="table table-striped table-hover mb-3"
+                        style="background: white;width: 100%; font-size: 14px;">
+
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th hidden>Pack Size</th>
+                                <th>Quantity</th>
+                                <th hidden>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach ($allStocks as $allstock)
+                                <tr>
+                                    <td id="name_{{ $allstock->product_id }}">
+                                        {{ $allstock->name }}
+                                        {{ $allstock->brand ? ' ' . $allstock->brand : '' }}
+                                        {{ $allstock->pack_size ?? '' }}{{ $allstock->sales_uom ?? '' }}
+                                    </td>
+                                    <td id="category_{{ $allstock->product_id }}">{{ $allstock->cat_name }}</td>
+                                    <td id="pack_size_{{ $allstock->product_id }}" hidden>{{ $allstock->pack_size }}</td>
+                                    <td id="quantity_{{ $allstock->product_id }}">{{ number_format($allstock->quantity) }}</td>
+                                    <td id="actions_{{ $allstock->product_id }}" hidden>
+                                        @if(auth()->user()->checkPermission('Manage Current Stock'))
+                                            <button type="button" class="btn btn-primary btn-rounded btn-sm"
+                                                onclick="editStock({{ $allstock->product_id }})">
+                                                Edit
+                                            </button>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                {{--Detailed--}}
+                <div class="table-responsive" id="all_detailed_stock" style="display: none;">
+                    {{--Detailed--}}
+                    <table id="all_detailed" class="table table-striped table-hover mb-3"
+                        style="background: white;width: 100%; font-size: 14px;">
+
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Batch Number</th>
+                                <th>Expire Date</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach ($allDetailed as $allDet)
+                                <tr>
+                                    <td id="d_name_{{ $allDet->product_id }}">
+                                        {{ $allDet->name }}
+                                        {{ $allDet->brand ? ' ' . $allDet->brand : '' }}
+                                        {{ $allDet->pack_size ?? '' }}{{ $allDet->sales_uom ?? '' }}
+                                    </td>
+                                    <td id="d_stock_value_{{ $allDet->product_id }}">
+                                        {{ $allDet->cat_name }}
+                                    </td>
+                                    <td id="d_batch_{{ $allDet->product_id }}">{{ $allDet->batch_number ?? '' }}</td>
+                                    <td id="d_expiry_{{ $allDet->product_id }}">{{ $allDet->expiry_date ?? '' }}</td>
+                                    <td id="d_quantity_{{ $allDet->product_id }}">
+                                        {{ floor($allDet->quantity) == $allDet->quantity ? number_format($allDet->quantity, 0) : number_format($allDet->quantity, 1) }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+
+                    </table>
+                </div>
+
+                {{--In stock Summary--}}
+                <div class="table-responsive" id="summary" style="display: none;">
                     {{--Summary--}}
                     <table id="current_stock" class="table table-striped table-hover mb-3"
                         style="background: white;width: 100%; font-size: 14px;">
@@ -69,7 +152,7 @@
                         <thead>
                             <tr>
                                 <th>Product Name</th>
-                                <th hidden>Brand</th>
+                                <th>Category</th>
                                 <th hidden>Pack Size</th>
                                 <th>Quantity</th>
                                 <th hidden>Actions</th>
@@ -84,15 +167,15 @@
                                         {{ $stock->brand ? ' ' . $stock->brand : '' }}
                                         {{ $stock->pack_size ?? '' }}{{ $stock->sales_uom ?? '' }}
                                     </td>
-                                    <td id="brand_{{ $stock->product_id }}" hidden>{{ $stock->brand }}</td>
+                                    <td id="category_{{ $stock->product_id }}">{{ $stock->cat_name }}</td>
                                     <td id="pack_size_{{ $stock->product_id }}" hidden>{{ $stock->pack_size }}</td>
                                     <td id="quantity_{{ $stock->product_id }}">{{ number_format($stock->quantity) }}</td>
                                     <td id="actions_{{ $stock->product_id }}" hidden>
                                         @if(auth()->user()->checkPermission('Manage Current Stock'))
-                                        <button type="button" class="btn btn-primary btn-rounded btn-sm"
-                                            onclick="editStock({{ $stock->product_id }})">
-                                            Edit
-                                        </button>
+                                            <button type="button" class="btn btn-primary btn-rounded btn-sm"
+                                                onclick="editStock({{ $stock->product_id }})">
+                                                Edit
+                                            </button>
                                         @endif
                                     </td>
                                 </tr>
@@ -103,7 +186,7 @@
 
                 </div>
 
-                {{--Detailed--}}
+                {{--Instock--}}
                 <div class="table-responsive" id="detailed" style="display: none;">
                     {{--Detailed--}}
                     <table id="current_stock_detailed" class="table table-striped table-hover mb-3"
@@ -112,10 +195,10 @@
                         <thead>
                             <tr>
                                 <th>Product Name</th>
+                                <th>Category</th>
                                 <th>Batch Number</th>
                                 <th>Expire Date</th>
                                 <th>Quantity</th>
-                                <th>Stock Value</th>
                             </tr>
                         </thead>
 
@@ -127,12 +210,13 @@
                                         {{ $data->brand ? ' ' . $data->brand : '' }}
                                         {{ $data->pack_size ?? '' }}{{ $data->sales_uom ?? '' }}
                                     </td>
+                                    <td id="d_stock_value_{{ $data->product_id }}">
+                                        {{ $data->cat_name }}
+                                    </td>
                                     <td id="d_batch_{{ $data->product_id }}">{{ $data->batch_number ?? '' }}</td>
                                     <td id="d_expiry_{{ $data->product_id }}">{{ $data->expiry_date ?? '' }}</td>
-                                    <td id="d_quantity_{{ $data->product_id }}">{{ floor($data->quantity) == $data->quantity ? number_format($data->quantity,0) : number_format($data->quantity,1) }}
-                                    </td>
-                                    <td id="d_stock_value_{{ $data->product_id }}">
-                                        {{ number_format((floatval($data->unit_cost) * floatval($data->quantity)) ?? 0, 2) ?? '' }}
+                                    <td id="d_quantity_{{ $data->product_id }}">
+                                        {{ floor($data->quantity) == $data->quantity ? number_format($data->quantity, 0) : number_format($data->quantity, 1) }}
                                     </td>
                                 </tr>
                             @endforeach
@@ -150,6 +234,7 @@
                         <thead>
                             <tr>
                                 <th>Product Name</th>
+                                <th>Category</th>
                                 <th>Quantity</th>
                             </tr>
                         </thead>
@@ -160,10 +245,15 @@
                                     <td id="o_name_{{ $out->product_id }}">
                                         {{ $out->name }}
                                         {{ $out->brand ? ' ' . $out->brand : '' }}
-                                        {{-- {{ $out->pack_size ? ' ' . $out->pack_size : '' }} --}}
                                         {{ $out->pack_size ?? '' }}{{ $out->sales_uom ?? '' }}
                                     </td>
-                                    <td id="o_quantity_{{ $out->product_id }}">{{ floor($out->quantity) == $out->quantity ? number_format($out->quantity,0) : number_format($out->quantity,1) }}</td>
+                                    <td id="o_name_{{ $out->product_id }}">
+                                        {{ $out->cat_name }}
+                                    </td>
+
+                                    <td id="o_quantity_{{ $out->product_id }}">
+                                        {{ floor($out->quantity) == $out->quantity ? number_format($out->quantity, 0) : number_format($out->quantity, 1) }}
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -179,6 +269,7 @@
                         <thead>
                             <tr>
                                 <th>Product Name</th>
+                                <th>Category</th>
                                 <th>Batch Number</th>
                                 <th>Expire Date</th>
                                 <th>Quantity</th>
@@ -191,11 +282,16 @@
                                     <td id="o_detal_name_{{ $out->product_id }}">
                                         {{ $out->name }}
                                         {{ $out->brand ? ' ' . $out->brand : '' }}
-                                        {{ $out->pack_size ? ' ' . $out->pack_size : '' }}
+                                        {{ $out->pack_size ?? ''}}{{ $out->sales_uom ?? '' }}
+                                    </td>
+                                    <td id="o_name_{{ $out->product_id }}">
+                                        {{ $out->cat_name }}
                                     </td>
                                     <td id="o_detal_batch_{{ $out->product_id }}">{{ $out->batch_number ?? '' }}</td>
                                     <td id="o_detal_expiry_{{ $out->product_id }}">{{ $out->expiry_date ?? '' }}</td>
-                                    <td id="o_detal_quantity_{{ $out->product_id }}">{{ floor($out->quantity) == $out->quantity ? number_format($out->quantity,0) : number_format($out->quantity,1) }}</td>
+                                    <td id="o_detal_quantity_{{ $out->product_id }}">
+                                        {{ floor($out->quantity) == $out->quantity ? number_format($out->quantity, 0) : number_format($out->quantity, 1) }}
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -221,6 +317,20 @@
             document.getElementById("outstock").style.display = "none";
             document.getElementById("outstock_detailed").style.display = "none";
 
+            $('#all_summary').DataTable({
+                responsive: true,
+                order: [
+                    [0, 'asc']
+                ]
+            });
+
+            $('#all_detailed').DataTable({
+                responsive: true,
+                order: [
+                    [0, 'asc']
+                ]
+            });
+
             $('#current_stock').DataTable({
                 responsive: true,
                 order: [
@@ -241,15 +351,13 @@
                     [0, 'asc']
                 ]
             });
-            
+
             $('#current_stock_out_detailed').DataTable({
                 responsive: true,
                 order: [
                     [0, 'asc']
                 ]
             });
-
-
 
             if (!$.fn.DataTable.isDataTable('#current_stock')) {
                 $('#current_stock').DataTable({
@@ -302,34 +410,37 @@
                 window.location.href = redirectUrl; // Redirect to the URL
             });
         });
-    
+
         const $stockStatus = $('#stock_status_id');
         const $category = $('#category_id');
 
         function showStockView(status, type) {
-        status = Number(status);
-        type = Number(type);
+            $('#all_summary, #all_detailed, #current_stock, #current_stock_detailed, #current_stock_out, #current_stock_out_detailed').hide();
+            $('#all_summary_stocks, #all_detailed_stock, #summary, #detailed, #outstock, #outstock_detailed').hide();
 
-        $('#current_stock, #current_stock_detailed, #current_stock_out, #current_stock_out_detailed').hide();
-        $('#summary, #detailed, #outstock, #outstock_detailed').hide();
-
-        if (status === 1 && type === 1) {
-        $('#current_stock').show();
-        $('#summary').show();
-        } else if (status === 1 && type === 0) {
-        $('#current_stock_detailed').show();
-        $('#detailed').show();
-        } else if (status === 0 && type === 1) {
-        $('#current_stock_out').show();
-        $('#outstock').show();
-        } else if (status === 0 && type === 0) {
-        $('#current_stock_out_detailed').show();
-        $('#outstock_detailed').show();
-        }
+            if (status === "all" && type == 1) {
+                $('#all_summary_stocks').show();
+                $('#all_summary').show();
+            } else if (status === "all" && type == 0) {
+                $('#all_detailed_stock').show();
+                $('#all_detailed').show();
+            } else if (status == 1 && type == 1) {
+                $('#summary').show();
+                $('#current_stock').show();
+            } else if (status == 1 && type == 0) {
+                $('#detailed').show();
+                $('#current_stock_detailed').show();
+            } else if (status == 0 && type == 1) {
+                $('#outstock').show();
+                $('#current_stock_out').show();
+            } else if (status == 0 && type == 0) {
+                $('#outstock_detailed').show();
+                $('#current_stock_out_detailed').show();
+            }
         }
 
         $(document).on('change', '#stock_status_id, #category_id', function () {
-        showStockView($stockStatus.val(), $category.val());
+            showStockView($stockStatus.val(), $category.val());
         });
 
         showStockView($stockStatus.val(), $category.val());
@@ -342,6 +453,6 @@
             });
         }
 
-       
+
     </script>
 @endpush
