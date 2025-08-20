@@ -34,11 +34,25 @@ class CurrentStockController extends Controller
                 'inv_products.brand', 'inv_products.pack_size', 'inv_categories.name'])
             ->havingRaw(DB::raw('sum(quantity) > 0'))
             ->get();
+            
+        $allStocks = DB::table('inv_current_stock')
+            ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
+            ->join('inv_categories','inv_products.category_id','=','inv_categories.id')
+            ->select('inv_current_stock.id','inv_current_stock.product_id','inv_products.name','inv_products.sales_uom',
+                'inv_products.brand', 'inv_products.pack_size',
+                DB::raw('sum(inv_current_stock.quantity) as quantity'),
+                'inv_categories.name as cat_name')
+            ->where('inv_current_stock.store_id',$store_id)
+            ->groupBy(['inv_current_stock.product_id', 'inv_products.name', 
+                'inv_products.brand', 'inv_products.pack_size', 'inv_categories.name'])
+            ->orderBy('inv_products.id', 'desc')
+            ->get();
 
         $detailed = DB::table('inv_current_stock')
             ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
+            ->join('inv_categories','inv_products.category_id','=','inv_categories.id')
             ->select('inv_current_stock.product_id','inv_products.name', 'inv_products.sales_uom', 'inv_current_stock.unit_cost',
-                'inv_products.brand', 'inv_products.pack_size',
+                'inv_products.brand', 'inv_products.pack_size', 'inv_categories.name as cat_name',
                 'inv_current_stock.quantity',
                 'inv_current_stock.batch_number',
                 'inv_current_stock.expiry_date')
@@ -46,26 +60,66 @@ class CurrentStockController extends Controller
             ->where('inv_current_stock.quantity','>',0)
             ->get();
 
-        $outstock = DB::table('inv_current_stock')
+        $allDetailed = DB::table('inv_current_stock')
             ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
-            ->select('inv_current_stock.product_id','inv_products.name',
-                'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom',
-                DB::raw('sum(inv_current_stock.quantity) as quantity'),
+            ->join('inv_categories','inv_products.category_id','=','inv_categories.id')
+            ->select('inv_current_stock.id', 'inv_current_stock.product_id','inv_products.name', 'inv_products.sales_uom', 'inv_current_stock.unit_cost',
+                'inv_products.brand', 'inv_products.pack_size', 'inv_categories.name as cat_name',
+                'inv_current_stock.quantity',
                 'inv_current_stock.batch_number',
                 'inv_current_stock.expiry_date')
             ->where('inv_current_stock.store_id',$store_id)
-            ->groupBy(['inv_current_stock.product_id', 'inv_products.name', 
-                'inv_products.brand', 'inv_products.pack_size',
-                'inv_current_stock.batch_number', 'inv_current_stock.expiry_date'])
-            ->havingRaw(DB::raw('sum(quantity) = 0'))
+            ->orderBy('inv_products.id', 'desc')
+            ->get();
+
+        $outstock = DB::table('inv_current_stock')
+            ->join('inv_products', 'inv_current_stock.product_id', '=', 'inv_products.id')
+            ->join('inv_categories', 'inv_products.category_id', '=', 'inv_categories.id')
+            ->select(
+                'inv_current_stock.id',
+                'inv_current_stock.product_id',
+                'inv_products.name',
+                'inv_products.sales_uom',
+                'inv_products.brand',
+                'inv_products.pack_size',
+                'inv_categories.name as cat_name',
+                DB::raw('sum(inv_current_stock.quantity) as quantity'),
+            )
+            ->where('inv_current_stock.store_id', $store_id)
+            ->groupBy([
+                'inv_current_stock.product_id',
+                'inv_products.name',
+                'inv_products.sales_uom',
+                'inv_products.brand',
+                'inv_products.pack_size',
+                'inv_categories.name'
+            ]
+            )
+            ->havingRaw('SUM(inv_current_stock.quantity) = 0')
+            ->distinct()
+            ->get();
+            
+        $outDetailed = DB::table('inv_current_stock')
+            ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
+            ->join('inv_categories','inv_products.category_id','=','inv_categories.id')
+            ->select('inv_current_stock.id','inv_current_stock.product_id','inv_products.name', 'inv_products.sales_uom', 'inv_current_stock.unit_cost',
+                'inv_products.brand', 'inv_products.pack_size', 'inv_categories.name as cat_name',
+                'inv_current_stock.quantity',
+                'inv_current_stock.batch_number',
+                'inv_current_stock.expiry_date')
+            ->where('inv_current_stock.store_id',$store_id)
+            ->where('inv_current_stock.quantity','=',0)
             ->get();
 
         $stores = Store::all();
 
         return view('stock_management.current_stock.current_stock')->with([
+            'allStocks' => $allStocks,
+            'allDetailed' => $allDetailed,
             'stocks' => $stocks,
             'detailed' => $detailed,
             'outstock' => $outstock,
+            'outDetailed' => $outDetailed,
             'stores' => $stores
         ]);
     }

@@ -19,7 +19,7 @@
 @section("content")
 
     <style>
-        .datepicker > .datepicker-days {
+        .datepicker>.datepicker-days {
             display: block;
         }
 
@@ -50,7 +50,6 @@
         .select2-container {
             width: 103% !important;
         }
-
     </style>
 
     <div class="col-sm-12">
@@ -62,15 +61,17 @@
                         </div>
                         <div class="col-md-3">
                             <label for="price_category" class="col-form-label text-md-right"
-                                   style="margin-left: 68%">Category:</label>
+                                style="margin-left: 68%">Category:</label>
                         </div>
                         <div class="col-md-3" style="margin-left: -2.6%;">
-                            <select name="price_category" class="js-example-basic-single form-control"
-                                    id="price_category">
+                            <select name="price_category" class="js-example-basic-single form-control" id="price_category">
                                 @foreach($price_categories as $price_category)
-                                    <option value="{{$price_category->id}}">{{ $price_category->name }}</option>
+                                    <option value="{{$price_category->id}}" {{ $loop->first ? 'selected' : '' }}>
+                                        {{ $price_category->name }}
+                                    </option>
                                 @endforeach
                             </select>
+
                         </div>
                     </div>
 
@@ -78,106 +79,153 @@
                         <div class="col-md-6" style="margin-left: 2%">
                         </div>
                         <div class="col-md-3">
-                            <label for="price_category" class="col-form-label text-md-right"
-                                   style="margin-left: 68%">Type:</label>
+                            <label for="type_id" class="col-form-label text-md-right" style="margin-left: 68%">Type:</label>
                         </div>
                         <div class="col-md-3" style="margin-left: -2.6%;">
                             <select name="type_id" class="js-example-basic-single form-control" id="type_id">
-                                <option readonly value="0" id="store_name_edit" disabled
-                                        selected>Select Type...
+                                <option readonly value="0" id="store_name_edit" disabled>Select Type...
                                 </option>
-                                <option name="store_name" value="1" selected >Current</option>
+                                <option name="store_name" value="pending" selected>Pending</option>
+                                <option name="store_name" value="1">Current</option>
                                 <option name="store_name" value="0">History</option>
                             </select>
                         </div>
                     </div>
 
-                    <div id="tbody1" class="table-responsive">
-                        <table id="fixed-header2" class="display table nowrap table-striped table-hover"
-                               style="width:100%">
-
+                    <div id="pendingTable" class="table-responsive">
+                        <table id="pendingPrices" class="display table nowrap table-striped table-hover" style="width:100%">
                             <thead>
-                            <tr>
-                                <th>Product Name</th>
-                                <th>Buy Price</th>
-                                <th>Sell Price</th>
-                                <th>Profit%</th>
-                                <th>Action</th>
-                                <th hidden>Category ID</th>
-                            </tr>
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Batch Number</th>
+                                    <th>Buy Price</th>
+                                    <th>Sell Price</th>
+                                    <th>Profit%</th>
+                                    <th>Action</th>
+                                    <th hidden>Category ID</th>
+                                </tr>
                             </thead>
                             <tbody>
-                               @foreach ($current_stocks as $stock)
-                                @if($stock->unit_cost>0)
-                                    <tr>
-                                        <td>
-                                            {{-- {{ $stock->product_name ?? '' }} --}}
-
-                                            {{ $stock->product_name }}
+                                {{-- @foreach ($current_stocks as $stock)
+                                @if($stock->unit_cost > 0)
+                                <tr>
+                                    <td>
+                                        {{ $stock->product_name }}
                                         {{ $stock->brand ? ' ' . $stock->brand : '' }}
                                         {{ $stock->pack_size ?? '' }}{{ $stock->sales_uom ?? '' }}
-                                        </td>
-                                        <td>{{ number_format($stock->unit_cost, 2) }}</td>
-                                        <td>{{ number_format($stock->price, 2) }}</td>
-                                        <td>{{ round($stock->profit, 0) }}%</td>
-                                        <td>
-                                            <div>
-                                                <button id='pricing'
-                                                        class='btn btn-sm btn-rounded btn-primary'
-                                                        type='button'
-                                                        data-toggle="modal" data-target="#edit"
-                                                        data-name='{{ $stock->product_name ?? '' }}'
-                                                        data-unit-cost='{{ $stock->unit_cost ?? '' }}'
-                                                        data-price='{{ $stock->price ?? '' }}'
-                                                        data-id='{{ $stock->id ?? '' }}'
-                                                        data-brand='{{ $stock->brand ?? '' }}'
-                                                        data-pack-size='{{ $stock->pack_size ?? '' }}'
-                                                        data-price-category='{{ $stock->price_category_name ?? '' }}'
-                                                        data-price-category-id='{{ $stock->price_category_id ?? '' }}'>Edit</button>
-                                            </div>
-                                        </td>
-                                        <td hidden>{{ $stock->price_category_id ?? '' }}</td>
-                                    </tr>
+                                    </td>
+                                    <td>{{ number_format($stock->unit_cost, 2) }}</td>
+                                    <td>{{ number_format($stock->price, 2) }}</td>
+                                    <td>{{ round($stock->profit, 0) }}%</td>
+                                    <td>
+                                        <div>
+                                            <button id='pricing' class='btn btn-sm btn-rounded btn-primary' type='button'
+                                                data-toggle="modal" data-target="#edit"
+                                                data-name='{{ $stock->product_name ?? '' }}'
+                                                data-unit-cost='{{ $stock->unit_cost ?? '' }}'
+                                                data-price='{{ $stock->price ?? '' }}' data-id='{{ $stock->id ?? '' }}'
+                                                data-brand='{{ $stock->brand ?? '' }}'
+                                                data-pack-size='{{ $stock->pack_size ?? '' }}'
+                                                data-sales-uom='{{ $stock->sales_uom ?? '' }}'
+                                                data-price-category='{{ $stock->price_category_name ?? '' }}'
+                                                data-price-category-id='{{ $stock->price_category_id ?? '' }}'>Edit</button>
+                                        </div>
+                                    </td>
+                                    <td hidden>{{ $stock->price_category_id ?? '' }}</td>
+                                </tr>
                                 @endif
-                            @endforeach
+                                @endforeach --}}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="tbody1" class="table-responsive" style="display: none;">
+                        <table id="fixed-header2" class="display table nowrap table-striped table-hover" style="width:100%">
+
+                            <thead>
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Batch Number</th>
+                                    <th>Buy Price</th>
+                                    <th>Sell Price</th>
+                                    <th>Profit%</th>
+                                    <th>Action</th>
+                                    <th hidden>Category ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{-- @foreach ($current_stocks as $stock)
+                                @if($stock->unit_cost > 0)
+                                <tr>
+                                    <td>
+                                        {{ $stock->product_name }}
+                                        {{ $stock->brand ? ' ' . $stock->brand : '' }}
+                                        {{ $stock->pack_size ?? '' }}{{ $stock->sales_uom ?? '' }}
+                                    </td>
+                                    <td>{{ number_format($stock->unit_cost, 2) }}</td>
+                                    <td>{{ number_format($stock->price, 2) }}</td>
+                                    <td>{{ round($stock->profit, 0) }}%</td>
+                                    <td>
+                                        <div>
+                                            <button id='pricing' class='btn btn-sm btn-rounded btn-primary' type='button'
+                                                data-toggle="modal" data-target="#edit"
+                                                data-name='{{ $stock->product_name ?? '' }}'
+                                                data-unit-cost='{{ $stock->unit_cost ?? '' }}'
+                                                data-price='{{ $stock->price ?? '' }}' data-id='{{ $stock->id ?? '' }}'
+                                                data-brand='{{ $stock->brand ?? '' }}'
+                                                data-pack-size='{{ $stock->pack_size ?? '' }}'
+                                                data-sales-uom='{{ $stock->sales_uom ?? '' }}'
+                                                data-price-category='{{ $stock->price_category_name ?? '' }}'
+                                                data-price-category-id='{{ $stock->price_category_id ?? '' }}'>Edit</button>
+                                        </div>
+                                    </td>
+                                    <td hidden>{{ $stock->price_category_id ?? '' }}</td>
+                                </tr>
+                                @endif
+                                @endforeach --}}
                             </tbody>
 
 
                         </table>
                     </div>
 
-                    <div id="tbody_detailed" class="table-responsive" style="display: none;">
-                        <table id="detailed_body"  class="display table nowrap table-striped table-hover"
-                               style="width: 100%;">
+                    <div id="historyTable" class="table-responsive" style="display: none;">
+                        <table id="priceHistory" class="display table nowrap table-striped table-hover"
+                            style="width: 100%;">
 
                             <thead>
-                            <tr>
-                                <th>Product Name</th>
-                                <th>Buy Price</th>
-                                <th>Sell Price</th>
-                                <th>Purchase Date</th>
-                                <th hidden>Real Time</th>
-                            </tr>
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Batch Number</th>
+                                    <th>Buy Price</th>
+                                    <th>Sell Price</th>
+                                    <th>Purchase Date</th>
+                                    <th hidden>Profit%</th>
+                                    <th hidden>Real Time</th>
+                                </tr>
                             </thead>
 
                             <tbody>
-                            @foreach ($stocks as $stock)
-                                @if($stock->unit_cost>0)
-                                    <tr>
-                                        <td>{{ $stock->name ?? '' }}</td>
-                                        <td>{{ number_format($stock->unit_cost,2) ?? '' }}</td>
-                                        <td>{{ number_format($stock->price,2) ?? '' }}</td>
-                                        <td>{{date('d-m-Y', strtotime($stock->updated_at))}}</td>
-                                        <td hidden>{{ $stock->updated_at ?? '' }}</td>
+                                {{-- @foreach ($stocks as $stock)
+                                @if($stock->unit_cost > 0)
+                                <tr>
+                                    <td>
+                                        {{ $stock->name }}
+                                        {{ $stock->brand ? ' ' . $stock->brand : '' }}
+                                        {{ $stock->pack_size ?? '' }}{{ $stock->sales_uom ?? '' }}
+                                    </td>
+                                    <td>{{ number_format($stock->unit_cost, 2) ?? '' }}</td>
+                                    <td>{{ number_format($stock->price, 2) ?? '' }}</td>
+                                    <td>{{date('Y-m-d', strtotime($stock->updated_at))}}</td>
+                                    <td hidden>{{ $stock->updated_at ?? '' }}</td>
 
-                                    </tr>
+                                </tr>
                                 @endif
-                            @endforeach
+                                @endforeach --}}
                             </tbody>
 
                         </table>
                     </div>
-
 
                 </div>
 
@@ -185,28 +233,6 @@
                 <div id="loading">
                     <image id="loading-image" src="{{asset('assets/images/spinner.gif')}}"></image>
                 </div>
-                <div id="tbody" style="display: none;" class="table-responsive">
-                    <table id="fixed-header1" class="display table nowrap table-striped table-hover"
-                           style="width:100%">
-
-                        <thead>
-                        <tr>
-                            <th>Product Name</th>
-                            <th>Buy Price</th>
-                            <th>Sell Price</th>
-                            <th>code</th>
-                            <th>Action</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-
-                        </tbody>
-
-                    </table>
-                </div>
-
-
-
 
             </div>
         </div>
@@ -218,9 +244,6 @@
     @include('stock_management.price_list.history')
 @endsection
 
-
-
-
 @push("page_scripts")
     <script src="{{asset("assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js")}}"></script>
     <script src="{{asset("assets/js/pages/ac-datepicker.js")}}"></script>
@@ -228,115 +251,7 @@
 
     @include('partials.notification')
 
-
-{{--    <script>--}}
-{{--        async function sendGetRequest() {--}}
-{{--            const selectedValue = document.getElementById('price_category').value;--}}
-
-
-
-{{--            try {--}}
-{{--                const response = await fetch(`{{ url('inventory/price-list') }}?price_category=${selectedValue}`);--}}
-
-{{--                if (!response.ok) {--}}
-{{--                    throw new Error('Network response was not ok');--}}
-{{--                }--}}
-
-{{--                console.log('Received Data:', "Returned Succesfully on Server");--}}
-
-{{--                // Process data as needed, e.g., update a table or display results--}}
-{{--            } catch (error) {--}}
-{{--                console.error('Error:', error);--}}
-{{--            }--}}
-{{--        }--}}
-{{--    </script>--}}
-
     <script>
-
-
-
-
-
-        // $.ajaxSetup({
-        //     headers: {
-        //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        //     }
-        // });
-
-        {{--$(document).ready(function () {--}}
-        {{--    loadPriceList();--}}
-        {{--});--}}
-
-        {{--function loadPriceList() {--}}
-        {{--    var e = document.getElementById("price_category");--}}
-        {{--    var value = e.options[e.selectedIndex].value;--}}
-
-        {{--    $("#fixed-header2").dataTable().fnDestroy();--}}
-        {{--    var table_main = $('#fixed-header2').DataTable({--}}
-        {{--        "processing": true,--}}
-        {{--        "serverSide": true,--}}
-        {{--        "ajax": {--}}
-        {{--            "url": "{{ route('all-price-list') }}",--}}
-        {{--            "dataType": "json",--}}
-        {{--            "type": "post",--}}
-        {{--            "cache": false,--}}
-        {{--            "data": {--}}
-        {{--                _token: "{{csrf_token()}}",--}}
-        {{--                price_category: value--}}
-        {{--            }--}}
-        {{--        },--}}
-        {{--        "columns": [--}}
-        {{--            {"data": "name"},--}}
-        {{--            {--}}
-        {{--                "data": "unit_cost", render: function (unit_cost) {--}}
-        {{--                    return formatMoney(unit_cost);--}}
-        {{--                }--}}
-        {{--            },--}}
-        {{--            {--}}
-        {{--                "data": "price", render: function (price) {--}}
-        {{--                    return formatMoney(price);--}}
-        {{--                }--}}
-        {{--            },--}}
-        {{--            {--}}
-        {{--                // Calculate profit percentage: ((price - unit_cost) / unit_cost) * 100--}}
-        {{--                "data": null, // Set data to null because calculation is done in render--}}
-        {{--                render: function (data, type, row) {--}}
-        {{--                    let unit_cost = row.unit_cost;--}}
-        {{--                    let price = row.price;--}}
-        {{--                    let profitPercent = ((price - unit_cost) / unit_cost) * 100;--}}
-        {{--                    return profitPercent.toFixed(2) + "%"; // Format as percentage with 2 decimal places--}}
-        {{--                }--}}
-        {{--            },--}}
-        {{--            {--}}
-        {{--                "data": 'action',--}}
-        {{--                defaultContent: "<div><button id='pricing' class='btn btn-sm btn-rounded btn-primary' type='button'>Edit</button></div>",--}}
-        {{--                "render": function (data, type, row) {--}}
-        {{--                    return `<div>--}}
-        {{--                  <button id='pricing'--}}
-        {{--                    class='btn btn-sm btn-rounded btn-primary'--}}
-        {{--                    type='button'--}}
-        {{--                    data-toggle="modal" data-target="#edit"--}}
-        {{--                    data-name='${row.name}'--}}
-        {{--                    data-unit-cost='${row.unit_cost}'--}}
-        {{--                    data-price='${row.price}'--}}
-        {{--                    data-id='${row.id}'>Edit</button>--}}
-        {{--                </div>`;--}}
-        {{--                }--}}
-        {{--            }--}}
-        {{--        ]--}}
-
-        {{--    });--}}
-
-        {{--    $('#tbody1').on('click', '#detail', function () {--}}
-        {{--        var data = table_main.row($(this).parents('tr')).data();--}}
-
-        {{--        var e = document.getElementById("price_category");--}}
-        {{--        var value = e.options[e.selectedIndex].value;--}}
-
-        {{--        retrivePriceHistory(value, data.product_id);--}}
-        {{--    });--}}
-        {{--}--}}
-
 
         $('#tbody1').on('click', '#detail', function () {
             var data = $('#fixed-header2').DataTable().row($(this).parents('tr')).data();
@@ -347,45 +262,52 @@
             retrivePriceHistory(value, data.product_id);
         });
 
-        $('#type_id').on('change', function () {
-            console.log("Type Changed")
-            var cat = document.getElementById("type_id");
-            var category = cat.options[cat.selectedIndex].value;
+        $('#price_category, #type_id').on('change', function () {
+            var selectedCategory = $('#price_category').val();
+            var selectedType = $('#type_id').val();
 
-            if(category==="1") {
-                $('#tbody1').show();
-                $('#tbody_detailed').hide();
+            $('#pendingTable, #tbody1, #tbody_detailed').hide();
 
-            }
-
-            if(category==="0")
-            {
-
-                $('#tbody_detailed').show();
-                $('#tbody1').hide();
-                $('#tbody').hide();
-
-
-
-            }
-
+            // AJAX request backend
+            $.ajax({
+                url: '{{ route("fetch-price-list") }}',
+                type: 'GET',
+                dataType: 'json',
+                data: {
+                    category_id: selectedCategory,
+                    type: selectedType
+                },
+                beforeSend: function () {
+                    $('#loading').show();
+                },
+                success: function (response) {
+                    console.log('FechResponse: ', response);
+                    if (selectedType === "pending") {
+                        renderTable('#pendingPrices', response);
+                        $('#pendingTable').show();
+                    } else if (selectedType === "1") {
+                        renderTable('#fixed-header2', response);
+                        $('#tbody1').show();
+                    } else if (selectedType === "0") {
+                        renderTable('#detailed_body', response);
+                        $('#tbody_detailed').show();
+                    }
+                },
+                complete: function () {
+                    $('#loading').hide();
+                },
+                error: function () {
+                    alert('Error fetching data!');
+                }
+            });
         });
 
-        // $('#edit').on('show.bs.modal', function (event) {
-        //     var button = $(event.relatedTarget);
-        //     var modal = $(this);
-        //
-        //     modal.find('.modal-body #id').val(button.data('id'));
-        //     modal.find('.modal-body #product_id').val(button.data('product_id'));
-        //     modal.find('.modal-body #stock_id').val(button.data('stock_id'));
-        //     modal.find('.modal-body #name_edit').val(button.data('name'));
-        //     modal.find('.modal-body #unit_cost_edit').val(button.data('unit'));
-        //     modal.find('.modal-body #sell_price_edit').val(button.data('sell'));
-        //     modal.find('.modal-body #price_category_edit').val(button.data('category'));
-        //     modal.find('.modal-body #d_auto_4').val(button.data('batch'));
-        //     modal.find('.modal-body #d_auto_5').val(button.data('expiry'));
-        //
-        // });
+        function renderTable(tableId, data) {
+            var table = $(tableId).DataTable();
+            table.clear();
+            table.rows.add(data);
+            table.draw();
+        }
 
         $('#edit').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
@@ -395,22 +317,26 @@
             var id = button.data('id');
             var brand = button.data('brand');
             var pack_size = button.data('pack-size');
-            var price_category_id = button.data('price-category-id');
-            var price_category = button.data('price-category');
+            var sales_uom = button.data('sales-uom');
+            var price_category_id = $('#price_category').val();
+            var price_category = $('#price_category option:selected').text().trim();
+            var selected_type = $('#type_id').val();
 
             var modal = $(this);
 
-            modal.find('.modal-body #name').val(name);
+            modal.find('.modal-body #name').val(name + ' ' + brand + ' ' + pack_size + sales_uom);
             modal.find('.modal-body #brand_edit').val(brand);
             modal.find('.modal-body #unit_cost_edit').val(unit_cost_edit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
             modal.find('.modal-body #price_category_edit').val(price_category);
             modal.find('.modal-body #sell_price_edit').val(sell_price_edit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
             modal.find('.modal-body #pack_size_edit').val(pack_size);
             modal.find('.modal-body #id').val(id);
+            modal.find('.modal-body #price_category').val(price_category);
+            modal.find('.modal-body #selected_type').val(selected_type);
             modal.find('.modal-body #price_category_id').val(price_category_id);
         });
 
-        $('#editPriceForm').on('submit', function(e) {
+        $('#editPriceForm').on('submit', function (e) {
             var unitCostField = $('#unit_cost_edit');
             var sellPriceField = $('#sell_price_edit');
 
@@ -450,7 +376,7 @@
                 url: ajaxurl,
                 type: "get",
                 dataType: "json",
-                data: {val: val},
+                data: { val: val },
                 success: function (data) {
                     document.getElementById("tbody1").style.display = 'none';
                     document.getElementById("tbody").style.display = 'block';
@@ -463,31 +389,9 @@
             });
         }
 
-
-        // var tables = $('#fixed-header1').DataTable({
-        //     'columns': [
-        //         {'data': 'name'},
-        //         {
-        //             'data': 'unit_cost', render: function (unit_cost) {
-        //                 return formatMoney(unit_cost);
-        //             }
-        //         },
-        //         {
-        //             'data': 'price', render: function (price) {
-        //                 return formatMoney(price);
-        //             }
-        //         },
-        //         {'data': 'product_id'},
-        //         {
-        //             'data': 'action',
-        //             defaultContent: "<div><button id='detail4' class='btn btn-sm btn-rounded btn-success' type='button'>Price History</button></div>"
-        //         }
-        //     ]
-        // });
-
         var table = $('#fixed-header-price').DataTable({
             'columns': [
-                {'data': 'product_name'},
+                { 'data': 'product_name' },
                 {
                     'data': 'unit_cost', render: function (unit_cost) {
                         return formatMoney(unit_cost);
@@ -498,8 +402,8 @@
                         return formatMoney(unit_cost);
                     }
                 },
-                {'data': 'price_category_name'},
-                {'data': 'batch_number'}
+                { 'data': 'price_category_name' },
+                { 'data': 'batch_number' }
             ]
         });
 
@@ -518,24 +422,6 @@
 
         }
 
-
-        // $(document).ready(function () {
-        // var table = $('#fixed-header').DataTable();
-        // $('#tbody1').on('click', '#detail', function () {
-        //     var data = table.row($(this).parents('tr')).data();
-        //
-        //     var values = $(this).val();
-        //     var selected_fields = values.split(',');
-        //     var product_id = selected_fields[1];
-        //
-        //     var e = document.getElementById("price_category");
-        //     var value = e.options[e.selectedIndex].value;
-        //
-        //     retrivePriceHistory(value, product_id);
-
-        // });
-        // });
-
         function change() {
             $('.price-list').text('Price List');
             document.getElementById("tbody1").style.display = 'block';
@@ -553,7 +439,7 @@
                 url: ajaxurl,
                 type: "get",
                 dataType: "json",
-                data: {price_category_id: data, product_id: data1},
+                data: { price_category_id: data, product_id: data1 },
                 success: function (data) {
                     bindPriceData(data);
 
@@ -564,7 +450,6 @@
             });
         }
 
-
         function bindPriceData(data) {
             table.clear();
             table.rows.add(data);
@@ -572,39 +457,210 @@
             $('#test').modal('show');
         }
 
+        // $(document).ready(function () {
+        //     function initPriceTable(selector) {
+        //         return $(selector).DataTable({
+        //             responsive: true,
+        //             order: [[0, 'asc']],
+        //             destroy: true,
+        //             columns: [
+        //                 {
+        //                     data: "product_name", render: function (data, type, row) {
+        //                         return `${row.product_name} ${row.brand ?? ''} ${row.pack_size ?? ''}${row.sales_uom ?? ''}`;
+        //                     }
+        //                 },
+        //                 { data: "batch_number", render: data => data ?? '' },
+        //                 { data: "unit_cost", render: data => formatMoney(data) },
+        //                 { data: "price", render: data => formatMoney(data) },
+        //                 { data: "profit", render: data => `${Math.round(data)}%` },
+        //                 {
+        //                     data: "id", render: function (data, type, row) {
+        //                         return `
+        //                         <button id='pricing' class='btn btn-sm btn-rounded btn-primary'
+        //                             type='button' data-toggle="modal" data-target="#edit"
+        //                             data-name='${row.product_name ?? ''}'
+        //                             data-unit-cost='${row.unit_cost ?? ''}'
+        //                             data-price='${row.price ?? ''}'
+        //                             data-id='${row.id ?? ''}'
+        //                             data-brand='${row.brand ?? ''}'
+        //                             data-pack-size='${row.pack_size ?? ''}'
+        //                             data-sales-uom='${row.sales_uom ?? ''}'
+        //                             data-price-category-id='${row.price_category_id ?? ''}'>Edit</button>
+        //                     `;
+        //                     }
+        //                 },
+        //                 // { data: "price_category_id", visible: false }
+        //             ]
+        //         });
+        //     }
+
+        //     const currentStocks = initPriceTable('#fixed-header2');
+        //     const pendingPrices = initPriceTable('#pendingPrices');
+        //     const priceHistory = initPriceTable('#priceHistory');
+
+        //     // Custom filter
+        //     $.fn.dataTable.ext.search.push(function (settings, data, dataIndex, row) {
+        //         var categoryId = $('#price_category').val();
+        //         var typeId = $('#type_id').val();
+        //         var rowCategory = row.price_category_id;
+
+        //         if (typeId === "pending") {
+        //             return rowCategory != categoryId;
+        //         } else if (typeId === "1") {
+        //             return rowCategory == categoryId;
+        //         } else if (typeId === "0") {
+        //             return rowCategory == categoryId;
+        //         }
+        //         return true;
+        //     });
+
+        //     currentStocks.draw();
+        //     pendingPrices.draw();
+        //     priceHistory.draw();
+
+        //     $('#price_category, #type_id').trigger('change');
+
+        //     $('#price_category, #type_id').on('change', function () {
+        //         currentStocks.draw();
+        //         pendingPrices.draw();
+        //         priceHistory.draw();
+        //     });
+        // });
 
         $(document).ready(function () {
 
-            $('#tbody_detailed').hide();
+            function initPriceTable(selector) {
+                return $(selector).DataTable({
+                    responsive: true,
+                    order: [[0, 'asc']],
+                    destroy: true,
+                    columns: [
+                        {
+                            data: "product_name", render: function (data, type, row) {
+                                return `${row.product_name} ${row.brand ?? ''} ${row.pack_size ?? ''}${row.sales_uom ?? ''}`;
+                            }
+                        },
+                        { data: "batch_number", render: data => data ?? '' },
+                        { data: "unit_cost", render: data => formatMoney(data) },
+                        { data: "price", render: data => formatMoney(data) },
+                        { data: "profit", render: data => (data ? `${Math.round(data)}%` : '0%') },
+                        {
+                            data: "id", render: function (data, type, row) {
+                                return `
+                                <button id='pricing' class='btn btn-sm btn-rounded btn-primary'
+                                    type='button' data-toggle="modal" data-target="#edit"
+                                    data-name='${row.product_name ?? ''}'
+                                    data-unit-cost='${row.unit_cost ?? ''}'
+                                    data-price='${row.price ?? ''}'
+                                    data-id='${row.id ?? ''}'
+                                    data-brand='${row.brand ?? ''}'
+                                    data-pack-size='${row.pack_size ?? ''}'
+                                    data-sales-uom='${row.sales_uom ?? ''}'
+                                    data-price-category-id='${row.price_category_id ?? ''}'>Edit</button>
+                            `;
+                            }
+                        },
+                        { data: "price_category_id", visible: false } // hidden but present
+                    ]
+                });
+            }
 
-            $('#detailed_body').DataTable({
-                responsive: true,
-                order: [[4, 'desc']]
+            function initHistoryTable(selector) {
+                return $(selector).DataTable({
+                    responsive: true,
+                    order: [[0, 'asc']],
+                    destroy: true,
+                    columns: [
+                        {
+                            data: "product_name", render: function (data, type, row) {
+                                return `${row.product_name} ${row.brand ?? ''} ${row.pack_size ?? ''}${row.sales_uom ?? ''}`;
+                            }
+                        },
+                        { data: "batch_number", render: data => data ?? '' },
+                        { data: "unit_cost", render: data => formatMoney(data) },
+                        { data: "price", render: data => formatMoney(data) },
+                        { data: "purchased_at", render: data => data ? data.split(' ')[0] : '' }, 
+                        // { data: "updated_at", render: data => data ? data.split(' ')[0] : '' }, 
+                        { data: "price_category_id", visible: false } 
+                    ]
+                });
+            }
+
+            const currentStocks = initPriceTable('#fixed-header2');
+            const pendingPrices = initPriceTable('#pendingPrices');
+            const priceHistory = initHistoryTable('#priceHistory');
+
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                var categoryId = $('#price_category').val();
+                var typeId = $('#type_id').val();
+
+                var api = new $.fn.dataTable.Api(settings);
+                var rowData = api.row(dataIndex).data();
+                var rowCategory = rowData ? rowData.price_category_id : null;
+
+                var rowCatStr = rowCategory === null || typeof rowCategory === 'undefined' ? '' : String(rowCategory);
+                var catStr = categoryId === null || typeof categoryId === 'undefined' ? '' : String(categoryId);
+
+                if (typeId === "pending") {
+                    return rowCatStr !== catStr;
+                } else if (typeId === "1") {
+                    return rowCatStr === catStr;
+                } else if (typeId === "0") {
+                    return rowCatStr === catStr || rowCatStr === '';
+                }
+                return true;
             });
 
-            const currentStocks = $('#fixed-header2').DataTable({
-                responsive: true,
-                order: [[0, 'asc']],
-                columnDefs: [
-                    {
-                        targets: 5, // Zero-based index of the hidden column
-                        visible: false, // Hide the column from view
-                        searchable: true, // Allow it to be searchable
+            function renderTable(tableId, data) {
+                var table = $(tableId).DataTable();
+                table.clear();
+                table.rows.add(data);
+                table.draw();
+            }
+
+            $('#price_category, #type_id').on('change', function () {
+                var selectedCategory = $('#price_category').val();
+                var selectedType = $('#type_id').val();
+
+                $('#pendingTable, #tbody1, #historyTable').hide();
+
+                $.ajax({
+                    url: '{{ route("fetch-price-list") }}',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: {
+                        category_id: selectedCategory,
+                        type: selectedType
                     },
-                ]
+                    beforeSend: function () {
+                        $('#loading').show();
+                    },
+                    success: function (response) {
+                        console.log('FechResponse: ', response);
+
+                        if (selectedType === "pending") {
+                            renderTable('#pendingPrices', response);
+                            $('#pendingTable').show();
+                        } else if (selectedType === "1") {
+                            renderTable('#fixed-header2', response);
+                            $('#tbody1').show();
+                        } else if (selectedType === "0") {
+                            renderTable('#priceHistory', response);
+                            $('#historyTable').show();
+                        }
+                    },
+                    complete: function () {
+                        $('#loading').hide();
+                    },
+                    error: function () {
+                        alert('Error fetching data!');
+                    }
+                });
             });
 
-
-            $('#price_category').on('change', function (e) {
-                e.preventDefault();
-
-                const selectedValue = $(this).val(); // Get the selected dropdown value
-                currentStocks.column(5).search(selectedValue).draw(); // Filter by the hidden column
-            });
+            $('#price_category, #type_id').trigger('change');
 
         });
-
-
 
     </script>
 

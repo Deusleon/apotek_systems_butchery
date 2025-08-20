@@ -295,6 +295,8 @@ Route::middleware(["auth","main_branch"])->group(function () {
         'index', 'store', 'update', 'destroy'
     ]);
 
+    Route::get('inventory/fetch-price-list', [PriceListController::class, 'fetchPriceList'])->name('fetch-price-list');
+
     Route::get('inventory/price-list/history',[PriceListController::class])->name('price-list-history');
 
 
