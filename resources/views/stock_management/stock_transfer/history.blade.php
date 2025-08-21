@@ -63,14 +63,14 @@
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
             <li class="nav-item">
-                <a class="nav-link text-uppercase" id="stock-transfer-tablist" data-toggle="pill"
-                   href="#stock-transfer" role="tab"
-                   aria-controls="stock_transfer" aria-selected="false">New Transfer</a>
+                <a class="nav-link text-uppercase" id="invoice-received"
+                    href="{{ route('stock-transfer.index') }}" role="tab" aria-controls="quotes_list"
+                    aria-selected="false">New Transfer</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link active text-uppercase" id="transfer-history-tablist" data-toggle="pill"
-                   href="#transfer-history" role="tab"
-                   aria-controls="transfer_history" aria-selected="true">Transfer History
+                <a class="nav-link active text-uppercase" id="order-received"
+                    href="{{ route('stock-transfer-history') }}" role="tab" aria-controls="new_quotes"
+                    aria-selected="true">Transfer History
                 </a>
             </li>
         </ul>
@@ -83,11 +83,11 @@
 
             {{-- Stock Transfer History Start --}}
             <div class="tab-pane fade show active" id="transfer-history" role="tabpanel" aria-labelledby="transfer-history-tab">
-                <div class="card-header">
-                    <div class="row">
+                <div class="mb-3 bg-light">
+                    <div class="row ml-1 text-right justify-content-end">
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label for="from_id">From</label>
+                                <label for="from_id justify-content-start">From:</label>
                                 <select name="from_id" id="from_id" class="form-control">
                                     <option value="">Select branch...</option>
                                     @foreach($stores as $store)
@@ -98,7 +98,7 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label for="to_id">To</label>
+                                <label for="to_id">To:</label>
                                 <select name="to_id" id="to_id" class="form-control">
                                     <option value="">Select branch..</option>
                                     @foreach($stores as $store)
@@ -106,9 +106,6 @@
                                     @endforeach
                                 </select>
                             </div>
-                        </div>
-                        <div class="col-md-6 text-right">
-                            <a href="{{ route('stock-transfer.index') }}" class="btn btn-secondary mt-4">New Transfer</a>
                         </div>
                     </div>
                 </div>

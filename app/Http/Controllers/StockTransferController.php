@@ -21,75 +21,85 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use PDF;
 
-class StockTransferController extends Controller
-{
+class StockTransferController extends Controller {
 
-    public function index()
-    {
+    public function index() {
 
+        $storeId = current_store_id();
 
-
-        $stores = Store::where('name','<>','ALL')->get();
-        $products = CurrentStock::with('product')->select(DB::raw('sum(quantity) as quantity'),
-            DB::raw('product_id'), DB::raw('max(id) as stock_id'))
-            ->where('quantity', '>', '0')
-            ->groupby('product_id')
+        if ( is_all_store() ) {
+            $products = CurrentStock::with( 'product' )
+            ->select( DB::raw( 'SUM(quantity) as quantity' ),
+            DB::raw( 'product_id' ), DB::raw( 'MAX(id) as stock_id' ) )
+            ->where( 'quantity', '>', 0 )
+            ->whereHas( 'product' )
+            ->groupBy( 'product_id' )
             ->get();
+        } else {
+            $products = CurrentStock::with( 'product' )
+            ->select( DB::raw( 'SUM(quantity) as quantity' ),
+            DB::raw( 'product_id' ), DB::raw( 'MAX(id) as stock_id' ) )
+            ->where( 'quantity', '>', 0 )
+            ->whereHas( 'product' )
+            ->where( 'store_id', $storeId )
+            ->groupBy( 'product_id' )
+            ->get();
+        }
 
-        return view('stock_management.stock_transfer.index')->with([
+        $stores = Store::where( 'name', '<>', 'ALL' )->get();
+        return view( 'stock_management.stock_transfer.index' )->with( [
             'stores' => $stores,
             'products' => $products
-        ]);
+        ] );
 
     }
 
-    public function storeTransfer(Request $request)
-    {
-        if ($request->ajax()) {
+    public function storeTransfer( Request $request ) {
+        if ( $request->ajax() ) {
             try {
-                $transfer_no = $this->store($request);
-                
-                return response()->json([
+                $transfer_no = $this->store( $request );
+
+                return response()->json( [
                     'success' => true,
                     'message' => 'Stock transfer created successfully!',
                     'transfer_no' => $transfer_no,
-                    'redirect_to' => route('stock-transfer-pdf-gen', $transfer_no),
-                    'history_url' => route('stock-transfer-history')
-                ]);
-            } catch (Exception $e) {
-                Log::error('Stock Transfer Creation Error: ' . $e->getMessage());
-                return response()->json([
+                    'redirect_to' => route( 'stock-transfer-pdf-gen', $transfer_no ),
+                    'history_url' => route( 'stock-transfer-history' )
+                ] );
+            } catch ( Exception $e ) {
+                Log::error( 'Stock Transfer Creation Error: ' . $e->getMessage() );
+                return response()->json( [
                     'success' => false,
                     'message' => 'Failed to create stock transfer. Please try again.',
                     'error' => $e->getMessage()
-                ], 500);
+                ], 500 );
             }
         }
-        
+
         // Non-AJAX request - redirect to history page
-        $transfer_no = $this->store($request);
-        return redirect()->route('stock-transfer-history')->with('success', 'Stock transfer created successfully!');
+        $transfer_no = $this->store( $request );
+        return redirect()->route( 'stock-transfer-history' )->with( 'success', 'Stock transfer created successfully!' );
     }
 
-    protected function sendNotifications($transfer, $status, $action)
-    {
+    protected function sendNotifications( $transfer, $status, $action ) {
         // Get users to notify based on the action
         $users = [];
-        
-        switch ($action) {
-            case 'created':
-                // Notify destination store managers
-                $users = User::whereHas('roles', function($q) {
-                    $q->where('name', 'store_manager');
-                })->where('store_id', $transfer->to_store)->get();
-                break;
 
-            case 'needs_approval':
-                // Notify users with approval permission - handle missing permission gracefully
-                try {
-                    $users = User::permission('approve_stock_transfers')->get();
-                } catch (Exception $e) {
-                    // If permission doesn't exist, notify store managers instead
+        switch ( $action ) {
+            case 'created':
+            // Notify destination store managers
+            $users = User::whereHas( 'roles', function( $q ) {
+                $q->where( 'name', 'store_manager' );
+            }
+        )->where( 'store_id', $transfer->to_store )->get();
+        break;
+
+        case 'needs_approval':
+        // Notify users with approval permission - handle missing permission gracefully
+        try {
+            $users = User::permission( 'approve_stock_transfers' )->get();
+        } catch ( Exception $e ) {
+            // If permission doesn't exist, notify store managers instead
                     $users = User::whereHas('roles', function($q) {
                         $q->where('name', 'store_manager');
                     })->get();
@@ -146,7 +156,7 @@ class StockTransferController extends Controller
                 'stock_id' => $value['stock_id'],
                 'product_id' => $value['product_id'],
                 'transfer_no' => $transfer_no,
-                'transfer_qty' => str_replace(',', '', $value['quantityTran']),
+                'transfer_qty' => str_replace(', ', '', $value['quantityTran']),
                 'from_store' => $request->from_id,
                 'to_store' => $request->to_id,
                 'status' => 1, // Created
@@ -166,15 +176,15 @@ class StockTransferController extends Controller
                 ->get();
 
             foreach ($stock_update as $stock) {
-                if ($stock->quantity >= str_replace(',', '', $value['quantityTran'])) {
-                    $present_stock = $stock->quantity - str_replace(',', '', $value['quantityTran']);
+                if ($stock->quantity >= str_replace(', ', '', $value['quantityTran'])) {
+                    $present_stock = $stock->quantity - str_replace(', ', '', $value['quantityTran']);
                     $stock->quantity = $present_stock;
                     if ($present_stock > 0) {
                         $value['quantityTran'] = 0;
                     }
                     $stock->save();
                 } else {
-                    $present_stock = str_replace(',', '', $value['quantityTran']) - $stock->quantity;
+                    $present_stock = str_replace(', ', '', $value['quantityTran']) - $stock->quantity;
                     if ($present_stock > 0) {
                         $stock->quantity = 0;
                         $value['quantityTran'] = $present_stock;
@@ -310,50 +320,48 @@ class StockTransferController extends Controller
             }
 
             // Update remarks for all transfers in this group since it's shared
-            StockTransfer::where('transfer_no', $transfer_no)->update(['remarks' => $remarks]);
+            StockTransfer::where( 'transfer_no', $transfer_no )->update( [ 'remarks' => $remarks ] );
 
             DB::commit();
 
-            return redirect()->route('stock-transfer-history')->with('success', 'Stock transfer updated successfully.');
+            return redirect()->route( 'stock-transfer-history' )->with( 'success', 'Stock transfer updated successfully.' );
 
-        } catch (Exception $e) {
+        } catch ( Exception $e ) {
             DB::rollBack();
-            Log::error('Stock Transfer Update Error: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Failed to update stock transfer: ' . $e->getMessage())->withInput();
+            Log::error( 'Stock Transfer Update Error: ' . $e->getMessage() );
+            return redirect()->back()->with( 'error', 'Failed to update stock transfer: ' . $e->getMessage() )->withInput();
         }
     }
 
-    public function transferNumberAutoGen()
-    {
+    public function transferNumberAutoGen() {
         $number_gen = new CommonFunctions();
         $unique = $number_gen->generateNumber();
         return $unique;
     }
 
-    public function generateStockTransferPDF($transfer_no)
-    {
-        $transfer = DB::table('inv_stock_transfers as t')
-            ->select(
-                't.*',
-                'fs.name as from_store_name',
-                'ts.name as to_store_name',
-                'p.name as product_name',
-                'p.brand',
-                'p.pack_size',
-                'u.name as created_by_name',
-                'up.name as updated_by_name'
-            )
-            ->join('inv_stores as fs', 'fs.id', '=', 't.from_store')
-            ->join('inv_stores as ts', 'ts.id', '=', 't.to_store')
-            ->join('inv_current_stock as cs', 'cs.id', '=', 't.stock_id')
-            ->join('inv_products as p', 'p.id', '=', 'cs.product_id')
-            ->join('users as u', 'u.id', '=', 't.created_by')
-            ->leftJoin('users as up', 'up.id', '=', 't.updated_by')
-            ->where('t.transfer_no', $transfer_no)
-            ->first();
+    public function generateStockTransferPDF( $transfer_no ) {
+        $transfer = DB::table( 'inv_stock_transfers as t' )
+        ->select(
+            't.*',
+            'fs.name as from_store_name',
+            'ts.name as to_store_name',
+            'p.name as product_name',
+            'p.brand',
+            'p.pack_size',
+            'u.name as created_by_name',
+            'up.name as updated_by_name'
+        )
+        ->join( 'inv_stores as fs', 'fs.id', '=', 't.from_store' )
+        ->join( 'inv_stores as ts', 'ts.id', '=', 't.to_store' )
+        ->join( 'inv_current_stock as cs', 'cs.id', '=', 't.stock_id' )
+        ->join( 'inv_products as p', 'p.id', '=', 'cs.product_id' )
+        ->join( 'users as u', 'u.id', '=', 't.created_by' )
+        ->leftJoin( 'users as up', 'up.id', '=', 't.updated_by' )
+        ->where( 't.transfer_no', $transfer_no )
+        ->first();
 
-        if (!$transfer) {
-            return back()->with('error', 'Transfer not found');
+        if ( !$transfer ) {
+            return back()->with( 'error', 'Transfer not found' );
         }
 
         // Get status text
@@ -365,16 +373,16 @@ class StockTransferController extends Controller
             5 => 'Acknowledged',
             6 => 'Completed'
         ];
-        $transfer->status_text = $statuses[$transfer->status] ?? 'Unknown';
+        $transfer->status_text = $statuses[ $transfer->status ] ?? 'Unknown';
 
         // Get audit trail - try to find relevant stock adjustments or provide empty collection
         try {
-            $audit_trail = DB::table('stock_adjustment_logs')
-                ->where('current_stock_id', $transfer->stock_id)
-                ->where('created_at', '>=', $transfer->created_at)
-                ->orderBy('created_at', 'asc')
-                ->get();
-        } catch (Exception $e) {
+            $audit_trail = DB::table( 'stock_adjustment_logs' )
+            ->where( 'current_stock_id', $transfer->stock_id )
+            ->where( 'created_at', '>=', $transfer->created_at )
+            ->orderBy( 'created_at', 'asc' )
+            ->get();
+        } catch ( Exception $e ) {
             // If audit table doesn't exist or has issues, provide empty collection
             $audit_trail = collect();
         }
@@ -431,7 +439,7 @@ class StockTransferController extends Controller
     public function filterTransferByDate(Request $request)
     {
         if ($request->ajax()) {
-            $all_transfer = StockTransfer::where(DB::raw('date(created_at)'), '=', $request->date)->get();
+            $all_transfer = StockTransfer::where(DB::raw('date( created_at )'), ' = ', $request->date)->get();
 
             foreach ($all_transfer as $transfer) {
                 $transfer->product;
@@ -447,11 +455,11 @@ class StockTransferController extends Controller
         if ($request->ajax()) {
 
 
-            $products = CurrentStock::select(DB::raw('sum(quantity) as quantity'),
-                DB::raw('product_id'), DB::raw('max(inv_current_stock.id) as stock_id'), 'inv_products.name', 'inv_products.pack_size')
-                ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+            $products = CurrentStock::select(DB::raw('sum( quantity ) as quantity'),
+                DB::raw('product_id'), DB::raw('max( inv_current_stock.id ) as stock_id'), 'inv_products.name', 'inv_products.pack_size')
+                ->join('inv_products', 'inv_products.id', ' = ', 'inv_current_stock.product_id')
                 ->where('inv_current_stock.quantity', '>', '0')
-                ->where('inv_products.status', '=', 1)
+                ->where('inv_products.status', ' = ', 1)
                 ->where('inv_current_stock.store_id', $request->from_id)
                 ->groupby('inv_current_stock.product_id', 'inv_products.name', 'inv_products.pack_size')
                 ->limit(10)
@@ -468,13 +476,13 @@ class StockTransferController extends Controller
     {
         if ($request->ajax()) {
 
-            $products = CurrentStock::select(DB::raw('sum(quantity) as quantity'),
-                DB::raw('product_id'), DB::raw('max(inv_current_stock.id) as stock_id'), 'inv_products.name', 'inv_products.pack_size')
-                ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+            $products = CurrentStock::select(DB::raw('sum( quantity ) as quantity'),
+                DB::raw('product_id'), DB::raw('max( inv_current_stock.id ) as stock_id'), 'inv_products.name', 'inv_products.pack_size')
+                ->join('inv_products', 'inv_products.id', ' = ', 'inv_current_stock.product_id')
                 ->where('inv_products.name', 'LIKE', "%{$request->word}%")
                 ->where('inv_current_stock.quantity', '>', '0')
                 ->where('inv_current_stock.store_id', $request->from_id)
-                ->where('inv_products.status', '=', 1)
+                ->where('inv_products.status', ' = ', 1)
                 ->groupby('inv_current_stock.product_id', 'inv_products.name', 'inv_products.pack_size')
                 ->limit(10)
                 ->get();
@@ -493,7 +501,7 @@ class StockTransferController extends Controller
             $unacknowledge = DB::table('inv_stock_transfers')
                 ->where('status','1')
                 ->where('evidence','<>','NULL')
-                ->where('transfer_no','=',$request->transfer_no)
+                ->where('transfer_no',' = ',$request->transfer_no)
                 ->get();
 
 
@@ -532,8 +540,8 @@ class StockTransferController extends Controller
 
         $stock_update = CurrentStock::find($request->stock_id);
 
-        $transfered_quantity = (int)str_replace(',','',$request->transfer_qty);
-        $received_quantity = (int)str_replace(',','',$request->transfer_qty);
+        $transfered_quantity = (int)str_replace(', ','',$request->transfer_qty);
+        $received_quantity = (int)str_replace(', ','',$request->transfer_qty);
 
         $remain_stock =  $transfered_quantity  - $received_quantity;
         $present_stock = $stock_update->quantity + $remain_stock;
@@ -567,7 +575,7 @@ class StockTransferController extends Controller
             ->first();
         $price = new PriceList;
         $price->stock_id = $current_stock->id;
-        $price->price = str_replace(',', '', $prev_price->price);
+        $price->price = str_replace(', ', '', $prev_price->price);
         $price->price_category_id = $prev_price->price_category_id;
         $price->status = 1;
         $price->created_at = date('Y-m-d H:m:s');
@@ -700,12 +708,12 @@ class StockTransferController extends Controller
                 'ts.name as to_store_name',
                 'u.name as created_by_name',
                 'up.name as updated_by_name',
-                DB::raw('COUNT(*) as total_products')
+                DB::raw('COUNT( * ) as total_products')
             )
-            ->join('inv_stores as fs', 'fs.id', '=', 't.from_store')
-            ->join('inv_stores as ts', 'ts.id', '=', 't.to_store')
-            ->join('users as u', 'u.id', '=', 't.created_by')
-            ->leftJoin('users as up', 'up.id', '=', 't.updated_by')
+            ->join('inv_stores as fs', 'fs.id', ' = ', 't.from_store')
+            ->join('inv_stores as ts', 'ts.id', ' = ', 't.to_store')
+            ->join('users as u', 'u.id', ' = ', 't.created_by')
+            ->leftJoin('users as up', 'up.id', ' = ', 't.updated_by')
             ->where('t.transfer_no', $transfer)
             ->groupBy('t.transfer_no', 't.from_store', 't.to_store', 't.created_at', 't.status', 't.remark', 't.evidence', 'fs.name', 'ts.name', 'u.name', 'up.name')
             ->first();
@@ -735,8 +743,8 @@ class StockTransferController extends Controller
                 'cs.unit_cost as unit_price',
                 DB::raw('t.transfer_qty * cs.unit_cost as total_price')
             )
-            ->join('inv_current_stock as cs', 'cs.id', '=', 't.stock_id')
-            ->join('inv_products as p', 'p.id', '=', 'cs.product_id')
+            ->join('inv_current_stock as cs', 'cs.id', ' = ', 't.stock_id')
+            ->join('inv_products as p', 'p.id', ' = ', 'cs.product_id')
             ->where('t.transfer_no', $transfer)
             ->get();
 
@@ -815,7 +823,7 @@ class StockTransferController extends Controller
             ]);
 
         $this->sendNotifications($transfer, 6, 'completed');
-        return response()->json(['message' => 'Transfer completed successfully']);
-    }
+        return response()->json(['message' => 'Transfer completed successfully' ] );
+        }
 
-}
+    }

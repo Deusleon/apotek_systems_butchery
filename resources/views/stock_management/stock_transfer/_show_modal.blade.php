@@ -1,5 +1,6 @@
 <!-- Show Stock Transfer Modal -->
-<div class="modal fade" id="showStockTransferModal" tabindex="-1" role="dialog" aria-labelledby="showStockTransferModalLabel" aria-hidden="true">
+<div class="modal fade" id="showStockTransferModal" tabindex="-1" role="dialog"
+    aria-labelledby="showStockTransferModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content shadow-sm border-0">
             <div class="modal-header bg-white text-white">
@@ -9,28 +10,37 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <strong>Transfer No:</strong>
-                        <p id="show_transfer_no"></p>
+                <div class="row">
+                    <div class="col-md-6">
+                        {{-- <div class="row mb-3"> --}}
+                            <div class="row">
+                                <strong class="col-md-4">Transfer No:</strong>
+                                <p id="show_transfer_no" class="text-body col-md-8"></p>
+                            </div>
+                            <div class="row">
+                                <strong class="col-md-4">From Store:</strong>
+                                <p id="show_from_store" class="text-body col-md-8"></p>
+                            </div>
+                            <div class="row">
+                                <strong class="col-md-4">To Store:</strong>
+                                <p id="show_to_store" class="text-body col-md-8"></p>
+                            </div>
+                            {{--
+                        </div> --}}
                     </div>
-                    <div class="col-md-4">
-                        <strong>From Store:</strong>
-                        <p id="show_from_store"></p>
-                    </div>
-                    <div class="col-md-4">
-                        <strong>To Store:</strong>
-                        <p id="show_to_store"></p>
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <strong>Status:</strong>
-                        <p id="show_status"></p>
-                    </div>
-                    <div class="col-md-8">
-                        <strong>Remarks:</strong>
-                        <p id="show_remarks"></p>
+                    <div class="col-md-6">
+                        <div class="row">
+                            <strong class="col-md-4">Status:</strong>
+                            <p id="show_status" class="text-body"></p>
+                        </div>
+                        <div class="row">
+                            <strong class="col-md-4">Remarks:</strong>
+                            <p id="show_remarks" class="text-body col-md-8"></p>
+                        </div>
+                        <div class="row">
+                            <strong class="col-md-4">Approved By:</strong>
+                            <p id="show_approved_by" class="text-body col-md-8"></p>
+                        </div>
                     </div>
                 </div>
                 <hr>

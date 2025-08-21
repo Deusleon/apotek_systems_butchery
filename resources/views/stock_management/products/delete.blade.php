@@ -17,8 +17,8 @@
                         <input type="hidden" name="product_id" id="product_id" value="">
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary btn-sm" data-dismiss="modal">No</button>
-                        <button type="submit" class="btn btn-danger btn-sm">Yes</button>
+                        <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">No</button>
+                        <button type="submit" class="btn btn-primary btn-sm">Yes</button>
                     </div>
                 </form>
 

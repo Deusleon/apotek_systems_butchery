@@ -15,6 +15,8 @@ use App\Http\Controllers\StockAdjustmentController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
+use App\Store;
 
 Route::post('/login', 'Auth\LoginController@login')->middleware('web');
 
@@ -34,7 +36,30 @@ Route::get('hardCodePwd','HomeController@hardCodePwd');
 
 Auth::routes(['register' => false]);
 
+// Change store routes
+Route::post('/set-current-store', function (Request $request) {
+    $user = Auth::user();
 
+    if ($user->store->name !== 'ALL') {
+        return response()->json(['error' => 'Not allowed'], 403);
+    }
+
+    $storeId = $request->input('store_id');
+
+    // Ensure store exists
+    if (!Store::find($storeId)) {
+        return response()->json(['error' => 'Invalid store'], 422);
+    }
+
+    session(['current_store_id' => $storeId]);
+
+    return response()->json([
+        'success' => true,
+        'current_store_id' => $storeId
+    ]);
+});
+
+Route::post('/change-store', [HomeController::class, 'changeStore'])->name('change_store');
 
 
 Route::middleware(["auth","main_branch"])->group(function () {
@@ -512,7 +537,7 @@ Route::middleware(["auth","main_branch"])->group(function () {
 
 
     /* Change Store */
-    Route::post('home/change_store',[HomeController::class,'changeStore'])->name('change_store');
+    // Route::post('home/change_store',[HomeController::class,'changeStore'])->name('change_store');
 
     /* Acknowledge all */
     Route::post('acknowledge-all',[StockTransferController::class,'acknowledgeAll'])->name('acknowledge-all');
