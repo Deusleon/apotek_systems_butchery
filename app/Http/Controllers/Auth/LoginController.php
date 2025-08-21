@@ -8,8 +8,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 
-class LoginController extends Controller
-{
+class LoginController extends Controller {
     /*
     |--------------------------------------------------------------------------
     | Login Controller
@@ -23,30 +22,20 @@ class LoginController extends Controller
 
     use AuthenticatesUsers;
 
-
     /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    public function login(Request $request)
-    {
+    * Handle a login request to the application.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+    *
+    * @throws \Illuminate\Validation\ValidationException
+    */
 
-//        $company = DB::table('users')->where('business_name',$request->facility)->first();
-//
-//        if ($company != null){
-//                session()->put('db_connection', $company->connection);
-//        }else {
-//                session()->flash('alert-warning','user created successfully!');
-//                return Redirect::back()->withErrors(['Business name not found']);
-//        }
+    public function login( Request $request ) {
 
-        session()->put('db_connection', 'demo');
+        session()->put( 'db_connection', 'demo' );
 
-        $this->validateLogin($request);
+        $this->validateLogin( $request );
 
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
@@ -71,33 +60,89 @@ class LoginController extends Controller
     }
 
 
-
-     /**
-     * Get the needed authorization credentials from the request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
-     */
-    protected function credentials(Request $request)
+    protected function authenticated(Request $request, $user)
     {
-        return ['email' => $request->{$this->username()}, 'password' => $request->password, 'status' => 1];
+        // Example you already set db_connection earlier in login() — keep or move here if you prefer
+        // session()->put('db_connection', 'demo');
+
+        // Ensure user has a store relationship
+        $store = null;
+        if ($user->relationLoaded('store')) {
+            $store = $user->store;
+        } else {
+            // attempt to load it safely
+            $store = $user->store()->first();
+        }
+
+        // If no store assigned, you may decide on default behaviour
+        if (!$store) {
+            // Option: set to null or a fallback id
+            session([
+                'current_store_id' => null,
+                'store' => null,
+            ]);
+            return null;
+        }
+
+        // If store name is 'ALL' (DB shows id = 1 for ALL), set special value.
+        // Be consistent: we'll use id = 1 to represent ALL ( same as your DB )
+        if ( strtoupper( $store->name ) === 'ALL' || $store->id == 1 ) {
+            session( [
+                'current_store_id' => 1,
+                'store' => 'ALL',
+            ] );
+        } else {
+            session( [
+                'current_store_id' => $store->id,
+                'store' => $store->name,
+            ] );
+        }
+
+        return null;
+    }
+    /**
+    * Override logout to clear session completely.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return \Illuminate\Http\Response
+    */
+
+    public function logout( Request $request ) {
+        $this->guard()->logout();
+
+        // Clear the session completely ( invalidate + regenerate token )
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect( '/login' );
     }
 
-
     /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/home';
+    * Get the needed authorization credentials from the request.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return array
+    */
+    protected function credentials( Request $request ) {
+        return [ 'email' => $request-> {
+            $this->username()}
+            , 'password' => $request->password, 'status' => 1 ];
+        }
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('guest')->except('logout');
+        /**
+        * Where to redirect users after login.
+        *
+        * @var string
+        */
+        protected $redirectTo = '/home';
+
+        /**
+        * Create a new controller instance.
+        *
+        * @return void
+        */
+
+        public function __construct() {
+            $this->middleware( 'guest' )->except( 'logout' );
+        }
     }
-}

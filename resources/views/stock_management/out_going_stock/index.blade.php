@@ -19,7 +19,7 @@
 @section("content")
 
     <style>
-        .datepicker > .datepicker-days {
+        .datepicker>.datepicker-days {
             display: block;
         }
 
@@ -46,26 +46,25 @@
             left: 50%;
             z-index: 100;
         }
-
     </style>
 
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
             <li class="nav-item">
                 <a class="nav-link text-uppercase" id="daily-stock-tablist" data-toggle="pill"
-                   href="{{ url('inventory/daily-stock-count') }}" role="tab"
-                   aria-controls="stock_adjustment" aria-selected="true">Daily Stock Count</a>
+                    href="{{ url('inventory/daily-stock-count') }}" role="tab" aria-controls="stock_adjustment"
+                    aria-selected="true">Daily Stock Count</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link active text-uppercase" id="outgoing-stock-tablist" data-toggle="pill"
-                   href="{{ url('inventory/out-going-stock') }}" role="tab"
-                   aria-controls="stock_list" aria-selected="false">Outgoing Stock
+                    href="{{ url('inventory/out-going-stock') }}" role="tab" aria-controls="stock_list"
+                    aria-selected="false">Outgoing Stock
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link text-uppercase" id="count-sheet-tablist"
-                   href="{{ url('inventory/inventory-count-sheet/Inventory Count Sheet') }}" role="tab"
-                   aria-controls="stock_list" aria-selected="false" target="_blank">Inventory Count Sheet
+                    href="{{ url('inventory/inventory-count-sheet/Inventory Count Sheet') }}" role="tab"
+                    aria-controls="stock_list" aria-selected="false" target="_blank">Inventory Count Sheet
                 </a>
             </li>
         </ul>
@@ -79,27 +78,41 @@
                         </div>
                         <div class="col-md-3" style="margin-left: 2.5%">
                             <label style="margin-left: 80%" for="issued_date"
-                                   class="col-form-label text-md-right">Date:</label>
+                                class="col-form-label text-md-right">Date:</label>
                         </div>
                         <div class="col-md-3" style="margin-left: -3.1%">
-                            <input style="width: 103.4%;" type="text" name="outgoing-date"
-                                   onchange="getOutgoingDate()"
-                                   class="form-control" id="outgoing-date" value=""/>
+                            <input style="width: 103.4%;" type="text" name="outgoing-date" onchange="getOutgoingDate()"
+                                class="form-control" id="outgoing-date" value="" />
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-6">
+
+                        </div>
+                        <div class="col-md-3">
+                            <div class="row justify-content-end">
+                                <label for="category" class="col-form-label text-md-right">Type:</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="category" class="js-example-basic-single form-control" id="category_id">
+                                <option name="store_name" value="1">Summary</option>
+                                <option name="store_name" value="0">Detailed</option>
+                            </select>
                         </div>
                     </div>
 
                     <div id="tbody" class="table-responsive">
-                        <table id="fixed-header" class="display table nowrap table-striped table-hover"
-                               style="width:100%">
+                        <table id="fixed-header" class="display table nowrap table-striped table-hover" style="width:100%">
 
                             <thead>
-                            <tr>
-                                <th>Product Name</th>
-                                <th>Out Mode</th>
-                                <th>Quantity</th>
-                                <th>User</th>
-                                <th>Out Date</th>
-                            </tr>
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Out Mode</th>
+                                    <th>Quantity</th>
+                                    <th>User</th>
+                                    <th>Out Date</th>
+                                </tr>
                             </thead>
 
                         </table>
@@ -108,16 +121,16 @@
 
                     <div id="tbodyRePrintFilter" style="display: none" class="table-responsive">
                         <table id="fixed-header-ledger" class="display table nowrap table-striped table-hover"
-                               style="width:100%">
+                            style="width:100%">
 
                             <thead>
-                            <tr>
-                                <th>Product Name</th>
-                                <th>Out Mode</th>
-                                <th>Quantity</th>
-                                <th>User</th>
-                                <th>Out Date</th>
-                            </tr>
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Out Mode</th>
+                                    <th>Quantity</th>
+                                    <th>User</th>
+                                    <th>Out Date</th>
+                                </tr>
                             </thead>
                             <tbody>
 
@@ -134,40 +147,40 @@
             </div>
         </div>
 
-        @endsection
+@endsection
 
 
 
 
-        @push("page_scripts")
-            <script src="{{asset("assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js")}}"></script>
-            <script src="{{asset("assets/js/pages/ac-datepicker.js")}}"></script>
+    @push("page_scripts")
+        <script src="{{asset("assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js")}}"></script>
+        <script src="{{asset("assets/js/pages/ac-datepicker.js")}}"></script>
 
-            @include('partials.notification')
+        @include('partials.notification')
 
 
-            <script type="text/javascript">
-                var config = {
-                    routes: {
-                        ledgerShow: '{{ route('outgoing-stock-show') }}'
-                    }
-                };
+        <script type="text/javascript">
+            var config = {
+                routes: {
+                    ledgerShow: '{{ route('outgoing-stock-show') }}'
+                }
+            };
 
-            </script>
+        </script>
 
-            <script src="{{asset("assets/apotek/js/outgoing-stock.js")}}"></script>
+        <script src="{{asset("assets/apotek/js/outgoing-stock.js")}}"></script>
 
-            <script>
-                $(document).ready(function() {
-                    // Listen for the click event on the Transfer History tab
-                    $('#daily-stock-tablist').on('click', function(e) {
-                        e.preventDefault(); // Prevent default tab switching behavior
-                        var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
-                        window.location.href = redirectUrl; // Redirect to the URL
-                    });
-
+        <script>
+            $(document).ready(function () {
+                // Listen for the click event on the Transfer History tab
+                $('#daily-stock-tablist').on('click', function (e) {
+                    e.preventDefault(); // Prevent default tab switching behavior
+                    var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
+                    window.location.href = redirectUrl; // Redirect to the URL
                 });
-            </script>
+
+            });
+        </script>
 
 
     @endpush
