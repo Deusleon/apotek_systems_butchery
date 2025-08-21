@@ -42,7 +42,7 @@
         <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade show active" id="order-receive">
                 <div class="table-responsive" id="purchases">
-                    <table id="orders_table" class="display table table-hover table-bordered align-middle"
+                    <table id="orders_table" class="display table nowrap table-striped table-hover"
                            style="width:100%">
                         <thead>
                         <tr>
@@ -50,7 +50,7 @@
                             <th>Supplier</th>
                             <th>Date</th>
                             <th class="text-right">Amount</th>
-                            <th class="text-center">Progress</th> <!-- Status column renamed to look meaningful -->
+                            <th class="text-center">Status</th> <!-- Status column renamed to look meaningful -->
                             <th class="text-center">Actions</th> <!-- Actions column -->
                         </tr>
                         </thead>
@@ -67,8 +67,8 @@
     <div class="modal fade" id="receiveOrderModal" tabindex="-1" role="dialog" aria-labelledby="receiveOrderModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document"> <!-- Smaller & centered -->
             <div class="modal-content shadow-lg rounded">
-                <div class="modal-header" style="background-color: #FF5252;">
-                    <h5 class="modal-title text-white" id="receiveOrderModalLabel">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="receiveOrderModalLabel">
                         <i class="feather icon-package mr-1"></i> Receive Purchase Order:
                         <span id="modal_order_number"></span>
                     </h5>
@@ -91,13 +91,13 @@
                             <table class="table table-sm table-striped table-bordered">
                                 <thead class="thead-light">
                                 <tr>
-                                    <th>Product (Pack Size)</th>
+                                    <th>Product Name</th>
                                     <th class="text-right">Ordered</th>
                                     <th class="text-right">Received</th>
-                                    <th class="text-right">Remaining</th>
-                                    <th class="text-right">Unit Price</th>
-                                    <th class="text-right">Total Price</th>
-                                    <th class="text-center">Receive Qty</th>
+                                    <th class="text-right d-none">Remaining</th>
+                                    <th class="text- d-none">Unit Price</th>
+                                    <th class="text-right d-none">Total Price</th>
+                                    <th class="text-center">Receive</th>
                                     <th class="text-center">Batch #</th>
                                     <th class="text-center">Expiry Date</th>
                                 </tr>
@@ -111,11 +111,11 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
-                        <i class="feather icon-x"></i> Cancel
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Cancel
                     </button>
-                    <button type="button" class="btn btn-success" id="proceed-receive-btn">
-                        <i class="feather icon-check-circle"></i> Confirm Receive
+                    <button type="button" class="btn btn-primary" id="proceed-receive-btn">
+                        Save
                     </button>
                 </div>
             </div>
@@ -151,26 +151,27 @@
                     }
                 },
                 {
-                    "data": "status", "className": "text-center",
+                    "data": "status", 
+                    "className": "text-center",
                     "render": function(data) {
-                    const badgeClass = "badge px-3 py-1";
-                    const style = "display:inline-block; min-width:110px;"; // fixed width
-                    if (data == '1') return `<span class='${badgeClass} badge-warning' style='${style}'>Pending</span>`;
-                    if (data == '2') return `<span class='${badgeClass} badge-info' style='${style}'>Partially</span>`;
-                    if (data == '3') return `<span class='${badgeClass} badge-success' style='${style}'>Completed</span>`;
-                    return `<span class='${badgeClass} badge-secondary' style='${style}'>Unknown</span>`;
-                   }
+                        const badgeClass = "badge btn-rounded btn-sm"; // Rounded & small like buttons
+                        const style = "display:inline-block; min-width:110px;"; // maintain fixed width
+                        if (data == '1') return `<span class='${badgeClass} badge-warning' style='${style}'>Pending</span>`;
+                        if (data == '2') return `<span class='${badgeClass} badge-info' style='${style}'>Partially</span>`;
+                        if (data == '3') return `<span class='${badgeClass} badge-success' style='${style}'>Completed</span>`;
+                        return `<span class='${badgeClass} badge-secondary' style='${style}'>Unknown</span>`;
+                    }
                 },
                 {
                 "data": null, "className": "text-center", "orderable": false,
                 "render": function(data, type, row) {
                     if (row.status == '3') {
-                        return `<button class="btn btn-sm btn-outline-success px-3 py-1" disabled>
-                                    <i class="feather icon-check"></i> Received
+                        return `<button class="btn btn-success btn-rounded btn-sm" disabled>
+                                     Received
                                 </button>`;
                     }
-                    return `<button class="btn btn-sm btn-primary receive-btn px-3 py-1" data-id="${row.id}">
-                                <i class="feather icon-package"></i> Receive
+                    return `<button class="btn btn-primary btn-rounded btn-sm receive-btn" data-id="${row.id}">
+                                 Receive
                             </button>`;
                 }
             }
@@ -210,9 +211,9 @@
                         <td>${item.product ? item.product.name : 'N/A'} (${item.pack_size || 'N/A'})</td>
                         <td class="text-right ordered-qty">${orderedQty}</td>
                         <td class="text-right received-qty-cell" data-initial-received="${receivedQty}">${receivedQty}</td>
-                        <td class="text-right remaining-qty-cell">${remaining}</td>
-                        <td class="text-right">${unitPrice.toLocaleString('en-US',{ minimumFractionDigits:2 })}</td>
-                        <td class="text-right">${totalPrice.toLocaleString('en-US',{ minimumFractionDigits:2 })}</td>
+                        <td class="text-right remaining-qty-cell d-none">${remaining}</td>
+                        <td class="text-right d-none">${unitPrice.toLocaleString('en-US',{ minimumFractionDigits:2 })}</td>
+                        <td class="text-right d-none">${totalPrice.toLocaleString('en-US',{ minimumFractionDigits:2 })}</td>
                         <td><input type="number" name="items[${index}][quantity]" 
                                    class="form-control form-control-sm text-center receive-qty-input"
                                    min="0" max="${remaining}" ${isFullyReceived?'disabled':''}></td>
@@ -254,7 +255,7 @@
 
             if (!hasQuantity) return alert('Please enter a quantity for at least one item to receive.');
 
-            $(this).prop('disabled', true).text('Processing...');
+            $(this).prop('disabled', true).text('Saving...');
             form.submit();
         });
 
@@ -265,7 +266,7 @@
         $('#receiveOrderModal').on('hidden.bs.modal', function() {
             $('#receiveOrderForm')[0].reset();
             $('#order_items_body').empty();
-            $('#proceed-receive-btn').prop('disabled', false).text('Confirm Receive');
+            $('#proceed-receive-btn').prop('disabled', false).text('Save');
         });
     });
 </script>
