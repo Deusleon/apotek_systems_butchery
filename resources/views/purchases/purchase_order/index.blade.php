@@ -193,6 +193,7 @@
                         </div>
                         @include('purchases.purchase_order_list.delete')
                         @include('purchases.purchase_order_list.details')
+                        @include('purchases.purchase_order_list.approve')
                     </div>
                     {{-- Order List End--}}
 

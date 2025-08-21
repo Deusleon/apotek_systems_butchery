@@ -252,18 +252,8 @@ $("#order_history_datatable tbody").on("click", "#cancel_btn", function () {
     $("#cancel-order").find(".modal-body #message").text(message);
     $("#cancel-order").find(".modal-body #delete_id").val(data.id);
 });
-
-$("#order_history_datatable tbody").on("click", "#print_btn", function () {
-    var data = order_history_datatable.row($(this).parents("tr")).data();
-    // var index =  order_history_datatable.row( $(this).parents('tr') ).index();
-    //     var print_data = [];
-    //     print_data.push(data);
-
-    document.getElementById("order_no").value = data.details[0].order_id;
-});
-
-// APPROVE inside modal
-$(document).on("click", "#approve_btn", function () {
+// --- Extract approval action so we can call it after confirmation ---
+function applyClientApprove() {
     if (!currentOrderData) return;
 
     // Mark as client-approved (frontend flag)
@@ -276,25 +266,55 @@ $(document).on("click", "#approve_btn", function () {
             .data(currentOrderData)
             .draw(false);
     }
+}
 
-    // Close the details modal
+// When user clicks Approve button inside details modal → open confirm modal
+$(document).on("click", "#approve_btn", function () {
+    if (!currentOrderData) return;
+
+    $("#approve_message").text(
+        "Are you sure you want to Approve Order '" +
+            currentOrderData.order_number +
+            "'?"
+    );
+
+    $("#approve-order").modal("show"); // <-- show confirm modal
     $("#purchases-details").modal("hide");
-
-    // OPTIONAL: If you want to persist approval in backend, uncomment this block and point to your route
-    /*
-    $.ajax({
-        url: '/purchase-order/approve', // <-- replace with your real route
-        type: 'POST',
-        data: {
-            _token: $('meta[name="csrf-token"]').attr('content'),
-            id: currentOrderData.id
-        },
-        success: function(resp){
-            // Optionally refresh or reflect new backend status
-        }
-    });
-    */
 });
+
+// If confirm → apply approve
+$(document)
+    .off("click", "#approve_yes_btn")
+    .on("click", "#approve_yes_btn", function () {
+        applyClientApprove();
+
+        //Success message
+        try {
+            if (window.toastr && typeof toastr.success === "function") {
+                toastr.success("Order approved successfully!");
+            } else if (typeof success_noti === "function") {
+                // if your notification.js exposes success_noti(...)
+                success_noti("Order approved successfully!");
+            } else if (typeof notify === "function") {
+                // some projects use notify(type, msg)
+                notify("success", "Order approved successfully!");
+            } else {
+                alert("Order approved successfully!");
+            }
+        } catch (e) {
+            console.log(e);
+        }
+        $("#approve-order").modal("hide");
+    });
+
+// If cancel → just close confirm, (optionally reopen details modal)
+$(document)
+    .off("click", "#approve_no_btn")
+    .on("click", "#approve_no_btn", function () {
+        $("#approve-order").modal("hide");
+        // If you prefer to reopen details modal:
+        // $("#purchases-details").modal("show");
+    });
 
 // CANCEL inside modal (open your existing cancel confirmation modal)
 $(document).on("click", "#cancel_btn_modal", function () {
