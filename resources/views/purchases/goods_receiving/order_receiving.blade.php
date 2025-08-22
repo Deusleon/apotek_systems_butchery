@@ -88,8 +88,8 @@
 
                         <!-- Order Items Table -->
                         <div class="table-responsive">
-                            <table class="table table-sm table-striped table-bordered">
-                                <thead class="thead-light">
+                            <table class="table table-sm table-striped">
+                                <thead>
                                 <tr>
                                     <th>Product Name</th>
                                     <th class="text-right">Ordered</th>

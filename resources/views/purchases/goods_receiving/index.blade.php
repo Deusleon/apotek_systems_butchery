@@ -281,7 +281,8 @@
             try {
                 document.getElementById('myFormId').reset();
                 document.getElementById("selected-product").value = '';
-                document.getElementById("invoicing_batch_n").value = '';
+                // REMOVE this line to prevent clearing the batch number
+                // document.getElementById("invoicing_batch_n").value = '';
                 document.getElementById("invoicing_purchase_date").value = '';
                 document.getElementById("total_selling_price").value = '0.00';
                 document.getElementById("total_buying_price").value = '0.00';
@@ -290,10 +291,12 @@
                 // console.log(e)
             }
 
-            // $('#store_id').val('').change();
-            $('#supplier_ids').val('').change();
-            // $('#good_receiving_supplier_ids').val('').change();
-            $('#invoice_id').val('').change();
+            // Reset select elements properly
+            $('#good_receiving_supplier_ids').val('').trigger('change');
+            $('#goodreceving_invoice_id').val('').trigger('change');
+            
+            // But preserve the batch number value from session
+            document.getElementById("invoicing_batch_n").value = "{{session('batch_number')}}";
         }
 
         var a = 1;
