@@ -1,5 +1,9 @@
 @extends("layouts.master")
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+
 @section('content-title')
     Goods Receiving
 @endsection
@@ -10,6 +14,46 @@
 @endsection
 
 @section("content")
+    <style>
+        /* Wrapper to control table height */
+        .receive-items-wrapper {
+            max-height: 350px;   /* adjust if needed */
+            overflow-y: auto;    /* enable vertical scroll only */
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+
+        /* Compact modal table */
+        .receive-items-table th,
+        .receive-items-table td {
+            padding: 6px 10px !important;  
+            vertical-align: middle !important;
+            white-space: nowrap;
+            font-size: 13px;
+        }
+
+        /* Fix table header without background color */
+        .receive-items-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background-color: transparent; /* no color */
+            border-bottom: 2px solid #dee2e6; /* keep bottom border for separation */
+        }
+
+        /* Inputs compact */
+        .receive-items-table input {
+            height: 30px;
+            padding: 2px 6px;
+            font-size: 13px;
+        }
+
+        .edit-mode-hidden {
+            display: none !important;
+        }
+
+
+    </style>
     <div class="col-sm-12">
         @if(Session::has('error'))
             <div class="alert alert-danger alert-top-right mx-auto" style="width: 70%">
@@ -72,7 +116,7 @@
                         <i class="feather icon-package mr-1"></i> Receive Purchase Order:
                         <span id="modal_order_number"></span>
                     </h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -86,24 +130,24 @@
                         <input type="hidden" name="supplier_id" id="modal_supplier_id">
                         <input type="hidden" name="order_id" id="modal_order_id">
 
-                        <!-- Order Items Table -->
-                        <div class="table-responsive">
-                            <table class="table table-sm table-striped">
+                       <!-- Order Items Table with fixed header -->
+                        <div class="receive-items-wrapper">
+                            <table class="table table-striped table-hover table-sm align-middle mb-0 receive-items-table" style="width:100%">
                                 <thead>
-                                <tr>
-                                    <th>Product Name</th>
-                                    <th class="text-right">Ordered</th>
-                                    <th class="text-right">Received</th>
-                                    <th class="text-right d-none">Remaining</th>
-                                    <th class="text- d-none">Unit Price</th>
-                                    <th class="text-right d-none">Total Price</th>
-                                    <th class="text-center">Receive</th>
-                                    <th class="text-center">Batch #</th>
-                                    <th class="text-center">Expiry Date</th>
-                                </tr>
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th class="text-right">Ordered</th>
+                                        <th class="text-right">Received</th>
+                                        <th class="text-right d-none">Remaining</th>
+                                        <th class="text-right d-none">Unit Price</th>
+                                        <th class="text-right d-none">Total Price</th>
+                                        <th class="text-center">Receive</th>
+                                        <th class="text-center">Batch #</th>
+                                        <th class="text-center">Expiry Date</th>
+                                    </tr>
                                 </thead>
                                 <tbody id="order_items_body">
-                                <!-- Injected by JavaScript -->
+                                    <!-- Injected by JavaScript -->
                                 </tbody>
                             </table>
                         </div>
@@ -111,10 +155,13 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">
                         Cancel
                     </button>
-                    <button type="button" class="btn btn-primary" id="proceed-receive-btn">
+                    <button type="button" class="btn btn-warning btn-sm" id="edit-receive-btn">
+                            Edit
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm" id="proceed-receive-btn">
                         Save
                     </button>
                 </div>
@@ -207,25 +254,33 @@
                 if (!isFullyReceived) hasReceivableItems = true;
 
                 detailsBody.append(`
-                    <tr>
-                        <td>${item.product ? item.product.name : 'N/A'} (${item.pack_size || 'N/A'})</td>
-                        <td class="text-right ordered-qty">${orderedQty}</td>
-                        <td class="text-right received-qty-cell" data-initial-received="${receivedQty}">${receivedQty}</td>
-                        <td class="text-right remaining-qty-cell d-none">${remaining}</td>
-                        <td class="text-right d-none">${unitPrice.toLocaleString('en-US',{ minimumFractionDigits:2 })}</td>
-                        <td class="text-right d-none">${totalPrice.toLocaleString('en-US',{ minimumFractionDigits:2 })}</td>
-                        <td><input type="number" name="items[${index}][quantity]" 
-                                   class="form-control form-control-sm text-center receive-qty-input"
-                                   min="0" max="${remaining}" ${isFullyReceived?'disabled':''}></td>
-                        <td><input type="text" name="items[${index}][batch_number]" 
-                                   class="form-control form-control-sm" ${isFullyReceived?'disabled':''}></td>
-                        <td><input type="date" name="items[${index}][expiry_date]" 
-                                   class="form-control form-control-sm" ${isFullyReceived?'disabled':''}></td>
-                        <input type="hidden" name="items[${index}][product_id]" value="${item.product_id}">
-                        <input type="hidden" name="items[${index}][purchase_order_detail_id]" value="${item.id}">
-                        <input type="hidden" name="items[${index}][cost_price]" value="${unitPrice}">
-                    </tr>
-                `);
+                <tr>
+                    <td>${item.product ? item.product.name : 'N/A'} (${item.pack_size || 'N/A'})</td>
+                    <td class="text-right ordered-qty">${orderedQty}</td>
+                    <td class="text-right received-qty-cell" data-initial-received="${receivedQty}">${receivedQty}</td>
+                    <td class="text-right remaining-qty-cell d-none">${remaining}</td>
+                    <td class="text-right d-none">${unitPrice.toLocaleString('en-US',{ minimumFractionDigits:2 })}</td>
+                    <td class="text-right d-none">${totalPrice.toLocaleString('en-US',{ minimumFractionDigits:2 })}</td>
+                    <td class="receive-cell text-center">
+                        <span class="plain-receive">${orderedQty}</span>
+                        <input type="text" name="items[${index}][quantity]" 
+                            class="form-control form-control-sm text-center receive-qty-input edit-mode-hidden"
+                            min="0" max="${remaining}" value="${orderedQty}" ${isFullyReceived?'disabled':''}>
+                    </td>
+                    <td>
+                        <input type="text" name="items[${index}][batch_number]" 
+                            class="form-control form-control-sm edit-mode-hidden" ${isFullyReceived?'disabled':''}>
+                    </td>
+                    <td>
+                        <input type="text" placeholder="YYYY/MM/DD" name="items[${index}][expiry_date]" 
+                            class="form-control form-control-sm edit-mode-hidden" ${isFullyReceived?'disabled':''}>
+                    </td>
+                    <input type="hidden" name="items[${index}][product_id]" value="${item.product_id}">
+                    <input type="hidden" name="items[${index}][purchase_order_detail_id]" value="${item.id}">
+                    <input type="hidden" name="items[${index}][cost_price]" value="${unitPrice}">
+                </tr>
+            `);
+
             });
 
             $('#proceed-receive-btn').prop('disabled', !hasReceivableItems);
@@ -268,6 +323,45 @@
             $('#order_items_body').empty();
             $('#proceed-receive-btn').prop('disabled', false).text('Save');
         });
+
+        // Initialize flatpickr on Expiry Date inputs
+        function initExpiryDatePickers() {
+            flatpickr("input[name*='[expiry_date]']", {
+                dateFormat: "Y-m-d",
+                allowInput: true,    // allows typing if needed
+                defaultDate: null    // starts empty
+            });
+        }
+
+        // Call this every time the modal opens
+        $('#receiveOrderModal').on('shown.bs.modal', function() {
+            initExpiryDatePickers();
+        });
+
+        // Edit button click
+        $('#edit-receive-btn').on('click', function() {
+            $('#order_items_body tr').each(function() {
+                const $row = $(this);
+                // Show inputs
+                $row.find('.receive-qty-input, [name*="[batch_number]"], [name*="[expiry_date]"]').removeClass('edit-mode-hidden');
+                // Hide plain text
+                $row.find('.plain-receive').hide();
+
+                // Get ordered quantity
+                const orderedQty = parseFloat($row.find('.ordered-qty').text()) || 0;
+
+                // Fill both receive input and received cell with ordered qty
+                $row.find('.receive-qty-input').val(orderedQty);
+                $row.find('.received-qty-cell').text(orderedQty);
+
+                // Also update remaining (if you want it visible)
+                $row.find('.remaining-qty-cell').text(0);
+            });
+
+            // Focus first receive input
+            $('#order_items_body tr:first .receive-qty-input').focus();
+        });
+
     });
 </script>
 @endpush
