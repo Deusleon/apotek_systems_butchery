@@ -63,8 +63,8 @@ class StockTransferController extends Controller {
                     'success' => true,
                     'message' => 'Stock transfer created successfully!',
                     'transfer_no' => $transfer_no,
-                    'redirect_to' => route( 'stock-transfer-pdf-gen', $transfer_no ),
-                    'history_url' => route( 'stock-transfer-history' )
+                    // 'redirect_to' => route( 'stock-transfer-pdf-gen', $transfer_no ),
+                    // 'history_url' => route( 'stock-transfer-history' )
                 ] );
             } catch ( Exception $e ) {
                 Log::error( 'Stock Transfer Creation Error: ' . $e->getMessage() );
@@ -127,11 +127,11 @@ class StockTransferController extends Controller {
 
     public function store(Request $request)
     {
-        Log::info("BodyOfRequest",['Data'=>$request->all()]);
+        // Log::info("BodyOfRequest",['Data'=>$request->all()]);
         
-        // Get default store
-        $default_store = Auth::user()->store->name ?? 'Default Store';
-        $stores = Store::where('name', $default_store)->first();
+        // // Get default store
+        // $default_store = Auth::user()->store->name ?? 'Default Store';
+        // $stores = Store::where('name', $default_store)->first();
         
         // Handle file upload
         $pictureName = null;
@@ -161,7 +161,7 @@ class StockTransferController extends Controller {
                 'to_store' => $request->to_id,
                 'status' => 1, // Created
                 'remarks' => $request->remark,
-                'updated_by' => $user_id,
+                // 'updated_by' => $user_id,
                 'created_by' => $user_id,
                 'created_at' => now(),
                 'evidence' => $pictureName
@@ -204,7 +204,7 @@ class StockTransferController extends Controller {
                     'to_store' => $save_data['to_store'],
                     'status' => $save_data['status'],
                     'remarks' => $save_data['remarks'],
-                    'updated_by' => $save_data['updated_by'],
+                    // 'updated_by' => $save_data['updated_by'],
                     'created_by' => $save_data['created_by'],
                     'created_at' => $save_data['created_at'],
                     'transfer_no' => $save_data['transfer_no'],
@@ -217,7 +217,7 @@ class StockTransferController extends Controller {
                     'product_id' => $save_data['product_id'],
                     'quantity' => $save_data['transfer_qty'],
                     'store_id' => $save_data['from_store'],
-                    'updated_by' => $save_data['updated_by'],
+                    'created_by' => $save_data['created_by'],
                     'out_mode' => 'Stock Transfer',
                     'updated_at' => date('Y-m-d'),
                     'movement' => 'OUT'
@@ -408,18 +408,26 @@ class StockTransferController extends Controller {
 
     public function stockTransferHistory()
     {
-        $store_id = Auth::user()->store_id;
+        $store_id = current_store_id();
         $stores = Store::where('name', '<>', 'ALL')->get();
 
-        // Get all transfers grouped by transfer_no, eager-loading relationships.
+        if ( is_all_store() ) {
+        // Get ALL transfers grouped by transfer_no
+        $transfers_groups = StockTransfer::with(['fromStore', 'toStore', 'currentStock.product'])
+            ->latest()
+            ->get()
+            ->groupBy('transfer_no');
+        }else{
+        // Get ONLY transfers that involve the current store
         $transfers_groups = StockTransfer::with(['fromStore', 'toStore', 'currentStock.product'])
             ->where(function ($query) use ($store_id) {
                 $query->where('from_store', $store_id)
-                      ->orWhere('to_store', $store_id);
+                    ->orWhere('to_store', $store_id);
             })
-            ->latest()->get()
+            ->latest()
+            ->get()
             ->groupBy('transfer_no');
-
+        }
         // Create a representative model for each group to display in the main table.
         $transfers = $transfers_groups->map(function ($group) {
             $repres = $group->first()->replicate(); // Use a replica to avoid overwriting original relations
@@ -453,23 +461,25 @@ class StockTransferController extends Controller {
     public function filterByStore(Request $request)
     {
         if ($request->ajax()) {
-
-
-            $products = CurrentStock::select(DB::raw('sum( quantity ) as quantity'),
-                DB::raw('product_id'), DB::raw('max( inv_current_stock.id ) as stock_id'), 'inv_products.name', 'inv_products.pack_size')
-                ->join('inv_products', 'inv_products.id', ' = ', 'inv_current_stock.product_id')
-                ->where('inv_current_stock.quantity', '>', '0')
-                ->where('inv_products.status', ' = ', 1)
+            $products = CurrentStock::select(
+                    DB::raw('SUM( inv_current_stock.quantity ) as quantity'),
+                    'inv_current_stock.product_id',
+                    DB::raw('MAX( inv_current_stock.id ) as stock_id'),
+                    'inv_products.name',
+                    'inv_products.pack_size',
+                    'inv_products.sales_uom'
+                )
+                ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                ->where('inv_current_stock.quantity', '>', 0)
+                ->where('inv_products.status', 1)
                 ->where('inv_current_stock.store_id', $request->from_id)
-                ->groupby('inv_current_stock.product_id', 'inv_products.name', 'inv_products.pack_size')
-                ->limit(10)
+                ->groupBy('inv_current_stock.product_id', 'inv_products.name', 'inv_products.pack_size')
+                // ->limit(10)
                 ->get();
 
-            foreach ($products as $product) {
-                $product->product;
-            }
-            return json_decode($products, true);
+            return response()->json($products);
         }
+
     }
 
     public function filterByWord(Request $request)

@@ -5,52 +5,55 @@ var option_data;
 
 var t = 0;
 
-var cart_table = $('#cart_table').DataTable({
+var cart_table = $("#cart_table").DataTable({
     searching: false,
     bPaginate: false,
     bInfo: false,
     bSort: false,
-    order: [[0, 'desc']],
+    order: [[0, "desc"]],
     language: {
-        'emptyTable': "Add products to transfer"
+        emptyTable: "Add products to transfer",
     },
     data: cart,
     columns: [
-        {title: "Product Name"},
+        { title: "Product Name" },
         {
-            title: "QOH", render: function (num) {
+            title: "QOH",
+            render: function (num) {
                 return numberWithCommas(num);
-            }
+            },
         },
-        {title: "Transfer Quantity"},
-        {title: "Product Id"},
-        {title: "Stock Id"},
+        { title: "Transfer Quantity" },
+        { title: "Product Id" },
+        { title: "Stock Id" },
         {
-            title: "Action", defaultContent: "<div>" +
+            title: "Action",
+            defaultContent:
+                "<div>" +
                 "<input type='button' value='Edit' id='edit_btn' class='btn btn-info btn-rounded btn-sm'/>" +
                 "<input type='button' value='Delete' id='delete_btn' class='btn btn-danger btn-rounded btn-sm'/>" +
-                "</div>"
-        }
+                "</div>",
+        },
     ],
-    "columnDefs": [
+    columnDefs: [
         {
-            "targets": [3],
-            "visible": false,
-            "searchable": false
-        }, {
-            "targets": [4],
-            "visible": false,
-            "searchable": false
-        }
-    ]
+            targets: [3],
+            visible: false,
+            searchable: false,
+        },
+        {
+            targets: [4],
+            visible: false,
+            searchable: false,
+        },
+    ],
 });
-
 
 function calculateCart() {
     if (cart.length === 0) {
-        $('#from_id').prop('disabled', false);
+        $("#from_id").prop("disabled", false);
     } else {
-        $('#from_id').prop('disabled', true);
+        $("#from_id").prop("disabled", true);
     }
 
     var total = 0;
@@ -58,27 +61,30 @@ function calculateCart() {
 
     var stringified_cart;
     if (cart[0]) {
+        var reduced__obj_cart = {},
+            incremental_cart;
 
-        var reduced__obj_cart = {}, incremental_cart;
-
-        for (var i = 0, c; c = cart[i]; ++i) {
-
+        for (var i = 0, c; (c = cart[i]); ++i) {
             if (undefined === reduced__obj_cart[c[0]]) {
                 reduced__obj_cart[c[0]] = c;
             } else {
-                reduced__obj_cart[c[0]][2] = Number(reduced__obj_cart[c[0]][2].toString().replace(',', '')) + Number(c[2]);
+                reduced__obj_cart[c[0]][2] =
+                    Number(
+                        reduced__obj_cart[c[0]][2].toString().replace(",", "")
+                    ) + Number(c[2]);
 
                 if (reduced__obj_cart[c[0]][2] > Number(c[1])) {
                     reduced__obj_cart[c[0]][2] = Number(c[1]);
                 }
 
-                reduced__obj_cart[c[0]][2] = numberWithCommas(reduced__obj_cart[c[0]][2]);
-
+                reduced__obj_cart[c[0]][2] = numberWithCommas(
+                    reduced__obj_cart[c[0]][2]
+                );
             }
         }
 
         incremental_cart = Object.keys(reduced__obj_cart).map(function (val) {
-            return reduced__obj_cart[val]
+            return reduced__obj_cart[val];
         });
 
         cart = incremental_cart;
@@ -88,10 +94,18 @@ function calculateCart() {
             sale_products.product_id = item[3];
             sale_products.stock_id = item[4];
             sale_products.quantityIn = item[1];
-            if (!((Number(item[2].toString().replace(',', '')) > Number(item[1])) || isNaN(item[2].toString().replace(',', '')))) {
-                sale_products.quantityTran = item[2].toString().replace(',', '');
+            if (
+                !(
+                    Number(item[2].toString().replace(",", "")) >
+                        Number(item[1]) ||
+                    isNaN(item[2].toString().replace(",", ""))
+                )
+            ) {
+                sale_products.quantityTran = item[2]
+                    .toString()
+                    .replace(",", "");
             }
-            if (isNaN(item[2].toString().replace(',', ''))) {
+            if (isNaN(item[2].toString().replace(",", ""))) {
                 t = 0;
             }
             order_cart.push(sale_products);
@@ -100,30 +114,51 @@ function calculateCart() {
         stringified_cart = JSON.stringify(order_cart);
     }
     document.getElementById("order_cart").value = stringified_cart;
-
 }
 
 function rePopulateSelect2() {
     $("#select_id option").remove();
-    $('#select_id').append($('<option>', {
-        value: '',
-        text: 'Select Product',
-        selected: true
-    }));
+    $("#select_id").append(
+        $("<option>", {
+            value: "",
+            text: "Select Product",
+            selected: true,
+        })
+    );
     $.each(option_data, function (id, detail) {
+        var datas = JSON.stringify([
+            detail.product.name,
+            detail.quantity,
+            detail.product_id,
+            detail.stock_id,
+        ]);
 
-        var datas = JSON.stringify([detail.product.name, detail.quantity, detail.product_id, detail.stock_id]);
-
-        $('#select_id').append($('<option>', {value: datas, text: detail.product.name}));
+        $("#select_id").append(
+            $("<option>", {
+                value: datas,
+                text:
+                    detail.product.name +
+                    " " +
+                    detail.brand +
+                    " " +
+                    detail.pack_size +
+                    detail.sales_uom,
+            })
+        );
     });
 }
 
-$(document).on('change', '#select_id', function () {
+$(document).on("change", "#select_id", function () {
     val();
 });
 
+$(document).on("change", "#from_id", function () {
+    var selected_from = $(this).val();
+    filterTransferByStore(selected_from);
+});
+
 function val() {
-    $('#edit_quantity').change();
+    $("#edit_quantity").change();
     var item = [];
     var cart_data = [];
     var sale_product = {};
@@ -131,8 +166,8 @@ function val() {
     if (!product) return;
 
     // rePopulateSelect2();
-    $('#select_id').val('');
-    var selected_fields = product.split(',');
+    $("#select_id").val("");
+    var selected_fields = product.split(",");
     var item_name = selected_fields[0];
     var price = Number(selected_fields[1]);
     var product_id = Number(selected_fields[2]);
@@ -150,20 +185,33 @@ function val() {
     cart_table.clear();
     cart_table.rows.add(cart);
     cart_table.draw();
-
 }
-
 
 function deselect() {
     cart = [];
     default_cart = [];
     calculateCart();
 
-    $('#remarks').val('');
-    $('#evidence').val('');
-    $('#to_id').val(0).change();
-    $('#from_id').val(0).change();
-    $('#select_id').prop('disabled', true);
+    $("#remarks").val("");
+    $("#evidence").val("");
+    $("#to_id").val(0).change();
+
+    const current_store = window.currentStore;
+    const selected_from = parseInt(current_store.id);
+    if (selected_from === 1) {
+        $("#from_id").val(0).change();
+        $("#select_id").prop("disabled", true);
+    }
+    filterTransferByStore(selected_from);
+    $("#select_id").empty();
+    $("#select_id").append(
+        $("<option>", {
+            value: "",
+            text: "Select Product...",
+            selected: true,
+            disabled: true,
+        })
+    );
 
     var stringified_cart = JSON.stringify(cart);
     document.getElementById("order_cart").value = stringified_cart;
@@ -172,14 +220,15 @@ function deselect() {
     cart_table.draw();
 }
 
-$('#cart_table tbody').on('click', '#edit_btn', function () {
+$("#cart_table tbody").on("click", "#edit_btn", function () {
     var quantity;
     if (t === 0) {
         /*not set then set it*/
-        var row_data = cart_table.row($(this).parents('tr')).data();
-        var index = cart_table.row($(this).parents('tr')).index();
-        quantity = row_data[2].toString().replace(',', '');
-        row_data[2] = "<div><input style='width: 50%' type='text' min='1' class='form-control' id='edit_quantity' onkeypress='return isNumberKey(event,this)' required/><span id='span_danger' style='display: none; color: red; font-size: 0.9em;'></span></div>";
+        var row_data = cart_table.row($(this).parents("tr")).data();
+        var index = cart_table.row($(this).parents("tr")).index();
+        quantity = row_data[2].toString().replace(",", "");
+        row_data[2] =
+            "<div><input style='width: 50%' type='text' min='1' class='form-control' id='edit_quantity' onkeypress='return isNumberKey(event,this)' required/><span id='span_danger' style='display: none; color: red; font-size: 0.9em;'></span></div>";
         cart[index] = row_data;
         cart_table.clear();
         cart_table.rows.add(cart);
@@ -187,33 +236,43 @@ $('#cart_table tbody').on('click', '#edit_btn', function () {
         document.getElementById("edit_quantity").value = quantity;
 
         t = 1;
-
     } else {
-        $('#edit_quantity').change();
+        $("#edit_quantity").change();
     }
-
 });
 
-
-//multiply quantity with amount....in stock transfer i don not need it
-$('#cart_table tbody').on('change', '#edit_quantity', function () {
+$("#cart_table tbody").on("change", "#edit_quantity", function () {
     t = 0;
-    var row_data = cart_table.row($(this).parents('tr')).data();
-    var index = cart_table.row($(this).parents('tr')).index();
+    var row_data = cart_table.row($(this).parents("tr")).data();
+    var index = cart_table.row($(this).parents("tr")).index();
 
-    row_data[2] = numberWithCommas(document.getElementById("edit_quantity").value);
+    row_data[2] = numberWithCommas(
+        document.getElementById("edit_quantity").value
+    );
 
-    if (Number(parseFloat(row_data[2].replace(/\,/g, ''), 10)) > Number(row_data[1])) {
-        document.getElementById("edit_quantity").style.borderColor = 'red';
-        document.getElementById("span_danger").style.display = 'block';
-        $('#span_danger').text('Maximum quantity is ' + Math.floor(row_data[1]));
+    if (
+        Number(parseFloat(row_data[2].replace(/\,/g, ""), 10)) >
+        Number(row_data[1])
+    ) {
+        document.getElementById("edit_quantity").style.borderColor = "red";
+        document.getElementById("span_danger").style.display = "block";
+        $("#span_danger").text(
+            "Maximum quantity is " + Math.floor(row_data[1])
+        );
         row_data[2] = row_data[2];
-        $('#transfer_preview').prop('disabled', true);
+        $("#transfer_preview").prop("disabled", true);
+        return;
+    } else if (Number(parseFloat(row_data[2].replace(/\,/g, ""), 10)) <= 0) {
+        document.getElementById("edit_quantity").style.borderColor = "red";
+        document.getElementById("span_danger").style.display = "block";
+        $("#span_danger").text("Minimum quantity is 1");
+        row_data[2] = row_data[2];
+        $("#transfer_preview").prop("disabled", true);
         return;
     }
 
-    document.getElementById("span_danger").style.display = 'none';
-    $('#transfer_preview').prop('disabled', false);
+    document.getElementById("span_danger").style.display = "none";
+    $("#transfer_preview").prop("disabled", false);
 
     cart[index] = row_data;
     calculateCart();
@@ -222,9 +281,9 @@ $('#cart_table tbody').on('change', '#edit_quantity', function () {
     cart_table.draw();
 });
 
-$('#cart_table tbody').on('click', '#delete_btn', function () {
+$("#cart_table tbody").on("click", "#delete_btn", function () {
     t = 0;
-    var index = cart_table.row($(this).parents('tr')).index();
+    var index = cart_table.row($(this).parents("tr")).index();
     cart.splice(index, 1);
     default_cart.splice(index, 1);
     calculateCart();
@@ -233,34 +292,56 @@ $('#cart_table tbody').on('click', '#delete_btn', function () {
     cart_table.draw();
 });
 
-$('#deselect-all').on('click', function () {
+$("#deselect-all").on("click", function () {
     deselect();
 });
 
-$('#transfer').on('submit', function (e) {
+$("#transfer").on("submit", function (e) {
     e.preventDefault();
 
     var check_cart = document.getElementById("order_cart").value;
 
+    var to_id = document.getElementById("to_id").value;
+    var from_id = document.getElementById("from_id").value;
+
+    if (from_id === "0") {
+        notify("Please select source branch", "top", "right", "warning");
+        return;
+    }
+    if (to_id === "0") {
+        notify("Please select destination branch", "top", "right", "warning");
+        return;
+    }
+
     //if cart is empty, then dont submit form
-    if (check_cart === '') {
-        $('#from_id').prop('disabled', false);
-        notify('Please complete transfer', 'top', 'right', 'warning');
+    if (check_cart === "") {
+        $("#from_id").prop("disabled", false);
+        notify(
+            "Please select products to complete transfer",
+            "top",
+            "right",
+            "warning"
+        );
         return false;
     }
 
     var check_cart_to_array;
-    if (check_cart === 'undefined') {
+    if (check_cart === "undefined") {
         check_cart_to_array = [];
     } else {
         check_cart_to_array = JSON.parse(check_cart);
     }
 
-
     //check if cart is empty []
     if (!(check_cart_to_array && check_cart_to_array.length)) {
-        notify('Transfer list is empty', 'top', 'right', 'warning');
-        $('#from_id').prop('disabled', false);
+        notify(
+            "Transfer list is empty! Please select products to complete transfer",
+            "top",
+            "right",
+            "warning"
+        );
+        $("#from_id").prop("disabled", false);
+        $("#to_id").prop("disabled", false);
         return false;
     }
 
@@ -268,59 +349,63 @@ $('#transfer').on('submit', function (e) {
         var from = document.getElementById("from_id");
         var from_id = from.options[from.selectedIndex].value;
         var to = document.getElementById("to_id");
-        var to_id = to.options[to.selectedIndex].value
-
-
+        var to_id = to.options[to.selectedIndex].value;
     } catch (e) {
-        notify('Please select From and To store', 'top', 'right', 'warning');
-        $('#from_id').prop('disabled', true);
+        notify("Something went wrong! Try again.", "top", "right", "warning");
+        // $("#from_id").prop("disabled", true);
         return false;
     }
-
 
     //check_cart if store are the same
     if (Number(from_id) === 0 && Number(to_id) === 0) {
-        document.getElementById('from_danger').style.display = 'block';
-        document.getElementById('to_danger').style.display = 'block';
-        document.getElementById('border').style.borderColor = 'red';
-        document.getElementById('to_border').style.borderColor = 'red';
-        $('#from_id').prop('disabled', true);
+        document.getElementById("from_danger").style.display = "block";
+        document.getElementById("to_danger").style.display = "block";
+        document.getElementById("border").style.borderColor = "red";
+        document.getElementById("to_border").style.borderColor = "red";
+        $("#from_id").prop("disabled", true);
         return false;
     }
 
-    document.getElementById('from_danger').style.display = 'none';
-    document.getElementById('to_danger').style.display = 'none';
-    document.getElementById('border').style.borderColor = 'white';
-    document.getElementById('to_border').style.borderColor = 'white';
-
+    document.getElementById("from_danger").style.display = "none";
+    document.getElementById("to_danger").style.display = "none";
+    document.getElementById("border").style.borderColor = "white";
+    document.getElementById("to_border").style.borderColor = "white";
 
     //check_cart the cart array if quantity tran is missing
     var tran = "quantityTran";
 
     for (var key in check_cart_to_array) {
-
         if (check_cart_to_array[key].hasOwnProperty(tran)) {
             //present
-            if (check_cart_to_array[key][tran] === '') {
-                notify('Minimum transfer quantity is 1', 'top', 'right', 'warning');
-                $('#from_id').prop('disabled', true);
+            if (check_cart_to_array[key][tran] === "") {
+                notify(
+                    "Minimum transfer quantity is 1",
+                    "top",
+                    "right",
+                    "warning"
+                );
+                $("#from_id").prop("disabled", true);
                 return false;
             } else if (check_cart_to_array[key][tran] === Number(0)) {
-                notify('Cannot transfer 0 quantity', 'top', 'right', 'warning');
-                $('#from_id').prop('disabled', true);
+                notify("Cannot transfer 0 quantity", "top", "right", "warning");
+                $("#from_id").prop("disabled", true);
                 return false;
             }
         } else {
             //not present
-            notify('Please check your transfer quantities', 'top', 'right', 'warning');
-            $('#from_id').prop('disabled', true);
+            notify(
+                "Please check your transfer quantities",
+                "top",
+                "right",
+                "warning"
+            );
+            $("#from_id").prop("disabled", true);
             return false;
         }
-
     }
 
     /*enable from select option*/
-    $('#from_id').prop('disabled', false);
+    $("#from_id").prop("disabled", false);
 
     // window.open('#', '_blank');
     // window.open(this.href, '_self');
@@ -328,9 +413,10 @@ $('#transfer').on('submit', function (e) {
 });
 
 function saveStockTransfer() {
-    var formData = new FormData($('#transfer')[0]);
+    $("#loading").show();
+    var formData = new FormData($("#transfer")[0]);
     var errorMessage = false;
-    $('#transfer_preview').attr('disabled', true);
+    $("#transfer_preview").attr("disabled", true);
 
     $.ajax({
         url: config.routes.stockTransferSave,
@@ -340,94 +426,108 @@ function saveStockTransfer() {
         processData: false,
         contentType: false,
         success: function (response) {
+            console.log("Stock transfer response:", response);
             if (response.success) {
-                notify(response.message || 'Stock transferred successfully', 'top', 'right', 'success');
-                
+                notify(
+                    response.message || "Stock transferred successfully",
+                    "top",
+                    "right",
+                    "success"
+                );
+
                 // Handle redirect options
-                if (response.redirect_to) {
-                    // Open PDF in new window
-                    window.open(response.redirect_to, '_blank');
-                }
-                
-                if (response.history_url) {
-                    // Redirect to history page after a short delay
-                    setTimeout(function() {
-                        window.location.href = response.history_url;
-                    }, 2000);
-                }
+                // if (response.redirect_to) {
+                //     // Open PDF in new window
+                //     window.open(response.redirect_to, "_blank");
+                // }
+
+                // if (response.history_url) {
+                //     // Redirect to history page after a short delay
+                //     setTimeout(function () {
+                //         window.location.href = response.history_url;
+                //     }, 2000);
+                // }
             } else {
-                notify(response.message || 'Failed to create stock transfer', 'top', 'right', 'danger');
+                notify(
+                    response.message || "Failed to create stock transfer",
+                    "top",
+                    "right",
+                    "danger"
+                );
             }
         },
         error: function (xhr, status, error) {
             errorMessage = true;
-            var message = 'Failed to create stock transfer!';
+            var message = "Failed to create stock transfer!";
             if (xhr.responseJSON && xhr.responseJSON.message) {
                 message = xhr.responseJSON.message;
             }
-            notify(message, 'top', 'right', 'danger');
+            notify(message, "top", "right", "danger");
         },
         complete: function () {
-            if(errorMessage === false) {
+            if (errorMessage === false) {
                 deselect();
             }
-            $('#transfer_preview').attr('disabled', false);
+            $("#transfer_preview").attr("disabled", false);
+            $('#loading').hide();
         },
-        timeout: 20000
+        timeout: 20000,
     });
 }
 
-
-// $('#to_id').prop('disabled', true);
-$('#select_id').prop('disabled', true);
-
-function filterTransferByStore() {
-    var from = document.getElementById('from_id');
-
-    if (!from.value || from.value == 0) {
+function filterTransferByStore(from_id) {
+    if (!from_id || from_id == 0) {
         return;
     }
 
-    var from_id = from.options[from.selectedIndex].value;
-
     /*ajax filter by store*/
-    $('#loading').show();
+    $("#loading").show();
     $.ajax({
         url: config.routes.filterByStore,
         type: "get",
         dataType: "json",
         data: {
-            from_id: from_id
+            from_id: from_id,
         },
         success: function (data) {
             option_data = data;
-            $('#to_id').prop('disabled', false);
-            $('#select_id').prop('disabled', false);
+            $("#to_id").prop("disabled", false);
+            $("#select_id").prop("disabled", false);
             $("#select_id option").remove();
-            $('#select_id').append($('<option>', {
-                value: '',
-                text: 'Select Product',
-                selected: false
-            }));
+            $("#select_id").append(
+                $("<option>", {
+                    value: "",
+                    text: "Select Product",
+                    selected: false,
+                })
+            );
             $.each(data, function (id, detail) {
+                var datas = JSON.stringify([
+                    detail.name,
+                    detail.quantity,
+                    detail.product_id,
+                    detail.stock_id,
+                ]);
 
-                var datas = JSON.stringify([detail.product.name, detail.quantity, detail.product_id, detail.stock_id]);
-
-                $('#select_id').append($('<option>', {value: datas, text: detail.product.name}));
+                $("#select_id").append(
+                    $("<option>", { value: datas, text: detail.name })
+                );
             });
         },
         complete: function () {
-            $('#loading').hide();
-        }
+            $("#loading").hide();
+        },
     });
-
 }
 
-$('#select_id').select2({
+$("#select_id").select2({
     language: {
         noResults: function () {
-            var search_input = $("#select_id").data('select2').$dropdown.find("input").val();
-            var from = document.getElementById('from_id');
+            var search_input = $("#select_id")
+                .data("select2")
+                .$dropdown.find("input")
+                .val();
+            var from = document.getElementById("from_id");
             var from_id = from.options[from.selectedIndex].value;
 
             /*make ajax call for more*/
@@ -437,27 +537,37 @@ $('#select_id').select2({
                 dataType: "json",
                 data: {
                     word: search_input,
-                    from_id: from_id
+                    from_id: from_id,
                 },
                 success: function (data) {
                     option_data = data;
                     $("#select_id option").remove();
-                    $('#select_id').append($('<option>', {
-                        value: '',
-                        text: 'Select Product'
-                    }));
+                    $("#select_id").append(
+                        $("<option>", {
+                            value: "",
+                            text: "Select Product",
+                        })
+                    );
                     $.each(data, function (id, detail) {
+                        var datas = JSON.stringify([
+                            detail.product.name,
+                            detail.quantity,
+                            detail.product_id,
+                            detail.stock_id,
+                        ]);
 
-                        var datas = JSON.stringify([detail.product.name, detail.quantity, detail.product_id, detail.stock_id]);
-
-                        $('#select_id').append($('<option>', {value: datas, text: detail.product.name}));
+                        $("#select_id").append(
+                            $("<option>", {
+                                value: datas,
+                                text: detail.product.name,
+                            })
+                        );
                     });
-                }
+                },
             });
-        }
-    }
+        },
+    },
 });
-
 
 function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
     try {
@@ -466,29 +576,38 @@ function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
 
         const negativeSign = amount < 0 ? "-" : "";
 
-        let i = parseInt(amount = Math.abs(Number(amount) || 0).toFixed(decimalCount)).toString();
-        let j = (i.length > 3) ? i.length % 3 : 0;
+        let i = parseInt(
+            (amount = Math.abs(Number(amount) || 0).toFixed(decimalCount))
+        ).toString();
+        let j = i.length > 3 ? i.length % 3 : 0;
 
-        return negativeSign + (j ? i.substr(0, j) + thousands : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) + (decimalCount ? decimal + Math.abs(amount - i).toFixed(decimalCount).slice(2) : "");
+        return (
+            negativeSign +
+            (j ? i.substr(0, j) + thousands : "") +
+            i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) +
+            (decimalCount
+                ? decimal +
+                  Math.abs(amount - i)
+                      .toFixed(decimalCount)
+                      .slice(2)
+                : "")
+        );
     } catch (e) {
-        console.log(e)
+        console.log(e);
     }
 }
 
 function numberWithCommas(digit) {
-    return String(parseFloat(digit)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return String(parseFloat(digit))
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 function isNumberKey(evt, obj) {
-    var charCode = (evt.which) ? evt.which : event.keyCode;
+    var charCode = evt.which ? evt.which : event.keyCode;
     var value = obj.value;
     var dotcontains = value.indexOf(".") !== -1;
-    if (dotcontains)
-        if (charCode === 46) return false;
+    if (dotcontains) if (charCode === 46) return false;
     if (charCode === 46) return true;
     return !(charCode > 31 && (charCode < 48 || charCode > 57));
-
 }
-
-
-

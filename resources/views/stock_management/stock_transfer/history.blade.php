@@ -130,7 +130,7 @@
                             @foreach($transfers as $transfer)
                                 <tr>
                                     <td>{{$transfer->transfer_no}}</td>
-                                                                        <td>{{ $transfer->created_at->format('d-m-Y') }}</td>
+                                                                        <td>{{ $transfer->created_at->format('Y-m-d') }}</td>
                                     <td>{{$transfer->total_products}}</td>
                                     <td align="left">
                                         <div style="margin-right: 50%">
@@ -146,7 +146,7 @@
                                     <td>
                                         @php
                                             $statuses = [
-                                                1 => ['name' => 'Created', 'class' => 'badge-secondary'],
+                                                1 => ['name' => 'created', 'class' => 'badge-secondary'],
                                                 2 => ['name' => 'Assigned', 'class' => 'badge-info'],
                                                 3 => ['name' => 'Approved', 'class' => 'badge-warning'],
                                                 4 => ['name' => 'In Transit', 'class' => 'badge-primary'],
