@@ -102,7 +102,7 @@
                                                 <option value="{{$store->id}}">{{$store->name}}</option>
                                             @endforeach
                                         </select>
-                                        {{-- <input id="initial_id" type="hidden" name="initial_to_id" value=""> --}}
+                                        <input type="hidden" id="current_store_id" value="{{ current_store()->id }}">
                                     </div>
                                     <span id="to_danger" style="display: none; font-size: 14px; color: red">Please choose
                                         branch</span>
@@ -117,9 +117,13 @@
                                             <option
                                                 value="{{$stock->product['name'] . ' ' . $stock->product['pack_size'] . ',' . $stock->quantity . ',' . $stock->product_id . ',' . $stock->stock_id}}">
                                                 {{$stock->product['name']}}
-                                                {{$stock->product['pack_size']}}{{$stock->product['sales_uom']}}
+                                                {{$stock->product['brand']}}
+                                                {{$stock->product['pack_size']}}{{$stock->product->sales_uom}}
                                             </option>
                                         @endforeach
+                                        <script>
+                                            console.log("Product: ", @json($products));
+                                        </script>
                                     </select>
                                 </div>
                             </div>
@@ -186,10 +190,7 @@
 
     <script type="text/javascript">
 
-        //dropdown in one remove in another
         var $from = $('#from_id');
-        var $to = $('#to_id');
-        var $to_options = $to.html();
 
         var config = {
             routes: {

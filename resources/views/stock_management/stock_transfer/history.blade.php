@@ -75,12 +75,6 @@
             </li>
         </ul>
         <div class="tab-content" id="myTabContent">
-            {{-- New Stock Transfer Start --}}
-            <div class="tab-pane fade" id="stock-transfer" role="tabpanel" aria-labelledby="stock_transfer-tab">
-                <p>New stock transfer form goes here. This is currently pointing to another page. You might want to create a dedicated view or include a form here.</p>
-                <a href="{{ route('stock-transfer.index') }}" class="btn btn-primary">Create New Transfer</a>
-            </div>
-
             {{-- Stock Transfer History Start --}}
             <div class="tab-pane fade show active" id="transfer-history" role="tabpanel" aria-labelledby="transfer-history-tab">
                 <div class="mb-3 bg-light">
@@ -109,11 +103,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="row" id="detail">
+                <div class="row ml-1 mr-1" id="detail">
                     <div style="display: block;" class="table-responsive">
                         <table id="fixed-header1" class="display table nowrap table-striped table-hover"
                                style="width:100%; ">
-
                             <thead>
                             <tr>
                                 <th>Transfer #</th>
@@ -128,7 +121,7 @@
                             </thead>
                             <tbody>
                             @foreach($transfers as $transfer)
-                                <tr>
+                                <tr class="p-0">
                                     <td>{{$transfer->transfer_no}}</td>
                                                                         <td>{{ $transfer->created_at->format('Y-m-d') }}</td>
                                     <td>{{$transfer->total_products}}</td>
@@ -143,22 +136,23 @@
                                         </div>
                                     </td>
 
-                                    <td>
+                                    <td class="justify-content-center">
                                         @php
                                             $statuses = [
-                                                1 => ['name' => 'created', 'class' => 'badge-secondary'],
-                                                2 => ['name' => 'Assigned', 'class' => 'badge-info'],
-                                                3 => ['name' => 'Approved', 'class' => 'badge-warning'],
-                                                4 => ['name' => 'In Transit', 'class' => 'badge-primary'],
-                                                5 => ['name' => 'Acknowledged', 'class' => 'badge-success'],
-                                                6 => ['name' => 'Completed', 'class' => 'badge-dark']
+                                                'created' => ['name' => 'Created', 'class' => 'badge-secondary'],
+                                                'assigned' => ['name' => 'Assigned', 'class' => 'badge-info'],
+                                                'approved' => ['name' => 'Approved', 'class' => 'badge-warning'],
+                                                'in_transit' => ['name' => 'In Transit', 'class' => 'badge-primary'],
+                                                'acknowledged' => ['name' => 'Acknowledged', 'class' => 'badge-success'],
+                                                'completed' => ['name' => 'Completed', 'class' => 'badge-dark'],
+                                                'cancelled' => ['name' => 'Cancelled', 'class' => 'badge-danger']
                                             ];
                                             $currentStatus = $transfer->status ?? 1;
                                             $statusInfo = $statuses[$currentStatus] ?? ['name' => 'Unknown', 'class' => 'badge-secondary'];
                                         @endphp
-                                        
-                                        <span class='badge {{ $statusInfo["class"] }}'>{{ $statusInfo["name"] }}</span>
-                                        
+
+                                        <button class='badge {{ $statusInfo["class"] }} btn btn-sm btn-rounded mt-2 p-2' style="width: 100px;">{{ $statusInfo["name"] }}</button>
+
                                         <!-- Status Workflow Buttons -->
                                         <div class="mt-1">
                                             @if($currentStatus == 1)
@@ -214,9 +208,9 @@
                                             @endif
                                         </div>
                                     </td>
-                                    <td>
+                                    <td class="">
                                         <!-- Show Button -->
-                                        <button type="button" class="btn btn-sm btn-rounded btn-success btn-show-transfer"
+                                        <button type="button" class="mt-2 btn btn-sm btn-rounded btn-success btn-show-transfer"
                                                 data-toggle="modal"
                                                 data-target="#showStockTransferModal"
                                                 data-transfer-no="{{ $transfer->transfer_no }}"
@@ -227,16 +221,22 @@
                                                 data-items='{{ json_encode($transfer->all_items->map(function($item) {
                                      return [
                                          'id' => $item->id,
-                                         'product_name' => optional(optional($item->currentStock)->product)->name,
+                                         'product_name' => 
+                                            optional(optional($item->currentStock)->product)->name . ' ' .
+                                            optional(optional($item->currentStock)->product)->brand . ' ' .
+                                            optional(optional($item->currentStock)->product)->pack_size.
+                                            optional(optional($item->currentStock)->product)->sales_uom,
                                          'quantity' => $item->transfer_qty,
                                          'accepted_qty' => $item->accepted_qty ?? 0,
                                      ];
                                 })) }}'               title="Show Details">
                                            Show
                                         </button>
-
+                                        <a href="{{ route('stock-transfer.edit') }}" class="mt-2 btn btn-sm btn-rounded btn-primary">
+                                            Edit
+                                        </a>
                                         <!-- Edit Button -->
-                                        <button type="button" class="btn btn-sm btn-rounded btn-primary btn-edit-transfer"
+                                        {{-- <button type="button" class="mt-2 btn btn-sm btn-rounded btn-primary btn-edit-transfer"
                                                 data-toggle="modal"
                                                 data-target="#editStockTransferModal"
                                                 data-update-url="{{ route('stock-transfer.update', $transfer->id) }}"
@@ -252,7 +252,7 @@
                                              ];
                                         })) }}'                  title="Edit Transfer">
                                              Edit
-                                        </button>
+                                        </button> --}}
                                     </td>
                                     <td hidden>{{ $transfer->created_at }}</td>
                                 </tr>
@@ -268,6 +268,7 @@
 
 @include('stock_management.stock_transfer._show_modal')
 @include('stock_management.stock_transfer._edit_modal')
+@include('stock_management.stock_transfer.confirm_modal')
 
 @endsection
 
@@ -280,7 +281,13 @@
 <script src="{{asset("assets/js/pages/ac-datepicker.js")}}"></script>
 
 <script>
-    $(document).ready(function() {
+    var config = {
+        routes: {
+            approveTransfer: '{{route('approve-transfer')}}'
+
+        }
+    };
+
         // Handle Show button click
         $('.btn-show-transfer').on('click', function() {
             const transferNo = $(this).data('transfer-no');
@@ -289,6 +296,22 @@
             const status = $(this).data('status');
             const remarks = $(this).data('remarks');
             const items = $(this).data('items');
+        $('#approve')
+            .data('transfer-no', transferNo)
+            .data('from-store', fromStore)
+            .data('to-store', toStore)
+            .data('status', status)
+            .data('remarks', remarks);
+            console.log('Transfer Status:', status);
+            if (status === 'Created') {
+                $('#close').hide();
+                $('#approve').show();
+                $('#cancel').show();
+            } else {
+                $('#close').show();
+                $('#approve').hide();
+                $('#cancel').hide();
+            }
 
             $('#show_transfer_no').text(transferNo);
             $('#show_from_store').text(fromStore);
@@ -309,9 +332,62 @@
                 });
             }
         });
+        
+        $('.btn-approve-transfer').on('click', function() {
+            const transferNo = $(this).data('transfer-no');
+            const action = $(this).data('action');
+            const status = $(this).data('status');
+            const fromStore = $(this).data('from-store');
+            const toStore = $(this).data('to-store');
+            
+            $('#showStockTransferModal').modal('hide');
 
-        // Handle Edit button click
-        $('.btn-edit-transfer').on('click', function() {
+            $('#showStockTransferModal').on('hidden.bs.modal', function () {
+                setTimeout(function() {
+                    $('#confirmModal').modal('show');
+                    $(this).off('hidden.bs.modal');
+                }, 0);
+            });
+
+            $('#confirm_transfer_no').val(transferNo);
+            $('#confirm_action').val(action);
+            $('#confirm_status').val(status);
+            $('#confirm_from_store').val(fromStore);
+            $('#confirm_to_store').val(toStore);
+            $('#confirm-modal-title').text('Approve Stock Transfer');
+            $('#confirm-message').text('Are you sure you want to approve this transfer from ' + fromStore + ' to ' + toStore + '?');
+        });
+
+function updateStatus(transferId, newStatus, action) {
+    if (!confirm('Are you sure you want to ' + action + ' this transfer?')) {
+        return;
+    }
+
+    $.ajax({
+        url: '/stock-transfer/' + transferId + '/' + action,
+        type: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}',
+            status: newStatus
+        },
+        success: function(response) {
+            toastr.success(response.message);
+            setTimeout(function() {
+                location.reload();
+            }, 1000);
+        },
+        error: function(xhr) {
+            if (xhr.responseJSON && xhr.responseJSON.error) {
+                toastr.error(xhr.responseJSON.error);
+            } else {
+                toastr.error('An error occurred while updating the status');
+            }
+        }
+    });
+}
+
+
+    $('.btn-edit-transfer').on('click', function() {
             const updateUrl = $(this).data('update-url');
             const transferNo = $(this).data('transfer-no');
             const fromStore = $(this).data('from-store');
@@ -346,7 +422,7 @@
                 itemsContainer.append(table);
             }
         });
-    });
+
 </script>
 
 
@@ -459,32 +535,32 @@
 
 @section('page_js')
 <script>
-function updateStatus(transferId, newStatus, action) {
-    if (!confirm('Are you sure you want to ' + action + ' this transfer?')) {
-        return;
-    }
+// function updateStatus(transferId, newStatus, action) {
+//     if (!confirm('Are you sure you want to ' + action + ' this transfer?')) {
+//         return;
+//     }
 
-    $.ajax({
-        url: '/stock-transfer/' + transferId + '/' + action,
-        type: 'POST',
-        data: {
-            _token: '{{ csrf_token() }}',
-            status: newStatus
-        },
-        success: function(response) {
-            toastr.success(response.message);
-            setTimeout(function() {
-                location.reload();
-            }, 1000);
-        },
-        error: function(xhr) {
-            if (xhr.responseJSON && xhr.responseJSON.error) {
-                toastr.error(xhr.responseJSON.error);
-            } else {
-                toastr.error('An error occurred while updating the status');
-            }
-        }
-    });
-}
+//     $.ajax({
+//         url: '/stock-transfer/' + transferId + '/' + action,
+//         type: 'POST',
+//         data: {
+//             _token: '{{ csrf_token() }}',
+//             status: newStatus
+//         },
+//         success: function(response) {
+//             toastr.success(response.message);
+//             setTimeout(function() {
+//                 location.reload();
+//             }, 1000);
+//         },
+//         error: function(xhr) {
+//             if (xhr.responseJSON && xhr.responseJSON.error) {
+//                 toastr.error(xhr.responseJSON.error);
+//             } else {
+//                 toastr.error('An error occurred while updating the status');
+//             }
+//         }
+//     });
+// }
 </script>
 @endsection

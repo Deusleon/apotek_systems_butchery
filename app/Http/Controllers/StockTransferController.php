@@ -82,6 +82,11 @@ class StockTransferController extends Controller {
     }
 
     protected function sendNotifications( $transfer, $status, $action ) {
+        Log::info( 'Sending stock transfer notifications', [
+            'transfer' => $transfer,
+            'status' => $status,
+            'action' => $action
+        ] );
         // Get users to notify based on the action
         $users = [];
 
@@ -116,7 +121,7 @@ class StockTransferController extends Controller {
         }
 
         // Send notifications only if users exist
-        if ($users->count() > 0) {
+        if (count($users) > 0) {
             try {
                 Notification::send($users, new StockTransferNotification($transfer, $status, $action));
             } catch (Exception $e) {
@@ -225,11 +230,11 @@ class StockTransferController extends Controller {
 
                 // Send notifications
                 $transfer = DB::table('inv_stock_transfers')->where('id', $transfer)->first();
-                $this->sendNotifications($transfer, 1, 'created');
+                $this->sendNotifications($transfer, 'created', 'created');
                 
                 // If approval is required, send approval notification
                 if (config('stock.require_transfer_approval', true)) {
-                    $this->sendNotifications($transfer, 1, 'needs_approval');
+                    $this->sendNotifications($transfer, 'created', 'needs_approval');
                 }
 
             } catch (\Exception $e) {
@@ -467,9 +472,10 @@ class StockTransferController extends Controller {
                     DB::raw('MAX( inv_current_stock.id ) as stock_id'),
                     'inv_products.name',
                     'inv_products.pack_size',
+                    'inv_products.brand',
                     'inv_products.sales_uom'
                 )
-                ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                ->join('inv_products', 'inv_products.id', ' = ', 'inv_current_stock.product_id')
                 ->where('inv_current_stock.quantity', '>', 0)
                 ->where('inv_products.status', 1)
                 ->where('inv_current_stock.store_id', $request->from_id)
@@ -687,26 +693,21 @@ class StockTransferController extends Controller {
     /**
      * Approve transfer
      */
-    public function approveTransfer(Request $request, $id)
+    public function approveTransfer(Request $request)
     {
-        $transfer = DB::table('inv_stock_transfers')->where('id', $id)->first();
-        
-        if (!in_array($transfer->status, [2, 3])) {
-            return response()->json(['error' => 'Transfer must be in Assigned or Approved status'], 400);
-        }
-
+        $order = $request->input('transfer_no');
+        $transfer = DB::table('inv_stock_transfers')->where('transfer_no', $order)->first();
+       
         DB::table('inv_stock_transfers')
-            ->where('id', $id)
+            ->where('transfer_no', $order)
             ->update([
-                'status' => 3, // Approved
+                'status' => 'approved',
                 'approved_by' => Auth::id(),
-                'approved_at' => now(),
-                'updated_by' => Auth::id(),
-                'updated_at' => now()
+                'approved_at' => now()
             ]);
 
-        $this->sendNotifications($transfer, 3, 'approved');
-        return response()->json(['message' => 'Transfer approved successfully']);
+        $this->sendNotifications($transfer, 'approved', 'approved');
+        return response()->json(['message' => 'Stock transfer approved successfully']);
     }
 
     public function showJson($transfer)

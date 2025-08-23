@@ -2,6 +2,8 @@ var cart = [];
 var default_cart = [];
 var order_cart = [];
 var option_data;
+const $to = $("#to_id");
+const TO_OPTIONS_HTML = $to.html();
 
 var t = 0;
 
@@ -128,6 +130,9 @@ function rePopulateSelect2() {
     $.each(option_data, function (id, detail) {
         var datas = JSON.stringify([
             detail.product.name,
+            detail.product.brand,
+            detail.product.pack_size,
+            detail.product.sales_uom,
             detail.quantity,
             detail.product_id,
             detail.stock_id,
@@ -148,39 +153,94 @@ function rePopulateSelect2() {
     });
 }
 
+$(document).ready(function () {
+    const current_store_id = parseInt($("#current_store_id").val(), 10) || 0;
+
+    if (current_store_id && current_store_id !== 1) {
+        $("#select_id").prop("disabled", false);
+        filterTransferByStore(current_store_id);
+    }
+
+    resetToOptions(current_store_id);
+});
+
 $(document).on("change", "#select_id", function () {
     val();
 });
 
 $(document).on("change", "#from_id", function () {
-    var selected_from = $(this).val();
+    const selected_from = parseInt($(this).val(), 10) || 0;
     filterTransferByStore(selected_from);
+    resetToOptions(selected_from);
 });
 
-function val() {
-    $("#edit_quantity").change();
-    var item = [];
-    var cart_data = [];
-    var sale_product = {};
-    var product = document.getElementById("select_id").value;
-    if (!product) return;
+function resetToOptions(storeIdToRemove) {
+    $to.html(TO_OPTIONS_HTML);
 
-    // rePopulateSelect2();
-    $("#select_id").val("");
-    var selected_fields = product.split(",");
-    var item_name = selected_fields[0];
-    var price = Number(selected_fields[1]);
-    var product_id = Number(selected_fields[2]);
-    var stock_id = Number(selected_fields[3]);
-    var quantity = 1;
-    item.push(item_name);
-    item.push(price);
-    item.push(quantity);
-    item.push(product_id);
-    item.push(stock_id);
-    cart_data.push(price);
+    if (storeIdToRemove && Number(storeIdToRemove) !== 0) {
+        $to.find('option[value="' + String(storeIdToRemove) + '"]').remove();
+    }
+
+    if ($.fn.select2 && $to.hasClass("select2-hidden-accessible")) {
+        $to.trigger("change.select2");
+    } else {
+        $to.trigger("change");
+    }
+}
+
+function val() {
+    // if edit input exists, trigger change to commit it
+    if ($("#edit_quantity").length) $("#edit_quantity").change();
+
+    var productValue = document.getElementById("select_id").value;
+    if (!productValue) return;
+
+    let selected_fields;
+    try {
+        if (
+            typeof productValue === "string" &&
+            productValue.trim().startsWith("[")
+        ) {
+            selected_fields = JSON.parse(productValue);
+        } else if (Array.isArray(productValue)) {
+            selected_fields = productValue;
+        } else {
+            selected_fields = String(productValue).split(",");
+        }
+    } catch (e) {
+        console.error("Failed to parse product:", productValue, e);
+        return;
+    }
+
+    const item_name =
+        selected_fields[0] +
+        " " +
+        selected_fields[1] +
+        " " +
+        selected_fields[2] +
+        selected_fields[3];
+    const QoH =
+        parseFloat(String(selected_fields[4] || 0).replace(/,/g, "")) || 0;
+    const product_id = Number(selected_fields[5]);
+    const stock_id = Number(selected_fields[6]);
+
+    console.log("Parsed selected product:", {
+        item_name,
+        QoH,
+        product_id,
+        stock_id,
+    });
+
+    const quantity = 1;
+
+    const item = [item_name, QoH, quantity, product_id, stock_id];
+
     cart.unshift(item);
-    default_cart.push(cart_data);
+    default_cart.unshift([QoH]);
+
+    // reset select
+    $("#select_id").val(null).trigger("change");
+
     calculateCart();
     cart_table.clear();
     cart_table.rows.add(cart);
@@ -196,8 +256,8 @@ function deselect() {
     $("#evidence").val("");
     $("#to_id").val(0).change();
 
-    const current_store = window.currentStore;
-    const selected_from = parseInt(current_store.id);
+    var current_store_id = $("#current_store_id").val();
+    const selected_from = parseInt(current_store_id);
     if (selected_from === 1) {
         $("#from_id").val(0).change();
         $("#select_id").prop("disabled", true);
@@ -357,7 +417,10 @@ $("#transfer").on("submit", function (e) {
     }
 
     //check_cart if store are the same
-    if (Number(from_id) === 0 && Number(to_id) === 0) {
+    if (
+        (Number(from_id) === 0 && Number(to_id) === 0) ||
+        Number(from_id) === Number(to_id)
+    ) {
         document.getElementById("from_danger").style.display = "block";
         document.getElementById("to_danger").style.display = "block";
         document.getElementById("border").style.borderColor = "red";
@@ -469,7 +532,7 @@ function saveStockTransfer() {
                 deselect();
             }
             $("#transfer_preview").attr("disabled", false);
-            $('#loading').hide();
+            $("#loading").hide();
         },
         timeout: 20000,
     });
@@ -491,6 +554,7 @@ function filterTransferByStore(from_id) {
         },
         success: function (data) {
             option_data = data;
+            console.log("Filtered products:", data);
             $("#to_id").prop("disabled", false);
             $("#select_id").prop("disabled", false);
             $("#select_id option").remove();
@@ -504,13 +568,25 @@ function filterTransferByStore(from_id) {
             $.each(data, function (id, detail) {
                 var datas = JSON.stringify([
                     detail.name,
+                    detail.brand,
+                    detail.pack_size,
+                    detail.sales_uom,
                     detail.quantity,
                     detail.product_id,
                     detail.stock_id,
                 ]);
 
                 $("#select_id").append(
-                    $("<option>", { value: datas, text: detail.name })
+                    $("<option>", {
+                        value: datas,
+                        text:
+                            detail.name +
+                            " " +
+                            detail.brand +
+                            " " +
+                            detail.pack_size +
+                            detail.sales_uom,
+                    })
                 );
             });
         },
@@ -551,6 +627,9 @@ $("#select_id").select2({
                     $.each(data, function (id, detail) {
                         var datas = JSON.stringify([
                             detail.product.name,
+                            detail.product.brand,
+                            detail.product.pack_size,
+                            detail.product.sales_uom,
                             detail.quantity,
                             detail.product_id,
                             detail.stock_id,

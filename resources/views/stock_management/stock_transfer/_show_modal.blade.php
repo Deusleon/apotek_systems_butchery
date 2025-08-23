@@ -10,7 +10,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="col">
+                <div class="col mb-2">
                     <div class="row">
                         <div class="col-4">
                             <strong class="">Transfer No:</strong>
@@ -40,8 +40,6 @@
                         </div>
                     </div>
                 </div>
-                {{-- <hr> --}}
-                {{-- <h6>Transferred Items</h6> --}}
                 <table class="display table nowrap table-striped table-hover">
                     <thead>
                         <tr>
@@ -55,7 +53,13 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="close" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="cancel" class="btn btn-danger" data-dismiss="modal">Reject</button>
+                <button type="button" id="approve" class="btn btn-primary btn-approve-transfer"
+                    data-target="#confirmModal" data-transfer-no="" data-action="approved" data-from-store="" data-to-store=""
+                    data-status="" title="Approve Transfer">
+                    Approve
+                </button>
             </div>
         </div>
     </div>
