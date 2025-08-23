@@ -244,7 +244,7 @@ $("#order_history_datatable tbody").on("click", "#cancel_btn", function () {
     var data = order_history_datatable.row($(this).parents("tr")).data();
     var index = order_history_datatable.row($(this).parents("tr")).index();
     $("#cancel-order").modal("show");
-    var message = "Are you sure you want to Cancel Order '".concat(
+    var message = "Are you sure you want to Reject Order '".concat(
         data.order_number,
         "'?"
     );
@@ -323,7 +323,7 @@ $(document).on("click", "#cancel_btn_modal", function () {
     // Open the already existing cancel confirm modal and reuse your original population logic
     $("#cancel-order").modal("show");
     var message =
-        "Are you sure you want to Cancel Order '" +
+        "Are you sure you want to Reject Order '" +
         currentOrderData.order_number +
         "'?";
     $("#cancel-order").find(".modal-body #message").text(message);

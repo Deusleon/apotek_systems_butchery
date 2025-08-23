@@ -113,7 +113,7 @@
             <div class="modal-content shadow-lg rounded">
                 <div class="modal-header">
                     <h5 class="modal-title" id="receiveOrderModalLabel">
-                        <i class="feather icon-package mr-1"></i> Receive Purchase Order:
+                        <i class="feather icon-package mr-1"></i>Purchase Order:
                         <span id="modal_order_number"></span>
                     </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">

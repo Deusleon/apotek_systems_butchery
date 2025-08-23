@@ -16,7 +16,7 @@
             <div class="modal-footer">
                 <!-- Cancel in modal (opens your existing cancel confirmation modal) -->
                 <button type="button" id="cancel_btn_modal" class="btn btn-danger">
-                    Cancel
+                    Reject
                 </button>
 
                  <!-- Approve in modal -->
