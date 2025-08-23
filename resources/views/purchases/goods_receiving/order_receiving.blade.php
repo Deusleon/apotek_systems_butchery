@@ -155,9 +155,6 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">
-                        Cancel
-                    </button>
                     <button type="button" class="btn btn-warning btn-sm" id="edit-receive-btn">
                             Edit
                     </button>
