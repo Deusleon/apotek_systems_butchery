@@ -106,23 +106,29 @@
                             </div>
                         </div>
                         <div class="col-md-2">
-                            <div class="form-group">
-                                @if($invoice_setting === 'YES')
-                                    <label for="code">Invoice # <font color="red">*</font></label>
-                                    <select name="invoice_no" class="form-control js-example-basic-single"
-                                        id="goodreceving_invoice_id" required>
-                                        <option selected="true" value="" disabled="disabled">Select Invoice..</option>
-                                    </select>
-                                @else
-                                    <label for="code">Invoice #</label>
-                                    <select name="invoice_no" class="form-control js-example-basic-single"
-                                        id="goodreceving_invoice_id">
-                                        <option selected="true" value="" disabled="disabled">Select Invoice..</option>
-
-                                    </select>
-                                @endif
-                            </div>
+                        <div class="form-group">
+                            @if($invoice_setting === 'YES')
+                                <label for="code">Invoice # <font color="red">*</font></label>
+                                <select name="invoice_no" class="form-control js-example-basic-single"
+                                    id="goodreceving_invoice_id" required>
+                                    <option selected="true" value="" disabled="disabled">Select Invoice..</option>
+                                    @foreach($invoices as $invoice)
+                                        <option value="{{ $invoice->id }}">{{ $invoice->invoice_no }} - {{ optional($invoice->supplier)->name }}</option>
+                                    @endforeach
+                                </select>
+                            @else
+                                <label for="code">Invoice #</label>
+                                <select name="invoice_no" class="form-control js-example-basic-single"
+                                    id="goodreceving_invoice_id">
+                                    <option selected="true" value="" disabled="disabled">Select Invoice..</option>
+                                    @foreach($invoices as $invoice)
+                                        <option value="{{ $invoice->id }}">{{ $invoice->invoice_no }} - {{ optional($invoice->supplier)->name }}</option>
+                                    @endforeach
+                                </select>
+                            @endif
                         </div>
+                    </div>
+
                         <div class="col-md-2">
                             <div class="form-group">
                                 @if($batch_setting === 'YES')
@@ -274,29 +280,37 @@
         });
 
         function resetForms() {
+            // Clear invoice table
             invoicecart_table.clear();
             invoicecart_table.draw();
+
+            // Reset cart arrays
             invoice_cart = [];
             invoice_cart_receiveds = [];
+
             try {
+                // Reset form fields except product & batch #
                 document.getElementById('myFormId').reset();
-                document.getElementById("selected-product").value = '';
-                // REMOVE this line to prevent clearing the batch number
-                // document.getElementById("invoicing_batch_n").value = '';
+
+                // Keep selected product untouched
+                // document.getElementById("selected-product").value = '';
+
+                // Preserve batch number
+                document.getElementById("invoicing_batch_n").value = "{{session('batch_number')}}";
+
+                // Clear dates & totals
                 document.getElementById("invoicing_purchase_date").value = '';
                 document.getElementById("total_selling_price").value = '0.00';
                 document.getElementById("total_buying_price").value = '0.00';
                 document.getElementById("sub_total").value = '0.00';
             } catch (e) {
-                // console.log(e)
+                console.error(e);
             }
 
             // Reset select elements properly
             $('#good_receiving_supplier_ids').val('').trigger('change');
             $('#goodreceving_invoice_id').val('').trigger('change');
             
-            // But preserve the batch number value from session
-            document.getElementById("invoicing_batch_n").value = "{{session('batch_number')}}";
         }
 
         var a = 1;
