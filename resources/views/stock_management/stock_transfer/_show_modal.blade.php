@@ -5,7 +5,7 @@
         <div class="modal-content shadow-sm border-0">
             <div class="modal-header bg-white text-white">
                 <h5 class="modal-title">Stock Transfer Details</h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -43,7 +43,7 @@
                 <table class="display table nowrap table-striped table-hover">
                     <thead>
                         <tr>
-                            <th>Product</th>
+                            <th>Product Name</th>
                             <th>Quantity</th>
                         </tr>
                     </thead>
@@ -53,13 +53,15 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <button type="button" id="close" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" id="cancel" class="btn btn-danger" data-dismiss="modal">Reject</button>
+                <button type="button" id="reject" class="btn btn-danger btn-reject-transfer"
+                    data-target="#confirmRejectModal" data-transfer-no="" data-action="cancelled" data-from-store=""
+                    data-to-store="" title="Reject Transfer">Reject</button>
                 <button type="button" id="approve" class="btn btn-primary btn-approve-transfer"
-                    data-target="#confirmModal" data-transfer-no="" data-action="approved" data-from-store="" data-to-store=""
-                    data-status="" title="Approve Transfer">
+                    data-target="#confirmModal" data-transfer-no="" data-action="approved" data-from-store=""
+                    data-to-store="" data-status="" title="Approve Transfer">
                     Approve
                 </button>
+                <button type="button" id="close" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

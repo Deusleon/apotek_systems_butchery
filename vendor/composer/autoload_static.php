@@ -33,6 +33,7 @@ class ComposerStaticInit7512b619ff658d5273426c72a6eca1d4
         '377b22b161c09ed6e5152de788ca020a' => __DIR__ . '/..' . '/spatie/laravel-permission/src/helpers.php',
         '0b47d6d4a00ca9112ba3953b49e7c9a4' => __DIR__ . '/..' . '/yajra/laravel-datatables-oracle/src/helper.php',
         'd21d43db5f6e840ee7b10744ec7fdf66' => __DIR__ . '/../..' . '/app/Helpers/helpers.php',
+        '00620ec3787303b77ee72cb3469bb395' => __DIR__ . '/../..' . '/app/Helpers/PermissionHelper.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -690,7 +691,6 @@ class ComposerStaticInit7512b619ff658d5273426c72a6eca1d4
         'App\\Http\\Middleware\\LogFileUpload' => __DIR__ . '/../..' . '/app/Http/Middleware/LogFileUpload.php',
         'App\\Http\\Middleware\\MainBranchMiddleware' => __DIR__ . '/../..' . '/app/Http/Middleware/MainBranchMiddleware.php',
         'App\\Http\\Middleware\\RedirectIfAuthenticated' => __DIR__ . '/../..' . '/app/Http/Middleware/RedirectIfAuthenticated.php',
-        'App\\Http\\Middleware\\SetCurrentStore' => __DIR__ . '/../..' . '/app/Http/Middleware/SetCurrentStore.php',
         'App\\Http\\Middleware\\TrimStrings' => __DIR__ . '/../..' . '/app/Http/Middleware/TrimStrings.php',
         'App\\Http\\Middleware\\TrustProxies' => __DIR__ . '/../..' . '/app/Http/Middleware/TrustProxies.php',
         'App\\Http\\Middleware\\VerifyCsrfToken' => __DIR__ . '/../..' . '/app/Http/Middleware/VerifyCsrfToken.php',

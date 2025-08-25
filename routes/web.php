@@ -339,6 +339,8 @@ Route::middleware(["auth","main_branch"])->group(function () {
     
     Route::post('inventory/stock-transfer-approve', 'StockTransferController@approveTransfer')->name('approve-transfer');
 
+    Route::post('inventory/stock-transfer-reject', 'StockTransferController@rejectTransfer')->name('reject-transfer');
+
     Route::get('inventory/stock-transfer_', 'StockTransferController@stockTransferHistory')->name('stock-transfer-history');
 
     Route::get('inventory/stock-transfer-filter-by-store', 'StockTransferController@filterByStore')->name('filter-by-store');

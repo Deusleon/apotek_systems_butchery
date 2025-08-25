@@ -21,7 +21,7 @@
                         <input type="hidden" name="confirm_action" id="confirm_action" value="">
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">No</button>
+                        <button type="button" id="close_confirm_modal" class="btn btn-danger btn-sm" data-dismiss="modal">No</button>
                         <button type="submit" class="btn btn-primary btn-sm">Yes</button>
                     </div>
                 </form>

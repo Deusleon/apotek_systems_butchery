@@ -113,17 +113,6 @@
                                     <label for="select_id">Products</label>
                                     <select id="select_id" name="select_id" class="form-control" disabled>
                                         <option selected="true" value="0" disabled>Select product...</option>
-                                        @foreach($products as $stock)
-                                            <option
-                                                value="{{$stock->product['name'] . ' ' . $stock->product['pack_size'] . ',' . $stock->quantity . ',' . $stock->product_id . ',' . $stock->stock_id}}">
-                                                {{$stock->product['name']}}
-                                                {{$stock->product['brand']}}
-                                                {{$stock->product['pack_size']}}{{$stock->product->sales_uom}}
-                                            </option>
-                                        @endforeach
-                                        <script>
-                                            console.log("Product: ", @json($products));
-                                        </script>
                                     </select>
                                 </div>
                             </div>
