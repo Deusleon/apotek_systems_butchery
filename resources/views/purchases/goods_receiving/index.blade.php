@@ -136,9 +136,7 @@
                                     <input type="text" name="batch_number" class="form-control" id="invoicing_batch_n"
                                         required="true" value="{{session('batch_number')}}" />
                                 @else
-                                    <label for="code">Batch #</label>
-                                    <input type="text" name="batch_number" class="form-control" id="invoicing_batch_n"
-                                        value="{{session('batch_number')}}" />
+                                    
                                 @endif
                             </div>
                         </div>

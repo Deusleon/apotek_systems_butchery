@@ -625,6 +625,9 @@ function goodReceivingFilterInvoiceBySupplier() {
     });
 }
 
+// Get expiry setting from hidden input
+var expiry_setting = $("#expire_date_enabler").val(); // will be 'YES' or 'NO'
+
 // InvoiceCartTable
 var invoicecart_table = $("#invoicecart_table").DataTable({
     searching: false,
@@ -657,7 +660,11 @@ var invoicecart_table = $("#invoicecart_table").DataTable({
         { title: "Quantity", data: "quantity" },
         { title: "Buy Price", data: "buying_price" },
         { title: "Sell Price", data: "selling_price" },
-        { title: "Expire  Date", data: "expire_date" },
+        {
+            title: "Expire Date",
+            data: "expire_date",
+            visible: expiry_setting.trim() === "YES", // trim to remove any whitespace
+        },
         {
             title: "Action",
             defaultContent:
