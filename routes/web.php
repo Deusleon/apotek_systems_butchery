@@ -348,11 +348,11 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::get('inventory/stock-transfer-filter-by-word', 'StockTransferController@filterByWord')->name('filter-by-word');
 
     /*Stock transfer acknowledge routes*/
-    Route::resource('inventor/stock-transfer-acknowledge', 'StockTransferAcknowledgeController')->only([
+    Route::resource('inventory/stock-transfer-acknowledge', 'StockTransferAcknowledgeController')->only([
         'store', 'update', 'destroy'
     ]);
 
-    Route::get('inventor/stock-transfer-acknowledge/{transfer_no}','StockTransferAcknowledgeController@index')->name('stock-transfer-acknowledge.index');
+    Route::get('inventory/stock-transfer-acknowledge/{transfer_no}','StockTransferAcknowledgeController@index')->name('stock-transfer-acknowledge.index');
 
     /*Re print transfer routes*/
     Route::resource('inventory/stock-transfer-reprint', 'RePrintTransferController')->only(['index']);

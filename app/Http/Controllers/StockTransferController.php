@@ -440,13 +440,15 @@ class StockTransferController extends Controller {
         // Collect unique approver IDs from all transfers (flatten groups first)
         $flattened = $transfers_groups->flatten(1); // collection of StockTransfer models
         $approverIds = $flattened->pluck('approved_by')->filter()->unique()->values()->all();
+        $cancellerIds = $flattened->pluck('cancelled_by')->filter()->unique()->values()->all();
 
         // Resolve User model from auth config (works for App\User or App\Models\User setups)
         $userModel = config('auth.providers.users.model');
 
         $approvers = [];
-        if (!empty($approverIds)) {
-            $approvers = $userModel::whereIn('id', $approverIds)->get()->keyBy('id');
+        if (!empty($approverIds) || !empty($cancellerIds)) {
+        $allIds = array_unique(array_merge($approverIds, $cancellerIds));
+        $approvers = $userModel::whereIn('id', $allIds)->get()->keyBy('id');
         }
 
         // Create a representative model for each group to display in the main table.
@@ -463,13 +465,16 @@ class StockTransferController extends Controller {
             $repres->all_items = $group;
 
             // get approver id from the group (first non-null approved_by)
-            $approverId = $group->pluck('approved_by')->filter()->first();
+        $approverId = $group->pluck('approved_by')->filter()->first();
+        $repres->approved_by_name = $approverId && isset($approvers[$approverId])
+            ? $approvers[$approverId]->name
+            : null;
 
-            if ($approverId && isset($approvers[$approverId])) {
-                $repres->approved_by_name = $approvers[$approverId]->name;
-            } else {
-                $repres->approved_by_name = null;
-            }
+        // canceller
+        $cancellerId = $group->pluck('cancelled_by')->filter()->first();
+        $repres->cancelled_by_name = $cancellerId && isset($approvers[$cancellerId])
+            ? $approvers[$cancellerId]->name
+            : null;
 
             return $repres;
         });

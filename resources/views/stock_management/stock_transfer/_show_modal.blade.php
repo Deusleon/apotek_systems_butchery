@@ -35,7 +35,7 @@
                             <p id="show_to_store" class="text-body"></p>
                         </div>
                         <div class="col-4">
-                            <strong class="">Approved By:</strong>
+                            <strong class="" id="show_approved_by_label"></strong>
                             <p id="show_approved_by" class="text-body"></p>
                         </div>
                     </div>
