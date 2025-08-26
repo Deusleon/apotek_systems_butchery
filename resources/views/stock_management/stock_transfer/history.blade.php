@@ -138,7 +138,7 @@
                                                                 <td class="justify-content-center">
                                                                     @php
                                                                         $statuses = [
-                                                                            'created' => ['name' => 'Created', 'class' => 'badge-secondary'],
+                                                                            'created' => ['name' => 'Pending', 'class' => 'badge-secondary'],
                                                                             'assigned' => ['name' => 'Assigned', 'class' => 'badge-info'],
                                                                             'approved' => ['name' => 'Approved', 'class' => 'badge-warning'],
                                                                             'in_transit' => ['name' => 'In Transit', 'class' => 'badge-primary'],
@@ -225,6 +225,7 @@
                                                                         data-to-store="{{ $transfer->toStore->name }}"
                                                                         data-status="{{ $statusInfo['name'] }}" data-remarks="{{ $transfer->remarks }}"
                                                                         data-approved-by="{{ $transfer->approved_by ? $transfer->approved_by_name : '' }}"
+                                                                        data-cancelled-by="{{ $transfer->cancelled_by ? $transfer->cancelled_by_name : '' }}"
                                                                         data-items='{{ json_encode($transfer->all_items->map(function ($item) {
                                         return [
                                             'id' => $item->id,
@@ -293,6 +294,7 @@
             const status = $(this).data('status');
             const remarks = $(this).data('remarks');
             const approvedBy = $(this).data('approved-by') || 'N/A';
+            const cancelledBy = $(this).data('cancelled-by') || 'N/A';
             const items = $(this).data('items');
             $('#approve')
                 .data('transfer-no', transferNo)
@@ -315,7 +317,7 @@
             rejectBtn.hide();
             closeBtn.hide();
             const canApprove = @json(userCan('stock_transfer.approve'));
-            if (status === 'Created' && canApprove) {
+            if (status === 'Pending' && canApprove) {
                 approveBtn.show().data({
                     'transfer-no': transferNo,
                     'from-store': fromStore,
@@ -330,7 +332,16 @@
             $('#show_transfer_no').text(transferNo);
             $('#show_from_store').text(fromStore);
             $('#show_to_store').text(toStore);
-            $('#show_approved_by').text(approvedBy);
+            if (status === 'Approved') {
+                $('#show_approved_by_label').text('Approved By:');
+                $('#show_approved_by').text(approvedBy);
+            } else if (status === 'Cancelled') {
+                $('#show_approved_by_label').text('Cancelled By:');
+                $('#show_approved_by').text(cancelledBy);
+            }else{
+                $('#show_approved_by_label').text('Approved By:');
+                $('#show_approved_by').text('N/A');
+            }
             $('#show_status').text(status);
             $('#show_remarks').text(remarks || 'N/A');
 

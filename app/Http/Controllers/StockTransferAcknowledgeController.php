@@ -20,11 +20,9 @@ class StockTransferAcknowledgeController extends Controller
 
     public function index($transfer_no)
     {
-
-
         $stores = Store::where('name','<>','ALL')->get();
         $store_id = Auth::user()->store_id;
-        $all_transfers = StockTransfer::where('status', '=', '1')
+        $all_transfers = StockTransfer::where('status', '=', 'approved')
             ->where('transfer_no','=',$transfer_no)
             ->get();
 
