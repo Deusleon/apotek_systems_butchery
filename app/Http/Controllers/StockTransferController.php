@@ -488,44 +488,6 @@ class StockTransferController extends Controller {
         return view('stock_management.stock_transfer.history', compact('transfers', 'stores'));
     }
 
-    // public function stockTransferHistory()
-    // {
-    //     $store_id = current_store_id();
-    //     $stores = Store::where('name', '<>', 'ALL')->get();
-
-    //     if ( is_all_store() ) {
-    //     // Get ALL transfers grouped by transfer_no
-    //     $transfers_groups = StockTransfer::with(['fromStore', 'toStore', 'currentStock.product'])
-    //         ->latest()
-    //         ->get()
-    //         ->groupBy('transfer_no');
-    //     }else{
-    //     // Get ONLY transfers that involve the current store
-    //     $transfers_groups = StockTransfer::with(['fromStore', 'toStore', 'currentStock.product'])
-    //         ->where(function ($query) use ($store_id) {
-    //             $query->where('from_store', $store_id)
-    //                 ->orWhere('to_store', $store_id);
-    //         })
-    //         ->latest()
-    //         ->get()
-    //         ->groupBy('transfer_no');
-    //     }
-    //     // Create a representative model for each group to display in the main table.
-    //     $transfers = $transfers_groups->map(function ($group) {
-    //         $repres = $group->first()->replicate(); // Use a replica to avoid overwriting original relations
-    //         $repres->id = $group->first()->id; // Keep original ID for links
-    //         $repres->total_products = $group->count();
-    //         $repres->status = $group->min('status');
-    //         $repres->remarks = $group->first()->remarks;
-    //     $repres->created_at = $group->first()->created_at;
-    //         // Pass the full group of items to the representative model
-    //         $repres->all_items = $group;
-    //         return $repres;
-    //     });
-
-    //     return view('stock_management.stock_transfer.history', compact('transfers', 'stores'));
-    // }
-
     public function filterTransferByDate(Request $request)
     {
         if ($request->ajax()) {
