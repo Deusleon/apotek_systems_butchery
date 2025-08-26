@@ -352,7 +352,9 @@ Route::middleware(["auth","main_branch"])->group(function () {
         'store', 'update', 'destroy'
     ]);
 
+    Route::post('inventory/stock-transfer-acknowledge', 'StockTransferAcknowledgeController@acknowledgeTransfer')->name('acknowledge-transfer');
     Route::get('inventory/stock-transfer-acknowledge/{transfer_no}','StockTransferAcknowledgeController@index')->name('stock-transfer-acknowledge.index');
+    Route::get('inventory/stock-transfer-acknowledge/{transfer_no}/acknowledge','StockTransferAcknowledgeController@fetchTransferToAcknowledge')->name('stock-transfer-to-acknowledge');
 
     /*Re print transfer routes*/
     Route::resource('inventory/stock-transfer-reprint', 'RePrintTransferController')->only(['index']);

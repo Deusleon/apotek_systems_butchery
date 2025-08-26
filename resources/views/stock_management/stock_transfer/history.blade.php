@@ -80,7 +80,7 @@
                     <div class="row ml-1 text-right justify-content-end">
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label for="from_id justify-content-start">From:</label>
+                                <label for="from_id" class="justify-content-start">From:</label>
                                 <select name="from_id" id="from_id" class="form-control">
                                     <option value="">Select Branch...</option>
                                     @foreach($stores as $store)
@@ -154,66 +154,66 @@
                                                                         style="width: 100px;">{{ $statusInfo["name"] }}</button>
 
                                                                     <!-- Status Workflow Buttons -->
-                                                                    <div class="mt-1">
+                                                                    {{-- <div class="mt-1">
                                                                         @if($currentStatus == 1)
-                                                                            @can('assign_transfers')
-                                                                                <button type="button" class="btn btn-info btn-xs"
-                                                                                    onclick="updateStatus({{ $transfer->id }}, 2, 'assign')">
-                                                                                    <i class="fas fa-user-check"></i> Assign
-                                                                                </button>
-                                                                            @endcan
+                                                                        @can('assign_transfers')
+                                                                        <button type="button" class="btn btn-info btn-xs"
+                                                                            onclick="updateStatus({{ $transfer->id }}, 2, 'assign')">
+                                                                            <i class="fas fa-user-check"></i> Assign
+                                                                        </button>
+                                                                        @endcan
 
-                                                                            @can('approve_transfers')
-                                                                                <button type="button" class="btn btn-warning btn-xs"
-                                                                                    onclick="updateStatus({{ $transfer->id }}, 3, 'approve')">
-                                                                                    <i class="fas fa-check-circle"></i> Approve
-                                                                                </button>
-                                                                            @endcan
+                                                                        @can('approve_transfers')
+                                                                        <button type="button" class="btn btn-warning btn-xs"
+                                                                            onclick="updateStatus({{ $transfer->id }}, 3, 'approve')">
+                                                                            <i class="fas fa-check-circle"></i> Approve
+                                                                        </button>
+                                                                        @endcan
                                                                         @endif
 
                                                                         @if($currentStatus == 2)
-                                                                            @can('approve_transfers')
-                                                                                <button type="button" class="btn btn-warning btn-xs"
-                                                                                    onclick="updateStatus({{ $transfer->id }}, 3, 'approve')">
-                                                                                    <i class="fas fa-check-circle"></i> Approve
-                                                                                </button>
-                                                                            @endcan
+                                                                        @can('approve_transfers')
+                                                                        <button type="button" class="btn btn-warning btn-xs"
+                                                                            onclick="updateStatus({{ $transfer->id }}, 3, 'approve')">
+                                                                            <i class="fas fa-check-circle"></i> Approve
+                                                                        </button>
+                                                                        @endcan
 
-                                                                            @can('manage_transfers')
-                                                                                <button type="button" class="btn btn-primary btn-xs"
-                                                                                    onclick="updateStatus({{ $transfer->id }}, 4, 'in-transit')">
-                                                                                    <i class="fas fa-truck"></i> In Transit
-                                                                                </button>
-                                                                            @endcan
+                                                                        @can('manage_transfers')
+                                                                        <button type="button" class="btn btn-primary btn-xs"
+                                                                            onclick="updateStatus({{ $transfer->id }}, 4, 'in-transit')">
+                                                                            <i class="fas fa-truck"></i> In Transit
+                                                                        </button>
+                                                                        @endcan
                                                                         @endif
 
                                                                         @if($currentStatus == 3)
-                                                                            @can('manage_transfers')
-                                                                                <button type="button" class="btn btn-primary btn-xs"
-                                                                                    onclick="updateStatus({{ $transfer->id }}, 4, 'in-transit')">
-                                                                                    <i class="fas fa-truck"></i> In Transit
-                                                                                </button>
-                                                                            @endcan
+                                                                        @can('manage_transfers')
+                                                                        <button type="button" class="btn btn-primary btn-xs"
+                                                                            onclick="updateStatus({{ $transfer->id }}, 4, 'in-transit')">
+                                                                            <i class="fas fa-truck"></i> In Transit
+                                                                        </button>
+                                                                        @endcan
                                                                         @endif
 
                                                                         @if($currentStatus == 4)
-                                                                            @can('acknowledge_transfers')
-                                                                                <button type="button" class="btn btn-success btn-xs"
-                                                                                    onclick="updateStatus({{ $transfer->id }}, 5, 'acknowledge')">
-                                                                                    <i class="fas fa-handshake"></i> Acknowledge
-                                                                                </button>
-                                                                            @endcan
+                                                                        @can('acknowledge_transfers')
+                                                                        <button type="button" class="btn btn-success btn-xs"
+                                                                            onclick="updateStatus({{ $transfer->id }}, 5, 'acknowledge')">
+                                                                            <i class="fas fa-handshake"></i> Acknowledge
+                                                                        </button>
+                                                                        @endcan
                                                                         @endif
 
                                                                         @if($currentStatus == 5)
-                                                                            @can('complete_transfers')
-                                                                                <button type="button" class="btn btn-dark btn-xs"
-                                                                                    onclick="updateStatus({{ $transfer->id }}, 6, 'complete')">
-                                                                                    <i class="fas fa-flag-checkered"></i> Complete
-                                                                                </button>
-                                                                            @endcan
+                                                                        @can('complete_transfers')
+                                                                        <button type="button" class="btn btn-dark btn-xs"
+                                                                            onclick="updateStatus({{ $transfer->id }}, 6, 'complete')">
+                                                                            <i class="fas fa-flag-checkered"></i> Complete
+                                                                        </button>
+                                                                        @endcan
                                                                         @endif
-                                                                    </div>
+                                                                    </div> --}}
                                                                 </td>
                                                                 <td class="">
                                                                     <!-- Show Button -->
@@ -250,6 +250,31 @@
                                                                         @endif
 
                                                                     @endif
+                                                                    @if (userCan('stock_transfer.acknowledge'))
+                                                                        <!-- Acknowledge Button -->
+                                                                        @if ($transfer->status === 'approved')
+                                                                            {{-- <a
+                                                                                href="{{ route('stock-transfer-acknowledge.index', $transfer->transfer_no) }}"
+                                                                                class="mt-2 btn btn-sm btn-rounded btn-primary">
+                                                                                Acknowledge
+                                                                            </a> --}}
+                                                                            {{-- <button type="button" class="mt-2 btn btn-sm btn-rounded btn-primary"
+                                                                                data-toggle="modal" data-target="#acknowledgeModal"
+                                                                                data-transfer-no="{{ $transfer->transfer_no }}">
+                                                                                Acknowledge
+                                                                            </button> --}}
+                                                                            <button type="button" class="btn btn-primary btn-sm btn-rounded btn-acknowledge"
+                                                                                data-toggle="modal" data-target="#acknowledgeModal"
+                                                                                data-transfer-no="{{ $transfer->transfer_no }}"
+                                                                                data-from-store="{{ $transfer->fromStore->id }}"
+                                                                                data-to-store="{{ $transfer->toStore->id }}">
+                                                                                Acknowledge
+                                                                            </button>
+
+
+                                                                        @endif
+
+                                                                    @endif
                                                                 </td>
                                                                 <td hidden>{{ $transfer->created_at }}</td>
                                                             </tr>
@@ -267,6 +292,7 @@
     @include('stock_management.stock_transfer._edit_modal')
     @include('stock_management.stock_transfer.confirm_modal')
     @include('stock_management.stock_transfer.confirm_reject_modal')
+    @include('stock_management.stock_transfer._acknowledge_modal')
 
 @endsection
 
@@ -282,7 +308,8 @@
         var config = {
             routes: {
                 rejectTransfer: '{{route('reject-transfer')}}',
-                approveStockTransfer: '{{route('approve-transfer')}}'
+                approveStockTransfer: '{{route('approve-transfer')}}',
+                fetchTransferToAcknowledge: "{{ url('inventory/stock-transfer-acknowledge') }}/:transfer_no/acknowledge"
             }
         };
 
@@ -338,7 +365,7 @@
             } else if (status === 'Cancelled') {
                 $('#show_approved_by_label').text('Cancelled By:');
                 $('#show_approved_by').text(cancelledBy);
-            }else{
+            } else {
                 $('#show_approved_by_label').text('Approved By:');
                 $('#show_approved_by').text('N/A');
             }
@@ -350,11 +377,11 @@
             if (items && items.length > 0) {
                 items.forEach(item => {
                     itemsTableBody.append(`
-                                                                <tr>
-                                                                    <td>${item.product_name}</td>
-                                                                    <td>${Number(item.quantity ?? 0).toFixed(0)}</td>
-                                                                </tr>
-                                                            `);
+                                                                                                                            <tr>
+                                                                                                                                <td>${item.product_name}</td>
+                                                                                                                                <td>${Number(item.quantity ?? 0).toFixed(0)}</td>
+                                                                                                                            </tr>
+                                                                                                                        `);
                 });
             }
         });
@@ -423,20 +450,274 @@
                 const tbody = table.find('tbody');
                 items.forEach((item, index) => {
                     tbody.append(`
-                                                                <tr>
-                                                                    <td>
-                                                                        ${item.product_name}
-                                                                        <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
-                                                                    </td>
-                                                                    <td>
-                                                                        <input type="number" name="transfers[${index}][transfer_qty]" class="form-control" value="${item.quantity}" required>
-                                                                    </td>
-                                                                </tr>
-                                                            `);
+                                                                                                                <tr>
+                                                                                                                    <td>
+                                                                                                                        ${item.product_name}
+                                                                                                                        <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
+                                                                                                                    </td>
+                                                                                                                    <td>
+                                                                                                                        <input type="number" name="transfers[${index}][transfer_qty]" class="form-control" value="${item.quantity}" required>
+                                                                                                                    </td>
+                                                                                                                </tr>
+                                                                                                            `);
                 });
                 itemsContainer.append(table);
             }
         });
+
+        $(document).on('click', '.btn-acknowledge', function () {
+            const transferNo = $(this).data('transfer-no');
+            $('#acknowledge_items_body').empty();
+            $('#acknowledge_transfer_no_input').val(transferNo);
+            $('#acknowledge_from_store_input').val($(this).data('from-store'));
+            $('#acknowledge_to_store_input').val($(this).data('to-store'));
+
+            $('#acknowledge_items_body').find('.receive')
+                .attr('contenteditable', false)
+                .removeClass('form-control p-2 mt-2 form-control-sm');
+            $('#edit-acknowledge-btn').text('Edit').data('editing', false);
+
+            const url = config.routes.fetchTransferToAcknowledge.replace(':transfer_no', transferNo);
+
+            // AJAX call
+            $.ajax({
+                url: url,
+                type: "GET",
+                dataType: "json",
+                // success: function (response) {
+                //     // console.log("Stock transfer to acknowledge:", response);
+                //     if (response.length > 0) {
+                //         response.forEach(item => {
+                //             $('#acknowledge_transfer_no').text(transferNo);
+                //             $('#acknowledge_from_store').text(item.from_store.name);
+                //             $('#acknowledge_to_store').text(item.to_store.name);
+                //             $('#acknowledge_items_body').append(`
+                //                                                                                                 <tr>
+                //                                                                                                     <td>${item.current_stock.product.name + ' ' +
+                //                 item.current_stock.product.brand + ' ' +
+                //                 item.current_stock.product.pack_size +
+                //                 item.current_stock.product.sales_uom}
+                //                                                                                                     </td>
+                //                                                                                                     <td class="transferred">${Number(item.transfer_qty).toFixed(0)}</td>
+                //                                                                                                     <td class="received">${Number(item.accepted_qty).toFixed(0)}</td>
+                //                                                                                                     <td class="receive text-center" data-original="${Number(item.transfer_qty).toFixed(0)}">${(Number(item.transfer_qty) - Number(item.accepted_qty)).toFixed(0)}</td>
+                //                                                                                                 </tr>
+                //                                                                                             `);
+                //         });
+                //     } else {
+                //         notify(
+                //             response.message || "Failed to fetch transferred Items",
+                //             "top",
+                //             "right",
+                //             "danger"
+                //         );
+                //     }
+                success: function (response) {
+                    $('#acknowledge_items_body').empty();
+
+                    if (response.length > 0) {
+                        response.forEach((item, index) => {
+                            const productLabel =
+                                (item.current_stock && item.current_stock.product)
+                                    ? (item.current_stock.product.name + ' ' +
+                                        item.current_stock.product.brand + ' ' +
+                                        item.current_stock.product.pack_size + 
+                                        item.current_stock.product.sales_uom)
+                                    : 'Unknown Product';
+
+                            const transferQty = Number(item.transfer_qty || 0).toFixed(0);
+                            const acceptedQty = Number(item.accepted_qty || 0).toFixed(0);
+                            const receiveDefault = (Number(transferQty) - Number(acceptedQty)).toFixed(0);
+
+                            $('#acknowledge_transfer_no').text(transferNo);
+                            $('#acknowledge_from_store').text(item.from_store.name);
+                            $('#acknowledge_to_store').text(item.to_store.name);
+
+                            $('#acknowledge_items_body').append(`
+                        <tr data-item-id="${item.id}">
+                            <td>
+                                ${productLabel}
+                                <!-- Hidden inputs for id and original transfer_qty so they are submitted -->
+                                <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
+                                <input type="hidden" name="transfers[${index}][transfer_qty]" value="${transferQty}">
+                            </td>
+                            <td class="transferred">${transferQty}</td>
+                            <td class="received">${acceptedQty}</td>
+                            <td class="receive text-center" data-original="${transferQty}" contenteditable="false">${receiveDefault}</td>
+                        </tr>
+                    `);
+                        });
+                    } else {
+                        notify(
+                            response.message || "Failed to fetch transferred Items",
+                            "top",
+                            "right",
+                            "danger"
+                        );
+                    }
+                },
+                error: function (xhr, status, error) {
+                    var message = "Failed to fetch transferred Items!";
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        message = xhr.responseJSON.message;
+                    }
+                    notify(message, "top", "right", "danger");
+                },
+                complete: function () {
+                    $("#loading").hide();
+                },
+                timeout: 20000,
+            });
+        });
+
+        $('#acknowledgeModal .edit-acknowledge-btn').on('click', function () {
+            const $btn = $(this);
+            const isEditing = $btn.data('editing') || false;
+            if (!isEditing) {
+                $('#acknowledge_items_body').find('.receive')
+                    .attr('contenteditable', true)
+                    .addClass('form-control p-2 mt-2 form-control-sm');
+                $btn.text('Ignore').data('editing', true);
+            } else {
+                $('#acknowledge_items_body').find('.receive')
+                    .attr('contenteditable', false)
+                    .removeClass('form-control p-2 mt-2 form-control-sm');
+                $btn.text('Edit').data('editing', false);
+            }
+        });
+
+        $(document).on('keydown', '#acknowledge_items_body .receive', function (e) {
+            const allowedKeys = [
+                8, 9, 13, 27, 46,
+                35, 36, 37, 38, 39, 40
+            ];
+            const isNumberKey = (e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 96 && e.keyCode <= 105);
+            if (isNumberKey || allowedKeys.indexOf(e.keyCode) !== -1) return;
+            if (e.ctrlKey || e.metaKey) return;
+            e.preventDefault();
+        });
+
+        function getCaretPosition(element) {
+            let sel = window.getSelection();
+            if (!sel.rangeCount) return 0;
+            let range = sel.getRangeAt(0);
+            let preCaretRange = range.cloneRange();
+            preCaretRange.selectNodeContents(element);
+            preCaretRange.setEnd(range.endContainer, range.endOffset);
+            return preCaretRange.toString().length;
+        }
+
+        function setCaretPosition(element, pos) {
+            let range = document.createRange();
+            let sel = window.getSelection();
+            if (!element.firstChild) element.appendChild(document.createTextNode(''));
+            const textLen = element.firstChild ? element.firstChild.length : 0;
+            const safePos = Math.max(0, Math.min(pos, textLen));
+            range.setStart(element.firstChild, safePos);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+
+        $(document).on('input', '#acknowledge_items_body .receive', function () {
+            const el = this;
+            const $cell = $(this);
+
+            let caretPos = getCaretPosition(el);
+            const original = $cell.text();
+            let cleaned = original.replace(/\D+/g, '');
+
+            cleaned = cleaned.replace(/^0+(?=\d)/, '');
+
+            if (cleaned !== original) {
+                const removed = original.length - cleaned.length;
+                $cell.text(cleaned);
+                const newCaret = Math.max(0, caretPos - removed);
+                setCaretPosition(el, newCaret);
+                caretPos = newCaret;
+            }
+
+            const transferred = parseInt($cell.siblings('.transferred').text(), 10) || 0;
+            const parsed = parseInt($cell.text().trim(), 10);
+            if (!isNaN(parsed) && parsed > transferred) {
+                $cell.text(transferred);
+                setCaretPosition(el, String(transferred).length);
+            }
+
+        });
+
+        $(document).on('blur', '#acknowledge_items_body .receive', function () {
+            const $cell = $(this);
+            const transferred = parseInt($cell.siblings('.transferred').text(), 10) || 0;
+            let text = $cell.text().trim();
+
+            text = text.replace(/\D+/g, '').replace(/^0+(?=\d)/, '');
+            let parsed = parseInt(text, 10);
+            if (isNaN(parsed)) parsed = 0;
+            if (parsed < 0) parsed = 0;
+            if (parsed > transferred) parsed = transferred;
+
+            $cell.text(parsed);
+        });
+
+        // $(document).ready(function () {
+        //     $('#transfer').on('submit', function (e) {
+        //         e.preventDefault();
+
+        //         $('#acknowledgeModal').off('hidden.bs.modal').one('hidden.bs.modal', function () {
+        //             $('#confirmAcknowledgeModal').modal('show');
+        //         });
+
+        //         $('#acknowledgeModal').modal('hide');
+
+        //     });
+
+        //     $('#confirmAcknowledgeBtn').on('click', function () {
+        //         $('#transfer')[0].submit();
+        //     });
+        // });
+        // --- 2) Update your submit handler to build accepted_qty hidden inputs before showing confirm modal ---
+        $('#transfer').on('submit', function (e) {
+            e.preventDefault();
+
+            // remove any previously added accepted_qty hidden inputs to avoid duplicates
+            $('#transfer').find('input[name$="[accepted_qty]"]').remove();
+
+            // Iterate each row and create hidden input for accepted_qty
+            $('#acknowledge_items_body tr').each(function (i, tr) {
+                const $tr = $(tr);
+                const transferred = parseInt($tr.find('.transferred').text().replace(/\D/g, ''), 10) || 0;
+                let acceptedText = $tr.find('.receive').text().trim();
+                acceptedText = (acceptedText === '') ? '0' : acceptedText.replace(/\D/g, '');
+                let accepted = parseInt(acceptedText, 10);
+                if (isNaN(accepted)) accepted = 0;
+                if (accepted < 0) accepted = 0;
+                if (accepted > transferred) accepted = transferred; // cap to transferred
+
+                // append hidden input to form
+                const input = $('<input>')
+                    .attr('type', 'hidden')
+                    .attr('name', `transfers[${i}][accepted_qty]`)
+                    .val(accepted);
+                $('#transfer').append(input);
+            });
+
+            // show confirm modal (same flow you had)
+            $('#acknowledgeModal').off('hidden.bs.modal').one('hidden.bs.modal', function () {
+                $('#confirmAcknowledgeModal').modal('show');
+            });
+
+            $('#acknowledgeModal').modal('hide');
+        });
+
+        // Confirm button performs native submit (will bypass the jQuery submit handler)
+        // so the dynamic hidden inputs are already present in the form.
+        $('#confirmAcknowledgeBtn').on('click', function () {
+            // Use native submit to avoid re-triggering the jQuery handler
+            $('#transfer')[0].submit();
+        });
+
+
 
     </script>
 
@@ -449,9 +730,9 @@
             order: [[7, 'desc']],
             columnDefs: [
                 {
-                    targets: [3, 4], // Zero-based index of the hidden column
-                    visible: true, // Hide the column from view
-                    searchable: true, // Allow it to be searchable
+                    targets: [3, 4],
+                    visible: true,
+                    searchable: true,
                 },
             ]
         });
