@@ -16,6 +16,7 @@ use App\StockAdjustmentLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class StockAdjustmentController extends Controller
 {
@@ -67,12 +68,12 @@ class StockAdjustmentController extends Controller
             ->get();
         
         // Debug the data
-        \Log::info('Stocks count: ' . $stocks->count());
+        Log::info('Stocks count: ' . $stocks->count()); 
         foreach ($stocks as $stock) {
-            \Log::info('Stock ID: ' . $stock->id);
-            \Log::info('Product relationship: ' . ($stock->product ? 'exists' : 'null'));
+            Log::info('Stock ID: ' . $stock->id);
+            Log::info('Product relationship: ' . ($stock->product ? 'exists' : 'null'));
             if ($stock->product) {
-                \Log::info('Product name: ' . $stock->product->name);
+                Log::info('Product name: ' . $stock->product->name);
             }
         }
         
@@ -141,7 +142,7 @@ class StockAdjustmentController extends Controller
             DB::commit();
             
             // Log the action
-            \Log::info('Stock adjustment created', [
+            Log::info('Stock adjustment created', [
                 'user' => Auth::user()->name,
                 'product_id' => $currentStock->product_id,
                 'product_name' => $currentStock->product->name ?? 'Unknown Product',
@@ -161,7 +162,7 @@ class StockAdjustmentController extends Controller
                            ->with('success', $successMessage);
         } catch (\Exception $e) {
             DB::rollback();
-            \Log::error('Error creating stock adjustment: ' . $e->getMessage(), [
+            Log::error('Error creating stock adjustment: ' . $e->getMessage(), [
                 'exception' => $e,
                 'request_data' => $request->all()
             ]);
