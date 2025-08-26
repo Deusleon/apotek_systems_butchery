@@ -121,8 +121,10 @@
                                 <select name="invoice_no" class="form-control js-example-basic-single"
                                     id="goodreceving_invoice_id">
                                     <option selected="true" value="" disabled="disabled">Select Invoice..</option>
-                                    @foreach($invoices as $invoice)
-                                        <option value="{{ $invoice->id }}">{{ $invoice->invoice_no }} - {{ optional($invoice->supplier)->name }}</option>
+                                    @foreach($invoices->sortByDesc('id') as $invoice)
+                                        <option value="{{ $invoice->id }}">
+                                            {{ $invoice->invoice_no }} - {{ optional($invoice->supplier)->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                             @endif
