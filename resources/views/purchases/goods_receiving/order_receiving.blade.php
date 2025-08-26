@@ -1,5 +1,9 @@
 @extends("layouts.master")
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+
 @section('content-title')
     Goods Receiving
 @endsection
@@ -10,6 +14,46 @@
 @endsection
 
 @section("content")
+    <style>
+        /* Wrapper to control table height */
+        .receive-items-wrapper {
+            max-height: 350px;   /* adjust if needed */
+            overflow-y: auto;    /* enable vertical scroll only */
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+
+        /* Compact modal table */
+        .receive-items-table th,
+        .receive-items-table td {
+            padding: 6px 10px !important;  
+            vertical-align: middle !important;
+            white-space: nowrap;
+            font-size: 13px;
+        }
+
+        /* Fix table header without background color */
+        .receive-items-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background-color: transparent; /* no color */
+            border-bottom: 2px solid #dee2e6; /* keep bottom border for separation */
+        }
+
+        /* Inputs compact */
+        .receive-items-table input {
+            height: 30px;
+            padding: 2px 6px;
+            font-size: 13px;
+        }
+
+        .edit-mode-hidden {
+            display: none !important;
+        }
+
+
+    </style>
     <div class="col-sm-12">
         @if(Session::has('error'))
             <div class="alert alert-danger alert-top-right mx-auto" style="width: 70%">
@@ -42,7 +86,7 @@
         <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade show active" id="order-receive">
                 <div class="table-responsive" id="purchases">
-                    <table id="orders_table" class="display table table-hover table-bordered align-middle"
+                    <table id="orders_table" class="display table nowrap table-striped table-hover"
                            style="width:100%">
                         <thead>
                         <tr>
@@ -50,7 +94,7 @@
                             <th>Supplier</th>
                             <th>Date</th>
                             <th class="text-right">Amount</th>
-                            <th class="text-center">Progress</th> <!-- Status column renamed to look meaningful -->
+                            <th class="text-center">Status</th> <!-- Status column renamed to look meaningful -->
                             <th class="text-center">Actions</th> <!-- Actions column -->
                         </tr>
                         </thead>
@@ -67,12 +111,12 @@
     <div class="modal fade" id="receiveOrderModal" tabindex="-1" role="dialog" aria-labelledby="receiveOrderModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document"> <!-- Smaller & centered -->
             <div class="modal-content shadow-lg rounded">
-                <div class="modal-header" style="background-color: #FF5252;">
-                    <h5 class="modal-title text-white" id="receiveOrderModalLabel">
-                        <i class="feather icon-package mr-1"></i> Receive Purchase Order:
+                <div class="modal-header">
+                    <h5 class="modal-title" id="receiveOrderModalLabel">
+                        <i class="feather icon-package mr-1"></i>Purchase Order:
                         <span id="modal_order_number"></span>
                     </h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -86,24 +130,24 @@
                         <input type="hidden" name="supplier_id" id="modal_supplier_id">
                         <input type="hidden" name="order_id" id="modal_order_id">
 
-                        <!-- Order Items Table -->
-                        <div class="table-responsive">
-                            <table class="table table-sm table-striped table-bordered">
-                                <thead class="thead-light">
-                                <tr>
-                                    <th>Product (Pack Size)</th>
-                                    <th class="text-right">Ordered</th>
-                                    <th class="text-right">Received</th>
-                                    <th class="text-right">Remaining</th>
-                                    <th class="text-right">Unit Price</th>
-                                    <th class="text-right">Total Price</th>
-                                    <th class="text-center">Receive Qty</th>
-                                    <th class="text-center">Batch #</th>
-                                    <th class="text-center">Expiry Date</th>
-                                </tr>
+                       <!-- Order Items Table with fixed header -->
+                        <div class="receive-items-wrapper">
+                            <table class="table table-striped table-hover table-sm align-middle mb-0 receive-items-table" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th class="text-right">Ordered</th>
+                                        <th class="text-right">Received</th>
+                                        <th class="text-right d-none">Remaining</th>
+                                        <th class="text-right d-none">Unit Price</th>
+                                        <th class="text-right d-none">Total Price</th>
+                                        <th class="text-center">Receive</th>
+                                        <th class="text-center">Batch #</th>
+                                        <th class="text-center">Expiry Date</th>
+                                    </tr>
                                 </thead>
                                 <tbody id="order_items_body">
-                                <!-- Injected by JavaScript -->
+                                    <!-- Injected by JavaScript -->
                                 </tbody>
                             </table>
                         </div>
@@ -111,11 +155,11 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
-                        <i class="feather icon-x"></i> Cancel
+                    <button type="button" class="btn btn-warning btn-sm" id="edit-receive-btn">
+                            Edit
                     </button>
-                    <button type="button" class="btn btn-success" id="proceed-receive-btn">
-                        <i class="feather icon-check-circle"></i> Confirm Receive
+                    <button type="button" class="btn btn-primary btn-sm" id="proceed-receive-btn">
+                        Save
                     </button>
                 </div>
             </div>
@@ -151,26 +195,27 @@
                     }
                 },
                 {
-                    "data": "status", "className": "text-center",
+                    "data": "status", 
+                    "className": "text-center",
                     "render": function(data) {
-                    const badgeClass = "badge px-3 py-1";
-                    const style = "display:inline-block; min-width:110px;"; // fixed width
-                    if (data == '1') return `<span class='${badgeClass} badge-warning' style='${style}'>Pending</span>`;
-                    if (data == '2') return `<span class='${badgeClass} badge-info' style='${style}'>Partially</span>`;
-                    if (data == '3') return `<span class='${badgeClass} badge-success' style='${style}'>Completed</span>`;
-                    return `<span class='${badgeClass} badge-secondary' style='${style}'>Unknown</span>`;
-                   }
+                        const badgeClass = "badge btn-rounded btn-sm"; // Rounded & small like buttons
+                        const style = "display:inline-block; min-width:110px;"; // maintain fixed width
+                        if (data == '1') return `<span class='${badgeClass} badge-warning' style='${style}'>Pending</span>`;
+                        if (data == '2') return `<span class='${badgeClass} badge-info' style='${style}'>Partially</span>`;
+                        if (data == '3') return `<span class='${badgeClass} badge-success' style='${style}'>Completed</span>`;
+                        return `<span class='${badgeClass} badge-secondary' style='${style}'>Unknown</span>`;
+                    }
                 },
                 {
                 "data": null, "className": "text-center", "orderable": false,
                 "render": function(data, type, row) {
                     if (row.status == '3') {
-                        return `<button class="btn btn-sm btn-outline-success px-3 py-1" disabled>
-                                    <i class="feather icon-check"></i> Received
+                        return `<button class="btn btn-success btn-rounded btn-sm" disabled>
+                                     Received
                                 </button>`;
                     }
-                    return `<button class="btn btn-sm btn-primary receive-btn px-3 py-1" data-id="${row.id}">
-                                <i class="feather icon-package"></i> Receive
+                    return `<button class="btn btn-primary btn-rounded btn-sm receive-btn" data-id="${row.id}">
+                                 Receive
                             </button>`;
                 }
             }
@@ -206,25 +251,33 @@
                 if (!isFullyReceived) hasReceivableItems = true;
 
                 detailsBody.append(`
-                    <tr>
-                        <td>${item.product ? item.product.name : 'N/A'} (${item.pack_size || 'N/A'})</td>
-                        <td class="text-right ordered-qty">${orderedQty}</td>
-                        <td class="text-right received-qty-cell" data-initial-received="${receivedQty}">${receivedQty}</td>
-                        <td class="text-right remaining-qty-cell">${remaining}</td>
-                        <td class="text-right">${unitPrice.toLocaleString('en-US',{ minimumFractionDigits:2 })}</td>
-                        <td class="text-right">${totalPrice.toLocaleString('en-US',{ minimumFractionDigits:2 })}</td>
-                        <td><input type="number" name="items[${index}][quantity]" 
-                                   class="form-control form-control-sm text-center receive-qty-input"
-                                   min="0" max="${remaining}" ${isFullyReceived?'disabled':''}></td>
-                        <td><input type="text" name="items[${index}][batch_number]" 
-                                   class="form-control form-control-sm" ${isFullyReceived?'disabled':''}></td>
-                        <td><input type="date" name="items[${index}][expiry_date]" 
-                                   class="form-control form-control-sm" ${isFullyReceived?'disabled':''}></td>
-                        <input type="hidden" name="items[${index}][product_id]" value="${item.product_id}">
-                        <input type="hidden" name="items[${index}][purchase_order_detail_id]" value="${item.id}">
-                        <input type="hidden" name="items[${index}][cost_price]" value="${unitPrice}">
-                    </tr>
-                `);
+                <tr>
+                    <td>${item.product ? item.product.name : 'N/A'} (${item.pack_size || 'N/A'})</td>
+                    <td class="text-right ordered-qty">${orderedQty}</td>
+                    <td class="text-right received-qty-cell" data-initial-received="${receivedQty}">${receivedQty}</td>
+                    <td class="text-right remaining-qty-cell d-none">${remaining}</td>
+                    <td class="text-right d-none">${unitPrice.toLocaleString('en-US',{ minimumFractionDigits:2 })}</td>
+                    <td class="text-right d-none">${totalPrice.toLocaleString('en-US',{ minimumFractionDigits:2 })}</td>
+                    <td class="receive-cell text-center">
+                        <span class="plain-receive">${orderedQty}</span>
+                        <input type="text" name="items[${index}][quantity]" 
+                            class="form-control form-control-sm text-center receive-qty-input edit-mode-hidden"
+                            min="0" max="${remaining}" value="${orderedQty}" ${isFullyReceived?'disabled':''}>
+                    </td>
+                    <td>
+                        <input type="text" name="items[${index}][batch_number]" 
+                            class="form-control form-control-sm edit-mode-hidden" ${isFullyReceived?'disabled':''}>
+                    </td>
+                    <td>
+                        <input type="text" placeholder="YYYY/MM/DD" name="items[${index}][expiry_date]" 
+                            class="form-control form-control-sm edit-mode-hidden" ${isFullyReceived?'disabled':''}>
+                    </td>
+                    <input type="hidden" name="items[${index}][product_id]" value="${item.product_id}">
+                    <input type="hidden" name="items[${index}][purchase_order_detail_id]" value="${item.id}">
+                    <input type="hidden" name="items[${index}][cost_price]" value="${unitPrice}">
+                </tr>
+            `);
+
             });
 
             $('#proceed-receive-btn').prop('disabled', !hasReceivableItems);
@@ -254,7 +307,7 @@
 
             if (!hasQuantity) return alert('Please enter a quantity for at least one item to receive.');
 
-            $(this).prop('disabled', true).text('Processing...');
+            $(this).prop('disabled', true).text('Saving...');
             form.submit();
         });
 
@@ -265,8 +318,47 @@
         $('#receiveOrderModal').on('hidden.bs.modal', function() {
             $('#receiveOrderForm')[0].reset();
             $('#order_items_body').empty();
-            $('#proceed-receive-btn').prop('disabled', false).text('Confirm Receive');
+            $('#proceed-receive-btn').prop('disabled', false).text('Save');
         });
+
+        // Initialize flatpickr on Expiry Date inputs
+        function initExpiryDatePickers() {
+            flatpickr("input[name*='[expiry_date]']", {
+                dateFormat: "Y-m-d",
+                allowInput: true,    // allows typing if needed
+                defaultDate: null    // starts empty
+            });
+        }
+
+        // Call this every time the modal opens
+        $('#receiveOrderModal').on('shown.bs.modal', function() {
+            initExpiryDatePickers();
+        });
+
+        // Edit button click
+        $('#edit-receive-btn').on('click', function() {
+            $('#order_items_body tr').each(function() {
+                const $row = $(this);
+                // Show inputs
+                $row.find('.receive-qty-input, [name*="[batch_number]"], [name*="[expiry_date]"]').removeClass('edit-mode-hidden');
+                // Hide plain text
+                $row.find('.plain-receive').hide();
+
+                // Get ordered quantity
+                const orderedQty = parseFloat($row.find('.ordered-qty').text()) || 0;
+
+                // Fill both receive input and received cell with ordered qty
+                $row.find('.receive-qty-input').val(orderedQty);
+                $row.find('.received-qty-cell').text(orderedQty);
+
+                // Also update remaining (if you want it visible)
+                $row.find('.remaining-qty-cell').text(0);
+            });
+
+            // Focus first receive input
+            $('#order_items_body tr:first .receive-qty-input').focus();
+        });
+
     });
 </script>
 @endpush

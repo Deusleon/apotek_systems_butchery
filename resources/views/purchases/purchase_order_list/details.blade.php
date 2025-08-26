@@ -14,19 +14,14 @@
             </div>
             <!-- Modal Footer (ADD THIS) -->
             <div class="modal-footer">
-                <!-- Approve in modal -->
-                <button type="button" id="approve_btn" class="btn btn-primary">
-                    Approve
-                </button>
-
                 <!-- Cancel in modal (opens your existing cancel confirmation modal) -->
                 <button type="button" id="cancel_btn_modal" class="btn btn-danger">
-                    Cancel
+                    Reject
                 </button>
 
-                <!-- Close only (optional) -->
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                    Close
+                 <!-- Approve in modal -->
+                <button type="button" id="approve_btn" class="btn btn-primary">
+                    Approve
                 </button>
             </div>
         </div>
