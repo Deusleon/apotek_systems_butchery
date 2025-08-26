@@ -59,6 +59,12 @@
             left: 50%;
             z-index: 100;
         }
+
+        .small-table table td,
+        .small-table table th {
+            padding: 0.35rem 0.5rem;
+            font-size: 0.875rem;
+        }
     </style>
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
@@ -151,7 +157,7 @@
                                                                     @endphp
 
                                                                     <button class='badge {{ $statusInfo["class"] }} btn btn-sm btn-rounded mt-2 p-2'
-                                                                        style="width: 100px;">{{ $statusInfo["name"] }}</button>
+                                                                        style="width: 120px;">{{ $statusInfo["name"] }}</button>
 
                                                                     <!-- Status Workflow Buttons -->
                                                                     {{-- <div class="mt-1">
@@ -226,6 +232,9 @@
                                                                         data-status="{{ $statusInfo['name'] }}" data-remarks="{{ $transfer->remarks }}"
                                                                         data-approved-by="{{ $transfer->approved_by ? $transfer->approved_by_name : '' }}"
                                                                         data-cancelled-by="{{ $transfer->cancelled_by ? $transfer->cancelled_by_name : '' }}"
+                                                                        data-acknowledged-by="{{ $transfer->acknowledged_by ? $transfer->acknowledged_by_name : '' }}"
+                                                                        data-remarks="{{ $transfer->remarks }}"
+                                                                        data-notes="{{ $transfer->notes }}"
                                                                         data-items='{{ json_encode($transfer->all_items->map(function ($item) {
                                         return [
                                             'id' => $item->id,
@@ -252,9 +261,6 @@
                                                                     @endif
                                                                     @if (userCan('stock_transfer.acknowledge'))
                                                                         <!-- Acknowledge Button -->
-                                                                            <script>
-                                                                                console.log('transfer', @json($transfer ?? 'N/A'));
-                                                                            </script>
                                                                         @if ($transfer->status === 'approved')
                                                                             {{-- <a
                                                                                 href="{{ route('stock-transfer-acknowledge.index', $transfer->transfer_no) }}"
@@ -319,10 +325,11 @@
             const toStore = $(this).data('to-store');
             const status = $(this).data('status');
             const remarks = $(this).data('remarks');
+            const notes = $(this).data('notes');
             const approvedBy = $(this).data('approved-by') || 'N/A';
             const cancelledBy = $(this).data('cancelled-by') || 'N/A';
             const acknowledgedBy = $(this).data('acknowledged-by') || 'N/A';
-            console.log('acknowledgedBy', acknowledgedBy);
+            // console.log('remarks', remarks);
             const items = $(this).data('items');
             $('#approve')
                 .data('transfer-no', transferNo)
@@ -337,7 +344,7 @@
                 .data('to-store', toStore)
                 .data('status', status)
                 .data('remarks', remarks);
-            
+
             const approveBtn = $('#approve');
             const rejectBtn = $('#reject');
             const closeBtn = $('#close');
@@ -361,16 +368,31 @@
             $('#show_from_store').text(fromStore);
             $('#show_to_store').text(toStore);
             $('#show_acknowledged_by').text(acknowledgedBy || 'N/A');
-            $('#show_remarks_textarea').val(remarks || 'N/A');
-            if (status === 'Approved') {
+            $('#show_remarks_textarea').text(remarks || 'N/A');
+            if (status === 'Pending') {
+                $('#show_remarks_label').text('Remarks:');
+                $('#show_remarks_textarea').text(remarks || 'N/A');
+                $('#acknowledge_remark_div').attr('hidden', true);
+                $('#show_approved_by_label').text('Approved By:');
+                $('#show_approved_by').text(approvedBy);
+            }else if (status === 'Approved') {
+                $('#show_remarks_label').text('Remarks:');
+                $('#show_remarks_textarea').text(remarks || 'N/A');
+                $('#acknowledge_remark_div').attr('hidden', true);
                 $('#show_approved_by_label').text('Approved By:');
                 $('#show_approved_by').text(approvedBy);
             } else if (status === 'Cancelled') {
+                $('#show_remarks_label').text('Remarks:');
+                $('#show_remarks_textarea').text(remarks || 'N/A');
                 $('#show_approved_by_label').text('Cancelled By:');
                 $('#show_approved_by').text(cancelledBy);
             } else {
+                $('#acknowledge_remark_div').attr('hidden', true);
+                $('#show_remarks_label').text('Transfer Remarks:');
+                $('#show_acknowledge_remark_textarea').text(notes || 'N/A');
                 $('#show_approved_by_label').text('Approved By:');
                 $('#show_approved_by').text(approvedBy || 'N/A');
+                $('#acknowledge_remark_div').removeAttr('hidden');
             }
             $('#show_status').text(status);
             $('#show_remarks').text(remarks || 'N/A');
@@ -378,13 +400,30 @@
             const itemsTableBody = $('#show_items_table_body');
             itemsTableBody.empty();
             if (items && items.length > 0) {
+                if (status === 'Completed' || status === 'Acknowledged') {
+                    $('#display_qty').attr('hidden', true);
+                    $('#hidden_transferred').removeAttr('hidden');
+                    $('#hidden_received').removeAttr('hidden');
+                } else {
+                    $('#display_qty').removeAttr('hidden');
+                    $('#hidden_transferred').attr('hidden', true);
+                    $('#hidden_received').attr('hidden', true);
+                }
                 items.forEach(item => {
-                    itemsTableBody.append(`
-                                        <tr>
-                                            <td>${item.product_name}</td>
-                                            <td>${Number(item.quantity ?? 0).toFixed(0)}</td>
-                                        </tr>
-                                    `);
+                    let row = `
+                <tr>
+                    <td>${item.product_name}</td>
+                    <td>${Number(item.quantity ?? 0).toFixed(0)}</td>
+            `;
+
+                    if (status === 'Completed' || status === 'Acknowledged') {
+                        row += `
+                    <td>${Number(item.accepted_qty ?? 0).toFixed(0)}</td>
+                `;
+                    }
+
+                    row += `</tr>`;
+                    itemsTableBody.append(row);
                 });
             }
         });
@@ -453,16 +492,16 @@
                 const tbody = table.find('tbody');
                 items.forEach((item, index) => {
                     tbody.append(`
-                                                                                                                    <tr>
-                                                                                                                        <td>
-                                                                                                                            ${item.product_name}
-                                                                                                                            <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
-                                                                                                                        </td>
-                                                                                                                        <td>
-                                                                                                                            <input type="number" name="transfers[${index}][transfer_qty]" class="form-control" value="${item.quantity}" required>
-                                                                                                                        </td>
-                                                                                                                    </tr>
-                                                                                                                `);
+                                                                                                                                        <tr>
+                                                                                                                                            <td>
+                                                                                                                                                ${item.product_name}
+                                                                                                                                                <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
+                                                                                                                                            </td>
+                                                                                                                                            <td>
+                                                                                                                                                <input type="number" name="transfers[${index}][transfer_qty]" class="form-control" value="${item.quantity}" required>
+                                                                                                                                            </td>
+                                                                                                                                        </tr>
+                                                                                                                                    `);
                 });
                 itemsContainer.append(table);
             }
@@ -509,18 +548,18 @@
                             $('#acknowledge_to_store').text(item.to_store.name);
 
                             $('#acknowledge_items_body').append(`
-                            <tr data-item-id="${item.id}">
-                                <td>
-                                    ${productLabel}
-                                    <!-- Hidden inputs for id and original transfer_qty so they are submitted -->
-                                    <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
-                                    <input type="hidden" name="transfers[${index}][transfer_qty]" value="${transferQty}">
-                                </td>
-                                <td class="transferred">${transferQty}</td>
-                                <td class="received">${acceptedQty}</td>
-                                <td class="receive text-center" data-original="${transferQty}" contenteditable="false">${receiveDefault}</td>
-                            </tr>
-                        `);
+                                                <tr data-item-id="${item.id}">
+                                                    <td>
+                                                        ${productLabel}
+                                                        <!-- Hidden inputs for id and original transfer_qty so they are submitted -->
+                                                        <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
+                                                        <input type="hidden" name="transfers[${index}][transfer_qty]" value="${transferQty}">
+                                                    </td>
+                                                    <td class="transferred">${transferQty}</td>
+                                                    <td class="received">${acceptedQty}</td>
+                                                    <td class="receive text-center" data-original="${transferQty}" contenteditable="false">${receiveDefault}</td>
+                                                </tr>
+                                            `);
                         });
                     } else {
                         notify(
@@ -551,12 +590,12 @@
             if (!isEditing) {
                 $('#acknowledge_items_body').find('.receive')
                     .attr('contenteditable', true)
-                    .addClass('form-control p-2 mt-2 form-control-sm');
+                    .addClass('form-control p-1 form-control-sm');
                 $btn.text('Ignore').data('editing', true);
             } else {
                 $('#acknowledge_items_body').find('.receive')
                     .attr('contenteditable', false)
-                    .removeClass('form-control p-2 mt-2 form-control-sm');
+                    .removeClass('form-control p-1 form-control-sm');
                 $btn.text('Edit').data('editing', false);
             }
         });
