@@ -476,6 +476,12 @@ class StockTransferController extends Controller {
             ? $approvers[$cancellerId]->name
             : null;
 
+        // acknowledged by
+        $acknowledgerId = $group->pluck('acknowledged_by')->filter()->first();
+        $repres->acknowledged_by_name = $acknowledgerId && isset($approvers[$acknowledgerId])
+            ? $approvers[$acknowledgerId]->name
+            : null;
+
             return $repres;
         });
 
@@ -868,7 +874,8 @@ class StockTransferController extends Controller {
 
             DB::commit();
 
-            return response()->json(['message' => 'Stock transfer approved successfully']);
+            // return response()->json(['message' => 'Stock transfer approved successfully']);
+            return redirect()->route('stock-transfer-history')->with(['message' => 'Stock transfer approved successfully']);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Approve transfer error: ' . $e->getMessage());

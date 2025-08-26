@@ -21,8 +21,8 @@
                             <p id="show_status" class="text-body"></p>
                         </div>
                         <div class="col-4">
-                            <strong class="">Remarks:</strong>
-                            <p id="show_remarks" class="text-body"></p>
+                            <strong class="" id="show_approved_by_label"></strong>
+                            <p id="show_approved_by" class="text-body"></p>
                         </div>
                     </div>
                     <div class="row">
@@ -35,8 +35,8 @@
                             <p id="show_to_store" class="text-body"></p>
                         </div>
                         <div class="col-4">
-                            <strong class="" id="show_approved_by_label"></strong>
-                            <p id="show_approved_by" class="text-body"></p>
+                            <strong class="">Acknowledged By:</strong>
+                            <p id="show_acknowledged_by" class="text-body"></p>
                         </div>
                     </div>
                 </div>
@@ -45,12 +45,16 @@
                         <tr>
                             <th>Product Name</th>
                             <th>Quantity</th>
+                            <th hidden>Transferred</th>
+                            <th hidden>Received</th>
                         </tr>
                     </thead>
                     <tbody id="show_items_table_body">
                         <!-- Items will be populated by JavaScript -->
                     </tbody>
                 </table>
+                <label for="show_remarks_textarea">Remarks:</label>
+                <textarea name="remarks" id="show_remarks_textarea" class="form-control" rows="3" disabled></textarea>
             </div>
             <div class="modal-footer">
                 <button type="button" id="reject" class="btn btn-danger btn-reject-transfer"

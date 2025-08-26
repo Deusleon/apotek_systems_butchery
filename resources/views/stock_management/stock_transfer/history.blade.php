@@ -252,22 +252,21 @@
                                                                     @endif
                                                                     @if (userCan('stock_transfer.acknowledge'))
                                                                         <!-- Acknowledge Button -->
+                                                                            <script>
+                                                                                console.log('transfer', @json($transfer ?? 'N/A'));
+                                                                            </script>
                                                                         @if ($transfer->status === 'approved')
                                                                             {{-- <a
                                                                                 href="{{ route('stock-transfer-acknowledge.index', $transfer->transfer_no) }}"
                                                                                 class="mt-2 btn btn-sm btn-rounded btn-primary">
                                                                                 Acknowledge
                                                                             </a> --}}
-                                                                            {{-- <button type="button" class="mt-2 btn btn-sm btn-rounded btn-primary"
-                                                                                data-toggle="modal" data-target="#acknowledgeModal"
-                                                                                data-transfer-no="{{ $transfer->transfer_no }}">
-                                                                                Acknowledge
-                                                                            </button> --}}
                                                                             <button type="button" class="btn btn-primary btn-sm btn-rounded btn-acknowledge"
                                                                                 data-toggle="modal" data-target="#acknowledgeModal"
                                                                                 data-transfer-no="{{ $transfer->transfer_no }}"
                                                                                 data-from-store="{{ $transfer->fromStore->id }}"
-                                                                                data-to-store="{{ $transfer->toStore->id }}">
+                                                                                data-to-store="{{ $transfer->toStore->id }}"
+                                                                                data-acknowledged-by="{{ $transfer->acknowledged_by ? $transfer->acknowledged_by_name : '' }}">
                                                                                 Acknowledge
                                                                             </button>
 
@@ -322,6 +321,8 @@
             const remarks = $(this).data('remarks');
             const approvedBy = $(this).data('approved-by') || 'N/A';
             const cancelledBy = $(this).data('cancelled-by') || 'N/A';
+            const acknowledgedBy = $(this).data('acknowledged-by') || 'N/A';
+            console.log('acknowledgedBy', acknowledgedBy);
             const items = $(this).data('items');
             $('#approve')
                 .data('transfer-no', transferNo)
@@ -336,7 +337,7 @@
                 .data('to-store', toStore)
                 .data('status', status)
                 .data('remarks', remarks);
-
+            
             const approveBtn = $('#approve');
             const rejectBtn = $('#reject');
             const closeBtn = $('#close');
@@ -359,6 +360,8 @@
             $('#show_transfer_no').text(transferNo);
             $('#show_from_store').text(fromStore);
             $('#show_to_store').text(toStore);
+            $('#show_acknowledged_by').text(acknowledgedBy || 'N/A');
+            $('#show_remarks_textarea').val(remarks || 'N/A');
             if (status === 'Approved') {
                 $('#show_approved_by_label').text('Approved By:');
                 $('#show_approved_by').text(approvedBy);
@@ -367,7 +370,7 @@
                 $('#show_approved_by').text(cancelledBy);
             } else {
                 $('#show_approved_by_label').text('Approved By:');
-                $('#show_approved_by').text('N/A');
+                $('#show_approved_by').text(approvedBy || 'N/A');
             }
             $('#show_status').text(status);
             $('#show_remarks').text(remarks || 'N/A');
@@ -377,11 +380,11 @@
             if (items && items.length > 0) {
                 items.forEach(item => {
                     itemsTableBody.append(`
-                                                                                                                            <tr>
-                                                                                                                                <td>${item.product_name}</td>
-                                                                                                                                <td>${Number(item.quantity ?? 0).toFixed(0)}</td>
-                                                                                                                            </tr>
-                                                                                                                        `);
+                                        <tr>
+                                            <td>${item.product_name}</td>
+                                            <td>${Number(item.quantity ?? 0).toFixed(0)}</td>
+                                        </tr>
+                                    `);
                 });
             }
         });
@@ -450,16 +453,16 @@
                 const tbody = table.find('tbody');
                 items.forEach((item, index) => {
                     tbody.append(`
-                                                                                                                <tr>
-                                                                                                                    <td>
-                                                                                                                        ${item.product_name}
-                                                                                                                        <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
-                                                                                                                    </td>
-                                                                                                                    <td>
-                                                                                                                        <input type="number" name="transfers[${index}][transfer_qty]" class="form-control" value="${item.quantity}" required>
-                                                                                                                    </td>
-                                                                                                                </tr>
-                                                                                                            `);
+                                                                                                                    <tr>
+                                                                                                                        <td>
+                                                                                                                            ${item.product_name}
+                                                                                                                            <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
+                                                                                                                        </td>
+                                                                                                                        <td>
+                                                                                                                            <input type="number" name="transfers[${index}][transfer_qty]" class="form-control" value="${item.quantity}" required>
+                                                                                                                        </td>
+                                                                                                                    </tr>
+                                                                                                                `);
                 });
                 itemsContainer.append(table);
             }
@@ -484,34 +487,6 @@
                 url: url,
                 type: "GET",
                 dataType: "json",
-                // success: function (response) {
-                //     // console.log("Stock transfer to acknowledge:", response);
-                //     if (response.length > 0) {
-                //         response.forEach(item => {
-                //             $('#acknowledge_transfer_no').text(transferNo);
-                //             $('#acknowledge_from_store').text(item.from_store.name);
-                //             $('#acknowledge_to_store').text(item.to_store.name);
-                //             $('#acknowledge_items_body').append(`
-                //                                                                                                 <tr>
-                //                                                                                                     <td>${item.current_stock.product.name + ' ' +
-                //                 item.current_stock.product.brand + ' ' +
-                //                 item.current_stock.product.pack_size +
-                //                 item.current_stock.product.sales_uom}
-                //                                                                                                     </td>
-                //                                                                                                     <td class="transferred">${Number(item.transfer_qty).toFixed(0)}</td>
-                //                                                                                                     <td class="received">${Number(item.accepted_qty).toFixed(0)}</td>
-                //                                                                                                     <td class="receive text-center" data-original="${Number(item.transfer_qty).toFixed(0)}">${(Number(item.transfer_qty) - Number(item.accepted_qty)).toFixed(0)}</td>
-                //                                                                                                 </tr>
-                //                                                                                             `);
-                //         });
-                //     } else {
-                //         notify(
-                //             response.message || "Failed to fetch transferred Items",
-                //             "top",
-                //             "right",
-                //             "danger"
-                //         );
-                //     }
                 success: function (response) {
                     $('#acknowledge_items_body').empty();
 
@@ -521,7 +496,7 @@
                                 (item.current_stock && item.current_stock.product)
                                     ? (item.current_stock.product.name + ' ' +
                                         item.current_stock.product.brand + ' ' +
-                                        item.current_stock.product.pack_size + 
+                                        item.current_stock.product.pack_size +
                                         item.current_stock.product.sales_uom)
                                     : 'Unknown Product';
 
@@ -534,18 +509,18 @@
                             $('#acknowledge_to_store').text(item.to_store.name);
 
                             $('#acknowledge_items_body').append(`
-                        <tr data-item-id="${item.id}">
-                            <td>
-                                ${productLabel}
-                                <!-- Hidden inputs for id and original transfer_qty so they are submitted -->
-                                <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
-                                <input type="hidden" name="transfers[${index}][transfer_qty]" value="${transferQty}">
-                            </td>
-                            <td class="transferred">${transferQty}</td>
-                            <td class="received">${acceptedQty}</td>
-                            <td class="receive text-center" data-original="${transferQty}" contenteditable="false">${receiveDefault}</td>
-                        </tr>
-                    `);
+                            <tr data-item-id="${item.id}">
+                                <td>
+                                    ${productLabel}
+                                    <!-- Hidden inputs for id and original transfer_qty so they are submitted -->
+                                    <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
+                                    <input type="hidden" name="transfers[${index}][transfer_qty]" value="${transferQty}">
+                                </td>
+                                <td class="transferred">${transferQty}</td>
+                                <td class="received">${acceptedQty}</td>
+                                <td class="receive text-center" data-original="${transferQty}" contenteditable="false">${receiveDefault}</td>
+                            </tr>
+                        `);
                         });
                     } else {
                         notify(
@@ -660,30 +635,11 @@
             $cell.text(parsed);
         });
 
-        // $(document).ready(function () {
-        //     $('#transfer').on('submit', function (e) {
-        //         e.preventDefault();
-
-        //         $('#acknowledgeModal').off('hidden.bs.modal').one('hidden.bs.modal', function () {
-        //             $('#confirmAcknowledgeModal').modal('show');
-        //         });
-
-        //         $('#acknowledgeModal').modal('hide');
-
-        //     });
-
-        //     $('#confirmAcknowledgeBtn').on('click', function () {
-        //         $('#transfer')[0].submit();
-        //     });
-        // });
-        // --- 2) Update your submit handler to build accepted_qty hidden inputs before showing confirm modal ---
         $('#transfer').on('submit', function (e) {
             e.preventDefault();
 
-            // remove any previously added accepted_qty hidden inputs to avoid duplicates
             $('#transfer').find('input[name$="[accepted_qty]"]').remove();
 
-            // Iterate each row and create hidden input for accepted_qty
             $('#acknowledge_items_body tr').each(function (i, tr) {
                 const $tr = $(tr);
                 const transferred = parseInt($tr.find('.transferred').text().replace(/\D/g, ''), 10) || 0;
@@ -692,9 +648,8 @@
                 let accepted = parseInt(acceptedText, 10);
                 if (isNaN(accepted)) accepted = 0;
                 if (accepted < 0) accepted = 0;
-                if (accepted > transferred) accepted = transferred; // cap to transferred
+                if (accepted > transferred) accepted = transferred;
 
-                // append hidden input to form
                 const input = $('<input>')
                     .attr('type', 'hidden')
                     .attr('name', `transfers[${i}][accepted_qty]`)
@@ -702,7 +657,6 @@
                 $('#transfer').append(input);
             });
 
-            // show confirm modal (same flow you had)
             $('#acknowledgeModal').off('hidden.bs.modal').one('hidden.bs.modal', function () {
                 $('#confirmAcknowledgeModal').modal('show');
             });
@@ -710,14 +664,9 @@
             $('#acknowledgeModal').modal('hide');
         });
 
-        // Confirm button performs native submit (will bypass the jQuery submit handler)
-        // so the dynamic hidden inputs are already present in the form.
         $('#confirmAcknowledgeBtn').on('click', function () {
-            // Use native submit to avoid re-triggering the jQuery handler
             $('#transfer')[0].submit();
         });
-
-
 
     </script>
 
