@@ -1,5 +1,5 @@
 <!-- Show Stock Transfer Modal -->
-<div class="modal fade" id="showStockTransferModal" tabindex="-1" role="dialog"
+<div class="modal fade small-table" id="showStockTransferModal" tabindex="-1" role="dialog"
     aria-labelledby="showStockTransferModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content shadow-sm border-0">
@@ -21,8 +21,8 @@
                             <p id="show_status" class="text-body"></p>
                         </div>
                         <div class="col-4">
-                            <strong class="">Remarks:</strong>
-                            <p id="show_remarks" class="text-body"></p>
+                            <strong class="" id="show_approved_by_label"></strong>
+                            <p id="show_approved_by" class="text-body"></p>
                         </div>
                     </div>
                     <div class="row">
@@ -35,22 +35,34 @@
                             <p id="show_to_store" class="text-body"></p>
                         </div>
                         <div class="col-4">
-                            <strong class="" id="show_approved_by_label"></strong>
-                            <p id="show_approved_by" class="text-body"></p>
+                            <strong class="">Acknowledged By:</strong>
+                            <p id="show_acknowledged_by" class="text-body"></p>
                         </div>
                     </div>
                 </div>
-                <table class="display table nowrap table-striped table-hover">
+                <table class="display table table-sm nowrap table-striped table-hover mb-6">
                     <thead>
                         <tr>
                             <th>Product Name</th>
-                            <th>Quantity</th>
+                            <th id="display_qty" hidden>Quantity</th>
+                            <th id="hidden_transferred" hidden>Transferred</th>
+                            <th id="hidden_received" hidden>Received</th>
                         </tr>
                     </thead>
                     <tbody id="show_items_table_body">
                         <!-- Items will be populated by JavaScript -->
                     </tbody>
                 </table>
+                <div class="row">
+                    <div class="col-6">
+                        <label for="show_remarks_textarea" class="font-bold" id="show_remarks_label"></label>
+                        <span name="remarks" id="show_remarks_textarea" disabled></span>
+                    </div>
+                    <div class="col-6" id="acknowledge_remark_div" hidden>
+                        <label for="show_acknowledge_remark_textarea" class="font-bold">Acknowledge Note:</label>
+                        <span name="acknowledge_remark" id="show_acknowledge_remark_textarea" disabled></span>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" id="reject" class="btn btn-danger btn-reject-transfer"

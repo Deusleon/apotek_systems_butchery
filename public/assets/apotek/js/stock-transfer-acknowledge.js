@@ -1,5 +1,7 @@
 //main filter tranfer table
 var table_stock_transfer = $('#fixed-header1').DataTable({
+    searching: false,
+    bPaginate: false,
     'language': {
         'emptyTable': "Please choose 'From' and 'To' store inorder to complete pending transfers"
     },
@@ -11,8 +13,8 @@ var table_stock_transfer = $('#fixed-header1').DataTable({
                 return numberWithCommas(data);
             }
         },
-        {'data': 'from_store.name'},
-        {'data': 'to_store.name'},
+        // {'data': 'from_store.name'},
+        // {'data': 'to_store.name'},
         {
             'data': 'action',
             defaultContent: "<div class='row'><button id='completed' class='btn btn-sm btn-rounded btn-success' type='button'>Acknowledge</button></div>"
@@ -20,9 +22,12 @@ var table_stock_transfer = $('#fixed-header1').DataTable({
     ]
 });
 
-
 //main transfer table list
-var table_stock_transfer_list = $('#fixed-header-main').DataTable();
+var table_stock_transfer_list = $('#fixed-header-main').DataTable({
+    searching: false,
+    bPaginate: false,
+    info: false,
+});
 
 
 //show table details
