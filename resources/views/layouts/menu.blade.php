@@ -76,7 +76,7 @@
                 <li class=""><a href="{{ route('price-list.index') }}" class="">Price List</a></li>
             @endif
             @if(auth()->user()->checkPermission('View Stock Transfer'))
-                <li class=""><a href="{{ route('stock-transfer-history') }}" class="">Stock Transfer</a></li>
+                <li class=""><a href="{{ route('stock-transfer.index') }}" class="">Stock Transfer</a></li>
             @endif
             @if(auth()->user()->checkPermission('View Stock Adjustment'))
                 <li class=""><a href="{{ route('stock-adjustments.index') }}" class="">Stock Adjustment</a></li>

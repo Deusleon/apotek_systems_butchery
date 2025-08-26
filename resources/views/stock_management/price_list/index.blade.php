@@ -85,8 +85,8 @@
                             <select name="type_id" class="js-example-basic-single form-control" id="type_id">
                                 <option readonly value="0" id="store_name_edit" disabled>Select Type...
                                 </option>
-                                <option name="store_name" value="pending" selected>Pending</option>
-                                <option name="store_name" value="1">Current</option>
+                                <option name="store_name" value="1" selected>Current</option>
+                                <option name="store_name" value="pending">Pending</option>
                                 <option name="store_name" value="0">History</option>
                             </select>
                         </div>
@@ -106,35 +106,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {{-- @foreach ($current_stocks as $stock)
-                                @if($stock->unit_cost > 0)
-                                <tr>
-                                    <td>
-                                        {{ $stock->product_name }}
-                                        {{ $stock->brand ? ' ' . $stock->brand : '' }}
-                                        {{ $stock->pack_size ?? '' }}{{ $stock->sales_uom ?? '' }}
-                                    </td>
-                                    <td>{{ number_format($stock->unit_cost, 2) }}</td>
-                                    <td>{{ number_format($stock->price, 2) }}</td>
-                                    <td>{{ round($stock->profit, 0) }}%</td>
-                                    <td>
-                                        <div>
-                                            <button id='pricing' class='btn btn-sm btn-rounded btn-primary' type='button'
-                                                data-toggle="modal" data-target="#edit"
-                                                data-name='{{ $stock->product_name ?? '' }}'
-                                                data-unit-cost='{{ $stock->unit_cost ?? '' }}'
-                                                data-price='{{ $stock->price ?? '' }}' data-id='{{ $stock->id ?? '' }}'
-                                                data-brand='{{ $stock->brand ?? '' }}'
-                                                data-pack-size='{{ $stock->pack_size ?? '' }}'
-                                                data-sales-uom='{{ $stock->sales_uom ?? '' }}'
-                                                data-price-category='{{ $stock->price_category_name ?? '' }}'
-                                                data-price-category-id='{{ $stock->price_category_id ?? '' }}'>Edit</button>
-                                        </div>
-                                    </td>
-                                    <td hidden>{{ $stock->price_category_id ?? '' }}</td>
-                                </tr>
-                                @endif
-                                @endforeach --}}
                             </tbody>
                         </table>
                     </div>
@@ -154,37 +125,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {{-- @foreach ($current_stocks as $stock)
-                                @if($stock->unit_cost > 0)
-                                <tr>
-                                    <td>
-                                        {{ $stock->product_name }}
-                                        {{ $stock->brand ? ' ' . $stock->brand : '' }}
-                                        {{ $stock->pack_size ?? '' }}{{ $stock->sales_uom ?? '' }}
-                                    </td>
-                                    <td>{{ number_format($stock->unit_cost, 2) }}</td>
-                                    <td>{{ number_format($stock->price, 2) }}</td>
-                                    <td>{{ round($stock->profit, 0) }}%</td>
-                                    <td>
-                                        <div>
-                                            <button id='pricing' class='btn btn-sm btn-rounded btn-primary' type='button'
-                                                data-toggle="modal" data-target="#edit"
-                                                data-name='{{ $stock->product_name ?? '' }}'
-                                                data-unit-cost='{{ $stock->unit_cost ?? '' }}'
-                                                data-price='{{ $stock->price ?? '' }}' data-id='{{ $stock->id ?? '' }}'
-                                                data-brand='{{ $stock->brand ?? '' }}'
-                                                data-pack-size='{{ $stock->pack_size ?? '' }}'
-                                                data-sales-uom='{{ $stock->sales_uom ?? '' }}'
-                                                data-price-category='{{ $stock->price_category_name ?? '' }}'
-                                                data-price-category-id='{{ $stock->price_category_id ?? '' }}'>Edit</button>
-                                        </div>
-                                    </td>
-                                    <td hidden>{{ $stock->price_category_id ?? '' }}</td>
-                                </tr>
-                                @endif
-                                @endforeach --}}
                             </tbody>
-
 
                         </table>
                     </div>
@@ -206,29 +147,12 @@
                             </thead>
 
                             <tbody>
-                                {{-- @foreach ($stocks as $stock)
-                                @if($stock->unit_cost > 0)
-                                <tr>
-                                    <td>
-                                        {{ $stock->name }}
-                                        {{ $stock->brand ? ' ' . $stock->brand : '' }}
-                                        {{ $stock->pack_size ?? '' }}{{ $stock->sales_uom ?? '' }}
-                                    </td>
-                                    <td>{{ number_format($stock->unit_cost, 2) ?? '' }}</td>
-                                    <td>{{ number_format($stock->price, 2) ?? '' }}</td>
-                                    <td>{{date('Y-m-d', strtotime($stock->updated_at))}}</td>
-                                    <td hidden>{{ $stock->updated_at ?? '' }}</td>
-
-                                </tr>
-                                @endif
-                                @endforeach --}}
                             </tbody>
 
                         </table>
                     </div>
 
                 </div>
-
 
                 <div id="loading">
                     <image id="loading-image" src="{{asset('assets/images/spinner.gif')}}"></image>
@@ -237,7 +161,6 @@
             </div>
         </div>
     </div>
-
 
     @include('stock_management.price_list.edit')
     @include('stock_management.price_list.show')
@@ -456,76 +379,6 @@
             table.draw();
             $('#test').modal('show');
         }
-
-        // $(document).ready(function () {
-        //     function initPriceTable(selector) {
-        //         return $(selector).DataTable({
-        //             responsive: true,
-        //             order: [[0, 'asc']],
-        //             destroy: true,
-        //             columns: [
-        //                 {
-        //                     data: "product_name", render: function (data, type, row) {
-        //                         return `${row.product_name} ${row.brand ?? ''} ${row.pack_size ?? ''}${row.sales_uom ?? ''}`;
-        //                     }
-        //                 },
-        //                 { data: "batch_number", render: data => data ?? '' },
-        //                 { data: "unit_cost", render: data => formatMoney(data) },
-        //                 { data: "price", render: data => formatMoney(data) },
-        //                 { data: "profit", render: data => `${Math.round(data)}%` },
-        //                 {
-        //                     data: "id", render: function (data, type, row) {
-        //                         return `
-        //                         <button id='pricing' class='btn btn-sm btn-rounded btn-primary'
-        //                             type='button' data-toggle="modal" data-target="#edit"
-        //                             data-name='${row.product_name ?? ''}'
-        //                             data-unit-cost='${row.unit_cost ?? ''}'
-        //                             data-price='${row.price ?? ''}'
-        //                             data-id='${row.id ?? ''}'
-        //                             data-brand='${row.brand ?? ''}'
-        //                             data-pack-size='${row.pack_size ?? ''}'
-        //                             data-sales-uom='${row.sales_uom ?? ''}'
-        //                             data-price-category-id='${row.price_category_id ?? ''}'>Edit</button>
-        //                     `;
-        //                     }
-        //                 },
-        //                 // { data: "price_category_id", visible: false }
-        //             ]
-        //         });
-        //     }
-
-        //     const currentStocks = initPriceTable('#fixed-header2');
-        //     const pendingPrices = initPriceTable('#pendingPrices');
-        //     const priceHistory = initPriceTable('#priceHistory');
-
-        //     // Custom filter
-        //     $.fn.dataTable.ext.search.push(function (settings, data, dataIndex, row) {
-        //         var categoryId = $('#price_category').val();
-        //         var typeId = $('#type_id').val();
-        //         var rowCategory = row.price_category_id;
-
-        //         if (typeId === "pending") {
-        //             return rowCategory != categoryId;
-        //         } else if (typeId === "1") {
-        //             return rowCategory == categoryId;
-        //         } else if (typeId === "0") {
-        //             return rowCategory == categoryId;
-        //         }
-        //         return true;
-        //     });
-
-        //     currentStocks.draw();
-        //     pendingPrices.draw();
-        //     priceHistory.draw();
-
-        //     $('#price_category, #type_id').trigger('change');
-
-        //     $('#price_category, #type_id').on('change', function () {
-        //         currentStocks.draw();
-        //         pendingPrices.draw();
-        //         priceHistory.draw();
-        //     });
-        // });
 
         $(document).ready(function () {
 

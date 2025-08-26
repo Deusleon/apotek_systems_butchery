@@ -53,10 +53,11 @@ class HomeController extends Controller {
 
         session( [ 'current_store_id' => $store->id, 'store' => $store->name ] );
 
-        return response()->json( [ 'success' => true, 'current_store_id' => $store->id ] );
+        return redirect()->back()->with( 'success', "Store changed to {$store->name}" );
     }
 
     //login form
+
     public function login() {
         return view( 'auth.login' );
     }
@@ -801,6 +802,7 @@ class HomeController extends Controller {
 
         echo json_encode( $json_data );
     }
+
     public function taskSchedule( Request $request ) {
         if ( $request->ajax() ) {
             $commonFunction = new CommonFunctions();

@@ -112,12 +112,12 @@ class StockTransferNotification extends Notification implements ShouldQueue
     protected function getStatusText()
     {
         $statuses = [
-            1 => 'Created',
-            2 => 'Assigned',
-            3 => 'Approved',
-            4 => 'In Transit',
-            5 => 'Acknowledged',
-            6 => 'Completed'
+            'created' => 'Created',
+            'assigned' => 'Assigned',
+            'approved' => 'Approved',
+            'in_transit' => 'In Transit',
+            'acknowledged' => 'Acknowledged',
+            'completed' => 'Completed'
         ];
 
         return $statuses[$this->status] ?? 'Unknown';

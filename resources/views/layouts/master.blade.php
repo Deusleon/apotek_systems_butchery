@@ -283,17 +283,19 @@ $store_id = Auth::user()->store_id;
                 @if($canAccessAll)
                     <li>
                         <div class="form-group" style="width: 200px!important; max-width: 100%; text-overflow: ellipsis;">
-                            <select name="store_id" id="store_id" class="js-example-basic-single form-control">
-                                <option value="" disabled {{ !session('current_store_id') ? 'selected' : '' }}>
-                                    Select Branch
-                                </option>
-
-                                @foreach($all_stores as $store)
-                                    <option value="{{ $store->id }}" {{ session('current_store_id') == $store->id ? 'selected' : '' }}>
-                                        {{ $store->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <form method="POST" action="{{ route('change_store') }}" id="storeForm">
+                                @csrf
+                                <select name="store_id" id="store_id" class="js-example-basic-single form-control"
+                                    onchange="this.form.submit()">
+                                    <option value="" disabled {{ !session('current_store_id') ? 'selected' : '' }}>Select
+                                        Branch</option>
+                                    @foreach($all_stores as $store)
+                                        <option value="{{ $store->id }}" {{ session('current_store_id') == $store->id ? 'selected' : '' }}>
+                                            {{ $store->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </form>
                         </div>
                     </li>
                 @endif
@@ -555,33 +557,6 @@ $store_id = Auth::user()->store_id;
     <script src="{{asset("assets/apotek/js/notification.js")}}"></script>
     <script>
 
-        $(document).ready(function () {
-            $('#store_id').change(function () {
-                var selectedStoreId = $(this).val();
-
-                if (selectedStoreId) {
-                    $.ajax({
-                        url: '{{ route('change_store') }}', // Replace with your actual endpoint
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({ store_id: selectedStoreId }),
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}' // Include CSRF token if using Laravel
-                        },
-                        success: function (data) {
-                            // Handle the data returned from the server
-                            console.log(data);
-                            notify('alert-success', 'Store changed successfully!');
-                            window.location.href = window.location.href;
-                            // Update the UI based on the returned data
-                        },
-                        error: function (xhr, status, error) {
-                            console.error('AJAX error:', status, error);
-                        }
-                    });
-                }
-            });
-        });
         var config = {
             token: '{{ csrf_token() }}',
             routes: {
