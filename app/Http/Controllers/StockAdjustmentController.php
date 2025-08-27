@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class StockAdjustmentController extends Controller
 {
@@ -28,38 +29,118 @@ class StockAdjustmentController extends Controller
 
     public function index()
     {
-        $query = StockAdjustmentLog::with(['currentStock.product', 'user', 'store']);
-        
-        // Apply date filter if provided
-        if (request('start_date') && request('end_date')) {
-            $startDate = request('start_date') . ' 00:00:00';
-            $endDate = request('end_date') . ' 23:59:59';
-            
-            $query->whereBetween('created_at', [$startDate, $endDate]);
-        }
-        
-        // Apply search filter if provided
-        if (request('search')) {
-            $search = request('search');
-            $query->where(function($q) use ($search) {
-                $q->whereHas('currentStock.product', function($q) use ($search) {
-                    $q->where('name', 'LIKE', "%{$search}%");
-                })
-                ->orWhere('reason', 'LIKE', "%{$search}%")
-                ->orWhere('reference_number', 'LIKE', "%{$search}%");
-            });
-        }
-        
-        // Apply adjustment type filter if provided
-        if (request('adjustment_type')) {
-            $query->where('adjustment_type', request('adjustment_type'));
-        }
-        
-        $adjustments = $query->latest()->paginate(15);
-        
+        $adjustments = StockAdjustmentLog::with(['currentStock.product', 'user', 'store'])
+                 ->latest()
+                 ->get();
+   
         return view('stock_management.adjustments.index', compact('adjustments'));
     }
+      public function newAdjustment()
+    {
+        $store_id = current_store_id();
+        $stocks = DB::table('inv_current_stock')
+            ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
+            ->join('inv_categories','inv_products.category_id','=','inv_categories.id')
+            ->select('inv_current_stock.id', 'inv_current_stock.product_id','inv_products.name','inv_products.sales_uom',
+                'inv_products.brand', 'inv_products.pack_size',
+                DB::raw('sum(inv_current_stock.quantity) as quantity'),
+                'inv_categories.name as cat_name')
+            ->where('inv_current_stock.store_id',$store_id)
+            ->groupBy(['inv_current_stock.product_id', 'inv_products.name', 
+                'inv_products.brand', 'inv_products.pack_size', 'inv_categories.name'])
+            ->havingRaw(DB::raw('sum(quantity) > 0'))
+            ->get();
+            
+        $allStocks = DB::table('inv_current_stock')
+            ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
+            ->join('inv_categories','inv_products.category_id','=','inv_categories.id')
+            ->select('inv_current_stock.id','inv_current_stock.product_id','inv_products.name','inv_products.sales_uom',
+                'inv_products.brand', 'inv_products.pack_size',
+                DB::raw('sum(inv_current_stock.quantity) as quantity'),
+                'inv_categories.name as cat_name')
+            ->where('inv_current_stock.store_id',$store_id)
+            ->groupBy(['inv_current_stock.product_id', 'inv_products.name', 
+                'inv_products.brand', 'inv_products.pack_size', 'inv_categories.name'])
+            ->orderBy('inv_products.id', 'desc')
+            ->get();
 
+        $detailed = DB::table('inv_current_stock')
+            ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
+            ->join('inv_categories','inv_products.category_id','=','inv_categories.id')
+            ->select('inv_current_stock.id', 'inv_current_stock.product_id', 'inv_products.name', 'inv_products.sales_uom', 'inv_current_stock.unit_cost',
+                'inv_products.brand', 'inv_products.pack_size', 'inv_categories.name as cat_name',
+                'inv_current_stock.quantity',
+                'inv_current_stock.batch_number',
+                'inv_current_stock.expiry_date')
+            ->where('inv_current_stock.store_id',$store_id)
+            ->where('inv_current_stock.quantity','>',0)
+            ->get();
+
+        $allDetailed = DB::table('inv_current_stock')
+            ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
+            ->join('inv_categories','inv_products.category_id','=','inv_categories.id')
+            ->select('inv_current_stock.id', 'inv_current_stock.product_id','inv_products.name', 'inv_products.sales_uom', 'inv_current_stock.unit_cost',
+                'inv_products.brand', 'inv_products.pack_size', 'inv_categories.name as cat_name',
+                'inv_current_stock.quantity',
+                'inv_current_stock.batch_number',
+                'inv_current_stock.expiry_date')
+            ->where('inv_current_stock.store_id',$store_id)
+            ->orderBy('inv_products.id', 'desc')
+            ->get();
+
+        $outstock = DB::table('inv_current_stock')
+            ->join('inv_products', 'inv_current_stock.product_id', '=', 'inv_products.id')
+            ->join('inv_categories', 'inv_products.category_id', '=', 'inv_categories.id')
+            ->select(
+                'inv_current_stock.id',
+                'inv_current_stock.product_id',
+                'inv_products.name',
+                'inv_products.sales_uom',
+                'inv_products.brand',
+                'inv_products.pack_size',
+                'inv_categories.name as cat_name',
+                DB::raw('sum(inv_current_stock.quantity) as quantity'),
+            )
+            ->where('inv_current_stock.store_id', $store_id)
+            ->groupBy([
+                'inv_current_stock.product_id',
+                'inv_products.name',
+                'inv_products.sales_uom',
+                'inv_products.brand',
+                'inv_products.pack_size',
+                'inv_categories.name'
+            ]
+            )
+            ->havingRaw('SUM(inv_current_stock.quantity) = 0')
+            ->distinct()
+            ->get();
+            
+        $outDetailed = DB::table('inv_current_stock')
+            ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
+            ->join('inv_categories','inv_products.category_id','=','inv_categories.id')
+            ->select('inv_current_stock.id','inv_current_stock.product_id','inv_products.name', 'inv_products.sales_uom', 'inv_current_stock.unit_cost',
+                'inv_products.brand', 'inv_products.pack_size', 'inv_categories.name as cat_name',
+                'inv_current_stock.quantity',
+                'inv_current_stock.batch_number',
+                'inv_current_stock.expiry_date')
+            ->where('inv_current_stock.store_id',$store_id)
+            ->where('inv_current_stock.quantity','=',0)
+            ->get();
+
+        $stores = Store::all();
+        $reasons = AdjustmentReason::all();
+
+        return view('stock_management.adjustments.new_adjustment')->with([
+            'allStocks' => $allStocks,
+            'allDetailed' => $allDetailed,
+            'stocks' => $stocks,
+            'detailed' => $detailed,
+            'outstock' => $outstock,
+            'outDetailed' => $outDetailed,
+            'stores' => $stores,
+            'reasons' => $reasons
+        ]);
+    }
     public function create()
     {
         $stocks = CurrentStock::with(['product'])
@@ -83,29 +164,39 @@ class StockAdjustmentController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'current_stock_id' => 'required|exists:inv_current_stock,id',
-            'adjustment_quantity' => 'required|numeric',
-            'adjustment_type' => 'required|in:increase,decrease',
-            'reason' => 'required|string|max:255',
-            'notes' => 'nullable|string'
-        ]);
+        $validator = Validator::make($request->all(), [
+        'stock_id' => 'required|exists:inv_current_stock,id',
+        'product_id' => 'required|exists:inv_products,id',
+        'current_stock' => 'required|numeric|min:0',
+        'new_quantity' => 'required|numeric|min:0',
+        'reason' => 'required|string|max:255',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'success' => false,
+            'errors'  => $validator->errors()
+        ], 422); 
+    }
+        // Log::info('Store Stock Adjustment Request:', $request->all());
 
         DB::beginTransaction();
         try {
-            // Get current stock
-            $currentStock = CurrentStock::findOrFail($request->current_stock_id);
+            $currentStock = CurrentStock::findOrFail($request->stock_id);
             $previousQuantity = $currentStock->quantity;
             
             // Calculate new quantity
-            $adjustmentQuantity = $request->adjustment_quantity;
-            if ($request->adjustment_type === 'increase') {
-                $newQuantity = $previousQuantity + $adjustmentQuantity;
+            $newQuantity = $request->new_quantity;
+            
+            if ($newQuantity > $previousQuantity) {
+                $adjustmentType = 'increase';
+                $adjustmentQuantity = $newQuantity - $previousQuantity;
             } else {
-                $newQuantity = $previousQuantity - $adjustmentQuantity;
-                
+                $adjustmentType = 'decrease';
+                $adjustmentQuantity = $previousQuantity - $newQuantity;
+
                 // Check if we have enough stock for decrease
-                if ($newQuantity < 0) {
+                if ($adjustmentType === 'decrease' && $adjustmentQuantity > $previousQuantity) {
                     return back()->with('error', 'Not enough stock available for adjustment. Current stock: ' . $previousQuantity);
                 }
             }
@@ -116,23 +207,23 @@ class StockAdjustmentController extends Controller
             
             // Create adjustment log with all necessary fields
             $adjustment = new StockAdjustmentLog();
-            $adjustment->current_stock_id = $request->current_stock_id;
+            $adjustment->current_stock_id = $request->stock_id;
             $adjustment->user_id = Auth::id();
-            $adjustment->store_id = session('store_id', 1); // Default to store 1 if not set
+            $adjustment->store_id = current_store_id();
             $adjustment->previous_quantity = $previousQuantity;
             $adjustment->new_quantity = $newQuantity;
             $adjustment->adjustment_quantity = $adjustmentQuantity;
-            $adjustment->adjustment_type = $request->adjustment_type;
+            $adjustment->adjustment_type = $adjustmentType;
             $adjustment->reason = $request->reason;
-            $adjustment->notes = $request->notes;
+            // $adjustment->notes = $request->notes;
             $adjustment->reference_number = 'ADJ-' . time(); // Generate a reference number
             $adjustment->save();
             
             // Add to stock tracking
             StockTracking::create([
                 'product_id' => $currentStock->product_id,
-                'store_id' => $currentStock->store_id,
-                'quantity' => ($request->adjustment_type === 'increase' ? $adjustmentQuantity : -$adjustmentQuantity),
+                'store_id' => current_store_id(),
+                'quantity' => ($adjustmentType === 'increase' ? $adjustmentQuantity : -$adjustmentQuantity),
                 'tracking_type' => 'adjustment',
                 'tracking_id' => $adjustment->id,
                 'user_id' => Auth::id(),
@@ -142,31 +233,36 @@ class StockAdjustmentController extends Controller
             DB::commit();
             
             // Log the action
-            Log::info('Stock adjustment created', [
-                'user' => Auth::user()->name,
-                'product_id' => $currentStock->product_id,
-                'product_name' => $currentStock->product->name ?? 'Unknown Product',
-                'adjustment_type' => $request->adjustment_type,
-                'adjustment_quantity' => $adjustmentQuantity,
-                'previous_quantity' => $previousQuantity,
-                'new_quantity' => $newQuantity,
-                'reason' => $request->reason
-            ]);
+            // Log::info('Stock adjustment created', [
+            //     'user' => Auth::user()->name,
+            //     'product_id' => $currentStock->product_id,
+            //     'product_name' => $currentStock->product->name ?? 'Unknown Product',
+            //     'adjustment_type' => $adjustmentType,
+            //     'adjustment_quantity' => $adjustmentQuantity,
+            //     'previous_quantity' => $previousQuantity,
+            //     'new_quantity' => $newQuantity,
+            //     'reason' => $request->reason
+            // ]);
             
             // Create detailed success message
             $productName = $currentStock->product->name ?? 'Unknown Product';
-            $adjustmentType = ucfirst($request->adjustment_type);
+            $adjustmentType = ucfirst($adjustmentType);
             $successMessage = "Stock adjustment created successfully! {$adjustmentType} of {$adjustmentQuantity} units for '{$productName}'. Previous stock: {$previousQuantity}, New stock: {$newQuantity}. Reference: {$adjustment->reference_number}";
             
-            return redirect()->route('stock-adjustments.index')
-                           ->with('success', $successMessage);
+            return response()->json([
+                'success' => true,
+                'message' => $successMessage
+            ]);
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Error creating stock adjustment: ' . $e->getMessage(), [
                 'exception' => $e,
                 'request_data' => $request->all()
             ]);
-            return back()->with('error', 'Error creating stock adjustment: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating stock adjustment: ' . $e->getMessage()
+            ], 500);
         }
     }
 

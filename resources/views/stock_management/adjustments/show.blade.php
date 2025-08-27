@@ -6,7 +6,7 @@
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="{{ route('stock-adjustments.index') }}">Stock Adjustments</a></li>
+    <li class="breadcrumb-item"><a href="{{ route('stock-adjustments-history') }}">Stock Adjustments</a></li>
     <li class="breadcrumb-item"><a href="#">View</a></li>
 @endsection
 
@@ -15,7 +15,7 @@
     <div class="card">
         <div class="card-header">
             <div class="float-right">
-                <a href="{{ route('stock-adjustments.index') }}" class="btn btn-primary">
+                <a href="{{ route('stock-adjustments-history') }}" class="btn btn-primary">
                     <i class="feather icon-list"></i> Back to List
                 </a>
                 <a href="{{ route('stock-adjustments.create') }}" class="btn btn-success">

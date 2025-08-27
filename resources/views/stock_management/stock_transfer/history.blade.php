@@ -275,10 +275,7 @@
                                                                                 data-acknowledged-by="{{ $transfer->acknowledged_by ? $transfer->acknowledged_by_name : '' }}">
                                                                                 Acknowledge
                                                                             </button>
-
-
                                                                         @endif
-
                                                                     @endif
                                                                 </td>
                                                                 <td hidden>{{ $transfer->created_at }}</td>

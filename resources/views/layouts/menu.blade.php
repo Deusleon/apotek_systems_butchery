@@ -79,7 +79,7 @@
                 <li class=""><a href="{{ route('stock-transfer.index') }}" class="">Stock Transfer</a></li>
             @endif
             @if(auth()->user()->checkPermission('View Stock Adjustment'))
-                <li class=""><a href="{{ route('stock-adjustments.index') }}" class="">Stock Adjustment</a></li>
+                <li class=""><a href="{{ route('new-stock-adjustment') }}" class="">Stock Adjustment</a></li>
             @endif
             @if(auth()->user()->checkPermission('View Daily Stock Count'))
                 <li class=""><a href="{{ route('daily-stock-count.index') }}" class="">Stock Count</a></li>
