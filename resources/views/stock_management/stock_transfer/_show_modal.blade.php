@@ -53,12 +53,13 @@
                         <!-- Items will be populated by JavaScript -->
                     </tbody>
                 </table>
+                <hr>
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-12">
                         <label for="show_remarks_textarea" class="font-bold" id="show_remarks_label"></label>
                         <span name="remarks" id="show_remarks_textarea" disabled></span>
-                    </div>
-                    <div class="col-6" id="acknowledge_remark_div" hidden>
+                    </div><br>
+                    <div class="col-12" id="acknowledge_remark_div" hidden>
                         <label for="show_acknowledge_remark_textarea" class="font-bold">Acknowledge Note:</label>
                         <span name="acknowledge_remark" id="show_acknowledge_remark_textarea" disabled></span>
                     </div>

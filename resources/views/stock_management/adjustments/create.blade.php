@@ -6,7 +6,7 @@
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="{{ route('stock-adjustments.index') }}">Stock Adjustments</a></li>
+    <li class="breadcrumb-item"><a href="{{ route('stock-adjustments-history') }}">Stock Adjustments</a></li>
     <li class="breadcrumb-item"><a href="#">Create</a></li>
 @endsection
 
@@ -117,7 +117,7 @@
                     <button type="submit" class="btn btn-primary">
                         <i class="feather icon-save"></i> Save Adjustment
                     </button>
-                    <a href="{{ route('stock-adjustments.index') }}" class="btn btn-light">
+                    <a href="{{ route('stock-adjustments-history') }}" class="btn btn-light">
                         <i class="feather icon-x"></i> Cancel
                     </a>
                 </div>

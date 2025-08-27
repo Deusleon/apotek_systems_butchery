@@ -21,7 +21,7 @@ class CurrentStockController extends Controller
 
     public function currentStock()
     {
-        $store_id = Auth::user()->store_id;
+        $store_id = current_store_id();
         $stocks = DB::table('inv_current_stock')
             ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
             ->join('inv_categories','inv_products.category_id','=','inv_categories.id')
@@ -29,7 +29,10 @@ class CurrentStockController extends Controller
                 'inv_products.brand', 'inv_products.pack_size',
                 DB::raw('sum(inv_current_stock.quantity) as quantity'),
                 'inv_categories.name as cat_name')
-            ->where('inv_current_stock.store_id',$store_id)
+            // ->where('inv_current_stock.store_id',$store_id)
+            ->when(!is_all_store(), function ($query) use ($store_id) {
+                return $query->where('inv_current_stock.store_id', $store_id);
+            })
             ->groupBy(['inv_current_stock.product_id', 'inv_products.name', 
                 'inv_products.brand', 'inv_products.pack_size', 'inv_categories.name'])
             ->havingRaw(DB::raw('sum(quantity) > 0'))
@@ -42,7 +45,10 @@ class CurrentStockController extends Controller
                 'inv_products.brand', 'inv_products.pack_size',
                 DB::raw('sum(inv_current_stock.quantity) as quantity'),
                 'inv_categories.name as cat_name')
-            ->where('inv_current_stock.store_id',$store_id)
+            // ->where('inv_current_stock.store_id',$store_id)
+            ->when(!is_all_store(), function ($query) use ($store_id) {
+                return $query->where('inv_current_stock.store_id', $store_id);
+            })
             ->groupBy(['inv_current_stock.product_id', 'inv_products.name', 
                 'inv_products.brand', 'inv_products.pack_size', 'inv_categories.name'])
             ->orderBy('inv_products.id', 'desc')
@@ -56,7 +62,10 @@ class CurrentStockController extends Controller
                 'inv_current_stock.quantity',
                 'inv_current_stock.batch_number',
                 'inv_current_stock.expiry_date')
-            ->where('inv_current_stock.store_id',$store_id)
+            // ->where('inv_current_stock.store_id',$store_id)
+            ->when(!is_all_store(), function ($query) use ($store_id) {
+                return $query->where('inv_current_stock.store_id', $store_id);
+            })
             ->where('inv_current_stock.quantity','>',0)
             ->get();
 
@@ -68,7 +77,10 @@ class CurrentStockController extends Controller
                 'inv_current_stock.quantity',
                 'inv_current_stock.batch_number',
                 'inv_current_stock.expiry_date')
-            ->where('inv_current_stock.store_id',$store_id)
+            // ->where('inv_current_stock.store_id',$store_id)
+            ->when(!is_all_store(), function ($query) use ($store_id) {
+                return $query->where('inv_current_stock.store_id', $store_id);
+            })
             ->orderBy('inv_products.id', 'desc')
             ->get();
 
@@ -85,7 +97,10 @@ class CurrentStockController extends Controller
                 'inv_categories.name as cat_name',
                 DB::raw('sum(inv_current_stock.quantity) as quantity'),
             )
-            ->where('inv_current_stock.store_id', $store_id)
+            // ->where('inv_current_stock.store_id', $store_id)
+            ->when(!is_all_store(), function ($query) use ($store_id) {
+                return $query->where('inv_current_stock.store_id', $store_id);
+            })
             ->groupBy([
                 'inv_current_stock.product_id',
                 'inv_products.name',
@@ -107,7 +122,10 @@ class CurrentStockController extends Controller
                 'inv_current_stock.quantity',
                 'inv_current_stock.batch_number',
                 'inv_current_stock.expiry_date')
-            ->where('inv_current_stock.store_id',$store_id)
+            // ->where('inv_current_stock.store_id',$store_id)
+            ->when(!is_all_store(), function ($query) use ($store_id) {
+                return $query->where('inv_current_stock.store_id', $store_id);
+            })
             ->where('inv_current_stock.quantity','=',0)
             ->get();
 
@@ -127,7 +145,7 @@ class CurrentStockController extends Controller
     //Current Stock
     public function allStock()
     {
-        $store_id = Auth::user()->store_id;
+        $store_id = current_store_id();
         $stocks = DB::table('inv_current_stock')
             ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
             ->join('sales_prices','inv_current_stock.id','=','sales_prices.stock_id')
@@ -349,8 +367,6 @@ class CurrentStockController extends Controller
             ], 500);
         }
     }
-
-
 
     public function index()
     {
@@ -816,7 +832,6 @@ class CurrentStockController extends Controller
         }
 
     }
-
     public function showPricing($id)
     {
         $stock = CurrentStock::with(['product', 'priceList' => function($query) {
