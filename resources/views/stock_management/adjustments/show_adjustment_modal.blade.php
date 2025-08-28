@@ -22,7 +22,8 @@
                             <th>Date</th>
                             <th>Type</th>
                             <th>Quantity</th>
-                            <th>Batch #</th>
+                            <th>Old Qty</th>
+                            <th>New Qty</th>
                             <th>Reason</th>
                             <th>Adjusted By</th>
                         </tr>
