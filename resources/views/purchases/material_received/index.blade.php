@@ -126,8 +126,8 @@
                         <tr>
                             <th>id</th>
                             <th>Product Name</th>
-                            <th>Quantity</th>
-                            <th class="d-none">Received</th>
+                            <th class="d-none">Ordered</th>
+                            <th>Quantity</th>    <!--receiving quantity-->
                             <th class="d-none">Remaining</th>
                             <th>Price</th>
                             <th>Amount</th>
@@ -316,7 +316,7 @@
                         }
                     ], "columnDefs": [
                         {
-                            "targets": [0,3,4],
+                            "targets": [0,2,4],
                             "visible": false
                         }
                     ],
