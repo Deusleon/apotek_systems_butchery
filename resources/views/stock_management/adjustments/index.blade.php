@@ -2,7 +2,6 @@
 
 @section('page_css')
     <style>
-
         .small-table table td,
         .small-table table th {
             padding: 0.35rem 0.5rem;
@@ -26,37 +25,19 @@
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
             <li class="nav-item">
-                <a class="nav-link text-uppercase" id="current-stock-tablist"
-                    href="{{ route('new-stock-adjustment') }}" aria-controls="current-stock" aria-selected="true">Stock
+                <a class="nav-link text-uppercase" id="current-stock-tablist" href="{{ route('new-stock-adjustment') }}"
+                    aria-controls="current-stock" aria-selected="true">Stock
                     Adjustment</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link active text-uppercase" id="all-stock-tablist" href="{{ route('stock-adjustments-history') }}"
-                    aria-controls="stock_list" aria-selected="false">Adjustment History
+                <a class="nav-link active text-uppercase" id="all-stock-tablist"
+                    href="{{ route('stock-adjustments-history') }}" aria-controls="stock_list"
+                    aria-selected="false">Adjustment History
                 </a>
             </li>
         </ul>
         <div class="card">
             <div class="card-body">
-                {{-- <div class="form-group row d-flex">
-                    <div class="col-md-6">
-                        <label for="stock_status" class="col-form-label text-md-right">Status:</label>
-                        <select name="stock_status" class="js-example-basic-single form-group" id="stock_status_id">
-                            <option name="store_name" value="all">All</option>
-                            <option name="store_name" value="1">In Stock</option>
-                            <option name="store_name" value="0">Out Of Stock</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="category" class="col-form-label text-md-left">Type:</label>
-
-                        <select name="category" class="js-example-basic-single form-control" id="category_id">
-                            <option name="store_name" value="1">Summary</option>
-                            <option name="store_name" value="0">Detailed</option>
-                        </select>
-                    </div>
-                </div> --}}
                 <!-- main table -->
                 {{--All Summary--}}
                 <div class="table-responsive" id="all_summary_stocks">
@@ -68,12 +49,6 @@
                             <tr>
                                 <th>Product Name</th>
                                 <th>Category</th>
-                                {{-- <th>Type</th> --}}
-                                {{-- <th>Quantity</th> --}}
-                                {{-- <th>Date</th> --}}
-                                {{-- <th hidden>Branch</th> --}}
-                                {{-- <th>Reason</th> --}}
-                                {{-- <th>Adjusted By</th> --}}
                                 @if (userCan('view stock adjustments'))
                                     <th>Actions</th>
                                 @endif
@@ -83,36 +58,24 @@
                         <tbody>
                             @foreach ($adjustments as $adjustment)
                                 <tr>
-                                    <td id="name_{{ $adjustment->currentStock->id }}">
-                                        {{ $adjustment->currentStock->product->name }}
-                                        {{ $adjustment->currentStock->product->brand ? ' ' . $adjustment->currentStock->product->brand : '' }}
-                                        {{ $adjustment->currentStock->product->pack_size ?? '' }}{{ $adjustment->currentStock->product->sales_uom ?? '' }}
+                                    <td>
+                                        {{ $adjustment->name }}
+                                        {{ $adjustment->brand ? ' ' . $adjustment->brand : '' }}
+                                        {{ $adjustment->pack_size ?? '' }}{{ $adjustment->sales_uom ?? '' }}
                                     </td>
-                                    <td id="category_{{ $adjustment->currentStock->id }}">{{ $adjustment->currentStock->product->category->name ?? 'N/A' }}</td>
-                                    {{-- <td id="type_{{ $adjustment->currentStock->id }}">
-                                        <span
-                                            class="badge p-2 btn-rounded badge-{{ $adjustment->adjustment_type === 'increase' ? 'success' : 'danger' }}" style="width: 70px;">
-                                            {{ ucfirst($adjustment->adjustment_type) }}
-                                        </span>
+                                    <td>{{ $adjustment->category_name }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-success btn-sm btn-rounded btn-show-adjustment"
+                                            data-toggle="modal" data-target="#showStockAdjustment"
+                                            data-product-id="{{ $adjustment->product_id }}"
+                                            data-product-name="{{ $adjustment->name }}"
+                                            data-product-brand="{{ $adjustment->brand }}"
+                                            data-product-pack-size="{{ $adjustment->pack_size }}"
+                                            data-product-sales-uom="{{ $adjustment->sales_uom }}"
+                                            data-more-details='@json($detailed[$adjustment->product_id] ?? [])'>
+                                            Show
+                                        </button>
                                     </td>
-                                    <td id="quantity_{{ $adjustment->currentStock->id }}">{{ number_format($adjustment->new_quantity) }}</td>
-                                    <td id="date_{{ $adjustment->currentStock->id }}">{{ $adjustment->created_at->format('Y-m-d') }}</td>
-                                    <td id="reason_{{ $adjustment->currentStock->id }}">{{ $adjustment->reason }}</td>
-                                    <td id="adjusted_by_{{ $adjustment->currentStock->id }}">{{ $adjustment->user->name ?? 'N/A' }}</td> --}}
-                                    @if (userCan('create stock adjustments'))
-                                        <td id="actions_{{ $adjustment->currentStock->id }}">
-                                            <!-- Adjustment Button -->
-                                            <button type="button" class="btn btn-success btn-sm btn-rounded btn-show-adjustment"
-                                                data-toggle="modal" data-target="#showAdjustedStockModal"
-                                                data-id="{{ $adjustment->id }}" data-product-id="{{ $adjustment->currentStock->product->id }}" data-product-name="{{ $adjustment->currentStock->product->name }}"
-                                                data-product-brand="{{ $adjustment->currentStock->product->brand }}"
-                                                data-product-pack-size="{{ $adjustment->currentStock->product->pack_size }}"
-                                                data-product-sales-uom="{{ $adjustment->currentStock->product->sales_uom }}"
-                                                data-adjusted-qty="{{ $adjustment->new_quantity }}">
-                                                Show
-                                            </button>
-                                        </td>
-                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>
@@ -133,40 +96,103 @@
 
 @push("page_scripts")
     <script>
-            $('#history').DataTable({
-                searching: true,
-                responsive: true,
-                order: [
-                    [0, 'asc']
-                ]
-            });
+        $('#history').DataTable({
+            searching: true,
+            responsive: true,
+            order: [
+                [0, 'asc']
+            ]
+        });
 
         $(document).on('click', '.btn-show-adjustment', function () {
             const $btn = $(this);
-            const product_name = $btn.data('product-name');
-            const product_brand = $btn.data('product-brand');
-            const product_pack_size = $btn.data('product-pack-size');
-            const product_sales_uom = $btn.data('product-sales-uom');
-            const current_stock = $btn.data('current-stock');
-            const id = $btn.data('id');
-            const product_id = $btn.data('product-id');
-            let stock = Number(current_stock);
-            let displayStock = (stock % 1 === 0) ? stock : stock.toFixed(1);
-            $('#show_product_name').text(product_name+' '+product_brand+' '+product_pack_size+product_sales_uom);
-            $('#show_current_stock').text(displayStock);
-            $('#confirmAdjustmentProductName').text(product_name);
-            $('#product_id').val(product_id);
-            $('#stock_id').val(id);
-            $('#current_stock_input').val(current_stock);
+            const productId = $btn.data('product-id');
+
+            const productName = ($btn.data('product-name') || '');
+            const brand = ($btn.data('product-brand') || '');
+            const pack = ($btn.data('product-pack-size') || '');
+            const uom = ($btn.data('product-sales-uom') || '');
+
+            let detailsByBatch = $btn.data('more-details');
+            if (typeof detailsByBatch === "string") {
+                try {
+                    detailsByBatch = JSON.parse(detailsByBatch);
+                } catch (e) {
+                    detailsByBatch = {};
+                }
+            }
+
+            $('#show_product_name').text(`${productName} ${brand} ${pack}${uom}`);
+
+            const $tbody = $('#show_items_table_body');
+            $tbody.empty();
+
+            const batches = Object.keys(detailsByBatch || {});
+            if (batches.length === 0) {
+                $tbody.append('<tr><td colspan="6" class="text-center text-muted">No adjustments found</td></tr>');
+            } else {
+                batches.forEach(batchNo => {
+                    let logs = detailsByBatch[batchNo] || [];
+
+                    if (!Array.isArray(logs)) logs = Object.values(logs);
+
+                    // header row for batch
+                    $tbody.append(
+                        `<tr class="table-active">
+                                            <td colspan="7"><strong>Batch #:</strong> ${batchNo}</td>
+                                        </tr>`
+                    );
+
+                    logs.forEach(log => {
+                        const created = extractDate(log.created_at);
+                        const type = (log.adjustment_type === 'increase' ? 'Postive' : 'Negative' || '-');
+                        const qty = (typeof log.adjustment_quantity !== 'undefined'
+                            ? formatNumber(log.adjustment_quantity)
+                            : (log.quantity ?? '-'));
+                        const reason = (log.reason ?? '-');
+                        const userNm = (log.user && log.user.name
+                            ? log.user.name
+                            : '-');
+                        const prevqty = (typeof log.previous_quantity !== 'undefined'
+                            ? formatNumber(log.previous_quantity)
+                            : '-');
+                        const newqty = (typeof log.new_quantity !== 'undefined'
+                            ? formatNumber(log.new_quantity) : '-');
+
+                        $tbody.append(
+                            `<tr>
+                                <td>${created}</td>
+                                <td>
+                                    <span class="badge p-2" style="${type === 'Postive' ? 'background-color:#BBF7D0; color:#48bb78;' : 'background-color:#FECACA; color:#f56565;'}width:60px;" >
+                                        ${capitalize(type)}
+                                    </span>
+                                </td>
+                                <td>${qty}</td>
+                                <td>${prevqty}</td>
+                                <td>${newqty}</td>
+                                <td>${reason}</td>
+                                <td>${userNm}</td>
+                            </tr>`
+                        );
+                    });
+                });
+
+            }
 
             $('#showStockAdjustment').modal('show');
         });
+        function extractDate(val) {
+            if (!val) return '-';
+            const d = new Date(val);
+            return isNaN(d) ? String(val).split(' ')[0] : d.toISOString().split('T')[0];
+        }
+        function capitalize(s) { s = s || ''; return s.charAt(0).toUpperCase() + s.slice(1); }
 
         function formatNumber(num) {
             if (num === null || num === undefined || num === '') return '';
             return parseFloat(num).toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 1
             });
         }
 

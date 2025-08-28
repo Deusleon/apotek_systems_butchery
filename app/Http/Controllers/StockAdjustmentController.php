@@ -29,11 +29,48 @@ class StockAdjustmentController extends Controller
 
     public function index()
     {
-        $adjustments = StockAdjustmentLog::with(['currentStock.product', 'user', 'store'])
-                 ->latest()
-                 ->get();
-   
-        return view('stock_management.adjustments.index', compact('adjustments'));
+        $store_id = current_store_id();
+        // Summary per product (grouped)
+        $adjustments = StockAdjustmentLog::join('inv_current_stock', 'stock_adjustment_logs.current_stock_id', '=', 'inv_current_stock.id')
+        ->join('inv_products', 'inv_current_stock.product_id', '=', 'inv_products.id')
+        ->join('inv_categories', 'inv_products.category_id', '=', 'inv_categories.id')
+        ->select(
+            'stock_adjustment_logs.current_stock_id',
+            'inv_products.id as product_id',
+            'inv_products.name',
+            'inv_products.brand',
+            'inv_products.pack_size',
+            'inv_products.sales_uom',
+            'inv_categories.name as category_name',
+            DB::raw('COUNT(stock_adjustment_logs.id) as adjustments_count'),
+            DB::raw('SUM(stock_adjustment_logs.adjustment_quantity) as total_adjusted')
+        )
+        ->where('stock_adjustment_logs.store_id', $store_id)
+        ->groupBy(
+            // 'stock_adjustment_logs.current_stock_id',
+            'inv_products.name',
+            'inv_products.brand',
+            'inv_products.pack_size',
+            'inv_products.sales_uom',
+            'inv_categories.name'
+        )
+        ->latest('stock_adjustment_logs.created_at')
+        ->get();
+
+         $detailed = StockAdjustmentLog::with(['currentStock.product.category', 'user'])
+        ->where('store_id', $store_id)
+        ->orderBy('created_at', 'desc')
+        ->get()
+        ->groupBy(function($item) {
+            return $item->currentStock->product_id; 
+        })
+        ->map(function($logs) {
+            return $logs->groupBy(function($item) {
+                return $item->currentStock->batch_number ?? 'N/A'; 
+            });
+        });
+
+        return view('stock_management.adjustments.index', compact('adjustments', 'detailed'));
     }
       public function newAdjustment()
     {
