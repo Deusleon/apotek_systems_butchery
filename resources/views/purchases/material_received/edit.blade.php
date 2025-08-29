@@ -21,11 +21,10 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="code" class="col-md-4 col-form-label text-md-right">Quantity <font
-                                        color="red">*</font></label>
+                                <label for="code" class="col-md-4 col-form-label text-md-right">Quantity</label>
                                 <div class="col-md-8">
                                     <input type="text" class="form-control" id="quantity_edit" name="quantity_edit"
-                                           onkeypress="return isNumberKey(event,this)" required autocomplete="off">
+                                           onkeypress="return isNumberKey(event,this)" autocomplete="off" readonly>
                                 </div>
                             </div>
                             <div class="form-group row">

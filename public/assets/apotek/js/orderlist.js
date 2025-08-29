@@ -49,7 +49,7 @@ var order_history_datatable = $("#order_history_datatable").DataTable({
                         "<button id='print_btn' class='btn btn-secondary btn-rounded btn-sm' disabled>" +
                         "<span class='fa fa-print' aria-hidden='true'></span> Print" +
                         "</button> " +
-                        "<span class='badge badge-warning badge-lg'>Cancelled</span>"
+                        "<span class='badge badge-warning badge-lg'>Rejected</span>"
                     );
                 }
 

@@ -142,8 +142,12 @@
                                         <th class="text-right d-none">Unit Price</th>
                                         <th class="text-right d-none">Total Price</th>
                                         <th class="text-center">Receive</th>
-                                        <th class="text-center">Batch #</th>
-                                        <th class="text-center">Expiry Date</th>
+                                        @if($batch_setting === 'YES')
+                                            <th class="text-center">Batch #</th>
+                                        @endif
+                                        @if($expire_date === 'YES')
+                                            <th class="text-center">Expiry Date</th>
+                                        @endif
                                     </tr>
                                 </thead>
                                 <tbody id="order_items_body">
@@ -173,6 +177,9 @@
 <script>
     $(document).ready(function() {
         const orders = @json($orders);
+        const batchSetting = @json($batch_setting);
+        const expireDate   = @json($expire_date);
+
 
         // Initialize DataTable
         const ordersTable = $('#orders_table').DataTable({
@@ -201,7 +208,7 @@
                         const badgeClass = "badge btn-rounded btn-sm"; // Rounded & small like buttons
                         const style = "display:inline-block; min-width:110px;"; // maintain fixed width
                         if (data == '1') return `<span class='${badgeClass} badge-warning' style='${style}'>Pending</span>`;
-                        if (data == '2') return `<span class='${badgeClass} badge-info' style='${style}'>Partially</span>`;
+                        if (data == '2') return `<span class='${badgeClass} badge-info' style='${style}'>Partial</span>`;
                         if (data == '3') return `<span class='${badgeClass} badge-success' style='${style}'>Completed</span>`;
                         return `<span class='${badgeClass} badge-secondary' style='${style}'>Unknown</span>`;
                     }
@@ -259,24 +266,30 @@
                     <td class="text-right d-none">${unitPrice.toLocaleString('en-US',{ minimumFractionDigits:2 })}</td>
                     <td class="text-right d-none">${totalPrice.toLocaleString('en-US',{ minimumFractionDigits:2 })}</td>
                     <td class="receive-cell text-center">
-                        <span class="plain-receive">${orderedQty}</span>
+                        <span class="plain-receive">${remaining}</span>
                         <input type="text" name="items[${index}][quantity]" 
                             class="form-control form-control-sm text-center receive-qty-input edit-mode-hidden"
-                            min="0" max="${remaining}" value="${orderedQty}" ${isFullyReceived?'disabled':''}>
+                            min="0" max="${remaining}" value="${remaining}" ${isFullyReceived?'disabled':''}>
                     </td>
+
+                    ${batchSetting === 'YES' ? `
                     <td>
                         <input type="text" name="items[${index}][batch_number]" 
                             class="form-control form-control-sm edit-mode-hidden" ${isFullyReceived?'disabled':''}>
-                    </td>
+                    </td>` : ''}
+
+                    ${expireDate === 'YES' ? `
                     <td>
-                        <input type="text" placeholder="YYYY/MM/DD" name="items[${index}][expiry_date]" 
+                        <input type="text" placeholder="YYYY-MM-DD" name="items[${index}][expiry_date]" 
                             class="form-control form-control-sm edit-mode-hidden" ${isFullyReceived?'disabled':''}>
-                    </td>
+                    </td>` : ''}
+                    
                     <input type="hidden" name="items[${index}][product_id]" value="${item.product_id}">
                     <input type="hidden" name="items[${index}][purchase_order_detail_id]" value="${item.id}">
                     <input type="hidden" name="items[${index}][cost_price]" value="${unitPrice}">
                 </tr>
-            `);
+                `);
+
 
             });
 
@@ -339,25 +352,31 @@
         $('#edit-receive-btn').on('click', function() {
             $('#order_items_body tr').each(function() {
                 const $row = $(this);
+
                 // Show inputs
                 $row.find('.receive-qty-input, [name*="[batch_number]"], [name*="[expiry_date]"]').removeClass('edit-mode-hidden');
                 // Hide plain text
                 $row.find('.plain-receive').hide();
 
-                // Get ordered quantity
+                // Extract values
                 const orderedQty = parseFloat($row.find('.ordered-qty').text()) || 0;
+                const initialReceivedQty = parseFloat($row.find('.received-qty-cell').data('initial-received')) || 0;
+                const remaining = orderedQty - initialReceivedQty;
 
-                // Fill both receive input and received cell with ordered qty
-                $row.find('.receive-qty-input').val(orderedQty);
-                $row.find('.received-qty-cell').text(orderedQty);
+                // Pre-fill receive input with the remaining (not ordered) ✅
+                $row.find('.receive-qty-input').val(remaining > 0 ? remaining : 0);
 
-                // Also update remaining (if you want it visible)
-                $row.find('.remaining-qty-cell').text(0);
+                // Update received cell = initial already received + remaining
+                $row.find('.received-qty-cell').text(initialReceivedQty + (remaining > 0 ? remaining : 0));
+
+                // Update remaining cell (so it goes to 0 if all filled)
+                $row.find('.remaining-qty-cell').text(orderedQty - (initialReceivedQty + remaining));
             });
 
             // Focus first receive input
             $('#order_items_body tr:first .receive-qty-input').focus();
         });
+
 
     });
 </script>

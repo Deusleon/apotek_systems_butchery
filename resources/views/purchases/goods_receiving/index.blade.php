@@ -121,8 +121,10 @@
                                 <select name="invoice_no" class="form-control js-example-basic-single"
                                     id="goodreceving_invoice_id">
                                     <option selected="true" value="" disabled="disabled">Select Invoice..</option>
-                                    @foreach($invoices as $invoice)
-                                        <option value="{{ $invoice->id }}">{{ $invoice->invoice_no }} - {{ optional($invoice->supplier)->name }}</option>
+                                    @foreach($invoices->sortByDesc('id') as $invoice)
+                                        <option value="{{ $invoice->id }}">
+                                            {{ $invoice->invoice_no }} - {{ optional($invoice->supplier)->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                             @endif
@@ -136,9 +138,7 @@
                                     <input type="text" name="batch_number" class="form-control" id="invoicing_batch_n"
                                         required="true" value="{{session('batch_number')}}" />
                                 @else
-                                    <label for="code">Batch #</label>
-                                    <input type="text" name="batch_number" class="form-control" id="invoicing_batch_n"
-                                        value="{{session('batch_number')}}" />
+                                    
                                 @endif
                             </div>
                         </div>
@@ -523,6 +523,58 @@
     <script src="{{asset("assets/apotek/js/goods-receiving.js")}}"></script>
     <script src="{{asset("assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js")}}"></script>
     <script src="{{asset("assets/js/pages/ac-datepicker.js")}}"></script>
+
+   <script>
+    // Step 1: Store all invoices in a JS array
+    const allInvoices = @json($invoices->map(function($inv) {
+        return [
+            'id' => $inv->id,
+            'invoice_no' => $inv->invoice_no,
+            'supplier_id' => $inv->supplier_id
+        ];
+    }));
+
+    // Step 2: Function to filter invoices when supplier changes
+    function goodReceivingFilterInvoiceBySupplier() {
+        const supplierSelect = document.getElementById('good_receiving_supplier_ids');
+        const invoiceSelect = document.getElementById('goodreceving_invoice_id');
+        const supplierId = supplierSelect.value;
+
+        // Clear current invoice options
+        invoiceSelect.innerHTML = '<option selected disabled>Select Invoice...</option>';
+
+        // Filter invoices based on selected supplier
+        const filteredInvoices = allInvoices.filter(inv => inv.supplier_id == supplierId);
+
+         // Sort descending by ID (latest first)
+        filteredInvoices.sort((a, b) => b.id - a.id);
+        
+        // Populate invoice dropdown (only invoice_no now)
+        filteredInvoices.forEach(inv => {
+            const option = document.createElement('option');
+            option.value = inv.id;
+            option.text = inv.invoice_no; // <-- removed the supplier name
+            invoiceSelect.appendChild(option);
+        });
+
+        // Reset Select2 display
+        $(invoiceSelect).val('').trigger('change');
+    }
+
+    // Step 3: Initialize Select2 for invoice dropdown
+    $(document).ready(function () {
+        $('#goodreceving_invoice_id').select2({
+            width: '100%',
+            placeholder: 'Select Invoice...'
+        });
+
+        $('#good_receiving_supplier_ids').select2({
+            width: '100%',
+            placeholder: 'Select Supplier...'
+        });
+    });
+</script>
+
 
 
     <script>

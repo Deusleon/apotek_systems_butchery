@@ -354,10 +354,12 @@ class GoodsReceivingController extends Controller
 
     public function orderReceive(Request $request)
 {
+    $batch_setting = Setting::where('id', 110)->value('value');
+    $expire_date = Setting::where('id', 123)->value('value');
+
     DB::beginTransaction();
 
     try {
-        // 🔹 Validation
         $validated = $request->validate([
             'order_id' => 'required|exists:orders,id',
             'supplier_id' => 'required|exists:inv_suppliers,id',
@@ -378,24 +380,26 @@ class GoodsReceivingController extends Controller
 
         $default_store_id = optional(Auth::user()->store->first())->id ?? 1;
 
-        // 🔹 Process each item
         foreach ($validated['items'] as $itemData) {
             if (empty($itemData['quantity']) || (int)$itemData['quantity'] <= 0) {
                 continue;
             }
 
             $received_qty = (int)$itemData['quantity'];
-            $order_detail = OrderDetail::find($itemData['purchase_order_detail_id']);
+            $order_detail = OrderDetail::findOrFail($itemData['purchase_order_detail_id']);
 
-            $remaining_qty = $order_detail->ordered_qty - $order_detail->received_quantity;
+            // Use the real DB column (received_qty) to compute remaining:
+            $current_received = (int)($order_detail->received_qty ?? 0);
+            $remaining_qty = (int)$order_detail->ordered_qty - $current_received;
+
             if ($received_qty > $remaining_qty) {
                 throw new \Exception("Cannot receive more than the remaining quantity for product ID {$itemData['product_id']}.");
             }
 
-            $order_detail->received_quantity += $received_qty;
-            $order_detail->save();
+            // Atomically increment the DB column to avoid accessor/setter mismatch:
+            $order_detail->increment('received_qty', $received_qty);
 
-            // 🔹 Save goods receiving
+            // --- Save goods_receiving (no change) ---
             $goods_receiving = new GoodsReceiving();
             $goods_receiving->product_id   = $itemData['product_id'];
             $goods_receiving->supplier_id  = $validated['supplier_id'];
@@ -407,7 +411,7 @@ class GoodsReceivingController extends Controller
             $goods_receiving->created_by   = Auth::id();
             $goods_receiving->save();
 
-            // 🔹 Update stock
+            // --- Update stock (no change) ---
             $stock = CurrentStock::firstOrNew([
                 'product_id'   => $itemData['product_id'],
                 'batch_number' => $itemData['batch_number'],
@@ -418,7 +422,7 @@ class GoodsReceivingController extends Controller
             $stock->expiry_date = $goods_receiving->expire_date;
             $stock->save();
 
-            // 🔹 Track stock movement
+            // --- Track stock movement (no change) ---
             StockTracking::create([
                 'stock_id'   => $stock->id,
                 'product_id' => $itemData['product_id'],
@@ -430,15 +434,16 @@ class GoodsReceivingController extends Controller
             ]);
         }
 
-        // 🔹 Update order status
-        $order->refresh();
-        $total_ordered  = $order->details->sum('ordered_qty');
-        $total_received = $order->details->sum('received_quantity');
+        // --- recompute totals directly from DB to avoid stale/aliased attributes ---
+        $total_ordered  = OrderDetail::where('order_id', $order->id)->sum('ordered_qty');
+        $total_received = OrderDetail::where('order_id', $order->id)->sum('received_qty');
 
-        if ($total_received >= $total_ordered) {
-            $order->status = '3'; // Fully received
-        } elseif ($total_received > 0) {
-            $order->status = '2'; // Partial
+        if ($total_received == 0) {
+            $order->status = '1'; // Pending
+        } elseif ($total_received < $total_ordered) {
+            $order->status = '2'; // Partially
+        } else {
+            $order->status = '3'; // Completed
         }
         $order->save();
 
@@ -455,6 +460,7 @@ class GoodsReceivingController extends Controller
         return redirect()->back()->with('error', 'An unexpected error occurred while processing the order.');
     }
 }
+
 
 
     public function filterInvoice(Request $request)

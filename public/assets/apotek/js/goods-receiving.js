@@ -625,6 +625,9 @@ function goodReceivingFilterInvoiceBySupplier() {
     });
 }
 
+// Get expiry setting from hidden input
+var expiry_setting = $("#expire_date_enabler").val(); // will be 'YES' or 'NO'
+
 // InvoiceCartTable
 var invoicecart_table = $("#invoicecart_table").DataTable({
     searching: false,
@@ -657,7 +660,11 @@ var invoicecart_table = $("#invoicecart_table").DataTable({
         { title: "Quantity", data: "quantity" },
         { title: "Buy Price", data: "buying_price" },
         { title: "Sell Price", data: "selling_price" },
-        { title: "Expire  Date", data: "expire_date" },
+        {
+            title: "Expire Date",
+            data: "expire_date",
+            visible: expiry_setting.trim() === "YES", // trim to remove any whitespace
+        },
         {
             title: "Action",
             defaultContent:
@@ -690,13 +697,30 @@ $("#invoicecart_table tbody").on("click", "#edit_btn", function () {
         row_data.selling_price = `<input style='width: 90%' type='text' class='form-control inventedAction' id='edit_selling_price' onchange='invoiceamountCheck()'  value=${selling_price}  required/>`;
 
         if (expire_date_enabler === "YES") {
-            row_data.expire_date = `<input style='width: 90%' type='date' class='form-control' id='edit_expire_date' min="${tommorow}" value="${expire_date}" required/>`;
+            row_data.expire_date = `<input style='width: 90%' type='text' class='form-control edit-expire-date' id='edit_expire_date' min="${tommorow}" placeholder="YYYY-MM-DD" value="${expire_date}" required/>`;
         }
         console.log(row_data.expire_date);
         invoice_cart[index] = row_data;
         invoicecart_table.clear();
         invoicecart_table.rows.add(invoice_cart);
         invoicecart_table.draw();
+
+        // 🔑 rebind the date picker
+        setTimeout(() => {
+            $(".edit-expire-date")
+                .daterangepicker({
+                    singleDatePicker: true,
+                    showDropdowns: true,
+                    minDate: moment().add(1, "days"),
+                    autoUpdateInput: false,
+                    locale: {
+                        format: "YYYY-MM-DD",
+                    },
+                })
+                .on("apply.daterangepicker", function (ev, picker) {
+                    $(this).val(picker.startDate.format("YYYY-MM-DD"));
+                });
+        }, 50);
 
         edit_btn_set = 1;
     }
