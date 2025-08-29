@@ -142,8 +142,12 @@
                                         <th class="text-right d-none">Unit Price</th>
                                         <th class="text-right d-none">Total Price</th>
                                         <th class="text-center">Receive</th>
-                                        <th class="text-center">Batch #</th>
-                                        <th class="text-center">Expiry Date</th>
+                                        @if($batch_setting === 'YES')
+                                            <th class="text-center">Batch #</th>
+                                        @endif
+                                        @if($expire_date === 'YES')
+                                            <th class="text-center">Expiry Date</th>
+                                        @endif
                                     </tr>
                                 </thead>
                                 <tbody id="order_items_body">
@@ -173,6 +177,9 @@
 <script>
     $(document).ready(function() {
         const orders = @json($orders);
+        const batchSetting = @json($batch_setting);
+        const expireDate   = @json($expire_date);
+
 
         // Initialize DataTable
         const ordersTable = $('#orders_table').DataTable({
@@ -201,7 +208,7 @@
                         const badgeClass = "badge btn-rounded btn-sm"; // Rounded & small like buttons
                         const style = "display:inline-block; min-width:110px;"; // maintain fixed width
                         if (data == '1') return `<span class='${badgeClass} badge-warning' style='${style}'>Pending</span>`;
-                        if (data == '2') return `<span class='${badgeClass} badge-info' style='${style}'>Partially</span>`;
+                        if (data == '2') return `<span class='${badgeClass} badge-info' style='${style}'>Partial</span>`;
                         if (data == '3') return `<span class='${badgeClass} badge-success' style='${style}'>Completed</span>`;
                         return `<span class='${badgeClass} badge-secondary' style='${style}'>Unknown</span>`;
                     }
@@ -265,19 +272,24 @@
                             min="0" max="${remaining}" value="${remaining}" ${isFullyReceived?'disabled':''}>
                     </td>
 
+                    ${batchSetting === 'YES' ? `
                     <td>
                         <input type="text" name="items[${index}][batch_number]" 
                             class="form-control form-control-sm edit-mode-hidden" ${isFullyReceived?'disabled':''}>
-                    </td>
+                    </td>` : ''}
+
+                    ${expireDate === 'YES' ? `
                     <td>
                         <input type="text" placeholder="YYYY-MM-DD" name="items[${index}][expiry_date]" 
                             class="form-control form-control-sm edit-mode-hidden" ${isFullyReceived?'disabled':''}>
-                    </td>
+                    </td>` : ''}
+                    
                     <input type="hidden" name="items[${index}][product_id]" value="${item.product_id}">
                     <input type="hidden" name="items[${index}][purchase_order_detail_id]" value="${item.id}">
                     <input type="hidden" name="items[${index}][cost_price]" value="${unitPrice}">
                 </tr>
-            `);
+                `);
+
 
             });
 

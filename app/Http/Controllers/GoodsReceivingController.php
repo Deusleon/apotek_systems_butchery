@@ -354,6 +354,9 @@ class GoodsReceivingController extends Controller
 
     public function orderReceive(Request $request)
 {
+    $batch_setting = Setting::where('id', 110)->value('value');
+    $expire_date = Setting::where('id', 123)->value('value');
+
     DB::beginTransaction();
 
     try {
