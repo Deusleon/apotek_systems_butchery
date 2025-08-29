@@ -23,7 +23,7 @@ class PurchaseOrderListController extends Controller
         $order = Order::find($request->id);
         $order->status = 'Cancelled';
         $order->save();
-        session()->flash("alert-danger", "Order Cancelled Successfully!");
+        session()->flash("alert-danger", "Order Rejected Successfully!");
         return back();
     }
 
