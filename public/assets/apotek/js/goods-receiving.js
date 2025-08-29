@@ -697,7 +697,7 @@ $("#invoicecart_table tbody").on("click", "#edit_btn", function () {
         row_data.selling_price = `<input style='width: 90%' type='text' class='form-control inventedAction' id='edit_selling_price' onchange='invoiceamountCheck()'  value=${selling_price}  required/>`;
 
         if (expire_date_enabler === "YES") {
-            row_data.expire_date = `<input style='width: 90%' type='text' class='form-control edit-expire-date' id='edit_expire_date' min="${tommorow}" placeholder="YYYY/MM/DD" value="${expire_date}" required/>`;
+            row_data.expire_date = `<input style='width: 90%' type='text' class='form-control edit-expire-date' id='edit_expire_date' min="${tommorow}" placeholder="YYYY-MM-DD" value="${expire_date}" required/>`;
         }
         console.log(row_data.expire_date);
         invoice_cart[index] = row_data;

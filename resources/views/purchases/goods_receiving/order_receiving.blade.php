@@ -270,7 +270,7 @@
                             class="form-control form-control-sm edit-mode-hidden" ${isFullyReceived?'disabled':''}>
                     </td>
                     <td>
-                        <input type="text" placeholder="YYYY/MM/DD" name="items[${index}][expiry_date]" 
+                        <input type="text" placeholder="YYYY-MM-DD" name="items[${index}][expiry_date]" 
                             class="form-control form-control-sm edit-mode-hidden" ${isFullyReceived?'disabled':''}>
                     </td>
                     <input type="hidden" name="items[${index}][product_id]" value="${item.product_id}">
