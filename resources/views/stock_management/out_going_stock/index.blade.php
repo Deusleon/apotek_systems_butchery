@@ -101,43 +101,40 @@
                             </select>
                         </div>
                     </div>
-
+                    {{-- Summary --}}
                     <div id="tbody" class="table-responsive">
-                        <table id="fixed-header" class="display table nowrap table-striped table-hover" style="width:100%">
+                        <table id="fixedHeader" class="display table nowrap table-striped table-hover" style="width:100%">
 
                             <thead>
                                 <tr>
                                     <th>Product Name</th>
-                                    <th>Out Mode</th>
                                     <th>Quantity</th>
-                                    <th>User</th>
-                                    <th>Out Date</th>
-                                </tr>
-                            </thead>
-
-                        </table>
-
-                    </div>
-
-                    <div id="tbodyRePrintFilter" style="display: none" class="table-responsive">
-                        <table id="fixed-header-ledger" class="display table nowrap table-striped table-hover"
-                            style="width:100%">
-
-                            <thead>
-                                <tr>
-                                    <th>Product Name</th>
-                                    <th>Out Mode</th>
-                                    <th>Quantity</th>
-                                    <th>User</th>
-                                    <th>Out Date</th>
+                                    <th>QoH</th>
                                 </tr>
                             </thead>
                             <tbody>
-
+                                
+                            </tbody>
                         </table>
 
                     </div>
+                    {{-- Detailed --}}
+                    <div id="detailedTable" style="display: none;" class="table-responsive">
+                        <table id="fixedHeader2" class="display table nowrap table-striped table-hover" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Batch #</th>
+                                    <th>Quantity</th>
+                                    <th>QoH</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
 
+                    </div>
 
                     <div id="loading">
                         <image id="loading-image" src="{{asset('assets/images/spinner.gif')}}"></image>

@@ -163,7 +163,7 @@
                                     {{-- <button id="deselect-all" class="btn btn-danger">Cancel</button> --}}
                                     {{-- <a href="{{ route('stock-transfer.index') }}" class="btn btn-danger">Clear</a> --}}
                                     <button id="transfer_preview" type="submit" class="btn btn-primary">
-                                        Update Transfer
+                                        Update
                                     </button>
                                 </div>
                             </div>
