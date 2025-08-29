@@ -778,7 +778,8 @@ class StockTransferController extends Controller {
 
                 if ($batches->isEmpty()) {
                     DB::rollBack();
-                    return response()->json(['message' => "Insufficient stock for product id {$productId} in store {$fromStore}"], 422);
+                    session()->flash('alert-danger', "Insufficient stock in this store");
+            return redirect()->route('stock-transfer-history')->with(['message' => "Insufficient stock for product id {$productId} in store {$fromStore}"]);
                 }
 
                 foreach ($batches as $batch) {
@@ -816,9 +817,11 @@ class StockTransferController extends Controller {
                 if ($remaining > 0) {
                     // not enough across all batches - rollback and return error
                     DB::rollBack();
-                    return response()->json([
-                        'message' => "Insufficient total stock for product id {$productId} in store {$fromStore}. Short by {$remaining}."
-                    ], 422);
+                    session()->flash('alert-danger', "Insufficient stock in this store");
+            return redirect()->route('stock-transfer-history')->with(['message' => "Insufficient stock for product id {$productId} in store {$fromStore}"]);
+                    // return response()->json([
+                    //     'message' => "Insufficient total stock for product id {$productId} in store {$fromStore}. Short by {$remaining}."
+                    // ], 422);
                 }
             }
 

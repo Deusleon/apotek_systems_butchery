@@ -83,7 +83,8 @@
         <div class="card">
             <div class="card-body">
                 <div class="tab-pane fade show active" id="new_sale" role="tabpanel" aria-labelledby="new_sale-tab">
-                    <form id="daily-stock" action="{{ route('daily-stock-count-pdf-gen') }}" method="post"
+                    {{-- <form id="daily-stock" action="{{ route('daily-stock-count-pdf-gen') }}" method="post" --}}
+                    <form id="daily-stock" action="" method="post"
                         enctype="multipart/form-data">
                         @csrf()
                         <div class="col mb-3">
@@ -92,7 +93,7 @@
                                     <div class="row">
                                         <label for="d_auto_8" class="col text-md-right mt-2">Date:</label>
                                         <input type="text" name="sale_date" class="col form-control" id="d_auto_8"
-                                            value="{{$today}}" required>
+                                            value="{{ \Carbon\Carbon::parse($today)->format('Y/m/d') }}" required>
                                     </div>
                                 </div>
                             </div>
@@ -116,9 +117,13 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <script>
+                                        console.log('Received data', @json($products));
+                                    </script>
                                     @foreach($products as $product)
                                         <tr>
-                                            <td>{{$product['product_name']}}</td>
+                                            {{-- <td>{{$product['product_name'].' '.$product['brand'].' '.$product['pack_size'].' '.$product['sales_uom']}}</td> --}}
+                                            <td>{{ $product['product_name'] }}</td>
                                             <td>{{ number_format($product['quantity_sold'], 0) }}</td>
                                             <td>{{ number_format($product['quantity_on_hand'], 0) }}</td>
                                         </tr>

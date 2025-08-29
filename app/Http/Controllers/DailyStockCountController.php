@@ -38,15 +38,22 @@ class DailyStockCountController extends Controller
     public function summation($specific_date)
     {
         /*get default store*/
-        $default_store_id = Auth::user()->store->id ?? 1;
+        $default_store_id = current_store_id();
 
         $sales_per_date = Sale::where(DB::raw('date(date)'), $specific_date)->get();
 
-        $current_stocks = CurrentStock::select(DB::raw('product_id'),
-            DB::raw('sum(quantity) as quantity_on_hand'), 'id')
-            ->where('store_id', $default_store_id)
-            ->groupby('product_id')
-            ->get();
+        if (is_all_store()){            
+            $current_stocks = CurrentStock::select(DB::raw('product_id'),
+                DB::raw('sum(quantity) as quantity_on_hand'), 'id')
+                ->groupby('product_id')
+                ->get();
+        }else{
+            $current_stocks = CurrentStock::select(DB::raw('product_id'),
+                DB::raw('sum(quantity) as quantity_on_hand'), 'id')
+                ->where('store_id', $default_store_id)
+                ->groupby('product_id')
+                ->get();
+        }
 
         $products = array();
         $dailyStockCount = array();
@@ -54,25 +61,29 @@ class DailyStockCountController extends Controller
         /*sale per day*/
         foreach ($sales_per_date as $sale_per_date) {
             /*check for that sale id*/
-            $sale_per_date_details = SalesDetail::select('sales_details.quantity', 'stock_id')
-                ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
-                ->where('store_id', $default_store_id)
-                ->where('sale_id', $sale_per_date->id)
-                ->get();
+            if (is_all_store()) {
+                $sale_per_date_details = SalesDetail::select('sales_details.quantity', 'stock_id')
+                    ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
+                    ->where('sale_id', $sale_per_date->id)
+                    ->get();
+            }else{
+                $sale_per_date_details = SalesDetail::select('sales_details.quantity', 'stock_id')
+                    ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
+                    ->where('store_id', $default_store_id)
+                    ->where('sale_id', $sale_per_date->id)
+                    ->get();
+            }
             foreach ($sale_per_date_details as $sale_per_date_detail) {
                 array_push($products, array(
                     'product_id' => $sale_per_date_detail->currentStock['product_id'],
-                    'product_name' => $sale_per_date_detail->currentStock['product']['name'],
-                    'brand' => $sale_per_date_detail->currentStock['product']['brand'],
-                    'pack_size' => $sale_per_date_detail->currentStock['product']['pack_size'],
+                    'product_name' => $sale_per_date_detail->currentStock['product']['name'] ?? 'N/A',
+                    'brand' => $sale_per_date_detail->currentStock['product']['brand'] ?? 'N/A',
+                    'pack_size' => $sale_per_date_detail->currentStock['product']['pack_size'] ?? 'N/A',
                     'quantity_sold' => $sale_per_date_detail->quantity,
                 ));
 
             }
-
-
         }
-
 
         //loop the results to sum
         foreach ($products as $ar) {

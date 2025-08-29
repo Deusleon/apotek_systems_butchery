@@ -498,19 +498,6 @@ function saveStockTransfer() {
                     "right",
                     "success"
                 );
-
-                // Handle redirect options
-                // if (response.redirect_to) {
-                //     // Open PDF in new window
-                //     window.open(response.redirect_to, "_blank");
-                // }
-
-                // if (response.history_url) {
-                //     // Redirect to history page after a short delay
-                //     setTimeout(function () {
-                //         window.location.href = response.history_url;
-                //     }, 2000);
-                // }
             } else {
                 notify(
                     response.message || "Failed to create stock transfer",
