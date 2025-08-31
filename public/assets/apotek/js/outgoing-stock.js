@@ -83,7 +83,7 @@ $("#d_auto_8")
         changeYear: true,
     })
     .on("change", function () {
-        filterByDate();
+        // filterByDate();
         $(".datepicker").hide();
     })
     .attr("readonly", "readonly");
