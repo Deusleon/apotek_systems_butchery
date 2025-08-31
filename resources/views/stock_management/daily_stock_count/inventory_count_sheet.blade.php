@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Inventory Count Sheet</title>
 
 
     <style>
-
         body {
             /*font-size: 30px;*/
         }
 
-        table, th, td {
+        table,
+        th,
+        td {
             /*border: 1px solid black;*/
             border-collapse: collapse;
             padding: 10px;
@@ -76,7 +78,7 @@
             margin-left: 78%;
         }
 
-        .topcorner > p {
+        .topcorner>p {
             font-size: 10px;
         }
 
@@ -87,58 +89,65 @@
         h4 {
             font-weight: normal;
         }
-
     </style>
 
 
 </head>
+
 <body>
 
-<h2 align="center">{{$pharmacy['name']}}</h2>
-<h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
-<h2 align="center" style="margin-top: -2%">Inventory Count Sheet</h2>
+    <h2 align="center">{{$pharmacy['name']}}</h2>
+    <h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
+    <h2 align="center" style="margin-top: -2%">Inventory Count Sheet</h2>
 
-<div class="row" style="margin-top: -2%">
-    <div class="col-md-12">
-        <h4 align="center">Perfomed By: {{Auth::user()->name}}, on {{date('d-m-Y')}}</h4>
-        @foreach($data as $key => $datum)
-            <table id="table-top-detail" align="center">
-                <thead>
-                <tr>
-                    <th>Store: {{$key}}</th>
-                </tr>
-                </thead>
-            </table>
+    <div class="row" style="margin-top: -2%">
+        <div class="col-md-12">
+            <div align="center">Perfomed By: {{Auth::user()->name}}, on {{date('d-m-Y')}}</div>
+            <div align="center">Branch: <b>{{ $default_store }}</b></div>
+            @php
+                $groupedData = [];
+                foreach ($data as $store => $stocks) {
+                    foreach ($stocks as $stock) {
+                        $pid = $stock['product_id'];
+
+                        if (!isset($groupedData[$pid])) {
+                            $groupedData[$pid] = $stock;
+                        } else {
+                            $groupedData[$pid]['quantity_on_hand'] += $stock['quantity_on_hand'];
+                        }
+                    }
+                }
+                $groupedData = array_values($groupedData);
+            @endphp
 
             <table id="table-detail" align="center">
                 <thead>
-                <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                    <th>Code</th>
-                    <th>Product Name</th>
-                    <th>Shelf No</th>
-                    <th>QOH</th>
-                    <th>Physical</th>
-                </tr>
-                </thead>
-                <!-- loop the product names here -->
-                @foreach($datum as $stock)
-                    <tr>
-                        <td>{{$stock['product_id']}}</td>
-                        <td>{{$stock['product_name']}}</td>
-                        <td>{{$stock['shelf_no']}}</td>
-                        <td align="right">
-                            <div style="margin-right: 50%">{{number_format($stock['quantity_on_hand'])}}</div>
-                        </td>
-                        <td></td>
+                    <tr style="background: #1f273b; color: white; font-size: 0.9em">
+                        <th>Code</th>
+                        <th>Product Name</th>
+                        <th>Shelf No</th>
+                        <th>QOH</th>
+                        <th>Physical</th>
                     </tr>
-                @endforeach
+                </thead>
+                <tbody>
+                    @foreach($groupedData as $stock)
+                        <tr>
+                            <td>{{ $stock['product_id'] }}</td>
+                            <td>{{ $stock['product_name'] . ' ' . $stock['brand'] . ' ' . $stock['pack_size'] . $stock['sales_uom'] }}
+                            </td>
+                            <td>{{ $stock['shelf_no'] }}</td>
+                            <td align="right">{{ number_format($stock['quantity_on_hand']) }}</td>
+                            <td></td>
+                        </tr>
+                    @endforeach
+                </tbody>
             </table>
-            <hr style="margin-top: -8%; margin-bottom: 2%;margin-left: 2%">
-        @endforeach
-    </div>
-</div>
 
-<script type="text/php">
+        </div>
+    </div>
+
+    <script type="text/php">
     if ( isset($pdf) ) {
         $x = 280;
         $y = 820;
@@ -151,14 +160,10 @@
         $angle = 0.0;   //  default
         $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
 
-
      }
-
-
-
 
 </script>
 
 </body>
-</html>
 
+</html>

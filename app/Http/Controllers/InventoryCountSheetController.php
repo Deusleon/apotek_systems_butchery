@@ -2,79 +2,75 @@
 
 namespace App\Http\Controllers;
 
-use App\CurrentStock;
 use App\Setting;
 use App\Store;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use PDF;
+use Barryvdh\DomPDF\Facade as PDF;
 
-ini_set('max_execution_time', 500);
-set_time_limit(500);
-ini_set('memory_limit', '512M');
+ini_set( 'max_execution_time', 500 );
+set_time_limit( 500 );
+ini_set( 'memory_limit', '512M' );
 
 class InventoryCountSheetController extends Controller
-{
-
-
+ {
     public function generateInventoryCountSheetPDF()
-    {
-        /*get default store*/
-        $default_store = Auth::user()->store->name ?? 'Default Store';
-        $stores = Store::where('name', $default_store)->first();
+ {
+        /* get default store */
+        $default_store = current_store()->name ?? 'Unknown Store';
+        $default_store_id = current_store_id();
 
-        if ($stores != null) {
-            $default_store_id = $stores->id;
-        } else {
-            $default_store_id = 1;
+        // Pharmacy info
+        $pharmacy[ 'name' ]    = Setting::where( 'id', 100 )->value( 'value' );
+        $pharmacy[ 'address' ] = Setting::where( 'id', 106 )->value( 'value' );
+        $pharmacy[ 'logo' ]    = Setting::where( 'id', 105 )->value( 'value' );
+        $pharmacy[ 'phone' ]   = Setting::where( 'id', 107 )->value( 'value' );
+
+        // Fetch current stock with product and store info using join
+        $current_stocks = DB::table( 'inv_current_stock as cs' )
+        ->join( 'inv_products as p', 'cs.product_id', '=', 'p.id' )
+        ->join( 'inv_stores as s', 'cs.store_id', '=', 's.id' )
+        ->select(
+            'cs.product_id',
+            'p.name as product_name',
+            'p.brand',
+            'p.pack_size',
+            'p.sales_uom',
+            'cs.store_id',
+            's.name as store_name',
+            'cs.shelf_number',
+            DB::raw( 'SUM(cs.quantity) as quantity_on_hand' )
+        )
+        ->when( !is_all_store(), fn( $q ) => $q->where( 'cs.store_id', $default_store_id ) )
+        ->groupBy( [ 'cs.product_id', 'cs.store_id', 'cs.shelf_number', 'p.name', 'p.brand', 'p.pack_size', 'p.sales_uom', 's.name' ] )
+        ->get();
+
+        // Transform to array
+        $data = [];
+        foreach ( $current_stocks as $stock ) {
+            $data[] = [
+                'store'            => $stock->store_name,
+                'shelf_no'         => $stock->shelf_number,
+                'product_id'       => $stock->product_id,
+                'product_name'     => $stock->product_name,
+                'brand'            => $stock->brand,
+                'pack_size'        => $stock->pack_size,
+                'sales_uom'        => $stock->sales_uom,
+                'quantity_on_hand' => ( float ) $stock->quantity_on_hand,
+            ];
         }
 
-        $pharmacy['name'] = Setting::where('id', 100)->value('value');
-        $pharmacy['address'] = Setting::where('id', 106)->value('value');
-        $pharmacy['logo'] = Setting::where('id', 105)->value('value');
-        $pharmacy['phone'] = Setting::where('id', 107)->value('value');
+        // Group by store
+        $data = collect( $data )->groupBy( 'store' )->toArray();
 
-        $data = array();
-        $current_stocks = CurrentStock::with('product', 'store')
-        ->select('product_id', 'store_id', 'shelf_number', DB::raw('SUM(quantity) as quantity_on_hand'))
-        ->where('store_id', $default_store_id)
-        ->groupBy(['product_id', 'store_id', 'shelf_number'])
-        ->get()
-        ->filter(function ($stock) {
-            return $stock->product !== null; 
-        });
-
-        foreach ($current_stocks as $current_stock) {
-            array_push($data, array(
-                'store' => $current_stock->store['name'],
-                'shelf_no' => $current_stock->shelf_number,
-                'product_id' => $current_stock->product['id'],
-                'product_name' => $current_stock->product['name'],
-                'quantity_on_hand' => $current_stock->quantity_on_hand
-            ));
+        if ( empty( $data ) ) {
+            return response()->view( 'error_pages.pdf_zero_data' );
         }
 
-        /*group by store*/
-        $grouped_by_store = [];
-        foreach ($data as $val) {
-            if (array_key_exists('store', $val)) {
-                $grouped_by_store[$val['store']][] = $val;
-            }
-        }
-
-        $data = $grouped_by_store;
-
-//        dd($data);
-
-        if ($data == []) {
-            return response()->view('error_pages.pdf_zero_data');
-        }
-
-        $pdf = PDF::loadView('stock_management.daily_stock_count.inventory_count_sheet',
-            compact('data', 'pharmacy'));
-        return $pdf->stream('inventory_count_sheet.pdf');
-
+        // Generate PDF
+        $pdf = PDF::loadView(
+            'stock_management.daily_stock_count.inventory_count_sheet',
+            compact( 'data', 'pharmacy', 'default_store' )
+        );
+        return $pdf->stream( 'inventory_count_sheet.pdf' );
     }
-
-
 }

@@ -7,6 +7,8 @@ use App\Sale;
 use App\SalesDetail;
 use App\Setting;
 use App\Store;
+use App\StockTracking;
+use App\StockAdjustmentLog;
 use App\Exports\DailyStockCountExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,90 +27,105 @@ class DailyStockCountController extends Controller
     public function index()
     {
 
-        $today = date('Y-m-d');
-        $to_index = $this->summation($today);
-
-        return view('stock_management.daily_stock_count.index')->with([
-            'products' => array_values($to_index),
-            'today' => $today
-        ]);
+        return view('stock_management.daily_stock_count.index');
 
     }
 
-    public function summation($specific_date)
-    {
-        /*get default store*/
-        $default_store_id = current_store_id();
-
-        $sales_per_date = Sale::where(DB::raw('date(date)'), $specific_date)->get();
-
-        if (is_all_store()){            
-            $current_stocks = CurrentStock::select(DB::raw('product_id'),
-                DB::raw('sum(quantity) as quantity_on_hand'), 'id')
-                ->groupby('product_id')
-                ->get();
-        }else{
-            $current_stocks = CurrentStock::select(DB::raw('product_id'),
-                DB::raw('sum(quantity) as quantity_on_hand'), 'id')
-                ->where('store_id', $default_store_id)
-                ->groupby('product_id')
-                ->get();
-        }
-
-        $products = array();
-        $dailyStockCount = array();
-
-        /*sale per day*/
-        foreach ($sales_per_date as $sale_per_date) {
-            /*check for that sale id*/
-            if (is_all_store()) {
-                $sale_per_date_details = SalesDetail::select('sales_details.quantity', 'stock_id')
-                    ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
-                    ->where('sale_id', $sale_per_date->id)
-                    ->get();
-            }else{
-                $sale_per_date_details = SalesDetail::select('sales_details.quantity', 'stock_id')
-                    ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
-                    ->where('store_id', $default_store_id)
-                    ->where('sale_id', $sale_per_date->id)
-                    ->get();
-            }
-            foreach ($sale_per_date_details as $sale_per_date_detail) {
-                array_push($products, array(
-                    'product_id' => $sale_per_date_detail->currentStock['product_id'],
-                    'product_name' => $sale_per_date_detail->currentStock['product']['name'] ?? 'N/A',
-                    'brand' => $sale_per_date_detail->currentStock['product']['brand'] ?? 'N/A',
-                    'pack_size' => $sale_per_date_detail->currentStock['product']['pack_size'] ?? 'N/A',
-                    'quantity_sold' => $sale_per_date_detail->quantity,
-                ));
-
-            }
-        }
-
-        //loop the results to sum
-        foreach ($products as $ar) {
-            foreach ($ar as $k => $v) {
-                if (array_key_exists($v, $dailyStockCount)) {
-                    $dailyStockCount[$v]['quantity_sold'] = $dailyStockCount[$v]['quantity_sold'] + $ar['quantity_sold'];
-                    foreach ($current_stocks as $value) {
-                        if ($dailyStockCount[$v]['product_id'] == $value->product_id) {
-                            $dailyStockCount[$v]['quantity_on_hand'] = $value->quantity_on_hand;
-                        }
-                    }
-                } else if ($k == 'product_id') {
-                    $dailyStockCount[$v] = $ar;
-                    foreach ($current_stocks as $value) {
-                        if ($dailyStockCount[$v]['product_id'] == $value->product_id) {
-                            $dailyStockCount[$v]['quantity_on_hand'] = $value->quantity_on_hand;
-                        }
-                    }
-                }
-            }
-        }
-
-        return $dailyStockCount;
-
+    public function fetchSalesWithStock(Request $request)
+{
+    if (! $request->ajax()) {
+        abort(400, 'AJAX only');
     }
+
+    $date = $request->date;
+    $default_store = current_store_id();
+
+    // 1) Fetch sale_ids per date
+    $saleIds = DB::table('sales')
+        ->whereDate('date', $date)
+        ->pluck('id');
+
+    if ($saleIds->isEmpty()) {
+        return response()->json(['items' => []]);
+    }
+
+    // 2) Fetch & aggregate sales_details (sum for every stock_id)
+    $salesDetails = DB::table('sales_details')
+        ->select('stock_id', DB::raw('SUM(quantity) as total_sold'))
+        ->whereIn('sale_id', $saleIds)
+        ->groupBy('stock_id')
+        ->get();
+
+    if ($salesDetails->isEmpty()) {
+        return response()->json(['items' => []]);
+    }
+
+    $stockIds = $salesDetails->pluck('stock_id')->unique();
+
+    // 3) Fetch current stock rows
+    $stockRows = DB::table('inv_current_stock')
+        ->select('id as stock_id', 'product_id', 'store_id', 'quantity')
+        ->whereIn('id', $stockIds)
+        ->when(!is_all_store(), function ($q) use ($default_store) {
+            $q->where('store_id', $default_store);
+        })
+        ->get();
+
+    if ($stockRows->isEmpty()) {
+        return response()->json(['items' => []]);
+    }
+
+    // 4) Aggregate sales per product_id
+    $salesPerProduct = $salesDetails->map(function ($row) use ($stockRows) {
+        $stock = $stockRows->firstWhere('stock_id', $row->stock_id);
+        return $stock ? [
+            'product_id' => $stock->product_id,
+            'store_id'   => $stock->store_id,
+            'sold'       => (float) $row->total_sold,
+        ] : null;
+    })->filter()
+    ->groupBy('product_id')
+    ->map(function ($group) {
+        return [
+            'product_id' => $group->first()['product_id'],
+            'store_id'   => $group->first()['store_id'],
+            'total_sold' => collect($group)->sum('sold'),
+        ];
+    });
+
+    // 5) Fetch total stock per product_id (sum for all batches)
+    $currentStock = DB::table('inv_current_stock')
+        ->select('product_id', DB::raw('SUM(quantity) as total_stock'))
+        ->when(!is_all_store(), function ($q) use ($default_store) {
+            $q->where('store_id', $default_store);
+        })
+        ->whereIn('product_id', $salesPerProduct->pluck('product_id'))
+        ->groupBy('product_id')
+        ->get()
+        ->keyBy('product_id');
+
+    // 6) Fetch product details
+    $products = DB::table('inv_products')
+        ->whereIn('id', $salesPerProduct->pluck('product_id'))
+        ->get()
+        ->keyBy('id');
+
+    // 7) Combine final items
+    $items = $salesPerProduct->map(function ($row) use ($currentStock, $products) {
+        $product = $products->get($row['product_id']);
+        $stock   = $currentStock->get($row['product_id']);
+
+        return [
+            'product_id'    => $row['product_id'],
+            'product'       => $product ? (array) $product : null,
+            'total_sold'    => (float) $row['total_sold'],
+            'current_stock' => $stock ? (float) $stock->total_stock : 0,
+            'store_id'      => $row['store_id'],
+        ];
+    })->values();
+
+    return response()->json(['items' => $items]);
+}
 
     public function showDailyStockFilter(Request $request)
     {
@@ -159,9 +176,6 @@ class DailyStockCountController extends Controller
                 $difference = $physicalStock - $qoh;
 
                 if ($difference != 0) {
-                    // Find the current stock entry for the product in the user's store
-                    // For simplicity, we are assuming one current stock entry per product per store.
-                    // In a more complex scenario, you might need to adjust specific batches.
                     $currentStock = CurrentStock::where('product_id', $productId)
                                                 ->where('store_id', $store_id)
                                                 ->first();

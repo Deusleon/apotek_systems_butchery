@@ -83,17 +83,16 @@
         <div class="card">
             <div class="card-body">
                 <div class="tab-pane fade show active" id="new_sale" role="tabpanel" aria-labelledby="new_sale-tab">
-                    {{-- <form id="daily-stock" action="{{ route('daily-stock-count-pdf-gen') }}" method="post" --}}
-                    <form id="daily-stock" action="" method="post"
-                        enctype="multipart/form-data">
+                    {{-- <form id="daily-stock" action="{{ route('daily-stock-count-pdf-gen') }}" method="post" --}} <form
+                        id="daily-stock" action="" method="post" enctype="multipart/form-data">
                         @csrf()
                         <div class="col mb-3">
                             <div class="row justify-content-end">
                                 <div class="col-4">
                                     <div class="row">
                                         <label for="d_auto_8" class="col text-md-right mt-2">Date:</label>
-                                        <input type="text" name="sale_date" class="col form-control" id="d_auto_8"
-                                            value="{{ \Carbon\Carbon::parse($today)->format('Y/m/d') }}" required>
+                                        <input type="text" name="sale_date" class="col form-control" id="d_auto_8" value=""
+                                            required>
                                     </div>
                                 </div>
                             </div>
@@ -117,17 +116,6 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <script>
-                                        console.log('Received data', @json($products));
-                                    </script>
-                                    @foreach($products as $product)
-                                        <tr>
-                                            {{-- <td>{{$product['product_name'].' '.$product['brand'].' '.$product['pack_size'].' '.$product['sales_uom']}}</td> --}}
-                                            <td>{{ $product['product_name'] }}</td>
-                                            <td>{{ number_format($product['quantity_sold'], 0) }}</td>
-                                            <td>{{ number_format($product['quantity_on_hand'], 0) }}</td>
-                                        </tr>
-                                    @endforeach
                                 </tbody>
 
                             </table>
@@ -185,15 +173,18 @@
         <script type="text/javascript">
             var config = {
                 routes: {
-                    filterShow: '{{ route('daily-stock-count-filter') }}'
+                    filterDailyStockCount: '{{ route('daily-stock-count-fetch') }}'
                 }
             };
 
         </script>
-        <script src="{{asset("assets/apotek/js/outgoing-stock.js")}}"></script>
 
         <script>
             $(document).ready(function () {
+                const today = new Date().toISOString().slice(0, 10);
+                fetchDailyCount(today); // Fetch data for today on page load
+                document.getElementById('d_auto_8').value = today;
+
                 // Listen for the click event on the Transfer History tab
                 $('#outgoing-stock-tablist').on('click', function (e) {
                     e.preventDefault(); // Prevent default tab switching behavior
@@ -255,8 +246,69 @@
                         notify('No physical stock values entered for adjustment.', 'top', 'right', 'warning');
                     }
                 });
+
+                $('#d_auto_8').on('change input', function () {
+                    fetchDailyCount($(this).val());
+                });
+
             });
+
+            //daily stock count date picker
+            $("#d_auto_8")
+                .datepicker({
+                    todayHighlight: true,
+                    format: "yyyy-mm-dd",
+                    changeYear: true,
+                })
+                .on("change", function () {
+                    // filterByDate();
+                    $(".datepicker").hide();
+                })
+                .attr("readonly", "readonly");
+
+            let dailyTable = $("#fixed-header2").DataTable({
+                destroy: true,
+                columns: [
+                    { data: "product_name" },
+                    { data: "total_sold" },
+                    { data: "current_stock" },
+                ],
+            });
+
+            function fetchDailyCount(date) {
+                if (!date) {
+                    return;
+                }
+
+                $("#loading").show();
+                $.ajax({
+                    url: config.routes.filterDailyStockCount,
+                    type: "get",
+                    dataType: "json",
+                    data: {
+                        date: date,
+                    },
+                    success: function (data) {
+                        // console.log("Response products:", data);
+
+                        dailyTable.clear();
+                        let rows = data.items
+                            .filter(item => item.store_id != null)
+                            .map(item => {
+                                return {
+                                    product_name: item.product ? item.product.name+' '+item.product.brand+' '+item.product.pack_size+item.product.sales_uom : "N/A",
+                                    total_sold: item.total_sold,
+                                    current_stock: item.current_stock,
+                                };
+                            });
+                        dailyTable.rows.add(rows).draw();
+
+                    },
+                    complete: function () {
+                        $("#loading").hide();
+                    },
+                });
+            }
+
         </script>
-
-
     @endpush
