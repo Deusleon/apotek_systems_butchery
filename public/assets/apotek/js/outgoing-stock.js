@@ -19,7 +19,7 @@ var table_daily_stock = $("#fixedHeader2").DataTable({
         { data: "qoh" },
     ],
     columnDefs: [
-        { type: 'date', targets: 4 } // target column index 4 (date)
+        { type: 'date', targets: 4 } 
     ],
     order: [[4, 'desc']]
 });
@@ -80,52 +80,6 @@ $("#category_id").on("change", function () {
         $("#detailedTable").show();
     }
 });
-
-//daily stock count date picker
-$("#d_auto_8")
-    .datepicker({
-        todayHighlight: true,
-        format: "yyyy-mm-dd",
-        changeYear: true,
-    })
-    .on("change", function () {
-        // filterByDate();
-        $(".datepicker").hide();
-    })
-    .attr("readonly", "readonly");
-
-function getOutgoingDate() {
-    var dates = document.querySelector("input[name=outgoing-date]").value;
-    dates = dates.split("-");
-    outgoingFilter(dates);
-}
-
-//daily stock count filter by date
-function filterByDate() {
-    var date = document.getElementById("d_auto_8").value;
-
-    if (date == "") {
-        return false;
-    }
-
-    var ajaxurl = config.routes.filterShow;
-
-    $("#loading").show();
-    $.ajax({
-        url: ajaxurl,
-        type: "get",
-        dataType: "json",
-        data: {
-            date: date,
-        },
-        success: function (data) {
-            bindStockCountData(data);
-        },
-        complete: function () {
-            $("#loading").hide();
-        },
-    });
-}
 
 // outgoing stock filter ajax call
 function outgoingFilter(dates) {
