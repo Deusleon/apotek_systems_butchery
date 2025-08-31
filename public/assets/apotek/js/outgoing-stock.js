@@ -12,10 +12,16 @@ var table_daily_stock = $("#fixedHeader2").DataTable({
     bInfo: true,
     columns: [
         { data: "product_name" },
-        { data: "stock_id" },
+        { data: "out_mode" },
         { data: "out_total" },
+        { data: "batch_number" },
+        { data: "date" },
         { data: "qoh" },
     ],
+    columnDefs: [
+        { type: 'date', targets: 4 } // target column index 4 (date)
+    ],
+    order: [[4, 'desc']]
 });
 
 $(function () {
@@ -134,11 +140,9 @@ function outgoingFilter(dates) {
             date_from: dates[0],
         },
         success: function (response) {
-            console.log("Response is:", response);
-            // document.getElementById('detailedTable').style.display = 'block';
-            // document.getElementById('tbody').style.display = 'none';
-            bindData(response.products);
-            bindStockCountData(response.stocks);
+            // console.log("Response is:", response);
+            bindData(response.summary);
+            bindStockCountData(response.detailed);
         },
         complete: function () {
             $("#loading").hide();
@@ -147,32 +151,54 @@ function outgoingFilter(dates) {
 }
 
 function bindData(data) {
-    // Filter tu zile items zenye out_total > 0
-    const filteredData = data.filter(item => Number(item.out_total) > 0);
+    const filteredData = data.filter((item) => Number(item.out_total) > 0);
 
     filteredData.forEach((item) => {
-        // Hesabu QoH kama ulivyo
-        let qoh = Number(item.current_stock) - Number(item.in_total) + Number(item.out_total);
-        item.qoh = Math.max(qoh, 0);
+        item.qoh = Number(item.current_stock).toFixed(0);
         item.out_total = Number(item.out_total).toFixed(0);
+        item.product_name = item.product.name+' '+item.product.brand+' '+item.product.pack_size+item.product.sales_uom;
     });
-
+    // console.log("Binding data:", filteredData);
     summary_table.clear();
     summary_table.rows.add(filteredData);
     summary_table.draw();
 }
 
 function bindStockCountData(data) {
-    const filteredData = data.filter(item => Number(item.out_total) > 0);
-    filteredData.forEach((item) => {
-        let qoh =
-            Number(item.current_stock) -
-            Number(item.in_total) +
-            Number(item.out_total);
-        item.qoh = Math.max(qoh, 0);
+    // flatten out_movements
+    let flattened = [];
+    data.forEach(item => {
+        if (item.out_movements && item.out_movements.length > 0) {
+            item.out_movements.forEach(mv => {
+                flattened.push({
+                    product_name: item.product_name+' '+item.product.brand+' '+item.product.pack_size+item.product.sales_uom,
+                    out_mode: mv.out_mode || '',
+                    out_total: mv.qty,
+                    batch_number: item.batch_number || '',
+                    date: mv.date,
+                    qoh: item.current_stock_batch != null ? Number(item.current_stock_batch).toFixed(0) : 0
+                });
+            });
+        }
     });
-    console.log("Binding data:", filteredData);
+
+    let grouped = {};
+    flattened.forEach(item => {
+        const key = `${item.product_name}|${item.out_mode}|${item.batch_number}|${item.date}`;
+        if (!grouped[key]) {
+            grouped[key] = { ...item };
+        } else {
+            grouped[key].out_total = Number(grouped[key].out_total) + Number(item.out_total);
+        }
+    });
+
+    let result = Object.values(grouped);
+
+    // sort by date descending
+    result.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // clear & bind
     table_daily_stock.clear();
-    table_daily_stock.rows.add(filteredData);
+    table_daily_stock.rows.add(result);
     table_daily_stock.draw();
 }

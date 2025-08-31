@@ -7,6 +7,8 @@ use App\Sale;
 use App\SalesDetail;
 use App\Setting;
 use App\Store;
+use App\StockTracking;
+use App\StockAdjustmentLog;
 use App\Exports\DailyStockCountExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -125,7 +127,6 @@ class DailyStockCountController extends Controller
     return response()->json(['items' => $items]);
 }
 
-
     public function showDailyStockFilter(Request $request)
     {
 
@@ -175,9 +176,6 @@ class DailyStockCountController extends Controller
                 $difference = $physicalStock - $qoh;
 
                 if ($difference != 0) {
-                    // Find the current stock entry for the product in the user's store
-                    // For simplicity, we are assuming one current stock entry per product per store.
-                    // In a more complex scenario, you might need to adjust specific batches.
                     $currentStock = CurrentStock::where('product_id', $productId)
                                                 ->where('store_id', $store_id)
                                                 ->first();

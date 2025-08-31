@@ -289,7 +289,7 @@
                         date: date,
                     },
                     success: function (data) {
-                        console.log("Response products:", data);
+                        // console.log("Response products:", data);
 
                         dailyTable.clear();
                         let rows = data.items
