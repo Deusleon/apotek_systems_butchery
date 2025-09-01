@@ -269,7 +269,7 @@
                         <span class="plain-receive">${remaining}</span>
                         <input type="text" name="items[${index}][quantity]" 
                             class="form-control form-control-sm text-center receive-qty-input edit-mode-hidden"
-                            min="0" max="${remaining}" value="${remaining}" ${isFullyReceived?'disabled':''}>
+                            min="0" max="${remaining}" value="${remaining}" ${isFullyReceived?'readonly':''}>
                     </td>
 
                     ${batchSetting === 'YES' ? `

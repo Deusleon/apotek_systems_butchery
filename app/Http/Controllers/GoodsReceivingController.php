@@ -368,10 +368,10 @@ class GoodsReceivingController extends Controller
             'items' => 'required|array',
             'items.*.purchase_order_detail_id' => 'required|exists:order_details,id',
             'items.*.product_id' => 'required|exists:inv_products,id',
-            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.quantity' => 'required|integer|min:0',
             'items.*.cost_price' => 'required|numeric|min:0',
         ]);
-
+        
         // Conditional validation based on settings
         if ($batch_setting === 'YES') {
             $request->validate([
@@ -466,9 +466,9 @@ class GoodsReceivingController extends Controller
 
         return redirect()->back()->with('alert-success', 'Order received successfully!');
 
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        DB::rollBack();
-        return redirect()->back()->withErrors($e->errors())->withInput();
+    // } catch (\Illuminate\Validation\ValidationException $e) {
+    //     DB::rollBack();
+    //     return redirect()->back()->withErrors($e->errors())->withInput();
     } catch (\Exception $e) {
         DB::rollBack();
         \Log::error('Order Receiving Error: '.$e->getMessage().' in '.$e->getFile().' on line '.$e->getLine());
