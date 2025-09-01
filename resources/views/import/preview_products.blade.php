@@ -96,42 +96,31 @@
                     </div>
 
                     <div class="preview-table">
-                        <table class="table" id="preview_stock_import">
+                        <table class="table" id="preview_products_import">
                             <thead>
                                 <tr>
-                                    {{-- <th>Row</th> --}}
-                                    <th>Product Code</th>
                                     <th>Product Name</th>
-                                    {{-- <th>Min Stock</th>
-                                    <th>Max Stock</th>
                                     <th>Barcode</th>
+                                    <th>Brand</th>
+                                    <th>Pack Size</th>
                                     <th>Category</th>
-                                    <th>Type</th>
-                                    <th>Status</th> --}}
-                                    <th>Buy Price</th>
-                                    <th>Sell Price</th>
-                                    <th>Quantity</th>
-                                    <th>Expiry</th>
+                                    <th>Unit of Measure</th>
+                                    <th>Min Stock</th>
+                                    <th>Max Stock</th>
                                     <th>Validation</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($preview_data as $row)
                                     <tr class="{{ !empty($row['errors']) ? 'error-row' : 'valid-row' }}">
-                                        {{-- <td>{{ $row['row_number'] }}</td> --}}
-                                        <td>{{ $row['data'][0] ?? '' }}</td>
                                         <td>{{ $row['data'][1] ?? '' }}</td>
-                                        {{-- <td>{{ $row['data'][5] ?? '' }}</td>
-                                        <td>{{ $row['data'][6] ?? '' }}</td>
-                                        <td>{{ $row['data'][7] ?? '' }}</td>
-                                        <td>{{ $row['data'][8] ?? '' }}</td>
-                                        <td>{{ $row['data'][9] ?? 'stockable' }}</td>
-                                        <td>{{ isset($row['data'][10]) ? ($row['data'][10] ? 'Active' : 'Inactive') : 'Active' }}
-                                        </td> --}}
                                         <td>{{ $row['data'][2] ?? '' }}</td>
                                         <td>{{ $row['data'][3] ?? '' }}</td>
                                         <td>{{ $row['data'][4] ?? '' }}</td>
                                         <td>{{ $row['data'][5] ?? '' }}</td>
+                                        <td>{{ $row['data'][6] ?? '' }}</td>
+                                        <td>{{ $row['data'][7] ?? '' }}</td>
+                                        <td>{{ $row['data'][8] ?? '' }}</td>
                                         <td>
                                             @if(!empty($row['errors']))
                                                 <span class="text-danger">
@@ -152,7 +141,7 @@
 
                     <div class="row mt-4">
                         <div class="col-md-12 text-center">
-                            <a href="{{ route('import-data') }}" class="btn btn-secondary">
+                            <a href="{{ route('import-products') }}" class="btn btn-secondary">
                                 <i class="feather icon-x-circle"></i> Cancel
                             </a>
                             @if($valid_count > 0)
@@ -165,7 +154,7 @@
                 @else
                     <div class="alert alert-warning" role="alert">
                         <i class="feather icon-alert-triangle"></i> No valid data found in the uploaded file.
-                        <a href="{{ route('import-data') }}" class="btn btn-sm btn-warning ml-3">
+                        <a href="{{ route('import-products') }}" class="btn btn-sm btn-warning ml-3">
                             Try Again
                         </a>
                     </div>
@@ -181,7 +170,7 @@
             // Create a hidden form for submission
             var $hiddenForm = $('<form>', {
                 'method': 'POST',
-                'action': '{{ route('record-import') }}',
+                'action': '{{ route('record-products-import') }}',
                 'style': 'display: none'
             }).append($('<input>', {
                 'type': 'hidden',
@@ -225,7 +214,7 @@
             });
         });
 
-        $('#preview_stock_import').DataTable({
+        $('#preview_products_import').DataTable({
             searching: true,
             bPaginate: true,
             bInfo: true,

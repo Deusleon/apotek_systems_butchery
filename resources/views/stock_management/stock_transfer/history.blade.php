@@ -144,82 +144,20 @@
                                                                 <td class="justify-content-center">
                                                                     @php
                                                                         $statuses = [
-                                                                            'created' => ['name' => 'Pending', 'class' => 'badge-secondary'],
-                                                                            'assigned' => ['name' => 'Assigned', 'class' => 'badge-info'],
-                                                                            'approved' => ['name' => 'Approved', 'class' => 'badge-warning'],
-                                                                            'in_transit' => ['name' => 'In Transit', 'class' => 'badge-primary'],
-                                                                            'acknowledged' => ['name' => 'Acknowledged', 'class' => 'badge-success'],
-                                                                            'completed' => ['name' => 'Completed', 'class' => 'badge-dark'],
-                                                                            'cancelled' => ['name' => 'Cancelled', 'class' => 'badge-danger']
+                                                                            'created' => ['name' => 'Pending', 'class' => 'background-color: #bfdbfe; color:#3B82F6;'],
+                                                                            'assigned' => ['name' => 'Assigned', 'class' => 'background-color: #FDBA74; color:#FF2A00;'],
+                                                                            'approved' => ['name' => 'Approved', 'class' => 'background-color: #FCE300; color:#FFEB3B;'],
+                                                                            'in_transit' => ['name' => 'In Transit', 'class' => 'background-color: #67E8F9; color: #00BCD4;'],
+                                                                            'acknowledged' => ['name' => 'Acknowledged', 'class' => 'background-color:#BBF7D0; color:#48bb78;'],
+                                                                            'completed' => ['name' => 'Completed', 'class' => 'background-color: #d8b4fe; color:#8B5CF6;'],
+                                                                            'cancelled' => ['name' => 'Cancelled', 'class' => 'background-color:#FECACA; color:#f56565;']
                                                                         ];
                                                                         $currentStatus = $transfer->status ?? 1;
                                                                         $statusInfo = $statuses[$currentStatus] ?? ['name' => 'Unknown', 'class' => 'badge-secondary'];
                                                                     @endphp
 
-                                                                    <button class='badge {{ $statusInfo["class"] }} btn btn-sm btn-rounded mt-2 p-2'
-                                                                        style="width: 120px;">{{ $statusInfo["name"] }}</button>
-
-                                                                    <!-- Status Workflow Buttons -->
-                                                                    {{-- <div class="mt-1">
-                                                                        @if($currentStatus == 1)
-                                                                        @can('assign_transfers')
-                                                                        <button type="button" class="btn btn-info btn-xs"
-                                                                            onclick="updateStatus({{ $transfer->id }}, 2, 'assign')">
-                                                                            <i class="fas fa-user-check"></i> Assign
-                                                                        </button>
-                                                                        @endcan
-
-                                                                        @can('approve_transfers')
-                                                                        <button type="button" class="btn btn-warning btn-xs"
-                                                                            onclick="updateStatus({{ $transfer->id }}, 3, 'approve')">
-                                                                            <i class="fas fa-check-circle"></i> Approve
-                                                                        </button>
-                                                                        @endcan
-                                                                        @endif
-
-                                                                        @if($currentStatus == 2)
-                                                                        @can('approve_transfers')
-                                                                        <button type="button" class="btn btn-warning btn-xs"
-                                                                            onclick="updateStatus({{ $transfer->id }}, 3, 'approve')">
-                                                                            <i class="fas fa-check-circle"></i> Approve
-                                                                        </button>
-                                                                        @endcan
-
-                                                                        @can('manage_transfers')
-                                                                        <button type="button" class="btn btn-primary btn-xs"
-                                                                            onclick="updateStatus({{ $transfer->id }}, 4, 'in-transit')">
-                                                                            <i class="fas fa-truck"></i> In Transit
-                                                                        </button>
-                                                                        @endcan
-                                                                        @endif
-
-                                                                        @if($currentStatus == 3)
-                                                                        @can('manage_transfers')
-                                                                        <button type="button" class="btn btn-primary btn-xs"
-                                                                            onclick="updateStatus({{ $transfer->id }}, 4, 'in-transit')">
-                                                                            <i class="fas fa-truck"></i> In Transit
-                                                                        </button>
-                                                                        @endcan
-                                                                        @endif
-
-                                                                        @if($currentStatus == 4)
-                                                                        @can('acknowledge_transfers')
-                                                                        <button type="button" class="btn btn-success btn-xs"
-                                                                            onclick="updateStatus({{ $transfer->id }}, 5, 'acknowledge')">
-                                                                            <i class="fas fa-handshake"></i> Acknowledge
-                                                                        </button>
-                                                                        @endcan
-                                                                        @endif
-
-                                                                        @if($currentStatus == 5)
-                                                                        @can('complete_transfers')
-                                                                        <button type="button" class="btn btn-dark btn-xs"
-                                                                            onclick="updateStatus({{ $transfer->id }}, 6, 'complete')">
-                                                                            <i class="fas fa-flag-checkered"></i> Complete
-                                                                        </button>
-                                                                        @endcan
-                                                                        @endif
-                                                                    </div> --}}
+                                                                    <button class='badge btn btn-sm btn-rounded mt-2 p-2'
+                                                                        style="width: 120px; {{ $statusInfo["class"] }}">{{ $statusInfo["name"] }}</button>
                                                                 </td>
                                                                 <td class="">
                                                                     <!-- Show Button -->

@@ -17,6 +17,7 @@ use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use App\Store;
+use Maatwebsite\Excel\Row;
 
 Route::post('/login', 'Auth\LoginController@login')->middleware('web');
 
@@ -82,13 +83,19 @@ Route::middleware(["auth","main_branch"])->group(function () {
 
     // Product Import Routes
     Route::prefix('import')->group(function () {
-        Route::get('/', 'ImportDataController@index')->name('import-data');
-        Route::get('/download-template', 'ImportDataController@downloadTemplate')->name('download-template');
-        Route::get('/preview', 'ImportDataController@showPreview')->name('show-preview');
-        Route::post('/preview', 'ImportDataController@previewImport')
+        Route::get('/stocks', 'ImportDataController@importData')->name('import-data');
+        Route::get('/products', 'ImportDataController@index' )->name('import-products');
+        Route::get('/download-template', 'ImportDataController@downloadStockTemplate')->name('download-template');
+        Route::get('/download-products-template', 'ImportDataController@downloadTemplate' )->name('download-products-template');
+        // Route::get('/preview', 'ImportDataController@showPreview')->name('show-preview');
+        Route::post('/preview', 'ImportDataController@previewStockImport')
             ->middleware(['web', 'log.upload'])
             ->name('preview-import');
-        Route::post('/record', 'ImportDataController@recordImport')->name('record-import');
+        Route::post('/preview/import', 'ImportDataController@previewImport')
+            ->middleware(['web', 'log.upload'])
+            ->name('preview-products-import');
+        Route::post('/record', 'ImportDataController@recordStockImport')->name('record-import');
+        Route::post('/record-products', 'ImportDataController@recordImport')->name('record-products-import');
     });
 
     Route::post('masters/products/store',
@@ -463,7 +470,6 @@ Route::middleware(["auth","main_branch"])->group(function () {
 
     Route::get('inventory/stock-count-analytics', 'InventoryReportController@stockCountAnalytics')->name('stock-count-analytics');
     
-
 
     /*Pdf generator routes*/
     Route::get('inventory/stock-transfer/pdfgen/{transfer_no}', 'StockTransferController@generateStockTransferPDF')->name('stock-transfer-pdf-gen');
