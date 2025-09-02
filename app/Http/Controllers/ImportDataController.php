@@ -432,7 +432,7 @@ class ImportDataController extends Controller {
 
                     // Get or create category
                     $category = Category::firstOrCreate(
-                        [ 'name' => $row[ 4 ] ],
+                        [ 'name' => $row[ 5 ] ],
                         [ 'created_by' => Auth::id() ]
                     );
 
@@ -440,16 +440,16 @@ class ImportDataController extends Controller {
 
                     // Create or update product
                     $product_data = [
-                        'barcode' => $row[ 1 ],
-                        'name' => $row[ 0 ],
-                        'brand' => $row[ 2 ],
-                        'pack_size' => $row[ 3 ],
-                        'unit' => $row[ 5 ],
-                        'min_stock' => $row[ 6 ],
-                        'max_stock' => $row[ 7 ],
+                        'barcode' => $row[ 2 ],
+                        'name' => $row[ 1 ],
+                        'brand' => $row[ 3 ],
+                        'pack_size' => $row[ 4 ],
+                        'sales_uom' => $row[ 6 ],
+                        'min_stock' => $row[ 7 ],
+                        'max_stock' => $row[ 8 ],
                         'category_id' => $category->id,
                         'type' => 'stockable',
-                        'status' => 'active',
+                        'status' => 1,
                         // 'updated_by' => Auth::id()
                     ];
 
@@ -514,9 +514,9 @@ class ImportDataController extends Controller {
             $message .= "Successfully imported {$successful_records} products. ";
             if ( $failed_records > 0 ) {
                 $message .= "Failed to import {$failed_records} products. Check import history for details.";
-                return redirect()->route( 'import-data' )->with( 'warning', $message );
+                return redirect()->route( 'import-products' )->with( 'warning', $message );
             } else {
-                return redirect()->route( 'import-data' )->with( 'success', $message );
+                return redirect()->route( 'import-products' )->with( 'success', $message );
             }
 
         } catch ( \Exception $e ) {
@@ -759,7 +759,7 @@ class ImportDataController extends Controller {
         if ( empty( $row[ 1 ] ) ) $errors[] = 'Product name is required';
         if ( empty( $row[ 2 ] ) ) $errors[] = 'Buy price is required';
         if ( empty( $row[ 3 ] ) ) $errors[] = 'Sell price is required';
-        if ( empty( $row[ 4 ] ) ) $errors[] = 'Quantity is required';
+        // if ( empty( $row[ 4 ] ) ) $errors[] = 'Quantity is required';
 
         // Numeric validations
         if ( !empty( $row[ 2 ] ) && !is_numeric( preg_replace( '/[^\d.]/', '', $row[ 2 ] ) ) ) $errors[] = 'Buy price must be numeric';

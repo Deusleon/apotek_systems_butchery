@@ -8,6 +8,10 @@ use App\Product as product;
 
 class Category extends Model
 {
+     protected $fillable = [
+        'name',
+    ];
+
     protected $table = 'inv_categories';
     public $timestamps = false;
 
