@@ -77,7 +77,7 @@ class RequisitionController extends Controller
         }
 
 
-        $items = Product::where('status', 1)->get();
+        $items = Product::where('status', 1)->select('id', 'name', 'brand', 'pack_size', 'sales_uom')->get();
         $users = User::where('status', 1)->get();
         $stores = Store::where('name','<>','ALL')
             ->get();
@@ -105,13 +105,24 @@ class RequisitionController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+        public function store(Request $request)
     {
-//        if (!Auth()->user()->checkPermission('Create Requisitions')) {
-//            abort(403, 'Access Denied');
-//        }
+        if (!Auth()->user()->checkPermission('Create Requisitions')) {
+            abort(403, 'Access Denied');
+        }
+
+        // Validate file upload
+        $request->validate([
+            'evidence' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048', // max 2MB
+        ]);
 
         $orders = json_decode($request->orders);
+
+        // Handle file upload - FIXED VARIABLE NAME
+        $evidencePath = null;
+        if($request->hasFile('evidence')) {
+            $evidencePath = $request->file('evidence')->store('requisition_evidence', 'public');
+        }
 
         $last_req_id = Requisition::orderBy('id', 'DESC')->first();
 
@@ -123,13 +134,11 @@ class RequisitionController extends Controller
 
         $req_no = date('m') . date('d') . str_pad($Id, 5, '0', STR_PAD_LEFT);
 
-        if(auth()->user()->checkPermission('Manage All Branches'))
-        {
+        if(auth()->user()->checkPermission('Manage All Branches')) {
             $from_store = $request->from_store;
         }
 
-        if(!auth()->user()->checkPermission('Manage All Branches'))
-        {
+        if(!auth()->user()->checkPermission('Manage All Branches')) {
             $from_store = Auth::user()->store_id;
         }
 
@@ -138,6 +147,7 @@ class RequisitionController extends Controller
             $requisition->req_no = $req_no;
             $requisition->notes = $request->notes;
             $requisition->remarks = $request->remark;
+            $requisition->evidence_document = $evidencePath; // FIXED COLUMN NAME
             $requisition->from_store = $from_store;
             $requisition->to_store = "1";
             $requisition->status = 0;
@@ -156,6 +166,7 @@ class RequisitionController extends Controller
                 $order_detail->unit = $order_details->unit;
                 $success = $order_detail->save();
             }
+            
             session()->flash("alert-success", "Requisition Created Successfully!");
             DB::commit();
 
