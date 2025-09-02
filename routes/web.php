@@ -15,6 +15,8 @@ use App\Http\Controllers\StockAdjustmentController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
+use App\Store;
 
 Route::post('/login', 'Auth\LoginController@login')->middleware('web');
 
@@ -34,7 +36,30 @@ Route::get('hardCodePwd','HomeController@hardCodePwd');
 
 Auth::routes(['register' => false]);
 
+// Change store routes
+Route::post('/set-current-store', function (Request $request) {
+    $user = Auth::user();
 
+    if ($user->store->name !== 'ALL') {
+        return response()->json(['error' => 'Not allowed'], 403);
+    }
+
+    $storeId = $request->input('store_id');
+
+    // Ensure store exists
+    if (!Store::find($storeId)) {
+        return response()->json(['error' => 'Invalid store'], 422);
+    }
+
+    session(['current_store_id' => $storeId]);
+
+    return response()->json([
+        'success' => true,
+        'current_store_id' => $storeId
+    ]);
+});
+
+Route::post('/change-store', [HomeController::class, 'changeStore'])->name('change_store');
 
 
 Route::middleware(["auth","main_branch"])->group(function () {
@@ -280,7 +305,8 @@ Route::middleware(["auth","main_branch"])->group(function () {
 
     /*stock adjustment routes*/
     Route::group(['middleware' => ['permission:View Stock Adjustment|Stock Adjustment']], function () {
-        Route::get('inventory/stock-adjustment', [StockAdjustmentController::class, 'index'])->name('stock-adjustments.index');
+        Route::get('inventory/stock-adjustment', [StockAdjustmentController::class, 'index'])->name('stock-adjustments-history');
+        Route::get('inventory/stock-adjustment/new_adjustment', [StockAdjustmentController::class, 'newAdjustment'])->name('new-stock-adjustment');
         Route::get('inventory/stock-adjustment/create', [StockAdjustmentController::class, 'create'])->name('stock-adjustments.create');
         Route::post('inventory/stock-adjustment', [StockAdjustmentController::class, 'store'])->name('stock-adjustments.store');
         Route::get('inventory/stock-adjustment/{adjustment}', [StockAdjustmentController::class, 'show'])->name('stock-adjustments.show');
@@ -311,6 +337,10 @@ Route::middleware(["auth","main_branch"])->group(function () {
     ]);
 
     Route::post('inventory/stock-transfer_1', 'StockTransferController@storeTransfer')->name('stock_transfer.store');
+    
+    Route::post('inventory/stock-transfer-approve', 'StockTransferController@approveTransfer')->name('approve-transfer');
+
+    Route::post('inventory/stock-transfer-reject', 'StockTransferController@rejectTransfer')->name('reject-transfer');
 
     Route::get('inventory/stock-transfer_', 'StockTransferController@stockTransferHistory')->name('stock-transfer-history');
 
@@ -319,11 +349,13 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::get('inventory/stock-transfer-filter-by-word', 'StockTransferController@filterByWord')->name('filter-by-word');
 
     /*Stock transfer acknowledge routes*/
-    Route::resource('inventor/stock-transfer-acknowledge', 'StockTransferAcknowledgeController')->only([
+    Route::resource('inventory/stock-transfer-acknowledge', 'StockTransferAcknowledgeController')->only([
         'store', 'update', 'destroy'
     ]);
 
-    Route::get('inventor/stock-transfer-acknowledge/{transfer_no}','StockTransferAcknowledgeController@index')->name('stock-transfer-acknowledge.index');
+    Route::post('inventory/stock-transfer-acknowledge', 'StockTransferAcknowledgeController@acknowledgeTransfer')->name('acknowledge-transfer');
+    Route::get('inventory/stock-transfer-acknowledge/{transfer_no}','StockTransferAcknowledgeController@index')->name('stock-transfer-acknowledge.index');
+    Route::get('inventory/stock-transfer-acknowledge/{transfer_no}/acknowledge','StockTransferAcknowledgeController@fetchTransferToAcknowledge')->name('stock-transfer-to-acknowledge');
 
     /*Re print transfer routes*/
     Route::resource('inventory/stock-transfer-reprint', 'RePrintTransferController')->only(['index']);
@@ -512,7 +544,7 @@ Route::middleware(["auth","main_branch"])->group(function () {
 
 
     /* Change Store */
-    Route::post('home/change_store',[HomeController::class,'changeStore'])->name('change_store');
+    // Route::post('home/change_store',[HomeController::class,'changeStore'])->name('change_store');
 
     /* Acknowledge all */
     Route::post('acknowledge-all',[StockTransferController::class,'acknowledgeAll'])->name('acknowledge-all');

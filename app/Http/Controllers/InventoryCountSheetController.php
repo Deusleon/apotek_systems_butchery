@@ -35,11 +35,14 @@ class InventoryCountSheetController extends Controller
         $pharmacy['phone'] = Setting::where('id', 107)->value('value');
 
         $data = array();
-        $current_stocks = CurrentStock::select(DB::raw('product_id'), 'store_id', 'shelf_number',
-            DB::raw('sum(quantity) as quantity_on_hand'))
-            ->where('store_id', $default_store_id)
-            ->groupby('product_id', 'store_id')
-            ->get();
+        $current_stocks = CurrentStock::with('product', 'store')
+        ->select('product_id', 'store_id', 'shelf_number', DB::raw('SUM(quantity) as quantity_on_hand'))
+        ->where('store_id', $default_store_id)
+        ->groupBy(['product_id', 'store_id', 'shelf_number'])
+        ->get()
+        ->filter(function ($stock) {
+            return $stock->product !== null; 
+        });
 
         foreach ($current_stocks as $current_stock) {
             array_push($data, array(

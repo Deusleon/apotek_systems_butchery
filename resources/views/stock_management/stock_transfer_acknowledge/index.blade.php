@@ -24,7 +24,8 @@
             width: 100%;
         }
 
-        .ms-selectable, .ms-selection {
+        .ms-selectable,
+        .ms-selection {
             background: #fff;
             color: #555555;
             float: left;
@@ -50,14 +51,24 @@
             left: 50%;
             z-index: 100;
         }
-
     </style>
     <div class="col-sm-12">
+        <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active text-uppercase" id="invoice-received" role="tab" aria-controls="quotes_list"
+                    aria-selected="false">Acknowledge Transfer</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link  text-uppercase" id="order-received" href="{{ route('stock-transfer-history') }}"
+                    role="tab" aria-controls="new_quotes" aria-selected="true">Transfer History
+                </a>
+            </li>
+        </ul>
         <div class="card">
             <div class="card-body">
                 <div class="tab-pane fade show active" id="new_sale" role="tabpanel" aria-labelledby="new_sale-tab">
                     <form id="transfer" action="{{ route('stock-transfer.store') }}" method="post"
-                          enctype="multipart/form-data">
+                        enctype="multipart/form-data">
                         @csrf()
                         <div class="row">
                             <div class="col-md-6">
@@ -65,14 +76,14 @@
 
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            {{-- <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="code">From</label>
-                                    <select id="from_id" name="from_id"
-                                            class="js-example-basic-single form-control drop" onchange="storeSelect()">
-                                        <option selected="true" disabled="disabled">Select store...</option>
+                                    <select id="from_id" name="from_id" class="js-example-basic-single form-control drop"
+                                        onchange="storeSelect()">
+                                        <option selected="true" disabled="disabled">Select Store...</option>
                                         @foreach($stores as $store)
-                                            <option value="{{$store->id}}">{{$store->name}}</option>
+                                        <option value="{{$store->id}}">{{$store->name}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -81,14 +92,14 @@
                                 <div class="form-group">
                                     <label for="code">To</label>
                                     <select id="to_id" name="to_id" class="js-example-basic-single form-control drop"
-                                            onchange="storeSelect()" disabled>
-                                        <option selected="true" disabled="disabled">Select store..</option>
+                                        onchange="storeSelect()" disabled>
+                                        <option selected="true" disabled="disabled">Select Store..</option>
                                         @foreach($stores as $store)
-                                            <option value="{{$store->id}}">{{$store->name}}</option>
+                                        <option value="{{$store->id}}">{{$store->name}}</option>
                                         @endforeach
                                     </select>
                                 </div>
-                            </div>
+                            </div> --}}
                         </div>
 
                         <!-- ajax loading gif -->
@@ -97,19 +108,18 @@
                         </div>
 
                         <div id="tbody" style="display: none;" class="table-responsive">
-                            <table id="fixed-header1"
-                                   class="display table nowrap table-striped table-hover"
-                                   style="width:100%">
+                            <table id="fixed-header1" class="display table nowrap table-striped table-hover"
+                                style="width:100%">
 
                                 <thead>
-                                <tr>
-                                    <th>Transfer #</th>
-                                    <th>Product Name</th>
-                                    <th>Quantity</th>
-                                    <th>From</th>
-                                    <th>To</th>
-                                    <th>Action</th>
-                                </tr>
+                                    <tr>
+                                        <th>Transfer #</th>
+                                        <th>Product Name</th>
+                                        <th>Quantity</th>
+                                        <th>From</th>
+                                        <th>To</th>
+                                        <th>Action</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                 </tbody>
@@ -118,58 +128,56 @@
                         </div>
 
                         <div id="tbody-main" style="display: block;" class="table-responsive">
-                            <table id="fixed-header-main"
-                                   class="display table nowrap table-striped table-hover"
-                                   style="width:100%">
+                            <table id="fixed-header-main" class="display table nowrap table-striped table-hover"
+                                style="width:100%">
 
                                 <thead>
-                                <tr>
-                                    <th>Transfer #</th>
-                                    {{--                                    <th>Date</th>--}}
-                                    <th>Product Name</th>
-                                    <th>Quantity</th>
-                                    <th>From</th>
-                                    <th>To</th>
-                                    <th>Action</th>
-                                </tr>
+                                    <tr>
+                                        {{-- <th>Transfer #</th> --}}
+                                        {{-- <th>Date</th>--}}
+                                        <th>Product Name</th>
+                                        <th>Transfered</th>
+                                        <th>Received</th>
+                                        <th>Receive</th>
+                                        {{-- <th>Action</th> --}}
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                @foreach($all_transfers as $all_transfer)
-                                    <tr>
-                                        <td>{{$all_transfer->transfer_no}}</td>
-                                        {{--                                        <td>{{date('Y-m-d',strtotime($all_transfer->created_at))}}</td>--}}
-                                        <td>{{$all_transfer->currentStock['product']['name']}}</td>
-                                        <td>{{number_format(floatval($all_transfer->transfer_qty))}}</td>
-                                        <td>{{$all_transfer->fromStore['name']}}</td>
-                                        <td>{{$all_transfer->toStore['name']}}</td>
-                                        <td>
-                                            <button id="complete_tran" class="btn btn-sm btn-rounded btn-success"
-                                                    data-id="{{$all_transfer->id}}"
-                                                    data-stock_id="{{$all_transfer->stock_id}}"
+                                    @foreach($all_transfers as $all_transfer)
+                                        <tr>
+                                            {{-- <td>{{$all_transfer->transfer_no}}</td> --}}
+                                            {{-- <td>{{date('Y-m-d',strtotime($all_transfer->created_at))}}</td>--}}
+                                            <td>
+                                                {{$all_transfer->currentStock['product']['name']}}
+                                                {{ optional($all_transfer->currentStock->product)->brand }}
+                                                {{ optional($all_transfer->currentStock->product)->pack_size }}{{ optional($all_transfer->currentStock->product)->sales_uom }}
+                                            </td>
+                                            <td>{{number_format(floatval($all_transfer->transfer_qty))}}</td>
+                                            <td>{{$all_transfer->fromStore['name']}}</td>
+                                            <td>{{$all_transfer->toStore['name']}}</td>
+                                            {{-- <td>
+                                                <button id="complete_tran" class="btn btn-sm btn-rounded btn-success"
+                                                    data-id="{{$all_transfer->id}}" data-stock_id="{{$all_transfer->stock_id}}"
                                                     data-transfer_qty="{{$all_transfer->transfer_qty}}"
                                                     data-from="{{$all_transfer->fromStore['name']}}"
                                                     data-to="{{$all_transfer->toStore['name']}}"
-                                                    data-transfer_no="{{$all_transfer->transfer_no}}"
-                                                    type="button"
-                                                    data-toggle="modal"
-                                                    data-target="#completes">Acknowledge
-                                            </button>
-                                        </td>
-                                    </tr>
-                                @endforeach
+                                                    data-transfer_no="{{$all_transfer->transfer_no}}" type="button"
+                                                    data-toggle="modal" data-target="#completes">Acknowledge
+                                                </button>
+                                            </td> --}}
+                                        </tr>
+                                    @endforeach
                                 </tbody>
 
                             </table>
 
-                            <div class="row">
+                            <div class="row mt-3 mb-3">
                                 <div class="col-md-6"></div>
                                 <div class="col-md-6">
                                     <div class="btn-group" style="float: right;">
                                         <a class="btn btn-danger" href="{{ url('inventory/stock-transfer_') }}">Cancel</a>
-                                        <button class="btn btn-primary" id="save_btn"
-                                                type="button"
-                                                data-toggle="modal"
-                                                data-target="#acknowledge_all">Acknowledge All</button>
+                                        <button class="btn btn-primary" id="save_btn" type="button" data-toggle="modal"
+                                            data-target="#acknowledge_all">Acknowledge All</button>
                                     </div>
                                 </div>
                             </div>

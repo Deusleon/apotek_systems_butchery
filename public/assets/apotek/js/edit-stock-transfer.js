@@ -22,7 +22,6 @@ var cart_table = $("#cart_table").DataTable({
         {
             title: "QOH",
             render: function (num) {
-                console.log("cart:", cart);
                 return numberWithCommas(num);
             },
         },
@@ -155,24 +154,63 @@ function rePopulateSelect2() {
 }
 
 $(document).ready(function () {
-    const current_store_id = parseInt($("#current_store_id").val(), 10) || 0;
+    const from_store = parseInt($("#from_id").val());
+    const transfered_data = JSON.parse($("#transfered_data").val());
 
-    if (current_store_id && current_store_id !== 1) {
+    if (from_store) {
         $("#select_id").prop("disabled", false);
-        filterTransferByStore(current_store_id);
+        filterTransferByStore(from_store);
     }
-
-    resetToOptions(current_store_id);
+    if (transfered_data && transfered_data.length > 0) {
+        loadTransferedDataToCart(transfered_data);
+    }
+    resetToOptions(from_store);
 });
+
+function loadTransferedDataToCart(transfered_data) {
+    if (!Array.isArray(transfered_data)) return;
+
+    cart = []; // clear cart
+
+    transfered_data.forEach((transfer) => {
+        const product = transfer.current_stock?.product || {};
+        const item_name =
+            (product.name || "Unknown Product") +
+            " " +
+            (product.brand || "") +
+            " " +
+            (product.pack_size || "") +
+            (product.sales_uom || "");
+
+        const QoH = parseFloat(
+            String(transfer.total_stock || 0).replace(/,/g, "")
+        );
+
+        const quantity = parseFloat(transfer.transfer_qty || 0);
+        const product_id = transfer.current_stock?.product_id || 0;
+        const stock_id = transfer.stock_id;
+
+        // Push into cart
+        cart.push([
+            item_name.trim(),
+            QoH,
+            numberWithCommas(quantity),
+            product_id,
+            stock_id,
+        ]);
+    });
+
+    // Refresh DataTable
+    cart_table.clear();
+    cart_table.rows.add(cart);
+    cart_table.draw();
+
+    // Update hidden input
+    calculateCart();
+}
 
 $(document).on("change", "#select_id", function () {
     val();
-});
-
-$(document).on("change", "#from_id", function () {
-    const selected_from = parseInt($(this).val(), 10) || 0;
-    filterTransferByStore(selected_from);
-    resetToOptions(selected_from);
 });
 
 function resetToOptions(storeIdToRemove) {
@@ -376,7 +414,7 @@ $("#transfer").on("submit", function (e) {
 
     //if cart is empty, then dont submit form
     if (check_cart === "") {
-        $("#from_id").prop("disabled", false);
+        // $("#from_id").prop("disabled", false);
         notify(
             "Please select products to complete transfer",
             "top",
@@ -401,7 +439,7 @@ $("#transfer").on("submit", function (e) {
             "right",
             "warning"
         );
-        $("#from_id").prop("disabled", false);
+        // $("#from_id").prop("disabled", false);
         $("#to_id").prop("disabled", false);
         return false;
     }
@@ -469,7 +507,7 @@ $("#transfer").on("submit", function (e) {
     }
 
     /*enable from select option*/
-    $("#from_id").prop("disabled", false);
+    // $("#from_id").prop("disabled", false);
 
     // window.open('#', '_blank');
     // window.open(this.href, '_self');
@@ -477,30 +515,86 @@ $("#transfer").on("submit", function (e) {
 });
 
 function saveStockTransfer() {
+    // make sure cart hidden input is up-to-date
+    calculateCart();
+
+    // build FormData from form
+    var formEl = $("#transfer")[0];
+    var formData = new FormData(formEl);
+
+    // ensure Laravel method spoofing and from_id (in case select is disabled)
+    formData.set("_method", "PUT");
+    formData.set("from_id", $("#from_id").val() || "");
+
+    // ensure order_cart is present and up-to-date (controller expects 'order_cart')
+    formData.set("order_cart", $("#order_cart").val() || "");
+
+    // ===== DEBUG: console all FormData entries =====
+    // console.groupCollapsed("Debug: FormData entries");
+    for (const pair of formData.entries()) {
+        const key = pair[0];
+        const value = pair[1];
+
+        // If value is a File, print its name and size
+        // if (value instanceof File) {
+        //     console.log(
+        //         key + " (file):",
+        //         value.name,
+        //         "(" + value.size + " bytes)"
+        //     );
+        // } else {
+        //     console.log(key + ":", value);
+        // }
+    }
+    console.groupEnd();
+
+    // Pretty-print order_cart if it's JSON
+    try {
+        const oc = formData.get("order_cart");
+        // if (oc) {
+        //     const parsed = JSON.parse(oc);
+        //     console.groupCollapsed("Debug: Parsed order_cart");
+        //     console.log("order_cart (as string):", oc);
+        //     if (Array.isArray(parsed)) {
+        //         console.table(parsed);
+        //     } else {
+        //         console.log(parsed);
+        //     }
+        //     console.groupEnd();
+        // } else {
+        //     console.warn("order_cart is empty or not set");
+        // }
+    } catch (err) {
+        console.error("Failed to parse order_cart JSON:", err);
+    }
+
+    // ===== proceed with AJAX send (existing behavior) =====
     $("#loading").show();
-    var formData = new FormData($("#transfer")[0]);
     var errorMessage = false;
     $("#transfer_preview").attr("disabled", true);
 
     $.ajax({
         url: config.routes.stockTransferSave,
-        type: "POST",
+        type: "POST", // we spoof _method=PUT above
         dataType: "json",
         data: formData,
         processData: false,
         contentType: false,
         success: function (response) {
-            console.log("Stock transfer response:", response);
+            // console.log("Stock transfer update response:", response);
             if (response.success) {
+                setTimeout(function () {
+                    window.location.href = config.routes.historyPage;
+                }, 0);
                 notify(
-                    response.message || "Stock transferred successfully",
+                    response.message || "Stock transfer updated successfully",
                     "top",
                     "right",
                     "success"
                 );
             } else {
                 notify(
-                    response.message || "Failed to create stock transfer",
+                    response.message || "Failed to update stock transfer",
                     "top",
                     "right",
                     "danger"
@@ -509,11 +603,26 @@ function saveStockTransfer() {
         },
         error: function (xhr, status, error) {
             errorMessage = true;
-            var message = "Failed to create stock transfer!";
-            if (xhr.responseJSON && xhr.responseJSON.message) {
-                message = xhr.responseJSON.message;
+            // improved error logging for debugging
+            console.error("AJAX error", status, error, xhr);
+            if (
+                xhr.status === 422 &&
+                xhr.responseJSON &&
+                xhr.responseJSON.errors
+            ) {
+                console.groupCollapsed("Validation errors (422)");
+                console.log(xhr.responseJSON.errors);
+                console.groupEnd();
+                // show first error to user
+                const first = Object.values(xhr.responseJSON.errors)[0][0];
+                notify(first, "top", "right", "danger");
+            } else {
+                var message = "Failed to update stock transfer!";
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
+                notify(message, "top", "right", "danger");
             }
-            notify(message, "top", "right", "danger");
         },
         complete: function () {
             if (errorMessage === false) {
@@ -525,6 +634,56 @@ function saveStockTransfer() {
         timeout: 20000,
     });
 }
+
+// function saveStockTransfer() {
+//     $("#loading").show();
+//     var formData = new FormData($("#transfer")[0]);
+//     var errorMessage = false;
+//     $("#transfer_preview").attr("disabled", true);
+//     console.log("formData:", formData);
+//     $.ajax({
+//         url: config.routes.stockTransferSave,
+//         type: "POST",
+//         dataType: "json",
+//         data: formData,
+//         processData: false,
+//         contentType: false,
+//         success: function (response) {
+//             console.log("Stock transfer update response:", response);
+//             if (response.success) {
+//                 notify(
+//                     response.message || "Stock transfer updated successfully",
+//                     "top",
+//                     "right",
+//                     "success"
+//                 );
+//             } else {
+//                 notify(
+//                     response.message || "Failed to update stock transfer",
+//                     "top",
+//                     "right",
+//                     "danger"
+//                 );
+//             }
+//         },
+//         error: function (xhr, status, error) {
+//             errorMessage = true;
+//             var message = "Failed to update stock transfer!";
+//             if (xhr.responseJSON && xhr.responseJSON.message) {
+//                 message = xhr.responseJSON.message;
+//             }
+//             notify(message, "top", "right", "danger");
+//         },
+//         complete: function () {
+//             if (errorMessage === false) {
+//                 deselect();
+//             }
+//             $("#transfer_preview").attr("disabled", false);
+//             $("#loading").hide();
+//         },
+//         timeout: 20000,
+//     });
+// }
 
 function filterTransferByStore(from_id) {
     if (!from_id || from_id == 0) {
