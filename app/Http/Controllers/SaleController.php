@@ -298,7 +298,6 @@ class SaleController extends Controller
                 // ->limit(20)
                 ->get();
                 
-        Log::info('Request', $products->toArray());
             if ($products->count() <= 0) {
                 return response()->json([
                     "message" => "No Products Found",
