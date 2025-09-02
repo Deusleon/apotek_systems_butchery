@@ -23,7 +23,6 @@ ini_set('memory_limit', '512M');
 class DailyStockCountController extends Controller
 {
 
-
     public function index()
     {
 

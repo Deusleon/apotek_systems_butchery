@@ -18,10 +18,8 @@ var table_daily_stock = $("#fixedHeader2").DataTable({
         { data: "date" },
         { data: "qoh" },
     ],
-    columnDefs: [
-        { type: 'date', targets: 4 } 
-    ],
-    order: [[4, 'desc']]
+    columnDefs: [{ type: "date", targets: 4 }],
+    order: [[4, "desc"]],
 });
 
 $(function () {
@@ -110,7 +108,13 @@ function bindData(data) {
     filteredData.forEach((item) => {
         item.qoh = Number(item.current_stock).toFixed(0);
         item.out_total = Number(item.out_total).toFixed(0);
-        item.product_name = item.product.name+' '+item.product.brand+' '+item.product.pack_size+item.product.sales_uom;
+        item.product_name =
+            item.product.name +
+            " " +
+            item.product.brand +
+            " " +
+            item.product.pack_size +
+            item.product.sales_uom;
     });
     // console.log("Binding data:", filteredData);
     summary_table.clear();
@@ -121,28 +125,38 @@ function bindData(data) {
 function bindStockCountData(data) {
     // flatten out_movements
     let flattened = [];
-    data.forEach(item => {
+    data.forEach((item) => {
         if (item.out_movements && item.out_movements.length > 0) {
-            item.out_movements.forEach(mv => {
+            item.out_movements.forEach((mv) => {
                 flattened.push({
-                    product_name: item.product_name+' '+item.product.brand+' '+item.product.pack_size+item.product.sales_uom,
-                    out_mode: mv.out_mode || '',
+                    product_name:
+                        item.product_name +
+                        " " +
+                        item.product.brand +
+                        " " +
+                        item.product.pack_size +
+                        item.product.sales_uom,
+                    out_mode: mv.out_mode || "",
                     out_total: mv.qty,
-                    batch_number: item.batch_number || '',
+                    batch_number: item.batch_number || "",
                     date: mv.date,
-                    qoh: item.current_stock_batch != null ? Number(item.current_stock_batch).toFixed(0) : 0
+                    qoh:
+                        item.current_stock_batch != null
+                            ? Number(item.current_stock_batch).toFixed(0)
+                            : 0,
                 });
             });
         }
     });
 
     let grouped = {};
-    flattened.forEach(item => {
+    flattened.forEach((item) => {
         const key = `${item.product_name}|${item.out_mode}|${item.batch_number}|${item.date}`;
         if (!grouped[key]) {
             grouped[key] = { ...item };
         } else {
-            grouped[key].out_total = Number(grouped[key].out_total) + Number(item.out_total);
+            grouped[key].out_total =
+                Number(grouped[key].out_total) + Number(item.out_total);
         }
     });
 

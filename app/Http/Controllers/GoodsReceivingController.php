@@ -352,25 +352,38 @@ class GoodsReceivingController extends Controller
 
     }
 
-    public function orderReceive(Request $request)
+   public function orderReceive(Request $request)
 {
-    $batch_setting = Setting::where('id', 110)->value('value');
-    $expire_date = Setting::where('id', 123)->value('value');
+    // Fetch settings
+    $batch_setting = Setting::where('id', 110)->value('value'); // YES/NO
+    $expire_date   = Setting::where('id', 123)->value('value'); // YES/NO
 
     DB::beginTransaction();
 
     try {
+        // Basic validation for all orders
         $validated = $request->validate([
             'order_id' => 'required|exists:orders,id',
             'supplier_id' => 'required|exists:inv_suppliers,id',
             'items' => 'required|array',
             'items.*.purchase_order_detail_id' => 'required|exists:order_details,id',
             'items.*.product_id' => 'required|exists:inv_products,id',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.batch_number' => 'nullable|string|max:255',
-            'items.*.expiry_date' => 'nullable|date',
+            'items.*.quantity' => 'required|integer|min:0',
             'items.*.cost_price' => 'required|numeric|min:0',
         ]);
+        
+        // Conditional validation based on settings
+        if ($batch_setting === 'YES') {
+            $request->validate([
+                'items.*.batch_number' => 'required|string|max:255'
+            ]);
+        }
+
+        if ($expire_date === 'YES') {
+            $request->validate([
+                'items.*.expiry_date' => 'required|date'
+            ]);
+        }
 
         $order = Order::with('details')->findOrFail($validated['order_id']);
 
@@ -381,14 +394,11 @@ class GoodsReceivingController extends Controller
         $default_store_id = optional(Auth::user()->store->first())->id ?? 1;
 
         foreach ($validated['items'] as $itemData) {
-            if (empty($itemData['quantity']) || (int)$itemData['quantity'] <= 0) {
-                continue;
-            }
-
             $received_qty = (int)$itemData['quantity'];
+            if ($received_qty <= 0) continue;
+
             $order_detail = OrderDetail::findOrFail($itemData['purchase_order_detail_id']);
 
-            // Use the real DB column (received_qty) to compute remaining:
             $current_received = (int)($order_detail->received_qty ?? 0);
             $remaining_qty = (int)$order_detail->ordered_qty - $current_received;
 
@@ -396,33 +406,38 @@ class GoodsReceivingController extends Controller
                 throw new \Exception("Cannot receive more than the remaining quantity for product ID {$itemData['product_id']}.");
             }
 
-            // Atomically increment the DB column to avoid accessor/setter mismatch:
             $order_detail->increment('received_qty', $received_qty);
 
-            // --- Save goods_receiving (no change) ---
+            // Determine batch number and expiry date based on settings
+            $batch_number = ($batch_setting === 'YES') ? $itemData['batch_number'] : null;
+            $expiry_date_value = ($expire_date === 'YES' && !empty($itemData['expiry_date']))
+                                 ? date('Y-m-d', strtotime($itemData['expiry_date']))
+                                 : null;
+
+            // Save goods receiving
             $goods_receiving = new GoodsReceiving();
             $goods_receiving->product_id   = $itemData['product_id'];
             $goods_receiving->supplier_id  = $validated['supplier_id'];
             $goods_receiving->quantity     = $received_qty;
             $goods_receiving->unit_cost    = $itemData['cost_price'];
             $goods_receiving->total_cost   = $received_qty * $itemData['cost_price'];
-            $goods_receiving->batch_number = $itemData['batch_number'];
-            $goods_receiving->expire_date  = $itemData['expiry_date'] ? date('Y-m-d', strtotime($itemData['expiry_date'])) : null;
+            $goods_receiving->batch_number = $batch_number;
+            $goods_receiving->expire_date  = $expiry_date_value;
             $goods_receiving->created_by   = Auth::id();
             $goods_receiving->save();
 
-            // --- Update stock (no change) ---
+            // Update or create stock
             $stock = CurrentStock::firstOrNew([
                 'product_id'   => $itemData['product_id'],
-                'batch_number' => $itemData['batch_number'],
+                'batch_number' => $batch_number,
                 'store_id'     => $default_store_id,
             ]);
             $stock->quantity   += $received_qty;
             $stock->unit_cost   = $itemData['cost_price'];
-            $stock->expiry_date = $goods_receiving->expire_date;
+            $stock->expiry_date = $expiry_date_value;
             $stock->save();
 
-            // --- Track stock movement (no change) ---
+            // Track stock movement
             StockTracking::create([
                 'stock_id'   => $stock->id,
                 'product_id' => $itemData['product_id'],
@@ -434,14 +449,14 @@ class GoodsReceivingController extends Controller
             ]);
         }
 
-        // --- recompute totals directly from DB to avoid stale/aliased attributes ---
+        // Recompute order status
         $total_ordered  = OrderDetail::where('order_id', $order->id)->sum('ordered_qty');
         $total_received = OrderDetail::where('order_id', $order->id)->sum('received_qty');
 
         if ($total_received == 0) {
             $order->status = '1'; // Pending
         } elseif ($total_received < $total_ordered) {
-            $order->status = '2'; // Partially
+            $order->status = '2'; // Partially received
         } else {
             $order->status = '3'; // Completed
         }
@@ -451,15 +466,16 @@ class GoodsReceivingController extends Controller
 
         return redirect()->back()->with('alert-success', 'Order received successfully!');
 
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        DB::rollBack();
-        return redirect()->back()->withErrors($e->errors())->withInput();
+    // } catch (\Illuminate\Validation\ValidationException $e) {
+    //     DB::rollBack();
+    //     return redirect()->back()->withErrors($e->errors())->withInput();
     } catch (\Exception $e) {
         DB::rollBack();
         \Log::error('Order Receiving Error: '.$e->getMessage().' in '.$e->getFile().' on line '.$e->getLine());
         return redirect()->back()->with('error', 'An unexpected error occurred while processing the order.');
     }
 }
+
 
 
 
