@@ -202,6 +202,7 @@ function getOrderHistory() {
 $("#order_history_datatable tbody").on("click", "#dtl_btn", function () {
     var row = order_history_datatable.row($(this).parents("tr"));
     var data = row.data();
+    console.log("RowData", data);
     currentOrderData = data; // keep reference for Approve/Cancel
     currentRowIndex = row.index(); // we’ll use this to update the row after approve
     orderDetails(data.details);
