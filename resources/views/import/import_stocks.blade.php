@@ -87,12 +87,12 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link text-uppercase" id="order-received" href="{{ route('download-products-template') }}"
-                    role="tab" aria-controls="new_quotes" aria-selected="true"> Download Products Template
+                    role="tab" aria-controls="new_quotes" aria-selected="true"> Products Template
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link text-uppercase" id="order-received" href="{{ route('download-template') }}"
-                    role="tab" aria-controls="new_quotes" aria-selected="true"> Download Stock Template
+                    role="tab" aria-controls="new_quotes" aria-selected="true"> Stock Template
                 </a>
             </li>
         </ul>
@@ -173,6 +173,12 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="feather icon-upload"></i> Preview Import
                             </button>
+                            {{-- <button type="submit" class="btn btn-primary">
+                                <i class="feather icon-download"></i> Template
+                            </button> --}}
+                            {{-- <button type="submit" class="btn btn-primary">
+                                <i class="feather icon-upload"></i> Template
+                            </button> --}}
                         </div>
                     </div>
                 </form>

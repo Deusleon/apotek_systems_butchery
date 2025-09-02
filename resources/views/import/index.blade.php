@@ -104,12 +104,12 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link text-uppercase" id="order-received" href="{{ route('download-products-template') }}"
-                    role="tab" aria-controls="new_quotes" aria-selected="true"> Download Products Template
+                    role="tab" aria-controls="new_quotes" aria-selected="true">  Products Template
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link text-uppercase" id="order-received" href="{{ route('download-template') }}" role="tab"
-                    aria-controls="new_quotes" aria-selected="true"> Download Stock Template
+                    aria-controls="new_quotes" aria-selected="true">  Stock Template
                 </a>
             </li>
         </ul>
@@ -295,7 +295,7 @@
             });
         });
 
-        $('#import_product_history').Datatable({
+        $('#import_product_history').DataTable({
             searching: true,
             bPaginate: true,
             bInfo: true,

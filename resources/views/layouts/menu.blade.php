@@ -68,7 +68,7 @@
                 <li class=""><a href="{{route('products.index')}}" class="">Product List</a></li>
             @endif
             @if(auth()->user()->checkPermission('View Data Import'))
-                <li class="nav-item"><a href="{{route('import-data')}}" class="nav-link"><span
+                <li class="nav-item"><a href="{{route('import-products')}}" class="nav-link"><span
                             class="pcoded-mtext">Products Import</span></a>
                 </li>
             @endif
