@@ -1,6 +1,6 @@
-var cart = [];//for data displayed.
+var cart = []; //for data displayed.
 var cart_data_desc = [];
-var default_cart = [];//for default values.
+var default_cart = []; //for default values.
 var details = [];
 var sale_items = [];
 var edit_btn_set = 0;
@@ -27,7 +27,6 @@ try {
 } catch (e) {
     console.log('discount error');
 }
-
 
 var items_table = $('#items_table').DataTable({
     searching: true,
@@ -149,26 +148,9 @@ var sale_list_Table = $('#sale_list_Table').DataTable({
     fixedHeader: true,
 });
 
-// $(document).off("change", '#products', addProductToList).on("change", '#products', addProductToList)
-//
-// function addProductToList()
-// {
-//     let customer_id = document.getElementById("customer_id").value;
-//     console.log(customer_id);
-//     if(customer_id !== '') {
-//         valueCollection();
-//     } else {
-//         notify('Select Customer First', 'top', 'right', 'warning');
-//
-//         $('#products option').prop('selected', function() {
-//             return this.defaultSelected;
-//         });
-//     }
-// }
-
 $("#products").on('change', function (event) {
     let customer_id = document.getElementById("customer_id").value;
-    console.log(customer_id);
+    // console.log(customer_id);
     if(customer_id !== '') {
         valueCollection();
     } else {
@@ -891,31 +873,38 @@ $("#sale_paid").on('change', function (evt) {
 });
 
 $('#products').select2({
+    placeholder: "Select Product...",
+    allowClear: true
+});
 
-    ajax: {
-            url: config.routes.filterProductByWord,
-            type: "get",
-            delay: 100,
-            dataType: "json",
-            data: function (params) {
-                var price_category = document.getElementById('price_category');
-                var price_category_id = price_category.options[price_category.selectedIndex].value;
-                var query = {
-                    word: params.term || ' ',
-                    price_category_id: price_category_id
-                }
-                return query;
+$('#price_category').change(function () {
+    var id = $(this).val();
+    if (id) {
+        $.ajax({
+            url: config.routes.selectProducts,
+            type: 'post',
+            data: {
+                "_token": config.token,
+                "id": id
             },
-            processResults: function (data, page) {
-                data = Object.keys(data).reduce(function (array, key) {
-                    array.push({ id: key, text: data[key] });
-                    return array;
-                }, []);
-                return {
-                    results: data
+            dataType: 'json',
+            success: function (result) {
+                $('#products').empty().trigger("change");
+                if (result.data && result.data.length > 0) {
+                    result.data.forEach(function (p) {
+                        var option = new Option(
+                            p.name,
+                            p.id,
+                            false, 
+                            false
+                        );
+                        $('#products').append(option);
+                    });
+                    $('#products').trigger("change"); 
                 }
             }
-        },
+        });
+    }
 });
 
 $('#products_b').select2({
@@ -977,32 +966,6 @@ function triggerSaleType() {
 $(document).ready(function () {
     triggerSaleType();
 });
-
-$('#price_category').change(function () {
-    $("#products option").remove();
-    $("#products_b option").remove();
-    var id = $(this).val();
-    storeLocally(id);
-    if (id) {
-        $.ajax({
-            url: config.routes.selectProducts,
-            data: {
-                "_token": config.token,
-                "id": id
-            },
-            type: 'post',
-            dataType: 'json',
-            success: function (result) {
-                $.each(result, function (detail, name) {
-                    $('#products').append($('<option>', {value: detail, text: name}));
-                    $('#products_b').append($('<option>', {value: detail, text: name}));
-                });
-            },
-        });
-    }
-
-});
-
 
 $("#save-customer").click(function () {
     document.getElementById('new-task').value = 'New Customer';

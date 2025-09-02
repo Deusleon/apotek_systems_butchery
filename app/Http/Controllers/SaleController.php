@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use PDF;
 use Illuminate\Support\Facades\View;
+use Maatwebsite\Excel\Concerns\ToArray;
 
 class SaleController extends Controller
 {
@@ -174,7 +175,6 @@ class SaleController extends Controller
 
     }
 
-
     public function getCreditSale(Request $request)
     {
 
@@ -214,39 +214,31 @@ class SaleController extends Controller
         }
     }
 
-
     public function selectProducts(Request $request)
     {
         /*get default store*/
-        $default_store = Auth::user()->store->name ?? 'Default Store';
-        $stores = Store::where('name', $default_store)->first();
+        $default_store = current_store_id();
 
-        if ($stores != null) {
-            $default_store_id = $stores->id;
-        } else {
-            $default_store_id = 1;
-        }
-
-        $output = [];
-        $output[""] = "Select Product";
         $products = PriceList::where('price_category_id', $request->get('id'))
             ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
             ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
             ->where('quantity', '>', 0)
             ->where('inv_products.status', '=', 1)
-            ->select('inv_products.id as id', 'name', 'barcode')
+            ->where('inv_current_stock.store_id', $default_store)
+            ->select('inv_products.id as id', 'name', 'barcode', 'inv_products.brand', 'inv_products.pack_size', 'sales_uom')
             ->groupBy('product_id')
             ->orderby('name', 'asc')
-            ->limit(100)
+            // ->limit(100)
             ->get();
-
-        $count = count($products);
-        if ($count <= 0) {
-            $output[""] = "No Products Found";
-        } else {
-            $output[""] = "Select Product...";
+            
+        if ($products->count() <= 0) {
+            return response()->json([
+                "message" => "No Products Found",
+                "data" => []
+            ]);
         }
 
+        $output = [];
         foreach ($products as $product) {
             $latest = PriceList::where('price_category_id', $request->get('id'))
                 ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
@@ -254,52 +246,67 @@ class SaleController extends Controller
                 ->orderBy('stock_id', 'desc')
                 ->where('product_id', $product->id)
                 ->first('price');
+
             $quantity = CurrentStock::where('product_id', $product->id)
-                ->where('store_id', $default_store_id)
+                ->where('store_id', $default_store)
                 ->sum('quantity');
-            $output["$product->name#@$latest->price#@$product->id#@$quantity"] = $product->name;
+                
+        if ($quantity > 0) {
+            $name = $product->name.' '.($product->brand ? $product->brand.' ' : '').$product->pack_size.$product->sales_uom;
+            $output[] = [
+                "id"       => $product->id,
+                "name"     => $name,
+                "price"    => $latest->price ?? 0,
+                "quantity" => $quantity
+            ];
+        }
         }
 
-        return $output;
+        return response()->json([
+            "message" => "Products Found",
+            "data"    => $output
+        ]);
     }
 
     public function filterProductByWord(Request $request)
     {
-        /*get default store*/
-        $default_store = Auth::user()->store->name ?? 'Default Store';
-        $stores = Store::where('name', $default_store)->first();
-
-        if ($stores != null) {
-            $default_store_id = $stores->id;
-        } else {
-            $default_store_id = 1;
-        }
+        $default_store_id = current_store_id();
 
         if ($request->ajax()) {
-            $output = [];
-            $output[""] = "Select Product";
-
             $products = PriceList::where('price_category_id', $request->price_category_id)
                 ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
                 ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
-                ->where('quantity', '>', 0)
+                ->where('inv_current_stock.quantity', '>', 0)
                 ->where('inv_products.status', '=', 1)
                 ->where('inv_current_stock.store_id', $default_store_id)
-                ->select('inv_products.id as id', 'inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.barcode', 'inv_products.type')
-                ->where('name', 'LIKE', "%{$request->word}%")
-                ->orwhere('barcode', 'LIKE', "%{$request->word}%")
-                ->groupBy('product_id')
-                ->limit(20)
+                ->where(function ($query) use ($request) {
+                    $query->where('inv_products.name', 'LIKE', "%{$request->word}%")
+                        ->orWhere('inv_products.barcode', 'LIKE', "%{$request->word}%")
+                        ->orWhere('inv_products.brand', 'LIKE', "%{$request->word}%")
+                        ->orWhere('inv_products.pack_size', 'LIKE', "%{$request->word}%")
+                        ->orWhere('inv_products.sales_uom', 'LIKE', "%{$request->word}%");
+                })
+                ->select(
+                    'inv_products.id as id',
+                    'inv_products.name',
+                    'inv_products.brand',
+                    'inv_products.pack_size',
+                    'inv_products.sales_uom',
+                )
+                ->groupBy('inv_products.id')
+                ->orderby('name', 'asc')
+                // ->limit(20)
                 ->get();
-
-
-            $count = count($products);
-            if ($count <= 0) {
-                $output[""] = "No Products Found";
-            } else {
-                $output[""] = "Select Product...";
+                
+        Log::info('Request', $products->toArray());
+            if ($products->count() <= 0) {
+                return response()->json([
+                    "message" => "No Products Found",
+                    "data"    => []
+                ]);
             }
 
+            $output = [];
             foreach ($products as $product) {
                 $latest = PriceList::where('price_category_id', $request->price_category_id)
                     ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
@@ -311,15 +318,86 @@ class SaleController extends Controller
                 $quantity = CurrentStock::where('product_id', $product->id)
                     ->where('store_id', $default_store_id)
                     ->sum('quantity');
-                if ($latest != null) {
-                    $output["$product->name $product->pack_size#@$latest->price#@$product->id#@$quantity#@$product->type"] = $product->name." ".$product->pack_size;
-                } else {
-                    $output[""] = "No Products Found";
+
+                if ($quantity > 0) {
+                    $name = $product->name.' '
+                        .($product->brand ? $product->brand.' ' : '')
+                        .$product->pack_size
+                        .$product->sales_uom;
+
+                    $output[] = [
+                        "id"       => $product->id,
+                        "name"     => $name,
+                        "price"    => $latest->price ?? 0,
+                        "quantity" => $quantity,
+                    ];
                 }
             }
-            return $output;
+
+            return response()->json([
+                "message" => "Select Product",
+                "data"    => $output
+            ]);
         }
     }
+
+    // public function filterProductByWord(Request $request)
+    // {
+    //     /*get default store*/
+    //     $default_store = Auth::user()->store->name ?? 'Default Store';
+    //     $stores = Store::where('name', $default_store)->first();
+
+    //     if ($stores != null) {
+    //         $default_store_id = $stores->id;
+    //     } else {
+    //         $default_store_id = 1;
+    //     }
+
+    //     if ($request->ajax()) {
+    //         $output = [];
+    //         $output[""] = "Select Product";
+
+    //         $products = PriceList::where('price_category_id', $request->price_category_id)
+    //             ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
+    //             ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+    //             ->where('quantity', '>', 0)
+    //             ->where('inv_products.status', '=', 1)
+    //             ->where('inv_current_stock.store_id', $default_store_id)
+    //             ->select('inv_products.id as id', 'inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.barcode', 'inv_products.type')
+    //             ->where('name', 'LIKE', "%{$request->word}%")
+    //             ->orwhere('barcode', 'LIKE', "%{$request->word}%")
+    //             ->groupBy('product_id')
+    //             ->limit(20)
+    //             ->get();
+
+
+    //         $count = count($products);
+    //         if ($count <= 0) {
+    //             $output[""] = "No Products Found";
+    //         } else {
+    //             $output[""] = "Select Product...";
+    //         }
+
+    //         foreach ($products as $product) {
+    //             $latest = PriceList::where('price_category_id', $request->price_category_id)
+    //                 ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
+    //                 ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+    //                 ->orderBy('stock_id', 'desc')
+    //                 ->where('product_id', $product->id)
+    //                 ->first('price');
+
+    //             $quantity = CurrentStock::where('product_id', $product->id)
+    //                 ->where('store_id', $default_store_id)
+    //                 ->sum('quantity');
+    //             if ($latest != null) {
+    //                 $output["$product->name $product->pack_size#@$latest->price#@$product->id#@$quantity#@$product->type"] = $product->name." ".$product->pack_size;
+    //             } else {
+    //                 $output[""] = "No Products Found";
+    //             }
+    //         }
+    //         return $output;
+    //     }
+    // }
 
     public function storeCashSale(Request $request)
     {

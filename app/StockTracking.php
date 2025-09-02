@@ -17,7 +17,9 @@ class StockTracking extends Model
         'out_mode',
         'store_id',
         'created_by',
-        'updated_by'
+        'updated_by',
+        'movement',
+        'created_at',
     ];
 
     public function currentStock()

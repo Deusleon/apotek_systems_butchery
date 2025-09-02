@@ -52,7 +52,6 @@
                                     <select id="price_category" class="js-example-basic-single form-control" required>
                                         <option value="" selected="true" disabled>Select Type</option>
                                         @foreach($price_category as $price)
-                                            <!-- <option value="{{$price->id}}">{{$price->name}}</option> -->
                                             <option
                                                 value="{{$price->id}}" {{$default_sale_type === $price->id  ? 'selected' : ''}}>{{$price->name}}</option>
                                         @endforeach
@@ -276,7 +275,7 @@
         var config = {
             token: '{{ csrf_token() }}',
             routes: {
-            selectProducts: '{{route('selectProducts')}}',
+                selectProducts: '{{route('selectProducts')}}',
                 storeCashSale: '{{route('cash-sales.storeCashSale')}}',
                 filterProductByWord: '{{route('filter-product-by-word')}}'
 
@@ -292,29 +291,6 @@
             // select2 is opened, handle event
             normal_search = 0;
         });
-
-
-        // let isSelecting = false; // Flag to prevent double entry
-        // let normal_search = 0;
-        //
-        // $('#products').on('select2:open', function (e) {
-        //     normal_search = 1;
-        //     isSelecting = false; // Reset flag when select2 opens
-        // });
-        //
-        // $('#products').on('select2:select', function (e) {
-        //     if (isSelecting) {
-        //         return; // Prevent double entry if already selecting
-        //     }
-        //     isSelecting = true; // Set flag to true on selection
-        //     // Handle the selection here, e.g., log or use selected data
-        //     console.log('Product selected:', e.params.data);
-        // });
-        //
-        // $('#products').on('select2:close', function (e) {
-        //     normal_search = 0;
-        //     isSelecting = false; // Reset flag when select2 closes
-        // });
 
         /*hide barcode search*/
         $.fn.toggleSelect2 = function (state) {
