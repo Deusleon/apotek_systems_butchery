@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use PDF;
 use Yajra\DataTables\DataTables;
 
@@ -325,19 +326,39 @@ class RequisitionController extends Controller
 
     public function update(Request $request)
     {
+        if (!Auth()->user()->checkPermission('Create Requisitions')) {
+            abort(403, 'Access Denied');
+        }
+
+        // Validate file upload (same as store method)
+        $request->validate([
+            'evidence' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048', // max 2MB
+        ]);
+
         $req_id = $request->requisition_id;
         $remarks = $request->remark;
-        if(auth()->user()->checkPermission('Manage All Branches'))
-        {
+        
+        if(auth()->user()->checkPermission('Manage All Branches')) {
             $from_store = $request->from_store;
         }
 
-        if(!auth()->user()->checkPermission('Manage All Branches'))
-        {
+        if(!auth()->user()->checkPermission('Manage All Branches')) {
             $from_store = Auth::user()->store_id;
         }
 
         $to_store = "1";
+
+        // Handle file upload - NEW CODE ADDED
+        $evidencePath = null;
+        if($request->hasFile('evidence')) {
+            $evidencePath = $request->file('evidence')->store('requisition_evidence', 'public');
+            
+            // Optional: Delete old evidence file if it exists
+            $oldRequisition = Requisition::find($req_id);
+            if ($oldRequisition->evidence_document && Storage::disk('public')->exists($oldRequisition->evidence_document)) {
+                Storage::disk('public')->delete($oldRequisition->evidence_document);
+            }
+        }
 
         $orders = json_decode($request->orders);
         if (!empty($orders)) {
@@ -348,8 +369,13 @@ class RequisitionController extends Controller
             $requisition->to_store = $to_store;
             $requisition->remarks = $remarks;
             $requisition->updated_by = Auth::user()->id;
+            
+            // Update evidence document if a new file was uploaded - NEW CODE
+            if ($evidencePath) {
+                $requisition->evidence_document = $evidencePath;
+            }
+            
             $requisition->save();
-
 
             foreach ($orders as $order_details) {
                 $check_req = RequisitionDetail::query()
@@ -375,19 +401,16 @@ class RequisitionController extends Controller
                     $order_detail->unit = $order_details->unit;
                     $order_detail->save();
                 }
-
-
             }
+            
             session()->flash("alert-success", "Requisition Updated Successfully!");
             DB::commit();
 
             return back();
         }
 
-
         session()->flash("alert-success", "Requisition Accepted Successfully!");
         return back();
-
     }
 
     public function destroy(Request $request)

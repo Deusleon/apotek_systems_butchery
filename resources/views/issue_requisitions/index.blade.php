@@ -22,10 +22,10 @@
                                     <tr>
                                         <th>Req. No</th>
                                         <th>Products</th>
-                                        <th>Status</th>
                                         <th>From</th>
                                         <th>To</th>
                                         <th>Date</th>
+                                        <th>Status</th>
                                         @can('View Requisitions Details')
                                             <th>Action</th>
                                         @endcan
@@ -75,6 +75,20 @@
                     name: 'products'
                 },
                 {
+                    data: 'fromStore',
+                    name: 'fromStore'
+                },
+                {
+                    data: 'toStore',
+                    name: 'toStore'
+                },
+                {
+                    data: 'reqDate', render: function (date) {
+                    return moment(date).format('YYYY-MM-DD');
+                },
+                orderable: false,
+                },
+                {
                     data: 'status',
                     render: function(status, type, row) {
                         if (status == 0) {
@@ -86,20 +100,6 @@
                         }
                     },
                     orderable: false,
-                },
-                {
-                    data: 'fromStore',
-                    name: 'fromStore'
-                },
-                {
-                    data: 'toStore',
-                    name: 'toStore'
-                },
-                {
-                    data: 'reqDate', render: function (date) {
-                    return moment(date).format('MMM DD, YYYY');
-                },
-                orderable: false,
                 },
                 @can('View Requisitions Details')
                     {

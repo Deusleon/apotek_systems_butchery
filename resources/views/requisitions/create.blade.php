@@ -247,7 +247,7 @@
         // Replace quantity text with input field
         const quantityCell = row.cells[1];
         quantityCell.innerHTML = `
-            <input type="number" 
+            <input type="text" 
                    class="form-control" 
                    value="${rowData.quantity}" 
                    step="any"
@@ -261,12 +261,6 @@
         inputField.focus();
         inputField.select();
         
-        // Change Edit button to Save button
-        const editButton = row.querySelector('.edit-btn');
-        editButton.textContent = 'Save';
-        editButton.setAttribute('onclick', `saveQuantityChange(event, ${rowIndex})`);
-        editButton.classList.remove('btn-primary');
-        editButton.classList.add('btn-success');
     }
 
     function saveQuantityChange(event, rowIndex) {

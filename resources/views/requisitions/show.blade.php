@@ -108,24 +108,41 @@
                             </div>
 
                             <!-- First Row: Remarks and Upload Document -->
+                            <!-- First Row: Remarks and Upload Document -->
                             <hr>
-                            <div class="row mb-3">
-                                <!-- Remarks (Left side) -->
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="remark"><b>Remarks</b></label>
-                                        <textarea id="remark" name="remark" class="form-control" rows="3" placeholder="Enter Remarks Here"></textarea>
-                                    </div>
+                            <div class="d-flex align-items-start">
+                                <!-- Remarks (bigger width) -->
+                                <div class="mr-5" style="flex: 5;">
+                                    <label for="remark"><b>Remarks</b></label>
+                                    <textarea type="text" class="form-control" id="remark" name="remark" placeholder="Enter Remarks Here">{{ $requisition->remarks ?? '' }}</textarea>
                                 </div>
-                                
-                                <!-- File Upload (Right side) -->
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="evidence"><b>Evidence <font color="red">*</font></b></label>
-                                        <input type="file" id="evidence" name="evidence" class="form-control" accept=".pdf,.doc,.docx,.jpg,.png">
-                                    </div>
+
+                                <!-- New Evidence -->
+                                <div class="mr-2" style="flex: 4;">
+                                    <label for="evidence"><b>New Evidence <font color="red">*</font></b></label>
+                                    <input type="file" id="evidence" name="evidence" class="form-control" accept=".pdf,.doc,.docx,.jpg,.png">
+                                </div>
+
+                                <!-- Existing Evidence -->
+                                <div style="flex: 1;">
+                                    <label class="form-label mb-2"><b>Existing</b></label>
+                                    @if($requisition->evidence_document)
+                                        <div>
+                                            <a href="{{ asset('storage/' . $requisition->evidence_document) }}" 
+                                            target="_blank" 
+                                            class="btn btn-warning text-body"
+                                            title="View Document">
+                                                View
+                                            </a>
+                                        </div>
+                                    @else
+                                        <div class="alert alert-warning py-2 mb-0">
+                                            <i class="feather icon-alert-triangle"></i> None
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
+
 
                             <!-- Second Row: Cancel and Update Buttons -->
                             <hr>
