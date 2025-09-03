@@ -14,9 +14,28 @@
     <div class="col-sm-12">
         <div class="card-block">
             <div class="col-sm-12">
+                <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase" id="requisition-create" 
+                        href="{{ url('purchases/requisitions-create') }}" role="tab"
+                        aria-controls="current-stock" aria-selected="true">New</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active text-uppercase" id="edit-requisition" 
+                        href="#" role="tab"
+                        aria-controls="edit-requisition" aria-selected="false">Edit Requisition</a>
+                    </li>
+                    @if(Auth::user()->checkPermission('View Requisition List'))
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase" id="requisitions" 
+                        href="{{ url('purchases/requisitions') }}" role="tab"
+                        aria-controls="stock_list" aria-selected="false">Requisition List</a>
+                    </li>
+                    @endif
+                </ul>
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                        <form action="{{ route('requisitions.update') }}" method="post">
+                        <form action="{{ route('requisitions.update') }}" method="post" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
                                 <div class="form-group col-md-4">
@@ -29,12 +48,12 @@
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label for="user">Date Created</label>
-                                    <h6>{{ date('j M, Y', strtotime($requisition->created_at)) }}</h6>
+                                    <h6>{{ date('Y-m-d', strtotime($requisition->created_at)) }}</h6>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group col-md-3">
-                                    <label for="from_store">From <font color="red">*</font></label>
+                                    <label for="from_store">Requesting From<font color="red">*</font></label>
                                     @if(!auth()->user()->checkPermission('Manage All Branches'))
                                         <select name="from_store" class="js-example-basic-single form-control" id="from_store"
                                                 required disabled="true">
@@ -61,12 +80,14 @@
                                         id="products">
                                         <option value="">Select Products...</option>
                                         @foreach ($items as $item)
-                                            <option value='@json($item)'>{{ $item->name }}</option>
+                                            <option value='@json($item)'>
+                                                {{ $item->name }} {{ $item->brand }} {{ $item->pack_size }} {{ $item->sales_uom }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="form-group col-md-3">
-
+                                    <!-- Empty space -->
                                 </div>
                             </div>
                             <input type="hidden" name="requisition_id" value="{{ $requisition->id }}">
@@ -76,7 +97,6 @@
                                     <thead>
                                         <tr class="bg-navy disabled">
                                             <th>Product Name</th>
-                                            <th>Unit</th>
                                             <th>Quantity</th>
                                             <th>Action</th>
                                         </tr>
@@ -86,26 +106,33 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="modal-footer">
-                                <div class="row flex-grow-1">
-                                    <div class="col-md-4">
-                                        <div class="form-group"><textarea id="remark" name="remark" class="form-control" rows="3" placeholder="Enter Remarks Here"></textarea>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="form-group">
-                                            <label for="evidence" class="form-label"><span style="color: red;">* </span>Upload Evidence</label>
-                                            <input type="file" class="form-control" id="evidence" name="evidence">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="btn-group" style="float: right;">
-                                            <a href="{{ route('requisitions.index') }}" class="btn btn-danger">Cancel
-                                            </a>
-                                            <button type="submit" class="btn btn-primary" id='submit_btn'>Update</button>
 
-                                        </div>
+                            <!-- First Row: Remarks and Upload Document -->
+                            <hr>
+                            <div class="row mb-3">
+                                <!-- Remarks (Left side) -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="remark"><b>Remarks</b></label>
+                                        <textarea id="remark" name="remark" class="form-control" rows="3" placeholder="Enter Remarks Here"></textarea>
                                     </div>
+                                </div>
+                                
+                                <!-- File Upload (Right side) -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="evidence"><b>Evidence <font color="red">*</font></b></label>
+                                        <input type="file" id="evidence" name="evidence" class="form-control" accept=".pdf,.doc,.docx,.jpg,.png">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Second Row: Cancel and Update Buttons -->
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-12 d-flex justify-content-end">
+                                    <a href="{{ route('requisitions.index') }}" class="btn btn-danger me-2">Cancel</a>
+                                    <button type="submit" class="btn btn-primary" id='submit_btn'>Update</button>
                                 </div>
                             </div>
                         </form>
@@ -212,16 +239,9 @@
                     data: 'products_',
                     render: function(data) {
                         if (!data) {
-                            return
+                            return "";
                         }
-                        return data.name
-                    }
-                },
-                {
-                    data: 'unit',
-                    render: function(data) {
-                        datas = data.toLocaleString();
-                        return `<input type="text" onblur="unitChange(event)" class="text-left w-100 border-0" name="unit" value="${datas??""}" readonly style="color: inherit; background-color: transparent;"/>`;
+                        return data.name + ' ' + (data.brand || '') + ' ' + (data.pack_size || '') + ' ' + (data.sales_uom || '');
                     }
                 },
                 {
