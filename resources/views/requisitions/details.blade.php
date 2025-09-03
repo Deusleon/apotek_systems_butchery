@@ -14,7 +14,6 @@
                             <thead>
                             <tr class="bg-navy disabled">
                                 <th>Product Name</th>
-                                <th>Unit</th>
                                 <th>Quantity</th>
                             </tr>
                             </thead>

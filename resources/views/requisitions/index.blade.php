@@ -35,7 +35,7 @@
                             <table id="table" class="display table nowrap table-striped table-hover" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th>Req. No</th>
+                                        <th>Req #</th>
                                         <th>Products</th>
                                         <th>From</th>
                                         <th>To</th>
@@ -89,16 +89,20 @@
             });
 
             // Populate Data to table
-            function populateTable(data) {
+           function populateTable(data) {
                 var tableBody = $('#order_table tbody');
                 tableBody.empty(); // Clear any existing rows
 
                 // Loop through the data and append rows to the table
                 data.forEach(function(item) {
+                    // Use the concatenated product name from the server
+                    var productName = item.full_product_name || 
+                                    (item.name + ' ' + (item.brand || '') + ' ' + 
+                                    (item.pack_size || '') + ' ' + (item.sales_uom || ''));
+                    
                     var row = '<tr>' +
-                        '<td>' + item.name + '</td>' +
-                        '<td>' + item.unit + '</td>' +
-                        '<td>' + item.quantity + '</td>' +
+                        '<td>' + productName + '</td>' +
+                        '<td>' + item.quantity + (item.unit ? ' ' + item.unit : '') + '</td>' +
                         '</tr>';
                     tableBody.append(row);
                 });
@@ -118,27 +122,24 @@
                 var id = button.data('id');
 
                 var tableBody = $('#order_table tbody');
-                tableBody.html('<tr><td colspan="3" class="text-center">Loading...</td></tr>');
+                tableBody.html('<tr><td colspan="2" class="text-center">Loading...</td></tr>');
 
                 $.ajax({
                     url: config.routes.retrieveRequisitions,
-                    type: 'POST', // Make sure to use POST
+                    type: 'POST',
                     data: {
-                        _token: config.token, // CSRF token
+                        _token: config.token,
                         req_id: id
                     },
-                    dataType: 'json', // Specify JSON format
+                    dataType: 'json',
                     success: function(response) {
-                        // Populate the table with the fetched data
-                        console.log(response);
                         populateTable(response);
-                        // console.log(response);
                     },
                     error: function(xhr, status, error) {
                         console.log('Error fetching data: ', error);
+                        tableBody.html('<tr><td colspan="2" class="text-center text-danger">Error loading data</td></tr>');
                     }
                 });
-
             });
 
         });
@@ -154,6 +155,7 @@
             }
         });
 
+        // DataTable initialization
         var table = $('#table').DataTable({
             iDisplayLength: 10,
             processing: true,
@@ -170,7 +172,10 @@
                 },
                 {
                     data: 'products',
-                    name: 'products'
+                    name: 'products',
+                    render: function(data, type, row) {
+                        return data || '';
+                    }
                 },
                 {
                     data: 'fromStore',
@@ -181,16 +186,17 @@
                     name: 'toStore'
                 },
                 {
-                    data: 'reqDate', render: function (date) {
-                    return moment(date).format('MMM DD, YYYY');
-                },
-                orderable: false,
+                    data: 'reqDate', 
+                    render: function (date) {
+                        return moment(date).format('YYYY-MM-DD');
+                    },
+                    orderable: false,
                 },
                 @can('View Requisitions Details')
                     {
-                    data: 'action',
-                    orderable: false,
-                    searchable: false
+                        data: 'action',
+                        orderable: false,
+                        searchable: false
                     }
                 @endcan
             ]
@@ -203,16 +209,26 @@
                 bInfo: true,
                 data: details,
                 columns: [
-                    { title: "Product Name" },
-                    { title: "Unit" },
-                    { title: "Quantity" }
+                    { 
+                        title: "Product Name",
+                        render: function(data, type, row) {
+                            return row.full_product_name || 
+                                (row.name + ' ' + (row.brand || '') + ' ' + 
+                                (row.pack_size || '') + ' ' + (row.sales_uom || ''));
+                        }
+                    },
+                    { 
+                        title: "Quantity",
+                        render: function(data, type, row) {
+                            return row.quantity + (row.unit ? ' ' + row.unit : '');
+                        }
+                    }
                 ]
             });
             details_table.destroy();
             details_table.clear();
             details_table.rows.add(details);
             details_table.draw();
-
         }
 
 

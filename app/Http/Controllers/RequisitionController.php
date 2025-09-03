@@ -59,7 +59,24 @@ class RequisitionController extends Controller
                     return $btn_view;
                 })
                 ->addColumn('products', function ($row) {
-                    $prod = '<span class="badge badge-primary p-1">' . $row->reqDetails->count() . ' Products</span>';
+                    // Get first 2-3 product names for display
+                    $productNames = [];
+                    foreach ($row->reqDetails->take(3) as $detail) {
+                        if ($detail->products_) {
+                            $productNames[] = $detail->products_->name . ' ' . 
+                                            $detail->products_->brand . ' ' . 
+                                            $detail->products_->pack_size . ' ' . 
+                                            $detail->products_->sales_uom;
+                        }
+                    }
+                    
+                    $displayText = implode(', ', $productNames);
+                    if ($row->reqDetails->count() > 3) {
+                        $displayText .= ' and ' . ($row->reqDetails->count() - 3) . ' more';
+                    }
+                    
+                    $prod = '<span class="badge badge-primary p-1" title="' . htmlspecialchars($displayText) . '">' . 
+                            $row->reqDetails->count() . ' Products</span>';
                     return $prod;
                 })
                 ->addColumn('reqDate', function ($row) {
@@ -175,33 +192,41 @@ class RequisitionController extends Controller
     }
 
     public function show($id)
-    {
-        if (!Auth()->user()->checkPermission('View Requisitions Details')) {
-            abort(403, 'Access Denied');
-        }
-
-        $items = Product::where('status', 1)->get();
-        $stores = Store::get();
-
-        $requisition = Requisition::with(['reqDetails', 'creator'])->find($id);
-
-        $fromStore = Store::findOrFail($requisition->from_store);
-        $toStore = Store::findOrFail($requisition->to_store);
-
-        $requisitionDet = RequisitionDetail::with('products_')
-            ->leftJoin('inv_current_stock', 'inv_current_stock.product_id', 'requisition_details.product')
-            ->selectRaw('requisition_details.*, sum(inv_current_stock.quantity) as qty_oh')
-            ->groupBy('inv_current_stock.product_id')
-            // ->havingRaw(DB::raw('sum(inv_current_stock.quantity) > 0'))
-            // ->where('inv_current_stock.store_id', $requisition->to_store)
-            ->where('requisition_details.req_id', $id)
-            ->get();
-
-        // $data = json_encode($requisitionDet);
-        // dd($data);
-
-        return view("requisitions.show", compact('requisition', 'requisitionDet', 'fromStore', 'toStore', 'items', 'stores'));
+{
+    if (!Auth()->user()->checkPermission('View Requisitions Details')) {
+        abort(403, 'Access Denied');
     }
+
+    $items = Product::where('status', 1)->get();
+    $stores = Store::get();
+
+    $requisition = Requisition::with(['reqDetails', 'creator'])->find($id);
+
+    $fromStore = Store::findOrFail($requisition->from_store);
+    $toStore = Store::findOrFail($requisition->to_store);
+
+    $requisitionDet = RequisitionDetail::with('products_')
+        ->leftJoin('inv_current_stock', 'inv_current_stock.product_id', 'requisition_details.product')
+        ->selectRaw('requisition_details.*, sum(inv_current_stock.quantity) as qty_oh')
+        ->groupBy('inv_current_stock.product_id')
+        // ->havingRaw(DB::raw('sum(inv_current_stock.quantity) > 0'))
+        // ->where('inv_current_stock.store_id', $requisition->to_store)
+        ->where('requisition_details.req_id', $id)
+        ->get();
+
+    // ADD THIS CONCATENATION CODE:
+    $requisitionDet->each(function($detail) {
+        if ($detail->products_) {
+            $detail->products_->full_product_name = 
+                $detail->products_->name . ' ' . 
+                ($detail->products_->brand ?? '') . ' ' . 
+                ($detail->products_->pack_size ?? '') . ' ' . 
+                ($detail->products_->sales_uom ?? '');
+        }
+    });
+
+    return view("requisitions.show", compact('requisition', 'requisitionDet', 'fromStore', 'toStore', 'items', 'stores'));
+}
 
     //Shows Requisition Details
     public function showRequisition(Request $request)
@@ -209,26 +234,54 @@ class RequisitionController extends Controller
         $id = $request->req_id;
         $data = DB::table('requisition_details')
             ->join('inv_products', 'inv_products.id','=', 'requisition_details.product')
-            ->select('inv_products.name','requisition_details.unit','requisition_details.quantity')
+            ->select(
+                'inv_products.name',
+                'inv_products.brand',
+                'inv_products.pack_size', 
+                'inv_products.sales_uom',
+                'requisition_details.unit',
+                'requisition_details.quantity'
+            )
             ->where('requisition_details.req_id','=',$id)
             ->get();
 
-        Log::info('message',['Data'=>$data]);
+        // Transform the data to include concatenated product name
+        $transformedData = $data->map(function($item) {
+            return [
+                'name' => $item->name,
+                'brand' => $item->brand,
+                'pack_size' => $item->pack_size,
+                'sales_uom' => $item->sales_uom,
+                'full_product_name' => $item->name . ' ' . $item->brand . ' ' . $item->pack_size . ' ' . $item->sales_uom,
+                'unit' => $item->unit,
+                'quantity' => $item->quantity
+            ];
+        });
 
-        return $data;
+        Log::info('message',['Data'=>$transformedData]);
+
+        return $transformedData;
     }
 
     public function printReq(Request $request)
     {
-
         $receipt_size = Setting::where('id', 119)->value('value');
-
         $req_id = $request->req_id;
 
         $requisition = Requisition::with(['reqDetails', 'reqTo', 'creator'])->find($req_id);
-
         $requisitionDet = RequisitionDetail::with('products_')->where('req_id', $req_id)->get();
         $pharmacy = $this->companyInfo();
+
+        // ADD CONCATENATION LOGIC HERE:
+        $requisitionDet->each(function($detail) {
+            if ($detail->products_) {
+                $detail->products_->full_product_name = 
+                    $detail->products_->name . ' ' . 
+                    ($detail->products_->brand ?? '') . ' ' . 
+                    ($detail->products_->pack_size ?? '') . ' ' . 
+                    ($detail->products_->sales_uom ?? '');
+            }
+        });
 
         if ($receipt_size == '58mm Thermal Paper') {
             $view = 'requisitions.pdf.receipt_thermal';
@@ -253,7 +306,6 @@ class RequisitionController extends Controller
         } else {
             echo "<script>window.close();</script>";
         }
-
     }
 
     private function companyInfo()
@@ -397,9 +449,9 @@ class RequisitionController extends Controller
 
     public function issue($id)
     {
-//        if (!Auth()->user()->checkPermission('View Requisitions Issue')) {
-//            abort(403, 'Access Denied');
-//        }
+    //        if (!Auth()->user()->checkPermission('View Requisitions Issue')) {
+    //            abort(403, 'Access Denied');
+    //        }
 
         $items = Product::where('status', 1)->get();
         $stores = Store::get();
@@ -417,6 +469,17 @@ class RequisitionController extends Controller
             // ->where('inv_current_stock.store_id', $fromStore)
             ->where('requisition_details.req_id', $id)
             ->get();
+
+        // ADD CONCATENATION LOGIC HERE:
+        $requisitionDet->each(function($detail) {
+            if ($detail->products_) {
+                $detail->products_->full_product_name = 
+                    $detail->products_->name . ' ' . 
+                    ($detail->products_->brand ?? '') . ' ' . 
+                    ($detail->products_->pack_size ?? '') . ' ' . 
+                    ($detail->products_->sales_uom ?? '');
+            }
+        });
 
         return view("issue_requisitions.show", compact('requisition', 'requisitionDet', 'fromStore', 'toStore', 'items', 'stores'));
     }
