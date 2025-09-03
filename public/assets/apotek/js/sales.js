@@ -240,7 +240,6 @@ $("#cart_table tbody").on("change", "#edit_quantity", function () {
     edit_btn_set = 0;
     var row_data = cart_table.row($(this).parents("tr")).data();
     var index = cart_table.row($(this).parents("tr")).index();
-    console.log("row_data:", row_data);
     if (
         document.getElementById("edit_quantity").value === "" ||
         document.getElementById("edit_quantity").value === "0"
@@ -748,6 +747,10 @@ function deselect() {
     if (discount_enable === "YES") {
         document.getElementById("sale_discount").value = 0.0;
     }
+    var backDate = document.getElementById('cash_sale_date');
+    if (backDate) {
+        backDate.value = '';
+    }
     document.getElementById("sub_total").value = 0.0;
     document.getElementById("total_vat").value = 0.0;
     document.getElementById("total").value = 0.0;
@@ -1006,109 +1009,73 @@ function valueCollection() {
     var selectedOption = sel.options[sel.selectedIndex];
     var name = selectedOption.getAttribute("data-name") || selectedOption.text;
     var price = Number(selectedOption.getAttribute("data-price") || 0);
-    var available_quantity = Number(selectedOption.getAttribute("data-quantity") || 0);
+    var available_quantity = Number(
+        selectedOption.getAttribute("data-quantity") || 0
+    );
     var productID = productValue;
 
     // Unit calcs
     var vatUnit = Number((price * tax).toFixed(2));
     var unitTotal = Number(price + vatUnit);
 
-    // Angalia kama ipo tayari
-    let idx = cart.findIndex(r => r[6] == productID);
+    // Check if the item already exist in cart
+    let idx = cart.findIndex((r) => r[6] == productID);
 
     if (idx !== -1) {
-        // Ilishakuwepo: ongeza qty na ipeleke juu
+        // If exist then add qty and move it on top.
         let row = cart[idx];
 
-        // Qty inaweza kuwa na "1,234" au "1 <span ...>Max</span>"
-        let rawQty = typeof row[1] === "number" ? row[1] : String(row[1]).split("<")[0];
+        let rawQty =
+            typeof row[1] === "number" ? row[1] : String(row[1]).split("<")[0];
         rawQty = Number(String(rawQty).replace(/,/g, "")) || 0;
 
         let newQty = rawQty + 1;
+        if (newQty > available_quantity) {
+            row[1] = numberWithCommas(rawQty) +
+            "<span class='text text-danger'> Max</span>";
+        } else {
+            row[1] = numberWithCommas(newQty);
+        }
 
-        row[1] = numberWithCommas(newQty);   // Qty (display)
-        row[2] = formatMoney(price);         // Unit price (HAIZIDISHWI)
-        row[3] = formatMoney(vatUnit * newQty);      // Total VAT
-        row[4] = formatMoney(unitTotal * newQty);    // Total Amount
-        row[5] = available_quantity;         // Stock
+        row[2] = formatMoney(price);
+        row[3] = formatMoney(vatUnit * newQty);
+        row[4] = formatMoney(unitTotal * newQty);
+        row[5] = available_quantity;
         row[6] = productID;
 
-        // Sogeza juu kwenye cart
+        // take on top of the cart
         cart.splice(idx, 1);
         cart.unshift(row);
 
-        // Dumisha ulinganifu na default_cart
         if (default_cart && default_cart.length) {
             const dc = default_cart.splice(idx, 1)[0];
             default_cart.unshift(dc);
         }
     } else {
-        // Mpya: tengeneza row na iweke juu
         var item = [
             name,
-            1,                          // qty
-            formatMoney(price),         // unit price
-            formatMoney(vatUnit),       // total VAT for qty=1
-            formatMoney(unitTotal),     // total amount for qty=1
-            available_quantity,         // stock qty
+            1, 
+            formatMoney(price), 
+            formatMoney(vatUnit), 
+            formatMoney(unitTotal), 
+            available_quantity, 
             productID,
-            ""                          // product type
+            "", 
         ];
         cart.unshift(item);
 
-        // weka pia entry sambamba kwenye default_cart
-        var cart_data = [ formatMoney(price), formatMoney(vatUnit), formatMoney(unitTotal) ];
+        var cart_data = [
+            formatMoney(price),
+            formatMoney(vatUnit),
+            formatMoney(unitTotal),
+        ];
         default_cart.unshift(cart_data);
     }
 
-    // Hesabu totals + redraw (discount() tayari hufanya redraw ya DataTable)
     discount();
 
-    // Muhimu: clear selection ili kuchagua tena item ileile kutrigge "change"
-    $('#products').val(null).trigger('change');
+    $("#products").val(null).trigger("change");
 }
-
-// function valueCollection() {
-//     $("#edit_quantity").change();
-//     $("#edit_price").change();
-
-//     var sel = document.getElementById("products");
-//     var productValue = sel.value;
-//     if (!productValue) return;
-
-//     var selectedOption = sel.options[sel.selectedIndex];
-//     // read from data-* attributes (set when populating)
-//     var name = selectedOption.getAttribute("data-name") || selectedOption.text;
-//     var price = Number(selectedOption.getAttribute("data-price") || 0);
-//     var available_quantity = Number(
-//         selectedOption.getAttribute("data-quantity") || 0
-//     );
-//     var productID = productValue;
-//     var vat = Number((price * tax).toFixed(2));
-//     var unit_total = Number(price + vat);
-//     var quantity = 1;
-
-//     var item = [];
-//     var cart_data = [];
-
-//     item.push(name);
-//     item.push(quantity);
-//     item.push(formatMoney(price));
-//     item.push(formatMoney(vat));
-//     item.push(formatMoney(unit_total));
-//     item.push(available_quantity);
-//     item.push(productID);
-//     item.push(""); // product type if any
-
-//     cart_data.push(formatMoney(price));
-//     cart_data.push(formatMoney(vat));
-//     cart_data.push(formatMoney(unit_total));
-//     default_cart.push(cart_data);
-//     cart.push(item);
-
-//     cart_table.clear().rows.add(cart).draw();
-//     discount();
-// }
 
 $(document).ready(function () {
     var id = document.getElementById("price_category").value;
@@ -1240,6 +1207,7 @@ $("#customer_payment").change(function () {
 $("#payment-status").change(function () {
     getCredits();
 });
+
 $("#sales_date").change(function () {
     getCredits();
 });
@@ -1280,8 +1248,6 @@ $("#credit_payment_table tbody").on("click", "#pay_btn", function () {
 /*local storage of sale type*/
 $("#sales_form").on("submit", function (e) {
     e.preventDefault();
-    // window.open('#', '_blank');
-    // window.open(this.href, '_self');
     var cart = document.getElementById("order_cart").value;
 
     if (cart === "" || cart === "undefined") {
@@ -1305,7 +1271,6 @@ function saveCashSale() {
         data: form,
         success: function (data) {
             window.open(data.redirect_to);
-            triggerSaleType();
             $("#save_btn").attr("disabled", false);
         },
         complete: function () {
