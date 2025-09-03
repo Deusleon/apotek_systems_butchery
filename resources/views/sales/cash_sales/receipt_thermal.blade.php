@@ -148,7 +148,11 @@
             </thead>
             @foreach($dat as $item)
                 <tr>
-                    <td align="left">{{$item['name']}}</td>
+                    <td align="left">
+                        {{$item['name']}}
+                        {{ $item['brand'] ? $item['name']." " : ""}}
+                        {{ $item['pack_size'] ? $item['pack_size'] : ""}}{{ $item['sales_uom'] ? $item['sales_uom'] : ""}}
+                    </td>
                     <td align="right">{{number_format($item['quantity'],0) }}</td>
                     <td align="right">{{number_format($item['sub_total'],2)}}</td>
                 </tr>

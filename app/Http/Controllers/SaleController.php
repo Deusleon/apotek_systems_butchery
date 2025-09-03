@@ -17,7 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use PDF;
+use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Support\Facades\View;
 use Maatwebsite\Excel\Concerns\ToArray;
 
@@ -339,68 +339,8 @@ class SaleController extends Controller
             ]);
         }
     }
-
-    // public function filterProductByWord(Request $request)
-    // {
-    //     /*get default store*/
-    //     $default_store = Auth::user()->store->name ?? 'Default Store';
-    //     $stores = Store::where('name', $default_store)->first();
-
-    //     if ($stores != null) {
-    //         $default_store_id = $stores->id;
-    //     } else {
-    //         $default_store_id = 1;
-    //     }
-
-    //     if ($request->ajax()) {
-    //         $output = [];
-    //         $output[""] = "Select Product";
-
-    //         $products = PriceList::where('price_category_id', $request->price_category_id)
-    //             ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
-    //             ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
-    //             ->where('quantity', '>', 0)
-    //             ->where('inv_products.status', '=', 1)
-    //             ->where('inv_current_stock.store_id', $default_store_id)
-    //             ->select('inv_products.id as id', 'inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.barcode', 'inv_products.type')
-    //             ->where('name', 'LIKE', "%{$request->word}%")
-    //             ->orwhere('barcode', 'LIKE', "%{$request->word}%")
-    //             ->groupBy('product_id')
-    //             ->limit(20)
-    //             ->get();
-
-
-    //         $count = count($products);
-    //         if ($count <= 0) {
-    //             $output[""] = "No Products Found";
-    //         } else {
-    //             $output[""] = "Select Product...";
-    //         }
-
-    //         foreach ($products as $product) {
-    //             $latest = PriceList::where('price_category_id', $request->price_category_id)
-    //                 ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
-    //                 ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
-    //                 ->orderBy('stock_id', 'desc')
-    //                 ->where('product_id', $product->id)
-    //                 ->first('price');
-
-    //             $quantity = CurrentStock::where('product_id', $product->id)
-    //                 ->where('store_id', $default_store_id)
-    //                 ->sum('quantity');
-    //             if ($latest != null) {
-    //                 $output["$product->name $product->pack_size#@$latest->price#@$product->id#@$quantity#@$product->type"] = $product->name." ".$product->pack_size;
-    //             } else {
-    //                 $output[""] = "No Products Found";
-    //             }
-    //         }
-    //         return $output;
-    //     }
-    // }
-
     public function storeCashSale(Request $request)
     {
-//store
         if ($request->ajax()) {
             $this->store($request);
             return response()->json([
@@ -411,15 +351,7 @@ class SaleController extends Controller
 
     public function store(Request $request)
     {
-        /*get default store*/
-        $default_store = Auth::user()->store->name ?? 'Default Store';
-        $stores = Store::where('name', $default_store)->first();
-
-        if ($stores != null) {
-            $default_store_id = $stores->id;
-        } else {
-            $default_store_id = 1;
-        }
+        $default_store = current_store_id();
 
         //some attributes declaration
         $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
@@ -430,7 +362,7 @@ class SaleController extends Controller
         if ($request->sale_date) {
             $date = $request->sale_date;
         } else {
-            $date = date('Y-m-d,H:i:s');
+            $date = date('Y-m-d');
         }
         //Avoid submission of a null Cart
         if (!$cart) {
@@ -457,17 +389,18 @@ class SaleController extends Controller
                     $unit_discount = (($bought['amount'] / ($total ?: 1)) * $discount) / $bought['quantity'];
                     $unit_price = $bought['price'];
                     $stocks = CurrentStock::with('product')->where('product_id', $bought['product_id'])
-                        ->where('store_id', $default_store_id)
+                        ->where('store_id', $default_store)
                         ->where('quantity', '>', 0)
                         ->get();
 
                     foreach ($stocks as $stock) {
-                        if($stock->product->type == 'consumable'){
-                            $qty = $bought['quantity'];
-                            $price = $unit_price * $qty;
-                            $sale_discount = $unit_discount * $qty;
-                            $bought['quantity'] -= $qty;
-                        }elseif ($bought['quantity'] <= $stock->quantity) {
+                        // if($stock->product->type == 'consumable'){
+                        //     $qty = $bought['quantity'];
+                        //     $price = $unit_price * $qty;
+                        //     $sale_discount = $unit_discount * $qty;
+                        //     $bought['quantity'] -= $qty;
+                        // }else
+                        if ($bought['quantity'] <= $stock->quantity) {
                             $qty = $bought['quantity'];
                             $price = $unit_price * $qty;
                             $sale_discount = $unit_discount * $qty;
@@ -498,7 +431,8 @@ class SaleController extends Controller
                             $stock_tracking->stock_id = $stock->id;
                             $stock_tracking->product_id = $bought['product_id'];
                             $stock_tracking->quantity = $qty;
-                            $stock_tracking->store_id = $default_store_id;
+                            $stock_tracking->store_id = $default_store;
+                            $stock_tracking->created_by = Auth::user()->id;
                             $stock_tracking->updated_by = Auth::user()->id;
                             $stock_tracking->out_mode = 'Cash Sales';
                             $stock_tracking->updated_at = date('Y-m-d');
@@ -656,7 +590,7 @@ class SaleController extends Controller
         if ($request->ajax()) {
             $customer = json_decode($request->customer_id, true);
             if ($customer) {
-                $request->customer_id = $customer['id'];
+                $request['customer_id'] = $customer['id'];
                 $this->store($request);
                 return response()->json([
                     'redirect_to' => route('getCashReceipt', '-1')
@@ -820,14 +754,12 @@ class SaleController extends Controller
                 ->groupby('sale_id')
                 ->first();
 
-                $paid = $amounts->paid;
-                $balance = $amounts->balance;
-                $remark = $amounts->remark;
-
+            $paid = $amounts->paid;
+            $balance = $amounts->balance;
+            $remark = $amounts->remark;
         }
 
         $sale_detail = SalesDetail::where('sale_id', $id)->get();
-
         $sales = array();
         $grouped_sales = array();
         $sn = 0;
@@ -845,6 +777,9 @@ class SaleController extends Controller
             array_push($sales, array(
                 'receipt_number' => $item->sale['receipt_number'],
                 'name' => $item->currentStock['product']['name'],
+                'brand' => $item->currentStock['product']['brand'],
+                'pack_size' => $item->currentStock['product']['pack_size'],
+                'sales_uom' => $item->currentStock['product']['sales_uom'],
                 'sn' => $sn,
                 'quantity' => $item->quantity,
                 'vat' => $vat,
@@ -864,6 +799,7 @@ class SaleController extends Controller
                 'created_at' => date('Y-m-d', strtotime($item->sale['date']))
             ));
         }
+        Log::info('Details', $sales);
 
 
         foreach ($sales as $val) {
