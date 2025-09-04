@@ -229,40 +229,41 @@ class RequisitionController extends Controller
     return view("requisitions.show", compact('requisition', 'requisitionDet', 'fromStore', 'toStore', 'items', 'stores'));
 }
 
-    //Shows Requisition Details
     public function showRequisition(Request $request)
-    {
-        $id = $request->req_id;
-        $data = DB::table('requisition_details')
-            ->join('inv_products', 'inv_products.id','=', 'requisition_details.product')
-            ->select(
-                'inv_products.name',
-                'inv_products.brand',
-                'inv_products.pack_size', 
-                'inv_products.sales_uom',
-                'requisition_details.unit',
-                'requisition_details.quantity'
-            )
-            ->where('requisition_details.req_id','=',$id)
-            ->get();
+{
+    $id = $request->req_id;
 
-        // Transform the data to include concatenated product name
-        $transformedData = $data->map(function($item) {
-            return [
-                'name' => $item->name,
-                'brand' => $item->brand,
-                'pack_size' => $item->pack_size,
-                'sales_uom' => $item->sales_uom,
-                'full_product_name' => $item->name . ' ' . $item->brand . ' ' . $item->pack_size . ' ' . $item->sales_uom,
-                'unit' => $item->unit,
-                'quantity' => $item->quantity
-            ];
-        });
+    $requisition = Requisition::with(['creator', 'reqDetails.products_'])->findOrFail($id);
+    $fromStore = Store::find($requisition->from_store);
+    $toStore = Store::find($requisition->to_store);
 
-        Log::info('message',['Data'=>$transformedData]);
+    $products = $requisition->reqDetails->map(function($detail) {
+        $product = $detail->products_;
+        $full_name = $product ? 
+            ($product->name.' '.($product->brand ?? '').' '.($product->pack_size ?? '').' '.($product->sales_uom ?? '')) 
+            : '';
 
-        return $transformedData;
-    }
+        return [
+            'full_product_name' => $full_name,
+            'quantity' => $detail->quantity,
+            'unit' => $detail->unit,
+            'quantity_given' => $detail->quantity_given ?? 0,
+            'on_hand' => $detail->qty_oh ?? 0
+        ];
+    });
+
+    return response()->json([
+        'requisition' => [
+            'req_no' => $requisition->req_no,
+            'from_store' => $fromStore->name ?? 'N/A',
+            'to_store' => $toStore->name ?? 'N/A',
+            'issued_by' => $requisition->creator->name ?? 'N/A',
+            'remarks' => $requisition->remarks,
+            'evidence_document' => $requisition->evidence_document
+        ],
+        'products' => $products
+    ]);
+}
 
     public function printReq(Request $request)
     {
@@ -435,40 +436,91 @@ class RequisitionController extends Controller
         return view('issue_requisitions.index');
     }
 
-    public function getRequisitionsIssue(Request $request)
+   public function issueHistory()
     {
-//        if (!Auth()->user()->checkPermission('View Requisitions Issue')) {
-//            abort(403, 'Access Denied');
-//        }
+        if (!Auth()->user()->checkPermission('View Requisitions Issue')) {
+            abort(403, 'Access Denied');
+        }
 
+        return view('issue_requisitions.history');
+    }
+
+    public function getRequisitionsHistory(Request $request)
+    {
         if ($request->ajax()) {
-            $data = Requisition::with(['reqDetails'])
+            $data = Requisition::with(['reqDetails', 'creator'])
                 ->leftJoin(DB::raw('inv_stores as from_store'), 'requisitions.from_store', '=', 'from_store.id')
                 ->leftJoin(DB::raw('inv_stores as to_store'), 'requisitions.to_store', '=', 'to_store.id')
                 ->selectRaw('requisitions.*, to_store.name as toStore, from_store.name as fromStore')
+                ->where('requisitions.status', 1) // ✅ Only Approved/Issued
                 ->orderBy('requisitions.id', 'DESC');
-            return DataTables::of($data)
-                ->addColumn('action', function ($row) {
-                    $btn_view = '';
-                    if (Auth()->user()->can('Manage Product Categories')) {
-                        if (Auth()->user()->can('Manage Product Categories')) {
-                            $btn_view = '<a href="' . route('requisitions.issue', $row->id) . '" class="btn btn-warning btn-sm" title="ISSUE">Issue</a>';
-                        }
-                    }
 
-                    return $btn_view;
-                })
+            return DataTables::of($data)
                 ->addColumn('products', function ($row) {
-                    $prod = '<span class="badge badge-primary p-1">' . $row->reqDetails->count() . ' Products</span>';
-                    return $prod;
+                    return '<span class="badge badge-primary p-1">' . $row->reqDetails->count() . ' Products</span>';
+                })
+                ->addColumn('issued_by', function ($row) {
+                    return $row->creator ? $row->creator->name : 'N/A';
                 })
                 ->addColumn('reqDate', function ($row) {
-                    return $row->created_at;
+                    return $row->updated_at ?? $row->created_at;
                 })
-                ->rawColumns(['action', 'products', 'reqTo', 'reqDate'])
+                ->addColumn('action', function ($row) {
+                    return '
+                        <button type="button" class="btn btn-sm btn-info btn-view btn-rounded" data-id="'.$row->id.'">Show</button>
+                    ';
+                })
+
+                ->rawColumns(['products', 'action'])
                 ->make(true);
         }
     }
+
+
+    public function getRequisitionsIssue(Request $request)
+{
+    // if (!Auth()->user()->checkPermission('View Requisitions Issue')) {
+    //     abort(403, 'Access Denied');
+    // }
+
+    if ($request->ajax()) {
+        $data = Requisition::with(['reqDetails'])
+            ->leftJoin(DB::raw('inv_stores as from_store'), 'requisitions.from_store', '=', 'from_store.id')
+            ->leftJoin(DB::raw('inv_stores as to_store'), 'requisitions.to_store', '=', 'to_store.id')
+            ->selectRaw('requisitions.*, to_store.name as toStore, from_store.name as fromStore')
+            ->orderBy('requisitions.id', 'DESC');
+
+        return DataTables::of($data)
+            ->addColumn('action', function ($row) {
+                $btn_view = '';
+
+                if (Auth()->user()->can('Manage Product Categories')) {
+                    if ($row->status == 0) {
+                        // Pending → show active Issue button
+                        $btn_view = '<a href="' . route('requisitions.issue', $row->id) . '" 
+                                        class="btn btn-warning btn-sm btn-rounded" title="ISSUE">Issue</a>';
+                    } elseif ($row->status == 1) {
+                        // Approved → disable Issue button
+                        $btn_view = '<button class="btn btn-warning btn-sm btn-rounded" disabled>Issue</button>';
+                    } else {
+                        // Denied or other statuses
+                        $btn_view = '<span class="badge badge-danger">No Action</span>';
+                    }
+                }
+
+                return $btn_view;
+            })
+            ->addColumn('products', function ($row) {
+                return '<span class="badge badge-primary p-1">' . $row->reqDetails->count() . ' Products</span>';
+            })
+            ->addColumn('reqDate', function ($row) {
+                return $row->created_at;
+            })
+            ->rawColumns(['action', 'products', 'reqTo', 'reqDate'])
+            ->make(true);
+    }
+}
+
 
     public function issue($id)
     {

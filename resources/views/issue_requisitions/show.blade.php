@@ -14,13 +14,24 @@
     <div class="col-sm-12">
         <div class="card-block">
             <div class="col-sm-12">
-                <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                        <form action="{{ route('requisitions.issuing') }}" method="post">
+                 <!-- TAB LIST - FIXED -->
+                <ul class="nav nav-pills mb-3" id="issueTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active text-uppercase" id="issue-details-tab" data-toggle="pill"
+                        href="#issue-details" role="tab" aria-controls="issue-details" aria-selected="true">Issue Details</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase" id="issue-list-tab" href="{{ route('issue.index') }}" 
+                        role="tab" aria-controls="issue-list" aria-selected="false">Issue List</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="issueTabContent">
+                    <div class="tab-pane fade show active" id="issue-details" role="tabpanel" aria-labelledby="issue-details-tab">
+                        <form action="{{ route('requisitions.issuing') }}" method="post" id="issueForm">
                             @csrf
                             <div class="row">
                                 <div class="form-group col-md-4">
-                                    <label for="user">Requisition No</label>
+                                    <label for="user">Requisition #</label>
                                     <h6>{{ $requisition->req_no }}</h6>
                                 </div>
                                 <div class="form-group col-md-4">
@@ -29,28 +40,41 @@
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label for="user">Date Created</label>
-                                    <h6>{{ date('j M, Y', strtotime($requisition->created_at)) }}</h6>
+                                    <h6>{{ date('Y-m-d', strtotime($requisition->created_at)) }}</h6>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group col-md-4">
-                                    <label for="user">From Store</label>
+                                    <label for="user">From Branch</label>
                                     <h6>{{ $fromStore->name }}</h6>
                                 </div>
                                 <div class="form-group col-md-4">
-                                    <label for="user">To Store</label>
+                                    <label for="user">To Branch</label>
                                     <h6>{{ $toStore->name }}</h6>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="evidence_document">View Evidence:</label>
+                                        @if($requisition->evidence_document)
+                                            <div class="d-flex align-items-center gap-3">
+                                                <a href="{{ Storage::url($requisition->evidence_document) }}" target="_blank" 
+                                                class="btn btn-warning text-body">
+                                                 View
+                                                </a>
+                                            </div>
+                                        @else
+                                            <h6 class="text-muted">No document attached.</h6>
+                                        @endif
                                 </div>
                             </div>
                             <input type="hidden" name="store_id" value="{{ $toStore->id }}">
                             <input type="hidden" name="requisition_id" value="{{ $requisition->id }}">
+                            
                             <div class="table-responsive">
                                 <table class="table nowrap table-striped table-hover" id="order_table">
                                     <thead>
                                         <tr class="bg-navy disabled">
-                                            <th>Product</th>
-                                            <th class="text-center">Unit</th>
-                                            <th class="text-center">Qty OH</th>
+                                            <th>Product Name</th>
+                                            <th class="text-center">QOH</th>
                                             <th class="text-center">Qty Req</th>
                                             <th class="text-center">Qty Issued</th>
                                         </tr>
@@ -59,89 +83,60 @@
                                         @php
                                             if ($requisition->status != 0) {
                                                 $disable = 'readonly';
+                                                $isEditable = false;
                                             } else {
                                                 $disable = '';
+                                                $isEditable = true;
                                             }
                                         @endphp
-                                        @foreach ($requisitionDet as $item)
-                                            {{-- @if ($item->quantity_given < $item->quantity) --}}
-                                                @php
-                                                    $available = '1';
-                                                @endphp
-                                                <tr>
-                                                    <td style="display: none"><input type="text" name="product_id[]"
-                                                            value="{{ $item->products_->id }}"></td>
-                                                    <td class=" border-0">{{ $item->products_->name }}</td>
-                                                    <td class="text-center border-0">{{ $item->unit }}</td>
-                                                    <td class="text-center border-0">{{ number_format($item->qty_oh) }}
-                                                    </td>
-                                                    <td class="text-center border-0">
-                                                        <input style="display: none" type="text" name="qty_req[]"
-                                                            value="{{ $item->quantity }}">{{ $item->quantity }}
-                                                    </td>
-                                                    <td class="text-center border-0"><input class="text-center "
-                                                            type="number" name="qty[]"
-                                                            value="{{ $item->quantity_given ?? $item->quantity }}"
-                                                            {{ $disable }} required /></td>
-                                                </tr>
-                                            {{-- @endif --}}
+                                        @foreach ($requisitionDet as $index => $item)
+                                            <tr>
+                                                <td style="display: none"><input type="text" name="product_id[]"
+                                                        value="{{ $item->products_->id }}"></td>
+                                                <td class="border-0">{{ $item->products_->full_product_name ?? $item->products_->name }}</td>
+                                                <td class="text-center border-0">{{ number_format($item->qty_oh) }}</td>
+                                                <td class="text-center border-0">
+                                                    <input class="form-control text-center" style="display: none" type="text" name="qty_req[]"
+                                                        value="{{ $item->quantity }}">{{ $item->quantity }}
+                                                </td>
+                                                <td class="text-center border-0 qty-issued-cell" data-index="{{ $index }}">
+                                                    <!-- Display as text initially -->
+                                                    <span class="qty-text">{{ $item->quantity_given ?? $item->quantity }}</span>
+                                                    <!-- Input field (hidden initially) -->
+                                                    <input class="form-control text-center qty-input" type="text" name="qty[]"
+                                                        value="{{ $item->quantity_given ?? $item->quantity }}"
+                                                        style="display: none;" {{ $disable }} required />
+                                                </td>
+                                            </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="row">
-                                {{-- <div class="form-group col-md-12">
-                                    <label for="products">Notes:</label>
-                                    <h6>{{ $requisition->notes ?? '--' }}</h6>
-                                </div> --}}
-                                {{-- <div class="form-group col-md-12">
-                                    <label for="products">Status:</label> <br>
-                                    @if ($requisition->status == 0)
-                                        <span class="badge badge-secondary p-1">Pending</span>
-                                    @elseif($requisition->status == 1)
-                                        <span class="badge badge-success p-1">Approved</span>
-                                    @elseif($requisition->status == 2)
-                                        <span class="badge badge-danger p-1">Denied</span>
-                                    @endif
-                                </div> --}}
 
-
+                            <div class="row mt-3">
                                 <div class="form-group col-md-12">
                                     <label for="products">Remarks:</label>
                                     @if (!$disable)
-                                        <textarea class="form-control" name="remarks" id="" rows="2"></textarea>
+                                        <textarea class="form-control" name="remarks" id="remarksTextarea" rows="2" readonly></textarea>
                                     @else
                                         <h6>{{ $requisition->remarks ?? '--' }}</h6>
                                     @endif
-
                                 </div>
                             </div>
+
                             <div class="modal-footer">
                                 @can('Approve Requisitions', Model::class)
                                     @if (!$disable)
-                                        <a href="{{ route('issue.index') }}" class="btn btn-secondary">Close</a>
-                                        <button type="submit" class="btn btn-primary" id='submit_btn'>Issue</button>
+                                        <!-- Edit and Issue buttons side by side -->
+                                        <div>
+                                            <!-- Edit button to toggle editing mode -->
+                                            <button type="button" class="btn btn-warning" id="editBtn">Edit</button>
+                                            <!-- Submit button -->
+                                            <button type="submit" class="btn btn-primary" id="submitBtn">Issue</button>
+                                        </div>
                                     @endif
                                 @endcan
                         </form>
-
-                        @can('Delete Requisitionss', Model::class)
-                            @if (!$disable)
-                                <form action="{{ route('requisitions.delete') }}" method="post">
-                                    @csrf
-                                    @method("DELETE")
-                                    <input type="hidden" name="req_id" value="{{ $requisition->id }}">
-                                    <button type="submit" name="save" class="btn btn-warning">Delete</button>
-                                </form>
-                            @endif
-                        @endcan
-
-                        {{-- @can('Print Requisitions', Model::class)
-                            <form action="{{ route('print-requisitions') }}" method="GET" target="_blank">
-                                <input type="hidden" name="req_id" value="{{ $requisition->id }}">
-                                <button type="submit" name="save" class="btn btn-secondary">Print</button>
-                            </form>
-                        @endcan --}}
                     </div>
                 </div>
             </div>
@@ -151,18 +146,65 @@
 
 @endsection
 
-
-
 @push('page_scripts')
     @include('partials.notification')
 
     <script>
         var rowCount = $('#order_table tr').length;
+        var isEditing = false;
 
         if (rowCount == 1) {
-            $("#submit_btn").attr("disabled", true);
+            $("#submitBtn").attr("disabled", true);
         } else {
-            $("#submit_btn").removeAttr("disabled");
+            $("#submitBtn").removeAttr("disabled");
         }
+        
+        // Add click handler for the Issue List tab
+        document.getElementById('issue-list-tab').addEventListener('click', function(e) {
+            window.location.href = this.getAttribute('href');
+        });
+
+        // Edit button functionality
+        document.getElementById('editBtn').addEventListener('click', function() {
+            if (!isEditing) {
+                // Switch to edit mode
+                this.textContent = 'Cancel';
+                this.classList.remove('btn-warning');
+                this.classList.add('btn-secondary');
+                
+                // Switch quantity display to input fields
+                document.querySelectorAll('.qty-text').forEach(function(el) {
+                    el.style.display = 'none';
+                });
+                
+                document.querySelectorAll('.qty-input').forEach(function(el) {
+                    el.style.display = 'block';
+                });
+                
+                // Enable remarks textarea
+                document.getElementById('remarksTextarea').readOnly = false;
+                
+                isEditing = true;
+            } else {
+                // Cancel edit mode
+                this.textContent = 'Edit';
+                this.classList.remove('btn-secondary');
+                this.classList.add('btn-warning');
+                
+                // Switch input fields back to text display
+                document.querySelectorAll('.qty-text').forEach(function(el) {
+                    el.style.display = 'inline';
+                });
+                
+                document.querySelectorAll('.qty-input').forEach(function(el) {
+                    el.style.display = 'none';
+                });
+                
+                // Disable remarks textarea
+                document.getElementById('remarksTextarea').readOnly = true;
+                
+                isEditing = false;
+            }
+        });
     </script>
 @endpush

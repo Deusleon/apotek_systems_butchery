@@ -39,7 +39,7 @@
                             @csrf
                             <div class="row">
                                 <div class="form-group col-md-4">
-                                    <label for="user">Requisition No</label>
+                                    <label for="user">Requisition #</label>
                                     <h6>{{ $requisition->req_no }}</h6>
                                 </div>
                                 <div class="form-group col-md-4">

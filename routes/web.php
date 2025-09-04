@@ -536,6 +536,8 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::post('/requisitions-data', 'RequisitionController@showRequisition')->name("requisitions.data");
 
     Route::get('purchases/requisitions-issue', 'RequisitionController@issueReq')->name('issue.index');
+    Route::get('purchases/requisitions-issue/history', 'RequisitionController@issueHistory')->name('requisitions-issue-history');
+    Route::get('/requisitions-issue-history-list', ['uses' => 'RequisitionController@getRequisitionsHistory', 'as' => 'requisitions-issue-history-list']);
     Route::get('/requisitions-issue-list', ['uses' => 'RequisitionController@getRequisitionsIssue', 'as' => 'requisitions-issue-list']);
     Route::get('/requisition-issue/{id}', 'RequisitionController@issue')->name('requisitions.issue');
     Route::post('requisitions-issuing', 'RequisitionController@issuing')->name('requisitions.issuing');
