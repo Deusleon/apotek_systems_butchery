@@ -177,9 +177,9 @@ class SaleController extends Controller
 
     public function getCreditSale(Request $request)
     {
-        Log::info('Request is: ', $request->all());
+
         $from = $request->date[0];
-        $to = $request->date[1] ? $request->date[1] : $from;
+        $to = $request->date[1];
 
         if ($request->ajax()) {
             if ($request->id) {
