@@ -118,7 +118,7 @@ var credit_payment_table = $("#credit_payment_table").DataTable({
         {
             data: "date",
             render: function (date) {
-                return moment(date).format("D-M-YYYY hh:mm:ss");
+                return moment(date).format("YYYY-MM-DD hh:mm:ss");
             },
         },
         {
@@ -164,20 +164,6 @@ $("#products").on("change", function () {
         notify("Select Customer First", "top", "right", "warning");
 
         $("#products option").prop("selected", function () {
-            return this.defaultSelected;
-        });
-    }
-});
-
-$("#products_b").on("change", function () {
-    let customer_id = document.getElementById("customer").value;
-    console.log(customer_id);
-    if (customer_id !== "") {
-        valueCollection();
-    } else {
-        notify("Select Customer First", "top", "right", "warning");
-
-        $("#products_b option").prop("selected", function () {
             return this.defaultSelected;
         });
     }
@@ -1115,11 +1101,11 @@ $("#add-customer").click(function () {
     document.getElementById("add-customer").style.display = "none";
 });
 
-if ($("#can_pay").length) {
-    credit_payment_table.column(6).visible(true);
-} else {
-    credit_payment_table.column(6).visible(false);
-}
+// if ($("#can_pay").length) {
+//     credit_payment_table.column(6).visible(true);
+// } else {
+    // credit_payment_table.column(6).visible(false);
+// }
 
 function getCredits() {
     if ($("#track").length) {
@@ -1143,7 +1129,7 @@ function getCredits() {
                 data.forEach(function (data) {
                     if (data.balance < 1) {
                         data.action =
-                            " <span class='badge badge-success'>Paid</span>";
+                            " <button class='btn btn-sm btn-rounded badge-success' disabled style=' color: #FFFFFF;'>Paid</button>";
                     }
                 });
                 if (status == "all") {
