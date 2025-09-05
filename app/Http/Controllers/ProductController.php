@@ -370,8 +370,8 @@ class ProductController extends Controller
         ini_set('memory_limit', '512M');
         
         try {
-            \Log::info('Starting export process');
-            \Log::info('Export format: ' . $request->format);
+            Log::info('Starting export process');
+            Log::info('Export format: ' . $request->format);
 
             // Only select the columns we need
             $query = Product::select('name', 'brand', 'pack_size', 'category_id', 'type', 'status', 'min_quantinty', 'max_quantinty')
@@ -389,7 +389,7 @@ class ProductController extends Controller
                 });
 
             $totalCount = $query->count();
-            \Log::info('Total products count: ' . $totalCount);
+            Log::info('Total products count: ' . $totalCount);
 
             if ($totalCount === 0) {
                 return back()->with('error', 'No products found to export');
@@ -397,7 +397,7 @@ class ProductController extends Controller
 
             switch ($request->format) {
                 case 'pdf':
-                    \Log::info('Generating PDF');
+                    Log::info('Generating PDF');
                     try {
                         // Get all products at once since we'll build a single HTML document
                         $products = $query->get();
@@ -435,24 +435,24 @@ class ProductController extends Controller
 
                         return $pdf->stream('products_'.date('Y-m-d').'.pdf');
                     } catch (\Exception $e) {
-                        \Log::error('Error generating PDF: ' . $e->getMessage());
-                        \Log::error('Stack trace: ' . $e->getTraceAsString());
+                        Log::error('Error generating PDF: ' . $e->getMessage());
+                        Log::error('Stack trace: ' . $e->getTraceAsString());
                         throw $e;
                     }
 
                 case 'excel':
-                    \Log::info('Generating Excel');
+                    Log::info('Generating Excel');
                     return Excel::download(new ProductsExport($query), 'products_'.date('Y-m-d').'.xlsx');
 
                 case 'csv':
-                    \Log::info('Generating CSV');
+                    Log::info('Generating CSV');
                     return Excel::download(new ProductsExport($query), 'products_'.date('Y-m-d').'.csv');
 
                 default:
                     return back()->with('error', 'Invalid export format');
             }
         } catch (Exception $e) {
-            \Log::error('Export error: ' . $e->getMessage());
+            Log::error('Export error: ' . $e->getMessage());
             return back()->with('error', 'An error occurred while exporting products: ' . $e->getMessage());
         }
     }

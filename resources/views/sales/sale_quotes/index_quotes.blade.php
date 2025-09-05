@@ -35,7 +35,7 @@
         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
             <li class="nav-item">
                 <a class="nav-link" id="new-order" data-toggle="pill" href="{{ route('sale-quotes.index') }}" role="tab"
-                    aria-controls="pills-home" aria-selected="true">New</a>
+                    aria-controls="pills-home" aria-selected="true">New Order</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link active" id="order-list" data-toggle="pill" href="{{ route('sale-quotes.order_list') }}"
@@ -417,25 +417,25 @@
                             update_url = update_url.replace('receipt_id', row.id);
 
                             return `
-                                                                        <button class="btn btn-sm btn-rounded btn-success" type="button"
-                                                                                onclick='showQuoteDetails(event)'
-                                                                                id="quote_details">Show
-                                                                        </button>
+                                                                                                        <button class="btn btn-sm btn-rounded btn-success" type="button"
+                                                                                                                onclick='showQuoteDetails(event)'
+                                                                                                                id="quote_details">Show
+                                                                                                        </button>
 
-                                                                        <a class="btn btn-sm btn-rounded btn-info" type="button"
-                                                                                href='${update_url}'
-                                                                                >Edit
-                                                                        </a>
+                                                                                                        <a class="btn btn-sm btn-rounded btn-info" type="button"
+                                                                                                                href='${update_url}'
+                                                                                                                >Edit
+                                                                                                        </a>
 
-                                                                        <a href="${receipt_url}" target="_blank">
-                                                                            <button class="btn btn-sm btn-rounded btn-secondary" type="button"><span
-                                                                                    class='fa fa-print' aria-hidden='true'></span>
-                                                                                Print
-                                                                            </button>
-                                                                        </a>
+                                                                                                        <a href="${receipt_url}" target="_blank">
+                                                                                                            <button class="btn btn-sm btn-rounded btn-secondary" type="button"><span
+                                                                                                                    class='fa fa-print' aria-hidden='true'></span>
+                                                                                                                Print
+                                                                                                            </button>
+                                                                                                        </a>
 
-                                                                        <button class="btn btn-sm btn-rounded btn-warning" type="button" onclick="convertQuoteToSale(${row.id})">Convert</button>
-                                                                `;
+                                                                                                        <button class="btn btn-sm btn-rounded btn-warning" type="button" onclick="convertQuoteToSale(${row.id})">Convert</button>
+                                                                                                `;
 
                         }
                     },
@@ -541,10 +541,22 @@
                 </div>
                 <div class="modal-body">
                     <div>
-                        Are you sure to convert this Sales Order into a confirmed Sale? <br> This action cannot be undone!.
+                        Are you sure to convert this sales order? This action cannot be undone!.
                     </div>
                     <div class="form-text mb-3">
-                        Stock quantities will be automatically deducted from inventory.
+                        Stock quantities will be automatically deducted from inventory. Fill the details below to preoceed
+                    </div>
+                    <div class="form-group">
+                        <label for="professionalSaleType" class="font-weight-bold">Sale Type <span
+                                class="text-danger">*</span></label>
+                        <select class="form-control" id="salesType" onchange="salesType(this)" required>
+                            <option value="cash" selected>Cash Sale</option>
+                            <option value="credit">Credit Sale</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="gracePeriodDiv">
+                        <label for="gracePeriod">Grace Period<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="" id="gracePeriod">
                     </div>
                     <input type="hidden" name="" id="convert_id">
                     <div class="form-group mt-3">
@@ -700,21 +712,42 @@
     let pendingConvertQuoteId = null;
     let lastConvertedSaleId = null;
     function convertQuoteToSale(quoteId) {
-        console.log('Convert button clicked for quote ID:', quoteId);
+        // console.log('Convert button clicked for quote ID:', quoteId);
         pendingConvertQuoteId = quoteId;
         document.getElementById('convert_id').value = quoteId;
+        document.getElementById('gracePeriodDiv').style.display = "none";
         $('#professionalConvertModal').modal('show');
     }
+
+    function salesType() {
+        var type = document.getElementById('salesType').value;
+        console.log('Sale type changed: ', type);
+        if (type === 'credit') {
+            document.getElementById('gracePeriod').setAttribute('required', 'required');
+            document.getElementById('gracePeriodDiv').style.display = "block";
+        } else {
+            document.getElementById('gracePeriodDiv').style.display = "none";
+        }
+    };
 
     function convertToSale() {
         const quoteId = document.getElementById('convert_id').value;
         const note = document.getElementById('conversionNotes').value;
+        const sale_type = document.getElementById('salesType').value;
+        const grace_period = document.getElementById('gracePeriod').value;
+        if (sale_type === 'credit' && (grace_period === '' || grace_period == 0)) {
+            notify("Grace period is required for credit sales", "top", "right", "warning");
+            return;
+        }
+
         $.ajax({
             url: '{{ route('convert-to-sales') }}',
             type: 'POST',
             data: {
                 quote_id: quoteId,
                 notes: note,
+                sale_type: sale_type,
+                grace_period: grace_period,
                 _token: '{{ csrf_token() }}'
             },
             success: function (response) {
@@ -735,7 +768,7 @@
                     }
 
                     // Set document links
-                    $('#invoiceLink').attr('href', '{{ route('generate-tax-invoice', '') }}/' + response.quote_id);
+                    // $('#invoiceLink').attr('href', '{{ route('generate-tax-invoice', '') }}/' + response.quote_id);
                     $('#deliveryNoteLink').attr('href', '{{ route('generate-delivery-note', '') }}/' + response.sale_id);
                     $('#receiptLink').attr('href', '{{ route('getCashReceipt', '') }}/' + response.sale_id);
 
@@ -752,9 +785,9 @@
                     // Open receipt in new tab
                     let receiptUrl = '{{ route('getCashReceipt', '') }}/' + response.sale_id;
                     window.open(receiptUrl, '_blank');
-                    
+
                 } else {
-                    notify(response.message, "top", "right", "danger");
+                    notify(response.error, "top", "right", "danger");
                 }
             },
             error: function (xhr, status, error) {
@@ -784,15 +817,15 @@
                 url: '{{ route('convert-to-sales') }}',
                 type: 'POST',
                 data: {
-                quote_id: pendingConvertQuoteId,
-                sale_type: saleType,
-                notes: conversionNotes,
-                _token: '{{ csrf_token() }}'
-            },
+                    quote_id: pendingConvertQuoteId,
+                    sale_type: saleType,
+                    notes: conversionNotes,
+                    _token: '{{ csrf_token() }}'
+                },
                 success: function (response) {
                     $('#professionalConvertModal').modal('hide');
 
-                    if (response.message === 'success' && response.sale_id) {
+                    if (response.status === 'success' && response.sale_id) {
                         // Show success modal with document links
                         $('#convertedSaleId').text(response.sale_id);
                         $('#convertedSaleType').text(saleType);

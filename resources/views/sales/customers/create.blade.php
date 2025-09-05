@@ -57,8 +57,8 @@
                     <div class="form-group row">
                         <label for="address" class="col-md-4 col-form-label text-md-right">Address</label>
                         <div class="col-md-8">
-                            <textarea type="text" class="form-control uniform-input" rows="1" name="address"
-                                aria-describedby="emailHelp" id="address" placeholder="Enter Address"></textarea>
+                            <input type="text" class="form-control uniform-input" name="address"
+                                aria-describedby="emailHelp" id="address" placeholder="Enter Address">
                         </div>
                     </div>
                     <div class="form-group row">

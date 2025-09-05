@@ -29,7 +29,7 @@
         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active" id="new-order" data-toggle="pill" href="{{ route('sale-quotes.index') }}"
-                    role="tab" aria-controls="pills-home" aria-selected="true">New</a>
+                    role="tab" aria-controls="pills-home" aria-selected="true">New Order</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" id="order-list" data-toggle="pill" href="{{ route('sale-quotes.order_list') }}"
@@ -244,7 +244,7 @@
                         }
                     ]
                 });
-                console.log('Cart table initialized successfully');
+                // console.log('Cart table initialized successfully');
             } catch (error) {
                 console.error('Error initializing cart table:', error);
             }

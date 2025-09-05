@@ -6,6 +6,7 @@ use App\CurrentStock;
 use App\Customer;
 use App\PriceCategory;
 use App\Sale;
+use App\SalesCredit;
 use App\SalesDetail;
 use App\SalesQuote;
 use App\SalesQuoteDetail;
@@ -136,6 +137,163 @@ class SaleQuoteController extends Controller {
 
     }
 
+    public function addQuoteItem( Request $request ) {
+        $vatRate = Setting::where( 'id', 120 )->value( 'value' ) / 100;
+        $price   = $request->price;
+
+        // Check kama product ipo tayari kwenye hiyo quote
+        $existingItem = SalesQuoteDetail::where( 'quote_id', $request->quote_id )
+        ->where( 'product_id', $request->product_id )
+        ->where( 'status', 1 )
+        ->first();
+
+        if ( $existingItem ) {
+            // update quantity na amount
+            $existingItem->quantity += $request->quantity;
+            $existingItem->vat      = $existingItem->price * $vatRate;
+            $existingItem->amount   = $existingItem->price * $existingItem->quantity;
+            $existingItem->updated_at = now();
+            $existingItem->updated_by = Auth::user()->id;
+            $existingItem->save();
+
+            // Fetch updated quote details as JSON
+            $data = $this->fetchUpdates( $request->quote_id );
+
+            // Include status and message
+            return response()->json( [
+                'status' => 'success',
+                'message' => 'Order item added successfully',
+                'data' => $data->original ?? $data
+            ] );
+        }
+
+        // Kama haipo, insert mpya
+        $newItem = new SalesQuoteDetail();
+        $newItem->quote_id   = $request->quote_id;
+        $newItem->product_id = $request->product_id;
+        $newItem->quantity   = $request->quantity;
+        $newItem->price      = $price;
+        $newItem->vat        = $price * $vatRate;
+        $newItem->amount     = $price * $request->quantity;
+        $newItem->status     = 1;
+        $newItem->updated_at = now();
+        $newItem->updated_by = Auth::user()->id;
+        $newItem->save();
+
+        // Fetch updated quote details as JSON
+        $data = $this->fetchUpdates( $request->quote_id );
+
+        // Include status and message
+        return response()->json( [
+            'status' => 'success',
+            'message' => 'Order item added successfully',
+            'data' => $data->original ?? $data
+        ] );
+    }
+
+    public function updateQuoteItem( Request $request ) {
+        $quantity = $request->quantity;
+        $price = $request->price;
+        $amount = $quantity * $price;
+        $id = $request->id;
+        $quote_id = $request->quote_id;
+
+        $updateOrder = DB::table( 'sales_quote_details' )
+        ->where( 'id', $id )
+        ->update( [
+            'quantity'=>$quantity,
+            'price'=>$price,
+            'amount'=>$amount
+        ] );
+
+        if ( $updateOrder ) {
+            // Fetch updated quote details as JSON
+            $data = $this->fetchUpdates( $quote_id );
+
+            // Include status and message
+            return response()->json( [
+                'status' => 'success',
+                'message' => 'Order item updated successfully',
+                'data' => $data->original ?? $data
+            ] );
+        }
+
+        return [ 'status' => 'failed', 'message'=>'Failed to update order item' ];
+    }
+
+    public function deleteQuoteItem( Request $request ) {
+        $id = $request->id;
+
+        $removeItem = SalesQuoteDetail::destroy( $id );
+        if ( $removeItem ) {
+            // Fetch updated quote details as JSON
+            $data = $this->fetchUpdates( $request->quote_id );
+
+            // Include status and message
+            return response()->json( [
+                'status' => 'success',
+                'message' => 'Order item removed successfully',
+                'data' => $data->original ?? $data
+            ] );
+        }
+        // Include status and message
+        return response()->json( [
+            'status' => 'failed',
+            'message' => 'Failed to remove order item',
+        ] );
+    }
+
+    public function changeCustomer( Request $request ) {
+        $updateCustomer = DB::table( 'sales_quotes' )
+        ->where( 'id', $request->id )
+        ->update( [
+            'customer_id'=>$request->customer_id
+        ] );
+
+        if ( $updateCustomer ) {
+            return [ 'status' => 'success', 'message'=>'Customer changed successful' ];
+        }
+    }
+
+    public function changePriceCatg( Request $request ) {
+        $updatePrice = DB::table( 'sales_quotes' )
+        ->where( 'id', $request->id )
+        ->update( [
+            'price_category_id'=>$request->price_category_id
+        ] );
+
+        if ( $updatePrice ) {
+            return [ 'status' => 'success', 'message'=>'Price changed successful' ];
+        }
+    }
+
+    public function saveFinalQuote( Request $request ) {
+        $exists = DB::table( 'sales_quote_details' )
+        ->where( 'quote_id', $request->id )
+        ->where( 'status', 1 )
+        ->exists();
+
+        if ( !$exists ) {
+            return response()->json( [
+                'status' => 'error',
+                'message' => 'Quote not found!'
+            ] );
+        }
+
+        $updateQuote = DB::table( 'sales_quote_details' )
+        ->where( 'quote_id', $request->id )
+        ->where( 'status', 1 )
+        ->update( [
+            'discount' => $request->discount
+        ] );
+
+        return response()->json( [
+            'status' => 'success',
+            'message' => 'Order updated successfully',
+            'redirect' => route( 'sale-quotes.order_list' )
+        ] );
+    }
+
     //Convert Sales Order to Sale ( Cash or Credit )
 
     public function convertToSale( $id ) {
@@ -201,28 +359,36 @@ class SaleQuoteController extends Controller {
     //Retrieves update sales details
 
     public function update( $id ) {
-
         //1. Retrieve Item Details
         $sales_details = DB::table( 'sales_quote_details' )
         ->join( 'inv_products', 'sales_quote_details.product_id', '=', 'inv_products.id' )
-        ->select( 'sales_quote_details.id', 'sales_quote_details.quote_id', 'sales_quote_details.product_id', 'inv_products.name', 'sales_quote_details.price', 'sales_quote_details.quantity', 'sales_quote_details.vat', 'sales_quote_details.discount', 'sales_quote_details.amount' )
-        ->where( 'sales_quote_details.quote_id', $id )
-        ->where( 'sales_quote_details.status', '1' )
+        ->select( 'sales_quote_details.id', 'sales_quote_details.quote_id', 'sales_quote_details.product_id', 'inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom', 'sales_quote_details.price', 'sales_quote_details.quantity', 'sales_quote_details.vat', 'sales_quote_details.discount', 'sales_quote_details.amount' )
+        ->where( 'sales_quote_details.quote_id', '=', $id )
+        ->where( 'sales_quote_details.status', 1 )
         ->get();
 
         $quote_id = $id;
 
         $order = SalesQuote::where( 'id', $id )->first();
-
-        $sub_total = DB::table( 'sales_quote_details' )
+        $quote_details = DB::table( 'sales_quote_details' )
         ->join( 'inv_products', 'sales_quote_details.product_id', '=', 'inv_products.id' )
-        ->select( 'inv_products.name', 'sales_quote_details.price', 'sales_quote_details.quantity', 'sales_quote_details.vat', 'sales_quote_details.discount', 'sales_quote_details.amount' )
+        ->select(
+            'inv_products.name',
+            'sales_quote_details.price',
+            'sales_quote_details.quantity',
+            'sales_quote_details.vat',
+            'sales_quote_details.discount',
+            'sales_quote_details.amount'
+        )
         ->where( 'sales_quote_details.quote_id', $id )
         ->where( 'sales_quote_details.status', '1' )
-        ->sum( 'amount' );
+        ->get();
+
+        $sub_total = $quote_details->sum( 'amount' );
 
         $customer_id = $order->customer_id;
         $quote_number = $order->quote_number;
+        $discount = optional( $quote_details->first() )->discount ?? 0;
 
         $vat = Setting::where( 'id', 120 )->value( 'value' ) / 100;
         //Get VAT %
@@ -242,7 +408,7 @@ class SaleQuoteController extends Controller {
 
         $price_category = PriceCategory::all();
         $sale_quotes = SalesQuote::where( 'id', $id )->orderBy( 'id', 'DESC' )->get();
-        $customers = Customer::where( 'id', $sale_quotes[ 0 ]->customer_id )->orderBy( 'name', 'ASC' )->get();
+        $customers = Customer::all();
         $current_stock = CurrentStock::all();
         $count = $sale_quotes->count();
         return View::make( 'sales.sale_quotes.edit' )
@@ -252,6 +418,7 @@ class SaleQuoteController extends Controller {
         ->with( compact( 'vat' ) )
         ->with( compact( 'total' ) )
         ->with( compact( 'sub_total' ) )
+        ->with( compact( 'discount' ) )
         ->with( compact( 'count' ) )
         ->with( compact( 'sale_quotes' ) )
         ->with( compact( 'customers' ) )
@@ -259,6 +426,82 @@ class SaleQuoteController extends Controller {
         ->with( compact( 'default_sale_type' ) )
         ->with( compact( 'current_stock' ) )
         ->with( compact( [ 'enable_discount', 'sales_details' ] ) );
+    }
+
+    public function fetchUpdates( $id ) {
+        // 1. Retrieve Item Details
+        $sales_details = DB::table( 'sales_quote_details' )
+        ->join( 'inv_products', 'sales_quote_details.product_id', '=', 'inv_products.id' )
+        ->select(
+            'sales_quote_details.id',
+            'sales_quote_details.quote_id',
+            'sales_quote_details.product_id',
+            'inv_products.name',
+            'inv_products.brand',
+            'inv_products.pack_size',
+            'inv_products.sales_uom',
+            'sales_quote_details.price',
+            'sales_quote_details.quantity',
+            'sales_quote_details.vat',
+            'sales_quote_details.discount',
+            'sales_quote_details.amount'
+        )
+        ->where( 'sales_quote_details.quote_id', '=', $id )
+        ->where( 'sales_quote_details.status', 1 )
+        ->get();
+
+        $quote_id = $id;
+
+        $order = SalesQuote::where( 'id', $id )->first();
+
+        $sub_total = DB::table( 'sales_quote_details' )
+        ->where( 'sales_quote_details.quote_id', $id )
+        ->where( 'sales_quote_details.status', 1 )
+        ->sum( 'amount' );
+
+        $customer_id = $order->customer_id ?? null;
+        $quote_number = $order->quote_number ?? null;
+
+        $vatRate = Setting::where( 'id', 120 )->value( 'value' ) / 100;
+        $enable_discount = Setting::where( 'id', 111 )->value( 'value' );
+
+        /* get default Price Category */
+        $default_sale_type = Setting::where( 'id', 125 )->value( 'value' );
+        $sale_type = PriceCategory::where( 'name', $default_sale_type )->first();
+
+        if ( $sale_type != null ) {
+            $default_sale_type = $sale_type->id;
+        } else {
+            $default_sale_type = PriceCategory::first()->value( 'id' );
+        }
+
+        $total = $sub_total + ( $sub_total * $vatRate );
+        // VAT calculated on subtotal
+
+        $price_category = PriceCategory::all();
+        $sale_quotes = SalesQuote::where( 'id', $id )->orderBy( 'id', 'DESC' )->get();
+        // $customers = Customer::where( 'id', $sale_quotes[ 0 ]->customer_id ?? 0 )->orderBy( 'name', 'ASC' )->get();
+        $customers = Customer::all();
+        $current_stock = CurrentStock::all();
+        $count = $sale_quotes->count();
+
+        // Return JSON instead of view
+        return response()->json( [
+            'customer_id' => $customer_id,
+            'quote_number' => $quote_number,
+            'quote_id' => $quote_id,
+            'vat' => $vatRate,
+            'total' => $total,
+            'sub_total' => $sub_total,
+            'count' => $count,
+            'sale_quotes' => $sale_quotes,
+            'customers' => $customers,
+            'price_category' => $price_category,
+            'default_sale_type' => $default_sale_type,
+            'current_stock' => $current_stock,
+            'enable_discount' => $enable_discount,
+            'sales_details' => $sales_details,
+        ] );
     }
 
     public function destroy( Request $request ) {
@@ -421,6 +664,8 @@ class SaleQuoteController extends Controller {
 
     public function convertToSales( Request $request ) {
         $quoteId = $request->quote_id;
+        $saleType = $request->sale_type;
+        $gracePeriod = $request->grace_period;
         $remarks = $request->notes;
 
         $default_store = current_store_id();
@@ -453,8 +698,11 @@ class SaleQuoteController extends Controller {
             ->get();
 
             if ( $quote_details->isEmpty() ) {
-                return [ 'message' => 'Order not found or already converted' ];
+                // return [ 'status' => 'error', 'message' => 'Order not found or already converted' ];
+                throw new \Exception( 'Order not found or already converted' );
             }
+
+            $total_amount = $quote_details->sum( 'amount' );
 
             //Saving Sale Summary and Get its ID
             $sale = DB::table( 'sales' )->insertGetId( array(
@@ -472,8 +720,8 @@ class SaleQuoteController extends Controller {
                 ->sum( 'quantity' );
 
                 if ( $item->quantity > $total_stock ) {
-                    return [ 'message' => "Insufficient stock for product {$item->name}" ];
-                    // throw new \Exception( "Insufficient stock for product {$item->name}" );
+                    // return [ 'status' => 'error', 'message' => "Insufficient stock for product {$item->name}" ];
+                    throw new \Exception( "Insufficient stock for product {$item->name}" );
                 }
 
                 $stocks = CurrentStock::with( 'product' )->where( 'product_id', $item->product_id )
@@ -516,7 +764,7 @@ class SaleQuoteController extends Controller {
                         $stock_tracking->store_id = $default_store;
                         $stock_tracking->created_by = Auth::user()->id;
                         $stock_tracking->updated_by = Auth::user()->id;
-                        $stock_tracking->out_mode = 'Order Sales';
+                        $stock_tracking->out_mode = $saleType === 'cash' ? 'Order sold in cash' : 'Order sold in credit';
                         $stock_tracking->updated_at = date( 'Y-m-d' );
                         $stock_tracking->movement = 'OUT';
                         $stock_tracking->save();
@@ -526,6 +774,22 @@ class SaleQuoteController extends Controller {
                         break;
                     }
                 }
+                //credit Sale
+                if ( $saleType !== 'cash' ) {
+
+                    $credit = new SalesCredit;
+                    $customer = Customer::find( $quote_details[ 0 ]->customer_id );
+                    $credit->sale_id = $sale;
+                    $credit->paid_amount = 0;
+                    $credit->balance = $total_amount;
+                    $credit->grace_period = $gracePeriod;
+                    $credit->remark = $remarks;
+                    $credit->created_by = Auth::User()->id;
+                    $credit->updated_by = Auth::User()->id;
+                    $customer->total_credit += $credit->balance;
+                    $credit->save();
+                    $customer->save();
+                }
             }
 
             $updatedQuote = DB::table( 'sales_quotes' )
@@ -534,25 +798,32 @@ class SaleQuoteController extends Controller {
                 'remark' => $remarks,
             ] );
 
-            if ( $updatedQuote ) {
-                $update = DB::table( 'sales_quote_details' )
-                ->where( 'quote_id', $quoteId )
-                ->update( [
-                    'status'=>'2',
-                    'updated_by' => Auth::User()->id
-                ] );
+            if ( !$updatedQuote ) {
+                throw new \Exception( 'Failed to update sales quote' );
+            }
 
-                $response = $update
-                ? [ 'status' => 'success', 'message' => 'Order converted to sales successfully', 'sale_id' => "$sale" ]
-                : [ 'message' => 'danger' ];
+            $update = DB::table( 'sales_quote_details' )
+            ->where( 'quote_id', $quoteId )
+            ->update( [
+                'status' => '2',
+                'updated_by' => Auth::user()->id
+            ] );
+
+            if ( !$update ) {
+                throw new \Exception( 'Failed to update sales quote details' );
             }
 
             DB::commit();
-            return $response;
+
+            return [
+                'status' => 'success',
+                'message' => 'Order converted to sales successfully',
+                'sale_id' => $sale
+            ];
         } catch ( \Exception $e ) {
             DB::rollBack();
             Log::error( 'ConvertToSales Error: ' . $e->getMessage(), [ 'trace' => $e->getTraceAsString() ] );
-            return [ 'message' => 'error', 'error' => $e->getMessage() ];
+            return [ 'status' => 'error', 'message' => 'An error occured', 'error' => $e->getMessage() ];
         }
     }
 
