@@ -10,13 +10,13 @@
             <div class="modal-body">
                 <div>
                     <div class="table-responsive">
-                        <table id="items_table" class="table nowrap table-striped table-hover" width="100%"></table>
+                        <table id="items_table" class="table nowrap table-striped table-hover" width="100%" style="font-size: 14px;"></table>
                     </div>
 
                     <hr>
                     <div class="row">
                         <div class="col-md-12">
-                            <h5>Remarks</h5>
+                            <label>Remarks</label>
                             <div class="quote_remark"></div>
                         </div>
                     </div>

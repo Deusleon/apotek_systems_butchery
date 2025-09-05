@@ -428,7 +428,7 @@
 
                                         <thead>
                                             <tr>
-                                                <th>Receipt#</th>
+                                                <th>Receipt #</th>
                                                 <th>Customer</th>
                                                 <th>Sales Date</th>
                                                 <th>Total</th>
@@ -499,6 +499,7 @@
                                     style="width:100%">
                                     <thead>
                                         <tr>
+                                            <th>Receipt #</th>
                                             <th>Customer Name</th>
                                             <th>Payment Date</th>
                                             <th>Amount</th>
@@ -515,6 +516,7 @@
                                     style="width:100%">
                                     <thead>
                                         <tr>
+                                            <th>Receipt #</th>
                                             <th>Customer Name</th>
                                             <th>Payment Date</th>
                                             <th>Amount</th>
@@ -629,7 +631,6 @@
         // Listen for the click event on the tab
         $('#credit-tracking-tablist').on('click', function () {
             console.log('Credit Tracking tab clicked');
-
             getCredits();
 
         });
@@ -650,10 +651,11 @@
 
         let payment_history_filter_table = $('#fixed-header-filter').DataTable({
             columns: [
+                { 'data': 'receipt_number' },
                 { 'data': 'name' },
                 {
                     'data': 'created_at', render: function (date) {
-                        return moment(date).format('D-M-YYYY');
+                        return moment(date).format('YYYY-MM-DD');
                     }
                 },
                 {
@@ -694,6 +696,7 @@
                     date: date
                 },
                 success: function (data) {
+                    console.log('This is data',data)
                     document.getElementById('main_table').style.display = 'none';
                     document.getElementById('filter_history').style.display = 'block';
 

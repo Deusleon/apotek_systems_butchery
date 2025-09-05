@@ -268,7 +268,13 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::get('sales/sales-orders/get-quotes', 'SaleQuoteController@getQuotes')->name('sale-quotes.get-quotes');
     Route::get('sales/sales-orders/receipt', 'SaleQuoteController@getQuoteReceipt')->name('getQuoteReceipt');
     Route::post('sales/sales-orders/save', 'SaleQuoteController@storeQuote')->name('storeQuote');
-    Route::post('sales/sales-orders/update', 'SaleQuoteController@updateQuote')->name('updateQuote');
+    // Route::post('sales/sales-orders/update', 'SaleQuoteController@updateQuote')->name('updateQuote');
+    Route::post('sales/sales-order/change-price', 'SaleQuoteController@changePriceCatg')->name('change-price-category');
+    Route::post('sales/sales-order/change-customer', 'SaleQuoteController@changeCustomer')->name('change-quote-customer');
+    Route::post('sales/sales-order/add-item','SaleQuoteController@addQuoteItem')->name('add-qoute-item');
+    Route::post('sales/sales-orders/update-item', 'SaleQuoteController@updateQuoteItem')->name('update-qoute-item');
+    Route::post('sales/sales-order/delete-item','SaleQuoteController@deleteQuoteItem')->name('delete-qoute-item');
+    Route::post('sales/sales-orders/save-editings', 'SaleQuoteController@saveFinalQuote')->name('save-final-qoute');
     Route::get('sales/sales-orders/receipt-reprint/{quote_id}', 'SaleQuoteController@receiptReprint')->name('receiptReprint');
     Route::get('sales/sales-orders/edit-sale/{quote_id}', 'SaleQuoteController@update')->name('updateSale');
     Route::post('sales/sales-orders/convert-to-sales', 'SaleQuoteController@convertToSales')->name('convert-to-sales');

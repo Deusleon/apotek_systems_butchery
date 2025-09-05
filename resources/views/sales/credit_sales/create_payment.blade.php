@@ -13,7 +13,7 @@
                 @csrf()
                 <div class="modal-body">
                     <div class="form-group row" style="padding-top:0px;">
-                        <label for="code" class="col-md-4 col-form-label text-md-right">Receipt#</label>
+                        <label for="code" class="col-md-4 col-form-label text-md-right">Receipt #</label>
                         <div class="col-md-8">
                             <input type="text" class="form-control" id="receipt-number" readonly>
                         </div>

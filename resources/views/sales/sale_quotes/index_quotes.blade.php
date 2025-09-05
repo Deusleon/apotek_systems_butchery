@@ -30,19 +30,16 @@
             opacity: 0;
             z-index: 1;
         }
-
     </style>
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
             <li class="nav-item">
-                <a class="nav-link" id="new-order" data-toggle="pill"
-                   href="{{ route('sale-quotes.index') }}" role="tab"
-                    aria-controls="pills-home" aria-selected="true">New</a>
+                <a class="nav-link" id="new-order" data-toggle="pill" href="{{ route('sale-quotes.index') }}" role="tab"
+                    aria-controls="pills-home" aria-selected="true">New Order</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link active" id="order-list" data-toggle="pill"
-                   href="{{ route('sale-quotes.order_list') }}" role="tab"
-                    aria-controls="pills-profile" aria-selected="false">Order List</a>
+                <a class="nav-link active" id="order-list" data-toggle="pill" href="{{ route('sale-quotes.order_list') }}"
+                    role="tab" aria-controls="pills-profile" aria-selected="false">Order List</a>
             </li>
         </ul>
         <div class="tab-content" id="pills-tabContent">
@@ -51,8 +48,8 @@
                     @if (auth()->user()->checkPermission('Manage Customers'))
                         <div class="row">
                             <div class="col-md-12">
-                                <button style="float: right;margin-bottom: 2%;" type="button"
-                                        class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#create"> Add
+                                <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-secondary btn-sm"
+                                    data-toggle="modal" data-target="#create"> Add
                                     New Customer
                                 </button>
                             </div>
@@ -66,10 +63,9 @@
                                 <label id="cat_label">Sales Type</label>
                                 <select id="price_category" class="js-example-basic-single form-control">
                                     <option value="">Select Sales Type</option>
-                                @foreach ($price_category as $price)
-                                    <!-- <option value="{{ $price->id }}">{{ $price->name }}</option> -->
-                                        <option value="{{ $price->id }}"
-                                            {{ $default_sale_type === $price->id ? 'selected' : '' }}>{{ $price->name }}
+                                    @foreach ($price_category as $price)
+                                        <!-- <option value="{{ $price->id }}">{{ $price->name }}</option> -->
+                                        <option value="{{ $price->id }}" {{ $default_sale_type === $price->id ? 'selected' : '' }}>{{ $price->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -87,7 +83,7 @@
                             <div class="form-group">
                                 <label for="code">Customer Name <font color="red">*</font></label>
                                 <select id="customer_id" name="customer_id" class="js-example-basic-single form-control"
-                                        required>
+                                    required>
                                     <option value="" disabled selected="true">Select Customer</option>
                                     @foreach ($customers as $customer)
                                         <option value="{{ $customer->id }}">{{ $customer->name }}</option>
@@ -111,7 +107,7 @@
                                 <div style="width: 99%">
                                     <label>Discount</label>
                                     <input type="text" onchange="discount()" id="sale_discount" class="form-control"
-                                           value="0" />
+                                        value="0" />
                                 </div>
                             @endif
                         </div>
@@ -123,14 +119,14 @@
                                 <label class="col-md-6 col-form-label text-md-right"><b>Sub Total:</b></label>
                                 <div class="col-md-6" style="display: flex; justify-content: flex-end">
                                     <input type="text" id="sub_total" class="form-control-plaintext text-md-right" readonly
-                                           value="0.00" />
+                                        value="0.00" />
                                 </div>
                             </div>
                             <div class="row">
                                 <label class="col-md-6 col-form-label text-md-right"><b>VAT:</b></label>
                                 <div class="col-md-6" style="display: flex; justify-content: flex-end">
                                     <input type="text" id="total_vat" class="form-control-plaintext text-md-right" readonly
-                                           value="0.00" />
+                                        value="0.00" />
                                 </div>
                             </div>
                             <div class="row">
@@ -138,10 +134,10 @@
                                         Amount:</b></label>
                                 <div class="col-md-6" style="display: flex; justify-content: flex-end">
                                     <input type="text" id="total" class="form-control-plaintext text-md-right" readonly
-                                           value="0.00" />
+                                        value="0.00" />
                                 </div>
                                 <span class="help-inline text text-danger" style="display: none; margin-left: 63%"
-                                      id="discount_error">Invalid Amount</span>
+                                    id="discount_error">Invalid Amount</span>
                             </div>
                         </div>
 
@@ -200,20 +196,21 @@
                     <input type="text" id="date_range" class="form-control w-auto" onchange="getQuotes()">
                 </div>
                 <div class="table-responsive" id="sales">
-                    <table id="sale_quotes-Table" class="display table nowrap table-striped table-hover" style="width:100%">
+                    <table id="sale_quotes-Table" class="display table nowrap table-striped table-hover"
+                        style="width:100%; font-size: 14px;">
                         <thead>
-                        <tr>
-                            <th>Order#</th>
-                            <th>Customer</th>
-                            <th>Date</th>
-                            <th>Amount</th>
-                            <th>Action</th>
-{{--                            <th>Sale Type</th>--}}
-{{--                            <th>VAT</th>--}}
-{{--                            <th>Discount</th>--}}
-{{--                            <th>Amount</th>--}}
-{{--                            <th>id</th>--}}
-                        </tr>
+                            <tr>
+                                <th>Order#</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Action</th>
+                                {{-- <th>Sale Type</th>--}}
+                                {{-- <th>VAT</th>--}}
+                                {{-- <th>Discount</th>--}}
+                                {{-- <th>Amount</th>--}}
+                                {{-- <th>id</th>--}}
+                            </tr>
                         </thead>
                         <tbody>
                         </tbody>
@@ -226,12 +223,12 @@
     @include('sales.customers.create')
 @endsection
 
-    @include('partials.notification')
+@include('partials.notification')
 
 @push('page_scripts')
     <script type="text/javascript">
         // Clear invalid localStorage entries immediately
-        (function() {
+        (function () {
             var lastPill = localStorage.getItem('lastPill');
             if (lastPill && (lastPill.includes('http') || !lastPill.startsWith('#'))) {
                 localStorage.removeItem('lastPill');
@@ -240,13 +237,13 @@
         })();
 
         $(document).ready(function () {
-            $('#new-order').on('click', function(e) {
+            $('#new-order').on('click', function (e) {
                 e.preventDefault(); // Prevent default tab switching behavior
                 var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
                 window.location.href = redirectUrl; // Redirect to the URL
             });
 
-            $('#order-list').on('click', function(e) {
+            $('#order-list').on('click', function (e) {
                 e.preventDefault(); // Prevent default tab switching behavior
                 var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
                 window.location.href = redirectUrl; // Redirect to the URL
@@ -274,44 +271,44 @@
         };
 
         /*normal product search box*/
-        $('#products').on('select2:open', function(e) {
+        $('#products').on('select2:open', function (e) {
             // select2 is opened, handle event
             normal_search = 1;
         });
-        $('#products').on('select2:close', function(e) {
+        $('#products').on('select2:close', function (e) {
             // select2 is opened, handle event
             normal_search = 0;
         });
 
         /*hide barcode search*/
-        $.fn.toggleSelect2 = function(state) {
-            return this.each(function() {
+        $.fn.toggleSelect2 = function (state) {
+            return this.each(function () {
                 $.fn[state ? 'show' : 'hide'].apply($(this).next('.select2-container'));
             });
         };
 
-        $(document).ready(function() {
+        $(document).ready(function () {
 
             var sale_type_id = localStorage.getItem('sale_type');
             $('#products_b').toggleSelect2(false);
 
             if (sale_type_id) {
                 $('#products_b').select2('close');
-                setTimeout(function() {
+                setTimeout(function () {
                     $('input[name="input_products_b"]').focus()
                 }, 30);
             }
 
-            $('#price_category').on('change', function() {
-                setTimeout(function() {
+            $('#price_category').on('change', function () {
+                setTimeout(function () {
                     $('input[name="input_products_b"]').focus()
                 }, 30);
             });
 
         });
 
-        $('#customer_id').on('change', function() {
-            setTimeout(function() {
+        $('#customer_id').on('change', function () {
+            setTimeout(function () {
                 $('input[name="input_products_b"]').focus()
             }, 30);
         });
@@ -321,7 +318,7 @@
         var doneTypingInterval = 500; //time in ms (5 seconds)
 
         //on keyup, start the countdown
-        $('#input_products_b').keyup(function() {
+        $('#input_products_b').keyup(function () {
             clearTimeout(typingTimer);
             if ($('#input_products_b').val()) {
                 typingTimer = setTimeout(doneTyping, doneTypingInterval);
@@ -343,8 +340,8 @@
                     date: $('#date_range').val()
                 },
                 type: 'GET',
-                success: function(data) {
-                    console.log('QuotesData',data);
+                success: function (data) {
+                    console.log('QuotesData', data);
                     quotes_table.clear();
                     quotes_table.rows.add(data)
                     quotes_table.draw();
@@ -352,9 +349,9 @@
             });
         }
 
-        $(document).ready(function() {
+        $(document).ready(function () {
 
-            $(function() {
+            $(function () {
 
                 var start = moment();
                 var end = moment();
@@ -389,86 +386,86 @@
                 columns: [
                     {
                         data: 'quote_number',
-                        render: function(data) {
+                        render: function (data) {
                             return data;
                         }
                     },
                     {
                         data: 'customer.name',
-                        render: function(data) {
+                        render: function (data) {
                             return data ?? '';
                         }
                     },
                     {
                         data: 'date',
-                        render: function(date) {
+                        render: function (date) {
                             return moment(date).format('DD-MM-YYYY');
                         }
                     },
                     {
                         data: 'cost.sub_total',
-                        render: function(data) {
+                        render: function (data) {
                             return formatMoney(data);
                         }
                     },
                     {
                         data: null,
-                        render: function(data, type, row) {
+                        render: function (data, type, row) {
                             let receipt_url = '{{ route('receiptReprint', 'receipt_id') }}';
                             let update_url = '{{ route('updateSale', 'receipt_id') }}';
                             receipt_url = receipt_url.replace('receipt_id', row.id);
                             update_url = update_url.replace('receipt_id', row.id);
 
                             return `
-                                        <button class="btn btn-sm btn-rounded btn-success" type="button"
-                                                onclick='showQuoteDetails(event)'
-                                                id="quote_details">Show
-                                        </button>
+                                                                                                        <button class="btn btn-sm btn-rounded btn-success" type="button"
+                                                                                                                onclick='showQuoteDetails(event)'
+                                                                                                                id="quote_details">Show
+                                                                                                        </button>
 
-                                        <a class="btn btn-sm btn-rounded btn-info" type="button"
-                                                href='${update_url}'
-                                                >Edit
-                                        </a>
+                                                                                                        <a class="btn btn-sm btn-rounded btn-info" type="button"
+                                                                                                                href='${update_url}'
+                                                                                                                >Edit
+                                                                                                        </a>
 
-                                        <a href="${receipt_url}" target="_blank">
-                                            <button class="btn btn-sm btn-rounded btn-secondary" type="button"><span
-                                                    class='fa fa-print' aria-hidden='true'></span>
-                                                Print
-                                            </button>
-                                        </a>
+                                                                                                        <a href="${receipt_url}" target="_blank">
+                                                                                                            <button class="btn btn-sm btn-rounded btn-secondary" type="button"><span
+                                                                                                                    class='fa fa-print' aria-hidden='true'></span>
+                                                                                                                Print
+                                                                                                            </button>
+                                                                                                        </a>
 
-                                        <button class="btn btn-sm btn-rounded btn-warning" type="button" onclick="convertQuoteToSale(${row.id})">Convert</button>
-                                `;
+                                                                                                        <button class="btn btn-sm btn-rounded btn-warning" type="button" onclick="convertQuoteToSale(${row.id})">Convert</button>
+                                                                                                `;
 
                         }
                     },
                     {
                         data: 'cost.name',
-                        render: function(data) {
+                        render: function (data) {
                             return data ?? '';
                         }
                     },
                     {
                         data: 'cost.vat',
-                        render: function(data) {
+                        render: function (data) {
                             return data ?? '';
                         }
                     },
                     {
                         data: 'cost.discount',
-                        render: function(data) {
+                        render: function (data) {
                             return data ?? '';
                         }
                     },
                     {
                         data: 'cost.amount',
-                        render: function(data) {
+                        render: function (data) {
                             return data ?? '';
                         }
                     },
                     {
                         data: 'id',
-                        render: function(data) {
+                        render: function (data) {
                             return data ?? '';
                         }
                     },
@@ -496,7 +493,7 @@
 
 
         //Maintain the current Pill on reload
-        $(function() {
+        $(function () {
             // Clear any invalid localStorage entries first
             var lastPill = localStorage.getItem('lastPill');
             if (lastPill && (!lastPill.startsWith('#') || lastPill.includes('http'))) {
@@ -504,7 +501,7 @@
                 lastPill = null;
             }
 
-            $('a[data-toggle="pill"]').on('shown.bs.tab', function(e) {
+            $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
                 // Store the tab ID instead of the full URL
                 var tabId = $(this).attr('href');
                 if (tabId && tabId.startsWith('#') && !tabId.includes('http')) {
@@ -531,220 +528,237 @@
     <script src="{{ asset('assets/apotek/js/sales.js') }}"></script>
     <script src="{{ asset('assets/apotek/js/customer.js') }}"></script>
 
-<!-- Professional Conversion Modal -->
-<div class="modal fade" id="professionalConvertModal" tabindex="-1" role="dialog" aria-labelledby="professionalConvertModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="professionalConvertModalLabel">
-                    <i class="fas fa-exchange-alt"></i> Convert Sales Order to Sale
-                </h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> You are about to convert this Sales Order into a confirmed Sale. This action cannot be undone.
+    <!-- Professional Conversion Modal -->
+    <div class="modal fade" id="professionalConvertModal" tabindex="-1" role="dialog"
+        aria-labelledby="professionalConvertModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Convert Sales Order to Sale</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                
-                <div class="form-group">
-                    <label for="professionalSaleType" class="font-weight-bold">Sale Type <span class="text-danger">*</span></label>
-                    <select class="form-control" id="professionalSaleType" required>
-                        <option value="Cash" selected>💵 Cash Sale</option>
-                        <option value="Credit">📝 Credit Sale</option>
-                    </select>
-                    <small class="form-text text-muted">Select the payment method for this sale</small>
+                <div class="modal-body">
+                    <div>
+                        Are you sure to convert this sales order? This action cannot be undone!.
+                    </div>
+                    <div class="form-text mb-3">
+                        Stock quantities will be automatically deducted from inventory. Fill the details below to preoceed
+                    </div>
+                    <div class="form-group">
+                        <label for="professionalSaleType" class="font-weight-bold">Sale Type <span
+                                class="text-danger">*</span></label>
+                        <select class="form-control" id="salesType" onchange="salesType(this)" required>
+                            <option value="cash" selected>Cash Sale</option>
+                            <option value="credit">Credit Sale</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="gracePeriodDiv">
+                        <label for="gracePeriod">Grace Period<span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="" id="gracePeriod">
+                    </div>
+                    <input type="hidden" name="" id="convert_id">
+                    <div class="form-group mt-3">
+                        <label for="conversionNotes">Conversion Notes</label>
+                        <textarea class="form-control" id="conversionNotes" rows="3"
+                            placeholder="(Optional) Add any notes about this conversion..."></textarea>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="conversionNotes" class="font-weight-bold">Conversion Notes</label>
-                    <textarea class="form-control" id="conversionNotes" rows="3" placeholder="Optional: Add any notes about this conversion..."></textarea>
-                    <small class="form-text text-muted">These notes will be saved for reference</small>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" title="Close">Close</button>
+                    <button type="button" id="convert_to_sale" class="btn btn-primary btn-convert-order"
+                        onclick="convertToSale()" title="Convert Order">
+                        Convert
+                    </button>
                 </div>
-                
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i> <strong>Important:</strong> Stock quantities will be automatically deducted from inventory.
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                    <i class="fas fa-times"></i> Cancel
-                </button>
-                <button type="button" class="btn btn-success" id="confirmProfessionalConvert">
-                    <i class="fas fa-check"></i> Yes, Convert
-                </button>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Success Modal -->
-<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="successModalLabel">
-                    <i class="fas fa-check-circle"></i> Conversion Successful!
-                </h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body text-center">
-                <div class="mb-4">
-                    <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="successModalLabel">
+                        <i class="fas fa-check-circle"></i> Conversion Successful!
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                
-                <h4 class="text-success mb-3">Sales Order Converted Successfully!</h4>
-                
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title">Sale Details:</h6>
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <strong>Sale ID:</strong><br>
-                                <span class="badge badge-primary" id="convertedSaleId">-</span>
+                <div class="modal-body text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+
+                    <h4 class="text-success mb-3">Sales Order Converted Successfully!</h4>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">Sale Details:</h6>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <strong>Sale ID:</strong><br>
+                                    <span class="badge badge-primary" id="convertedSaleId">-</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Sale Type:</strong><br>
+                                    <span class="badge badge-info" id="convertedSaleType">-</span>
+                                </div>
                             </div>
-                            <div class="col-sm-6">
-                                <strong>Sale Type:</strong><br>
-                                <span class="badge badge-info" id="convertedSaleType">-</span>
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <strong>Receipt Number:</strong><br>
+                                    <span class="badge badge-secondary" id="convertedReceiptNumber">-</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row mt-2">
-                            <div class="col-12">
-                                <strong>Receipt Number:</strong><br>
-                                <span class="badge badge-secondary" id="convertedReceiptNumber">-</span>
-                            </div>
-                        </div>
-                        <div class="row mt-2">
-                            <div class="col-sm-6">
-                                <strong>Tax Invoice #:</strong><br>
-                                <span class="badge badge-success" id="convertedTaxInvoiceNumber">-</span>
-                            </div>
-                            <div class="col-sm-6">
-                                <strong>Delivery Note #:</strong><br>
-                                <span class="badge badge-info" id="convertedDeliveryNoteNumber">-</span>
+                            <div class="row mt-2">
+                                <div class="col-sm-6">
+                                    <strong>Tax Invoice #:</strong><br>
+                                    <span class="badge badge-success" id="convertedTaxInvoiceNumber">-</span>
+                                </div>
+                                <div class="col-sm-6">
+                                    <strong>Delivery Note #:</strong><br>
+                                    <span class="badge badge-info" id="convertedDeliveryNoteNumber">-</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="mt-4">
-                    <h6>Available Documents:</h6>
-                    <div class="btn-group-vertical w-100" role="group">
-                        <a href="#" id="invoiceLink" class="btn btn-outline-primary" target="_blank">
-                            <i class="fas fa-file-invoice"></i> View Tax Invoice
-                        </a>
-                        <a href="#" id="deliveryNoteLink" class="btn btn-outline-info" target="_blank">
-                            <i class="fas fa-truck"></i> View Delivery Note
-                        </a>
-                        <a href="#" id="receiptLink" class="btn btn-outline-success" target="_blank">
-                            <i class="fas fa-receipt"></i> View Receipt
-                        </a>
+
+                    <div class="mt-4">
+                        <h6>Available Documents:</h6>
+                        <div class="btn-group-vertical w-100" role="group">
+                            <a href="#" id="invoiceLink" class="btn btn-outline-primary" target="_blank">
+                                <i class="fas fa-file-invoice"></i> View Tax Invoice
+                            </a>
+                            <a href="#" id="deliveryNoteLink" class="btn btn-outline-info" target="_blank">
+                                <i class="fas fa-truck"></i> View Delivery Note
+                            </a>
+                            <a href="#" id="receiptLink" class="btn btn-outline-success" target="_blank">
+                                <i class="fas fa-receipt"></i> View Receipt
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                    <i class="fas fa-times"></i> Close
-                </button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
     <!-- Modal Markup -->
-    <div class="modal fade" id="convertConfirmModal" tabindex="-1" role="dialog" aria-labelledby="convertConfirmModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="convertConfirmModalLabel">Confirm Conversion</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <p>Are you sure you want to convert this Sales Order to a Sale?</p>
-            <div class="form-group">
-              <label for="saleType">Sale Type:</label>
-              <select class="form-control" id="saleType">
-                <option value="cash">Cash</option>
-                <option value="credit">Credit</option>
-              </select>
+    <div class="modal fade" id="convertConfirmModal" tabindex="-1" role="dialog" aria-labelledby="convertConfirmModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="convertConfirmModalLabel">Confirm Conversion</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to convert this Sales Order to a Sale?</p>
+                    <div class="form-group">
+                        <label for="saleType">Sale Type:</label>
+                        <select class="form-control" id="saleType">
+                            <option value="cash">Cash</option>
+                            <option value="credit">Credit</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning" id="confirmConvertBtn">Yes, Convert</button>
+                </div>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-warning" id="confirmConvertBtn">Yes, Convert</button>
-          </div>
         </div>
-      </div>
     </div>
     <!-- Success Modal -->
-    <div class="modal fade" id="convertSuccessModal" tabindex="-1" role="dialog" aria-labelledby="convertSuccessModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="convertSuccessModalLabel">Conversion Successful</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <p>Sales Order converted successfully!</p>
-            <div id="conversionLinks" style="display: none;">
-              <a href="#" target="_blank" class="btn btn-primary mb-2" id="invoiceLink">View/Print Tax Invoice</a>
-              <a href="#" target="_blank" class="btn btn-info" id="deliveryNoteLink">View/Print Delivery Note</a>
+    <div class="modal fade" id="convertSuccessModal" tabindex="-1" role="dialog" aria-labelledby="convertSuccessModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="convertSuccessModalLabel">Conversion Successful</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Sales Order converted successfully!</p>
+                    <div id="conversionLinks" style="display: none;">
+                        <a href="#" target="_blank" class="btn btn-primary mb-2" id="invoiceLink">View/Print Tax Invoice</a>
+                        <a href="#" target="_blank" class="btn btn-info" id="deliveryNoteLink">View/Print Delivery Note</a>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          </div>
         </div>
-      </div>
     </div>
-</div>
+    </div>
 @endpush
 
 <!-- Place this script at the end of the file so convertQuoteToSale is globally available -->
 <script type="text/javascript">
-let pendingConvertQuoteId = null;
-let lastConvertedSaleId = null;
-function convertQuoteToSale(quoteId) {
-    console.log('Convert button clicked for quote ID:', quoteId);
-    pendingConvertQuoteId = quoteId;
-    $('#professionalConvertModal').modal('show');
-}
+    let pendingConvertQuoteId = null;
+    let lastConvertedSaleId = null;
+    function convertQuoteToSale(quoteId) {
+        // console.log('Convert button clicked for quote ID:', quoteId);
+        pendingConvertQuoteId = quoteId;
+        document.getElementById('convert_id').value = quoteId;
+        document.getElementById('gracePeriodDiv').style.display = "none";
+        $('#professionalConvertModal').modal('show');
+    }
 
-// Professional conversion handling
-$(document).ready(function() {
-    $('#confirmProfessionalConvert').on('click', function() {
-        if (!pendingConvertQuoteId) return;
-        
-        var saleType = $('#professionalSaleType').val();
-        var conversionNotes = $('#conversionNotes').val().trim();
-        
-        // Disable button and show loading
-        $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Converting...');
-        
+    function salesType() {
+        var type = document.getElementById('salesType').value;
+        console.log('Sale type changed: ', type);
+        if (type === 'credit') {
+            document.getElementById('gracePeriod').setAttribute('required', 'required');
+            document.getElementById('gracePeriodDiv').style.display = "block";
+        } else {
+            document.getElementById('gracePeriodDiv').style.display = "none";
+        }
+    };
+
+    function convertToSale() {
+        const quoteId = document.getElementById('convert_id').value;
+        const note = document.getElementById('conversionNotes').value;
+        const sale_type = document.getElementById('salesType').value;
+        const grace_period = document.getElementById('gracePeriod').value;
+        if (sale_type === 'credit' && (grace_period === '' || grace_period == 0)) {
+            notify("Grace period is required for credit sales", "top", "right", "warning");
+            return;
+        }
+
         $.ajax({
             url: '{{ route('convert-to-sales') }}',
             type: 'POST',
-            data: { 
-                quote_id: pendingConvertQuoteId, 
-                sale_type: saleType,
-                notes: conversionNotes,
-                _token: '{{ csrf_token() }}' 
+            data: {
+                quote_id: quoteId,
+                notes: note,
+                sale_type: sale_type,
+                grace_period: grace_period,
+                _token: '{{ csrf_token() }}'
             },
-            success: function(response) {
+            success: function (response) {
+                console.log('Response is: ', response);
                 $('#professionalConvertModal').modal('hide');
-                
-                if (response.message === 'success' && response.sale_id) {
+
+                if (response.status === 'success' && response.sale_id) {
                     // Show success modal with document links
                     $('#convertedSaleId').text(response.sale_id);
-                    $('#convertedSaleType').text(saleType);
                     $('#convertedReceiptNumber').text(response.receipt_number || 'N/A');
-                    
+
                     // Update modal with additional info if available
                     if (response.tax_invoice_number) {
                         $('#convertedTaxInvoiceNumber').text(response.tax_invoice_number);
@@ -752,43 +766,115 @@ $(document).ready(function() {
                     if (response.delivery_note_number) {
                         $('#convertedDeliveryNoteNumber').text(response.delivery_note_number);
                     }
-                    
+
                     // Set document links
-                    $('#invoiceLink').attr('href', '{{ route('generate-tax-invoice', '') }}/' + response.quote_id);
+                    // $('#invoiceLink').attr('href', '{{ route('generate-tax-invoice', '') }}/' + response.quote_id);
                     $('#deliveryNoteLink').attr('href', '{{ route('generate-delivery-note', '') }}/' + response.sale_id);
                     $('#receiptLink').attr('href', '{{ route('getCashReceipt', '') }}/' + response.sale_id);
-                    
-                    $('#successModal').modal('show');
-                    
+
+                    // $('#successModal').modal('show');
+                    notify(response.message, "top", "right", "success");
+
                     // Refresh the table
                     if (typeof getQuotes === 'function') {
                         getQuotes();
                     } else if (quotes_table && quotes_table.ajax) {
                         quotes_table.ajax.reload();
                     }
+
+                    // Open receipt in new tab
+                    let receiptUrl = '{{ route('getCashReceipt', '') }}/' + response.sale_id;
+                    window.open(receiptUrl, '_blank');
+
                 } else {
-                    showAlert('error', 'Conversion Failed', response.message || 'Unknown error occurred');
+                    notify(response.error, "top", "right", "danger");
                 }
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 $('#professionalConvertModal').modal('hide');
                 console.error('Conversion Error:', xhr.responseText);
                 showAlert('error', 'Conversion Error', 'An error occurred: ' + error);
             },
-            complete: function() {
+            complete: function () {
                 $('#confirmProfessionalConvert').prop('disabled', false).html('Yes, Convert');
                 pendingConvertQuoteId = null;
             }
         });
-    });
-});
+    };
 
-// Professional alert function
-function showAlert(type, title, message) {
-    var alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
-    var iconClass = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle';
-    
-    var alertHtml = `
+    // Professional conversion handling
+    $(document).ready(function () {
+        $('#confirmProfessionalConvert').on('click', function () {
+            if (!pendingConvertQuoteId) return;
+
+            var saleType = $('#professionalSaleType').val();
+            var conversionNotes = $('#conversionNotes').val().trim();
+
+            // Disable button and show loading
+            $(this).prop('disabled', true).html('<i class = "fas fa-spinner fa-spin" ></i > Converting...');
+
+            $.ajax({
+                url: '{{ route('convert-to-sales') }}',
+                type: 'POST',
+                data: {
+                    quote_id: pendingConvertQuoteId,
+                    sale_type: saleType,
+                    notes: conversionNotes,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function (response) {
+                    $('#professionalConvertModal').modal('hide');
+
+                    if (response.status === 'success' && response.sale_id) {
+                        // Show success modal with document links
+                        $('#convertedSaleId').text(response.sale_id);
+                        $('#convertedSaleType').text(saleType);
+                        $('#convertedReceiptNumber').text(response.receipt_number || 'N/A');
+
+                        // Update modal with additional info if available
+                        if (response.tax_invoice_number) {
+                            $('#convertedTaxInvoiceNumber').text(response.tax_invoice_number);
+                        }
+                        if (response.delivery_note_number) {
+                            $('#convertedDeliveryNoteNumber').text(response.delivery_note_number);
+                        }
+
+                        // Set document links
+                        $('#invoiceLink').attr('href', '{{ route('generate-tax-invoice', '') }}/' + response.quote_id);
+                        $('#deliveryNoteLink').attr('href', '{{ route('generate-delivery-note', '') }}/' + response.sale_id);
+                        $('#receiptLink').attr('href', '{{ route('getCashReceipt', '') }}/' + response.sale_id);
+
+                        $('#successModal').modal('show');
+
+                        // Refresh the table
+                        if (typeof getQuotes === 'function') {
+                            getQuotes();
+                        } else if (quotes_table && quotes_table.ajax) {
+                            quotes_table.ajax.reload();
+                        }
+                    } else {
+                        showAlert('error', 'Conversion Failed', response.message || 'Unknown error occurred');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    $('#professionalConvertModal').modal('hide');
+                    console.error('Conversion Error:', xhr.responseText);
+                    showAlert('error', 'Conversion Error', 'An error occurred: ' + error);
+                },
+                complete: function () {
+                    $('#confirmProfessionalConvert').prop('disabled', false).html('Yes, Convert');
+                    pendingConvertQuoteId = null;
+                }
+            });
+        });
+    });
+
+    // Professional alert function
+    function showAlert(type, title, message) {
+        var alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        var iconClass = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle';
+
+        var alertHtml = `
         <div class="alert ${alertClass} alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
             <i class="${iconClass}"></i> <strong>${title}:</strong> ${message}
             <button type="button" class="close" data-dismiss="alert">
@@ -796,14 +882,14 @@ function showAlert(type, title, message) {
             </button>
         </div>
     `;
-    
-    $('body').append(alertHtml);
-    
-    // Auto remove after 5 seconds
-    setTimeout(function() {
-        $('.alert').fadeOut(500, function() {
-            $(this).remove();
-        });
-    }, 5000);
-}
+
+        $('body').append(alertHtml);
+
+        // Auto remove after 5 seconds
+        setTimeout(function () {
+            $('.alert').fadeOut(500, function () {
+                $(this).remove();
+            });
+        }, 5000);
+    }
 </script>

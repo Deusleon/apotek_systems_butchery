@@ -28,14 +28,12 @@
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
             <li class="nav-item">
-                <a class="nav-link active" id="new-order" data-toggle="pill"
-                   href="{{ route('sale-quotes.index') }}" role="tab"
-                   aria-controls="pills-home" aria-selected="true">New</a>
+                <a class="nav-link active" id="new-order" data-toggle="pill" href="{{ route('sale-quotes.index') }}"
+                    role="tab" aria-controls="pills-home" aria-selected="true">New Order</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="order-list" data-toggle="pill"
-                   href="{{ route('sale-quotes.order_list') }}" role="tab"
-                   aria-controls="pills-profile" aria-selected="false">Order List</a>
+                <a class="nav-link" id="order-list" data-toggle="pill" href="{{ route('sale-quotes.order_list') }}"
+                    role="tab" aria-controls="pills-profile" aria-selected="false">Order List</a>
             </li>
         </ul>
         <div class="tab-content" id="pills-tabContent">
@@ -44,8 +42,8 @@
                     @if (auth()->user()->checkPermission('Manage Customers'))
                         <div class="row">
                             <div class="col-md-12">
-                                <button style="float: right;margin-bottom: 2%;" type="button"
-                                    class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#create"> Add
+                                <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-secondary btn-sm"
+                                    data-toggle="modal" data-target="#create"> Add
                                     New Customer
                                 </button>
                             </div>
@@ -61,8 +59,7 @@
                                     <option value="">Select Sales Type</option>
                                     @foreach ($price_category as $price)
                                         <!-- <option value="{{ $price->id }}">{{ $price->name }}</option> -->
-                                        <option value="{{ $price->id }}"
-                                            {{ $default_sale_type === $price->id ? 'selected' : '' }}>{{ $price->name }}
+                                        <option value="{{ $price->id }}" {{ $default_sale_type === $price->id ? 'selected' : '' }}>{{ $price->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -212,7 +209,7 @@
 @push('page_scripts')
     @include('partials.notification')
     <script type="text/javascript">
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Global variables
             var cart = [];
             var default_cart = [];
@@ -233,21 +230,21 @@
                     ordering: false,
                     data: cart,
                     columns: [
-                        {title: "Product Name"},
-                        {title: "Quantity"},
-                        {title: "Price"},
-                        {title: "VAT"},
-                        {title: "Amount"},
-                        {title: "Stock Qty", visible: false},
-                        {title: "productID", visible: false},
-                        {title: "Product Type", visible: false},
+                        { title: "Product Name" },
+                        { title: "Quantity" },
+                        { title: "Price" },
+                        { title: "VAT" },
+                        { title: "Amount" },
+                        { title: "Stock Qty", visible: false },
+                        { title: "productID", visible: false },
+                        { title: "Product Type", visible: false },
                         {
                             title: "Action",
                             defaultContent: "<div><input type='button' value='Edit' id='edit_btn' class='btn btn-info btn-rounded btn-sm'/><input type='button' value='Delete' id='delete_btn' class='btn btn-danger btn-rounded btn-sm'/></div>"
                         }
                     ]
                 });
-                console.log('Cart table initialized successfully');
+                // console.log('Cart table initialized successfully');
             } catch (error) {
                 console.error('Error initializing cart table:', error);
             }
@@ -259,7 +256,7 @@
                 var total = 0;
 
                 // Calculate totals from cart
-                cart.forEach(function(item) {
+                cart.forEach(function (item) {
                     var quantity = item[1];
                     var price = parseFloat(item[2].replace(/\,/g, ''));
                     var vat = parseFloat(item[3].replace(/\,/g, ''));
@@ -296,8 +293,27 @@
             }
 
             // Format money function
-            function formatMoney(amount) {
-                return parseFloat(amount).toFixed(2);
+            function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
+                try {
+                    decimalCount = Math.abs(decimalCount);
+                    decimalCount = isNaN(decimalCount) ? 2 : decimalCount;
+                    const negativeSign = amount < 0 ? "-" : "";
+                    let i = parseInt(
+                        (amount = Math.abs(Number(amount) || 0).toFixed(decimalCount))
+                    ).toString();
+                    let j = i.length > 3 ? i.length % 3 : 0;
+                    return (
+                        negativeSign +
+                        (j ? i.substr(0, j) + thousands : "") +
+                        i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) +
+                        (decimalCount
+                            ? decimal +
+                            Math.abs(amount - i)
+                                .toFixed(decimalCount)
+                                .slice(2)
+                            : "")
+                    );
+                } catch (e) { }
             }
 
             // Number formatting function
@@ -441,7 +457,7 @@
             });
 
             // Helper function for number validation
-            window.isNumberKey = function(evt, element) {
+            window.isNumberKey = function (evt, element) {
                 var charCode = (evt.which) ? evt.which : evt.keyCode;
                 if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57) && charCode != 44) {
                     if (evt.preventDefault) {
@@ -455,47 +471,84 @@
             // Function to add product to cart
             function addProductToCart(productData) {
                 if (!productData) return;
-                
-                var selected_fields = productData.split('#@');
-                var item_name = selected_fields[0];
-                var price = Number(selected_fields[1]);
-                var productID = Number(selected_fields[2]);
-                var qty = Number(selected_fields[3]);
-                var product_type = selected_fields[4] || '';
-                var vat = Number((price * tax).toFixed(2));
-                var unit_total = Number(price + vat);
-                var quantity = 1;
 
-                // Create item for cart display
-                var item = [];
-                item.push(item_name);
-                item.push(quantity);
-                item.push(formatMoney(price));
-                item.push(formatMoney(vat));
-                item.push(formatMoney(unit_total));
-                item.push(qty);
-                item.push(productID);
-                item.push(product_type);
+                $("#edit_quantity").change();
+                $("#edit_price").change();
 
-                // Create cart_data for default values
-                var cart_data = [];
-                cart_data.push(formatMoney(price));
-                cart_data.push(formatMoney(vat));
-                cart_data.push(formatMoney(unit_total));
+                var sel = document.getElementById("products");
+                var productValue = sel.value;
+                if (!productValue) return;
 
-                // Add to arrays
-                cart.push(item);
-                default_cart.push(cart_data);
+                var selectedOption = sel.options[sel.selectedIndex];
+                var name = selectedOption.getAttribute("data-name") || selectedOption.text;
+                var price = Number(selectedOption.getAttribute("data-price") || 0);
+                var available_quantity = Number(
+                    selectedOption.getAttribute("data-quantity") || 0
+                );
+                var productID = productValue;
 
-                // Update cart table
-                if (cart_table) {
-                    cart_table.clear().rows.add(cart).draw();
+                // Unit calcs
+                var vatUnit = Number((price * tax).toFixed(2));
+                var unitTotal = Number(price + vatUnit);
+
+                // Check if the item already exist in cart
+                let idx = cart.findIndex((r) => r[6] == productID);
+
+                if (idx !== -1) {
+                    // If exist then add qty and move it on top.
+                    let row = cart[idx];
+
+                    let rawQty =
+                        typeof row[1] === "number" ? row[1] : String(row[1]).split("<")[0];
+                    rawQty = Number(String(rawQty).replace(/,/g, "")) || 0;
+
+                    let newQty = rawQty + 1;
+                    if (newQty > available_quantity) {
+                        row[1] = numberWithCommas(rawQty) +
+                            "<span class='text text-danger'> Max</span>";
+                    } else {
+                        row[1] = numberWithCommas(newQty);
+                    }
+
+                    row[2] = formatMoney(price);
+                    row[3] = formatMoney(vatUnit * newQty);
+                    row[4] = formatMoney(unitTotal * newQty);
+                    row[5] = available_quantity;
+                    row[6] = productID;
+
+                    // take on top of the cart
+                    cart.splice(idx, 1);
+                    cart.unshift(row);
+
+                    if (default_cart && default_cart.length) {
+                        const dc = default_cart.splice(idx, 1)[0];
+                        default_cart.unshift(dc);
+                    }
+                } else {
+                    var item = [
+                        name,
+                        1,
+                        formatMoney(price),
+                        formatMoney(vatUnit),
+                        formatMoney(unitTotal),
+                        available_quantity,
+                        productID,
+                        "",
+                    ];
+                    cart.unshift(item);
+
+                    var cart_data = [
+                        formatMoney(price),
+                        formatMoney(vatUnit),
+                        formatMoney(unitTotal),
+                    ];
+                    default_cart.unshift(cart_data);
                 }
 
-                // Call discount function to update totals
                 discount();
 
-                console.log('Product added to cart:', item_name);
+                $("#products").val(null).trigger("change");
+                console.log('Product added to cart:', item);
             }
 
             // Function to load products based on price category
@@ -506,8 +559,6 @@
                     return;
                 }
 
-                console.log('Loading products for category:', priceCategory);
-                
                 $.ajax({
                     url: '{{ route("selectProducts") }}',
                     type: 'POST',
@@ -515,26 +566,31 @@
                         id: priceCategory,
                         _token: '{{ csrf_token() }}'
                     },
-                    success: function(data) {
-                        console.log('Products loaded:', data);
-                        
+                    success: function (response) {
+                        // console.log('Products loaded:', data);
+
                         // Clear existing options
                         $('#products').empty();
-                        
-                        // Add default option
-                        $('#products').append('<option value="">Select Product</option>');
-                        
-                        // Add products
-                        $.each(data, function(key, value) {
-                            if (key !== '') {
-                                $('#products').append('<option value="' + key + '">' + value + '</option>');
-                            }
+                        response.data.forEach(function (p) {
+                            $("#products").append(
+                                $("<option>", {
+                                    value: "",
+                                    text: "Select product",
+                                }),
+                                $("<option>", {
+                                    value: p.id,
+                                    text: p.name,
+                                    "data-name": p.name,
+                                    "data-price": p.price,
+                                    "data-quantity": p.quantity,
+                                })
+                            );
                         });
-                        
+
                         // Refresh select2
                         $('#products').trigger('change');
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         console.error('Error loading products:', xhr.responseText);
                         $('#products').empty().append('<option value="">Error loading products</option>');
                     }
@@ -545,10 +601,10 @@
             $("#products").on('change', function (event) {
                 let customer_id = document.getElementById("customer_id").value;
                 let selectedProduct = $(this).val();
-                
+
                 console.log('Product selected:', selectedProduct);
                 console.log('Customer ID:', customer_id);
-                
+
                 if (!customer_id) {
                     if (typeof notify === 'function') {
                         notify('Select Customer First', 'top', 'right', 'warning');
@@ -558,7 +614,7 @@
                     $(this).val('').trigger('change');
                     return;
                 }
-                
+
                 if (selectedProduct && selectedProduct !== '') {
                     console.log('Adding product to cart');
                     addProductToCart(selectedProduct);
@@ -601,20 +657,20 @@
                 data: []
             });
 
-            $('#price_category').on('change', function() {
+            $('#price_category').on('change', function () {
                 var selectedCategory = $(this).val();
                 console.log('Price category changed to:', selectedCategory);
                 loadProducts();
-        });
+            });
 
-        $('#customer_id').on('change', function() {
+            $('#customer_id').on('change', function () {
                 if ($('#price_category').val()) {
                     loadProducts();
                 }
             });
 
             // Clear cart button
-            $('#deselect-all-quote').on('click', function() {
+            $('#deselect-all-quote').on('click', function () {
                 var cart_data = document.getElementById("order_cart").value;
                 if (!(cart_data === '' || cart_data === 'undefined')) {
                     var r = confirm('Cancel quote?');
@@ -629,7 +685,7 @@
             });
 
             // Save button
-            $('#save_btn').on('click', function() {
+            $('#save_btn').on('click', function () {
                 saveQuoteForm();
             });
 
@@ -638,7 +694,7 @@
                 var customer_id = $('#customer_id').val();
                 var price_category = $('#price_category').val();
                 var remark = $('#remark').val();
-                
+
                 if (!customer_id) {
                     if (typeof notify === 'function') {
                         notify('Please select a customer', 'top', 'right', 'error');
@@ -647,7 +703,7 @@
                     }
                     return;
                 }
-                
+
                 if (!price_category) {
                     if (typeof notify === 'function') {
                         notify('Please select a sales type', 'top', 'right', 'error');
@@ -656,7 +712,7 @@
                     }
                     return;
                 }
-                
+
                 if (cart.length === 0) {
                     if (typeof notify === 'function') {
                         notify('Please add at least one product to the cart', 'top', 'right', 'error');
@@ -665,16 +721,16 @@
                     }
                     return;
                 }
-                
+
                 // Prepare order cart data
                 order_cart = [];
-                cart.forEach(function(item) {
+                cart.forEach(function (item) {
                     var quantity = item[1];
                     // Handle quantity with "Max" indicator
                     if (typeof quantity === 'string' && quantity.includes('Max')) {
                         quantity = quantity.split(' ')[0].replace(/,/g, '');
                     }
-                    
+
                     var product = {
                         product_id: item[6],
                         quantity: quantity,
@@ -684,12 +740,12 @@
                     };
                     order_cart.push(product);
                 });
-                
+
                 // Update hidden fields
                 document.getElementById("order_cart").value = JSON.stringify(order_cart);
                 document.getElementById("price_cat").value = price_category;
                 document.getElementById("discount_value").value = sale_discount;
-                
+
                 var formData = {
                     customer_id: customer_id,
                     price_category_id: price_category,
@@ -698,43 +754,43 @@
                     remark: remark,
                     _token: '{{ csrf_token() }}'
                 };
-                
+
                 console.log('Saving quote with data:', formData);
-                
+
                 // Disable save button
                 $('#save_btn').prop('disabled', true).text('Saving...');
-                
+
                 $.ajax({
                     url: "{{ route('storeQuote') }}",
                     type: "POST",
                     data: formData,
                     success: function (response) {
                         console.log('Quote saved successfully:', response);
-                        
+
                         if (typeof notify === 'function') {
                             notify('Quote saved successfully!', 'top', 'right', 'success');
                         } else {
                             alert('Quote saved successfully!');
                         }
-                        
+
                         // Clear form
                         deselectQuote();
                         $('#customer_id').val('').trigger('change');
                         $('#price_category').val('').trigger('change');
                         $('#remark').val('');
-                        
+
                         // Re-enable save button
                         $('#save_btn').prop('disabled', false).text('Save');
                     },
                     error: function (xhr, status, error) {
                         console.error('Error saving quote:', xhr.responseText);
-                        
+
                         if (typeof notify === 'function') {
                             notify('Error saving quote: ' + xhr.responseText, 'top', 'right', 'error');
                         } else {
                             alert('Error saving quote: ' + xhr.responseText);
                         }
-                        
+
                         // Re-enable save button
                         $('#save_btn').prop('disabled', false).text('Save');
                     }
@@ -745,13 +801,13 @@
             window.discount = discount;
 
             // Tab navigation handlers
-            $('#new-order').on('click', function(e) {
+            $('#new-order').on('click', function (e) {
                 e.preventDefault();
                 var redirectUrl = $(this).attr('href');
                 window.location.href = redirectUrl;
             });
 
-            $('#order-list').on('click', function(e) {
+            $('#order-list').on('click', function (e) {
                 e.preventDefault();
                 var redirectUrl = $(this).attr('href');
                 window.location.href = redirectUrl;
