@@ -15,25 +15,36 @@ class Order extends Model
     }
 
     public function details()
-    {
-        return $this->hasMany(OrderDetail::class, 'order_id', 'id')
-            ->join('inv_products', 'inv_products.id', '=', 'order_details.product_id')
-            ->select(
-                'order_details.order_id as order_id', 
-                'inv_products.id as product_id', 
-                'order_details.id as order_item_id', 
-                'name', 
-                'pack_size',
-                'order_details.ordered_qty as quantity', 
-                'order_details.received_qty as received_quantity',
-                'unit_price as price', 
-                'vat', 
-                'discount', 
-                'amount', 
-                'item_status'
-            )
-            ->groupBy('order_details.id');
-    }
+        {
+            return $this->hasMany(OrderDetail::class, 'order_id', 'id')
+                ->join('inv_products', 'inv_products.id', '=', 'order_details.product_id')
+                ->select(
+                    'order_details.id as order_item_id',
+                    'order_details.order_id',
+                    'order_details.product_id',
+                    'inv_products.name',
+                    'inv_products.brand',
+                    'inv_products.pack_size',
+                    'inv_products.sales_uom',
+                    'order_details.ordered_qty',
+                    'order_details.received_qty',
+                    'order_details.unit_price as price',
+                    'order_details.vat',
+                    'order_details.amount'
+                )
+                ->groupBy(
+                    'order_details.id',
+                    'order_details.order_id',
+                    'order_details.product_id',
+                    'inv_products.name',
+                    'inv_products.pack_size',
+                    'order_details.ordered_qty',
+                    'order_details.received_qty',
+                    'order_details.unit_price',
+                    'order_details.vat',
+                    'order_details.amount'
+                );
+        }
 
     public function orderDetail()
     {
