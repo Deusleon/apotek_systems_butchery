@@ -149,13 +149,16 @@
             var end = moment();
 
             function cb(start, end) {
-                $('#returned_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                $('#returned_date span').html(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
             }
 
             $('#returned_date').daterangepicker({
                 startDate: moment().startOf('month'),
                 endDate: end,
                 autoUpdateInput: true,
+                locale: {
+                    format: 'YYYY/MM/DD' 
+                },
                 ranges: {
                     'Today': [moment(), moment()],
                     'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -208,7 +211,7 @@
                             return_table.column(6).visible(false);
                             data.forEach(function (data) {
                                 if (data.status == 5) {
-                                    data.item_returned.bought_qty += data.item_returned.rtn_qty;//This calculate the original bought qty
+                                    data.item_returned.bought_qty += Number(data.item_returned.rtn_qty); //This calculate the original bought qty
                                     data.item_returned.amount = (data.item_returned.amount / data.item_returned.rtn_qty) * data.item_returned.bought_qty;
                                 }
 
@@ -238,7 +241,7 @@
                 {data: 'item_returned.name'},
                 {
                     data: 'item_returned.b_date', render: function (date) {
-                        return moment(date).format('D-MM-YYYY');
+                        return moment(date).format('YYYY-MM-DD');
                     }
                 },
                 {
@@ -250,7 +253,7 @@
                 },
                 {
                     data: 'date', render: function (date) {
-                        return moment(date).format('D-MM-YYYY');
+                        return moment(date).format('YYYY-MM-DD');
                     }
                 },
                 {
@@ -309,58 +312,4 @@
         });
     </script>
 
-
-
-
-
 @endpush
-{{--@if($count>0)
-<tr>
-@foreach($sales_returns as $s_return)
-<td>{{$s_return->item_returned->name}}</td>
-<td>{{date('j M, Y', strtotime($s_return->item_returned->b_date))}}</td>
-@if($s_return->item_returned->status == 3||$s_return->item_returned->status == 5)
-
-<td>{{$s_return->item_returned->bought_qty+$s_return->quantity}}</td>
-@else
-<td>{{$s_return->item_returned->bought_qty}}</td>
-@endif
-
-
-<td>{{date('j M, Y', strtotime($s_return->date))}}</td>
-<td>{{$s_return->quantity}}</td>
-@if($s_return->item_returned->bought_qty != 0)
-<td>{{number_format((($s_return->item_returned->amount-$s_return->item_returned->discount)/$s_return->item_returned->bought_qty)*$s_return->quantity,2)}}</td>
-@else
-<td>{{($s_return->item_returned->amount/1)*$s_return->quantity}}</td>
-@endif
-<td>
-@if($s_return->item_returned->status == 2)
-<button class="btn btn-sm btn-rounded btn-success"
-data-r_qty="{{$s_return->quantity}}"
-data-stock-id="{{$s_return->item_returned->stock_id}}"
-data-qty="{{$s_return->item_returned->bought_qty}}"
-data-item_detail_id="{{$s_return->item_returned->item_detail_id}}"
-data-reason="{{$s_return->reason}}"
-type="button"data-toggle="modal"
-data-target="#approve">Approve
-</button>
-<button class="btn btn-sm btn-rounded btn-danger"
-data-id="{{$s_return->id}}"
-data-item_detail_id="{{$s_return->item_returned->item_detail_id}}"
-data-reason="{{$s_return->reason}}"
-type="button"data-toggle="modal"
-data-target="#reject">Reject
-</button>
-@elseif($s_return->item_returned->status == 4)
-<h4><span class="badge badge-danger">Rejected !</span></h4>
-@else
-<h4><span class="badge badge-success">Approved</span></h4>
-
-@endif
-
-</td>
-</tr>
-
-@endforeach
-@endif--}}

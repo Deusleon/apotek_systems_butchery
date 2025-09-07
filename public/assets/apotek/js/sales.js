@@ -740,10 +740,6 @@ function discount() {
 }
 
 function deselect() {
-    // document.getElementById("sales_form").reset();
-    // rePopulateSelect2();
-    // rePopulateSelect2Customer();
-    // $('#customer_id').val('').change();
     if (discount_enable === "YES") {
         document.getElementById("sale_discount").value = 0.0;
     }
@@ -974,25 +970,26 @@ $("#price_category").change(function () {
             },
             dataType: "json",
             success: function (result) {
-                $("#products").empty().trigger("change");
-                if (result.data && result.data.length > 0) {
-                    result.data.forEach(function (p) {
-                        $("#products").append(
-                            $("<option>", {
-                                value: "",
-                                text: "Select product",
-                            }),
-                            $("<option>", {
-                                value: p.id,
-                                text: p.name,
-                                "data-name": p.name,
-                                "data-price": p.price,
-                                "data-quantity": p.quantity,
-                            })
-                        );
-                    });
-                    $("#products").trigger("change");
-                }
+                populateProducts(result.data || []);
+                // $("#products").empty().trigger("change");
+                // if (result.data && result.data.length > 0) {
+                //     result.data.forEach(function (p) {
+                //         $("#products").append(
+                //             $("<option>", {
+                //                 value: "",
+                //                 text: "Select product",
+                //             }),
+                //             $("<option>", {
+                //                 value: p.id,
+                //                 text: p.name,
+                //                 "data-name": p.name,
+                //                 "data-price": p.price,
+                //                 "data-quantity": p.quantity,
+                //             })
+                //         );
+                //     });
+                //     $("#products").trigger("change");
+                // }
             },
         });
     }
@@ -1089,29 +1086,66 @@ $(document).ready(function () {
             },
             dataType: "json",
             success: function (result) {
-                $("#products").empty().trigger("change");
-                if (result.data && result.data.length > 0) {
-                    result.data.forEach(function (p) {
-                        $("#products").append(
-                            $("<option>", {
-                                value: "",
-                                text: "Select product",
-                            }),
-                            $("<option>", {
-                                value: p.id,
-                                text: p.name,
-                                "data-name": p.name,
-                                "data-price": p.price,
-                                "data-quantity": p.quantity,
-                            })
-                        );
-                    });
-                    $("#products").trigger("change");
-                }
+                populateProducts(result.data || []);
+                // $("#products").empty().trigger("change");
+                // if (result.data && result.data.length > 0) {
+                //     result.data.forEach(function (p) {
+                //         $("#products").append(
+                //             $("<option>", {
+                //                 value: "",
+                //                 text: "Select product",
+                //             }),
+                //             $("<option>", {
+                //                 value: p.id,
+                //                 text: p.name,
+                //                 "data-name": p.name,
+                //                 "data-price": p.price,
+                //                 "data-quantity": p.quantity,
+                //             })
+                //         );
+                //     });
+                //     $("#products").trigger("change");
+                // }
             },
         });
     }
 });
+
+function populateProducts(optionsList) {
+    const $sel = $('#products');
+
+    // only init/destroy if select2 is present
+    if ($sel.data('select2')) {
+        $sel.select2('destroy');
+    }
+
+    $sel.empty();
+
+    // Add default option once
+    $sel.append($('<option>', { value: '', text: 'Select product' }));
+
+    if (Array.isArray(optionsList) && optionsList.length) {
+        optionsList.forEach(function (p) {
+            $sel.append($('<option>', {
+                value: p.id,
+                text: p.name,
+                'data-name': p.name,
+                'data-price': p.price,
+                'data-quantity': p.quantity
+            }));
+        });
+    }
+
+    // Re-init select2 (only if plugin loaded)
+    if ($.fn.select2) {
+        $sel.select2({ placeholder: 'Select Product...', allowClear: true });
+    } else {
+        console.error('Select2 not loaded');
+    }
+
+    // ensure no selection
+    $sel.val('').trigger('change');
+}
 
 $("#save-customer").click(function () {
     document.getElementById("new-task").value = "New Customer";

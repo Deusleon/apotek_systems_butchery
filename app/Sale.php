@@ -34,12 +34,7 @@ class Sale extends Model
 
     public function salesDetail()
     {
-        return $this->hasMany(SalesDetail::class, 'sales_id');
-    }
-
-    public function salesDetails()
-    {
-        return $this->hasMany(SalesDetail::class, 'sales_id');
+        return $this->hasMany(SalesDetail::class, 'sale_id');
     }
 
     public function user()

@@ -62,7 +62,7 @@ $("#products").on("change", function () {
                 fetchProducts();
                 refreshSalesTable(response.data);
                 isCartEmpty(response.data.sales_details.length);
-                console.log("response", response);
+                // console.log("response", response);
                 // notify(response.message, "top", "right", "success");
                 document.getElementById("sub_total").value = formatNumber(
                     Number(response.data.sub_total),
@@ -98,7 +98,7 @@ $("#customer_id").on("change", function () {
             },
             success: function (response) {
                 fetchProducts();
-                console.log("response", response);
+                // console.log("response", response);
             },
             error: function (xhr) {
                 notify("Failed", "top", "right", "danger");
@@ -121,7 +121,7 @@ $("#price_category").on("change", function () {
             },
             success: function (response) {
                 fetchProducts();
-                console.log("response", response);
+                // console.log("response", response);
             },
             error: function (xhr) {
                 notify("Failed", "top", "right", "danger");

@@ -37,76 +37,78 @@
             <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
                 <li class="nav-item">
                     <a class="nav-link active text-uppercase" id="sales-history-tablist" data-toggle="pill"
-                       href="{{ route('sale-histories.SalesHistory') }}" role="tab"
-                       aria-controls="sales_history" aria-selected="true">Sales History</a>
+                        href="{{ route('sale-histories.SalesHistory') }}" role="tab" aria-controls="sales_history"
+                        aria-selected="true">Sales History</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" id="sales-return-tablist" data-toggle="pill"
-                       href="{{ route('sale-returns.index') }}" role="tab"
-                       aria-controls="sales_returns" aria-selected="false">Returns
+                        href="{{ route('sale-returns.index') }}" role="tab" aria-controls="sales_returns"
+                        aria-selected="false">Returns
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" id="sales-approval-tablist" data-toggle="pill"
-                       href="{{ route('sale-returns-approval.getSalesReturn') }}" role="tab"
-                       aria-controls="sales_returns" aria-selected="false">Approval
+                        href="{{ route('sale-returns-approval.getSalesReturn') }}" role="tab" aria-controls="sales_returns"
+                        aria-selected="false">Approval
                     </a>
                 </li>
             </ul>
             <div class="tab-content" id="myTabContent">
 
-                 {{-- Sales History Start --}}
-                <div class="tab-pane fade show active" id="sales-history" role="tabpanel" aria-labelledby="sales_history-tab">
-                <input type="hidden" value="{{$vat}}" id="vat">
-                <div class="form-group row">
-                    <div class="col-md-6"></div>
-                    <div class="col-md-3" style="margin-left: 2.5%">
-                        <label style="margin-left: 80%" for="filter" class="col-form-label text-md-right">Date:</label>
-                    </div>
-                    <div class="col-md-3" style="margin-left: -3.4%">
-                        <input style="width: 103.4%;" type="text" class="form-control" id="daterange"/>
-                    </div>
-
-                </div>
-                <form id="sale_receipt_reprint" action="{{route('sale-reprint-receipt')}}" method="post"
-                      enctype="multipart/form-data" target="_blank">
-                    @csrf()
-
-                    <div class="table-responsive" id="sales">
-
-                        <table id="sale_history_table" class="display table nowrap table-striped table-hover dataTable no-footer"
-                               style="width:100%">
-
-                            <thead>
-                            <tr>
-                                <th>Receipt #</th>
-                                <th>Date</th>
-                                <th>Customer</th>
-                                <th>Sub Total</th>
-                                <th>VAT</th>
-                                <th>Discount</th>
-                                <th>Amount</th>
-                                <th>Action</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-
-                        </table>
+                {{-- Sales History Start --}}
+                <div class="tab-pane fade show active" id="sales-history" role="tabpanel"
+                    aria-labelledby="sales_history-tab">
+                    <input type="hidden" value="{{$vat}}" id="vat">
+                    <div class="form-group row">
+                        <div class="col-md-6"></div>
+                        <div class="col-md-3" style="margin-left: 2.5%">
+                            <label style="margin-left: 80%" for="filter" class="col-form-label text-md-right">Date:</label>
+                        </div>
+                        <div class="col-md-3" style="margin-left: -3.4%">
+                            <input style="width: 103.4%;" type="text" class="form-control" id="daterange" />
+                        </div>
 
                     </div>
+                    <form id="sale_receipt_reprint_form" action="{{route('sale-reprint-receipt')}}" method="post"
+                        enctype="multipart/form-data" target="_blank">
+                        @csrf()
 
-                    <!-- ajax loading gif -->
-                    <div id="loading">
-                        <image id="loading-image" src="{{asset('assets/images/spinner.gif')}}"></image>
-                    </div>
+                        <div class="table-responsive" id="sales">
 
-                    <input type="hidden" value="" id="category">
-                    <input type="hidden" value="" id="customers">
-                    <input type="hidden" value="" id="print" name="reprint_receipt">
-                    <input type="hidden" value="" id="fixed_price">
+                            <table id="sale_history_dataTable"
+                                class="display table nowrap table-striped table-hover dataTable no-footer"
+                                style="width:100%">
 
-                </form>
+                                <thead>
+                                    <tr>
+                                        <th>Receipt #</th>
+                                        <th>Date</th>
+                                        <th>Customer</th>
+                                        <th>Sub Total</th>
+                                        <th>VAT</th>
+                                        <th>Discount</th>
+                                        <th>Amount</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                        <!-- ajax loading gif -->
+                        <div id="loading">
+                            <image id="loading-image" src="{{asset('assets/images/spinner.gif')}}"></image>
+                        </div>
+
+                        <input type="hidden" value="" id="category">
+                        <input type="hidden" value="" id="customers">
+                        <input type="hidden" value="" id="print" name="reprint_receipt">
+                        <input type="hidden" value="" id="fixed_price">
+
+                    </form>
                 </div>
                 {{-- Sales History End --}}
 
@@ -116,26 +118,27 @@
                         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
                             <li class="nav-item">
                                 <a class="nav-link active text-uppercase" id="sales-return-tablist" data-toggle="pill"
-                                   href="#sales-return" role="tab"
-                                   aria-controls="sales_return" aria-selected="true">Return</a>
+                                    href="#sales-return" role="tab" aria-controls="sales_return"
+                                    aria-selected="true">Return</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-uppercase" id="returns-approval-tablist" data-toggle="pill"
-                                   href="#sales-return-approval" role="tab"
-                                   aria-controls="sales_return_approval" aria-selected="false">Approval
+                                    href="#sales-return-approval" role="tab" aria-controls="sales_return_approval"
+                                    aria-selected="false">Approval
                                 </a>
                             </li>
                         </ul>
                         <div class="card-block">
                             <div class="tab-content" id="myTabContent">
                                 {{-- Sales Return Start--}}
-                                <div class="tab-pane fade show active" id="sales-return" role="tabpanel" aria-labelledby="sales_return-tab">
-                                    <input type="hidden" value="{{$vat}}" id="vat">
+                                {{-- <div class="tab-pane fade show active" id="sales-return" role="tabpanel"
+                                    aria-labelledby="sales_return-tab">
                                     <div class="table-responsive" id="items" style="display: none;">
-                                        {{--                    <h4>Sale Items List</h4>--}}
-                                        <table id="items_table" class="table nowrap table-striped table-hover" width="100%"></table>
+                                        <table id="items_table" class="table nowrap table-striped table-hover" width="100%">
+                                        </table>
                                         <div class="btn-group" style="float: right; margin-right: 4%; margin-top: 2%">
-                                            <button class="btn btn-sm btn-rounded btn-danger" onclick="return false" id="cancel">Back
+                                            <button class="btn btn-sm btn-rounded btn-danger" onclick="return false"
+                                                id="cancel">Back
                                             </button>
                                         </div>
                                     </div>
@@ -146,35 +149,35 @@
                                             </div>
                                             <div class="col-md-3" style="margin-left: 2.5%">
                                                 <label style="margin-left: 80%" for="issued_date"
-                                                       class="col-form-label text-md-right">Date:</label>
+                                                    class="col-form-label text-md-right">Date:</label>
                                             </div>
                                             <div class="col-md-3" style="margin-left: -3.1%">
-                                                <input style="width: 103.4%;" type="text" name="expire_date" class="form-control"
-                                                       id="sold_date"
-                                                       onchange="getSales()">
+                                                <input style="width: 103.4%;" type="text" name="expire_date"
+                                                    class="form-control" id="sold_date" onchange="getSales()">
                                             </div>
                                             <div class="col-md-6" hidden>
 
                                             </div>
                                             <div class="form-group col-md-6" hidden>
                                                 <label for="Seach">Search</label>
-                                                <input type="text" class="form-control" id="searching_sales" placeholder="Search"/>
+                                                <input type="text" class="form-control" id="searching_sales"
+                                                    placeholder="Search" />
                                             </div>
                                         </div>
                                         <div class="table-responsive">
-                                            <table id="sale_list_return_table" class="display table nowrap table-striped table-hover"
-                                                   style="width:100%">
+                                            <table id="sale_list_return_table"
+                                                class="display table nowrap table-striped table-hover" style="width:100%">
                                                 <thead>
-                                                <tr>
-                                                    <th>Receipt #</th>
-                                                    <th>Date</th>
-                                                    <th>Customer</th>
-                                                    <th>Sub Total</th>
-                                                    <th>VAT</th>
-                                                    <th>Discount</th>
-                                                    <th>Amount</th>
-                                                    <th>Action</th>
-                                                </tr>
+                                                    <tr>
+                                                        <th>Receipt #</th>
+                                                        <th>Date</th>
+                                                        <th>Customer</th>
+                                                        <th>Sub Total</th>
+                                                        <th>VAT</th>
+                                                        <th>Discount</th>
+                                                        <th>Amount</th>
+                                                        <th>Action</th>
+                                                    </tr>
                                                 </thead>
                                                 <tbody>
 
@@ -184,32 +187,23 @@
                                         </div>
                                     </div>
 
-                                    <!-- ajax loading gif -->
-                                    <div id="loading">
-                                        <image id="loading-image" src="{{asset('assets/images/spinner.gif')}}"></image>
-                                    </div>
-
-                                    <input type="hidden" value="" id="category">
-                                    <input type="hidden" value="" id="customers">
-                                    <input type="hidden" value="" id="print">
-                                    <input type="hidden" value="" id="fixed_price">
-
-                                </div>
+                                </div> --}}
                                 {{-- Sales Return End--}}
 
                                 {{-- Sales Return Approval Start--}}
-                                <div class="tab-pane fade" id="sales-return-approval" role="tabpanel" aria-labelledby="sales_return_approval-tab">
+                                {{-- <div class="tab-pane fade" id="sales-return-approval" role="tabpanel"
+                                    aria-labelledby="sales_return_approval-tab">
                                     <div class="form-group row">
                                         <div class="col-md-6">
 
                                         </div>
                                         <div class="col-md-3" style="margin-left: 2.5%">
                                             <label style="margin-left: 74%" for=""
-                                                   class="col-form-label text-md-right">Status:</label>
+                                                class="col-form-label text-md-right">Status:</label>
                                         </div>
                                         <div class="col-md-3" style="margin-left: -3.2%;">
-                                            <select id="retun_status"
-                                                    class="js-example-basic-single form-control" onchange="getRetunedProducts()">
+                                            <select id="retun_status" class="js-example-basic-single form-control"
+                                                onchange="getRetunedProducts()">
                                                 <option value="2">Pending</option>
                                                 <option value="3">Approved</option>
                                                 <option value="4">Rejected</option>
@@ -222,25 +216,26 @@
                                         </div>
                                         <div class="col-md-3" style="margin-left: 2.5%">
                                             <label style="margin-left: 78%" for=""
-                                                   class="col-form-label text-md-right">Date:</label>
+                                                class="col-form-label text-md-right">Date:</label>
                                         </div>
                                         <div class="col-md-3" style="margin-left: -3.4%;">
                                             <input style="width: 104%;" type="text" class="form-control" id="returned_date"
-                                                   onchange="getRetunedProducts()">
+                                                onchange="getRetunedProducts()">
                                         </div>
                                     </div>
                                     <div class="table-responsive">
-                                        <table id="return_table" class="display table nowrap table-striped table-hover" style="width:100%">
+                                        <table id="return_table" class="display table nowrap table-striped table-hover"
+                                            style="width:100%">
                                             <thead>
-                                            <tr>
-                                                <th>Product Name</th>
-                                                <th>Buy Date</th>
-                                                <th>Qty Bought</th>
-                                                <th>Return Date</th>
-                                                <th>Qty Returned</th>
-                                                <th>Refund</th>
-                                                <th>Action</th>
-                                            </tr>
+                                                <tr>
+                                                    <th>Product Name</th>
+                                                    <th>Buy Date</th>
+                                                    <th>Qty Bought</th>
+                                                    <th>Return Date</th>
+                                                    <th>Qty Returned</th>
+                                                    <th>Refund</th>
+                                                    <th>Action</th>
+                                                </tr>
                                             </thead>
                                             <tbody>
 
@@ -248,18 +243,8 @@
 
                                         </table>
 
-                                        <!-- ajax loading gif -->
-                                        <div id="loading">
-                                            <image id="loading-image" src="{{asset('assets/images/spinner.gif')}}"></image>
-                                        </div>
-
-                                        <input type="hidden" value="" id="category">
-                                        <input type="hidden" value="" id="customers">
-                                        <input type="hidden" value="" id="print">
-                                        <input type="hidden" value="" id="fixed_price">
-
                                     </div>
-                                </div>
+                                </div> --}}
                                 {{-- Sales Return Approval End--}}
 
                             </div>
@@ -292,65 +277,15 @@
         var config = {
             token: '{{ csrf_token() }}',
             routes: {
-                salesDetails: '{{route('sale_detail')}}'
+                salesDetails: '{{route('sale_detail')}}',
+                getSalesHistory: '{{route('getSalesHistory')}}',
+                getSalesHistoryData: '{{ route('getSalesHistoryData') }}'
             }
         };
 
-        // Populate Data to table
-        function populateTable(data) {
-            var tableBody = $('#sales_history_table tbody');
-            tableBody.empty(); // Clear any existing rows
-
-            // Loop through the data and append rows to the table
-            data.forEach(function(item) {
-                var row = '<tr>' +
-                    '<td>' + item.name + '</td>' +
-                    '<td>' + item.price + '</td>' +
-                    '<td>' + Math.floor(item.quantity,0) + '</td>' +
-                    '<td>' + item.customer_name + '</td>' +
-                    '</tr>';
-                tableBody.append(row);
-            });
-        }
-
-        //Display
-        $('#sale-details').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var id = button.data('id');
-
-            var tableBody = $('#sales_history_table tbody');
-            tableBody.html('<tr><td colspan="4" class="text-center">Loading...</td></tr>');
-
-            $.ajax({
-                url: config.routes.salesDetails,
-                type: 'POST', // Make sure to use POST
-                data: {
-                    _token: config.token, // CSRF token
-                    receipt_number: id
-                },
-                dataType: 'json', // Specify JSON format
-                success: function(response) {
-                    // Populate the table with the fetched data
-                    console.log(response);
-                    populateTable(response);
-                    // console.log(response);
-                },
-                error: function(xhr, status, error) {
-                    console.log('Error fetching data: ', error);
-                }
-            });
-
-        });
-
-        //Datatable format on the table
-        $('#sales_history_table').DataTable({
-            responsive: true,
-            order: [[0, 'asc']],
-            searching: true
-        });
     </script>
 
-    <script src="{{asset("assets/apotek/js/sales.js")}}"></script>
+    <script src="{{asset("assets/apotek/js/sales_history.js")}}"></script>
     <script type="text/javascript">
 
         $.ajaxSetup({
@@ -359,106 +294,10 @@
             }
         });
 
-
-        function getHistory() {
-            var range = document.getElementById('daterange').value;
-            range = range.split('-');
-
-            $("#sale_history_table").dataTable().fnDestroy();
-
-            $('#sale_history_table').DataTable({
-                "processing": true,
-                "serverSide": true,
-                "ajax": {
-                    "url": config_sales_history.routes.getSalesHistory,
-                    "dataType": "json",
-                    "type": "post",
-                    "cache": false,
-                    "data": {
-                        _token: "{{csrf_token()}}",
-                        range: range
-                    }
-                },
-                "columns": [
-                    {'data': 'receipt_number'},
-                    {
-                        'data': 'date', render: function (date) {
-                            return moment(date).format('D-M-YYYY');
-                        }
-                    },
-                    {'data': 'customer', render: function (customer) {
-                            if(customer) {
-                                return customer.name
-                            }
-                            return '';
-                        }
-                    },
-
-                    {   'data': 'cost', render: function (cost) {
-                            if(cost) {
-                                return formatMoney(((cost.amount - cost.discount) / (1 + (cost.vat / cost.sub_total))));
-                            }
-                            return '';
-                        }
-                    },
-
-                    {
-                        'data': 'cost', render: function (cost) {
-                            if(cost) {
-                            return formatMoney(((cost.amount - cost.discount) * (cost.vat / cost.sub_total)));
-                            }
-                            return '';
-                        }
-                    },
-                    {
-                        'data': 'cost', render: function (cost) {
-                            if(cost) {
-                                return formatMoney(cost.discount);
-                            }
-                            return '';
-                        }
-                    },
-                    {
-                        'data': 'cost', render: function (cost) {
-                            if(cost) {
-                                return formatMoney(((cost.amount - cost.discount)));
-                            }
-                            return '';
-                        }
-                    },
-                    {
-                        'data': "action",
-                        render: function (data, type, row) {
-                            return `<button type='button' data-toggle="modal" data-target="#sale-details" class='btn btn-sm btn-rounded btn-success' data-id='${row.receipt_number}'>Show</button>
-                        <button type='submit' id='sale_receipt_reprint' class='btn btn-sm btn-rounded btn-secondary'>
-                            <span class='fa fa-print' aria-hidden='true'></span>Print</button>`;
-                        }
-                    }
-                ], aaSorting: [[1, 'desc']],
-                "columnDefs": [
-                    {"orderable": false, "targets": [3, 4, 5, 6, 7]}
-                ]
-
-            });
-
-        }
-
-
-
-
-        $('#sale_history_table tbody').on('click', '#sale_receipt_reprint', function () {
-            var row_data = $('#sale_history_table').DataTable().row($(this).parents('tr')).data();
-            document.getElementById("print").value = row_data.receipt_number;
-        });
-
-
-        var config_sales_history = {
-            token: '{{ csrf_token() }}',
-            routes: {
-                getSalesHistory: '{{route('getSalesHistory')}}'
-
-            }
-        };
+        // $('#sale_history_table tbody').on('click', '#sale_receipt_reprint', function () {
+        //     var row_data = $('#sale_history_table').DataTable().row($(this).parents('tr')).data();
+        //     document.getElementById("print").value = row_data.receipt_number;
+        // });
 
     </script>
     <script type="text/javascript">
@@ -468,17 +307,22 @@
             var end = moment();
 
             function cb(start, end) {
-                $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                // Display format tu
+                $('#daterange').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
             }
 
             $('#daterange').daterangepicker({
                 startDate: moment().startOf('month'),
                 endDate: end,
+                autoUpdateInput: true,
+                locale: {
+                    format: 'YYYY/MM/DD' 
+                },
                 ranges: {
                     'Today': [moment(), moment()],
                     'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                     'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    // 'Last 30 Days': [moment().subtract(29, 'days'), moment()],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
                     'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
                     'This Year': [moment().startOf('year'), moment()]
@@ -491,13 +335,13 @@
 
     </script>
 
-    {{-- Return Sale  --}}
+    {{-- Return Sale --}}
     @include('partials.notification')
     <script src="{{asset("assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js")}}"></script>
     <script src="{{asset("assets/js/pages/ac-datepicker.js")}}"></script>
 
 
-   {{-- Date Functions   --}}
+    {{-- Date Functions --}}
     <script type="text/javascript">
 
         $.ajaxSetup({
@@ -512,18 +356,21 @@
             var end = moment();
 
             function cb(start, end) {
-                $('#sold_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                $('#daterange').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
             }
 
             $('#sold_date').daterangepicker({
                 startDate: moment().startOf('month'),
                 endDate: moment().endOf('month'),
                 autoUpdateInput: true,
+                locale: {
+                    format: 'YYYY/MM/DD' 
+                },
                 ranges: {
                     'Today': [moment(), moment()],
                     'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                     'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    // 'Last 30 Days': [moment().subtract(29, 'days'), moment()],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
                     'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
                     'This Year': [moment().startOf('year'), moment()]
@@ -558,14 +405,15 @@
                     }
                 },
                 "columns": [
-                    {'data': 'receipt_number'},
+                    { 'data': 'receipt_number' },
                     {
                         'data': 'date', render: function (date) {
                             return moment(date).format('D-M-YYYY');
                         }
                     },
-                    {'data': 'customer', render: function (customer) {
-                            if(customer) {
+                    {
+                        'data': 'customer', render: function (customer) {
+                            if (customer) {
                                 return customer.name
                             }
                             return '';
@@ -573,7 +421,7 @@
                     },
                     {
                         'data': 'cost', render: function (cost) {
-                            if(cost) {
+                            if (cost) {
                                 return formatMoney(((cost.amount - cost.discount) / (1 + (cost.vat / cost.sub_total))));
                             }
                             return '';
@@ -582,7 +430,7 @@
 
                     {
                         'data': 'cost', render: function (cost) {
-                            if(cost) {
+                            if (cost) {
                                 return formatMoney(((cost.amount - cost.discount) * (cost.vat / cost.sub_total)));
                             }
                             return '';
@@ -595,7 +443,7 @@
                     },
                     {
                         'data': 'cost', render: function (cost) {
-                            if(cost) {
+                            if (cost) {
                                 return formatMoney(((cost.amount - cost.discount)));
                             }
                             return '';
@@ -607,7 +455,7 @@
                     }
                 ], aaSorting: [[1, 'desc']],
                 "columnDefs": [
-                    {"orderable": false, "targets": [3, 4, 5, 6, 7]}
+                    { "orderable": false, "targets": [3, 4, 5, 6, 7] }
                 ]
 
             });
@@ -623,7 +471,7 @@
     </script>
 
 
-    {{-- Return Sale Approval    --}}
+    {{-- Return Sale Approval --}}
     <script type="text/javascript">
 
         $(function () {
@@ -631,7 +479,8 @@
             var end = moment();
 
             function cb(start, end) {
-                $('#returned_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                // Display format tu
+                $('#daterange').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
             }
 
             $('#returned_date').daterangepicker({
@@ -717,7 +566,7 @@
             bInfo: true,
             // dom: 't',
             columns: [
-                {data: 'item_returned.name'},
+                { data: 'item_returned.name' },
                 {
                     data: 'item_returned.b_date', render: function (date) {
                         return moment(date).format('D-MM-YYYY');
@@ -761,23 +610,23 @@
     </script>
 
 
-   {{--    Tabs Control--}}
+    {{-- Tabs Control--}}
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Listen for the click event on the Transfer History tab
-            $('#sales-history-tablist').on('click', function(e) {
+            $('#sales-history-tablist').on('click', function (e) {
                 e.preventDefault(); // Prevent default tab switching behavior
                 var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
                 window.location.href = redirectUrl; // Redirect to the URL
             });
 
-            $('#sales-return-tablist').on('click', function(e) {
+            $('#sales-return-tablist').on('click', function (e) {
                 e.preventDefault(); // Prevent default tab switching behavior
                 var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
                 window.location.href = redirectUrl; // Redirect to the URL
             });
 
-            $('#sales-approval-tablist').on('click', function(e) {
+            $('#sales-approval-tablist').on('click', function (e) {
                 e.preventDefault(); // Prevent default tab switching behavior
                 var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
                 window.location.href = redirectUrl; // Redirect to the URL
@@ -786,10 +635,5 @@
 
 
     </script>
-
-
-
-
-
 
 @endpush

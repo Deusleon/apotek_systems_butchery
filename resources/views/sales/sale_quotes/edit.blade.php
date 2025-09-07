@@ -347,7 +347,7 @@
                     },
                     success: function(response) {
                         if (response.status === 'success') {
-                            console.log('response', response);
+                            // console.log('response', response);
                             // notify(response.message, 'top', 'right', 'success');
                             document.getElementById('sub_total').value = formatNumber(Number(response.data.sub_total), 2);
                             document.getElementById('total_vat').value = formatNumber(Number(response.data.vat), 2);

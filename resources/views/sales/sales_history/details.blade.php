@@ -8,6 +8,11 @@
         </button>
       </div>
       <div class="modal-body">
+            <div>
+              <div>Receipt Number: <span id="receipt_no" class="text-body"></span></div> 
+              <div>Custmer Name: <span id="customer_name" class="text-body"></span> </div>
+              <div>Date: <span id="sales_date" class="text-body"></span> </div>
+            </div>
             <div class="table-responsive">
               <table id="sales_history_table" class="table nowrap table-striped table-hover" width="100%">
                   <thead>
@@ -15,7 +20,6 @@
                       <th>Product Name</th>
                       <th>Price</th>
                       <th>Quantity</th>
-                      <th>Customer Name</th>
                   </tr>
                   </thead>
                   <tbody>

@@ -341,7 +341,7 @@
                 },
                 type: 'GET',
                 success: function (data) {
-                    console.log('QuotesData', data);
+                    // console.log('QuotesData', data);
                     quotes_table.clear();
                     quotes_table.rows.add(data)
                     quotes_table.draw();
@@ -399,7 +399,7 @@
                     {
                         data: 'date',
                         render: function (date) {
-                            return moment(date).format('DD-MM-YYYY');
+                            return moment(date).format('YYYY-MM-DD');
                         }
                     },
                     {
@@ -416,27 +416,41 @@
                             receipt_url = receipt_url.replace('receipt_id', row.id);
                             update_url = update_url.replace('receipt_id', row.id);
 
-                            return `
-                                                                                                        <button class="btn btn-sm btn-rounded btn-success" type="button"
-                                                                                                                onclick='showQuoteDetails(event)'
-                                                                                                                id="quote_details">Show
-                                                                                                        </button>
+                            let buttons = `
+                                    <button class="btn btn-sm btn-rounded btn-success" type="button"
+                                            onclick="showQuoteDetails(event)"
+                                            id="quote_details">Show
+                                    </button>
+                                    <a href="${receipt_url}" target="_blank">
+                                        <button class="btn btn-sm btn-rounded btn-secondary" type="button">
+                                            <span class="fa fa-print" aria-hidden="true"></span>
+                                            Print
+                                        </button>
+                                    </a>`;
 
-                                                                                                        <a class="btn btn-sm btn-rounded btn-info" type="button"
-                                                                                                                href='${update_url}'
-                                                                                                                >Edit
-                                                                                                        </a>
+                            if (data.status === 1) {
+                                buttons += `
 
-                                                                                                        <a href="${receipt_url}" target="_blank">
-                                                                                                            <button class="btn btn-sm btn-rounded btn-secondary" type="button"><span
-                                                                                                                    class='fa fa-print' aria-hidden='true'></span>
-                                                                                                                Print
-                                                                                                            </button>
-                                                                                                        </a>
-
-                                                                                                        <button class="btn btn-sm btn-rounded btn-warning" type="button" onclick="convertQuoteToSale(${row.id})">Convert</button>
-                                                                                                `;
-
+                                    <a class="btn btn-sm btn-rounded btn-info"
+                                    href="${update_url}">
+                                    Edit
+                                    </a>
+                                        <button class="btn btn-sm btn-rounded btn-warning"
+                                                type="button"
+                                                onclick="convertQuoteToSale(${row.id})">
+                                            Convert
+                                        </button>
+                                    `;
+                            }else{
+                                buttons += `
+                                        <button class="btn btn-sm btn-rounded btn-primary opacity-75"
+                                                type="button"
+                                                disabled>
+                                            Sold
+                                        </button>
+                                    `;
+                            }
+                            return buttons;
                         }
                     },
                     {
@@ -540,12 +554,6 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div>
-                        Are you sure to convert this sales order? This action cannot be undone!.
-                    </div>
-                    <div class="form-text mb-3">
-                        Stock quantities will be automatically deducted from inventory. Fill the details below to preoceed
-                    </div>
                     <div class="form-group">
                         <label for="professionalSaleType" class="font-weight-bold">Sale Type <span
                                 class="text-danger">*</span></label>
@@ -568,7 +576,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal" title="Close">Close</button>
                     <button type="button" id="convert_to_sale" class="btn btn-primary btn-convert-order"
-                        onclick="convertToSale()" title="Convert Order">
+                        onclick="convertionConfirm()" title="Convert Order">
                         Convert
                     </button>
                 </div>
@@ -664,18 +672,12 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p>Are you sure you want to convert this Sales Order to a Sale?</p>
-                    <div class="form-group">
-                        <label for="saleType">Sale Type:</label>
-                        <select class="form-control" id="saleType">
-                            <option value="cash">Cash</option>
-                            <option value="credit">Credit</option>
-                        </select>
-                    </div>
+                    <p class="mb-3">Are you sure you want to convert this Sales Order to a Sale? This action cannot be undone!.</p>
+                    <p>Stock quantities will be automatically deducted from inventory.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-warning" id="confirmConvertBtn">Yes, Convert</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="convertToSale()">Yes, Convert</button>
                 </div>
             </div>
         </div>
@@ -721,7 +723,7 @@
 
     function salesType() {
         var type = document.getElementById('salesType').value;
-        console.log('Sale type changed: ', type);
+        // console.log('Sale type changed: ', type);
         if (type === 'credit') {
             document.getElementById('gracePeriod').setAttribute('required', 'required');
             document.getElementById('gracePeriodDiv').style.display = "block";
@@ -729,6 +731,14 @@
             document.getElementById('gracePeriodDiv').style.display = "none";
         }
     };
+    
+    function convertionConfirm() {
+        $('#professionalConvertModal').off('hidden.bs.modal').one('hidden.bs.modal', function () {
+            $('#convertConfirmModal').modal('show');
+        });
+
+        $('#professionalConvertModal').modal('hide');
+    }
 
     function convertToSale() {
         const quoteId = document.getElementById('convert_id').value;
@@ -752,7 +762,7 @@
             },
             success: function (response) {
                 console.log('Response is: ', response);
-                $('#professionalConvertModal').modal('hide');
+                $('#convertConfirmModal').modal('hide');
 
                 if (response.status === 'success' && response.sale_id) {
                     // Show success modal with document links
@@ -791,83 +801,16 @@
                 }
             },
             error: function (xhr, status, error) {
-                $('#professionalConvertModal').modal('hide');
+                $('#convertConfirmModal').modal('hide');
                 console.error('Conversion Error:', xhr.responseText);
-                showAlert('error', 'Conversion Error', 'An error occurred: ' + error);
+                notify('An error occurred: ' + error, "top", "right", "danger")
             },
             complete: function () {
-                $('#confirmProfessionalConvert').prop('disabled', false).html('Yes, Convert');
+                $('#convertConfirmModal').prop('disabled', false).html('Yes, Convert');
                 pendingConvertQuoteId = null;
             }
         });
     };
-
-    // Professional conversion handling
-    $(document).ready(function () {
-        $('#confirmProfessionalConvert').on('click', function () {
-            if (!pendingConvertQuoteId) return;
-
-            var saleType = $('#professionalSaleType').val();
-            var conversionNotes = $('#conversionNotes').val().trim();
-
-            // Disable button and show loading
-            $(this).prop('disabled', true).html('<i class = "fas fa-spinner fa-spin" ></i > Converting...');
-
-            $.ajax({
-                url: '{{ route('convert-to-sales') }}',
-                type: 'POST',
-                data: {
-                    quote_id: pendingConvertQuoteId,
-                    sale_type: saleType,
-                    notes: conversionNotes,
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function (response) {
-                    $('#professionalConvertModal').modal('hide');
-
-                    if (response.status === 'success' && response.sale_id) {
-                        // Show success modal with document links
-                        $('#convertedSaleId').text(response.sale_id);
-                        $('#convertedSaleType').text(saleType);
-                        $('#convertedReceiptNumber').text(response.receipt_number || 'N/A');
-
-                        // Update modal with additional info if available
-                        if (response.tax_invoice_number) {
-                            $('#convertedTaxInvoiceNumber').text(response.tax_invoice_number);
-                        }
-                        if (response.delivery_note_number) {
-                            $('#convertedDeliveryNoteNumber').text(response.delivery_note_number);
-                        }
-
-                        // Set document links
-                        $('#invoiceLink').attr('href', '{{ route('generate-tax-invoice', '') }}/' + response.quote_id);
-                        $('#deliveryNoteLink').attr('href', '{{ route('generate-delivery-note', '') }}/' + response.sale_id);
-                        $('#receiptLink').attr('href', '{{ route('getCashReceipt', '') }}/' + response.sale_id);
-
-                        $('#successModal').modal('show');
-
-                        // Refresh the table
-                        if (typeof getQuotes === 'function') {
-                            getQuotes();
-                        } else if (quotes_table && quotes_table.ajax) {
-                            quotes_table.ajax.reload();
-                        }
-                    } else {
-                        showAlert('error', 'Conversion Failed', response.message || 'Unknown error occurred');
-                    }
-                },
-                error: function (xhr, status, error) {
-                    $('#professionalConvertModal').modal('hide');
-                    console.error('Conversion Error:', xhr.responseText);
-                    showAlert('error', 'Conversion Error', 'An error occurred: ' + error);
-                },
-                complete: function () {
-                    $('#confirmProfessionalConvert').prop('disabled', false).html('Yes, Convert');
-                    pendingConvertQuoteId = null;
-                }
-            });
-        });
-    });
 
     // Professional alert function
     function showAlert(type, title, message) {
