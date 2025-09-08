@@ -9,10 +9,10 @@ use App\SalesCredit;
 use App\SalesDetail;
 use App\SalesReturn;
 use App\Setting;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use View;
+use Illuminate\Support\Facades\View;
 
 class SaleReturnController extends Controller
 {
@@ -28,22 +28,6 @@ class SaleReturnController extends Controller
             ->with(compact('sales'))
             ->with(compact('count'));
     }
-
-//    public function getSales(Request $request)
-//    {
-//        $from = $request->date[0];
-//        $to = $request->date[1];
-//        $user = Auth::user()->id;
-//        $sales = Sale::where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
-//            ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
-//            ->get();
-//        foreach ($sales as $sale) {
-//            $sale->cost;
-//            $sale->details;
-//        }
-//        $data = json_decode($sales, true);
-//        return $data;
-//    }
 
     public function getSales(Request $request)
     {
@@ -117,7 +101,6 @@ class SaleReturnController extends Controller
 
 
     }
-
     public function getRetunedProducts(Request $request)
     {
         if ($request->action == "approve") {
@@ -131,21 +114,21 @@ class SaleReturnController extends Controller
         if ($request->status == 4) {
             $returns = SalesReturn::join('sales_details', 'sales_details.id', '=', 'sales_returns.sale_detail_id')
                 ->where('sales_details.status', '=', 4)
-                ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
-                ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
+                ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '>=', $from)
+                ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '<=', $to)
                 ->get();
         } else if ($request->status == 3) {
             $returns = SalesReturn::join('sales_details', 'sales_details.id', '=', 'sales_returns.sale_detail_id')
                 ->where('sales_details.status', '=', 3)
                 ->orWhere('sales_details.status', '=', 5)
-                ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
-                ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
+                ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '>=', $from)
+                ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '<=', $to)
                 ->get();
         } else {
             $returns = SalesReturn::join('sales_details', 'sales_details.id', '=', 'sales_returns.sale_detail_id')
                 ->where('sales_details.status', '=', 2)
-                ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
-                ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
+                ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '>=', $from)
+                ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '<=', $to)
                 ->get();
         }
 

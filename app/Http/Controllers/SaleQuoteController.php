@@ -75,7 +75,9 @@ class SaleQuoteController extends Controller {
         }
 
         $price_category = PriceCategory::all();
-        $sale_quotes = SalesQuote::orderBy( 'id', 'DESC' )
+        $sale_quotes = SalesQuote::orderBy( 'sales_quotes.id', 'DESC' )
+        ->join( 'sales_quote_details', 'sales_quote_details.quote_id', '=', 'sales_quotes.id' )
+        ->select( 'sales_quote_details.status' )
         ->where( 'store_id', '=', $store_id )
         ->get();
         $customers = Customer::orderBy( 'name', 'ASC' )->get();
@@ -97,9 +99,20 @@ class SaleQuoteController extends Controller {
         $date_range = explode( '-', $request->date );
         $from = date( 'Y-m-d', strtotime( trim( $date_range[ 0 ] ) ) );
         $to = date( 'Y-m-d', strtotime( trim( $date_range[ 1 ] ) ) );
-        $sale_quotes = SalesQuote::with( [ 'cost', 'customer', 'details' ] )->orderBy( 'id', 'DESC' )
-        ->where( 'store_id', '=', $store_id )
-        ->whereBetween( DB::raw( 'DATE(`date`)' ), [ $from, $to ] )->get();
+        $sale_quotes = SalesQuote::with( [ 'cost', 'customer', 'details' ] )
+        ->select( 'sales_quotes.*' )
+        ->selectSub( function ( $query ) {
+            $query->from( 'sales_quote_details' )
+            ->select( 'status' )
+            ->whereColumn( 'sales_quote_details.quote_id', 'sales_quotes.id' )
+            ->orderBy( 'sales_quote_details.id', 'asc' ) 
+            ->limit( 1 );
+        }
+        , 'status' )
+        ->where( 'store_id', $store_id )
+        ->whereBetween( 'date', [ $from, $to ] )
+        ->orderBy( 'id', 'desc' )
+        ->get();
         return response()->json( $sale_quotes, 200 );
     }
 
@@ -295,7 +308,6 @@ class SaleQuoteController extends Controller {
     }
 
     //Convert Sales Order to Sale ( Cash or Credit )
-
     public function convertToSale( $id ) {
 
     }
@@ -798,9 +810,9 @@ class SaleQuoteController extends Controller {
                 'remark' => $remarks,
             ] );
 
-            if ( !$updatedQuote ) {
-                throw new \Exception( 'Failed to update sales quote' );
-            }
+            // if ( !$updatedQuote ) {
+            //     throw new \Exception( 'Failed to update sales quote' );
+            // }
 
             $update = DB::table( 'sales_quote_details' )
             ->where( 'quote_id', $quoteId )

@@ -246,7 +246,7 @@
                 });
                 // console.log('Cart table initialized successfully');
             } catch (error) {
-                console.error('Error initializing cart table:', error);
+                // console.error('Error initializing cart table:', error);
             }
 
             // Discount calculation function
@@ -548,7 +548,7 @@
                 discount();
 
                 $("#products").val(null).trigger("change");
-                console.log('Product added to cart:', item);
+                // console.log('Product added to cart:', item);
             }
 
             // Function to load products based on price category
@@ -591,7 +591,7 @@
                         $('#products').trigger('change');
                     },
                     error: function (xhr, status, error) {
-                        console.error('Error loading products:', xhr.responseText);
+                        // console.error('Error loading products:', xhr.responseText);
                         $('#products').empty().append('<option value="">Error loading products</option>');
                     }
                 });
@@ -602,8 +602,8 @@
                 let customer_id = document.getElementById("customer_id").value;
                 let selectedProduct = $(this).val();
 
-                console.log('Product selected:', selectedProduct);
-                console.log('Customer ID:', customer_id);
+                // console.log('Product selected:', selectedProduct);
+                // console.log('Customer ID:', customer_id);
 
                 if (!customer_id) {
                     if (typeof notify === 'function') {
@@ -616,7 +616,7 @@
                 }
 
                 if (selectedProduct && selectedProduct !== '') {
-                    console.log('Adding product to cart');
+                    // console.log('Adding product to cart');
                     addProductToCart(selectedProduct);
                     // Clear the selection after adding to cart
                     setTimeout(() => {
@@ -635,7 +635,7 @@
                     cart_table.clear().draw();
                 }
                 discount(); // Update totals
-                console.log('Cart cleared');
+                // console.log('Cart cleared');
             }
 
             // Initialize customer select2
@@ -659,7 +659,7 @@
 
             $('#price_category').on('change', function () {
                 var selectedCategory = $(this).val();
-                console.log('Price category changed to:', selectedCategory);
+                // console.log('Price category changed to:', selectedCategory);
                 loadProducts();
             });
 
@@ -755,7 +755,7 @@
                     _token: '{{ csrf_token() }}'
                 };
 
-                console.log('Saving quote with data:', formData);
+                // console.log('Saving quote with data:', formData);
 
                 // Disable save button
                 $('#save_btn').prop('disabled', true).text('Saving...');
@@ -765,7 +765,7 @@
                     type: "POST",
                     data: formData,
                     success: function (response) {
-                        console.log('Quote saved successfully:', response);
+                        // console.log('Quote saved successfully:', response);
 
                         if (typeof notify === 'function') {
                             notify('Quote saved successfully!', 'top', 'right', 'success');
@@ -783,7 +783,7 @@
                         $('#save_btn').prop('disabled', false).text('Save');
                     },
                     error: function (xhr, status, error) {
-                        console.error('Error saving quote:', xhr.responseText);
+                        // console.error('Error saving quote:', xhr.responseText);
 
                         if (typeof notify === 'function') {
                             notify('Error saving quote: ' + xhr.responseText, 'top', 'right', 'error');

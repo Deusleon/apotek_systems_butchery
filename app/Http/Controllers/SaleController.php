@@ -394,12 +394,6 @@ class SaleController extends Controller
                         ->get();
 
                     foreach ($stocks as $stock) {
-                        // if($stock->product->type == 'consumable'){
-                        //     $qty = $bought['quantity'];
-                        //     $price = $unit_price * $qty;
-                        //     $sale_discount = $unit_discount * $qty;
-                        //     $bought['quantity'] -= $qty;
-                        // }else
                         if ($bought['quantity'] <= $stock->quantity) {
                             $qty = $bought['quantity'];
                             $price = $unit_price * $qty;
@@ -586,7 +580,6 @@ class SaleController extends Controller
 
     public function storeCreditSale(Request $request)
     {
-//Get the ID of customer from JSON Object
         if ($request->ajax()) {
             $customer = json_decode($request->customer_id, true);
             if ($customer) {
@@ -605,96 +598,79 @@ class SaleController extends Controller
 
     public function getSalesHistory(Request $request)
     {
+        $from = $request->range[0] ?? null;
+        $to = $request->range[1] ?? null;
+        $storeId = current_store_id();
 
-        $columns = array(
-            0 => 'receipt_number',
-            1 => 'date',
-            2 => 'price_category_id'
-        );
+        // Get aggregated data for sales_details
+        $salesDetailsSubquery = DB::table('sales_details')
+            ->select([
+                'sale_id',
+                DB::raw('SUM(amount) as total_amount'),
+                DB::raw('SUM(discount) as total_discount'), 
+                DB::raw('SUM(vat) as total_vat'),
+                DB::raw('COUNT(*) as items_count')
+            ])
+            ->groupBy(['sale_id']);
 
-        $from = $request->range[0];
-        $to = $request->range[1];
+        // Then join sales table
+        $query = Sale::with(['customer', 'cost'])
+            ->joinSub($salesDetailsSubquery, 'sales_summary', function ($join) {
+                $join->on('sales.id', '=', 'sales_summary.sale_id');
+            });
 
-        $totalData = Sale::whereBetween(DB::raw('date(date)'),
-            [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
-            ->orderby('id', 'DESC')
-            ->count();
-
-        $totalFiltered = $totalData;
-
-        $limit = $request->input('length');
-        $start = $request->input('start');
-        $order = $columns[$request->input('order.0.column')];
-        $dir = $request->input('order.0.dir');
-
-        if (empty($request->input('search.value'))) {
-            $sales = Sale::with(['customer', 'cost', 'priceCategory'])
-                ->whereBetween(DB::raw('date(date)'),
-                [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
-                ->offset($start)
-                ->limit($limit)
-                ->orderBy($order, $dir)
-                ->get();
-        } else {
-            $search = $request->input('search.value');
-
-            $sales = Sale::with(['customer', 'cost', 'priceCategory'])
-                ->join('customers', 'sales.customer_id', '=', 'customers.id')
-                ->whereBetween(DB::raw('date(sales.date)'), [
-                    date('Y-m-d', strtotime($from)),
-                    date('Y-m-d', strtotime($to))
-                ])
-                ->where(function($query) use ($search) {
-                    $query->where('sales.receipt_number', 'LIKE', "%{$search}%")
-                ->orWhere(DB::raw('date(sales.date)'), 'LIKE', "%{$search}%")
-                          ->orWhere('customers.name', 'LIKE', "%{$search}%");
-                })
-                ->select('sales.*') // Select only sales table columns to avoid conflicts
-                ->offset($start)
-                ->limit($limit)
-                ->orderBy($order, $dir)
-                ->get();
-
-            Log::info("SalesData",["Data"=>$sales]);
-
-            $totalFiltered = Sale::join('customers', 'sales.customer_id', '=', 'customers.id')
-                ->whereBetween(DB::raw('date(sales.date)'),
-                [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
-                ->where(function($query) use ($search) {
-                    $query->where('sales.receipt_number', 'LIKE', "%{$search}%")
-                          ->orWhere(DB::raw('date(sales.date)'), 'LIKE', "%{$search}%")
-                          ->orWhere('customers.name', 'LIKE', "%{$search}%");
-                })
-                ->count();
+        // Store filter
+        if (!is_all_store()) {
+            $salesDetailsSubquery->join('inv_current_stock', 'sales_details.stock_id', '=', 'inv_current_stock.id')
+                ->where('inv_current_stock.store_id', $storeId);
         }
 
-
-        // The relationships are already loaded via eager loading, no need for manual loading
-        // Add action buttons to each sale and enhance cost object with price category name
-            foreach ($sales as $sale) {
-            $detailsButton = '<button type="button" id="sale_details" class="btn btn-sm btn-rounded btn-success" data-id="' . $sale->receipt_number . '" data-toggle="modal" data-target="#sale-details">Show</button>';
-            $reprintButton = '<button type="button" id="sale_receipt_reprint" class="btn btn-sm btn-rounded btn-secondary" data-id="' . $sale->receipt_number . '"><span class="fa fa-print" aria-hidden="true"></span> Print</button>';
-
-            $sale->action = $detailsButton . ' ' . $reprintButton;
-
-            // Add price category name to cost object if both exist
-            if ($sale->cost && $sale->priceCategory) {
-                $sale->cost->name = $sale->priceCategory->name;
-            }
+        // Date filter
+        if ($from && $to) {
+            $query->whereBetween(DB::raw('date(sales.date)'), [
+                date('Y/m/d', strtotime($from)),
+                date('Y/m/d', strtotime($to))
+            ]);
         }
 
-        $json_data = array(
-            "draw" => intval($request->input('draw')),
-            "recordsTotal" => intval($totalData),
-            "recordsFiltered" => intval($totalFiltered),
+        // Select specific columns
+        $sales = $query->select([
+                'sales.*',
+                'sales_summary.total_amount',
+                'sales_summary.total_discount', 
+                'sales_summary.total_vat',
+                'sales_summary.items_count'
+            ])
+            ->get();
+            
+        return response()->json([
             "data" => $sales
-        );
-
-        echo json_encode($json_data);
-
-
+        ]);
     }
 
+    public function getSalesHistoryData(Request $request)
+    {
+        $saleReceipt = $request->receipt;
+        $storeId = current_store_id();
+
+        // Get aggregated data for sales_details
+        $salesDetails = DB::table('sales_details')
+                    ->join('inv_current_stock', 'sales_details.stock_id', '=', 'inv_current_stock.id')
+                    ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                    ->where('sale_id', $saleReceipt);
+
+        // Store filter
+        if (!is_all_store()) {
+        $salesDetails->where('inv_current_stock.store_id', $storeId);
+        }
+
+        $results = $salesDetails->select('sales_details.*', 'inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom')->get();
+            
+        return response()->json([
+            "data" => $results
+        ]);
+    }
+    
     public function salesDetailsData(Request $request)
     {
 
@@ -716,7 +692,7 @@ class SaleController extends Controller
             abort(403, 'Access Denied');
         }
 
-        $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
+        $vat = Setting::where('id', 120)->value('value') / 100; 
         $customers = Customer::orderBy('name', 'ASC')->get();
         return View::make('sales.sales_history.index')
             ->with(compact('vat'))->with(compact('customers'));

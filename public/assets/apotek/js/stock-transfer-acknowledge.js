@@ -72,8 +72,6 @@ var table_re_print = $('#fixed-header-re-print1').DataTable({
 
 
 function storeSelect() {
-
-
     try {
         var from = document.getElementById("from_id");
         var from_id = from.options[from.selectedIndex].value;
@@ -99,8 +97,6 @@ function storeSelect() {
 
 
 function storeSelectRePrint() {
-
-
     try {
         var from = document.getElementById("from_id");
         var from_id = from.options[from.selectedIndex].value;

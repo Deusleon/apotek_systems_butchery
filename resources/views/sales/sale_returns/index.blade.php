@@ -111,14 +111,14 @@
                 </div>
 
                 <!-- ajax loading gif -->
-                <div id="loading">
+                {{-- <div id="loading">
                     <image id="loading-image" src="{{asset('assets/images/spinner.gif')}}"></image>
                 </div>
 
                 <input type="hidden" value="" id="category">
                 <input type="hidden" value="" id="customers">
                 <input type="hidden" value="" id="print">
-                <input type="hidden" value="" id="fixed_price">
+                <input type="hidden" value="" id="fixed_price"> --}}
 
                 </div>
                 {{-- Sales Return End--}}
@@ -232,18 +232,21 @@
             var end = moment();
 
             function cb(start, end) {
-                $('#sold_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                $('#sold_date span').html(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
             }
 
             $('#sold_date').daterangepicker({
                 startDate: moment().startOf('month'),
                 endDate: moment().endOf('month'),
                 autoUpdateInput: true,
+                locale: {
+                    format: 'YYYY/MM/DD' 
+                },
                 ranges: {
                     'Today': [moment(), moment()],
                     'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
                     'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    // 'Last 30 Days': [moment().subtract(29, 'days'), moment()],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
                     'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
                     'This Year': [moment().startOf('year'), moment()]
@@ -281,7 +284,7 @@
                     {'data': 'receipt_number'},
                     {
                         'data': 'date', render: function (date) {
-                            return moment(date).format('D-M-YYYY');
+                            return moment(date).format('YYYY-MM-DD');
                         }
                     },
                     {'data': 'customer', render: function (customer) {
@@ -351,13 +354,16 @@
             var end = moment();
 
             function cb(start, end) {
-                $('#returned_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                $('#returned_date span').html(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
             }
 
             $('#returned_date').daterangepicker({
                 startDate: moment().startOf('month'),
                 endDate: end,
                 autoUpdateInput: true,
+                locale: {
+                    format: 'YYYY/MM/DD' 
+                },
                 ranges: {
                     'Today': [moment(), moment()],
                     'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -440,13 +446,13 @@
                 {data: 'item_returned.name'},
                 {
                     data: 'item_returned.b_date', render: function (date) {
-                        return moment(date).format('D-MM-YYYY');
+                        return moment(date).format('YYYY-MM-DD');
                     }
                 },
                 {data: 'item_returned.bought_qty'},
                 {
                     data: 'date', render: function (date) {
-                        return moment(date).format('D-MM-YYYY');
+                        return moment(date).format('YYYY-MM-DD');
                     }
                 },
                 {data: 'item_returned.rtn_qty'},
