@@ -1,3 +1,14 @@
+<style>
+    .intl-tel-input {
+        width: 100%;
+    }
+    .iti {
+        width: 100%;
+    }
+    .iti__selected-flag {
+        z-index: 1;
+    }
+</style>
 <div class="modal fade" id="edit" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -39,7 +50,7 @@
                                 {{--                                       pattern="^0\d{3}[\-]\d{3}[\-]\d{3}$"--}}
                                 {{--                                       title="Eg:0777-777-777" required="true">--}}
                                 <input type="text" class="form-control"
-                                       id="phone_edits" name="mobile" required style="width: 127%;">
+                                       id="phone_edits" name="mobile" required style="width: 100%;">
                                 <span id="valid-msgs" class="hide"></span>
                                 <span id="error-msgs" class="text text-danger"></span>
                                 <span class="text-danger">
