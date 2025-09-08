@@ -321,7 +321,7 @@ class SaleQuoteController extends Controller {
     //Store sales order data
 
     public function store( Request $request ) {
-        $store_id = Auth::user()->store_id;
+        $store_id = current_store_id();
         date_default_timezone_set( 'Africa/Nairobi' );
         //some attributes declaration
         $cart = json_decode( $request->cart, true );

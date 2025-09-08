@@ -82,8 +82,8 @@
                                 <thead>
                                     <tr>
                                         <th>Receipt #</th>
-                                        <th>Date</th>
                                         <th>Customer</th>
+                                        <th>Date</th>
                                         <th>Sub Total</th>
                                         <th>VAT</th>
                                         <th>Discount</th>

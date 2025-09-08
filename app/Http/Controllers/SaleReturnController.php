@@ -115,6 +115,7 @@ class SaleReturnController extends Controller
                 ->where('sales_details.status', '=', 4)
                 ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '>=', $from)
                 ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '<=', $to)
+                ->orderBy('sales_details.id', 'desc')
                 ->get();
         } else if ($request->status == 3) {
             $returns = SalesReturn::join('sales_details', 'sales_details.id', '=', 'sales_returns.sale_detail_id')
@@ -122,12 +123,14 @@ class SaleReturnController extends Controller
                 ->orWhere('sales_details.status', '=', 5)
                 ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '>=', $from)
                 ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '<=', $to)
+                ->orderBy('sales_details.id', 'desc')
                 ->get();
         } else {
             $returns = SalesReturn::join('sales_details', 'sales_details.id', '=', 'sales_returns.sale_detail_id')
                 ->where('sales_details.status', '=', 2)
                 ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '>=', $from)
                 ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '<=', $to)
+                ->orderBy('sales_details.id', 'desc')
                 ->get();
         }
 

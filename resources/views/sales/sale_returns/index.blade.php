@@ -93,8 +93,8 @@
                             <thead>
                             <tr>
                                 <th>Receipt #</th>
-                                <th>Date</th>
                                 <th>Customer</th>
+                                <th>Date</th>
                                 <th>Sub Total</th>
                                 <th>VAT</th>
                                 <th>Discount</th>
@@ -282,16 +282,16 @@
                 },
                 "columns": [
                     {'data': 'receipt_number'},
-                    {
-                        'data': 'date', render: function (date) {
-                            return moment(date).format('YYYY-MM-DD');
-                        }
-                    },
                     {'data': 'customer', render: function (customer) {
                             if(customer) {
                                 return customer.name
                             }
                             return '';
+                        }
+                    },
+                    {
+                        'data': 'date', render: function (date) {
+                            return moment(date).format('YYYY-MM-DD');
                         }
                     },
                     {

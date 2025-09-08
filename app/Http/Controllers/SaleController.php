@@ -126,12 +126,14 @@ class SaleController extends Controller
                     ->join('customers', 'customers.id', '=', 'sales.customer_id')
                     ->whereBetween(DB::raw('date(created_at)'), [date('Y/m/d', strtotime($dates[0])),
                         date('Y/m/d', strtotime($dates[1]))])
+                        ->orderBy('sales_credits.created_at', 'desc')
                     ->get();
             } else {
                 if ($request->date === null) {
                     $payments = SalesCredit::join('sales', 'sales.id', '=', 'sales_credits.sale_id')
                         ->join('customers', 'customers.id', '=', 'sales.customer_id')
                         ->where('sales.customer_id', $request->customer_id)
+                        ->orderBy('sales_credits.created_at', 'desc')
                         ->get();
                 } else {
                     $payments = SalesCredit::join('sales', 'sales.id', '=', 'sales_credits.sale_id')
@@ -139,6 +141,7 @@ class SaleController extends Controller
                         ->whereBetween(DB::raw('date(created_at)'), [date('Y/m/d', strtotime($dates[0])),
                             date('Y/m/d', strtotime($dates[1]))])
                         ->where('sales.customer_id', $request->customer_id)
+                        ->orderBy('sales_credits.created_at', 'desc')
                         ->get();
                 }
 
@@ -183,18 +186,20 @@ class SaleController extends Controller
         if ($request->ajax()) {
             if ($request->id) {
                 $sales = Sale::join('sales_credits', 'sales_credits.sale_id', '=', 'sales.id')
-                    ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
-                    ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
+                    ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '>=', $from)
+                    ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '<=', $to)
                     ->join('customers', 'customers.id', '=', 'sales.customer_id')
                     ->where('customer_id', $request->id)
                     ->groupBy('sale_id')
+                    ->orderBy('sales.id', 'DESC')
                     ->get();
             } else {
-                $sales = Sale::where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '>=', $from)
-                    ->where(DB::Raw("DATE_FORMAT(date,'%m/%d/%Y')"), '<=', $to)
+                $sales = Sale::where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '>=', $from)
+                    ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '<=', $to)
                     ->join('sales_credits', 'sales_credits.sale_id', '=', 'sales.id')
                     ->join('customers', 'customers.id', '=', 'sales.customer_id')
                     ->groupBy('sale_id')
+                    ->orderBy('sales.id', 'DESC')
                     ->get();
             }
 
