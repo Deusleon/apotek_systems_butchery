@@ -69,80 +69,83 @@
 
     <script>
 
-        $(document).ready(function () {
+    $(document).ready(function () {
+        // ----- keep your config token and routes definition (if you already have it) -----
+        var config = {
+            token: '{{ csrf_token() }}',
+            routes: {
+                retrieveRequisitions: '{{route('requisitions.data')}}'
+            }
+        };
 
-            $('#order_table').DataTable({
+        // Initialize the modal table once and keep a reference
+        var orderTable;
+        if ($.fn.dataTable.isDataTable('#order_table')) {
+            orderTable = $('#order_table').DataTable();
+        } else {
+            orderTable = $('#order_table').DataTable({
                 responsive: true,
-                order: [[0, 'asc']]
+                searching: false,
+                paging: false,
+                info: false,
+                ordering: false, // modal list - no ordering necessary
+                columns: [
+                    { title: "Product Name" },
+                    { title: "Quantity" }
+                ]
             });
+        }
 
-            $('#requisitions').on('click', function(e) {
-                e.preventDefault(); // Prevent default tab switching behavior
-                var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
-                window.location.href = redirectUrl; // Redirect to the URL
-            });
+        // Robust populateTable using DataTables API
+        function populateTable(rows) {
+            orderTable.clear();
 
-            $('#requisition-create').on('click', function(e) {
-                e.preventDefault(); // Prevent default tab switching behavior
-                var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
-                window.location.href = redirectUrl; // Redirect to the URL
-            });
-
-            // Populate Data to table
-           function populateTable(data) {
-                var tableBody = $('#order_table tbody');
-                tableBody.empty(); // Clear any existing rows
-
-                // Loop through the data and append rows to the table
-                data.forEach(function(item) {
-                    // Use the concatenated product name from the server
-                    var productName = item.full_product_name || 
-                                    (item.name + ' ' + (item.brand || '') + ' ' + 
-                                    (item.pack_size || '') + ' ' + (item.sales_uom || ''));
-                    
-                    var row = '<tr>' +
-                        '<td>' + productName + '</td>' +
-                        '<td>' + item.quantity + (item.unit ? ' ' + item.unit : '') + '</td>' +
-                        '</tr>';
-                    tableBody.append(row);
-                });
+            if (!rows || rows.length === 0) {
+                orderTable.row.add(['No products found', '']).draw();
+                return;
             }
 
-            //Endpoints
-            var config = {
-                token: '{{ csrf_token() }}',
-                routes: {
-                    retrieveRequisitions: '{{route('requisitions.data')}}'
-                }
-            };
-
-            //Display
-            $('#requisition-details').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget);
-                var id = button.data('id');
-
-                var tableBody = $('#order_table tbody');
-                tableBody.html('<tr><td colspan="2" class="text-center">Loading...</td></tr>');
-
-                $.ajax({
-                    url: config.routes.retrieveRequisitions,
-                    type: 'POST',
-                    data: {
-                        _token: config.token,
-                        req_id: id
-                    },
-                    dataType: 'json',
-                    success: function(response) {
-                        populateTable(response);
-                    },
-                    error: function(xhr, status, error) {
-                        console.log('Error fetching data: ', error);
-                        tableBody.html('<tr><td colspan="2" class="text-center text-danger">Error loading data</td></tr>');
-                    }
-                });
+            rows.forEach(function(item) {
+                // item may already have full_product_name
+                var name = item.full_product_name || [
+                    item.name, item.brand, item.pack_size, item.sales_uom
+                ].filter(Boolean).join(' ');
+                var qty = (item.quantity !== undefined ? item.quantity : '') + (item.unit ? ' ' + item.unit : '');
+                orderTable.row.add([name, qty]);
             });
 
+            orderTable.draw();
+        }
+
+        // When modal opens — fetch server data and fill table
+        $('#requisition-details').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var id = button.data('id');
+
+            // Show quick loading row
+            orderTable.clear().row.add(['Loading...', '']).draw();
+
+            $.ajax({
+                url: config.routes.retrieveRequisitions,
+                type: 'POST',
+                data: {
+                    _token: config.token,
+                    req_id: id
+                },
+                dataType: 'json',
+                success: function(response) {
+                    // be robust: controller returns { requisition: {...}, products: [...] }
+                    var rows = (response && (response.products || response)) || [];
+                    populateTable(rows);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching requisition data:', error, xhr.responseText);
+                    orderTable.clear().row.add(['Error loading data', '']).draw();
+                }
+            });
         });
+
+    });
 
 
     </script>
