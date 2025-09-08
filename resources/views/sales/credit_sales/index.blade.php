@@ -270,7 +270,7 @@
                                             <div class="col-md-3">
                                                 <div style="width: 99%">
                                                     <label>Grace Period (Days)<font color="red">*</font></label>
-                                                    <input type="number" min="" name="grace_period" id="grace_period"
+                                                    <input type="text" min="" name="grace_period" id="grace_period"
                                                         class="form-control" value="" required />
                                                 </div>
                                             </div>

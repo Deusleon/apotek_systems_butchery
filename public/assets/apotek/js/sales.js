@@ -26,9 +26,9 @@ try {
 }
 
 var items_table = $("#items_table").DataTable({
-    searching: true,
-    bPaginate: true,
-    bInfo: true,
+    searching: false,
+    bPaginate: false,
+    bInfo: false,
     data: sale_items,
     columns: [
         { title: "ID" },
@@ -119,7 +119,7 @@ var credit_payment_table = $("#credit_payment_table").DataTable({
         {
             data: "date",
             render: function (date) {
-                return moment(date).format("D-M-YYYY");
+                return moment(date).format("YYYY-MM-DD");
             },
         },
         {
@@ -839,8 +839,11 @@ function saleReturn(items, sale_id) {
     });
 }
 
-function quoteDetails(remark, items) {
-    $("div.quote_remark").text(remark);
+function quoteDetails(remark, items, data) {
+    $("#quote_remark").text(remark);
+    $("#quote_no").text(data.quote_number);
+    $("#customer_name").text(data.customer.name);
+    $("#sales_date").text(moment(data.date).format("YYYY-MM-DD"));
     action =
         "<input type='button' value='Sale' id='sale_btn' class='btn btn-primary btn-rounded btn-sm'/>";
     sale_items = [];

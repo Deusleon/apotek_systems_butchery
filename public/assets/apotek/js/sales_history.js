@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $('#loading').show();
+    $("#loading").show();
     var daterange =
         moment().format("YYYY/MM/DD") + "-" + moment().format("YYYY/MM/DD");
     getHistory(daterange);
@@ -54,7 +54,7 @@ if (!$.fn.DataTable.isDataTable("#sales_history_table")) {
         order: [[0, "asc"]],
         searching: false,
         paging: false,
-        info: false, // ongeza hii ili info isionekane
+        info: false,
         columns: [
             { title: "Product Name" },
             { title: "Quantity" },
@@ -91,7 +91,13 @@ function populateTable(data) {
                 item.id +
                 "' data-date='" +
                 moment(item.date).format("YYYY-MM-DD") +
-                "'>Show</button>",
+                "'>Show</button>"
+            +`<a href="${"receipt_url"}" target="_blank">
+                <button class="btn btn-sm btn-rounded btn-secondary" type="button">
+                    <span class="fa fa-print" aria-hidden="true"></span>
+                    Print
+                </button>
+            </a>`,
         ]);
     });
 
