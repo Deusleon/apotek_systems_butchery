@@ -124,8 +124,8 @@ class SaleController extends Controller
                 /*return all by date*/
                 $payments = SalesCredit::join('sales', 'sales.id', '=', 'sales_credits.sale_id')
                     ->join('customers', 'customers.id', '=', 'sales.customer_id')
-                    ->whereBetween(DB::raw('date(created_at)'), [date('Y-m-d', strtotime($dates[0])),
-                        date('Y-m-d', strtotime($dates[1]))])
+                    ->whereBetween(DB::raw('date(created_at)'), [date('Y/m/d', strtotime($dates[0])),
+                        date('Y/m/d', strtotime($dates[1]))])
                     ->get();
             } else {
                 if ($request->date === null) {
@@ -136,8 +136,8 @@ class SaleController extends Controller
                 } else {
                     $payments = SalesCredit::join('sales', 'sales.id', '=', 'sales_credits.sale_id')
                         ->join('customers', 'customers.id', '=', 'sales.customer_id')
-                        ->whereBetween(DB::raw('date(created_at)'), [date('Y-m-d', strtotime($dates[0])),
-                            date('Y-m-d', strtotime($dates[1]))])
+                        ->whereBetween(DB::raw('date(created_at)'), [date('Y/m/d', strtotime($dates[0])),
+                            date('Y/m/d', strtotime($dates[1]))])
                         ->where('sales.customer_id', $request->customer_id)
                         ->get();
                 }
@@ -170,7 +170,6 @@ class SaleController extends Controller
         $credit->save();
         $customer->save();
         session()->flash("alert-success", "Payment recorded successfully!");
-        session(['activeTabView' => 'tracking']);
         return back();
 
     }
@@ -362,7 +361,7 @@ class SaleController extends Controller
         if ($request->sale_date) {
             $date = $request->sale_date;
         } else {
-            $date = date('Y-m-d');
+            $date = date('Y/m/d');
         }
         //Avoid submission of a null Cart
         if (!$cart) {
@@ -429,7 +428,7 @@ class SaleController extends Controller
                             $stock_tracking->created_by = Auth::user()->id;
                             $stock_tracking->updated_by = Auth::user()->id;
                             $stock_tracking->out_mode = 'Cash Sales';
-                            $stock_tracking->updated_at = date('Y-m-d');
+                            $stock_tracking->updated_at = date('Y/m/d');
                             $stock_tracking->movement = 'OUT';
                             $stock_tracking->save();
 
@@ -536,7 +535,7 @@ class SaleController extends Controller
                     'paid' => $paid,
                     'balance' => $balance,
                     'remark' => $remark,
-                    'created_at' => date('Y-m-d', strtotime($item->sale['date']))
+                    'created_at' => date('Y/m/d', strtotime($item->sale['date']))
                 ));
             }
 
@@ -772,7 +771,7 @@ class SaleController extends Controller
                 'paid' => $paid,
                 'balance' => $balance,
                 'remark' => $remark,
-                'created_at' => date('Y-m-d', strtotime($item->sale['date']))
+                'created_at' => date('Y/m/d', strtotime($item->sale['date']))
             ));
         }
         Log::info('Details', $sales);
@@ -881,7 +880,7 @@ class SaleController extends Controller
                 'sold_by' => $item->sale['user']['name'],
                 'customer' => $item->sale['customer']['name'],
                 'customer_tin' => $item->sale['customer']['tin'],
-                'created_at' => date('Y-m-d', strtotime($item->sale['date']))
+                'created_at' => date('Y/m/d', strtotime($item->sale['date']))
             ));
         }
 

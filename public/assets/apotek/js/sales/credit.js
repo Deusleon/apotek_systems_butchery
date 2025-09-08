@@ -156,8 +156,11 @@ var sale_list_Table = $("#sale_list_Table").DataTable({
     fixedHeader: true,
 });
 
-$("#products").on("change", function () {
-    let customer_id = document.getElementById("customer").value;
+$("#products").on("change", function (e) {
+    var productValue = $(this).val();
+    if (!productValue) return;
+    let customer_id = document.getElementById("customer_id").value;
+
     if (customer_id !== "") {
         valueCollection();
     } else {
@@ -169,7 +172,7 @@ $("#products").on("change", function () {
     }
 });
 
-$("#customer").on("change", function () {
+$("#customer_id").on("change", function () {
     discount();
 });
 
@@ -650,11 +653,11 @@ function discount() {
     var max_credit;
     var balance;
     if ($("#credit_sale").length) {
-        var customer_x = document.getElementById("customer").value;
+        var customer_x = document.getElementById("customer_id").value;
         if (customer_x === "") {
             customer = JSON.parse("{}");
         } else {
-            customer = JSON.parse(document.getElementById("customer").value);
+            customer = JSON.parse(document.getElementById("customer_id").value);
         }
 
         max_credit = customer.credit_limit - customer.total_credit || 0;
@@ -746,7 +749,7 @@ function deselect() {
 function deselect1() {
     // document.getElementById("credit_sales_form").reset();
     // $('#price_category').val('').change();
-    $("#customer").val("").change();
+    $("#customer_id").val("").change();
     try {
         document.getElementById("sale_paid").value = 0;
         document.getElementById("sale_discount").value = 0;

@@ -54,7 +54,7 @@
                 <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
                     @if(Auth::user()->checkPermission('View Credit Sales'))
                         <li class="nav-item">
-                            <a class="nav-link active text-uppercase" id="credit-sales-tablist" data-toggle="pill"
+                            <a class="nav-link text-uppercase" id="credit-sale-receiving-tablist" data-toggle="pill"
                                 href="#credit-sale-receiving" role="tab" aria-controls="credit_sales"
                                 aria-selected="true">New</a>
                         </li>
@@ -64,7 +64,7 @@
 
                         @if(!Auth::user()->checkPermission('View Credit Sales'))
                             <li class="nav-item">
-                                <a class="nav-link active text-uppercase" id="credit-tracking-tablist" data-toggle="pill"
+                                <a class="nav-link text-uppercase" id="credit-tracking-tablist" data-toggle="pill"
                                     href="#credit-tracking" role="tab" aria-controls="credit_tracking"
                                     aria-selected="false">Tracking
                                 </a>
@@ -84,7 +84,7 @@
                     @if(Auth::user()->checkPermission('View Credit Payment'))
                         @if(!Auth::user()->checkPermission('View Credit Sales') && !Auth::user()->checkPermission('View Credit Tracking'))
                             <li class="nav-item">
-                                <a class="nav-link active text-uppercase" id="credit-payment-tablist" data-toggle="pill"
+                                <a class="nav-link text-uppercase" id="credit-payment-tablist" data-toggle="pill"
                                     href="#credit-payment" role="tab" aria-controls="credit_payment" aria-selected="false">Payments
                                 </a>
                             </li>
@@ -102,7 +102,7 @@
                 <div class="tab-content" id="myTabContent">
                     {{-- Credit Sales--}}
                     @if(Auth::user()->checkPermission('View Credit Sales'))
-                        <div class="tab-pane fade show active" id="credit-sale-receiving" role="tabpanel"
+                        <div class="tab-pane fade" id="credit-sale-receiving" role="tabpanel"
                             aria-labelledby="credit_sales-tab">
                             <form id="credit_sales_form">
                                 @csrf()
@@ -145,7 +145,7 @@
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label for="code">Customer Name<font color="red">*</font></label>
-                                                <select name="customer_id" id="customer"
+                                                <select name="customer_id" id="customer_id"
                                                     class="js-example-basic-single form-control" title="Customer" required>
                                                     <option value="">Select Customer</option>
                                                     @foreach($customers as $customer)
@@ -271,7 +271,7 @@
                                                 <div style="width: 99%">
                                                     <label>Grace Period (Days)<font color="red">*</font></label>
                                                     <input type="number" min="" name="grace_period" id="grace_period"
-                                                        class="form-control" value="" required/>
+                                                        class="form-control" value="" required />
                                                 </div>
                                             </div>
 
@@ -362,7 +362,7 @@
                     @endif
 
                     @if(!Auth::user()->checkPermission('View Credit Sales'))
-                        <div class="tab-pane fade show active" id="credit-sale-receiving" role="tabpanel"
+                        <div class="tab-pane fade show" id="credit-sale-receiving" role="tabpanel"
                             aria-labelledby="credit_sales-tab">
                             <div class="row">
 
@@ -547,13 +547,26 @@
         </div>
     </div>
 
-    @if(session('activeTabView') === 'tracking')
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                document.getElementById('credit-tracking-tablist').click();
-            });
-        </script>
-    @endif
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let activeTabView = localStorage.getItem("creditActiveTab");
+
+            if (activeTabView) {
+                // Ondoa active kwa zote
+                document.querySelectorAll(".nav-link").forEach(el => el.classList.remove("active"));
+                document.querySelectorAll(".tab-pane").forEach(el => el.classList.remove("active", "show"));
+
+                // Ongeza active kwenye tab iliyohifadhiwa
+                let tabBtn = document.getElementById(activeTabView + "-tablist");
+                let tabPane = document.getElementById(activeTabView);
+
+                tabBtn?.classList.add("active");
+                tabPane?.classList.add("active", "show");
+            }
+        });
+
+    </script>
+
 
     @include('sales.customers.create')
 
@@ -602,7 +615,7 @@
             var start = moment();
             var end = moment();
 
-            
+
             function cb(start, end) {
                 $('#daterange').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
             }
@@ -612,7 +625,7 @@
                 endDate: end,
                 autoUpdateInput: true,
                 locale: {
-                    format: 'YYYY/MM/DD' 
+                    format: 'YYYY/MM/DD'
                 },
                 ranges: {
                     'Today': [moment(), moment()],
@@ -633,8 +646,17 @@
     <script type="text/javascript">
 
         // Listen for the click event on the tab
+        $('#credit-sale-receiving-tablist').on('click', function () {
+            // console.log('New credit tab clicked');
+            localStorage.setItem('creditActiveTab', 'credit-sale-receiving');
+            // getCredits();
+
+        });
+
+        // Listen for the click event on the tab
         $('#credit-tracking-tablist').on('click', function () {
-            console.log('Credit Tracking tab clicked');
+            // console.log('Credit Tracking tab clicked');
+            localStorage.setItem('creditActiveTab', 'credit-tracking');
             getCredits();
 
         });
@@ -700,7 +722,7 @@
                     date: date
                 },
                 success: function (data) {
-                    console.log('This is data',data)
+                    console.log('This is data', data)
                     document.getElementById('main_table').style.display = 'none';
                     document.getElementById('filter_history').style.display = 'block';
 
@@ -733,7 +755,7 @@
                 endDate: moment().endOf('month'),
                 autoUpdateInput: true,
                 locale: {
-                    format: 'YYYY/MM/DD' 
+                    format: 'YYYY/MM/DD'
                 },
                 ranges: {
                     'Today': [moment(), moment()],
@@ -748,7 +770,7 @@
             cb(start, end);
 
             $('input[name="date_of_sale"]').on('apply.daterangepicker', function (ev, picker) {
-                $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+                $(this).val(picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD'));
                 filterPaymentHistory();
             });
 
@@ -772,7 +794,8 @@
 
         //Payment Clicked
         $('#credit-payment-tablist').on('click', function () {
-            console.log('Credit Payment tab clicked');
+            // console.log('Credit Payment tab clicked');
+            localStorage.setItem('creditActiveTab', 'credit-payment');
 
             filterPaymentHistory();
 
