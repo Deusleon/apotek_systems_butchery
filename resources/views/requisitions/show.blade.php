@@ -264,8 +264,7 @@
                 {
                     data: 'quantity',
                     render: function(data) {
-                        datas = data.toLocaleString();
-                        return `<input type="text" onblur="quantityChange(event)" class="text-left w-100 border-0" step="any" name="qty" value="${datas??""}" readonly style="color: inherit; background-color: transparent;"/>`;
+                        return data.toLocaleString();
                     }
                 },
                 {
@@ -278,28 +277,16 @@
         cart.drawTable();
 
         function enableEdit(event) {
-            // Locate the parent row of the button clicked
             const row = event.target.closest('tr');
+            const td = row.querySelector('td:nth-child(2)'); // Quantity column
+            const currentQty = td.innerText;
 
-            // Find the input field within this row
-            const inputField = row.querySelector('input[name="qty"]');
+            // Replace text with input using Bootstrap form-control
+            td.innerHTML = `<input type="text" name="qty" class="form-control" value="${currentQty}" onblur="quantityChange(event)">`;
 
-            // Enable editing by removing the readonly attribute
-            if (inputField) {
-                inputField.removeAttribute('readonly');
-                inputField.focus(); // Optionally, focus the input for user convenience
-
-                // Apply styles to the input field
-                inputField.style.width='20%'
-                inputField.style.border = '1px solid #000000'; // Example: blue border
-                inputField.style.borderRadius = '4px';        // Rounded corners
-                inputField.style.boxShadow = '0 0 5px rgba(0, 0, 0, 0.25)';
-                inputField.style.padding = '10px 20px';            // Remove default focus outline
-                inputField.style.backgroundColor = '#f4f7fa'; // Example: light blue background
-                inputField.style.transition = 'border-color .15s ease-in-out,box-shadow .15s ease-in-out'; // Smooth transition effect
-
-            }
+            td.querySelector('input').focus();
         }
+
 
         function deleteItem(event) {
             let item = $('#order_table').DataTable().row($(event.target).parents('tr')).data();

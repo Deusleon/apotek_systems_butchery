@@ -116,52 +116,53 @@
 
                 let html = `
                 <div class="row mb-4">
-                    <div class="col-md-6">
+                    <!-- Column 1 -->
+                    <div class="col-md-4">
                         <div class="detail-item">
-                            <label class="font-weight-bold text-primary">Req #:</label>
+                            <label class="font-weight-bold">Req #:</label>
                             <p>${requisition.req_no}</p>
                         </div>
                         <div class="detail-item">
-                            <label class="font-weight-bold text-primary">From Store:</label>
+                            <label class="font-weight-bold">From Store:</label>
                             <p>${requisition.from_store}</p>
                         </div>
+                    </div>
+
+                    <!-- Column 2 -->
+                    <div class="col-md-4">
                         <div class="detail-item">
-                            <label class="font-weight-bold text-primary">To Store:</label>
+                            <label class="font-weight-bold">To Store:</label>
                             <p>${requisition.to_store}</p>
                         </div>
-                    </div>
-                    <div class="col-md-6">
                         <div class="detail-item">
-                            <label class="font-weight-bold text-primary">Issued By:</label>
+                            <label class="font-weight-bold">Issued By:</label>
                             <p>${requisition.issued_by}</p>
                         </div>
+                    </div>
+
+                    <!-- Column 3 -->
+                    <div class="col-md-4">
                         <div class="detail-item">
-                            <label class="font-weight-bold text-primary">Date Issued:</label>
-                            <p>${requisition.created_at ? moment(requisition.created_at).format('YYYY-MM-DD HH:mm') : '-'}</p>
-                        </div>
-                        <div class="detail-item">
-                            <label class="font-weight-bold text-primary">Evidence:</label>
+                            <label class="font-weight-bold">Evidence:</label>
                             <div class="mt-1">
                                 ${requisition.evidence_document ? 
                                     `<a href="/storage/${requisition.evidence_document}" target="_blank" class="btn btn-warning btn-sm rounded-pill">
                                         <i class="feather icon-file-text mr-1"></i>View Document
-                                     </a>` : 
+                                    </a>` : 
                                     '<span class="text-muted">No document attached</span>'
                                 }
                             </div>
                         </div>
                     </div>
                 </div>
-
                 <div class="detail-item mb-3">
-                    <label class="font-weight-bold text-primary">Remarks:</label>
-                    <p class="border rounded p-2 bg-light">${requisition.remarks || 'No remarks provided'}</p>
+                    <label class="font-weight-bold">Remarks:</label>
+                    <p>${requisition.remarks || 'No remarks provided'}</p>
                 </div>
-
-                <h6 class="border-bottom pb-2 text-primary font-weight-bold">Products Information</h6>
+                <h6 class="pb-2 font-weight-bold">Products Information</h6>
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover table-sm">
-                        <thead class="bg-light">
+                    <table class="table table-striped table-hover table-sm">
+                        <thead>
                             <tr>
                                 <th class="font-weight-bold">Product Name</th>
                                 <th class="text-center font-weight-bold">Qty Requested</th>
