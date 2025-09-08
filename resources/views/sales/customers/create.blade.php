@@ -17,7 +17,7 @@
     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action="{{ route('customers.store') }}" method="post">
+            <form action="{{ route('customers.store') }}" id="create_customer" method="post">
                 @csrf()
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalCenterTitle">Add New Customer</h5>

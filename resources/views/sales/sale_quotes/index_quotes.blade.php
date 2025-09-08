@@ -406,7 +406,7 @@
                         }
                     },
                     {
-                        data: 'cost.sub_total',
+                        data: 'cost.amount',
                         render: function (data) {
                             return formatMoney(data);
                         }
@@ -505,6 +505,7 @@
 
         function showQuoteDetails(event) {
             let data = quotes_table.row($(event.target).parents('tr')).data();
+            // console.log('Data', data);
             quoteDetails(data.remark, data.details);
         }
 

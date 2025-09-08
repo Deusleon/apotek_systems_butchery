@@ -416,7 +416,7 @@
                             return_table.column(6).visible(false);
                             data.forEach(function (data) {
                                 if (data.status == 5) {
-                                    data.item_returned.bought_qty += data.item_returned.rtn_qty;//This calculate the original bought qty
+                                    data.item_returned.bought_qty += Number(data.item_returned.rtn_qty);//This calculate the original bought qty
                                     data.item_returned.amount = (data.item_returned.amount / data.item_returned.rtn_qty) * data.item_returned.bought_qty;
                                 }
 

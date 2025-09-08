@@ -135,7 +135,7 @@
                                 <tbody>
                                     @foreach($sales_details as $saleData)
                                         <tr data-id="{{ $saleData->id }}">
-                                            <td>{{ $saleData->name }}</td>
+                                            <td>{{ $saleData->name.' '.$saleData->brand.' '.$saleData->pack_size.$saleData->sales_uom }}</td>
                                             <td class="quantity">{{ $saleData->quantity }}</td>
                                             <td class="price">{{ number_format($saleData->price, 0) }}</td>
                                             <td>{{ number_format($saleData->vat, 0) }}</td>

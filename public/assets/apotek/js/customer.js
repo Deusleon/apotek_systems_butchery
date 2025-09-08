@@ -5,6 +5,36 @@ $('#create').on('show.bs.modal', function () {
     validateMobile(input, validationMsg);
 });
 
+//Create customer
+$(document).on('submit', '#create_customer', function(e) {
+    e.preventDefault(); 
+    
+    let form = $(this);
+    let actionUrl = form.attr('action');
+    
+    $.ajax({
+        url: actionUrl,
+        type: "POST",
+        data: form.serialize(),
+        success: function(response) {
+            console.log('Customer', response);
+            let customer = response.customer;
+
+            $('#customer_id').append(
+                `<option value="${customer.id}" selected>${customer.name}</option>`
+            );
+
+            $('#customer').val(customer.id).trigger('change');
+
+            $('#create').modal('hide');
+
+            form[0].reset();
+        },
+        error: function(xhr) {
+            console.log(xhr.responseText);
+        }
+    });
+});
 
 //Edit Modal
 $('#edit').on('show.bs.modal', function (event) {

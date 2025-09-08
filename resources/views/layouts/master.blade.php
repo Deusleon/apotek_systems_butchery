@@ -550,6 +550,13 @@ $store_id = Auth::user()->store_id;
     <!-- daterangepicker js -->
     <script src="{{asset("assets/plugins/daterangepicker-master/js/daterangepicker.js")}}"></script>
 
+    <script src="{{ asset('assets/plugins/intl-tel-input/js/intlTelInput.js') }}"></script>
+    <script>
+        var input = document.querySelector("#phone");
+        window.intlTelInput(input, {
+            utilsScript: "{{ asset('assets/plugins/intl-tel-input/js/utils.js') }}", // <-- Hapa
+        });
+    </script>
 
     {{-- custom java scripts for the page --}}
 
