@@ -15,7 +15,7 @@ class Sale extends Model
         return $this->hasMany(SalesDetail::class, 'sale_id', 'id')
             ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
             ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
-            ->select('sales_details.id as id', 'name', 'sales_details.quantity as quantity', 'price', 'vat', 'discount', 'amount', 'sales_details.status')
+            ->select('sales_details.id as id', 'name', 'brand', 'pack_size', 'sales_uom', 'sales_details.quantity as quantity', 'price', 'vat', 'discount', 'amount', 'sales_details.status')
             ->groupBy('sales_details.id');
     }
 

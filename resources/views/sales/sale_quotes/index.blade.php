@@ -271,7 +271,7 @@
 
                     sub_total += (price * quantity);
                     total_vat += (vat * quantity);
-                    total += (amount * quantity);
+                    total += (amount);
                 });
 
                 // Apply discount if enabled
@@ -611,7 +611,7 @@
                     } else {
                         alert('Select Customer First');
                     }
-                    $(this).val('').trigger('change');
+                    $(this).val(null).trigger('change.select2');
                     return;
                 }
 
@@ -706,9 +706,9 @@
 
                 if (!price_category) {
                     if (typeof notify === 'function') {
-                        notify('Please select a sales type', 'top', 'right', 'error');
+                        notify('Please select sales type', 'top', 'right', 'error');
                     } else {
-                        alert('Please select a sales type');
+                        alert('Please select sales type');
                     }
                     return;
                 }
@@ -775,7 +775,7 @@
 
                         // Clear form
                         deselectQuote();
-                        $('#customer_id').val('').trigger('change');
+                        $('#customer_id').val(null).trigger('change.select2');
                         $('#price_category').val('').trigger('change');
                         $('#remark').val('');
 

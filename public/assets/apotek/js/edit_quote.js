@@ -62,7 +62,7 @@ $("#products").on("change", function () {
                 fetchProducts();
                 refreshSalesTable(response.data);
                 isCartEmpty(response.data.sales_details.length);
-                // console.log("response", response);
+                console.log("response", response);
                 // notify(response.message, "top", "right", "success");
                 document.getElementById("sub_total").value = formatNumber(
                     Number(response.data.sub_total),
@@ -206,7 +206,7 @@ function refreshSalesTable(data) {
     data.sales_details.forEach(function (item) {
         var row = `
         <tr data-id="${item.id}">
-            <td>${item.name}</td>
+            <td>${item.name} ${item.brand ? item.brand+' ' : ''} ${item.pack_size} ${item.sales_uom}</td>
             <td class="quantity">${formatNumber(item.quantity, 0)}</td>
             <td class="price">${formatNumber(item.price, 0)}</td>
             <td>${formatNumber(item.vat, 0)}</td>

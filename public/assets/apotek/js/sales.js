@@ -799,14 +799,14 @@ function saleReturn(items, sale_id) {
     localStorage.setItem("id", id);
     document.getElementById("sales").style.display = "none";
     sale_items = [];
-    returned = " <span class='badge badge-warning'>Partial</span>";
+    returned = " <button class='btn btn-sm btn-rounded btn-success' disabled>Return</button>";
     pending = " <span class='badge badge-secondary'>Pending</span>";
     rejected = " <span class='badge badge-danger'>Rejected</span>";
     items.forEach(function (item) {
         var item_data = [];
         if (item.status !== 3) {
             item_data.push(item.id);
-            item_data.push(item.name);
+            item_data.push(item.name+' '+(item.brand ? item.brand+' ':'')+item.pack_size+item.sales_uom);
             item_data.push(item.quantity);
             item_data.push(item.price);
             item_data.push(item.vat);
@@ -847,13 +847,13 @@ function quoteDetails(remark, items) {
     items.forEach(function (item) {
         var item_data = [];
         item_data.push(item.id);
-        item_data.push(item.name);
+        item_data.push(item.name+' '+(item.brand ? item.brand+' ' : '')+item.pack_size+item.sales_uom);
         item_data.push(item.quantity);
         item_data.push(item.price / item.quantity); //unit price
         item_data.push(item.vat);
         item_data.push(item.discount);
-        item_data.push(item.amount);
-        item_data.push(action); //this is not used now (Just an Idea for quote to sale conversion)
+        item_data.push(Number(item.amount)-Number(item.discount));
+        item_data.push(action); 
         sale_items.push(item_data);
     });
     items_table.clear();
@@ -942,6 +942,9 @@ $("#products").select2({
 });
 
 $("#products").on("change", function (event) {
+    var productValue = $(this).val();
+    if (!productValue) return;
+    
     let sel = document.getElementById("products");
     let selectedOption = sel.options[sel.selectedIndex];
 

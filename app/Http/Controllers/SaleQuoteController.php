@@ -97,8 +97,8 @@ class SaleQuoteController extends Controller {
     public function getQuotes( Request $request ) {
         $store_id = current_store_id();
         $date_range = explode( '-', $request->date );
-        $from = date( 'Y-m-d', strtotime( trim( $date_range[ 0 ] ) ) );
-        $to = date( 'Y-m-d', strtotime( trim( $date_range[ 1 ] ) ) );
+        $from = date( 'Y-m-d 00:00:00', strtotime( trim( $date_range[ 0 ] ) ) );
+        $to = date( 'Y-m-d 23:59:59', strtotime( trim( $date_range[ 1 ] ) ) );
         $sale_quotes = SalesQuote::with( [ 'cost', 'customer', 'details' ] )
         ->select( 'sales_quotes.*' )
         ->selectSub( function ( $query ) {
@@ -111,6 +111,12 @@ class SaleQuoteController extends Controller {
         , 'status' )
         ->where( 'store_id', $store_id )
         ->whereBetween( 'date', [ $from, $to ] )
+        ->whereExists(function ($query) {
+            $query->select(DB::raw(1))
+                ->from('sales_quote_details')
+                ->whereColumn('sales_quote_details.quote_id', 'sales_quotes.id')
+                ->where('sales_quote_details.status', 1);
+        })
         ->orderBy( 'id', 'desc' )
         ->get();
         return response()->json( $sale_quotes, 200 );

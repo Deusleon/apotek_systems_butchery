@@ -99,7 +99,6 @@ class SaleReturnController extends Controller
 
         echo json_encode($json_data);
 
-
     }
     public function getRetunedProducts(Request $request)
     {
