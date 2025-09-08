@@ -36,8 +36,8 @@ var saleHistoryTable = $("#sale_history_dataTable").DataTable({
     searching: true,
     columns: [
         { title: "Receipt #", searchable: true },
-        { title: "Date", searchable: true },
         { title: "Customer", searchable: true },
+        { title: "Date", searchable: true },
         { title: "Sub Total", searchable: true },
         { title: "VAT", searchable: true },
         { title: "Discount", searchable: true },
@@ -73,8 +73,8 @@ function populateTable(data) {
     data.forEach(function (item) {
         saleHistoryTable.row.add([
             item.receipt_number,
-            moment(item.date).format("YYYY-MM-DD"),
             item.customer.name,
+            moment(item.date).format("YYYY-MM-DD"),
             formatMoney(Number(item.total_amount) + Number(item.total_vat)),
             formatMoney(Number(item.total_vat)),
             formatMoney(Number(item.total_discount)),
