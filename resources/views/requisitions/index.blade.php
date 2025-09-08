@@ -134,10 +134,20 @@
                 },
                 dataType: 'json',
                 success: function(response) {
-                    // be robust: controller returns { requisition: {...}, products: [...] }
-                    var rows = (response && (response.products || response)) || [];
+                    var requisition = response.requisition || {};
+                    var rows = response.products || [];
+
+                    // Populate requisition info
+                    $('#req_no').text(requisition.req_no || 'N/A');
+                    $('#created_by').text(requisition.creator?.name || 'N/A');
+                    $('#date_created').text(
+                        requisition.created_at ? moment(requisition.created_at).format('YYYY-MM-DD') : 'N/A'
+                    );
+
+                    // Populate products table
                     populateTable(rows);
                 },
+
                 error: function(xhr, status, error) {
                     console.error('Error fetching requisition data:', error, xhr.responseText);
                     orderTable.clear().row.add(['Error loading data', '']).draw();

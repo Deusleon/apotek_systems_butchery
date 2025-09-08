@@ -230,40 +230,43 @@ class RequisitionController extends Controller
 }
 
     public function showRequisition(Request $request)
-{
-    $id = $request->req_id;
+    {
+        $id = $request->req_id;
 
-    $requisition = Requisition::with(['creator', 'reqDetails.products_'])->findOrFail($id);
-    $fromStore = Store::find($requisition->from_store);
-    $toStore = Store::find($requisition->to_store);
+        $requisition = Requisition::with(['creator', 'reqDetails.products_'])->findOrFail($id);
+        $fromStore = Store::find($requisition->from_store);
+        $toStore = Store::find($requisition->to_store);
 
-    $products = $requisition->reqDetails->map(function($detail) {
-        $product = $detail->products_;
-        $full_name = $product ? 
-            ($product->name.' '.($product->brand ?? '').' '.($product->pack_size ?? '').' '.($product->sales_uom ?? '')) 
-            : '';
+        $products = $requisition->reqDetails->map(function($detail) {
+            $product = $detail->products_;
+            $full_name = $product ? 
+                ($product->name.' '.($product->brand ?? '').' '.($product->pack_size ?? '').' '.($product->sales_uom ?? '')) 
+                : '';
 
-        return [
-            'full_product_name' => $full_name,
-            'quantity' => $detail->quantity,
-            'unit' => $detail->unit,
-            'quantity_given' => $detail->quantity_given ?? 0,
-            'on_hand' => $detail->qty_oh ?? 0
-        ];
-    });
+            return [
+                'full_product_name' => $full_name,
+                'quantity' => $detail->quantity,
+                'unit' => $detail->unit,
+                'quantity_given' => $detail->quantity_given ?? 0,
+                'on_hand' => $detail->qty_oh ?? 0
+            ];
+        });
 
-    return response()->json([
+        return response()->json([
         'requisition' => [
             'req_no' => $requisition->req_no,
             'from_store' => $fromStore->name ?? 'N/A',
             'to_store' => $toStore->name ?? 'N/A',
             'issued_by' => $requisition->creator->name ?? 'N/A',
+            'created_by' => $requisition->creator->name ?? 'N/A',
+            'created_at' => $requisition->created_at,
             'remarks' => $requisition->remarks,
             'evidence_document' => $requisition->evidence_document
         ],
         'products' => $products
     ]);
-}
+
+    }
 
     public function printReq(Request $request)
     {
