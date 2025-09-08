@@ -210,35 +210,39 @@ $("#order_history_datatable tbody").on("click", "#dtl_btn", function () {
 });
 
 function orderDetails(items) {
-    document.getElementById("order_details_table").style.display = "true";
     order_items = [];
     items.forEach(function (item) {
         var item_data = [];
-        item_data.push(5);
-        // Concatenate product name with other properties
+
+        // ID column (hidden)
+        item_data.push(item.order_item_id);
+
+        // Product Name with optional properties
         var fullProductName = item.name;
         if (item.brand) fullProductName += " " + item.brand;
         if (item.pack_size) fullProductName += " " + item.pack_size;
-        if (item.sales_uom) fullProductName += " " + item.sales_uom;
-
+        if (item.sales_uom) fullProductName += "" + item.sales_uom;
         item_data.push(fullProductName);
-        item_data.push(item.quantity);
+
+        // Quantity
+        item_data.push(item.ordered_qty);
+
+        // Price, VAT, Amount
         item_data.push(formatMoney(item.price));
         item_data.push(formatMoney(item.vat));
         item_data.push(formatMoney(item.amount));
+
+        // Action column (hidden)
+        item_data.push("");
+
         order_items.push(item_data);
     });
 
     order_details_table.clear();
     order_details_table.rows.add(order_items);
-    order_details_table.column(0).visible(false);
-    order_details_table.column(6).visible(false);
+    order_details_table.column(0).visible(false); // hide ID
+    order_details_table.column(6).visible(false); // hide Action
     order_details_table.draw();
-
-    $("#cancel").on("click", function () {
-        document.getElementById("purchases").style.display = "block";
-        document.getElementById("items").style.display = "none";
-    });
 }
 
 $("#order_history_datatable tbody").on("click", "#cancel_btn", function () {

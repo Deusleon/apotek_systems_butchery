@@ -14,13 +14,32 @@
     <div class="col-sm-12">
         <div class="card-block">
             <div class="col-sm-12">
+                <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase" id="requisition-create" 
+                        href="{{ url('purchases/requisitions-create') }}" role="tab"
+                        aria-controls="current-stock" aria-selected="true">New</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active text-uppercase" id="edit-requisition" 
+                        href="#" role="tab"
+                        aria-controls="edit-requisition" aria-selected="false">Edit Requisition</a>
+                    </li>
+                    @if(Auth::user()->checkPermission('View Requisition List'))
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase" id="requisitions" 
+                        href="{{ url('purchases/requisitions') }}" role="tab"
+                        aria-controls="stock_list" aria-selected="false">Requisition List</a>
+                    </li>
+                    @endif
+                </ul>
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                        <form action="{{ route('requisitions.update') }}" method="post">
+                        <form action="{{ route('requisitions.update') }}" method="post" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
                                 <div class="form-group col-md-4">
-                                    <label for="user">Requisition No</label>
+                                    <label for="user">Requisition #</label>
                                     <h6>{{ $requisition->req_no }}</h6>
                                 </div>
                                 <div class="form-group col-md-4">
@@ -29,12 +48,12 @@
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label for="user">Date Created</label>
-                                    <h6>{{ date('j M, Y', strtotime($requisition->created_at)) }}</h6>
+                                    <h6>{{ date('Y-m-d', strtotime($requisition->created_at)) }}</h6>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group col-md-3">
-                                    <label for="from_store">From <font color="red">*</font></label>
+                                    <label for="from_store">Requesting From<font color="red">*</font></label>
                                     @if(!auth()->user()->checkPermission('Manage All Branches'))
                                         <select name="from_store" class="js-example-basic-single form-control" id="from_store"
                                                 required disabled="true">
@@ -61,12 +80,14 @@
                                         id="products">
                                         <option value="">Select Products...</option>
                                         @foreach ($items as $item)
-                                            <option value='@json($item)'>{{ $item->name }}</option>
+                                            <option value='@json($item)'>
+                                                {{ $item->name }} {{ $item->brand }} {{ $item->pack_size }} {{ $item->sales_uom }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="form-group col-md-3">
-
+                                    <!-- Empty space -->
                                 </div>
                             </div>
                             <input type="hidden" name="requisition_id" value="{{ $requisition->id }}">
@@ -76,7 +97,6 @@
                                     <thead>
                                         <tr class="bg-navy disabled">
                                             <th>Product Name</th>
-                                            <th>Unit</th>
                                             <th>Quantity</th>
                                             <th>Action</th>
                                         </tr>
@@ -86,26 +106,50 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="modal-footer">
-                                <div class="row flex-grow-1">
-                                    <div class="col-md-4">
-                                        <div class="form-group"><textarea id="remark" name="remark" class="form-control" rows="3" placeholder="Enter Remarks Here"></textarea>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="form-group">
-                                            <label for="evidence" class="form-label"><span style="color: red;">* </span>Upload Evidence</label>
-                                            <input type="file" class="form-control" id="evidence" name="evidence">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="btn-group" style="float: right;">
-                                            <a href="{{ route('requisitions.index') }}" class="btn btn-danger">Cancel
-                                            </a>
-                                            <button type="submit" class="btn btn-primary" id='submit_btn'>Update</button>
 
+                            <!-- First Row: Remarks and Upload Document -->
+                            <!-- First Row: Remarks and Upload Document -->
+                            <hr>
+                            <div class="d-flex align-items-start">
+                                <!-- Remarks (bigger width) -->
+                                <div class="mr-5" style="flex: 5;">
+                                    <label for="remark"><b>Remarks</b></label>
+                                    <textarea type="text" class="form-control" id="remark" name="remark" placeholder="Enter Remarks Here">{{ $requisition->remarks ?? '' }}</textarea>
+                                </div>
+
+                                <!-- New Evidence -->
+                                <div class="mr-2" style="flex: 4;">
+                                    <label for="evidence"><b>New Evidence <font color="red">*</font></b></label>
+                                    <input type="file" id="evidence" name="evidence" class="form-control" accept=".pdf,.doc,.docx,.jpg,.png">
+                                </div>
+
+                                <!-- Existing Evidence -->
+                                <div style="flex: 1;">
+                                    <label class="form-label mb-2"><b>Existing</b></label>
+                                    @if($requisition->evidence_document)
+                                        <div>
+                                            <a href="{{ asset('storage/' . $requisition->evidence_document) }}" 
+                                            target="_blank" 
+                                            class="btn btn-warning text-body"
+                                            title="View Document">
+                                                View
+                                            </a>
                                         </div>
-                                    </div>
+                                    @else
+                                        <div class="alert alert-warning py-2 mb-0">
+                                            <i class="feather icon-alert-triangle"></i> None
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+
+
+                            <!-- Second Row: Cancel and Update Buttons -->
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-12 d-flex justify-content-end">
+                                    <a href="{{ route('requisitions.index') }}" class="btn btn-danger me-2">Cancel</a>
+                                    <button type="submit" class="btn btn-primary" id='submit_btn'>Update</button>
                                 </div>
                             </div>
                         </form>
@@ -212,23 +256,15 @@
                     data: 'products_',
                     render: function(data) {
                         if (!data) {
-                            return
+                            return "";
                         }
-                        return data.name
-                    }
-                },
-                {
-                    data: 'unit',
-                    render: function(data) {
-                        datas = data.toLocaleString();
-                        return `<input type="text" onblur="unitChange(event)" class="text-left w-100 border-0" name="unit" value="${datas??""}" readonly style="color: inherit; background-color: transparent;"/>`;
+                        return data.name + ' ' + (data.brand || '') + ' ' + (data.pack_size || '') + ' ' + (data.sales_uom || '');
                     }
                 },
                 {
                     data: 'quantity',
                     render: function(data) {
-                        datas = data.toLocaleString();
-                        return `<input type="text" onblur="quantityChange(event)" class="text-left w-100 border-0" step="any" name="qty" value="${datas??""}" readonly style="color: inherit; background-color: transparent;"/>`;
+                        return data.toLocaleString();
                     }
                 },
                 {
@@ -241,28 +277,16 @@
         cart.drawTable();
 
         function enableEdit(event) {
-            // Locate the parent row of the button clicked
             const row = event.target.closest('tr');
+            const td = row.querySelector('td:nth-child(2)'); // Quantity column
+            const currentQty = td.innerText;
 
-            // Find the input field within this row
-            const inputField = row.querySelector('input[name="qty"]');
+            // Replace text with input using Bootstrap form-control
+            td.innerHTML = `<input type="text" name="qty" class="form-control" value="${currentQty}" onblur="quantityChange(event)">`;
 
-            // Enable editing by removing the readonly attribute
-            if (inputField) {
-                inputField.removeAttribute('readonly');
-                inputField.focus(); // Optionally, focus the input for user convenience
-
-                // Apply styles to the input field
-                inputField.style.width='20%'
-                inputField.style.border = '1px solid #000000'; // Example: blue border
-                inputField.style.borderRadius = '4px';        // Rounded corners
-                inputField.style.boxShadow = '0 0 5px rgba(0, 0, 0, 0.25)';
-                inputField.style.padding = '10px 20px';            // Remove default focus outline
-                inputField.style.backgroundColor = '#f4f7fa'; // Example: light blue background
-                inputField.style.transition = 'border-color .15s ease-in-out,box-shadow .15s ease-in-out'; // Smooth transition effect
-
-            }
+            td.querySelector('input').focus();
         }
+
 
         function deleteItem(event) {
             let item = $('#order_table').DataTable().row($(event.target).parents('tr')).data();

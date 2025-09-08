@@ -10,108 +10,88 @@
 @endsection
 
 @section('content')
+<div class="col-sm-12">
+    <!-- TAB LIST -->
+    <ul class="nav nav-pills mb-3" id="issueTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active text-uppercase" id="issue-list-tab" data-toggle="pill"
+               href="{{ route('issue.index') }}" role="tab" aria-controls="issue-list" aria-selected="true">Issue List</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-uppercase" id="issue-history-tab" data-toggle="pill"
+               href="{{ route('requisitions-issue-history') }}" role="tab" aria-controls="issue-history" aria-selected="false">Issue History</a>
+        </li>
+    </ul>
 
-    <div class="col-sm-12">
-        <div class="card-block">
-            <div class="col-sm-12">
-                <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                        <div class="table-responsive">
-                            <table id="table" class="display table nowrap table-striped table-hover" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th>Req. No</th>
-                                        <th>Products</th>
-                                        <th>Status</th>
-                                        <th>From</th>
-                                        <th>To</th>
-                                        <th>Date</th>
-                                        @can('View Requisitions Details')
-                                            <th>Action</th>
-                                        @endcan
-                                    </tr>
-                                </thead>
-                                <tbody id="table-body">
-
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- ISSUE LIST CONTENT -->
+    <div class="tab-content card-block">
+        <div class="table-responsive">
+            <table id="table" class="display table nowrap table-striped table-hover" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Req #</th>
+                        <th>Products</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        @can('View Requisitions Details')
+                            <th>Action</th>
+                        @endcan
+                    </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
         </div>
     </div>
-
+</div>
 @endsection
 
-
-
 @push('page_scripts')
-    @include('partials.notification')
+@include('partials.notification')
 
-    <script>
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
+<script>
+    $.ajaxSetup({
+        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
+    });
 
-        var table = $('#table').DataTable({
-            iDisplayLength: 10,
-            processing: true,
-            serverSide: true,
-            columnDefs: [{
-                "targets": "_all"
-            }],
-            ajax: {
-                url: "{{ route('requisitions-issue-list') }}"
+    // DataTable for Issue List
+    var table = $('#table').DataTable({
+        iDisplayLength: 10,
+        processing: true,
+        serverSide: true,
+        ajax: { url: "{{ route('requisitions-issue-list') }}" },
+        columns: [
+            { data: 'req_no', name: 'req_no' },
+            { data: 'products', name: 'products', searchable: false },
+            { data: 'fromStore', name: 'fromStore', searchable: false },
+            { data: 'toStore', name: 'toStore', searchable: false },
+            { 
+                data: 'reqDate',
+                render: function(date) { return moment(date).format('YYYY-MM-DD'); },
+                orderable: false,
+                searchable: false
             },
-            columns: [{
-                    data: 'req_no',
-                    name: 'req_no'
-                },
-                {
-                    data: 'products',
-                    name: 'products'
-                },
-                {
-                    data: 'status',
-                    render: function(status, type, row) {
-                        if (status == 0) {
-                            return `<span class="badge badge-secondary p-1">Pending</span>`
-                        } else if (status == 1) {
-                            return `<span class="badge badge-success p-1">Approved</span>`
-                        } else if (status == 2) {
-                            return `<span class="badge badge-danger p-1">Denied</span>`
-                        }
-                    },
-                    orderable: false,
-                },
-                {
-                    data: 'fromStore',
-                    name: 'fromStore'
-                },
-                {
-                    data: 'toStore',
-                    name: 'toStore'
-                },
-                {
-                    data: 'reqDate', render: function (date) {
-                    return moment(date).format('MMM DD, YYYY');
+            { 
+                data: 'status',
+                render: function(status) {
+                    if(status == 0) return `<span class="badge badge-secondary p-1">Pending</span>`;
+                    else if(status == 1) return `<span class="badge badge-success p-1">Approved</span>`;
+                    else if(status == 2) return `<span class="badge badge-danger p-1">Denied</span>`;
                 },
                 orderable: false,
-                },
-                @can('View Requisitions Details')
-                    {
-                    data: 'action',
-                    orderable: false,
-                    searchable: false
-                    }
-                @endcan
-            ]
-        });
+                searchable: false
+            },
+            @can('View Requisitions Details')
+            { data: 'action', orderable: false, searchable: false }
+            @endcan
+        ]
+    });
 
-
-
-    </script>
+    // Redirect tabs to separate routes
+    $('#issue-history-tab').on('click', function(e){
+        e.preventDefault();
+        window.location.href = $(this).attr('href');
+    });
+</script>
 @endpush

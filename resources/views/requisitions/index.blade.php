@@ -35,7 +35,7 @@
                             <table id="table" class="display table nowrap table-striped table-hover" style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th>Req. No</th>
+                                        <th>Req #</th>
                                         <th>Products</th>
                                         <th>From</th>
                                         <th>To</th>
@@ -69,79 +69,93 @@
 
     <script>
 
-        $(document).ready(function () {
+    $(document).ready(function () {
+        // ----- keep your config token and routes definition (if you already have it) -----
+        var config = {
+            token: '{{ csrf_token() }}',
+            routes: {
+                retrieveRequisitions: '{{route('requisitions.data')}}'
+            }
+        };
 
-            $('#order_table').DataTable({
+        // Initialize the modal table once and keep a reference
+        var orderTable;
+        if ($.fn.dataTable.isDataTable('#order_table')) {
+            orderTable = $('#order_table').DataTable();
+        } else {
+            orderTable = $('#order_table').DataTable({
                 responsive: true,
-                order: [[0, 'asc']]
+                searching: false,
+                paging: false,
+                info: false,
+                ordering: false, // modal list - no ordering necessary
+                columns: [
+                    { title: "Product Name" },
+                    { title: "Quantity" }
+                ]
             });
+        }
 
-            $('#requisitions').on('click', function(e) {
-                e.preventDefault(); // Prevent default tab switching behavior
-                var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
-                window.location.href = redirectUrl; // Redirect to the URL
-            });
+        // Robust populateTable using DataTables API
+        function populateTable(rows) {
+            orderTable.clear();
 
-            $('#requisition-create').on('click', function(e) {
-                e.preventDefault(); // Prevent default tab switching behavior
-                var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
-                window.location.href = redirectUrl; // Redirect to the URL
-            });
-
-            // Populate Data to table
-            function populateTable(data) {
-                var tableBody = $('#order_table tbody');
-                tableBody.empty(); // Clear any existing rows
-
-                // Loop through the data and append rows to the table
-                data.forEach(function(item) {
-                    var row = '<tr>' +
-                        '<td>' + item.name + '</td>' +
-                        '<td>' + item.unit + '</td>' +
-                        '<td>' + item.quantity + '</td>' +
-                        '</tr>';
-                    tableBody.append(row);
-                });
+            if (!rows || rows.length === 0) {
+                orderTable.row.add(['No products found', '']).draw();
+                return;
             }
 
-            //Endpoints
-            var config = {
-                token: '{{ csrf_token() }}',
-                routes: {
-                    retrieveRequisitions: '{{route('requisitions.data')}}'
-                }
-            };
-
-            //Display
-            $('#requisition-details').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget);
-                var id = button.data('id');
-
-                var tableBody = $('#order_table tbody');
-                tableBody.html('<tr><td colspan="3" class="text-center">Loading...</td></tr>');
-
-                $.ajax({
-                    url: config.routes.retrieveRequisitions,
-                    type: 'POST', // Make sure to use POST
-                    data: {
-                        _token: config.token, // CSRF token
-                        req_id: id
-                    },
-                    dataType: 'json', // Specify JSON format
-                    success: function(response) {
-                        // Populate the table with the fetched data
-                        console.log(response);
-                        populateTable(response);
-                        // console.log(response);
-                    },
-                    error: function(xhr, status, error) {
-                        console.log('Error fetching data: ', error);
-                    }
-                });
-
+            rows.forEach(function(item) {
+                // item may already have full_product_name
+                var name = item.full_product_name || [
+                    item.name, item.brand, item.pack_size, item.sales_uom
+                ].filter(Boolean).join(' ');
+                var qty = (item.quantity !== undefined ? item.quantity : '') + (item.unit ? ' ' + item.unit : '');
+                orderTable.row.add([name, qty]);
             });
 
+            orderTable.draw();
+        }
+
+        // When modal opens — fetch server data and fill table
+        $('#requisition-details').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var id = button.data('id');
+
+            // Show quick loading row
+            orderTable.clear().row.add(['Loading...', '']).draw();
+
+            $.ajax({
+                url: config.routes.retrieveRequisitions,
+                type: 'POST',
+                data: {
+                    _token: config.token,
+                    req_id: id
+                },
+                dataType: 'json',
+                success: function(response) {
+                    var requisition = response.requisition || {};
+                    var rows = response.products || [];
+
+                    // Populate requisition info
+                    $('#req_no').text(requisition.req_no || 'N/A');
+                    $('#created_by').text(requisition.creator?.name || 'N/A');
+                    $('#date_created').text(
+                        requisition.created_at ? moment(requisition.created_at).format('YYYY-MM-DD') : 'N/A'
+                    );
+
+                    // Populate products table
+                    populateTable(rows);
+                },
+
+                error: function(xhr, status, error) {
+                    console.error('Error fetching requisition data:', error, xhr.responseText);
+                    orderTable.clear().row.add(['Error loading data', '']).draw();
+                }
+            });
         });
+
+    });
 
 
     </script>
@@ -154,6 +168,7 @@
             }
         });
 
+        // DataTable initialization
         var table = $('#table').DataTable({
             iDisplayLength: 10,
             processing: true,
@@ -170,7 +185,10 @@
                 },
                 {
                     data: 'products',
-                    name: 'products'
+                    name: 'products',
+                    render: function(data, type, row) {
+                        return data || '';
+                    }
                 },
                 {
                     data: 'fromStore',
@@ -181,16 +199,17 @@
                     name: 'toStore'
                 },
                 {
-                    data: 'reqDate', render: function (date) {
-                    return moment(date).format('MMM DD, YYYY');
-                },
-                orderable: false,
+                    data: 'reqDate', 
+                    render: function (date) {
+                        return moment(date).format('YYYY-MM-DD');
+                    },
+                    orderable: false,
                 },
                 @can('View Requisitions Details')
                     {
-                    data: 'action',
-                    orderable: false,
-                    searchable: false
+                        data: 'action',
+                        orderable: false,
+                        searchable: false
                     }
                 @endcan
             ]
@@ -203,16 +222,26 @@
                 bInfo: true,
                 data: details,
                 columns: [
-                    { title: "Product Name" },
-                    { title: "Unit" },
-                    { title: "Quantity" }
+                    { 
+                        title: "Product Name",
+                        render: function(data, type, row) {
+                            return row.full_product_name || 
+                                (row.name + ' ' + (row.brand || '') + ' ' + 
+                                (row.pack_size || '') + ' ' + (row.sales_uom || ''));
+                        }
+                    },
+                    { 
+                        title: "Quantity",
+                        render: function(data, type, row) {
+                            return row.quantity + (row.unit ? ' ' + row.unit : '');
+                        }
+                    }
                 ]
             });
             details_table.destroy();
             details_table.clear();
             details_table.rows.add(details);
             details_table.draw();
-
         }
 
 

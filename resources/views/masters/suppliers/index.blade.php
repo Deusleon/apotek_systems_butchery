@@ -98,6 +98,10 @@
     @include('partials.notification')
 
     <script>
+        $(document).ready(function(){
+            $('#save_btn, #save_btns').prop('disabled', true);
+        });
+
 
         $('#edit').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
@@ -123,163 +127,54 @@
 
         //Create Modal
         $('#edit').on('show.bs.modal', function () {
-            var input = document.querySelector("#phone_edits");
-            var errorMsg = document.querySelector("#error-msgs");
-            var validMsg = document.querySelector("#valid-msgs");
-            validateMobiles(input, errorMsg, validMsg);
+            initPhoneValidation("#phone_edits", "#save_btns");
         });
 
         //Create Modal
         $('#create').on('show.bs.modal', function () {
-            var input = document.querySelector("#phone_edit");
-            var errorMsg = document.querySelector("#error-msg");
-            var validMsg = document.querySelector("#valid-msg");
-            validateMobile(input, errorMsg, validMsg);
+            initPhoneValidation("#phone_edit", "#save_btn");
         });
 
-        function validateMobile(input, errorMsg, validMsg, action) {
 
-            var errorMap = ["Invalid Phone Number", "Invalid Country Code", "Too Short", "Too Long", "Invalid Phone Number"];
+        function initPhoneValidation(inputSelector, saveBtnSelector) {
+            const input = document.querySelector(inputSelector);
+            const validMsg = input.parentElement.querySelector('.hide'); // assuming first span is valid-msg
+            const errorMsg = validMsg.nextElementSibling; // next span is error-msg
+            const errorMap = ["Invalid Phone Number", "Invalid Country Code", "Too Short", "Too Long", "Invalid Phone Number"];
 
-            input.addEventListener('keyup', reset);
-            if (action) {
-                var iti = window.intlTelInput(input, {
-                    customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
-                        return "e.g. " + selectedCountryPlaceholder;
-                    },
-                    initialCountry: "tz",
-                    geoIpLookup: function (callback) {
-                        $.get('https://ipinfo.io', function () {
-                        }, "jsonp").always(function (resp) {
-                            var countryCode = (resp && resp.country) ? resp.country : "";
-                            callback(countryCode);
-                        });
-                    },
-                    utilsScript: "{{asset("assets/plugins/intl-tel-input/js/utils.js?1562189064761")}}",
-                    onlyCountries: ["tz", "ug", "ke", "rw", "bi", "sd"],
-                    nationalMode: false,
-                });
-            } else {
-                var iti = window.intlTelInput(input, {
-                    customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
-                        return "e.g. " + selectedCountryPlaceholder;
-                    },
-                    initialCountry: "tz",
-                    geoIpLookup: function (callback) {
-                        $.get('https://ipinfo.io', function () {
-                        }, "jsonp").always(function (resp) {
-                            var countryCode = (resp && resp.country) ? resp.country : "";
-                            callback(countryCode);
-                        });
-                    },
-                    utilsScript: "{{asset("assets/plugins/intl-tel-input/js/utils.js?1562189064761")}}",
-                    onlyCountries: ["tz", "ug", "ke", "rw", "bi", "sd"],
-                });
-            }
-            var reset = function () {
+            const iti = window.intlTelInput(input, {
+                initialCountry: "tz",
+                onlyCountries: ["tz", "ug", "ke", "rw", "bi", "sd"],
+                nationalMode: false,
+                utilsScript: "{{asset('assets/plugins/intl-tel-input/js/utils.js?1562189064761')}}"
+            });
+
+            function reset() {
                 input.classList.remove("error");
-                errorMsg.innerHTML = "";
-                errorMsg.classList.add("hide");
                 validMsg.classList.add("hide");
-            };
+                errorMsg.classList.add("hide");
+                errorMsg.innerHTML = "";
+                $(saveBtnSelector).prop('disabled', true);
+            }
 
-// on blur: validate
-            input.addEventListener('blur', function () {
+            function validateNumber() {
                 reset();
                 if (input.value.trim()) {
                     if (iti.isValidNumber()) {
-                        $('#save_btn').prop('disabled', false);
-                        $('#edit_btn').prop('disabled', false);
                         validMsg.classList.remove("hide");
-                        document.getElementById('phone_edit').value = iti.getNumber();
-                        if (action) {//On edit there is action variable
-                            // document.getElementById('phone_edit').value = iti.getNumber();
-                        }
+                        $(saveBtnSelector).prop('disabled', false);
+                        input.value = iti.getNumber();
                     } else {
                         input.classList.add("error");
-                        $('#save_btn').prop('disabled', true);
-                        $('#edit_btn').prop('disabled', true);
-                        var errorCode = iti.getValidationError();
-                        errorMsg.innerHTML = errorMap[errorCode];
+                        $(saveBtnSelector).prop('disabled', true);
+                        const errorCode = iti.getValidationError();
+                        errorMsg.innerHTML = errorMap[errorCode] || "Invalid Number";
                         errorMsg.classList.remove("hide");
                     }
                 }
-            });
-
-// on keyup / change flag: reset
-            input.addEventListener('change', reset);
-        }
-
-        function validateMobiles(input, errorMsg, validMsg, action) {
-
-            var errorMap = ["Invalid Phone Number", "Invalid Country Code", "Too Short", "Too Long", "Invalid Phone Number"];
-
-            input.addEventListener('keyup', reset);
-            if (action) {
-                var iti = window.intlTelInput(input, {
-                    customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
-                        return "e.g. " + selectedCountryPlaceholder;
-                    },
-                    initialCountry: "tz",
-                    geoIpLookup: function (callback) {
-                        $.get('https://ipinfo.io', function () {
-                        }, "jsonp").always(function (resp) {
-                            var countryCode = (resp && resp.country) ? resp.country : "";
-                            callback(countryCode);
-                        });
-                    },
-                    utilsScript: "{{asset("assets/plugins/intl-tel-input/js/utils.js?1562189064761")}}",
-                    onlyCountries: ["tz", "ug", "ke", "rw", "bi", "sd"],
-                    nationalMode: false,
-                });
-            } else {
-                var iti = window.intlTelInput(input, {
-                    customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
-                        return "e.g. " + selectedCountryPlaceholder;
-                    },
-                    initialCountry: "tz",
-                    geoIpLookup: function (callback) {
-                        $.get('https://ipinfo.io', function () {
-                        }, "jsonp").always(function (resp) {
-                            var countryCode = (resp && resp.country) ? resp.country : "";
-                            callback(countryCode);
-                        });
-                    },
-                    utilsScript: "{{asset("assets/plugins/intl-tel-input/js/utils.js?1562189064761")}}",
-                    onlyCountries: ["tz", "ug", "ke", "rw", "bi", "sd"],
-                });
             }
-            var reset = function () {
-                input.classList.remove("error");
-                errorMsg.innerHTML = "";
-                errorMsg.classList.add("hide");
-                validMsg.classList.add("hide");
-            };
 
-// on blur: validate
-            input.addEventListener('blur', function () {
-                reset();
-                if (input.value.trim()) {
-                    if (iti.isValidNumber()) {
-                        $('#save_btns').prop('disabled', false);
-                        $('#edit_btn').prop('disabled', false);
-                        validMsg.classList.remove("hide");
-                        document.getElementById('phone_edits').value = iti.getNumber();
-                        if (action) {//On edit there is action variable
-                            // document.getElementById('phone_edit').value = iti.getNumber();
-                        }
-                    } else {
-                        input.classList.add("error");
-                        $('#save_btns').prop('disabled', true);
-                        $('#edit_btn').prop('disabled', true);
-                        var errorCode = iti.getValidationError();
-                        errorMsg.innerHTML = errorMap[errorCode];
-                        errorMsg.classList.remove("hide");
-                    }
-                }
-            });
-
-// on keyup / change flag: reset
+            input.addEventListener('blur', validateNumber);
             input.addEventListener('change', reset);
         }
 

@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use PDF;
 use Yajra\DataTables\DataTables;
 
@@ -59,7 +60,24 @@ class RequisitionController extends Controller
                     return $btn_view;
                 })
                 ->addColumn('products', function ($row) {
-                    $prod = '<span class="badge badge-primary p-1">' . $row->reqDetails->count() . ' Products</span>';
+                    // Get first 2-3 product names for display
+                    $productNames = [];
+                    foreach ($row->reqDetails->take(3) as $detail) {
+                        if ($detail->products_) {
+                            $productNames[] = $detail->products_->name . ' ' . 
+                                            $detail->products_->brand . ' ' . 
+                                            $detail->products_->pack_size . ' ' . 
+                                            $detail->products_->sales_uom;
+                        }
+                    }
+                    
+                    $displayText = implode(', ', $productNames);
+                    if ($row->reqDetails->count() > 3) {
+                        $displayText .= ' and ' . ($row->reqDetails->count() - 3) . ' more';
+                    }
+                    
+                    $prod = '<span class="badge badge-primary p-1" title="' . htmlspecialchars($displayText) . '">' . 
+                            $row->reqDetails->count() . ' Products</span>';
                     return $prod;
                 })
                 ->addColumn('reqDate', function ($row) {
@@ -77,7 +95,7 @@ class RequisitionController extends Controller
         }
 
 
-        $items = Product::where('status', 1)->get();
+        $items = Product::where('status', 1)->select('id', 'name', 'brand', 'pack_size', 'sales_uom')->get();
         $users = User::where('status', 1)->get();
         $stores = Store::where('name','<>','ALL')
             ->get();
@@ -105,13 +123,24 @@ class RequisitionController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+        public function store(Request $request)
     {
-//        if (!Auth()->user()->checkPermission('Create Requisitions')) {
-//            abort(403, 'Access Denied');
-//        }
+        if (!Auth()->user()->checkPermission('Create Requisitions')) {
+            abort(403, 'Access Denied');
+        }
+
+        // Validate file upload
+        $request->validate([
+            'evidence' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048', // max 2MB
+        ]);
 
         $orders = json_decode($request->orders);
+
+        // Handle file upload - FIXED VARIABLE NAME
+        $evidencePath = null;
+        if($request->hasFile('evidence')) {
+            $evidencePath = $request->file('evidence')->store('requisition_evidence', 'public');
+        }
 
         $last_req_id = Requisition::orderBy('id', 'DESC')->first();
 
@@ -123,13 +152,11 @@ class RequisitionController extends Controller
 
         $req_no = date('m') . date('d') . str_pad($Id, 5, '0', STR_PAD_LEFT);
 
-        if(auth()->user()->checkPermission('Manage All Branches'))
-        {
+        if(auth()->user()->checkPermission('Manage All Branches')) {
             $from_store = $request->from_store;
         }
 
-        if(!auth()->user()->checkPermission('Manage All Branches'))
-        {
+        if(!auth()->user()->checkPermission('Manage All Branches')) {
             $from_store = Auth::user()->store_id;
         }
 
@@ -138,6 +165,7 @@ class RequisitionController extends Controller
             $requisition->req_no = $req_no;
             $requisition->notes = $request->notes;
             $requisition->remarks = $request->remark;
+            $requisition->evidence_document = $evidencePath; // FIXED COLUMN NAME
             $requisition->from_store = $from_store;
             $requisition->to_store = "1";
             $requisition->status = 0;
@@ -156,6 +184,7 @@ class RequisitionController extends Controller
                 $order_detail->unit = $order_details->unit;
                 $success = $order_detail->save();
             }
+            
             session()->flash("alert-success", "Requisition Created Successfully!");
             DB::commit();
 
@@ -164,60 +193,100 @@ class RequisitionController extends Controller
     }
 
     public function show($id)
-    {
-        if (!Auth()->user()->checkPermission('View Requisitions Details')) {
-            abort(403, 'Access Denied');
-        }
-
-        $items = Product::where('status', 1)->get();
-        $stores = Store::get();
-
-        $requisition = Requisition::with(['reqDetails', 'creator'])->find($id);
-
-        $fromStore = Store::findOrFail($requisition->from_store);
-        $toStore = Store::findOrFail($requisition->to_store);
-
-        $requisitionDet = RequisitionDetail::with('products_')
-            ->leftJoin('inv_current_stock', 'inv_current_stock.product_id', 'requisition_details.product')
-            ->selectRaw('requisition_details.*, sum(inv_current_stock.quantity) as qty_oh')
-            ->groupBy('inv_current_stock.product_id')
-            // ->havingRaw(DB::raw('sum(inv_current_stock.quantity) > 0'))
-            // ->where('inv_current_stock.store_id', $requisition->to_store)
-            ->where('requisition_details.req_id', $id)
-            ->get();
-
-        // $data = json_encode($requisitionDet);
-        // dd($data);
-
-        return view("requisitions.show", compact('requisition', 'requisitionDet', 'fromStore', 'toStore', 'items', 'stores'));
+{
+    if (!Auth()->user()->checkPermission('View Requisitions Details')) {
+        abort(403, 'Access Denied');
     }
 
-    //Shows Requisition Details
+    $items = Product::where('status', 1)->get();
+    $stores = Store::get();
+
+    $requisition = Requisition::with(['reqDetails', 'creator'])->find($id);
+
+    $fromStore = Store::findOrFail($requisition->from_store);
+    $toStore = Store::findOrFail($requisition->to_store);
+
+    $requisitionDet = RequisitionDetail::with('products_')
+        ->leftJoin('inv_current_stock', 'inv_current_stock.product_id', 'requisition_details.product')
+        ->selectRaw('requisition_details.*, sum(inv_current_stock.quantity) as qty_oh')
+        ->groupBy('inv_current_stock.product_id')
+        // ->havingRaw(DB::raw('sum(inv_current_stock.quantity) > 0'))
+        // ->where('inv_current_stock.store_id', $requisition->to_store)
+        ->where('requisition_details.req_id', $id)
+        ->get();
+
+    // ADD THIS CONCATENATION CODE:
+    $requisitionDet->each(function($detail) {
+        if ($detail->products_) {
+            $detail->products_->full_product_name = 
+                $detail->products_->name . ' ' . 
+                ($detail->products_->brand ?? '') . ' ' . 
+                ($detail->products_->pack_size ?? '') . ' ' . 
+                ($detail->products_->sales_uom ?? '');
+        }
+    });
+
+    return view("requisitions.show", compact('requisition', 'requisitionDet', 'fromStore', 'toStore', 'items', 'stores'));
+}
+
     public function showRequisition(Request $request)
     {
         $id = $request->req_id;
-        $data = DB::table('requisition_details')
-            ->join('inv_products', 'inv_products.id','=', 'requisition_details.product')
-            ->select('inv_products.name','requisition_details.unit','requisition_details.quantity')
-            ->where('requisition_details.req_id','=',$id)
-            ->get();
 
-        Log::info('message',['Data'=>$data]);
+        $requisition = Requisition::with(['creator', 'reqDetails.products_'])->findOrFail($id);
+        $fromStore = Store::find($requisition->from_store);
+        $toStore = Store::find($requisition->to_store);
 
-        return $data;
+        $products = $requisition->reqDetails->map(function($detail) {
+            $product = $detail->products_;
+            $full_name = $product ? 
+                ($product->name.' '.($product->brand ?? '').' '.($product->pack_size ?? '').' '.($product->sales_uom ?? '')) 
+                : '';
+
+            return [
+                'full_product_name' => $full_name,
+                'quantity' => $detail->quantity,
+                'unit' => $detail->unit,
+                'quantity_given' => $detail->quantity_given ?? 0,
+                'on_hand' => $detail->qty_oh ?? 0
+            ];
+        });
+
+        return response()->json([
+        'requisition' => [
+            'req_no' => $requisition->req_no,
+            'from_store' => $fromStore->name ?? 'N/A',
+            'to_store' => $toStore->name ?? 'N/A',
+            'issued_by' => $requisition->creator->name ?? 'N/A',
+            'created_by' => $requisition->creator->name ?? 'N/A',
+            'created_at' => $requisition->created_at,
+            'remarks' => $requisition->remarks,
+            'evidence_document' => $requisition->evidence_document
+        ],
+        'products' => $products
+    ]);
+
     }
 
     public function printReq(Request $request)
     {
-
         $receipt_size = Setting::where('id', 119)->value('value');
-
         $req_id = $request->req_id;
 
         $requisition = Requisition::with(['reqDetails', 'reqTo', 'creator'])->find($req_id);
-
         $requisitionDet = RequisitionDetail::with('products_')->where('req_id', $req_id)->get();
         $pharmacy = $this->companyInfo();
+
+        // ADD CONCATENATION LOGIC HERE:
+        $requisitionDet->each(function($detail) {
+            if ($detail->products_) {
+                $detail->products_->full_product_name = 
+                    $detail->products_->name . ' ' . 
+                    ($detail->products_->brand ?? '') . ' ' . 
+                    ($detail->products_->pack_size ?? '') . ' ' . 
+                    ($detail->products_->sales_uom ?? '');
+            }
+        });
 
         if ($receipt_size == '58mm Thermal Paper') {
             $view = 'requisitions.pdf.receipt_thermal';
@@ -242,7 +311,6 @@ class RequisitionController extends Controller
         } else {
             echo "<script>window.close();</script>";
         }
-
     }
 
     private function companyInfo()
@@ -262,19 +330,39 @@ class RequisitionController extends Controller
 
     public function update(Request $request)
     {
+        if (!Auth()->user()->checkPermission('Create Requisitions')) {
+            abort(403, 'Access Denied');
+        }
+
+        // Validate file upload (same as store method)
+        $request->validate([
+            'evidence' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048', // max 2MB
+        ]);
+
         $req_id = $request->requisition_id;
         $remarks = $request->remark;
-        if(auth()->user()->checkPermission('Manage All Branches'))
-        {
+        
+        if(auth()->user()->checkPermission('Manage All Branches')) {
             $from_store = $request->from_store;
         }
 
-        if(!auth()->user()->checkPermission('Manage All Branches'))
-        {
+        if(!auth()->user()->checkPermission('Manage All Branches')) {
             $from_store = Auth::user()->store_id;
         }
 
         $to_store = "1";
+
+        // Handle file upload - NEW CODE ADDED
+        $evidencePath = null;
+        if($request->hasFile('evidence')) {
+            $evidencePath = $request->file('evidence')->store('requisition_evidence', 'public');
+            
+            // Optional: Delete old evidence file if it exists
+            $oldRequisition = Requisition::find($req_id);
+            if ($oldRequisition->evidence_document && Storage::disk('public')->exists($oldRequisition->evidence_document)) {
+                Storage::disk('public')->delete($oldRequisition->evidence_document);
+            }
+        }
 
         $orders = json_decode($request->orders);
         if (!empty($orders)) {
@@ -285,8 +373,13 @@ class RequisitionController extends Controller
             $requisition->to_store = $to_store;
             $requisition->remarks = $remarks;
             $requisition->updated_by = Auth::user()->id;
+            
+            // Update evidence document if a new file was uploaded - NEW CODE
+            if ($evidencePath) {
+                $requisition->evidence_document = $evidencePath;
+            }
+            
             $requisition->save();
-
 
             foreach ($orders as $order_details) {
                 $check_req = RequisitionDetail::query()
@@ -312,19 +405,16 @@ class RequisitionController extends Controller
                     $order_detail->unit = $order_details->unit;
                     $order_detail->save();
                 }
-
-
             }
+            
             session()->flash("alert-success", "Requisition Updated Successfully!");
             DB::commit();
 
             return back();
         }
 
-
         session()->flash("alert-success", "Requisition Accepted Successfully!");
         return back();
-
     }
 
     public function destroy(Request $request)
@@ -349,46 +439,97 @@ class RequisitionController extends Controller
         return view('issue_requisitions.index');
     }
 
-    public function getRequisitionsIssue(Request $request)
+   public function issueHistory()
     {
-//        if (!Auth()->user()->checkPermission('View Requisitions Issue')) {
-//            abort(403, 'Access Denied');
-//        }
+        if (!Auth()->user()->checkPermission('View Requisitions Issue')) {
+            abort(403, 'Access Denied');
+        }
 
+        return view('issue_requisitions.history');
+    }
+
+    public function getRequisitionsHistory(Request $request)
+    {
         if ($request->ajax()) {
-            $data = Requisition::with(['reqDetails'])
+            $data = Requisition::with(['reqDetails', 'creator'])
                 ->leftJoin(DB::raw('inv_stores as from_store'), 'requisitions.from_store', '=', 'from_store.id')
                 ->leftJoin(DB::raw('inv_stores as to_store'), 'requisitions.to_store', '=', 'to_store.id')
                 ->selectRaw('requisitions.*, to_store.name as toStore, from_store.name as fromStore')
+                ->where('requisitions.status', 1) // ✅ Only Approved/Issued
                 ->orderBy('requisitions.id', 'DESC');
-            return DataTables::of($data)
-                ->addColumn('action', function ($row) {
-                    $btn_view = '';
-                    if (Auth()->user()->can('Manage Product Categories')) {
-                        if (Auth()->user()->can('Manage Product Categories')) {
-                            $btn_view = '<a href="' . route('requisitions.issue', $row->id) . '" class="btn btn-warning btn-sm" title="ISSUE">Issue</a>';
-                        }
-                    }
 
-                    return $btn_view;
-                })
+            return DataTables::of($data)
                 ->addColumn('products', function ($row) {
-                    $prod = '<span class="badge badge-primary p-1">' . $row->reqDetails->count() . ' Products</span>';
-                    return $prod;
+                    return '<span class="badge badge-primary p-1">' . $row->reqDetails->count() . ' Products</span>';
+                })
+                ->addColumn('issued_by', function ($row) {
+                    return $row->creator ? $row->creator->name : 'N/A';
                 })
                 ->addColumn('reqDate', function ($row) {
-                    return $row->created_at;
+                    return $row->updated_at ?? $row->created_at;
                 })
-                ->rawColumns(['action', 'products', 'reqTo', 'reqDate'])
+                ->addColumn('action', function ($row) {
+                    return '
+                        <button type="button" class="btn btn-sm btn-info btn-view btn-rounded" data-id="'.$row->id.'">Show</button>
+                    ';
+                })
+
+                ->rawColumns(['products', 'action'])
                 ->make(true);
         }
     }
 
+
+    public function getRequisitionsIssue(Request $request)
+{
+    // if (!Auth()->user()->checkPermission('View Requisitions Issue')) {
+    //     abort(403, 'Access Denied');
+    // }
+
+    if ($request->ajax()) {
+        $data = Requisition::with(['reqDetails'])
+            ->leftJoin(DB::raw('inv_stores as from_store'), 'requisitions.from_store', '=', 'from_store.id')
+            ->leftJoin(DB::raw('inv_stores as to_store'), 'requisitions.to_store', '=', 'to_store.id')
+            ->selectRaw('requisitions.*, to_store.name as toStore, from_store.name as fromStore')
+            ->orderBy('requisitions.id', 'DESC');
+
+        return DataTables::of($data)
+            ->addColumn('action', function ($row) {
+                $btn_view = '';
+
+                if (Auth()->user()->can('Manage Product Categories')) {
+                    if ($row->status == 0) {
+                        // Pending → show active Issue button
+                        $btn_view = '<a href="' . route('requisitions.issue', $row->id) . '" 
+                                        class="btn btn-warning btn-sm btn-rounded" title="ISSUE">Issue</a>';
+                    } elseif ($row->status == 1) {
+                        // Approved → disable Issue button
+                        $btn_view = '<button class="btn btn-warning btn-sm btn-rounded" disabled>Issue</button>';
+                    } else {
+                        // Denied or other statuses
+                        $btn_view = '<span class="badge badge-danger">No Action</span>';
+                    }
+                }
+
+                return $btn_view;
+            })
+            ->addColumn('products', function ($row) {
+                return '<span class="badge badge-primary p-1">' . $row->reqDetails->count() . ' Products</span>';
+            })
+            ->addColumn('reqDate', function ($row) {
+                return $row->created_at;
+            })
+            ->rawColumns(['action', 'products', 'reqTo', 'reqDate'])
+            ->make(true);
+    }
+}
+
+
     public function issue($id)
     {
-//        if (!Auth()->user()->checkPermission('View Requisitions Issue')) {
-//            abort(403, 'Access Denied');
-//        }
+    //        if (!Auth()->user()->checkPermission('View Requisitions Issue')) {
+    //            abort(403, 'Access Denied');
+    //        }
 
         $items = Product::where('status', 1)->get();
         $stores = Store::get();
@@ -406,6 +547,17 @@ class RequisitionController extends Controller
             // ->where('inv_current_stock.store_id', $fromStore)
             ->where('requisition_details.req_id', $id)
             ->get();
+
+        // ADD CONCATENATION LOGIC HERE:
+        $requisitionDet->each(function($detail) {
+            if ($detail->products_) {
+                $detail->products_->full_product_name = 
+                    $detail->products_->name . ' ' . 
+                    ($detail->products_->brand ?? '') . ' ' . 
+                    ($detail->products_->pack_size ?? '') . ' ' . 
+                    ($detail->products_->sales_uom ?? '');
+            }
+        });
 
         return view("issue_requisitions.show", compact('requisition', 'requisitionDet', 'fromStore', 'toStore', 'items', 'stores'));
     }
