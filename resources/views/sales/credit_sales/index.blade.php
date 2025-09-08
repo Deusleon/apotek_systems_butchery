@@ -602,14 +602,18 @@
             var start = moment();
             var end = moment();
 
+            
             function cb(start, end) {
-                $('#sales_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                $('#daterange').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
             }
 
             $('#sales_date').daterangepicker({
                 startDate: moment().startOf('month'),
                 endDate: end,
                 autoUpdateInput: true,
+                locale: {
+                    format: 'YYYY/MM/DD' 
+                },
                 ranges: {
                     'Today': [moment(), moment()],
                     'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -721,14 +725,16 @@
             var end = moment();
 
             function cb(start, end) {
-                $('#receive_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                $('#daterange').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
             }
 
             $('#sales_date_payment').daterangepicker({
                 startDate: moment().startOf('month'),
                 endDate: moment().endOf('month'),
                 autoUpdateInput: true,
-
+                locale: {
+                    format: 'YYYY/MM/DD' 
+                },
                 ranges: {
                     'Today': [moment(), moment()],
                     'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],

@@ -357,13 +357,16 @@
                 var end = moment();
 
                 function cb(start, end) {
-                    $('#date_range span').html(start.format('MMMM D, YYYY') + ' - ' + end.format(
-                        'MMMM D, YYYY'));
+                    $('#daterange').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
                 }
 
                 $('#date_range').daterangepicker({
                     startDate: start,
                     endDate: end,
+                    autoUpdateInput: true,
+                    locale: {
+                        format: 'YYYY/MM/DD'
+                    },
                     ranges: {
                         'Today': [moment(), moment()],
                         'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -417,38 +420,38 @@
                             update_url = update_url.replace('receipt_id', row.id);
 
                             let buttons = `
-                                    <button class="btn btn-sm btn-rounded btn-success" type="button"
-                                            onclick="showQuoteDetails(event)"
-                                            id="quote_details">Show
-                                    </button>
-                                    <a href="${receipt_url}" target="_blank">
-                                        <button class="btn btn-sm btn-rounded btn-secondary" type="button">
-                                            <span class="fa fa-print" aria-hidden="true"></span>
-                                            Print
-                                        </button>
-                                    </a>`;
+                                            <button class="btn btn-sm btn-rounded btn-success" type="button"
+                                                    onclick="showQuoteDetails(event)"
+                                                    id="quote_details">Show
+                                            </button>
+                                            <a href="${receipt_url}" target="_blank">
+                                                <button class="btn btn-sm btn-rounded btn-secondary" type="button">
+                                                    <span class="fa fa-print" aria-hidden="true"></span>
+                                                    Print
+                                                </button>
+                                            </a>`;
 
                             if (data.status === 1) {
                                 buttons += `
 
-                                    <a class="btn btn-sm btn-rounded btn-info"
-                                    href="${update_url}">
-                                    Edit
-                                    </a>
-                                        <button class="btn btn-sm btn-rounded btn-warning"
-                                                type="button"
-                                                onclick="convertQuoteToSale(${row.id})">
-                                            Convert
-                                        </button>
-                                    `;
-                            }else{
+                                            <a class="btn btn-sm btn-rounded btn-info"
+                                            href="${update_url}">
+                                            Edit
+                                            </a>
+                                                <button class="btn btn-sm btn-rounded btn-warning"
+                                                        type="button"
+                                                        onclick="convertQuoteToSale(${row.id})">
+                                                    Convert
+                                                </button>
+                                            `;
+                            } else {
                                 buttons += `
-                                        <button class="btn btn-sm btn-rounded btn-primary opacity-75"
-                                                type="button"
-                                                disabled>
-                                            Sold
-                                        </button>
-                                    `;
+                                                <button class="btn btn-sm btn-rounded btn-primary opacity-75"
+                                                        type="button"
+                                                        disabled>
+                                                    Sold
+                                                </button>
+                                            `;
                             }
                             return buttons;
                         }
@@ -672,7 +675,8 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p class="mb-3">Are you sure you want to convert this Sales Order to a Sale? This action cannot be undone!.</p>
+                    <p class="mb-3">Are you sure you want to convert this Sales Order to a Sale? This action cannot be
+                        undone!.</p>
                     <p>Stock quantities will be automatically deducted from inventory.</p>
                 </div>
                 <div class="modal-footer">
@@ -731,7 +735,7 @@
             document.getElementById('gracePeriodDiv').style.display = "none";
         }
     };
-    
+
     function convertionConfirm() {
         $('#professionalConvertModal').off('hidden.bs.modal').one('hidden.bs.modal', function () {
             $('#convertConfirmModal').modal('show');

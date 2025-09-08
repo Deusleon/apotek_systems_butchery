@@ -1,9 +1,17 @@
-$("#daterange").on("apply.daterangepicker", function (ev, picker) {
-    getHistory();
+$(document).ready(function () {
+    $('#loading').show();
+    var daterange =
+        moment().format("YYYY/MM/DD") + "-" + moment().format("YYYY/MM/DD");
+    getHistory(daterange);
+    $("#loading").hide();
 });
 
-function getHistory() {
-    var range = document.getElementById("daterange").value;
+$("#daterange").on("apply.daterangepicker", function (ev, picker) {
+    var range = $(this).val();
+    getHistory(range);
+});
+
+function getHistory(range) {
     range = range.split("-");
     if (range) {
         $.ajax({
@@ -50,13 +58,12 @@ if (!$.fn.DataTable.isDataTable("#sales_history_table")) {
         columns: [
             { title: "Product Name" },
             { title: "Quantity" },
-            { title: "Price" }
+            { title: "Price" },
         ],
     });
 } else {
     saleHistoryDataTable = $("#sales_history_table").DataTable();
 }
-
 
 function populateTable(data) {
     // Clear old rows
@@ -96,7 +103,7 @@ $(document).on("click", ".show-sales", function () {
     var receipt = $(this).data("receipt");
     var customer = $(this).data("customer");
     var date = $(this).data("date");
-    var saleId = $(this).data('sale-id');
+    var saleId = $(this).data("sale-id");
     $("#sale-details").modal("show");
     $("#receipt_no").text(receipt);
     $("#customer_name").text(customer);
@@ -129,7 +136,11 @@ function populateHistoryTable(data) {
     // Add new rows
     data.forEach(function (item) {
         saleHistoryDataTable.row.add([
-            item.name+' '+(item.brand ? item.brand+' ':'')+item.pack_size+item.sales_uom,
+            item.name +
+                " " +
+                (item.brand ? item.brand + " " : "") +
+                item.pack_size +
+                item.sales_uom,
             formatMoney(Number(item.quantity).toFixed(0)),
             formatMoney(Number(item.price)),
         ]);

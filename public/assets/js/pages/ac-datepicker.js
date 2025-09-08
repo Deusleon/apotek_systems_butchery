@@ -1,43 +1,48 @@
-'use strict';
+"use strict";
 $(document).ready(function () {
-    $('#d_week').datepicker({
-        daysOfWeekDisabled: "2"
+    $("#d_week").datepicker({
+        daysOfWeekDisabled: "2",
     });
 
-    $('#d_highlight').datepicker({
-        daysOfWeekHighlighted: "1"
+    $("#d_highlight").datepicker({
+        daysOfWeekHighlighted: "1",
     });
 
-    $('#d_auto').datepicker({
+    $("#d_auto").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: 'yyyy-mm-dd',
-        changeYear: true
+        format: "yyyy-mm-dd",
+        changeYear: true,
     });
 
-    $('#date_edit').datepicker({
+    $("#date_edit").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: 'yyyy-mm-dd',
-        changeYear: true
+        format: "yyyy-mm-dd",
+        changeYear: true,
     });
 
-    $('#due_date').datepicker({
+    $("#due_date").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: 'yyyy-mm-dd',
-        changeYear: true
+        format: "yyyy-mm-dd",
+        changeYear: true,
     });
-    $('#expire_d').datepicker({
+    $("#expire_d").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: 'yyyy-mm-dd',
-        changeYear: true
+        format: "yyyy-mm-dd",
+        changeYear: true,
+        startDate: tomorrow,
     });
 
     var date = new Date();
-    var tomorrow = new Date(date.getFullYear(), date.getMonth(), (date.getDate() + 1));
-    var end = new Date(date.getFullYear(), date.getMonth(), (date.getDate() + 1));
+    var tomorrow = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate() + 1
+    );
+    var end = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
 
     // $('#expire_date_1').datepicker({
     //     format: "dd-mm-yyyy",
@@ -45,95 +50,103 @@ $(document).ready(function () {
     //     autoclose: true,
     //     changeYear: true
     // });
-    $('#expire_date_2').datepicker({
+    $("#expire_date_2").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: 'yyyy-mm-dd',
-        changeYear: true
+        format: "yyyy-mm-dd",
+        changeYear: true,
     });
 
-    $('#credit_sale_date').datepicker({
+    $("#credit_sale_date").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: 'yyyy-mm-dd',
-        changeYear: true
+        format: "yyyy-mm-dd",
+        changeYear: true,
+        endDate: new Date(),
     });
-    $('#cash_sale_date').datepicker({
+    $("#credit_sale_date").prop("readonly", true);
+
+    $("#cash_sale_date").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: 'yyyy-mm-dd',
-        changeYear: true
+        format: "yyyy-mm-dd",
+        changeYear: true,
+        endDate: new Date(),
     });
-    $('#rec_d').datepicker({
+    $("#cash_sale_date").prop("readonly", true);
+
+    $("#rec_d").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: 'yyyy-mm-dd',
-        changeYear: true
+        format: "yyyy-mm-dd",
+        changeYear: true,
     });
 
-    $('#d_auto_1').datepicker({
+    $("#d_auto_1").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: 'yyyy-mm-dd',
-        changeYear: true
+        format: "yyyy-mm-dd",
+        changeYear: true,
     });
 
-    $('#d_auto_2').datepicker({
+    $("#d_auto_2").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: 'yyyy-mm-dd',
-        changeYear: true
+        format: "yyyy-mm-dd",
+        changeYear: true,
     });
 
-    $('#d_auto_3').datepicker({
+    $("#d_auto_3").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: 'yyyy-mm-dd',
-        changeYear: true
+        format: "yyyy-mm-dd",
+        changeYear: true,
     });
 
-    $('#d_auto_4').datepicker({
+    $("#d_auto_4").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: 'yyyy-mm-dd',
-        changeYear: true
+        format: "yyyy-mm-dd",
+        changeYear: true,
     });
 
-    $('#d_auto_5').datepicker({
+    $("#d_auto_5").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: 'yyyy-mm-dd',
-        changeYear: true
+        format: "yyyy-mm-dd",
+        changeYear: true,
     });
 
-    $('#d_auto_6').datepicker({
-        todayHighlight: true,
-        format: 'yyyy-mm-dd',
-        changeYear: true
-    }).on('change', function () {
-        $('.datepicker').hide();
-    }).attr('readonly', 'readonly');
+    $("#d_auto_6")
+        .datepicker({
+            todayHighlight: true,
+            format: "yyyy-mm-dd",
+            changeYear: true,
+        })
+        .on("change", function () {
+            $(".datepicker").hide();
+        })
+        .attr("readonly", "readonly");
 
-
-    $('#d_disable').datepicker({
-        datesDisabled: ['10/15/2018', '10/16/2018', '10/17/2018', '10/18/2018']
+    $("#d_disable").datepicker({
+        datesDisabled: ["10/15/2018", "10/16/2018", "10/17/2018", "10/18/2018"],
     });
 
-    $('#d_toggle').datepicker({
+    $("#d_toggle").datepicker({
         keyboardNavigation: false,
         forceParse: false,
-        toggleActive: true
+        toggleActive: true,
     });
 
-    $('#d_today').datepicker({
+    $("#d_today").datepicker({
         keyboardNavigation: false,
         forceParse: false,
-        todayHighlight: true
+        todayHighlight: true,
     });
 
-    $('#disp_week').datepicker({
-        calendarWeeks: true
+    $("#disp_week").datepicker({
+        calendarWeeks: true,
     });
 
-    $('#datepicker_range').datepicker({});
+    $("#datepicker_range").datepicker({});
 });
