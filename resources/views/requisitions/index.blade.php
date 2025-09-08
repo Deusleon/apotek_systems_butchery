@@ -139,7 +139,7 @@
 
                     // Populate requisition info
                     $('#req_no').text(requisition.req_no || 'N/A');
-                    $('#created_by').text(requisition.creator?.name || 'N/A');
+                    $('#created_by').text(requisition.created_by || 'N/A');
                     $('#date_created').text(
                         requisition.created_at ? moment(requisition.created_at).format('YYYY-MM-DD') : 'N/A'
                     );
