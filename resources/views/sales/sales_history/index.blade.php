@@ -572,7 +572,7 @@
                 { data: 'item_returned.name' },
                 {
                     data: 'item_returned.b_date', render: function (date) {
-                        return moment(date).format('D-MM-YYYY');
+                        return moment(date).format('YYYY-MM-DD');
                     }
                 },
                 {
@@ -583,7 +583,7 @@
                 },
                 {
                     data: 'date', render: function (date) {
-                        return moment(date).format('D-MM-YYYY');
+                        return moment(date).format('YYYY-MM-DD');
                     }
                 },
                 {
