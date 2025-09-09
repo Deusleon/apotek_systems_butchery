@@ -543,6 +543,12 @@ function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
     } catch (e) {}
 }
 
+function newDiscount(){
+    var discount = document.getElementById('sale_discount').value;
+      var newDiscount = unformatNumber(discount);
+        console.log("NwDS", newDiscount);
+}
+
 function discount() {
     if (discount_enable === "YES") {
         var dis = document.getElementById("sale_discount").value;
@@ -643,7 +649,6 @@ function discount() {
             total += bought_product.amount;
             order_cart.push(bought_product);
         });
-        //SUBTOTAL WITH DISCOUNT
         total -= sale_discount;
         sub_total = total / (1 + tax);
         total_vat = total - sub_total;

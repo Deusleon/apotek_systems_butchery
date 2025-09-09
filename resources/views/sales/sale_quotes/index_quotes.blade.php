@@ -169,13 +169,6 @@
                     </div>
                     <hr>
 
-                    {{-- barcode input boxes --}}
-                    <select id="products_b">
-                        <option value="" disabled selected style="display:none;">Select Product</option>
-                    </select>
-                    <input type="text" id="input_products_b" name="input_products_b" value="" />
-                    {{-- end barcode input boxes --}}
-
                     <div class="row">
                         <div class="col-md-6"></div>
                         <div class="col-md-6">

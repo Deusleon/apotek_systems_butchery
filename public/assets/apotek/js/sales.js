@@ -784,6 +784,8 @@ function deselect1() {
 
 function deselectQuote() {
     document.getElementById("quote_sale_form").reset();
+    document.getElementById("#sale_discount").value = '';
+    $("#customer_id").val("").change();
     $("#customer_id").val("").change();
     sub_total = 0;
     total = 0;
@@ -852,7 +854,7 @@ function quoteDetails(remark, items, data) {
         item_data.push(item.id);
         item_data.push(item.name+' '+(item.brand ? item.brand+' ' : '')+item.pack_size+item.sales_uom);
         item_data.push(item.quantity);
-        item_data.push(item.price / item.quantity); //unit price
+        item_data.push(item.price);
         item_data.push(item.vat);
         item_data.push(item.discount);
         item_data.push(Number(item.amount)-Number(item.discount));

@@ -147,7 +147,7 @@ function populateHistoryTable(data) {
                 (item.brand ? item.brand + " " : "") +
                 item.pack_size +
                 item.sales_uom,
-            formatMoney(Number(item.quantity).toFixed(0)),
+            Number(item.quantity).toFixed(0),
             formatMoney(Number(item.price)),
         ]);
     });
