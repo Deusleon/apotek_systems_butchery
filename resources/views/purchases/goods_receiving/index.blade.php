@@ -487,7 +487,7 @@
 
         //Purchase Date
         $('input[name="purchase_date"]').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('YYYY/MM/DD'));
+            $(this).val(picker.startDate.format('YYYY-MM-DD'));
         });
 
         $('input[name="purchase_date"]').on('cancel.daterangepicker', function (ev, picker) {
