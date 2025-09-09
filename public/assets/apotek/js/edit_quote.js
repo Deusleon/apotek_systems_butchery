@@ -62,7 +62,7 @@ $("#products").on("change", function () {
                 fetchProducts();
                 refreshSalesTable(response.data);
                 isCartEmpty(response.data.sales_details.length);
-                console.log("response", response);
+                // console.log("response", response);
                 // notify(response.message, "top", "right", "success");
                 document.getElementById("sub_total").value = formatNumber(
                     Number(response.data.sub_total),
@@ -163,6 +163,15 @@ $("#price_category").on("change", function () {
     }
 });
 
+function newDiscount(val){
+    var currentTotal = document.getElementById('total').value;
+    var sub_total = document.getElementById('sub_total').value;
+    var vat = document.getElementById('total_vat').value;
+    var newTotal = Number(unformatNumber(sub_total)-unformatNumber(val))+Number(unformatNumber(vat))
+    // console.log('NewDisc', currentTotal, sub_total, vat);
+    document.getElementById('total').value = formatNumber(newTotal, 2);
+}
+
 function fetchProducts() {
     var id = document.getElementById("price_category").value;
     if (id) {
@@ -222,11 +231,7 @@ function refreshSalesTable(data) {
         `;
         tbody.append(row);
     });
-
-    // Update totals
-    // $('#sub_total').val(formatNumber(data.sub_total,2));
-    // $('#total_vat').val(formatNumber(data.vat,2));
-    // $('#total').val(formatNumber(data.total,2));
+    document.getElementById("sale_discount").value = formatNumber(Number(data.discount),2);
     document.getElementById("sub_total").value = formatNumber(
         Number(data.sub_total),
         2
@@ -235,8 +240,7 @@ function refreshSalesTable(data) {
         Number(data.vat),
         2
     );
-    document.getElementById("total").value = formatNumber(
-        Number(data.total),
+    document.getElementById("total").value = formatNumber(Number(data.total),
         2
     );
 }

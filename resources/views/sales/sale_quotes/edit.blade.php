@@ -131,6 +131,8 @@
                                     </tr>
                                 </thead>
                                 <input type="hidden" name="" id="quoted_id" value="{{ $quote_id }}">
+                                <input type="hidden" name="" id="vat_rate_percent" value="{{ $vat_rate }}">
+                                <input type="hidden" name="" id="vat_rate" value="{{ $total_vat }}">
                                 <input type="hidden" name="" id="sales_details" value="{{ $sales_details->count() }}">
                                 <tbody>
                                     @foreach($sales_details as $saleData)
@@ -138,7 +140,7 @@
                                             <td>{{ $saleData->name.' '.$saleData->brand.' '.$saleData->pack_size.$saleData->sales_uom }}</td>
                                             <td class="quantity">{{ $saleData->quantity }}</td>
                                             <td class="price">{{ number_format($saleData->price, 0) }}</td>
-                                            <td>{{ number_format($saleData->vat, 0) }}</td>
+                                            <td class="vat">{{ number_format($saleData->vat, 0) }}</td>
                                             <td class="amount">{{ number_format($saleData->amount, 0) }}</td>
                                             <td hidden>{{ number_format($saleData->discount, 0) }}</td>
                                             <td>
@@ -160,7 +162,7 @@
                             @if ($enable_discount === 'YES')
                                 <div style="width: 99%">
                                     <label>Discount</label>
-                                    <input type="text" onchange="discount()" id="sale_discount" class="form-control"
+                                    <input type="text" onchange="newDiscount(this.value)" id="sale_discount" class="form-control"
                                         value="{{ number_format($discount, 2) ?? '0.00' }}" />
                                 </div>
                             @endif
@@ -180,7 +182,7 @@
                                 <label class="col-md-6 col-form-label text-md-right"><b>VAT:</b></label>
                                 <div class="col-md-6" style="display: flex; justify-content: flex-end">
                                     <input type="text" id="total_vat" class="form-control-plaintext text-md-right" readonly
-                                        value="{{ number_format($vat, 2) ?? '0.0' }}" />
+                                        value="{{ number_format($total_vat, 2) ?? '0.0' }}" />
                                 </div>
                             </div>
                             <div class="row">
@@ -196,7 +198,7 @@
                         </div>
 
 
-                        <input type="hidden" value="{{ $vat }}" id="vat">
+                        <input type="hidden" value="{{ $total_vat }}" id="vat">
                         <input type="hidden" value="0.00" id="sale_paid">
                         <input type="hidden" value="Yes" id="quotes_page">
                         <input type="hidden" value="0.00" id="change_amount">
@@ -367,6 +369,7 @@
                     if (!$(e.target).closest(tr).length) {
                         var qInput = tr.find('td.quantity input');
                         var pInput = tr.find('td.price input');
+                        var vVal = $('#vat_rate_percent').val();
 
                         if (qInput.length && pInput.length) {
                             var qVal = unformatNumber(qInput.val());
@@ -374,6 +377,7 @@
 
                             tr.find('td.quantity').text(formatNumber(qVal, 0));
                             tr.find('td.price').text(formatNumber(pVal, 0));
+                            tr.find('td.vat').text(formatNumber((qVal *(vVal * pVal)), 0));
                             tr.find('td.amount').text(formatNumber(qVal * pVal, 0));
                         }
 
@@ -399,7 +403,7 @@
                     success: function(response) {
                         refreshSalesTable(response.data);
                         isCartEmpty(response.data.sales_details.length);
-                        // console.log('response', response);
+                        console.log('response', response);
                     },
                     error: function(xhr) {
                         notify('Failed', 'top', 'right', 'danger');
