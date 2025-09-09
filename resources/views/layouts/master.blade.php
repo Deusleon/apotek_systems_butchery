@@ -307,12 +307,12 @@ $store_id = Auth::user()->store_id;
                             <dfn data-info="This is the default store, where all activities will be based on."><a
                                     href="{{route('configurations.index')}}">
                                     @if(session()->get('store') !== "Please Set Store")
-                                    <span class="badge badge-info">Welcome, {{session()->get('store')}}</span> @else
+                                    <span class="badge badge-info">Welcome, {{ current_store()->name }}</span> @else
                                     <span class="badge badge-danger">Please Set Default Store</span> @endif</a></dfn>
                         @else
                             <dfn data-info="This is the default store, where all activities will be based on."><a href="#">
                                     @if(session()->get('store') !== "Please Set Store")
-                                    <span class="badge badge-info">Welcome, {{session()->get('store')}}</span> @else
+                                    <span class="badge badge-info">Welcome, {{current_store()->name}}</span> @else
                                     <span class="badge badge-danger">Please Set Default Store</span> @endif</a></dfn>
                         @endif
                     </div>
