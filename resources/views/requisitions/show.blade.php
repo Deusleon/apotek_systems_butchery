@@ -56,7 +56,7 @@
                                     <label for="from_store">Requesting From<font color="red">*</font></label>
                                     @if(!auth()->user()->checkPermission('Manage All Branches'))
                                         <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
-                                            <option value="">Select Store...</option>
+                                            <option value="">Select Branch...</option>
                                             @foreach ($stores as $item)
                                                 @if($item->id != Auth::user()->store_id && strtoupper($item->name) !== 'ALL')
                                                     <option value="{{ $item->id }}" 
@@ -70,7 +70,7 @@
 
                                     @if(auth()->user()->checkPermission('Manage All Branches'))
                                         <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
-                                            <option value="">Select Store...</option>
+                                            <option value="">Select Branch...</option>
                                             @foreach ($stores as $item)
                                                 @if($item->id != Auth::user()->store_id && strtoupper($item->name) !== 'ALL')
                                                     <option value="{{ $item->id }}" 

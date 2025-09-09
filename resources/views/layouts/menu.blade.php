@@ -39,13 +39,6 @@
             @if(auth()->user()->checkPermission('View Purchase Order'))
                 <li class=""><a href="{{route('purchase-order.index')}}" class="">Purchase Order</a></li>
             @endif
-            @if(auth()->user()->checkPermission('View Requisition'))
-                <li class=""><a href="{{ route('requisitions.create')}}" class="">Requisition</a></li>
-            @endif
-            @if(auth()->user()->checkPermission('View Requisition Issue'))
-                <li class=""><a href="{{ route('issue.index') }}" class="">Issue</a></li>
-            @endif
-
             @if(auth()->user()->checkPermission('View Suppliers'))
                 <li class=""><a href="{{route('suppliers.index')}}" class="">Suppliers</a></li>
             @endif
@@ -73,6 +66,13 @@
             @if(auth()->user()->checkPermission('View Price List'))
                 <li class=""><a href="{{ route('price-list.index') }}" class="">Price List</a></li>
             @endif
+            @if(auth()->user()->checkPermission('View Requisition'))
+                <li class=""><a href="{{ route('requisitions.create')}}" class="">Stock Requisition</a></li>
+            @endif
+            @if(auth()->user()->checkPermission('View Requisition Issue'))
+                <li class=""><a href="{{ route('issue.index') }}" class="">Stock Issue</a></li>
+            @endif
+
             @if(auth()->user()->checkPermission('View Stock Transfer'))
                 <li class=""><a href="{{ route('stock-transfer.index') }}" class="">Stock Transfer</a></li>
             @endif
@@ -126,12 +126,13 @@
                     @if(auth()->user()->checkPermission('View Invoices'))
                         <li class=""><a href="{{route('invoice-management.index')}}" class="">Invoices</a></li>
                     @endif
-                    @if(auth()->user()->checkPermission('View Assets'))
+                   {{-- @if(auth()->user()->checkPermission('View Assets'))
                         <li class=""><a href="#" class="">Assets</a></li>
                     @endif
                     @if(auth()->user()->checkPermission('View Cash Flow'))
                         <li class=""><a href="#" class="">Cash Flow</a></li>
                     @endif
+                    --}}
         </ul>
 
 

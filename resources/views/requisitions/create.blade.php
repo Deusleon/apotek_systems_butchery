@@ -41,7 +41,7 @@
                                     
                                     @if(!auth()->user()->checkPermission('Manage All Branches'))
                                     <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
-                                        <option value="">Select Store...</option>
+                                        <option value="">Select Branch...</option>
                                         @foreach ($stores as $item)
                                             @if($item->id != Auth::user()->store_id)
                                                 <option value="{{ $item->id }}" {{ $loop->first ? 'selected' : '' }}>{{ $item->name }}</option>
@@ -52,7 +52,7 @@
                                     
                                     @if(auth()->user()->checkPermission('Manage All Branches'))
                                     <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
-                                        <option value="">Select Store...</option>
+                                        <option value="">Select Branch...</option>
                                         @foreach ($stores as $item)
                                             @if($item->id != Auth::user()->store_id)
                                                 <option value="{{ $item->id }}">{{ $item->name }}</option>

@@ -210,7 +210,7 @@
                         if (data == '1') return `<span class='${badgeClass} badge-warning' style='${style}'>Pending</span>`;
                         if (data == '2') return `<span class='${badgeClass} badge-info' style='${style}'>Partial</span>`;
                         if (data == '3') return `<span class='${badgeClass} badge-success' style='${style}'>Completed</span>`;
-                        return `<span class='${badgeClass} badge-secondary' style='${style}'>Unknown</span>`;
+                        return `<span class='${badgeClass} badge-secondary' style='${style}'>Rejected</span>`;
                     }
                 },
                 {
