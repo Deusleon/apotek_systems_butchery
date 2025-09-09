@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Setting;
 use App\User;
+use App\Store;
+use Spatie\Permission\Models\Role;
 use Dompdf\Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -24,9 +26,10 @@ class UserController extends Controller
     public function index()
     {
         $users = User::orderBy('name')->get();
+        $roles = Role::orderBy('name')->get();
+        $stores = Store::orderBy('name')->get();
 
-
-        return view('users.index', compact("users"));
+        return view('users.index', compact('users', 'roles', 'stores'));
     }
 
     public function addPermission(Request $request)
@@ -85,10 +88,10 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:50',
             'position' => 'nullable|string|max:50',
-            'role' => 'required',
+            'role' => 'required|exists:roles,id',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
-            'store_id' => 'required'
+            'store_id' => 'required|exists:inv_stores,id',
         ]);
 
         $user = new User;
@@ -101,7 +104,11 @@ class UserController extends Controller
         $user->store_id = $request->store_id;
         $user->save();
 
-        $user->syncRoles($request->role);
+        // ✅ resolve role id to role name before syncing
+        $role = Role::find($request->role);
+        if ($role) {
+            $user->syncRoles($role->name);
+        }
 
         session()->flash("alert-success", "User created successfully!");
         return back();

@@ -55,21 +55,27 @@
                                 <div class="form-group col-md-3">
                                     <label for="from_store">Requesting From<font color="red">*</font></label>
                                     @if(!auth()->user()->checkPermission('Manage All Branches'))
-                                        <select name="from_store" class="js-example-basic-single form-control" id="from_store"
-                                                required disabled="true">
+                                        <select name="from_store" class="js-example-basic-single form-control" id="from_store" required disabled="true">
                                             <option value="">Select Store...</option>
                                             @foreach ($stores as $item)
-                                                <option value='{{ $item->id }}' {{ $item->id == Auth::user()->store_id ? 'selected="selected"' : '' }}>{{ $item->name }}</option>
+                                                @if($item->id != Auth::user()->store_id)
+                                                    <option value='{{ $item->id }}' {{ $item->id == Auth::user()->store_id ? 'selected="selected"' : '' }}>
+                                                        {{ $item->name }}
+                                                    </option>
+                                                @endif
                                             @endforeach
                                         </select>
                                     @endif
 
                                     @if(auth()->user()->checkPermission('Manage All Branches'))
-                                        <select name="from_store" class="js-example-basic-single form-control" id="from_store"
-                                                required>
+                                        <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
                                             <option value="">Select Store...</option>
                                             @foreach ($stores as $item)
-                                                <option value='{{ $item->id }}' {{ $item->id == Auth::user()->store_id ? 'selected="selected"' : '' }}>{{ $item->name }}</option>
+                                                @if($item->id != Auth::user()->store_id)
+                                                    <option value='{{ $item->id }}'>
+                                                        {{ $item->name }}
+                                                    </option>
+                                                @endif
                                             @endforeach
                                         </select>
                                     @endif

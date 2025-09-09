@@ -16,13 +16,13 @@
             <div class="col-sm-12">
                 <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link text-uppercase" id="requisition-create" data-toggle="pill"
+                        <a class="nav-link text-uppercase" id="requisition-create"
                            href="{{ url('purchases/requisitions-create') }}" role="tab"
                            aria-controls="current-stock" aria-selected="true">New</a>
                     </li>
                     @if(Auth::user()->checkPermission('View Requisition List'))
                     <li class="nav-item">
-                        <a class="nav-link active text-uppercase" id="requisitions" data-toggle="pill"
+                        <a class="nav-link active text-uppercase" id="requisitions"
                            href="{{ url('purchases/requisitions') }}" role="tab"
                            aria-controls="stock_list" aria-selected="false">Requisition List
                         </a>

@@ -107,6 +107,7 @@ class MaterialReceivedController extends Controller
             ->join('users', 'users.id', '=', 'inv_incoming_stock.created_by')
             ->whereBetween(DB::raw('date(inv_incoming_stock.created_at)'), [$from, $to])
             ->orderby('created_at', 'DESC')
+            ->orderby('id', 'DESC')
             ->count();
     }
 
@@ -132,6 +133,7 @@ class MaterialReceivedController extends Controller
                 ->offset($start)
                 ->limit($limit)
                 ->orderby('created_at', 'DESC')
+                ->orderby('id', 'DESC')
                 ->get();
         } else {
             $material_received = GoodsReceiving::select(
@@ -207,6 +209,7 @@ class MaterialReceivedController extends Controller
                 ->offset($start)
                 ->limit($limit)
                 ->orderby('created_at', 'DESC')
+                ->orderby('id', 'DESC')
                 ->get();
 
             $totalFiltered = GoodsReceiving::select('inv_incoming_stock.id')

@@ -34,9 +34,7 @@
         </a>
         <ul class="pcoded-submenu">
             @if(auth()->user()->checkPermission('View Goods Receiving'))
-                @if(auth()->user()->store_id == '1')
                 <li class=""><a href="{{route('goods-receiving.index')}}" class="">Goods Receiving</a></li>
-                @endif
             @endif
             @if(auth()->user()->checkPermission('View Purchase Order'))
                 <li class=""><a href="{{route('purchase-order.index')}}" class="">Purchase Order</a></li>

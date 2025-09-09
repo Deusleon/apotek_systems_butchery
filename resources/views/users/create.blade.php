@@ -85,26 +85,16 @@
                             </div>
 
                         <div class="form-group row">
-                                <label for="role" class="col-md-4 col-form-label text-md-right">{{ __('User Role') }} <font color="red">*</font></label>
-                                <div class="col-md-8">
-                                        <select class="form-control select2"  class="form-control" id="role" name="role[]"  data-placeholder="Select Role" required data-width="100%">
-                                                @foreach(getRoles() as $role)
-                                                    <option value="{{$role->id}}" {{ ($role->id == old('role') ? "selected":"") }}>{{$role->name}}</option>
-                                                @endforeach
-                                        </select>
-                                <span class="text-danger">
-                                    <strong id="role-error"></strong>
-                                </span>
-                                </div>
-                        </div>
-
-
-                        <div class="form-group row">
-                            <label for="role" class="col-md-4 col-form-label text-md-right">{{ __('User Store') }} <font color="red">*</font></label>
+                            <label for="role" class="col-md-4 col-form-label text-md-right">
+                                {{ __('User Role') }} <font color="red">*</font>
+                            </label>
                             <div class="col-md-8">
-                                <select class="form-control select2"  class="form-control" id="store" name="store_id"  data-placeholder="Select Store" required data-width="100%">
-                                    @foreach(getStores() as $role)
-                                        <option value="{{$role->id}}" {{ ($role->id == old('store_id') ? "selected":"") }}>{{$role->name}}</option>
+                                <select class="form-control select2" id="role" name="role" data-placeholder="Select Role" required data-width="100%">
+                                    <option value="">Select Role</option>
+                                    @foreach($roles as $role)
+                                        <option value="{{ $role->id }}" {{ old('role') == $role->id ? 'selected' : '' }}>
+                                            {{ $role->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                                 <span class="text-danger">
@@ -113,8 +103,25 @@
                             </div>
                         </div>
 
-
-
+                        <div class="form-group row">
+                            <label for="store" class="col-md-4 col-form-label text-md-right">
+                                {{ __('User Store') }} <font color="red">*</font>
+                            </label>
+                            <div class="col-md-8">
+                                <select class="form-control select2" id="store" name="store_id" data-placeholder="Select Store" required data-width="100%">
+                                    <option value="">Select Store</option>
+                                    @foreach($stores as $store)
+                                        <option value="{{ $store->id }}" {{ old('store_id') == $store->id ? 'selected' : '' }}>
+                                            {{ $store->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <span class="text-danger">
+                                    <strong id="store-error"></strong>
+                                </span>
+                            </div>
+                        </div>
+                        
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Save</button>
