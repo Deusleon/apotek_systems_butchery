@@ -171,6 +171,14 @@
 @endsection
 
 
+<!-- Add this before scripts -->
+<style>
+/* Force Select2 dropdown to open downward for products */
+#products + .select2-container .select2-dropdown {
+    top: 100% !important; /* Position dropdown below input */
+    bottom: auto !important;
+}
+</style>
 
 @push('page_scripts')
     @include('partials.notification')
