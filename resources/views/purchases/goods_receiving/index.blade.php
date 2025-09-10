@@ -445,19 +445,18 @@
         });
 
         $(function () {
-            var start = moment();
-            var end = moment();
-
             $('#invoicing_purchase_date').daterangepicker({
                 singleDatePicker: true,
                 showDropdowns: true,
                 autoUpdateInput: false,
+                maxDate: moment(), // ✅ prevents choosing tomorrow or future dates
                 locale: {
                     format: 'YYYY-MM-DD'
                 },
                 drops: "up"
             });
         });
+
 
         $(function () {
             var start = moment();
