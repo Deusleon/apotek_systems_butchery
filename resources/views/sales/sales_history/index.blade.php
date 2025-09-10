@@ -480,7 +480,7 @@
             var end = moment();
 
             function cb(start, end) {
-                // Display format tu
+                // Display format
                 $('#daterange').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
             }
 

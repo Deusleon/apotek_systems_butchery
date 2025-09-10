@@ -229,12 +229,17 @@
             var end = moment();
 
             function cb(start, end) {
-                $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                // Display format
+                $('#reportrange span').html(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
             }
 
             $('#daterange').daterangepicker({
                 startDate: start,
                 endDate: end,
+                autoUpdateInput: true,
+                locale: {
+                    format: 'YYYY/MM/DD' 
+                },
                 ranges: {
                     'Today': [moment(), moment()],
                     'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
