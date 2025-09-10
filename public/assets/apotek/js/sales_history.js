@@ -67,20 +67,20 @@ if (!$.fn.DataTable.isDataTable("#sales_history_table")) {
 
 function populateTable(data) {
     // Clear old rows
-    saleHistoryTable.clear();
+    saleHistoryTable.clear()
 
     // Add new rows
     data.forEach(function (item) {
+        let receipt_url = config.routes.receiptBaseUrl.replace(":receipt", item.receipt_number)
         saleHistoryTable.row.add([
             item.receipt_number,
             item.customer.name,
             moment(item.date).format("YYYY-MM-DD"),
-            formatMoney(Number(item.total_amount) + Number(item.total_vat)),
+            formatMoney(Number(item.total_amount)-Number(item.total_vat)),
             formatMoney(Number(item.total_vat)),
             formatMoney(Number(item.total_discount)),
             formatMoney(
-                Number(item.total_amount) +
-                    Number(item.total_vat) -
+                Number(item.total_amount) -
                     Number(item.total_discount)
             ),
             "<button type='button' class='btn btn-sm show-sales btn-rounded btn-success' data-receipt='" +
@@ -91,13 +91,13 @@ function populateTable(data) {
                 item.id +
                 "' data-date='" +
                 moment(item.date).format("YYYY-MM-DD") +
-                "'>Show</button>"
-            +`<a href="${"receipt_url"}" target="_blank">
-                <button class="btn btn-sm btn-rounded btn-secondary" type="button">
-                    <span class="fa fa-print" aria-hidden="true"></span>
-                    Print
-                </button>
-            </a>`,
+                "'>Show</button>" +
+                `<a href="${receipt_url}" target="_blank">
+                    <button class="btn btn-sm btn-rounded btn-secondary" type="button">
+                        <span class="fa fa-print" aria-hidden="true"></span>
+                        Print
+                    </button>
+                </a>`,
         ]);
     });
 

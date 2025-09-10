@@ -138,7 +138,7 @@
                             <td align="left">{{$item['sn']}}</td>
                             <td align="left">
                                 {{$item['name']}}
-                                {{ $item['brand'] ? $item['name'] . " " : ""}}
+                                {{ $item['brand'] ? $item['brand'] . " " : ""}}
                                 {{ $item['pack_size'] ? $item['pack_size'] : ""}}{{ $item['sales_uom'] ? $item['sales_uom'] : ""}}
                             </td>
                             <td align="right">{{$item['quantity']}}</td>

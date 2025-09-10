@@ -34,7 +34,6 @@
                                         New Customer
                                     </button>
                                 </div>
-
                             </div>
                         @endif
                         @csrf()
@@ -75,6 +74,11 @@
                             </div>
                         </div>
 
+                        <!-- ajax loading gif -->
+                        {{-- <div id="loading">
+                            <img id="loading-image" src="{{asset('assets/images/spinner.gif')}}" />
+                        </div> --}}
+                        
                         <div class="row" id="detail">
                             <hr>
                             <div class="table teble responsive" style="width: 100%;">

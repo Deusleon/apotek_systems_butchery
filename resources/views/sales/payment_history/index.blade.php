@@ -149,6 +149,8 @@
                             date: date
                         },
                         success: function (data) {
+                            console.log('Data', data);
+                            
                             document.getElementById('main_table').style.display = 'none';
                             document.getElementById('filter_history').style.display = 'block';
 

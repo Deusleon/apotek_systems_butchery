@@ -1020,20 +1020,19 @@ function valueCollection() {
 
     var selectedOption = sel.options[sel.selectedIndex];
     var name = selectedOption.getAttribute("data-name") || selectedOption.text;
-    var price = Number(selectedOption.getAttribute("data-price") || 0);
     var available_quantity = Number(
         selectedOption.getAttribute("data-quantity") || 0
     );
     var productID = productValue;
 
-    // Unit calcs
-    var vatUnit = Number((price * tax).toFixed(2));
-    var unitTotal = Number(price + vatUnit);
-
     // Check if the item already exist in cart
     let idx = cart.findIndex((r) => r[6] == productID);
 
     if (idx !== -1) {
+        var price =  parseFloat(cart[idx][2].replace(/,/g, ''));
+        // Unit calcs
+        var vatUnit = Number((price * tax).toFixed(2));
+        var unitTotal = Number(price + vatUnit);
         // If exist then add qty and move it on top.
         let row = cart[idx];
 
@@ -1064,6 +1063,10 @@ function valueCollection() {
             default_cart.unshift(dc);
         }
     } else {
+        var price = Number(selectedOption.getAttribute("data-price") || 0);
+        // Unit calcs
+        var vatUnit = Number((price * tax).toFixed(2));
+        var unitTotal = Number(price + vatUnit);
         var item = [
             name,
             1, 

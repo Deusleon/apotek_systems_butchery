@@ -45,6 +45,25 @@
             opacity: 0;
             z-index: 1;
         }
+        #loading {
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            position: fixed;
+            display: none;
+            opacity: 0.7;
+            background-color: #fff;
+            z-index: 99;
+            text-align: center;
+        }
+
+        #loading-image {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            z-index: 100;
+        }
     </style>
 
     <div class="col-sm-12">
@@ -348,7 +367,7 @@
                                                 <button type="button" class="btn btn-danger" id="deselect-all-credit-sale">
                                                     Cancel
                                                 </button>
-                                                <button class="btn btn-primary" id="save_btn">Save</button>
+                                                <button type="submit" class="btn btn-primary" id="save_btn">Save</button>
                                             </div>
                                         </div>
                                     </div>
@@ -360,6 +379,11 @@
                             </form>
                         </div>
                     @endif
+
+                        <!-- ajax loading gif -->
+                        <div id="loading">
+                            <img id="loading-image" src="{{asset('assets/images/spinner.gif')}}" />
+                        </div>
 
                     @if(!Auth::user()->checkPermission('View Credit Sales'))
                         <div class="tab-pane fade show" id="credit-sale-receiving" role="tabpanel"
