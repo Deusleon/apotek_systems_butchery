@@ -297,7 +297,7 @@
                     {
                         'data': 'cost', render: function (cost) {
                             if(cost) {
-                                return formatMoney(((cost.amount - cost.discount) / (1 + (cost.vat / cost.sub_total))));
+                                return formatMoney(cost.vat);
                             }
                                 return '';
                         }

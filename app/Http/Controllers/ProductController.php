@@ -101,12 +101,12 @@ class ProductController extends Controller
         $this->validate($request, [
             'name' => 'required|string|max:255',
             'barcode' => 'nullable|string|max:50',
-            // 'brand' => 'required|string|max:100',
+            'brand' => 'nullable|string|max:100',
             'pack_size' => 'required|string|max:50',
             'category' => 'required|exists:inv_categories,id',
             'sale_uom' => 'required|string|max:50',
-            'min_quantinty' => 'required|numeric|min:0',
-            'max_quantinty' => 'required|numeric|min:0',
+            'min_quantinty' => 'nullable|numeric|min:0',
+            'max_quantinty' => 'nullable|numeric|min:0',
             // 'product_type' => 'nullable|in:stockable,consumable',
             'status' => 'nullable|in:0,1'
         ]);
@@ -293,13 +293,13 @@ class ProductController extends Controller
             $product->sub_category_id = $request->sub_category;
             $product->generic_name = $request->generic_name;
             $product->standard_uom = $request->standardUoM;
-            $product->sales_uom = $request->saleUoM;
+            $product->sales_uom = $request->sale_uom;
             $product->purchase_uom = $request->purchaseUoM;
             $product->indication = $request->indication;
             $product->dosage = $request->dosage;
             $product->status = 1;
-            $product->min_quantinty = str_replace(',', '', $request->min_stock);
-            $product->max_quantinty = str_replace(',', '', $request->max_stock);
+            $product->min_quantinty = str_replace(',', '', $request->min_quantinty);
+            $product->max_quantinty = str_replace(',', '', $request->max_quantinty);
 
             try {
                 $product->save();
