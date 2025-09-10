@@ -259,6 +259,7 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::get('sales/credit-sale/receipt', 'SaleController@getCreditReceipt')->name('getCreditReceipt');
     Route::get('sales/sale/filter-by-word', 'SaleController@filterProductByWord')->name('filter-product-by-word');
     Route::post('sales/history/sale-reprint', 'SaleController@receiptReprint')->name('sale-reprint-receipt');
+    Route::get('sales/history/sale-reprint/{receipt}', 'SaleController@receiptReprint')->name('sale-reprint-receipt-get');
     Route::get('sales/credit-tracking/payment-history/filter', 'SaleController@paymentHistoryFilter')->name('payment-history-filter');
 
 

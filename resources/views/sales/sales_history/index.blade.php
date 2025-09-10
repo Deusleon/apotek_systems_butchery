@@ -279,7 +279,8 @@
             routes: {
                 salesDetails: '{{route('sale_detail')}}',
                 getSalesHistory: '{{route('getSalesHistory')}}',
-                getSalesHistoryData: '{{ route('getSalesHistoryData') }}'
+                getSalesHistoryData: '{{ route('getSalesHistoryData') }}',
+                receiptBaseUrl: "{{ route('sale-reprint-receipt-get', ['receipt' => ':receipt']) }}"
             }
         };
 
@@ -608,7 +609,6 @@
         $('#searching_returns').on('keyup', function () {
             return_table.search(this.value).draw();
         });
-
 
     </script>
 

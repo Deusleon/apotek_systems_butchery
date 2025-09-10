@@ -124,8 +124,8 @@ class SaleController extends Controller
                 /*return all by date*/
                 $payments = SalesCredit::join('sales', 'sales.id', '=', 'sales_credits.sale_id')
                     ->join('customers', 'customers.id', '=', 'sales.customer_id')
-                    ->whereBetween(DB::raw('date(created_at)'), [date('Y/m/d', strtotime($dates[0])),
-                        date('Y/m/d', strtotime($dates[1]))])
+                    ->whereBetween(DB::raw('date(created_at)'), [date('Y-m-d', strtotime($dates[0])),
+                        date('Y-m-d', strtotime($dates[1]))])
                         ->orderBy('sales_credits.created_at', 'desc')
                     ->get();
             } else {
@@ -138,8 +138,8 @@ class SaleController extends Controller
                 } else {
                     $payments = SalesCredit::join('sales', 'sales.id', '=', 'sales_credits.sale_id')
                         ->join('customers', 'customers.id', '=', 'sales.customer_id')
-                        ->whereBetween(DB::raw('date(created_at)'), [date('Y/m/d', strtotime($dates[0])),
-                            date('Y/m/d', strtotime($dates[1]))])
+                        ->whereBetween(DB::raw('date(created_at)'), [date('Y-m-d', strtotime($dates[0])),
+                            date('Y-m-d', strtotime($dates[1]))])
                         ->where('sales.customer_id', $request->customer_id)
                         ->orderBy('sales_credits.created_at', 'desc')
                         ->get();
@@ -463,7 +463,7 @@ class SaleController extends Controller
 
     }
 
-    public function receiptReprint(Request $request)
+    public function receiptReprint($receipt, Request $request)
     {
         try {
             $receipt_size = Setting::where('id', 119)->value('value');
@@ -477,8 +477,8 @@ class SaleController extends Controller
 
             Log::info('PrintSize', ['Size' => $receipt_size]);
 
-
-            $id = Sale::where('receipt_number', $request->reprint_receipt)->value('id');
+            $receipt_number = $receipt ?? $request->reprint_receipt;
+            $id = Sale::where('receipt_number', $receipt_number)->value('id');
 
             /*check if receipt is credit or not*/
             $credit_sale = SalesCredit::where('sale_id', $id)->get();
@@ -507,7 +507,6 @@ class SaleController extends Controller
             }
 
             $sale_detail = SalesDetail::where('sale_id', $id)->get();
-
             $sales = array();
             $grouped_sales = array();
             $sn = 0;
@@ -523,7 +522,10 @@ class SaleController extends Controller
                 $sn++;
                 array_push($sales, array(
                     'receipt_number' => $item->sale['receipt_number'],
-                    'name' => $item->currentStock['product']['name'],
+                    'name' => $item->currentStock['product']['brand'],
+                    'brand' => $item->currentStock['product']['name'],
+                    'pack_size' => $item->currentStock['product']['pack_size'],
+                    'sales_uom' => $item->currentStock['product']['sales_uom'],
                     'sn' => $sn,
                     'quantity' => $item->quantity,
                     'vat' => $vat,
@@ -646,6 +648,7 @@ class SaleController extends Controller
                 'sales_summary.items_count'
             ])
             ->get();
+            Log::info('Data is'.json_encode($sales, JSON_PRETTY_PRINT));
             
         return response()->json([
             "data" => $sales

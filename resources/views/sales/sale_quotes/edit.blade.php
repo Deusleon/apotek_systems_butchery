@@ -139,16 +139,15 @@
                                         <tr data-id="{{ $saleData->id }}">
                                             <td>{{ $saleData->name.' '.$saleData->brand.' '.$saleData->pack_size.$saleData->sales_uom }}</td>
                                             <td class="quantity">{{ $saleData->quantity }}</td>
-                                            <td class="price">{{ number_format($saleData->price, 0) }}</td>
-                                            <td class="vat">{{ number_format($saleData->vat, 0) }}</td>
-                                            <td class="amount">{{ number_format($saleData->amount, 0) }}</td>
-                                            <td hidden>{{ number_format($saleData->discount, 0) }}</td>
+                                            <td class="price">{{ number_format($saleData->price, 2) }}</td>
+                                            <td class="vat">{{ number_format($saleData->vat, 2) }}</td>
+                                            <td class="amount">{{ number_format($saleData->amount, 2) }}</td>
+                                            <td hidden>{{ number_format($saleData->discount, 2) }}</td>
                                             <td>
                                                 <button type="button" class="btn btn-primary btn-sm btn-edit btn-rounded">Edit</button>
                                                 <button type="button" class="btn btn-danger btn-sm btn-delete btn-rounded" data-quote-id="{{ $saleData->quote_id }}" data-quote-item-id="{{ $saleData->id }}">Delete</button>
                                             </td>
                                         </tr>
-
                                     @endforeach
                                 </tbody>
 

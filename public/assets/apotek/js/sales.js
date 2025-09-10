@@ -743,9 +743,9 @@ function deselect() {
     if (discount_enable === "YES") {
         document.getElementById("sale_discount").value = 0.0;
     }
-    var backDate = document.getElementById('cash_sale_date');
+    var backDate = document.getElementById("cash_sale_date");
     if (backDate) {
-        backDate.value = '';
+        backDate.value = "";
     }
     document.getElementById("sub_total").value = 0.0;
     document.getElementById("total_vat").value = 0.0;
@@ -784,7 +784,7 @@ function deselect1() {
 
 function deselectQuote() {
     document.getElementById("quote_sale_form").reset();
-    document.getElementById("#sale_discount").value = '';
+    document.getElementById("#sale_discount").value = "";
     $("#customer_id").val("").change();
     $("#customer_id").val("").change();
     sub_total = 0;
@@ -801,14 +801,21 @@ function saleReturn(items, sale_id) {
     localStorage.setItem("id", id);
     document.getElementById("sales").style.display = "none";
     sale_items = [];
-    returned = " <button class='btn btn-sm btn-rounded btn-success' disabled>Return</button>";
+    returned =
+        " <button class='btn btn-sm btn-rounded btn-success' disabled>Return</button>";
     pending = " <span class='badge badge-secondary'>Pending</span>";
     rejected = " <span class='badge badge-danger'>Rejected</span>";
     items.forEach(function (item) {
         var item_data = [];
         if (item.status !== 3) {
             item_data.push(item.id);
-            item_data.push(item.name+' '+(item.brand ? item.brand+' ':'')+item.pack_size+item.sales_uom);
+            item_data.push(
+                item.name +
+                    " " +
+                    (item.brand ? item.brand + " " : "") +
+                    item.pack_size +
+                    item.sales_uom
+            );
             item_data.push(item.quantity);
             item_data.push(item.price);
             item_data.push(item.vat);
@@ -852,13 +859,19 @@ function quoteDetails(remark, items, data) {
     items.forEach(function (item) {
         var item_data = [];
         item_data.push(item.id);
-        item_data.push(item.name+' '+(item.brand ? item.brand+' ' : '')+item.pack_size+item.sales_uom);
+        item_data.push(
+            item.name +
+                " " +
+                (item.brand ? item.brand + " " : "") +
+                item.pack_size +
+                item.sales_uom
+        );
         item_data.push(item.quantity);
         item_data.push(item.price);
         item_data.push(item.vat);
         item_data.push(item.discount);
-        item_data.push(Number(item.amount)-Number(item.discount));
-        item_data.push(action); 
+        item_data.push(Number(item.amount) - Number(item.discount));
+        item_data.push(action);
         sale_items.push(item_data);
     });
     items_table.clear();
@@ -949,7 +962,7 @@ $("#products").select2({
 $("#products").on("change", function (event) {
     var productValue = $(this).val();
     if (!productValue) return;
-    
+
     let sel = document.getElementById("products");
     let selectedOption = sel.options[sel.selectedIndex];
 
@@ -979,25 +992,6 @@ $("#price_category").change(function () {
             dataType: "json",
             success: function (result) {
                 populateProducts(result.data || []);
-                // $("#products").empty().trigger("change");
-                // if (result.data && result.data.length > 0) {
-                //     result.data.forEach(function (p) {
-                //         $("#products").append(
-                //             $("<option>", {
-                //                 value: "",
-                //                 text: "Select product",
-                //             }),
-                //             $("<option>", {
-                //                 value: p.id,
-                //                 text: p.name,
-                //                 "data-name": p.name,
-                //                 "data-price": p.price,
-                //                 "data-quantity": p.quantity,
-                //             })
-                //         );
-                //     });
-                //     $("#products").trigger("change");
-                // }
             },
         });
     }
@@ -1013,20 +1007,20 @@ function valueCollection() {
 
     var selectedOption = sel.options[sel.selectedIndex];
     var name = selectedOption.getAttribute("data-name") || selectedOption.text;
-    var price = Number(selectedOption.getAttribute("data-price") || 0);
     var available_quantity = Number(
         selectedOption.getAttribute("data-quantity") || 0
     );
     var productID = productValue;
 
-    // Unit calcs
-    var vatUnit = Number((price * tax).toFixed(2));
-    var unitTotal = Number(price + vatUnit);
-
     // Check if the item already exist in cart
     let idx = cart.findIndex((r) => r[6] == productID);
 
     if (idx !== -1) {
+        var price =  parseFloat(cart[idx][2].replace(/,/g, ''));
+        // Unit calcs
+        var vatUnit = Number((price * tax).toFixed(2));
+        var unitTotal = Number(price + vatUnit);
+
         // If exist then add qty and move it on top.
         let row = cart[idx];
 
@@ -1036,13 +1030,14 @@ function valueCollection() {
 
         let newQty = rawQty + 1;
         if (newQty > available_quantity) {
-            row[1] = numberWithCommas(rawQty) +
-            "<span class='text text-danger'> Max</span>";
+            row[1] =
+                numberWithCommas(rawQty) +
+                "<span class='text text-danger'> Max</span>";
         } else {
             row[1] = numberWithCommas(newQty);
         }
 
-        row[2] = formatMoney(price);
+        // row[2] = formatMoney(price);
         row[3] = formatMoney(vatUnit * newQty);
         row[4] = formatMoney(unitTotal * newQty);
         row[5] = available_quantity;
@@ -1057,15 +1052,19 @@ function valueCollection() {
             default_cart.unshift(dc);
         }
     } else {
+        var price = Number(selectedOption.getAttribute("data-price") || 0);
+        // Unit calcs
+        var vatUnit = Number((price * tax).toFixed(2));
+        var unitTotal = Number(price + vatUnit);
         var item = [
             name,
-            1, 
-            formatMoney(price), 
-            formatMoney(vatUnit), 
-            formatMoney(unitTotal), 
-            available_quantity, 
+            1,
+            formatMoney(price),
+            formatMoney(vatUnit),
+            formatMoney(unitTotal),
+            available_quantity,
             productID,
-            "", 
+            "",
         ];
         cart.unshift(item);
 
@@ -1095,64 +1094,47 @@ $(document).ready(function () {
             dataType: "json",
             success: function (result) {
                 populateProducts(result.data || []);
-                // $("#products").empty().trigger("change");
-                // if (result.data && result.data.length > 0) {
-                //     result.data.forEach(function (p) {
-                //         $("#products").append(
-                //             $("<option>", {
-                //                 value: "",
-                //                 text: "Select product",
-                //             }),
-                //             $("<option>", {
-                //                 value: p.id,
-                //                 text: p.name,
-                //                 "data-name": p.name,
-                //                 "data-price": p.price,
-                //                 "data-quantity": p.quantity,
-                //             })
-                //         );
-                //     });
-                //     $("#products").trigger("change");
-                // }
             },
         });
     }
 });
 
 function populateProducts(optionsList) {
-    const $sel = $('#products');
+    const $sel = $("#products");
 
     // only init/destroy if select2 is present
-    if ($sel.data('select2')) {
-        $sel.select2('destroy');
+    if ($sel.data("select2")) {
+        $sel.select2("destroy");
     }
 
     $sel.empty();
 
     // Add default option once
-    $sel.append($('<option>', { value: '', text: 'Select product' }));
+    $sel.append($("<option>", { value: "", text: "Select product" }));
 
     if (Array.isArray(optionsList) && optionsList.length) {
         optionsList.forEach(function (p) {
-            $sel.append($('<option>', {
-                value: p.id,
-                text: p.name,
-                'data-name': p.name,
-                'data-price': p.price,
-                'data-quantity': p.quantity
-            }));
+            $sel.append(
+                $("<option>", {
+                    value: p.id,
+                    text: p.name,
+                    "data-name": p.name,
+                    "data-price": p.price,
+                    "data-quantity": p.quantity,
+                })
+            );
         });
     }
 
     // Re-init select2 (only if plugin loaded)
     if ($.fn.select2) {
-        $sel.select2({ placeholder: 'Select Product...', allowClear: true });
+        $sel.select2({ placeholder: "Select Product...", allowClear: true });
     } else {
-        console.error('Select2 not loaded');
+        console.error("Select2 not loaded");
     }
 
     // ensure no selection
-    $sel.val('').trigger('change');
+    $sel.val("").trigger("change");
 }
 
 $("#save-customer").click(function () {
@@ -1289,6 +1271,7 @@ $("#credit_payment_table tbody").on("click", "#pay_btn", function () {
 
 /*local storage of sale type*/
 $("#sales_form").on("submit", function (e) {
+    // $("#loading").show();
     e.preventDefault();
     var cart = document.getElementById("order_cart").value;
 
@@ -1319,12 +1302,14 @@ function saveCashSale() {
             notify("Sale recorded successfully", "top", "right", "success");
             deselect();
             $("#save_btn").attr("disabled", false);
+            // $("#loading").hide();
         },
         timeout: 20000,
     });
 }
 
 $("#credit_sales_form").on("submit", function (e) {
+    // $("#loading").show();
     e.preventDefault();
 
     var cart = document.getElementById("order_cart").value;
@@ -1358,6 +1343,9 @@ function saveCreditSale() {
             deselect1();
             window.open(data.redirect_to);
             $("#save_btn").attr("disabled", false);
+        },
+        complete: function () {
+            // $("#loading").hide();
         },
     });
 }

@@ -194,6 +194,7 @@ $store_id = Auth::user()->store_id;
         .alert-top-right i {
             margin-right: 8px;
         }
+        
     </style>
 
 
@@ -304,16 +305,16 @@ $store_id = Auth::user()->store_id;
                 <li>
                     <div class="dropdown">
                         @if(auth()->user()->checkPermission('View Settings'))
-                            <dfn data-info="This is the default store, where all activities will be based on."><a
+                            <dfn data-info="This is the default branch, where all activities will be based on."><a
                                     href="{{route('configurations.index')}}">
                                     @if(session()->get('store') !== "Please Set Store")
-                                    <span class="badge badge-info">Welcome, {{ current_store()->name }}</span> @else
-                                    <span class="badge badge-danger">Please Set Default Store</span> @endif</a></dfn>
+                                    <span class="badge badge-info">Branch: {{ current_store()->name }}</span> @else
+                                    <span class="badge badge-danger">Please Set Default Branch</span> @endif</a></dfn>
                         @else
-                            <dfn data-info="This is the default store, where all activities will be based on."><a href="#">
+                            <dfn data-info="This is the default branch, where all activities will be based on."><a href="#">
                                     @if(session()->get('store') !== "Please Set Store")
-                                    <span class="badge badge-info">Welcome, {{current_store()->name}}</span> @else
-                                    <span class="badge badge-danger">Please Set Default Store</span> @endif</a></dfn>
+                                    <span class="badge badge-info">Branch: {{current_store()->name}}</span> @else
+                                    <span class="badge badge-danger">Please Set Default Branch</span> @endif</a></dfn>
                         @endif
                     </div>
                 </li>
