@@ -5,7 +5,7 @@
     <title>Cash Sale Details Report</title>
     <style>
         body {
-            font-size: 12px;
+            font-size: 13px;
         }
 
         * {
@@ -13,11 +13,15 @@
         }
 
         table,
-        th,
-        td {
-            /*border: 1px solid black;*/
+        th {
             border-collapse: collapse;
-            padding: 10px;
+            padding: 8px;
+        }
+
+        table,
+        td {
+            border-collapse: collapse;
+            padding: 5px;
         }
 
         table {
@@ -110,6 +114,12 @@
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}</h3>
         <h2 align="center" style="margin-top: -1%">Cash Sales Details Report</h2>
         <h4 align="center" style="margin-top: -1%">{{$pharmacy['date_range']}}</h4>
+        @php
+            $grand_sub_total = 0;
+            $grand_vat_total = 0;
+            $grand_discount_total = 0;
+            $grand_amount_total = 0;
+        @endphp
         @foreach($data[0][0] as $key => $dat)
             {{-- {{$pharmacy['tin_number']}} {{date('j M, Y', strtotime($dat[0]['created_at']))}}--}}
             <table id="table-detail-main">
@@ -121,33 +131,37 @@
                 <!-- loop the product names here -->
                 <thead>
                     <tr style="background: #1f273b; color: white;">
-                        <th align="left">SN</th>
+                        <th align="left" style="width: 1%;">#</th>
                         <th align="left">Product Name</th>
-                        <th align="left">Batch Number</th>
-                        <th align="left">Price Type</th>
+                        <th align="left">Batch #</th>
+                        {{-- <th align="left">Price Type</th> --}}
                         <th align="left">Sold By</th>
-                        <th align="left">Date</th>
-                        <th align="right">Quantity</th>
+                        <th align="left" style="width: 9%;">Date</th>
+                        <th align="center">Qty</th>
                         <th align="right">Sell Price</th>
                         <th align="right">Sub total</th>
                         <th align="right">VAT</th>
-                        <th align="right">Discount</th>
+                        @if ($enable_discount === 'YES')
+                            <th align="right">Discount</th>
+                        @endif
                         <th align="right">Amount</th>
                     </tr>
                 </thead>
                 @foreach($dat as $item)
                     <tr>
-                        <td align="left">{{$loop->iteration}}</td>
+                        <td align="left">{{$loop->iteration}}.</td>
                         <td align="left">{{$item['name']}}</td>
                         <td align="left">{{$item['batch_number']}}</td>
-                        <td align="left">{{$item['price_type']}}</td>
+                        {{-- <td align="left">{{$item['price_type']}}</td> --}}
                         <td align="left">{{$item['sold_by']}}</td>
                         <td align="left">{{$item['date']}}</td>
-                        <td align="right">{{number_format($item['quantity'], 0)}}</td>
+                        <td align="center">{{number_format($item['quantity'], 0)}}</td>
                         <td align="right">{{number_format($item['price'], 2)}}</td>
                         <td align="right">{{number_format($item['sub_total'], 2)}}</td>
                         <td align="right">{{number_format($item['vat'], 2)}}</td>
-                        <td align="right">{{number_format($item['discount'], 2)}}</td>
+                        @if ($enable_discount === 'YES')
+                            <td align="right">{{number_format($item['discount'], 2)}}</td>
+                        @endif
                         <td align="right">{{number_format($item['amount'], 2)}}</td>
                     </tr>
                 @endforeach
@@ -155,102 +169,87 @@
 
             @foreach($data[0][2][$key] as $e)
                 {{-- {{number_format($e['test_total'],2)}}--}}
-                <table style="width: 103%; background-color: white">
-                    <thead>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </thead>
+                <table style="width: 101%;">
                     <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td align="right" style="padding-top: -3%"><b>Sub Total:</b></td>
-                        <td align="right" style="padding-top: -3%">
-                            {{number_format($e['amount_total'] - $e['vat_total'] + $e['discount_total'], 2)}}</td>
+                        <td colspan="10" align="right" style="padding-top: -3%; width: 85%;"><b>Sub Total:</b></td>
+                        <td align="right" style="padding-top: -3%;">
+                            {{number_format($e['amount_total'] - $e['vat_total'] + $e['discount_total'], 2)}}
+                        </td>
                     </tr>
                     <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td align="right" style="padding-top: -3%"><b>Discount:</b></td>
-                        <td align="right" style="padding-top: -3%">{{number_format($e['discount_total'], 2)}}</td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td align="right" style="padding-top: -3%"><b>VAT:</b></td>
+                        <td colspan="10" align="right" style="padding-top: -3%; width: 85%;"><b>VAT:</b></td>
                         <td align="right" style="padding-top: -3%">{{number_format($e['vat_total'], 2)}}</td>
                     </tr>
+                    @if ($enable_discount === 'YES')
+                        <tr>
+                            <td colspan="10" align="right" style="padding-top: -3%; width: 85%;"><b>Discount:</b></td>
+                            <td align="right" style="padding-top: -3%">{{number_format($e['discount_total'], 2)}}</td>
+                        </tr>
+                    @endif
                     <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td align="right" style="padding-top: -3%"><b>Total:</b></td>
+                        <td colspan="10" align="right" style="padding-top: -3%; width: 85%;"><b>Total:</b></td>
                         <td align="right" style="padding-top: -3%">{{number_format($e['amount_total'], 2)}}</td>
                     </tr>
                 </table>
+                @php
+                    $grand_sub_total += $e['amount_total'] - $e['vat_total'] + $e['discount_total'];
+                    $grand_vat_total += $e['vat_total'];
+                    $grand_discount_total += $e['discount_total'];
+                    $grand_amount_total += $e['amount_total'];
+                @endphp
             @endforeach
-
-
-
             <hr>
         @endforeach
 
+        {{-- Grand total table --}}
+        <div style="width:100%;">
+            <table style="width:100%; border-collapse: collapse;">
+                <tr>
+                    <th colspan="3" style="text-align: center; padding:8px; font-size: 17px;">
+                        Grand Total:
+                    </th>
+                </tr>
+                <tr>
+                    <td style="width:46%; text-align:right; font-size: 15px;">
+                        Sub Total:
+                    </td>
+                    <td style="width:15%; text-align:right; font-size: 15px;">
+                        {{number_format($grand_sub_total, 2)}}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:46%; text-align:right; font-size: 15px;">
+                        VAT:
+                    </td>
+                    <td style="width:15%; text-align:right; font-size: 15px;">
+                        {{number_format($grand_vat_total, 2)}}
+                    </td>
+                </tr>
+                @if ($enable_discount === 'YES')
+                    <tr>
+                        <td style="width:46%; text-align:right; font-size: 15px;">
+                            Discount:
+                        </td>
+                        <td style="width:15%; text-align:right; font-size: 15px;">
+                            {{number_format($grand_discount_total, 2)}}
+                        </td>
+                    </tr>
+                @endif
+                <tr>
+                    <td style="width:46%; text-align:right; font-size: 15px;">
+                        Total:
+                    </td>
+                    <td style="width:15%; text-align:right; font-size: 15px;">
+                        {{number_format($grand_amount_total, 2)}}
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <hr">
     </div>
 
     <script type="text/php">
-    if ( isset($pdf) ) {
-        $x = 280;
-        $y = 820;
-        $text = "{PAGE_NUM} of {PAGE_COUNT} pages";
-        $font = null;
-        $size = 10;
-        $color = array(0,0,0);
-        $word_space = 0.0;  //  default
-        $char_space = 0.0;  //  default
-        $angle = 0.0;   //  default
-        $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
-
-
-     }
-
-
 
 </script>
 

@@ -142,7 +142,7 @@
                                 {{ $item['pack_size'] ? $item['pack_size'] : ""}}{{ $item['sales_uom'] ? $item['sales_uom'] : ""}}
                             </td>
                             <td align="right">{{$item['quantity']}}</td>
-                            <td align="right">{{number_format($item['price'] / $item['quantity'], 2)}}</td>
+                            <td align="right">{{number_format($item['price'], 2)}}</td>
                             <td align="right">{{number_format($item['vat'], 2)}}</td>
                             <td align="right">{{number_format($item['amount'], 2)}}</td>
                         </tr>
