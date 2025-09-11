@@ -400,7 +400,7 @@ class SaleController extends Controller
                     foreach ($stocks as $stock) {
                         if ($bought['quantity'] <= $stock->quantity) {
                             $qty = $bought['quantity'];
-                            $price = $unit_price * $qty;
+                            $price = $unit_price;
                             $sale_discount = $unit_discount * $qty;
                             $stock->quantity -= $qty;
                             $stock->created_by = Auth::User()->id;
@@ -408,7 +408,7 @@ class SaleController extends Controller
                         } else {
                             $qty = $stock->quantity;
                             $sale_discount = $unit_discount * $qty;
-                            $price = $unit_price * $qty;
+                            $price = $unit_price;
                             $stock->quantity = 0;
                             $stock->created_by = Auth::User()->id;
                             $bought['quantity'] -= $qty;
@@ -419,8 +419,8 @@ class SaleController extends Controller
                             $details->stock_id = $stock->id;
                             $details->quantity = $qty;
                             $details->price = $price;
-                            $details->vat = $details->price * $vat;
-                            $details->amount = $details->price + $details->vat;
+                            $details->vat = ($details->price * $vat) * $details->quantity;
+                            $details->amount = ($details->price*$details->quantity) + $details->vat;
                             $details->discount = $sale_discount;
                             $details->save();
                             $stock->save();
@@ -448,7 +448,7 @@ class SaleController extends Controller
                 $customer = Customer::find($request->customer_id);
                 $credit->sale_id = $sale;
                 $credit->paid_amount = $request->paid_amount;
-                $credit->balance = $total - $discount - $request->paid_amount;
+                $credit->balance = ($total - $discount) - $request->paid_amount;
                 $credit->grace_period = $request->grace_period;
                 $credit->remark = $request->remark;
                 $credit->created_by = Auth::User()->id;
@@ -755,8 +755,9 @@ class SaleController extends Controller
                 $vat_percent = $item->vat / $item->price;
             }
             $sub_total = ($amount / (1 + $vat_percent));
-            $vat = $amount - $sub_total;
+            $vat = $item->vat * $item->quantity;
             $sn++;
+            // dd($item->sale['cost']);
             array_push($sales, array(
                 'receipt_number' => $item->sale['receipt_number'],
                 'name' => $item->currentStock['product']['name'],
