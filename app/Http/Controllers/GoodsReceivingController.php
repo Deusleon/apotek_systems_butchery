@@ -662,14 +662,10 @@ class GoodsReceivingController extends Controller
                     ->where('product_id', $product->id)
                     ->first('price');
 
-                $quantity = CurrentStock::where('product_id', $product->id)->sum('quantity');
 
-                array_push($max_prices, array(
-                    'name' => $data->currentStock['product']['name'],
-                    'brand' => $currentStock['product']['brand'],
+                array_push($max_prices, array(                    // 'brand' => $currentStock['product']['brand'],
                     'unit_cost' => $buying_price,
                     'price' => $data->price,
-                    'quantity' => $quantity,
                     'id' => $data->stock_id,
                     'product_id' => $product->id,
                     'supplier_id' => $product->supplier_id
