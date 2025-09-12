@@ -189,6 +189,8 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::get('purchases/purchase-order/select/filter-product', 'OrderController@filterSupplierProduct')->name('filter-product');
     Route::get('purchases/purchase-order/select/filter-product-input', 'OrderController@filterSupplierProductInput')->name('filter-product-input');
 
+    //new route for the order list page
+    Route::get('purchases/purchase-order-list', 'OrderController@orderList')->name('purchases.purchase-order.list');
 
     //Purchase OrderList routes
     Route::get('purchases/order-history', 'PurchaseOrderListController@index')->name('order-history.index');

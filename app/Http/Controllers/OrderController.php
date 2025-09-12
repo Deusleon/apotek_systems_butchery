@@ -25,6 +25,15 @@ class OrderController extends Controller
             compact('suppliers', 'vat', 'orders'));
     }
 
+   public function orderList()
+{
+    $orders = Order::with(['supplier', 'details.product:id,name,pack_size,brand,sales_uom'])
+        ->where('status', '!=', 'θ')
+        ->get();
+    
+    return View::make('purchases.purchase_order.orderlist', compact('orders'));
+}
+
     public function store(Request $request)
     {
         $number_gen = new CommonFunctions();

@@ -15,8 +15,10 @@ var order_history_datatable = $("#order_history_datatable").DataTable({
     searching: true,
     bPaginate: true,
     bInfo: true,
-    ordering: false,
+    ordering: true,
+    order: [[0, "desc"]],
     columns: [
+        { data: "id", visible: false }, // hidden ID column for internal use
         { data: "order_number" },
         { data: "supplier.name" },
         {
@@ -75,7 +77,6 @@ var order_history_datatable = $("#order_history_datatable").DataTable({
             },
         },
     ],
-    aaSorting: [[2, "desc"]],
 });
 
 var order_details_table = $("#order_details_table").DataTable({
@@ -186,6 +187,7 @@ function getOrderHistory() {
         type: "get",
         dataType: "json",
         success: function (data) {
+            console.log("Data received:", data);
             data.forEach(function (data) {
                 if (data.status === "Cancelled") {
                     data.action =
@@ -195,6 +197,7 @@ function getOrderHistory() {
             order_history_datatable.clear();
             order_history_datatable.rows.add(data);
             order_history_datatable.draw();
+            order_history_datatable.order([0, "desc"]).draw();
         },
     });
 }
