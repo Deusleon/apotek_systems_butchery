@@ -218,6 +218,7 @@ Route::middleware(["auth","main_branch"])->group(function () {
     //GoodsReceiving Routes
     Route::get('purchases/goods-receiving', 'GoodsReceivingController@index')->name('goods-receiving.index');
     Route::get('purchases/orders-receiving', 'GoodsReceivingController@orderReceiving')->name('orders-receiving.index');
+    Route::post('purchases/orders/{id}/approve', 'OrderController@approve')->name('orders.approve');
     Route::post('purchases/goods-receiving/order-receive', 'GoodsReceivingController@orderReceive')->name('goods-receiving.orderReceive');
     Route::get('purchases/loading-item-price', 'GoodsReceivingController@getItemPrice')->name('receiving-price-category');
     Route::get('purchases/loading-product-price', 'GoodsReceivingController@getItemPrice2')->name('product-price-category');

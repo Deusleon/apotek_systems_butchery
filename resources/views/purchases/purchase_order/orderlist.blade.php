@@ -99,8 +99,10 @@
         var config2 = {
             managePurchaseHistory: '{{auth()->user()->hasPermissionTo('View Purchase Order')}}',
             routes: {
-                getOrderHistory: '{{route('getOrderHistory')}}'
-            }
+                getOrderHistory: '{{route('getOrderHistory')}}',
+                approveOrder: '{{route('orders.approve', ['id' => ':id'])}}'
+            },
+            csrfToken: '{{ csrf_token() }}' // ← ADD THIS LINE
         };
 
         // IMPORTANT: Allow printing ONLY when approved

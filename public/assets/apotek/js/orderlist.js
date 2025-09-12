@@ -40,7 +40,10 @@ var order_history_datatable = $("#order_history_datatable").DataTable({
                 // - Backend flags: status === '2' or status === '3' or status === 'Approved'
                 // - Front-end approval (set by clicking Approve in modal): row.clientApproved === true
                 var isApprovedByBackend =
-                    status === "2" || status === "3" || status === "Approved";
+                    status === "2" ||
+                    status === "3" ||
+                    status == "4" ||
+                    status === "Approved";
                 var isApprovedByClient = !!row.clientApproved;
 
                 // Cancelled: never printable
@@ -208,9 +211,60 @@ $("#order_history_datatable tbody").on("click", "#dtl_btn", function () {
     console.log("RowData", data);
     currentOrderData = data; // keep reference for Approve/Cancel
     currentRowIndex = row.index(); // we’ll use this to update the row after approve
+    updateModalButtons(data.status);
     orderDetails(data.details);
     $("#purchases-details").modal("show");
 });
+
+$("#order_history_datatable tbody").on("click", "#dtl_btn", function () {
+    var row = order_history_datatable.row($(this).parents("tr"));
+    var data = row.data();
+    console.log("RowData", data);
+    currentOrderData = data;
+    currentRowIndex = row.index();
+
+    // Update buttons based on status - THIS IS THE KEY LINE
+    updateModalButtons(data.status);
+
+    orderDetails(data.details);
+    $("#purchases-details").modal("show");
+});
+
+// Your perfect function
+function updateModalButtons(status) {
+    var cancelBtn = $("#cancel_btn_modal");
+    var approveBtn = $("#approve_btn");
+    var statusMessage = $("#status_message");
+
+    // Reset all elements
+    cancelBtn.show();
+    approveBtn.show();
+    statusMessage.addClass("d-none");
+
+    // If status is not '1', hide buttons and show message
+    if (status !== "1") {
+        cancelBtn.hide();
+        approveBtn.hide();
+        statusMessage.removeClass("d-none");
+
+        // Set appropriate message based on status
+        if (status === "2" || status === "3" || status === "4") {
+            statusMessage.text(
+                "This order has already been approved and cannot be modified."
+            );
+            statusMessage.removeClass("alert-info").addClass("alert-success");
+        } else if (status === "Cancelled") {
+            statusMessage.text(
+                "This order has been Rejected and cannot be modified."
+            );
+            statusMessage.removeClass("alert-info").addClass("alert-warning");
+        } else {
+            statusMessage.text(
+                "This order cannot be modified in its current status."
+            );
+        }
+    }
+}
 
 function orderDetails(items) {
     order_items = [];
@@ -262,18 +316,67 @@ $("#order_history_datatable tbody").on("click", "#cancel_btn", function () {
 });
 // --- Extract approval action so we can call it after confirmation ---
 function applyClientApprove() {
-    if (!currentOrderData) return;
-
-    // Mark as client-approved (frontend flag)
-    currentOrderData.clientApproved = true;
-
-    // Update that specific row in the DataTable so Print becomes enabled
-    if (currentRowIndex !== null) {
-        order_history_datatable
-            .row(currentRowIndex)
-            .data(currentOrderData)
-            .draw(false);
+    if (!currentOrderData) {
+        console.error("No current order data!");
+        return;
     }
+
+    console.log("Approving order ID:", currentOrderData.id);
+
+    // Build the URL with the actual order ID
+    var approveUrl = config2.routes.approveOrder.replace(
+        ":id",
+        currentOrderData.id
+    );
+    console.log("API URL:", approveUrl);
+
+    // Make API call to update order status in database
+    $.ajax({
+        url: approveUrl,
+        type: "POST",
+        data: {
+            _token: config2.csrfToken, // ← USE THE TOKEN FROM CONFIG2
+        },
+        success: function (response) {
+            console.log("API Response:", response);
+            if (response.success) {
+                // Update frontend only after successful backend update
+                currentOrderData.clientApproved = true;
+                currentOrderData.status = "1"; // Update status to match backend
+
+                if (currentRowIndex !== null) {
+                    order_history_datatable
+                        .row(currentRowIndex)
+                        .data(currentOrderData)
+                        .draw(false);
+                }
+
+                // Show success message
+                try {
+                    if (window.toastr && typeof toastr.success === "function") {
+                        toastr.success(response.message);
+                    } else if (typeof success_noti === "function") {
+                        success_noti(response.message);
+                    } else if (typeof notify === "function") {
+                        notify("success", response.message);
+                    } else {
+                        alert(response.message);
+                    }
+                } catch (e) {
+                    console.log(e);
+                    alert(response.message);
+                }
+            } else {
+                console.error("API Error:", response.message);
+                alert("Error: " + response.message);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("AJAX Error:", status, error);
+            console.error("Response:", xhr.responseText);
+            alert("Error approving order. Please check console for details.");
+        },
+    });
 }
 
 // When user clicks Approve button inside details modal → open confirm modal
@@ -294,24 +397,7 @@ $(document).on("click", "#approve_btn", function () {
 $(document)
     .off("click", "#approve_yes_btn")
     .on("click", "#approve_yes_btn", function () {
-        applyClientApprove();
-
-        //Success message
-        try {
-            if (window.toastr && typeof toastr.success === "function") {
-                toastr.success("Order approved successfully!");
-            } else if (typeof success_noti === "function") {
-                // if your notification.js exposes success_noti(...)
-                success_noti("Order approved successfully!");
-            } else if (typeof notify === "function") {
-                // some projects use notify(type, msg)
-                notify("success", "Order approved successfully!");
-            } else {
-                alert("Order approved successfully!");
-            }
-        } catch (e) {
-            console.log(e);
-        }
+        applyClientApprove(); // This now handles the success message internally
         $("#approve-order").modal("hide");
     });
 

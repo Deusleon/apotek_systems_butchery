@@ -34,6 +34,32 @@ class OrderController extends Controller
     return View::make('purchases.purchase_order.orderlist', compact('orders'));
 }
 
+public function approve(Request $request, $id)
+{
+    try {
+        \Log::info('Approving order ID: ' . $id); // Add logging
+        
+        $order = Order::findOrFail($id);
+        
+        // Update order status to '2' (Approved)
+        $order->status = '2';
+        $order->save();
+
+        \Log::info('Order approved successfully: ' . $id); // Add logging
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Order approved successfully!'
+        ]);
+    } catch (\Exception $e) {
+        \Log::error('Error approving order: ' . $e->getMessage()); // Add logging
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Error approving order: ' . $e->getMessage()
+        ], 500);
+    }
+}
     public function store(Request $request)
     {
         $number_gen = new CommonFunctions();
