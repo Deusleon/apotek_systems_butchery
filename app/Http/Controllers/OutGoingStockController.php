@@ -33,7 +33,9 @@ class OutGoingStockController extends Controller {
     // ----------------------------
     $stockTracking = StockTracking::whereBetween('updated_at', [$from->toDateTimeString(), $to->toDateTimeString()])
         ->where('movement', 'OUT')
-        ->when($useStoreFilter, fn($q) => $q->where('store_id', $default_store))
+        ->when($useStoreFilter, function($q) use ($default_store) {
+            return $q->where('store_id', $default_store);
+        })
         ->get();
 
     if ($stockTracking->isEmpty()) {
