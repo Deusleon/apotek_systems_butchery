@@ -59,7 +59,8 @@ class SaleReportController extends Controller {
             case 2:
             $data = $this->cashSaleSummaryReport( $from, $to );
             $pdf = PDF::loadView( 'sale_reports.cash_sale_summary_report_pdf',
-            compact( 'data', 'pharmacy' ) );
+            compact( 'data', 'pharmacy' ) )
+            ->setPaper( 'a4', 'landscape' );
             return $pdf->stream( 'sale_summary_report.pdf' );
 
             case 3:
@@ -151,7 +152,7 @@ class SaleReportController extends Controller {
         $sub_total_total = 0;
 
         foreach ( $sale_detail as $item ) {
-            $amount = $item->amount - $item->discount;
+            $amount = $item->amount;
             $sub_total = $item->price * $item->quantity;
             $vat = $item->amount - $sub_total;
 
@@ -247,51 +248,6 @@ class SaleReportController extends Controller {
         return $to_print;
     }
 
-    // private function cashSaleSummaryReport( $from, $to ) {
-    //     $store_id = current_store_id();
-    //     $from = date( 'Y-m-d', strtotime( $from ) );
-    //     $to = date( 'Y-m-d', strtotime( $to ) );
-
-    //     $query = SalesDetail::join( 'sales', 'sales.id', '=', 'sales_details.sale_id' )
-    //     ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
-    //     ->join( 'customers', 'customers.id', '=', 'sales.customer_id' )
-    //     ->join( 'users', 'users.id', '=', 'sales.created_by' )
-    //     ->leftJoin( 'sales_credits', 'sales_credits.sale_id', '=', 'sales.id' )
-    //     ->select(
-    //         'customers.name as customer_name',
-    //         'users.name as sold_by',
-    //         'sales.*',
-    //         'sales_details.*',
-    //         'price_categories.name as price_type'
-    // )
-    //     ->whereBetween( DB::raw( 'date(sales.date)' ), [ $from, $to ] )
-    //     ->whereRaw( '(sales_details.status != 3 or sales_details.status is null)' )
-    //     ->whereNull( 'sales_credits.sale_id' )
-    //     ->groupby( 'dates' )
-    //     ->orderby( 'dates', 'desc' );
-
-    //     if ( !is_all_store() ) {
-    //         $query->where( 'inv_current_stock.store_id', $store_id );
-    //     }
-
-    //     $sale_detail = $query->get();
-
-    //     $sale_detail_to_pdf = [];
-
-    //     foreach ( $sale_detail as $item ) {
-    //         $sub_total = $item->quantity * $item->price;
-
-    //         array_push( $sale_detail_to_pdf, array(
-    //             'date' => $item->dates,
-    //             'sub_total' =>  $sub_total,
-    //             'sold_by' => $item->name
-    // ) );
-
-    //     }
-
-    //     return $sale_detail_to_pdf;
-    // }
-
     private function cashSaleSummaryReport( $from, $to )
  {
         $store_id = current_store_id();
@@ -325,6 +281,7 @@ class SaleReportController extends Controller {
         ->orderBy( 'sale_date', 'desc' );
 
         $sale_detail = $query->get();
+        // dd($sale_detail);
 
         // Format ya kurudisha kwa PDF
         $sale_detail_to_pdf = [];
@@ -332,10 +289,10 @@ class SaleReportController extends Controller {
             $sale_detail_to_pdf[] = [
                 'receipt_number' => $item->receipt_number,
                 'date'           => $item->sale_date,
-                'sub_total'      => (float) $item->sub_total, 2,
-                'discount'       => (float) $item->discount_total, 2,
-                'vat'            => (float) $item->vat_total, 2,
-                'total'          => (float) $item->total_amount, 2,
+                'sub_total'      => round( ( float ) $item->sub_total, 2 ),
+                'discount'       => round( ( float ) $item->discount_total, 2 ),
+                'vat'            => round( ( float ) $item->vat_total, 2 ),
+                'total'          => round( ( float ) $item->total_amount, 2 ),
                 'customer_name'  => $item->customer_name,
                 'sold_by'        => $item->sold_by,
             ];

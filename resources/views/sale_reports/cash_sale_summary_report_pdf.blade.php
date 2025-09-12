@@ -46,10 +46,10 @@
         }
 
         #table-detail tr> {
-            line-height: 13px;
+            line-height: 20px;
         }
 
-        #table-detail tr:nth-child(even) {
+        #table-detail tbody tr:nth-child(even) {
             background-color: #f2f2f2;
         }
 
@@ -104,49 +104,61 @@
                     <tr style="background: #1f273b; color: white;">
                         <th align="center">#</th>
                         <th align="left">Receipt #</th>
-                        <th align="left" style="width: 11%; background-color: red;">Date</th>
+                        <th align="left">Date</th>
                         <th align="left">Customer Name</th>
                         <th align="left">Sold By</th>
                         <th align="right">Sub Total</th>
+                        <th align="right">VAT</th>
                         <th align="right">Discount</th>
                         <th align="right">Total</th>
                     </tr>
                 </thead>
-                <?php $x = 0; ?>
-                @foreach($data as $item)
+                <tbody>
+                    <?php $x = 0; ?>
+                    <?php $total_sub_total = 0;?>
+                    <?php $total_vat = 0;?>
+                    <?php $total_discount = 0;?>
+                    <?php $grand_total = 0;?>
+                    @foreach($data as $item)
+                        <tr>
+                            <td align="center">{{ $loop->iteration }}.</td>
+                            <td align="left">{{ $item['receipt_number'] }}</td>
+                            <td align="left">{{date('Y-m-d', strtotime($item['date']))}}</td>
+                            <td align="left">{{$item['customer_name']}}</td>
+                            <td align="left">{{$item['sold_by']}}</td>
+                            <td align="right">
+                                <div>{{number_format($item['sub_total'], 2)}}</div>
+                            </td>
+                            <td align="right">{{number_format($item['vat'], 2)}}</td>
+                            <td align="right">{{number_format($item['discount'], 2)}}</td>
+                            <td align="right">{{number_format($item['total'], 2)}}</td>
+
+                        </tr>
+                        <?php    $total_sub_total += $item['sub_total'];?>
+                        <?php    $total_vat += $item['vat'];?>
+                        <?php    $total_discount += $item['discount'];?>
+                        <?php    $grand_total += $item['total'] - $item['discount'];?>
+                    @endforeach
+                </tbody>
+                <tfoot>
                     <tr>
-                        <td align="center">{{ $loop->iteration }}.</td>
-                        <td align="left">{{ $item['receipt_number'] }}</td>
-                        <td align="left">{{date('Y-m-d', strtotime($item['date']))}}</td>
-                        <td align="left">{{$item['customer_name']}}</td>
-                        <td align="left">{{$item['sold_by']}}</td>
-                        <td align="right">
-                            <div>{{number_format($item['sub_total'], 2)}}</div>
-                        </td>
-                        <td align="right">{{number_format($item['discount'], 2)}}</td>
-                        <td align="right">{{number_format($item['total'], 2)}}</td>
-
+                        <td colspan="8" align="right" style="font-weight: bold;">Sub total:</td>
+                        <td align="right">{{ number_format($total_sub_total, 2) }}</td>
                     </tr>
-                    <?php    $x += $item['sub_total'];?>
-
-                @endforeach
+                    <tr>
+                        <td colspan="8" align="right" style="font-weight: bold;">VAT:</td>
+                        <td align="right">{{ number_format($total_vat, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="8" align="right" style="font-weight: bold;">Discount:</td>
+                        <td align="right">{{ number_format($total_discount, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="8" align="right" style="font-weight: bold;">Total:</td>
+                        <td align="right">{{ number_format($grand_total, 2) }}</td>
+                    </tr>
+                </tfoot>
             </table>
-
-            <div class="full-row" style="padding-top: 1%">
-                <div class="col-35">
-                    <div class="full-row">
-                    </div>
-
-                </div>
-                <div class="col-15"></div>
-                <div class="col-25"></div>
-                <div class="col-25">
-                    <div class="full-row">
-                        <div class="col-50" align="right"><b>Total </b></div>
-                        <div class="col-50" align="right">{{number_format($x, 2)}}</div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
     <script type="text/php">
