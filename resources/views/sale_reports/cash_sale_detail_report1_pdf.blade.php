@@ -42,9 +42,7 @@
         }
 
         #table-detail {
-            /*border-spacing: 5px;*/
             width: 100%;
-            /*margin-top: 2%;*/
         }
 
         #table-detail-1 {
