@@ -337,7 +337,7 @@ class GoodsReceivingController extends Controller
             if ($request->purchase_date != null) {
                 $incoming_stock->created_at = date('Y-m-d', strtotime($request->purchase_date));
             } else {
-                $incoming_stock->created_at = date('Y-m-d');
+                $incoming_stock->created_at = date('Y-m-d H:i:s');
 
             }
             $incoming_stock->save();
@@ -387,7 +387,7 @@ class GoodsReceivingController extends Controller
 
         $order = Order::with('details')->findOrFail($validated['order_id']);
 
-        if ($order->status == '3') {
+        if ($order->status == '4') {
             return redirect()->back()->with('error', 'This order has already been fully received.');
         }
 
@@ -454,11 +454,11 @@ class GoodsReceivingController extends Controller
         $total_received = OrderDetail::where('order_id', $order->id)->sum('received_qty');
 
         if ($total_received == 0) {
-            $order->status = '1'; // Pending
+            $order->status = '2'; // Pending
         } elseif ($total_received < $total_ordered) {
-            $order->status = '2'; // Partially received
+            $order->status = '3'; // Partially received
         } else {
-            $order->status = '3'; // Completed
+            $order->status = '4'; // Completed
         }
         $order->save();
 
@@ -662,14 +662,10 @@ class GoodsReceivingController extends Controller
                     ->where('product_id', $product->id)
                     ->first('price');
 
-                $quantity = CurrentStock::where('product_id', $product->id)->sum('quantity');
 
-                array_push($max_prices, array(
-                    'name' => $data->currentStock['product']['name'],
-                    'brand' => $currentStock['product']['brand'],
+                array_push($max_prices, array(                    // 'brand' => $currentStock['product']['brand'],
                     'unit_cost' => $buying_price,
                     'price' => $data->price,
-                    'quantity' => $quantity,
                     'id' => $data->stock_id,
                     'product_id' => $product->id,
                     'supplier_id' => $product->supplier_id
@@ -800,7 +796,7 @@ class GoodsReceivingController extends Controller
                 if ($request->purchase_date != null) {
                     $incoming_stock->created_at = date('Y-m-d', strtotime($request->purchase_date));
                 } else {
-                    $incoming_stock->created_at = date('Y-m-d');
+                    $incoming_stock->created_at = date('Y-m-d H:i:s');
 
                 }
 

@@ -921,7 +921,7 @@ function invoicevaluesCollection() {
     }
 
     var selected_fields = product.split("#@");
-    // console.log("Selected-item",selected_fields)
+    // console.log("Selected-item", selected_fields);
     var item_name = selected_fields[0];
     var product_id = selected_fields[1];
     var brand = selected_fields[2];
@@ -959,7 +959,7 @@ function invoicevaluesCollection() {
         item.selling_price = selling_price;
         item.buying_price = buying_price;
         item.expire_date = "";
-
+        console.log("Item to be added to cart", invoice_cart);
         if (
             invoice_cart.some(function (element) {
                 return element.id == item.id;
@@ -1013,6 +1013,7 @@ function getInvoiceItemPrice(
             supplier_id: supplier_id,
         },
         success: function (data) {
+            console.log("invoice item price", data);
             if (call_back && typeof call_back == "function") {
                 call_back(data);
                 $("#invoiceselected-product").val("").change();
