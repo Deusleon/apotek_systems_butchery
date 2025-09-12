@@ -337,7 +337,7 @@ class GoodsReceivingController extends Controller
             if ($request->purchase_date != null) {
                 $incoming_stock->created_at = date('Y-m-d', strtotime($request->purchase_date));
             } else {
-                $incoming_stock->created_at = date('Y-m-d H:i:s');
+                $incoming_stock->created_at = date('Y-m-d');
 
             }
             $incoming_stock->save();
@@ -794,9 +794,16 @@ class GoodsReceivingController extends Controller
                 $incoming_stock->created_by = Auth::user()->id;
                 $incoming_stock->sell_price = $unit_sell_price;
                 if ($request->purchase_date != null) {
-                    $incoming_stock->created_at = date('Y-m-d', strtotime($request->purchase_date));
+                    $date1 = date('Y-m-d', strtotime($request->purchase_date));
+                    $date2 = date('Y-m-d');
+                    if ($date1 < $date2) {
+                        $incoming_stock->created_at = date('Y-m-d H:i:s', strtotime($request->purchase_date));
+                    }else {
+                        $newDate = now();
+                        $incoming_stock->created_at = $newDate;
+                    }
                 } else {
-                    $incoming_stock->created_at = date('Y-m-d H:i:s');
+                    $incoming_stock->created_at = now();
 
                 }
 
