@@ -596,7 +596,7 @@ function discount() {
         cart = result;
         var price_category = document.getElementById("price_category").value;
         $("#price_category").prop("disabled", true);
-        document.getElementById("cat_label").style.color = "red";
+        // document.getElementById("cat_label").style.color = "red";
         cart.forEach(function (item, index, arr) {
             var bought_product = {};
             bought_product.price = parseFloat(item[2].replace(/\,/g, ""), 10);

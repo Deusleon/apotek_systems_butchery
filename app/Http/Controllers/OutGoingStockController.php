@@ -23,7 +23,7 @@ class OutGoingStockController extends Controller {
     }
 
     $from = \Carbon\Carbon::parse($request->input('date_from'))->startOfDay();
-    $to   = \Carbon\Carbon::parse($request->input('date', $request->input('date_to')))->endOfDay();
+    $to   = \Carbon\Carbon::parse($request->input('date_to'))->endOfDay();
 
     $default_store = current_store_id();
     $useStoreFilter = ! is_all_store();

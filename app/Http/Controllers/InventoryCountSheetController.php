@@ -40,7 +40,9 @@ class InventoryCountSheetController extends Controller
             'cs.shelf_number',
             DB::raw( 'SUM(cs.quantity) as quantity_on_hand' )
         )
-        ->when( !is_all_store(), fn( $q ) => $q->where( 'cs.store_id', $default_store_id ) )
+        ->when( !is_all_store(), function( $q ) use ( $default_store_id ){
+            return $q->where( 'cs.store_id', $default_store_id );
+        } )
         ->groupBy( [ 'cs.product_id', 'cs.store_id', 'cs.shelf_number', 'p.name', 'p.brand', 'p.pack_size', 'p.sales_uom', 's.name' ] )
         ->get();
 

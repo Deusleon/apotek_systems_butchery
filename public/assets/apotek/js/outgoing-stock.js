@@ -26,11 +26,14 @@ $(function () {
     var start = moment();
     var end = moment();
 
-    function cb(start, end) {
-        $("#outgoing-date span").html(
-            start.format("MMMM D, YYYY") + " - " + end.format("MMMM D, YYYY")
-        );
-    }
+            function cb(start, end) {
+                $("#outgoing-date span").html(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
+            }
+    // function cb(start, end) {
+    //     $("#outgoing-date span").html(
+    //         start.format("MMMM D, YYYY") + " - " + end.format("MMMM D, YYYY")
+    //     );
+    // }
 
     $("#outgoing-date").daterangepicker(
         {
@@ -38,6 +41,9 @@ $(function () {
             endDate: moment().endOf("month"),
             maxDate: end,
             autoUpdateInput: true,
+                locale: {
+                    format: 'YYYY/MM/DD' 
+                },
             ranges: {
                 Today: [moment(), moment()],
                 Yesterday: [
@@ -79,8 +85,18 @@ $("#category_id").on("change", function () {
     }
 });
 
+$("#outgoing-date").on("change", function(){
+    var date = $(this).val();
+    outgoingFilter(date);
+});
+
 // outgoing stock filter ajax call
 function outgoingFilter(dates) {
+    
+    var parts = dates.split(" - ");
+    var from = moment(parts[0], "YYYY/MM/DD").format("YYYY-MM-DD");
+    var to   = moment(parts[1], "YYYY/MM/DD").format("YYYY-MM-DD");
+
     var ajaxurl = config.routes.ledgerShow;
     $("#loading").show();
     $.ajax({
@@ -88,8 +104,8 @@ function outgoingFilter(dates) {
         type: "get",
         dataType: "json",
         data: {
-            date: dates[1],
-            date_from: dates[0],
+            date_from: from,
+            date_to: to,
         },
         success: function (response) {
             // console.log("Response is:", response);
@@ -109,12 +125,12 @@ function bindData(data) {
         item.qoh = Number(item.current_stock).toFixed(0);
         item.out_total = Number(item.out_total).toFixed(0);
         item.product_name =
-            item.product.name +
+            (item.product.name ? item.product.name : '') +
             " " +
-            item.product.brand +
+            (item.product.brand ? item.product.brand : '') +
             " " +
-            item.product.pack_size +
-            item.product.sales_uom;
+            (item.product.pack_size ? item.product.pack_size : '') +
+            (item.product.sales_uom ? item.product.sales_uom : '');
     });
     // console.log("Binding data:", filteredData);
     summary_table.clear();
