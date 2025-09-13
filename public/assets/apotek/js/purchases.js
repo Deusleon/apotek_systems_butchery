@@ -201,7 +201,7 @@ function discount() {
                 reduced__obj_cart[c[0]][1] =
                     Number(
                         reduced__obj_cart[c[0]][1].toString().replace(",", "")
-                    ) + Number(c[1]);
+                    ) + Number(c[1].toString().replace(",", ""));
                 reduced__obj_cart[c[0]][4] = formatMoney(
                     Number(
                         reduced__obj_cart[c[0]][1].toString().replace(",", "")

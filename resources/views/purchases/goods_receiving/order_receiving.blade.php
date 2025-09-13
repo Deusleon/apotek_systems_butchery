@@ -207,23 +207,41 @@
                     "render": function(data) {
                         const badgeClass = "badge btn-rounded btn-sm"; // Rounded & small like buttons
                         const style = "display:inline-block; min-width:110px;"; // maintain fixed width
-                        if (data == '1') return `<span class='${badgeClass} badge-warning' style='${style}'>Pending</span>`;
-                        if (data == '2') return `<span class='${badgeClass} badge-info' style='${style}'>Partial</span>`;
-                        if (data == '3') return `<span class='${badgeClass} badge-success' style='${style}'>Completed</span>`;
+                        if (data == '2' || data == '1') return `<span class='${badgeClass} badge-warning' style='${style}'>Pending</span>`;
+                        if (data == '3') return `<span class='${badgeClass} badge-info' style='${style}'>Partial</span>`;
+                        if (data == '4') return `<span class='${badgeClass} badge-success' style='${style}'>Completed</span>`;
                         return `<span class='${badgeClass} badge-secondary' style='${style}'>Rejected</span>`;
                     }
                 },
                 {
                 "data": null, "className": "text-center", "orderable": false,
                 "render": function(data, type, row) {
-                    if (row.status == '3') {
+                    if (row.status == '4') {
                         return `<button class="btn btn-success btn-rounded btn-sm" disabled>
                                      Received
                                 </button>`;
                     }
-                    return `<button class="btn btn-primary btn-rounded btn-sm receive-btn" data-id="${row.id}">
+                    if (row.status == '1') {
+                        return `<button class="btn btn-primary btn-rounded btn-sm receive-btn" data-id="${row.id}">
                                  Receive
-                            </button>`;
+                                </button>`;
+
+                    }
+                    if (row.status == '2') {
+                        return `<button class="btn btn-primary btn-rounded btn-sm receive-btn" data-id="${row.id}">
+                                 Receive
+                                </button>`;
+
+                    }
+                    if (row.status == '3') {
+                        return `<button class="btn btn-primary btn-rounded btn-sm receive-btn" data-id="${row.id}">
+                                 Receive
+                                </button>`;
+
+                    }
+                    return `<button class="btn btn-success btn-rounded btn-sm" disabled>
+                                     Rejected
+                                </button>`;
                 }
             }
             ],
@@ -259,7 +277,12 @@
 
                 detailsBody.append(`
                 <tr>
-                    <td>${item.product ? item.product.name : 'N/A'} (${item.pack_size || 'N/A'})</td>
+                    <td>
+                    ${item.product 
+                        ? `${item.product.name} ${item.product.pack_size || ''} ${item.product.brand || ''} ${item.product.sales_uom || ''}`
+                        : 'N/A'}
+                    </td>
+
                     <td class="text-right ordered-qty">${orderedQty}</td>
                     <td class="text-right received-qty-cell" data-initial-received="${receivedQty}">${receivedQty}</td>
                     <td class="text-right remaining-qty-cell d-none">${remaining}</td>

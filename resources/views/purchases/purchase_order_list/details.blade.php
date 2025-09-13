@@ -23,6 +23,12 @@
                 <button type="button" id="approve_btn" class="btn btn-primary">
                     Approve
                 </button>
+
+                <!-- Status message for non-actionable orders -->
+                <div id="status_message" class="alert alert-info d-none">
+                    This order cannot be modified as it's already processed.
+                </div>
+                
             </div>
         </div>
     </div>
