@@ -684,14 +684,17 @@ $("#invoicecart_table tbody").on("click", "#edit_btn", function () {
     if (edit_btn_set === 0) {
         var row_data = invoicecart_table.row($(this).parents("tr")).data();
         var index = invoicecart_table.row($(this).parents("tr")).index();
-        quantity = row_data.quantity;
-        console.log(row_data.selling_price);
+        quantity = row_data.quantity.toString().replace(",", "");
         buying_price = row_data.buying_price.toString().replace(",", "");
         selling_price = row_data.selling_price.toString().replace(",", "");
         expire_date = row_data.expire_date;
         let tommorow = moment().add(1, "days").format("YYYY-MM-DD");
-        console.log(tommorow);
-        console.log(expire_date);
+        let raw_values = {
+            quantity: row_data.quantity,
+            buying_price: row_data.buying_price,
+            selling_price: row_data.selling_price,
+            expire_date: row_data.expire_date,
+        };
         row_data.quantity = `<input style='width: 90%' type='text' class='form-control' id='invoice_edit_quantity' value=${quantity}  required/>`;
         row_data.buying_price = `<input style='width: 90%' type='text' class='form-control inventedAction' id='edit_buying_price' onchange='invoiceamountCheck()'  value=${buying_price}  required/>`;
         row_data.selling_price = `<input style='width: 90%' type='text' class='form-control inventedAction' id='edit_selling_price' onchange='invoiceamountCheck()'  value=${selling_price}  required/>`;
@@ -699,8 +702,8 @@ $("#invoicecart_table tbody").on("click", "#edit_btn", function () {
         if (expire_date_enabler === "YES") {
             row_data.expire_date = `<input style='width: 90%' type='text' class='form-control edit-expire-date' id='edit_expire_date' min="${tommorow}" placeholder="YYYY-MM-DD" value="${expire_date}" required/>`;
         }
-        console.log(row_data.expire_date);
         invoice_cart[index] = row_data;
+        // console.log("raw_values:", invoice_cart[index]);
         invoicecart_table.clear();
         invoicecart_table.rows.add(invoice_cart);
         invoicecart_table.draw();
@@ -782,7 +785,7 @@ $("#invoicecart_table tbody").on(
             notify("Quantity is required", "top", "right", "warning");
             return false;
         }
-        console.log(document.getElementById("invoice_edit_quantity").value);
+        // console.log(document.getElementById("invoice_edit_quantity").value);
         row_data.quantity = numberWithCommas(
             document.getElementById("invoice_edit_quantity").value
         );
@@ -921,7 +924,7 @@ function invoicevaluesCollection() {
     }
 
     var selected_fields = product.split("#@");
-    // console.log("Selected-item",selected_fields)
+    // console.log("Selected-item", selected_fields);
     var item_name = selected_fields[0];
     var product_id = selected_fields[1];
     var brand = selected_fields[2];
@@ -959,25 +962,28 @@ function invoicevaluesCollection() {
         item.selling_price = selling_price;
         item.buying_price = buying_price;
         item.expire_date = "";
-
+        // console.log("Item to be added to cart", invoice_cart);
         if (
             invoice_cart.some(function (element) {
                 return element.id == item.id;
             })
         ) {
-            console.log("element id = item id");
             invoice_cart = invoice_cart.map(function (element) {
+                console.log("Element", element);
                 if (element.id == item.id) {
                     element.quantity = +element.quantity + item.quantity;
                     invoice_item_received.quantity = element.quantity;
+                    console.log(
+                        "Updated Element",
+                        invoice_cart_received.quantity
+                    );
                 }
                 return element;
             });
             totalCostCalculated();
         } else {
-            console.log("element id != item id");
             invoice_cart.unshift(item);
-            console.log(invoice_cart);
+            // console.log(invoice_cart);
             totalCostCalculated();
         }
         invoicecart_table.clear();
@@ -1013,6 +1019,7 @@ function getInvoiceItemPrice(
             supplier_id: supplier_id,
         },
         success: function (data) {
+            console.log("invoice item price", data);
             if (call_back && typeof call_back == "function") {
                 call_back(data);
                 $("#invoiceselected-product").val("").change();
