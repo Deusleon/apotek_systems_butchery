@@ -182,17 +182,7 @@
         $angle = 0.0;   //  default
         $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
 
-
      }
-
-
-
-
-
-
-
-
-
 
 </script>
 </body>
