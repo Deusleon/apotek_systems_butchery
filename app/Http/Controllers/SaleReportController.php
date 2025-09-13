@@ -556,140 +556,103 @@ unset($dayData);
     return array_values($groupedByDate);
     }
 
-    // private function creditSaleSummaryReport( $from, $to ) {
-    // $store_id = current_store_id();
-    //     $from = date( 'Y-m-d', strtotime( $from ) );
-    //     $to = date( 'Y-m-d', strtotime( $to ) );
+    private function creditSaleSummaryReport($from, $to)
+    {
+        $store_id = current_store_id();
+        $from = date('Y-m-d', strtotime($from));
+        $to   = date('Y-m-d', strtotime($to));
 
-    //     $sale_detail = SalesDetail::join( 'sales_credits', 'sales_credits.sale_id', '=', 'sales_details.sale_id' )
-    //     ->select( DB::raw( 'sales.id' ),
-    //     DB::raw( 'sum( amount ) as amount' ),
-    //     DB::raw( 'sum( vat ) as vat' ),
-    //     DB::raw( 'sum( price ) as price' ),
-    //     DB::raw( 'sum( discount ) as discount' ),
-    //     DB::raw( 'date( date ) as dates' ), DB::raw( 'sales.created_by' ), DB::raw( 'name' ) )
-    //     ->join( 'sales', 'sales.id', '=', 'sales_details.sale_id' )
-    //     ->whereBetween( DB::raw( 'date( date )' ), [ $from, $to ] )
-    //     ->join( 'users', 'users.id', '=', 'sales.created_by' )
-    //     ->groupby( 'dates', 'created_by' )
-    //     ->get();
+        // Subquery: Total credits paid in each sale
+        $creditsSumSub = DB::table('sales_credits')
+            ->select('sale_id', DB::raw('SUM(paid_amount) as total_paid'))
+            ->groupBy(['sale_id']);
 
-    //     $sale_detail_to_pdf = array();
+        // Subquery: Latest Balance
+        $creditsLatestSub = DB::table('sales_credits as sc1')
+            ->select('sc1.sale_id', 'sc1.balance')
+            ->whereRaw('sc1.id = (
+                SELECT sc2.id
+                FROM sales_credits sc2
+                WHERE sc2.sale_id = sc1.sale_id
+                ORDER BY sc2.id DESC
+                LIMIT 1
+            )');
 
-    //     foreach ( $sale_detail as $item ) {
-    //         $value = $item->amount - $item->discount;
-    //         $vat_percent = $item->vat / $item->price;
-    //         $sub_total = ( $value / ( 1 + $vat_percent ) );
+        $query = SalesDetail::join('sales', 'sales.id', '=', 'sales_details.sale_id')
+            ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
+            ->join('users', 'users.id', '=', 'sales.created_by')
+            ->join('customers', 'customers.id', '=', 'sales.customer_id')
+            ->joinSub($creditsSumSub, 'credits_sum', function($join) {
+                $join->on('credits_sum.sale_id', '=', 'sales.id');
+            })
+            ->joinSub($creditsLatestSub, 'credits_latest', function($join) {
+                $join->on('credits_latest.sale_id', '=', 'sales.id');
+            })
+            ->select(
+                'sales.id as sale_id',
+                'sales.receipt_number',
+                'customers.name as customer_name',
+                'users.name as sold_by',
+                DB::raw('SUM(sales_details.amount) as total'),
+                DB::raw('COALESCE(credits_sum.total_paid, 0) as paid'),
+                DB::raw('COALESCE(credits_latest.balance, 0) as balance'),
+                DB::raw('date(sales.date) as date')
+            )
+            ->whereBetween(DB::raw('date(sales.date)'), [$from, $to])
+            ->groupBy(
+                'sales.id',
+                'sales.receipt_number',
+                'customers.name',
+                'users.name',
+                'sales.date',
+                'credits_sum.total_paid',
+                'credits_latest.balance'
+            )
+            ->orderBy('sales.date', 'desc')
+            ->orderBy('sales.id', 'desc');
 
-    //         array_push( $sale_detail_to_pdf, array(
-    //             'date' => $item->dates,
-    //             'sub_total' => number_format( ( float )( $sub_total )
-    //             , 2, '.', '' ),
-    //             'sold_by' => $item->name
-    //         ) );
-
-    //     }
-
-    //     return $sale_detail_to_pdf;
-    // }
-    
- private function creditSaleSummaryReport($from, $to)
-{
-    $store_id = current_store_id();
-    $from = date('Y-m-d', strtotime($from));
-    $to   = date('Y-m-d', strtotime($to));
-
-    // Subquery: Jumla ya credits zilizolipwa kwa kila sale
-    $creditsSumSub = DB::table('sales_credits')
-        ->select('sale_id', DB::raw('SUM(paid_amount) as total_paid'))
-        ->groupBy(['sale_id']);
-
-    // Subquery: Balance ya mwisho kwa kila sale
-    $creditsLatestSub = DB::table('sales_credits as sc1')
-        ->select('sc1.sale_id', 'sc1.balance')
-        ->whereRaw('sc1.id = (
-            SELECT sc2.id
-            FROM sales_credits sc2
-            WHERE sc2.sale_id = sc1.sale_id
-            ORDER BY sc2.id DESC
-            LIMIT 1
-        )');
-
-    $query = SalesDetail::join('sales', 'sales.id', '=', 'sales_details.sale_id')
-        ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
-        ->join('users', 'users.id', '=', 'sales.created_by')
-        ->join('customers', 'customers.id', '=', 'sales.customer_id')
-        ->joinSub($creditsSumSub, 'credits_sum', function($join) {
-            $join->on('credits_sum.sale_id', '=', 'sales.id');
-        })
-        ->joinSub($creditsLatestSub, 'credits_latest', function($join) {
-            $join->on('credits_latest.sale_id', '=', 'sales.id');
-        })
-        ->select(
-            'sales.id as sale_id',
-            'sales.receipt_number',
-            'customers.name as customer_name',
-            'users.name as sold_by',
-            DB::raw('SUM(sales_details.amount) as total'),
-            DB::raw('COALESCE(credits_sum.total_paid, 0) as paid'),
-            DB::raw('COALESCE(credits_latest.balance, 0) as balance'),
-            DB::raw('date(sales.date) as date')
-        )
-        ->whereBetween(DB::raw('date(sales.date)'), [$from, $to])
-        ->groupBy(
-            'sales.id',
-            'sales.receipt_number',
-            'customers.name',
-            'users.name',
-            'sales.date',
-            'credits_sum.total_paid',
-            'credits_latest.balance'
-        )
-        ->orderBy('sales.date', 'desc')
-        ->orderBy('sales.id', 'desc');
-
-    if (!is_all_store()) {
-        $query->where('inv_current_stock.store_id', $store_id);
-    }
-
-    $sale_detail = $query->get();
-
-    $data = [];
-    $grand_total   = 0;
-    $total_paid    = 0;
-    $total_balance = 0;
-
-    foreach ($sale_detail as $item) {
-        $status = 'Unpaid';
-        if ($item->balance <= 0) {
-            $status = 'Paid';
-        } elseif ($item->paid > 0 && $item->balance > 0) {
-            $status = 'Partial';
+        if (!is_all_store()) {
+            $query->where('inv_current_stock.store_id', $store_id);
         }
 
-        $data[] = [
-            'receipt_number' => $item->receipt_number,
-            'customer_name'  => $item->customer_name,
-            'total'          => (float)$item->total,
-            'paid'           => (float)$item->paid,
-            'balance'        => (float)$item->balance,
-            'sold_by'        => $item->sold_by,
-            'status'         => $status,
+        $sale_detail = $query->get();
+
+        $data = [];
+        $grand_total   = 0;
+        $total_paid    = 0;
+        $total_balance = 0;
+
+        foreach ($sale_detail as $item) {
+            $status = 'Unpaid';
+            if ($item->balance <= 0) {
+                $status = 'Paid';
+            } elseif ($item->paid > 0 && $item->balance > 0) {
+                $status = 'Partial';
+            }
+
+            $data[] = [
+                'receipt_number' => $item->receipt_number,
+                'customer_name'  => $item->customer_name,
+                'total'          => (float)$item->total,
+                'paid'           => (float)$item->paid,
+                'balance'        => (float)$item->balance,
+                'sold_by'        => $item->sold_by,
+                'status'         => $status,
+            ];
+
+            // totals for footer
+            $grand_total   += $item->total;
+            $total_paid    += $item->paid;
+            $total_balance += $item->balance;
+        }
+
+        return [
+            'info'          => $data,
+            'grand_total'   => $grand_total,
+            'total_paid'    => $total_paid,
+            'total_balance' => $total_balance,
         ];
-
-        // totals for footer
-        $grand_total   += $item->total;
-        $total_paid    += $item->paid;
-        $total_balance += $item->balance;
     }
-
-    return [
-        'info'          => $data,
-        'grand_total'   => $grand_total,
-        'total_paid'    => $total_paid,
-        'total_balance' => $total_balance,
-    ];
-}
 
 
     private function creditPaymentReport( $from, $to ) {

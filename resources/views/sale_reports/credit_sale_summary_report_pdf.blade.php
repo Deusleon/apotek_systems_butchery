@@ -142,11 +142,6 @@
             <div style="margin-top: 10px; padding-top: 5px;">
                 <h3 align="center">Overall Summary</h3>
                 <table style="width: 30%; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd;">
-                    {{-- <tr style="background: #f8f9fa;">
-                        <td align="right" style="padding: 8px; width: 70%;"><b>Total Sales Transactions:</b></td>
-                        <td align="right" style="padding: 8px;">{{ number_format($overallTotals['total_count'], 0) }}
-                        </td>
-                    </tr> --}}
                     <tr>
                         <td align="right" style="padding: 8px; width: 50%;"><b>Total Amount:</b></td>
                         <td align="right" style="padding: 8px;">{{ number_format($data['grand_total'], 2) }}</td>
