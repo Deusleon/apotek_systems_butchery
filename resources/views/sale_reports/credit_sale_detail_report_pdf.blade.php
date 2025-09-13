@@ -1,64 +1,61 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Credit Sales Details Report</title>
     <style>
-
         body {
-            font-size: 12px;
+            font-size: 13px;
         }
 
         * {
             font-family: Verdana, Arial, sans-serif;
         }
 
-        table, th, td {
-            border: 1px solid black;
+        table,
+        th {
             border-collapse: collapse;
-            padding: 10px;
-            font-size: x-small;
+            padding: 8px;
         }
 
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
+        table,
+        td {
+            border-collapse: collapse;
+            padding: 5px;
         }
 
-        .full-row {
-            width: 100%;
-            padding-left: 3%;
-            padding-right: 2%;
+        table {
+            page-break-inside: auto
         }
 
-        .col-50 {
-            display: inline-block;
-            font-size: 13px;
-            width: 50%;
+        tr {
+            page-break-inside: avoid;
+            page-break-after: auto
         }
 
-        .col-25 {
-            display: inline-block;
-            font-size: 13px;
-            width: 25%;
+        thead {
+            display: table-header-group
         }
 
-        .col-35 {
-            display: inline-block;
-            font-size: 13px;
-            width: 35%;
+        tfoot {
+            display: table-footer-group
         }
-
-        .col-15 {
-            display: inline-block;
-            font-size: 13px;
-            width: 15%;
-        }
-
 
         #table-detail {
-            border-spacing: 6%;
-            width: 96%;
-            margin-top: -13%;
-            border: none;
+            width: 100%;
+        }
+
+        #table-detail-main {
+            width: 103%;
+            border-collapse: collapse;
+        }
+
+        #table-detail tr> {
+            line-height: 13px;
+        }
+
+        #table-detail tr:nth-child(even) {
+            background-color: #f2f2f2;
         }
 
         #container .logo-container {
@@ -71,156 +68,168 @@
             max-width: 160px;
             max-height: 160px;
         }
-
-
     </style>
 </head>
+
 <body>
-<div class="row">
-    <div id="container">
-        <div class="logo-container">
-            @if($pharmacy['logo'])
-                <img src="{{public_path('fileStore/logo/'.$pharmacy['logo'])}}"/>
-            @endif
+    <div class="row">
+        <div id="container">
+            <div class="logo-container">
+                @if($pharmacy['logo'])
+                    <img src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
+                @endif
+            </div>
         </div>
     </div>
-</div>
-<div class="row" style="padding-top: -2%">
-    <h1 align="center">{{$pharmacy['name']}}</h1>
-    <h3 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['address']}}</h3>
-    <h3 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['phone']}}</h3>
-    <h3 align="center"
-        style="font-weight: normal;margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
-    <h2 align="center" style="margin-top: -1%">Credit Sales Details Report</h2>
-    <h4 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['date_range']}}</h4>
+    <div class="row" style="padding-top: -2%">
+        <h1 align="center">{{$pharmacy['name']}}</h1>
+        <h3 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['address']}}</h3>
+        <h3 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['phone']}}</h3>
+        <h3 align="center" style="font-weight: normal;margin-top: -1%">
+            {{$pharmacy['email'] . ' | ' . $pharmacy['website']}}
+        </h3>
+        <h2 align="center" style="margin-top: -1%">Credit Sales Details Report</h2>
+        <h4 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['date_range']}}</h4>
 
-    @foreach($data as $datas => $dat)
-        <div class="row" style="margin-top: 15%">
-            <table class="table table-sm" id="table-detail" align="center">
+        @foreach($data as $dat)
+            <table id="table-detail-main">
                 <tr>
-                    <th align="left">SN</th>
-                    <th align="left">Product Name</th>
-                    <th align="right">Quantity</th>
-                    <th align="right">Price</th>
-                    {{--<th align="right">Sub Total</th>
-                    <th align="right">Discount</th>--}}
-                    <th align="right">VAT</th>
-                    <th align="right">Amount</th>
+                    <td><b>Date:</b> {{ date('j M, Y', strtotime($dat['date'])) }}</td>
                 </tr>
+            </table>
 
-                @foreach($dat as $item)
-                    <tr>
-                        <td align="left">{{$loop->iteration}}</td>
-                        <td align="left">{{$item['name']}}</td>
-                        <td align="right">{{number_format($item['quantity'],0)}}</td>
-                        <td align="right">{{number_format($item['price']/$item['quantity'],2)}}</td>
-                        {{--                        <td align="right">{{number_format($item['sub_total'],2)}}</td>--}}
-                        {{--                        <td align="right">{{number_format($item['discount'],2)}}</td>--}}
-                        <td align="right">{{number_format($item['vat'],2)}}</td>
-                        <td align="right">{{number_format($item['amount'],2)}}</td>
+            <table id="table-detail" align="center" style="margin-top: -1%; padding-top: 0%;">
+                <thead>
+                    <tr style="background: #1f273b; color: white;">
+                        <th align="left" style="width: 1%;">#</th>
+                        <th align="left" style="width: 20%">Product Name</th>
+                        <th align="left">Batch #</th>
+                        <th align="left">Sold By</th>
+                        <th align="right" style="width: 2%">Qty</th>
+                        <th align="right">Sell Price</th>
+                        <th align="right">Sub Total</th>
+                        <th align="right">VAT</th>
+                        @if ($enable_discount === 'YES')
+                            <th align="right">Discount</th>
+                        @endif
+                        <th align="right">Amount</th>
                     </tr>
-                @endforeach
+                </thead>
 
+                <tbody>
+                    @php $i = 1; @endphp
+                    @foreach($dat['grouped_data'] as $itm)
+                        <tr>
+                            <td>{{$i++}}.</td>
+                            <td>{{$itm['name']}}</td>
+                            <td>{{$itm['batch']}}</td>
+                            <td>{{$itm['sold_by']}}</td>
+                            <td align="right">{{ number_format($itm['quantity'], 0) }}</td>
+                            <td align="right">{{ number_format($itm['price'], 2) }}</td>
+                            <td align="right">{{ number_format($itm['sub_total'], 2) }}</td>
+                            <td align="right">{{ number_format($itm['vat'], 2) }}</td>
+                            <td align="right">{{ number_format($itm['discount'], 2) }}</td>
+                            <td align="right">{{ number_format($itm['amount'], 2) }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+
+            <table style="width: 101%; margin-bottom: 5%;">
+                <tr>
+                    <td align="right" style="padding-top: -4%; width: 60%;"><b>Sub Total:</b></td>
+                    <td align="right" style="padding-top: -4%;">
+                        {{ number_format(($dat['totals']['grand_total'] - $dat['totals']['total_vat']), 2) }}
+                    </td>
+                    <td align="right" style="padding-top: -4%; width: 20%;"><b>Paid:</b></td>
+                    <td align="right" style="padding-top: -4%">{{ number_format($dat['totals']['total_paid'], 2) }}</td>
+                </tr>
+                <tr>
+                    <td align="right" style="padding-top: -4%; width: 60%;"><b>VAT:</b></td>
+                    <td align="right" style="padding-top: -4%">{{ number_format($dat['totals']['total_vat'], 2) }}</td>
+                    <td align="right" style="padding-top: -4%; width: 20%;"><b>Balance:</b></td>
+                    <td align="right" style="padding-top: -4%">{{ number_format($dat['totals']['total_balance'], 2) }}</td>
+                </tr>
+                @if ($enable_discount === 'YES')
+                    <tr>
+                        <td align="right" style="padding-top: -3%; width: 40%;"><b>Discount:</b></td>
+                        <td align="right" style="padding-top: -3%">{{ number_format($dat['totals']['total_discount'], 2) }}</td>
+                    </tr>
+                @endif
+                <tr>
+                    <td align="right" style="padding-top: -3%; width: 40%;"><b>Total:</b></td>
+                    <td align="right" style="padding-top: -3%">{{ number_format($dat['totals']['grand_total'], 2) }}</td>
+                </tr>
+            </table>
+            <hr>
+        @endforeach
+        {{-- compute overall totals in blade --}}
+        @php
+            $overallTotals = [
+                'total_count' => 0,
+                'grand_total' => 0.0,
+                'total_paid' => 0.0,
+                'total_balance' => 0.0,
+                'total_vat' => 0.0,
+                'total_discount' => 0.0,
+            ];
+
+            foreach ($data as $day) {
+                $tot = $day['totals'] ?? [];
+
+                // determine sales count for the day
+                if (isset($tot['count_sales'])) {
+                    $count = (int) $tot['count_sales'];
+                } elseif (isset($tot['countSales'])) {
+                    $count = (int) $tot['countSales'];
+                } elseif (isset($day['sales']) && is_array($day['sales'])) {
+                    $count = count($day['sales']);
+                } else {
+                    $count = 0;
+                }
+
+                $overallTotals['total_count'] += $count;
+                $overallTotals['grand_total'] += (float) ($tot['grand_total'] ?? 0);
+                $overallTotals['total_paid'] += (float) ($tot['total_paid'] ?? 0);
+                $overallTotals['total_balance'] += (float) ($tot['total_balance'] ?? 0);
+                $overallTotals['total_vat'] += (float) ($tot['total_vat'] ?? 0);
+                $overallTotals['total_discount'] += (float) ($tot['total_discount'] ?? 0);
+            }
+
+            // round for neatness
+            $overallTotals['grand_total'] = round($overallTotals['grand_total'], 2);
+            $overallTotals['total_paid'] = round($overallTotals['total_paid'], 2);
+            $overallTotals['total_balance'] = round($overallTotals['total_balance'], 2);
+            $overallTotals['total_vat'] = round($overallTotals['total_vat'], 2);
+            $overallTotals['total_discount'] = round($overallTotals['total_discount'], 2);
+        @endphp
+
+        <div style="margin-top: 10px; padding-top: 5px;">
+            <h3 align="center">Overall Period Summary</h3>
+            <table style="width: 30%; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd;">
+                {{-- <tr style="background: #f8f9fa;">
+                    <td align="right" style="padding: 8px; width: 70%;"><b>Total Sales Transactions:</b></td>
+                    <td align="right" style="padding: 8px;">{{ number_format($overallTotals['total_count'], 0) }}</td>
+                </tr> --}}
+                <tr>
+                    <td align="right" style="padding: 8px; width: 50%;"><b>Total Amount:</b></td>
+                    <td align="right" style="padding: 8px;">{{ number_format($overallTotals['grand_total'], 2) }}</td>
+                </tr>
+                <tr>
+                    <td align="right" style="padding: 8px; width: 50%;"><b>Total Paid:</b></td>
+                    <td align="right" style="padding: 8px;">{{ number_format($overallTotals['total_paid'], 2) }}</td>
+                </tr>
+                <tr>
+                    <td align="right" style="padding: 8px; width: 50%;"><b>Outstanding Balance:</b></td>
+                    <td align="right" style="padding: 8px; color: red;">
+                        {{ number_format($overallTotals['total_balance'], 2) }}</td>
+                </tr>
             </table>
         </div>
-        <div class="full-row" style="padding-top: 1%">
-            <div class="col-35">
-                <div class="full-row">
-                    <div class="col-50" align="left"><b>Sold By: </b></div>
-                    <div class="col-50" align="right">{{$dat[0]['sold_by']}}</div>
-                </div>
-
-            </div>
-            <div class="col-15"></div>
-            <div class="col-25"></div>
-            <div class="col-25">
-                <div class="full-row">
-                    <div class="col-50" align="left"><b>Sub Total: </b></div>
-                    <div class="col-50"
-                         align="right">{{number_format(($dat[0]['grand_total']-$dat[0]['total_vat']),2)}}</div>
-                </div>
-            </div>
-        </div>
-        <div class="full-row">
-            <div class="col-35">
-                <div class="full-row">
-                    <div class="col-50" align="left"><b>Sales Date:</b></div>
-                    <div class="col-50" align="right">{{date('j M, Y', strtotime($dat[0]['created_at']))}}</div>
-                </div>
-            </div>
-            <div class="col-15"></div>
-            <div class="col-25"></div>
-            <div class="col-25">
-                <div class="full-row">
-                    <div class="col-50" align="left"><b>Discount: </b></div>
-                    <div class="col-50" align="right">{{number_format($dat[0]['total_discount'],2)}}</div>
-                </div>
-            </div>
-        </div>
-        <div class="full-row">
-            <div class="col-35">
-                <div class="full-row">
-                    <div class="col-50" align="left"><b>Recept #: </b></div>
-                    <div class="col-50" align="right">{{$datas}}</div>
-                </div>
-            </div>
-            <div class="col-15"></div>
-            <div class="col-25"></div>
-            <div class="col-25">
-                <div class="full-row">
-                    <div class="col-50" align="left"><b>VAT: </b></div>
-                    <div class="col-50" align="right">{{number_format($dat[0]['total_vat'],2)}}</div>
-                </div>
-            </div>
-        </div>
-        <div class="full-row">
-            <div class="col-35">
-                <div class="full-row">
-                    <div class="col-50" align="left"><b>TIN #: </b></div>
-                    <div class="col-50" align="right">{{$pharmacy['tin_number']}}</div>
-                </div>
-            </div>
-            <div class="col-15"></div>
-            <div class="col-25"></div>
-            <div class="col-25">
-                <div class="full-row">
-                    <div class="col-50" align="left"><b>Total:</b></div>
-                    <div class="col-50" align="right">{{number_format(($dat[0]['grand_total']),2)}}</div>
-                </div>
-            </div>
-        </div>
-        <div class="full-row">
-            <div class="col-35">
-                <div class="full-row">
-                    <div class="col-50" align="left"><b>Customer: </b></div>
-                    <div class="col-50" align="right">{{$dat[0]['customer']}}</div>
-                </div>
-            </div>
-            <div class="col-15"></div>
-            <div class="col-25"></div>
-            <div class="col-25">
-                <div class="full-row">
-                    <div class="col-50" align="left"><b>Paid:</b></div>
-                    <div class="col-50" align="right">{{number_format(($dat[0]['paid']),2)}}</div>
-                </div>
-            </div>
-        </div>
-        <div class="full-row">
-            <div class="col-35"></div>
-            <div class="col-15"></div>
-            <div class="col-25"></div>
-            <div class="col-25">
-                <div class="full-row">
-                    <div class="col-50" align="left"><b>Balance:</b></div>
-                    <div class="col-50" align="right">{{number_format(($dat[0]['balance']),2)}}</div>
-                </div>
-            </div>
-        </div>
-        <hr>
-    @endforeach
 
 
-    <script type="text/php">
+
+        <script type="text/php">
     if ( isset($pdf) ) {
         $x = 280;
         $y = 820;
@@ -236,14 +245,8 @@
 
      }
 
-
-
-
-
     </script>
-
 
 </body>
 
 </html>
-

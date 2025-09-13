@@ -81,7 +81,7 @@
                                 class="col-form-label text-md-right">Date:</label>
                         </div>
                         <div class="col-md-3" style="margin-left: -3.1%">
-                            <input style="width: 103.4%;" type="text" name="outgoing-date" onchange="getOutgoingDate()"
+                            <input style="width: 103.4%;" type="text" name="outgoing-date"
                                 class="form-control" id="outgoing-date" value="" />
                         </div>
                     </div>

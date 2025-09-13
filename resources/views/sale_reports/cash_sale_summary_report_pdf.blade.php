@@ -109,7 +109,9 @@
                         <th align="left">Sold By</th>
                         <th align="right">Sub Total</th>
                         <th align="right">VAT</th>
-                        <th align="right">Discount</th>
+                        @if ($enable_discount === 'YES')
+                            <th align="right">Discount</th>
+                        @endif
                         <th align="right">Total</th>
                     </tr>
                 </thead>
@@ -130,7 +132,9 @@
                                 <div>{{number_format($item['sub_total'], 2)}}</div>
                             </td>
                             <td align="right">{{number_format($item['vat'], 2)}}</td>
-                            <td align="right">{{number_format($item['discount'], 2)}}</td>
+                            @if ($enable_discount === 'YES')
+                                <td align="right">{{number_format($item['discount'], 2)}}</td>
+                            @endif
                             <td align="right">{{number_format($item['total'], 2)}}</td>
 
                         </tr>
@@ -140,24 +144,28 @@
                         <?php    $grand_total += $item['total'] - $item['discount'];?>
                     @endforeach
                 </tbody>
-                <tfoot>
+            </table>
+            <table style="width: 101%;">
+                <tr>
+                    <td colspan="10" align="right" style="padding-top: -3%; width: 85%;"><b>Sub Total:</b></td>
+                    <td align="right" style="padding-top: -3%;">
+                        {{number_format($total_sub_total, 2)}}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="10" align="right" style="padding-top: -3%; width: 85%;"><b>VAT:</b></td>
+                    <td align="right" style="padding-top: -3%">{{number_format($total_vat, 2)}}</td>
+                </tr>
+                @if ($enable_discount === 'YES')
                     <tr>
-                        <td colspan="8" align="right" style="font-weight: bold;">Sub total:</td>
-                        <td align="right">{{ number_format($total_sub_total, 2) }}</td>
+                        <td colspan="10" align="right" style="padding-top: -3%; width: 85%;"><b>Discount:</b></td>
+                        <td align="right" style="padding-top: -3%">{{number_format($total_discount, 2)}}</td>
                     </tr>
-                    <tr>
-                        <td colspan="8" align="right" style="font-weight: bold;">VAT:</td>
-                        <td align="right">{{ number_format($total_vat, 2) }}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="8" align="right" style="font-weight: bold;">Discount:</td>
-                        <td align="right">{{ number_format($total_discount, 2) }}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="8" align="right" style="font-weight: bold;">Total:</td>
-                        <td align="right">{{ number_format($grand_total, 2) }}</td>
-                    </tr>
-                </tfoot>
+                @endif
+                <tr>
+                    <td colspan="10" align="right" style="padding-top: -3%; width: 85%;"><b>Total:</b></td>
+                    <td align="right" style="padding-top: -3%">{{number_format($grand_total, 2)}}</td>
+                </tr>
             </table>
         </div>
     </div>

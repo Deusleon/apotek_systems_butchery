@@ -130,12 +130,12 @@
                 <thead>
                     <tr style="background: #1f273b; color: white;">
                         <th align="left" style="width: 1%;">#</th>
-                        <th align="left">Product Name</th>
+                        <th align="left" style="width: 20%">Product Name</th>
                         <th align="left">Batch #</th>
                         {{-- <th align="left">Price Type</th> --}}
                         <th align="left">Sold By</th>
-                        <th align="left" style="width: 9%;">Date</th>
-                        <th align="center">Qty</th>
+                        {{-- <th align="left" style="width: 9%;">Date</th> --}}
+                        <th align="center" style="width: 2%">Qty</th>
                         <th align="right">Sell Price</th>
                         <th align="right">Sub total</th>
                         <th align="right">VAT</th>
@@ -152,7 +152,7 @@
                         <td align="left">{{$item['batch_number']}}</td>
                         {{-- <td align="left">{{$item['price_type']}}</td> --}}
                         <td align="left">{{$item['sold_by']}}</td>
-                        <td align="left">{{$item['date']}}</td>
+                        {{-- <td align="left">{{$item['date']}}</td> --}}
                         <td align="center">{{number_format($item['quantity'], 0)}}</td>
                         <td align="right">{{number_format($item['price'], 2)}}</td>
                         <td align="right">{{number_format($item['sub_total'], 2)}}</td>
@@ -198,53 +198,34 @@
             @endforeach
             <hr>
         @endforeach
-
-        {{-- Grand total table --}}
-        <div style="width:100%;">
-            <table style="width:100%; border-collapse: collapse;">
-                <tr>
-                    <th colspan="3" style="text-align: center; padding:8px; font-size: 17px;">
-                        Grand Total:
-                    </th>
-                </tr>
-                <tr>
-                    <td style="width:46%; text-align:right; font-size: 15px;">
-                        Sub Total:
-                    </td>
-                    <td style="width:15%; text-align:right; font-size: 15px;">
-                        {{number_format($grand_sub_total, 2)}}
-                    </td>
-                </tr>
-                <tr>
-                    <td style="width:46%; text-align:right; font-size: 15px;">
-                        VAT:
-                    </td>
-                    <td style="width:15%; text-align:right; font-size: 15px;">
-                        {{number_format($grand_vat_total, 2)}}
-                    </td>
-                </tr>
-                @if ($enable_discount === 'YES')
+        @if (!empty($data[0][2]) && count($data[0][2]) > 0)
+            {{-- Grand total table --}}
+            <div style="margin-top: 10px; padding-top: 5px;">
+                <h3 align="center"><b>Overall Summary</b></h3>
+                <table style="width: 30%; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd;">
+                    <tr style="background: #f8f9fa;">
+                        <td align="right" style="padding: 8px; width: 50%;"><b>Sub Total:</b></td>
+                        <td align="right" style="padding: 8px;">{{ number_format($grand_sub_total, 2) }}</td>
+                    </tr>
                     <tr>
-                        <td style="width:46%; text-align:right; font-size: 15px;">
-                            Discount:
-                        </td>
-                        <td style="width:15%; text-align:right; font-size: 15px;">
-                            {{number_format($grand_discount_total, 2)}}
+                        <td align="right" style="padding: 8px; width: 50%;"><b>VAT:</b></td>
+                        <td align="right" style="padding: 8px;">{{ number_format($grand_vat_total, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <td align="right" style="padding: 8px; width: 50%;"><b>Discount:</b></td>
+                        <td align="right" style="padding: 8px;">{{ number_format($grand_discount_total, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <td align="right" style="padding: 8px; width: 50%;"><b>Total:</b></td>
+                        <td align="right" style="padding: 8px;">
+                            {{ number_format($grand_amount_total, 2) }}
                         </td>
                     </tr>
-                @endif
-                <tr>
-                    <td style="width:46%; text-align:right; font-size: 15px;">
-                        Total:
-                    </td>
-                    <td style="width:15%; text-align:right; font-size: 15px;">
-                        {{number_format($grand_amount_total, 2)}}
-                    </td>
-                </tr>
-            </table>
-        </div>
-
-        <hr">
+                </table>
+            </div>
+        @else
+            <div style="width: 100%; justify-content: center; text-align: center;">No data found</div>
+        @endif
     </div>
 
     <script type="text/php">
