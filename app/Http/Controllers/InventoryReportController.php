@@ -12,6 +12,7 @@ use App\StockAdjustment;
 use App\StockIssue;
 use App\StockTracking;
 use App\StockTransfer;
+use App\StockCountSchedule;
 use App\Store;
 use FPDF;
 use Illuminate\Database\Eloquent\Collection;
@@ -688,10 +689,10 @@ class InventoryReportController extends Controller
     public function stockCountAnalytics()
     {
         // Total number of scheduled stock counts
-        $totalSchedules = \App\StockCountSchedule::count();
+        $totalSchedules = StockCountSchedule::count();
 
         // Breakdown of schedules by status
-        $schedulesByStatus = \App\StockCountSchedule::select('status', DB::raw('count(*) as count'))
+        $schedulesByStatus = StockCountSchedule::select('status', DB::raw('count(*) as count'))
             ->groupBy('status')
             ->pluck('count', 'status');
 
