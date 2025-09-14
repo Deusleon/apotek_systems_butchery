@@ -110,15 +110,23 @@ class SaleReportController extends Controller {
             return $pdf->stream( 'customer_payment_statement.pdf' );
 
             case 8:
-            $data = $this->priceListReport( $request->category );
-            if ( empty( $data ) ) {
-                return response()->view( 'error_pages.pdf_zero_data' );
+            if($request->category === 'all'){
+                $data = $this->priceListPivot();
+                if (empty($data)) {
+                    return response()->view('error_pages.pdf_zero_data');
+                }
+                $pdf = Pdf::loadView('sale_reports.price_list_all_categories_report_pdf', 
+                compact( 'data', 'pharmacy' ) );
+                return $pdf->stream('price_list_all_categories_report_pdf.pdf');
+            }else{
+                $data = $this->priceListReport($request->category);
+                if (empty($data)) {
+                    return response()->view('error_pages.pdf_zero_data');
+                }
+                $pdf = Pdf::loadView('sale_reports.price_list_report_pdf', 
+                compact( 'data', 'pharmacy' ) );
+                return $pdf->stream('price_list_report.pdf');
             }
-            $view = 'sale_reports.price_list_report_pdf';
-            $output = 'price_list_report.pdf';
-            $inventory_report = new InventoryReportController();
-            $inventory_report->splitPdf( $data, $view, $output );
-            break;
 
             case 11:
             $data = $this->saleReturnReport($from, $to);
@@ -751,7 +759,7 @@ unset($dayData);
         ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id' )
         ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
         ->Where( 'inv_products.status', '1' )
-        ->select( 'inv_products.id as id', 'name' )
+        ->select( 'inv_products.id as id', 'inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom' )
         ->groupBy( 'product_id' )
         ->get();
 
@@ -763,8 +771,9 @@ unset($dayData);
             ->where( 'product_id', $product->id )
             ->first( 'price' );
 
+            $product_name = $data->currentStock[ 'product' ][ 'name' ].' '.($data->currentStock[ 'product' ][ 'brand' ].' ' ?? '').$data->currentStock[ 'product' ][ 'pack_size' ].$data->currentStock[ 'product' ][ 'sales_uom' ];
             array_push( $max_prices, array(
-                'name' => $data->currentStock[ 'product' ][ 'name' ],
+                'name' => $product_name,
                 'buy_price' => $data->currentStock[ 'unit_cost' ],
                 'sell_price' => $data->price,
                 'category_name' => $data->priceCategory[ 'name' ]
@@ -778,7 +787,65 @@ unset($dayData);
         return $max_prices;
 
     }
+    private function priceListPivot()
+    {
+        $categories = PriceList::with('priceCategory')
+            ->select('price_category_id')
+            ->distinct()
+            ->get()
+            ->pluck('priceCategory.name', 'price_category_id')
+            ->toArray();
 
+        $products = DB::table('inv_products')
+            ->join('inv_current_stock', 'inv_current_stock.product_id', '=', 'inv_products.id')
+            ->where('inv_products.status', 1)
+            ->select('inv_products.id', 'inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom', 'inv_current_stock.unit_cost')
+            ->groupBy(['inv_products.id', 'inv_products.name', 'inv_current_stock.unit_cost'])
+            ->get();
+
+        $result = [];
+        
+        foreach ($products as $i => $product) {
+            $product_name = trim(
+                $product->name . ' ' .
+                ($product->brand.' ' ?? '') . 
+                ($product->pack_size ?? '') .
+                ($product->sales_uom ?? '')
+            );
+            $row = [
+                '#'          => $i + 1,
+                'name'       => $product_name,
+                'buy_price'  => $product->unit_cost,
+            ];
+
+            foreach ($categories as $catId => $catName) {
+                $row[$catName] = null;
+            }
+
+            $prices = PriceList::whereHas('priceCategory') 
+                    ->whereHas('currentStock', function ($q) use ($product) {
+                        $q->where('product_id', $product->id);
+                    })
+                    ->with('priceCategory')
+                    ->get();
+
+            // foreach ($prices as $price) {
+            //     $row[$price->priceCategory->name] = $price->price;
+            // }
+            foreach ($prices as $price) {
+                if ($price->priceCategory) { // hakikisha haiko null
+                    $row[$price->priceCategory->name] = $price->price;
+                }
+            }
+
+            $result[] = $row;
+        }
+
+        return [
+            'categories' => $categories,
+            'products'   => $result,
+        ];
+    }
     private function saleReturnReport($from, $to) {
         $store_id = current_store_id();
         $query = SalesReturn::join( 'sales_details', 'sales_details.id', '=', 'sales_returns.sale_detail_id' )

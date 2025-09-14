@@ -112,20 +112,22 @@
     <h2 align="center" style="margin-top: -1%">Price List Report</h2>
     <h4 align="center" style="margin-top: -1%">For {{$data[0]['category_name']}} category</h4>
 
-    <div class="row" style="margin-top: 2%;">
+    <div class="row" style="margin-top: 0%;">
         <div class="col-md-12">
             <table id="table-detail" align="center">
                 <thead>
                 <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                    <th>Product Name</th>
+                    <th align="center">#</th>
+                    <th align="left">Product Name</th>
                     <th align="right">Buy Price</th>
                     <th align="right">Sell Price</th>
                 </tr>
                 </thead>
-
+                {{-- @dd($data) --}}
                 @foreach($data as $item)
                     <tr>
-                        <td>{{$item['name']}}</td>
+                        <td align="center">{{$loop->iteration}}.</td>
+                        <td align="left">{{$item['name']}}</td>
                         <td align="right">{{number_format($item['buy_price'],2)}}</td>
                         <td align="right">{{number_format($item['sell_price'],2)}}</td>
                     </tr>

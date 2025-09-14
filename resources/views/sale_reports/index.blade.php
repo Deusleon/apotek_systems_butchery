@@ -82,7 +82,7 @@
                                         <!-- <option value="6">Bill Sales Details Report</option>
                                         <option value="7">Company Billing Report</option> -->
                                         <option value="8">Price List Report</option>
-                                    {{--                                        <option value="9">Category Price List Report</option>--}}
+                                                                           {{-- <option value="9">Category Price List Report</option> --}}
                                     <!--   <option value="10">Sales Trend Chart</option> -->
                                         <option value="11">Sales Return Report</option>
                                         <option value="12">Sales Comparison Report</option>
@@ -106,6 +106,8 @@
                                         <option value="{{$category->id}}">
                                             {{$category->name}}</option>
                                     @endforeach
+                                        <option value="all">
+                                            All Categories</option>
                                 </select>
                                 <span id="warning"
                                       style="color: #ff0000; display: none">Please select a category</span>
