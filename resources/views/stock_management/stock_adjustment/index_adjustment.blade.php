@@ -93,7 +93,7 @@
                     <div class="col-md-4" >
                         <label for="stock_status" class="col-form-label text-md-right"
                         >Status:</label>
-                        <select name="stock_status" class="js-example-basic-single form-group"
+                        <select name="stock_status" class="js-example-basic-single form-control"
                                 id="stock_status_id">
                             <option name="store_name" value="1">In Stock</option>
                             <option name="store_name" value="0">Out Of Stock</option>

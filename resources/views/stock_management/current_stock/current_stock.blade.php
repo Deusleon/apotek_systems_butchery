@@ -44,7 +44,7 @@
                 <div class="form-group row d-flex">
                     <div class="col-md-6">
                         <label for="stock_status" class="col-form-label text-md-right">Status:</label>
-                        <select name="stock_status" class="js-example-basic-single form-group" id="stock_status_id">
+                        <select name="stock_status" class="js-example-basic-single form-control" id="stock_status_id">
                             <option name="store_name" value="all">All</option>
                             <option name="store_name" value="1">In Stock</option>
                             <option name="store_name" value="0">Out Of Stock</option>
@@ -53,7 +53,6 @@
 
                     <div class="col-md-6">
                         <label for="category" class="col-form-label text-md-left">Type:</label>
-
                         <select name="category" class="js-example-basic-single form-control" id="category_id">
                             <option name="store_name" value="1">Summary</option>
                             <option name="store_name" value="0">Detailed</option>
