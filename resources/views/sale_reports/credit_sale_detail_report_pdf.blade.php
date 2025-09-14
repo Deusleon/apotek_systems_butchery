@@ -206,28 +206,28 @@
 
         <div style="margin-top: 10px; padding-top: 5px;">
             <h3 align="center">Overall Period Summary</h3>
-            <table style="width: 30%; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd;">
-                {{-- <tr style="background: #f8f9fa;">
-                    <td align="right" style="padding: 8px; width: 70%;"><b>Total Sales Transactions:</b></td>
-                    <td align="right" style="padding: 8px;">{{ number_format($overallTotals['total_count'], 0) }}</td>
-                </tr> --}}
+            <table
+                style="width: auto; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
                 <tr>
-                    <td align="right" style="padding: 8px; width: 50%;"><b>Total Amount:</b></td>
-                    <td align="right" style="padding: 8px;">{{ number_format($overallTotals['grand_total'], 2) }}</td>
+                    <td style="padding: 8px; text-align: right;"><b>Total Amount</b></td>
+                    <td style="padding: 8px; text-align: center;"><b>:</b></td>
+                    <td style="padding: 8px; text-align: right;">
+                        <b>{{ number_format($overallTotals['grand_total'], 2) }}</b></td>
                 </tr>
                 <tr>
-                    <td align="right" style="padding: 8px; width: 50%;"><b>Total Paid:</b></td>
-                    <td align="right" style="padding: 8px;">{{ number_format($overallTotals['total_paid'], 2) }}</td>
+                    <td style="padding: 8px; text-align: right;"><b>Total Paid</b></td>
+                    <td style="padding: 8px; text-align: center;"><b>:</b></td>
+                    <td style="padding: 8px; text-align: right;">
+                        <b>{{ number_format($overallTotals['total_paid'], 2) }}</b></td>
                 </tr>
                 <tr>
-                    <td align="right" style="padding: 8px; width: 50%;"><b>Outstanding Balance:</b></td>
-                    <td align="right" style="padding: 8px; color: red;">
-                        {{ number_format($overallTotals['total_balance'], 2) }}</td>
+                    <td style="padding: 8px; text-align: right;"><b>Outstanding Balance</b></td>
+                    <td style="padding: 8px; text-align: center;"><b>:</b></td>
+                    <td style="padding: 8px; text-align: right; color: red;">
+                        <b>{{ number_format($overallTotals['total_balance'], 2) }}</b></td>
                 </tr>
             </table>
         </div>
-
-
 
         <script type="text/php">
     if ( isset($pdf) ) {
