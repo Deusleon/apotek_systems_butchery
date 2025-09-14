@@ -198,34 +198,57 @@
             @endforeach
             <hr>
         @endforeach
-        @if (!empty($data[0][2]) && count($data[0][2]) > 0)
-            {{-- Grand total table --}}
-            <div style="margin-top: 10px; padding-top: 5px;">
-                <h3 align="center"><b>Overall Summary</b></h3>
-                <table style="width: 30%; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd;">
-                    <tr style="background: #f8f9fa;">
-                        <td align="right" style="padding: 8px; width: 50%;"><b>Sub Total:</b></td>
-                        <td align="right" style="padding: 8px;">{{ number_format($grand_sub_total, 2) }}</td>
-                    </tr>
-                    <tr>
-                        <td align="right" style="padding: 8px; width: 50%;"><b>VAT:</b></td>
-                        <td align="right" style="padding: 8px;">{{ number_format($grand_vat_total, 2) }}</td>
-                    </tr>
-                    <tr>
-                        <td align="right" style="padding: 8px; width: 50%;"><b>Discount:</b></td>
-                        <td align="right" style="padding: 8px;">{{ number_format($grand_discount_total, 2) }}</td>
-                    </tr>
-                    <tr>
-                        <td align="right" style="padding: 8px; width: 50%;"><b>Total:</b></td>
-                        <td align="right" style="padding: 8px;">
-                            {{ number_format($grand_amount_total, 2) }}
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        @else
-            <div style="width: 100%; justify-content: center; text-align: center;">No data found</div>
-        @endif
+        {{-- <div style="margin-top: 10px; padding-top: 5px;">
+            <h3 align="center"><b>Overall Summary</b></h3>
+            <table style="width: 30%; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd;">
+                <tr style="background: #f8f9fa;">
+                    <td align="right" style="padding: 8px; width: 50%;"><b>Sub Total:</b></td>
+                    <td align="right" style="padding: 8px;">{{ number_format($grand_sub_total, 2) }}</td>
+                </tr>
+                <tr>
+                    <td align="right" style="padding: 8px; width: 50%;"><b>VAT:</b></td>
+                    <td align="right" style="padding: 8px;">{{ number_format($grand_vat_total, 2) }}</td>
+                </tr>
+                <tr>
+                    <td align="right" style="padding: 8px; width: 50%;"><b>Discount:</b></td>
+                    <td align="right" style="padding: 8px;">{{ number_format($grand_discount_total, 2) }}</td>
+                </tr>
+                <tr>
+                    <td align="right" style="padding: 8px; width: 50%;"><b>Total:</b></td>
+                    <td align="right" style="padding: 8px;">
+                        {{ number_format($grand_amount_total, 2) }}
+                    </td>
+                </tr>
+            </table>
+        </div> --}}
+        <div style="margin-top: 10px; padding-top: 5px;">
+            <h3 align="center"><b>Overall Summary</b></h3>
+            <table
+                style="min-width: 25%; width: auto; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 4px; text-align: right;"><b>Sub Total</b></td>
+                    <td style="padding: 4px; text-align: center;"><b>:</b></td>
+                    <td style="padding: 4px; text-align: right;"><b>{{ number_format($grand_sub_total, 2) }}</b></td>
+                </tr>
+                <tr>
+                    <td style="padding: 4px; text-align: right;"><b>VAT</b></td>
+                    <td style="padding: 4px; text-align: center;"><b>:</b></td>
+                    <td style="padding: 4px; text-align: right;"><b>{{ number_format($grand_vat_total, 2) }}</b></td>
+                </tr>
+                <tr>
+                    <td style="padding: 4px; text-align: right;"><b>Discount</b></td>
+                    <td style="padding: 4px; text-align: center;"><b>:</b></td>
+                    <td style="padding: 4px; text-align: right;"><b>{{ number_format($grand_discount_total, 2) }}</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 4px; text-align: right;"><b>Total</b></td>
+                    <td style="padding: 4px; text-align: center;"><b>:</b></td>
+                    <td style="padding: 4px; text-align: right;"><b>{{ number_format($grand_amount_total, 2) }}</b></td>
+                </tr>
+            </table>
+        </div>
+
     </div>
 
     <script type="text/php">

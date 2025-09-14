@@ -131,13 +131,13 @@ class SaleReportController extends Controller {
             return $pdf->stream( 'sale_return_report.pdf' );
 
             case 12:
-            $dates = explode( ' - ', $request->date_range );
-            $data = $this->salesComparison( $dates );
-            if ( $data == [] ) {
+            $data = $this->salesComparison( $from, $to );
+            if ( empty($data) || $data[0]['grand_total'] == 0 ) {
                 return response()->view( 'error_pages.pdf_zero_data' );
             }
             $pdf = PDF::loadView( 'sale_reports.sales_comparison_report_pdf',
-            compact( 'data', 'pharmacy' ) );
+            compact( 'data', 'pharmacy' ) )
+            ->setPaper( 'a4', 'landscape' );
             return $pdf->stream( 'sales_comparison_report.pdf' );
             default:
 
@@ -798,17 +798,26 @@ unset($dayData);
         return $returns;
     }
 
-    private function salesComparison( $dates ) {
-        $date[ 0 ] = date( 'Y-m-d', strtotime( $dates[ 0 ] ) );
-        $date[ 1 ] = date( 'Y-m-d', strtotime( $dates[ 1 ] ) );
-
+    private function salesComparison( $from, $to ) {
+        $store_id = current_store_id();
         $initial = array();
         $dates_only = array();
         $users = array();
-        $user_sales = Sale::orderby( 'id', 'asc' )->groupby( 'created_by' )->pluck( 'created_by' );
-        $user_sales_date = Sale::select( DB::Raw( 'date( date ) as date' ) )
-        ->whereBetween( DB::Raw( 'date( date )' ), [ $date[ 0 ], $date[ 1 ] ] )
-        ->orderby( 'id', 'asc' )->groupby( DB::Raw( 'date( date )' ) )->get();
+        $query1 = Sale::join( 'sales_details', 'sales.id', '=', 'sales_details.sale_id' )
+        ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
+        ->orderby( 'sales.id', 'asc' )->groupby( 'sales.created_by' );
+        $query2 = Sale::join( 'sales_details', 'sales.id', '=', 'sales_details.sale_id' )
+        ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
+        ->select( DB::Raw( 'date( date ) as date' ) )
+        ->whereBetween( DB::Raw( 'date( date )' ), [ $from, $to ] )
+        ->orderby( 'sales.id', 'asc' )->groupby( DB::Raw( 'date( date )' ) );
+
+        if (!is_all_store()) {
+            $query1->where('inv_current_stock.store_id', $store_id);
+            $query2->where('inv_current_stock.store_id', $store_id);
+        }
+        $user_sales = $query1->pluck('sales.created_by');;
+        $user_sales_date = $query2->get();
 
         foreach ( $user_sales as $user ) {
             $user_sale = User::find( $user );
@@ -823,18 +832,24 @@ unset($dayData);
             array_push( $dates_only, $dates->date );
         }
 
-        $sale_detail = SalesDetail::select( DB::Raw( 'sum( amount ) as amount' ), 'sale_id' )
+        $query = SalesDetail::select( DB::Raw( 'sum( amount ) as amount' ), 'sale_id' )
+        ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
         ->join( 'sales', 'sales.id', '=', 'sales_details.sale_id' )
-        ->whereBetween( DB::Raw( 'date( date )' ), [ $date[ 0 ], $date[ 1 ] ] )
-        ->groupby( 'sale_id' )
-        ->get();
+        ->whereBetween( DB::Raw( 'date( date )' ), [ $from, $to ] )
+        ->groupby( 'sale_id' );
+        
+        if (!is_all_store()) {
+            $query->where('inv_current_stock.store_id', $store_id);
+        }
+        
+        $sale_detail = $query->get();
 
         foreach ( $sale_detail as $detail ) {
             array_push( $initial, array(
                 'user' => $detail->sale[ 'user' ][ 'name' ],
                 'amount' => $detail->amount,
-                'from' => $date[ 0 ],
-                'to' => $date[ 1 ],
+                'from' => $from,
+                'to' => $to,
                 'date' => date( 'Y-m-d', strtotime( $detail->sale[ 'date' ] ) )
             ) );
 
