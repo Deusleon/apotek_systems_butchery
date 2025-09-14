@@ -118,9 +118,10 @@
             <table id="table-detail" align="center">
                 <thead>
                 <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                    <th>Customer Name</th>
+                    <th align="center">#</th>
+                    <th align="left">Receipt #</th>
+                    <th align="left">Customer Name</th>
                     <th align="center">Payment Date</th>
-                    <th align="right">Receipt #</th>
                     <th align="right">Amount</th>
                 </tr>
                 <thead>
@@ -128,24 +129,34 @@
                 <?php $total = 0 ?>
                 @foreach($data as $payment)
                     <tr>
-                        <td>{{$payment->name}}</td>
-                        <td align="center">{{date('j M, Y h:i:s a', strtotime($payment->created_at))}}</td>
-                        <td align="right">{{$payment->receipt_number}}</td>
+                        <td align="center">{{ $loop->iteration }}.</td>
+                        <td align="left">{{$payment->receipt_number}}</td>
+                        <td align="left">{{$payment->name}}</td>
+                        <td align="center">{{date('Y-m-d h:i:s a', strtotime($payment->created_at))}}</td>
                         <td align="right">{{number_format($payment->paid_amount,2)}}</td>
                         <?php $total += $payment->paid_amount ?>
                         @endforeach
                     </tr>
-                    <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                        <td style="border: none" colspan="2"></td>
+                    {{-- <tr style="font-size: 0.9em">
+                        <td style="border: none" colspan="3"></td>
                         <td colspan="1" align="right"><b>Total</b></td>
                         <td colspan="1" align="right"><b>{{number_format($total,2)}}</b></td>
-                    </tr>
+                    </tr> --}}
                 </tbody>
             </table>
+            <hr>
+            <div style="margin-top: 10px; padding-top: 5px;">
+                <h3 align="center">Overall Summary</h3>
+                <table style="width: 30%; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd;">
+                    <tr>
+                        <td align="right" style="padding: 8px; width: 50%;"><b>Total Amount:</b></td>
+                        <td align="right" style="padding: 8px;">{{ number_format($total, 2) }}</td>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
 </div>
-
 
 <script type="text/php">
     if ( isset($pdf) ) {
@@ -163,13 +174,8 @@
 
      }
 
-
-
 </script>
-
 
 </body>
 
-
 </html>
-

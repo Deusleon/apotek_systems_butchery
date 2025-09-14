@@ -259,7 +259,6 @@ class SaleReportController extends Controller {
 
         return $to_print;
     }
-
     private function cashSaleSummaryReport( $from, $to )
  {
         $store_id = current_store_id();
@@ -293,7 +292,6 @@ class SaleReportController extends Controller {
         ->orderBy( 'sale_date', 'desc' );
 
         $sale_detail = $query->get();
-        // dd( $sale_detail );
 
         // Format ya kurudisha kwa PDF
         $sale_detail_to_pdf = [];
@@ -312,7 +310,6 @@ class SaleReportController extends Controller {
 
         return $sale_detail_to_pdf;
     }
-
     private function creditSaleDetailReport( $from, $to ) {
         $store_id = current_store_id();
         $from = date( 'Y-m-d', strtotime( $from ) );
@@ -474,10 +471,6 @@ foreach ( $salesById as $sale ) {
 
 // === 3 ) BONUS: Group similar products across ALL sales for the date ===
 foreach ( $groupedByDate as $date => &$dayData ) {
-    // Log::info( 'DateSalesReceipts', [
-    //     'date' => $date,
-    //     'receipts' => array_values( array_map( fn( $s ) => $s[ 'receipt_number' ] ?? null, $dayData[ 'sales' ] ) )
-    // ] );
     $crossSaleGrouped = [];
 
     foreach ( $dayData[ 'sales' ] as $sale ) {
@@ -513,16 +506,6 @@ foreach ( $groupedByDate as $date => &$dayData ) {
                 ];
             }
 
-            // Before adding, log what's being added (for debugging)
-            // Log::info('Cross add', [
-            //     'date' => $date,
-            //     'crossKey' => $crossKey,
-            //     'item_qty' => $item['quantity'],
-            //     'item_amount' => $item['amount'],
-            //     'item_detail_ids' => $itemDetailIds,
-            //     'receipt' => $receiptNo,
-            // ]);
-
             $crossSaleGrouped[$crossKey]['quantity'] += (float)$item['quantity'];
             $crossSaleGrouped[$crossKey]['amount'] += (float)$item['amount'];
             $crossSaleGrouped[$crossKey]['vat'] += (float)$item['vat'];
@@ -555,7 +538,6 @@ unset($dayData);
     krsort($groupedByDate);
     return array_values($groupedByDate);
     }
-
     private function creditSaleSummaryReport($from, $to)
     {
         $store_id = current_store_id();
@@ -653,41 +635,123 @@ unset($dayData);
             'total_balance' => $total_balance,
         ];
     }
+    // private function creditPaymentReport( $from, $to ) {
+    //     $store_id = current_store_id();
+    //     $from = date( 'Y-m-d', strtotime( $from ) );
+    //     $to = date( 'Y-m-d', strtotime( $to ) );
 
+    //     $query = SalesCredit::join( 'sales', 'sales.id', '=', 'sales_credits.sale_id' )
+    //     ->join( 'customers', 'customers.id', '=', 'sales.customer_id' )
+    //     ->join( 'sales_details', 'sales.id', '=', 'sales_details.sale_id' )
+    //     ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
+    //     ->whereBetween( DB::raw( 'date( sales_credits.created_at )' ), [ $from, $to ] )
+    //     ->where( 'paid_amount', '>', 0 );
+        
+    //     if (!is_all_store()) {
+    //         $query->where('inv_current_stock.store_id', $store_id);
+    //     }
 
-    private function creditPaymentReport( $from, $to ) {
+    //     $payments = $query->get();
+    //     return $payments;
+    // }
+    private function creditPaymentReport($from, $to) {
+    $store_id = current_store_id();
+    $from = date('Y-m-d', strtotime($from));
+    $to   = date('Y-m-d', strtotime($to));
 
-        $from = date( 'Y-m-d', strtotime( $from ) );
-        $to = date( 'Y-m-d', strtotime( $to ) );
+    $query = SalesCredit::join('sales', 'sales.id', '=', 'sales_credits.sale_id')
+        ->join('customers', 'customers.id', '=', 'sales.customer_id')
+        ->whereBetween(DB::raw('date(sales_credits.created_at)'), [$from, $to])
+        ->where('sales_credits.paid_amount', '>', 0);
 
-        $payments = SalesCredit::join( 'sales', 'sales.id', '=', 'sales_credits.sale_id' )
-        ->join( 'customers', 'customers.id', '=', 'sales.customer_id' )
-        ->whereBetween( DB::raw( 'date( sales_credits.created_at )' ), [ $from, $to ] )
-        ->where( 'paid_amount', '>', 0 )
-        ->get();
-        return $payments;
+    // Filter by store without causing duplicates
+    if (!is_all_store()) {
+        $query->whereExists(function($q) use ($store_id) {
+            $q->select(DB::raw(1))
+              ->from('sales_details')
+              ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
+              ->whereColumn('sales_details.sale_id', 'sales_credits.sale_id')
+              ->where('inv_current_stock.store_id', $store_id);
+        });
     }
 
-    private function customerStatement( $from, $to, $customer_id ) {
+    $payments = $query->get();
 
-        $from = date( 'Y-m-d', strtotime( $from ) );
-        $to = date( 'Y-m-d', strtotime( $to ) );
+    return $payments;
+}
 
-        $data = json_decode( Sale::join( 'sales_credits', 'sales_credits.sale_id', '=', 'sales.id' )
-        ->whereBetween( DB::raw( 'date( sales_credits.created_at )' ), [ $from, $to ] )
-        ->join( 'customers', 'customers.id', '=', 'sales.customer_id' )
-        ->where( 'customer_id', $customer_id )
-        // ->where( 'paid_amount', '>', 0 )
-        ->get(), true );
-        $grouped_data = [];
-        foreach ( $data as $val ) {
-            if ( array_key_exists( 'receipt_number', $val ) ) {
-                $grouped_data[ $val[ 'receipt_number' ] ][] = $val;
+private function customerStatement($from, $to, $customer_id)
+{
+    $store_id = current_store_id();
+    $from = date('Y-m-d', strtotime($from));
+    $to   = date('Y-m-d', strtotime($to));
+
+    $query = Sale::join('sales_credits', 'sales_credits.sale_id', '=', 'sales.id')
+        ->join('customers', 'customers.id', '=', 'sales.customer_id')
+        ->join('users', 'users.id', '=', 'sales.created_by')
+        ->whereBetween(DB::raw('date(sales_credits.created_at)'), [$from, $to])
+        ->where('sales.customer_id', $customer_id)
+        ->select(
+            'sales.*',
+            'customers.name as customer_name',
+            'users.name as received_by',
+            'sales_credits.created_at as created_at',
+            'sales_credits.paid_amount',
+            'sales_credits.balance'
+        );
+
+    // Filter by store without causing duplication
+    if (!is_all_store()) {
+        $query->whereExists(function ($q) use ($store_id) {
+            $q->select(DB::raw(1))
+              ->from('sales_details')
+              ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
+              ->whereColumn('sales_details.sale_id', 'sales.id')
+              ->where('inv_current_stock.store_id', $store_id);
+        });
+    }
+
+    // fetch as array
+    $data = $query->get()->toArray();
+
+    // first: group by receipt_number and sum total_paid across all rows
+    $grouped_data = [];
+    $total_paid = 0.0;
+
+    foreach ($data as $val) {
+        $receipt = $val['receipt_number'] ?? 'UNKNOWN';
+        $grouped_data[$receipt][] = $val;
+
+        $total_paid += (float)($val['paid_amount'] ?? 0);
+    }
+
+    // second: compute total_balance = sum of **latest balance per receipt**
+    $total_balance = 0.0;
+    foreach ($grouped_data as $receipt => $rows) {
+        // find the latest credit row in $rows by created_at
+        $latest = null;
+        foreach ($rows as $r) {
+            // ensure created_at exists; compare timestamps
+            if ($latest === null) {
+                $latest = $r;
+            } else {
+                $t1 = strtotime($r['created_at'] ?? '1970-01-01 00:00:00');
+                $t2 = strtotime($latest['created_at'] ?? '1970-01-01 00:00:00');
+                if ($t1 > $t2) {
+                    $latest = $r;
+                }
             }
         }
 
-        return $grouped_data;
+        $total_balance += (float)($latest['balance'] ?? 0);
     }
+
+    return [
+        'grouped_data'   => $grouped_data,
+        'total_paid'     => $total_paid,
+        'total_balance'  => $total_balance,
+    ];
+}
 
     private function priceListReport( $category ) {
         $max_prices = array();
