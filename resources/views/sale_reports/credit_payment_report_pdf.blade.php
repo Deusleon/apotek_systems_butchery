@@ -178,4 +178,18 @@
 
 </body>
 
+</html>$text, $font, $size, $color, $word_space, $char_space, $angle);
+
+
+     }
+
+
+
+</script>
+
+
+</body>
+
+
 </html>
+
