@@ -19,7 +19,7 @@
         .receive-items-wrapper {
             max-height: 350px;   /* adjust if needed */
             overflow-y: auto;    /* enable vertical scroll only */
-            border: 1px solid #dee2e6;
+            border: none;
             border-radius: 4px;
         }
 
