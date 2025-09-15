@@ -35,17 +35,6 @@
                                            onkeypress="return isNumberKey(event,this)" required autocomplete="off">
                                 </div>
                             </div>
-                            <div class="form-group row">
-                                <label for="supplier_id" class="col-md-4 col-form-label text-md-right">Supplier <font color="red">*</font></label>
-                                <div class="col-md-8">
-                                    <select class="form-control" id="supplier_id_edit" name="supplier_id_edit" required>
-                                        <option value="">-- Select Supplier --</option>
-                                        @foreach($suppliers as $supplier)
-                                            <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
                             @if($expire_date === "YES")
                                 <div class="form-group row">
                                     <label for="code" class="col-md-4 col-form-label text-md-right">Expire Date <font
@@ -64,6 +53,17 @@
                                     </div>
                                 </div>
                             @endif
+                            <div class="form-group row">
+                                <label for="supplier_id" class="col-md-4 col-form-label text-md-right">Supplier <font color="red">*</font></label>
+                                <div class="col-md-8">
+                                    <select class="form-control" id="supplier_id_edit" name="supplier_id_edit" required>
+                                        <option value="">-- Select Supplier --</option>
+                                        @foreach($suppliers as $supplier)
+                                            <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                             <div class="form-group row">
                                 <label for="code" class="col-md-4 col-form-label text-md-right">Receive Date <font
                                         color="red">*</font></label>
