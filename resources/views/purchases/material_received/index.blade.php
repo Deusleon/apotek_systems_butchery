@@ -349,6 +349,14 @@
             }
             $('#edit').find('.modal-body #receive_date_edit').val(moment(row_data.created_at).format('YYYY-MM-DD'));
             $('#edit').find('.modal-body #id').val(row_data.id);
+
+            // ✅ Preselect supplier
+            if (row_data.supplier && row_data.supplier.id) {
+                $('#supplier_id_edit').val(row_data.supplier.id).trigger('change');
+            } else {
+                $('#supplier_id_edit').val('').trigger('change');
+            }
+
             $('#edit').modal('show');
 
         });

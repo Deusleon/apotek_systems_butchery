@@ -47,6 +47,7 @@ class MaterialReceivedController extends Controller
         $update_material->total_cost = $total_buyprice;
         $update_material->total_sell = $total_sellprice;
         $update_material->item_profit = $profit;
+        $update_material->supplier_id = $request->supplier_id_edit;
         $update_material->created_by = Auth::user()->id;
         $update_material->created_at = date('Y-m-d', strtotime($request->receive_date_edit));
 
