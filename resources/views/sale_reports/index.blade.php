@@ -73,6 +73,9 @@
                                     <select id="report_option" name="report_option" onchange="reportOption()"
                                             class="js-example-basic-single form-control drop" required>
                                         <option selected="true" value="" disabled="disabled">Select report</option>
+                                        <option value="9">Sales Details Report</option>
+                                        <option value="10">Sales Summary Report</option>
+                                        <option value="7">Sales Total Report</option>
                                         <option value="1">Cash Sales Details Report</option>
                                         <option value="2">Cash Sales Summary Report</option>
                                         <option value="3">Credit Sales Details Report</option>

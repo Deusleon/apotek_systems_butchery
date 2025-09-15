@@ -127,6 +127,16 @@ class SaleReportController extends Controller {
                 compact( 'data', 'pharmacy' ) );
                 return $pdf->stream('price_list_report.pdf');
             }
+            
+            case 9:
+            $data = $this->saleDetailReport( $from, $to );
+            if ( empty( $data ) || ( isset( $data[ 0 ] ) && empty( array_filter( $data[ 0 ] ) ) ) ) {
+                return response()->view( 'error_pages.pdf_zero_data' );
+            }
+            $pdf = PDF::loadView( 'sale_reports.sale_detail_report_pdf',
+            compact( 'data', 'pharmacy', 'enable_discount' ) )
+            ->setPaper( 'a4', 'landscape' );
+            return $pdf->stream( 'Sales Details Report.pdf' );
 
             case 11:
             $data = $this->saleReturnReport($from, $to);
@@ -152,6 +162,134 @@ class SaleReportController extends Controller {
         }
     }
 
+    private function saleDetailReport( $from, $to ) {
+        $store_id = current_store_id();
+        $from = date( 'Y-m-d', strtotime( $from ) );
+        $to = date( 'Y-m-d', strtotime( $to ) );
+
+        $query = SalesDetail::join( 'sales', 'sales.id', '=', 'sales_details.sale_id' )
+        ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
+        ->join( 'price_categories', 'price_categories.id', '=', 'sales.price_category_id' )
+        // ->leftJoin( 'sales_credits', 'sales_credits.sale_id', '=', 'sales.id' )
+        ->select(
+            'inv_current_stock.*',
+            'inv_current_stock.quantity as current_quantity',
+            'sales.*',
+            'sales_details.*',
+            'price_categories.name as price_type'
+        )
+        ->whereBetween( DB::raw( 'date(sales.date)' ), [ $from, $to ] )
+        ->whereRaw( '(sales_details.status != 3 or sales_details.status is null)' )
+        ->orderBy('sales.date', 'DESC');
+
+        if ( !is_all_store() ) {
+            $query->where( 'inv_current_stock.store_id', $store_id );
+        }
+
+        $sale_detail = $query->get();
+
+        $sales = [];
+        $grand_total = 0;
+        $vat_total = 0;
+        $discount_total = 0;
+        $sub_total_total = 0;
+
+        foreach ( $sale_detail as $item ) {
+            $amount = $item->amount;
+            $sub_total = $item->price * $item->quantity;
+            $vat = $item->amount - $sub_total;
+
+            $product_name = $item->currentStock[ 'product' ][ 'name' ] . ' ' .
+            ( $item->currentStock[ 'product' ][ 'brand' ] ? $item->currentStock[ 'product' ][ 'brand' ] . ' ' : '' ) .
+            ( $item->currentStock[ 'product' ][ 'pack_size' ] ? $item->currentStock[ 'product' ][ 'pack_size' ] : '' ) .
+            $item->currentStock[ 'product' ][ 'sales_uom' ];
+
+            // Grouping key ( Product + Batch + SoldBy + Price + Date )
+            $group_key = $product_name . '|' .
+            $item->currentStock[ 'batch_number' ] . '|' .
+            $item->sale[ 'user' ][ 'name' ] . '|' .
+            $item->price . '|' .
+            date( 'Y-m-d', strtotime( $item->sale[ 'date' ] ) );
+
+            if ( !isset( $sales[ $group_key ] ) ) {
+                $sales[ $group_key ] = [
+                    'receipt_number' => $item->sale[ 'receipt_number' ],
+                    'name' => $product_name,
+                    'batch_number' => $item->currentStock[ 'batch_number' ],
+                    'price_type' => $item->price_type,
+                    'date' => date( 'Y-m-d', strtotime( $item->date ) ),
+                    'quantity' => 0,
+                    'vat' => 0,
+                    'discount' => 0,
+                    'price' => $item->price,
+                    'amount' => 0,
+                    'sub_total' => 0,
+                    'sold_by' => $item->sale[ 'user' ][ 'name' ],
+                    'customer' => $item->sale[ 'customer' ][ 'name' ],
+                    'created_at' => date( 'Y-m-d', strtotime( $item->sale[ 'date' ] ) )
+                ];
+            }
+
+            // Aggregate duplicate rows
+            $sales[ $group_key ][ 'quantity' ] += $item->quantity;
+            $sales[ $group_key ][ 'sub_total' ] += $sub_total;
+            $sales[ $group_key ][ 'vat' ] += $item->vat;
+            $sales[ $group_key ][ 'discount' ] += $item->discount;
+            $sales[ $group_key ][ 'amount' ] += $amount;
+
+            // Update grand totals
+            $grand_total += ( $item->amount ) - ( $item->discount );
+            $sub_total_total += $item->amount;
+            $vat_total += $item->vat;
+            $discount_total += $item->discount;
+        }
+
+        // Normalize $sales array
+        $sales = array_values( $sales );
+
+        // Group sales by date
+        $grouped_sales = [];
+        foreach ( $sales as $val ) {
+            if ( array_key_exists( 'created_at', $val ) ) {
+                $grouped_sales[ $val[ 'created_at' ] ][] = $val;
+            }
+        }
+
+        // Summaries per date
+        $total_by_date = [];
+        foreach ( $grouped_sales as $key => $j ) {
+            $sb_total = 0;
+            $dis_total = 0;
+            $va_total = 0;
+            $amount_total = 0;
+            foreach ( $j as $i ) {
+                $sb_total += $i[ 'amount' ];
+                $dis_total += $i[ 'discount' ];
+                $va_total += $i[ 'vat' ];
+                $amount_total += ( $i[ 'amount' ] - $i[ 'discount' ] );
+                $date = $i[ 'created_at' ];
+            }
+            $total_by_date[] = [
+                'date' => $date,
+                'sub_total' => $sb_total,
+                'discount_total' => $dis_total,
+                'vat_total' => $va_total,
+                'amount_total' => $amount_total
+            ];
+        }
+
+        $total_grouped_sales = [];
+        foreach ( $total_by_date as $val ) {
+            if ( array_key_exists( 'date', $val ) ) {
+                $total_grouped_sales[ $val[ 'date' ] ][] = $val;
+            }
+        }
+
+        $to_print = [];
+        array_push( $to_print, [ $grouped_sales, $sales, $total_grouped_sales ] );
+
+        return $to_print;
+    }
     private function cashSaleDetailReport( $from, $to ) {
         $store_id = current_store_id();
         $from = date( 'Y-m-d', strtotime( $from ) );
@@ -170,7 +308,8 @@ class SaleReportController extends Controller {
         )
         ->whereBetween( DB::raw( 'date(sales.date)' ), [ $from, $to ] )
         ->whereRaw( '(sales_details.status != 3 or sales_details.status is null)' )
-        ->whereNull( 'sales_credits.sale_id' );
+        ->whereNull( 'sales_credits.sale_id' )
+        ->orderBy('sales.date', 'DESC');
 
         if ( !is_all_store() ) {
             $query->where( 'inv_current_stock.store_id', $store_id );

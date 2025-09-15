@@ -120,7 +120,7 @@
                         <tr style="background: #1f273b; color: white;">
                             <th align="center">#</th>
                             <th align="left">Product Name</th>
-                            <th align="left">Buy Date</th>
+                            <th align="left">Sales Date</th>
                             <th align="center">Qty Bought</th>
                             <th align="left">Return Date</th>
                             <th align="center">Qty Returned</th>
