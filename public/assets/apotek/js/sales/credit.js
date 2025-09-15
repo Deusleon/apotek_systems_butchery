@@ -1131,6 +1131,7 @@ function getCredits() {
             type: "get",
             dataType: "json",
             success: function (data) {
+                // console.log('Data', data);
                 //Remove Pay Button for Balance < 1
                 data.forEach(function (data) {
                     if (data.balance < 1) {

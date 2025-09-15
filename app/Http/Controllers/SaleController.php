@@ -177,30 +177,85 @@ class SaleController extends Controller
 
     }
 
+    // public function getCreditSale(Request $request)
+    // {
+
+    //     $from = $request->date[0];
+    //     $to = $request->date[1];
+
+    //     if ($request->ajax()) {
+    //         if ($request->id) {
+    //             $sales = Sale::join('sales_credits', 'sales_credits.sale_id', '=', 'sales.id')
+    //                 ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '>=', $from)
+    //                 ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '<=', $to)
+    //                 ->join('customers', 'customers.id', '=', 'sales.customer_id')
+    //                 ->where('customer_id', $request->id)
+    //                 ->groupBy('sale_id')
+    //                 ->orderBy('sales.id', 'DESC')
+    //                 ->get();
+    //         } else {
+    //             $sales = Sale::where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '>=', $from)
+    //                 ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '<=', $to)
+    //                 ->join('sales_credits', 'sales_credits.sale_id', '=', 'sales.id')
+    //                 ->join('customers', 'customers.id', '=', 'sales.customer_id')
+    //                 ->groupBy('sale_id')
+    //                 ->orderBy('sales.id', 'DESC')
+    //                 ->get();
+    //         }
+
+    //         foreach ($sales as $sale) {
+    //             $outstanding = SalesCredit::where('sale_id', $sale->sale_id)->orderBy('id', 'desc')->first('balance');
+    //             $discount = SalesDetail::where('sale_id', $sale->sale_id)->sum('discount');
+    //             $amount = SalesDetail::where('sale_id', $sale->sale_id)->sum('amount');
+    //             $sale->paid_amount = SalesCredit::where('sale_id', $sale->sale_id)->sum('paid_amount');
+    //             $sale->balance = $outstanding->balance;
+    //             $sale->total_amount = $amount - $discount;
+    //         }
+
+    //         $data = json_decode($sales, true);
+
+    //         return $data;
+    //     }
+    // }
+
+      
     public function getCreditSale(Request $request)
     {
-
+        $store_id = current_store_id();
         $from = $request->date[0];
         $to = $request->date[1];
 
         if ($request->ajax()) {
             if ($request->id) {
-                $sales = Sale::join('sales_credits', 'sales_credits.sale_id', '=', 'sales.id')
-                    ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '>=', $from)
-                    ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '<=', $to)
+                $query = Sale::join('sales_credits', 'sales_credits.sale_id', '=', 'sales.id')
+                    ->join('sales_details', 'sales_details.sale_id', '=', 'sales.id')
+                    ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
+                    ->where('date', '>=', $from)
+                    ->where('date', '<=', $to)
                     ->join('customers', 'customers.id', '=', 'sales.customer_id')
                     ->where('customer_id', $request->id)
-                    ->groupBy('sale_id')
-                    ->orderBy('sales.id', 'DESC')
-                    ->get();
+                    ->groupBy('sales_credits.sale_id')
+                    ->orderBy('sales.id', 'DESC');
+
+                    if (!is_all_store()) {
+                       $query->where('inv_current_stock.store_id', $store_id);
+                    }
+
+                    $sales = $query->get();
             } else {
-                $sales = Sale::where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '>=', $from)
-                    ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '<=', $to)
+                $query = Sale::where('date', '>=', $from)
+                    ->where('date', '<=', $to)
                     ->join('sales_credits', 'sales_credits.sale_id', '=', 'sales.id')
                     ->join('customers', 'customers.id', '=', 'sales.customer_id')
-                    ->groupBy('sale_id')
-                    ->orderBy('sales.id', 'DESC')
-                    ->get();
+                    ->join('sales_details', 'sales_details.sale_id', '=', 'sales.id')
+                    ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
+                    ->groupBy('sales_credits.sale_id')
+                    ->orderBy('sales.id', 'DESC');
+                    
+                    if (!is_all_store()) {
+                       $query->where('inv_current_stock.store_id', $store_id);
+                    }
+                    $sales = $query->get();
             }
 
             foreach ($sales as $sale) {

@@ -593,6 +593,7 @@ unset($dayData);
             })
             ->select(
                 'sales.id as sale_id',
+                'sales.date as sales_date',
                 'sales.receipt_number',
                 'customers.name as customer_name',
                 'users.name as sold_by',
@@ -634,6 +635,7 @@ unset($dayData);
             }
 
             $data[] = [
+                'sales_date' => $item->sales_date,
                 'receipt_number' => $item->receipt_number,
                 'customer_name'  => $item->customer_name,
                 'total'          => (float)$item->total,
@@ -663,8 +665,15 @@ unset($dayData);
 
     $query = SalesCredit::join('sales', 'sales.id', '=', 'sales_credits.sale_id')
         ->join('customers', 'customers.id', '=', 'sales.customer_id')
+        ->join('users', 'users.id', '=', 'sales.created_by')
         ->whereBetween(DB::raw('date(sales_credits.created_at)'), [$from, $to])
-        ->where('sales_credits.paid_amount', '>', 0);
+        ->where('sales_credits.paid_amount', '>', 0)
+        ->select(
+            'sales_credits.*',
+            'sales.receipt_number',
+            'customers.name as customer_name',
+            'users.name as received_by'
+        );
 
     // Filter by store without causing duplicates
     if (!is_all_store()) {
