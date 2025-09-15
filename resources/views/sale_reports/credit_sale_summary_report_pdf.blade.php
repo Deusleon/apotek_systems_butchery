@@ -105,6 +105,7 @@
                         <th align="center">#</th>
                         <th align="left">Receipt #</th>
                         <th align="left">Customer Name</th>
+                        <th align="left">Date</th>
                         <th align="right">Total</th>
                         <th align="right">Paid</th>
                         <th align="right">Balance</th>
@@ -119,6 +120,7 @@
                             <td align="center">{{ $loop->iteration }}.</td>
                             <td align="left">{{ $item['receipt_number'] }}</td>
                             <td align="left">{{$item['customer_name']}}</td>
+                            <td align="left">{{ date('Y-m-d', strtotime($item['sales_date'])) }}</td>
                             <td align="right">{{number_format($item['total'], 2)}}</td>
                             <td align="right">{{number_format($item['paid'], 2)}}</td>
                             <td align="right">{{number_format($item['balance'], 2)}}</td>

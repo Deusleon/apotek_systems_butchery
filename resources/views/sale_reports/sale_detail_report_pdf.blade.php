@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Cash Sale Details Report</title>
+    <title>Sale Details Report</title>
     <style>
         body {
             font-size: 13px;
@@ -110,7 +110,7 @@
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}</h3>
-        <h2 align="center" style="margin-top: -1%">Cash Sales Details Report</h2>
+        <h2 align="center" style="margin-top: -1%">Sales Details Report</h2>
         <h4 align="center" style="margin-top: -1%">{{$pharmacy['date_range']}}</h4>
         @php
             $grand_sub_total = 0;

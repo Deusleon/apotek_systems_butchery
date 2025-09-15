@@ -122,27 +122,25 @@
                             <th align="center">#</th>
                             <th align="left">Receipt #</th>
                             <th align="left">Customer Name</th>
-                            <th align="center">Payment Date</th>
+                            <th align="center">Date</th>
                             <th align="right">Amount</th>
+                            <th align="left">Received By</th>
                         </tr>
                         <thead>
                         <tbody>
                             <?php $total = 0 ?>
+                            {{-- @dd($data) --}}
                             @foreach($data as $payment)
                                 <tr>
                                     <td align="center">{{ $loop->iteration }}.</td>
                                     <td align="left">{{$payment->receipt_number}}</td>
-                                    <td align="left">{{$payment->name}}</td>
-                                    <td align="center">{{date('Y-m-d h:i:s a', strtotime($payment->created_at))}}</td>
+                                    <td align="left">{{$payment->customer_name}}</td>
+                                    <td align="center">{{date('Y-m-d', strtotime($payment->created_at))}}</td>
                                     <td align="right">{{number_format($payment->paid_amount, 2)}}</td>
+                                    <td align="left">{{$payment->received_by}}</td>
                                     <?php    $total += $payment->paid_amount ?>
                             @endforeach
                             </tr>
-                            {{-- <tr style="font-size: 0.9em">
-                                <td style="border: none" colspan="3"></td>
-                                <td colspan="1" align="right"><b>Total</b></td>
-                                <td colspan="1" align="right"><b>{{number_format($total,2)}}</b></td>
-                            </tr> --}}
                         </tbody>
                 </table>
                 <hr>
