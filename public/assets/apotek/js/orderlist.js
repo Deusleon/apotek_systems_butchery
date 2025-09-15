@@ -342,7 +342,7 @@ function applyClientApprove() {
             if (response.success) {
                 // Update frontend only after successful backend update
                 currentOrderData.clientApproved = true;
-                currentOrderData.status = "1"; // Update status to match backend
+                currentOrderData.status = response.status; // Update status to match backend
 
                 if (currentRowIndex !== null) {
                     order_history_datatable
