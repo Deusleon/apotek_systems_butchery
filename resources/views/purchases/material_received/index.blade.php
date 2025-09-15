@@ -339,7 +339,12 @@
         $('#received_material_table tbody').on('click', '#edit_btn', function () {
             var row_data = $('#received_material_table').DataTable().row($(this).parents('tr')).data();
 
-            $('#edit').find('.modal-body #name_edit').val(row_data.product.name);
+           $('#edit').find('.modal-body #name_edit').val(
+                (row_data.product.name || '') + ' ' +
+                (row_data.product.brand || '') + ' ' +
+                (row_data.product.pack_size || '') +
+                (row_data.product.sales_uom || '')
+            );
             $('#edit').find('.modal-body #quantity_edit').val(numberWithCommas(row_data.quantity));
             $('#edit').find('.modal-body #price_edit').val(formatMoney(row_data.unit_cost));
             if (row_data.expire_date) {
