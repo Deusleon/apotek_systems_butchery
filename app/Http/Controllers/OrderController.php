@@ -45,6 +45,8 @@ public function approve(Request $request, $id)
         $order->status = '2';
         $order->save();
 
+        session()->flash("alert-success", "Order approved Successfully!");
+
         \Log::info('Order approved successfully: ' . $id); // Add logging
 
         return response()->json([
@@ -138,7 +140,7 @@ public function approve(Request $request, $id)
                 }
 
                 array_push($max_prices, array(
-                    'name' => $stock->name . ' ' . ($stock->brand ?? '') . ' ' . ($stock->pack_size ?? '') . ' ' . ($stock->sales_uom ?? ''),
+                    'name' => $stock->name . ' ' . ($stock->brand ?? '') . ' ' . ($stock->pack_size ?? '') . ($stock->sales_uom ?? ''),
                     'unit_cost' => $data['unit_cost'],
                     'product_id' => $stock->id,
                     'incoming_id' => $data['id']
