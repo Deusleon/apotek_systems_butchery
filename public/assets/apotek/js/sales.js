@@ -1016,7 +1016,7 @@ function valueCollection() {
     let idx = cart.findIndex((r) => r[6] == productID);
 
     if (idx !== -1) {
-        var price =  parseFloat(cart[idx][2].replace(/,/g, ''));
+        var price = parseFloat(cart[idx][2].replace(/,/g, ""));
         // Unit calcs
         var vatUnit = Number((price * tax).toFixed(2));
         var unitTotal = Number(price + vatUnit);
@@ -1274,10 +1274,20 @@ $("#sales_form").on("submit", function (e) {
     // $("#loading").show();
     e.preventDefault();
     var cart = document.getElementById("order_cart").value;
-
+    var is_backdate_enabled = document.getElementById(
+        "is_backdate_enabled"
+    ).value;
+    var saleDate = document.getElementById('cash_sale_date').value;
+    
     if (cart === "" || cart === "undefined") {
         notify("Sale list empty", "top", "right", "warning");
         return false;
+    }
+    if (is_backdate_enabled === 'YES') {
+        if (saleDate === '' || saleDate == null) {
+            notify("Sales date is required", "top", "right", "warning");
+            return false;
+        }
     }
 
     $("#save_btn").attr("disabled", true);

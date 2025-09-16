@@ -120,7 +120,9 @@
                         <tr style="background: #1f273b; color: white; font-size: 0.9em">
                             <th align="center">#</th>
                             <th align="left">Product Name</th>
-                            <th align="right">Buy Price</th>
+                            @if ($type == 1)
+                                <th align="right">Buy Price</th>
+                            @endif
                             @foreach($data['categories'] as $catName)
                                 <th align="right">{{ $catName }}</th>
                             @endforeach
@@ -132,7 +134,9 @@
                             <tr>
                                 <td align="center">{{ $loop->iteration }}.</td>
                                 <td align="left">{{ $row['name'] }}</td>
-                                <td align="right">{{ number_format($row['buy_price'], 2) }}</td>
+                                @if ($type == 1)
+                                    <td align="right">{{ number_format($row['buy_price'], 2) }}</td>
+                                @endif
                                 @foreach($data['categories'] as $catName)
                                     <td align="right">{{ $row[$catName] ? number_format($row[$catName], 2) : '-' }}</td>
                                 @endforeach

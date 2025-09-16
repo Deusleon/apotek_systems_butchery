@@ -156,7 +156,7 @@
 
         @endforeach
         <div style="margin-top: 10px; padding-top: 5px;">
-            <h3 align="center">Overall Summary</h3>
+            <h3 align="center"><b>Total Summary</b></h3>
             <table
                 style="width: auto; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
                 <tr>

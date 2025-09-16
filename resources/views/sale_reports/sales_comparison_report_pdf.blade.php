@@ -143,6 +143,7 @@
                 <hr>
                 @php
                     $sumByUser = $data[0]['sum_by_user'];
+                    $grandTotal = $data[0]['grand_total'];
 
                     $topSellers = [];
                     foreach ($sumByUser as $user => $entries) {
@@ -150,9 +151,11 @@
                         foreach ($entries as $entry) {
                             $total += $entry['amount'];
                         }
+                        $percentage = $grandTotal > 0 ? ($total / $grandTotal) * 100 : 0;
                         $topSellers[] = [
                             'user' => $user,
-                            'total_sales' => $total
+                            'total_sales' => $total,
+                            'percentage' => $percentage
                         ];
                     }
 
@@ -162,19 +165,36 @@
                     });
 
                     // take top 3
-                    $topSellers = array_slice($topSellers, 0, 3);
+                    $topSellers = array_slice($topSellers, 0);
                 @endphp
 
                 <div style="margin-top: 10px; padding-top: 5px;">
-                    <h3 align="center">Top Sellers</h3>
+                    <h3 align="center"><b>Top Sellers</b></h3>
                     <table
                         style="width: auto; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
                         @foreach($topSellers as $seller)
                             <tr>
+                                <td style="padding: 8px;"><b>#</b></td>
+                                <td style="padding: 8px; text-align: left;"><b>Name:</b></td>
+                                <td style="padding: 8px; text-align: center;"><b>:</b></td>
+                                <td style="padding: 8px; text-align: right;">
+                                    <b>Sales</b>
+                                </td>
+                                <td style="padding: 8px; text-align: center;"><b>:</b></td>
+                                <td style="padding: 8px; text-align: right;">
+                                    <b>%</b>
+                                </td>
+                            </tr>
+                            <tr>
                                 <td style="padding: 8px;"><b>{{ $loop->iteration }}.</b></td>
                                 <td style="padding: 8px; text-align: left;"><b>{{ $seller['user'] }}</b></td>
                                 <td style="padding: 8px; text-align: center;"><b>:</b></td>
-                                <td style="padding: 8px; text-align: right;"><b>{{ number_format($seller['total_sales'], 2) }}</b>
+                                <td style="padding: 8px; text-align: right;">
+                                    <b>{{ number_format($seller['total_sales'], 2) }}</b>
+                                </td>
+                                <td style="padding: 8px; text-align: center;"><b>:</b></td>
+                                <td style="padding: 8px; text-align: right;">
+                                    <b>{{ number_format($seller['percentage'], 2) }}%</b>
                                 </td>
                             </tr>
                         @endforeach
@@ -199,25 +219,7 @@
         $angle = 0.0;   //  default
         $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
 
-
      }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 </script>
 

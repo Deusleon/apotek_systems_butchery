@@ -88,6 +88,7 @@
 
                         </div>
                         <hr>
+                        <input type="hidden" name="" id="is_backdate_enabled" value="{{$back_date}}">
                         @if($back_date=="NO")
                             <div class="row">
                                 <div class="col-md-4">

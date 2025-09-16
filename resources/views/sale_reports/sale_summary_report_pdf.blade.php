@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Credit Sale Summary Report</title>
+    <title>Sales Summary Report</title>
     <style>
         body {
             font-size: 13px;
@@ -95,7 +95,7 @@
         <h3 align="center" style="font-weight: normal;margin-top: -1%">
             {{$pharmacy['email'] . ' | ' . $pharmacy['website']}}
         </h3>
-        <h2 align="center" style="margin-top: -1%">Credit Sales Summary Report</h2>
+        <h2 align="center" style="margin-top: -1%">Sales Summary Report</h2>
         <h4 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['date_range']}}</h4>
 
         <div class="row" style="">
@@ -104,67 +104,69 @@
                     <tr style="background: #1f273b; color: white;">
                         <th align="center">#</th>
                         <th align="left">Receipt #</th>
-                        <th align="left">Customer Name</th>
                         <th align="left">Date</th>
-                        <th align="right">Total</th>
-                        <th align="right">Paid</th>
-                        <th align="right">Balance</th>
+                        <th align="left">Customer Name</th>
                         <th align="left">Sold By</th>
-                        <th align="left">Status</th>
+                        <th align="right">Sub Total</th>
+                        <th align="right">VAT</th>
+                        @if ($enable_discount === 'YES')
+                            <th align="right">Discount</th>
+                        @endif
+                        <th align="right">Total</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {{-- @dd($data) --}}
-                    @foreach($data['info'] as $item)
+                    <?php $x = 0; ?>
+                    <?php $total_sub_total = 0;?>
+                    <?php $total_vat = 0;?>
+                    <?php $total_discount = 0;?>
+                    <?php $grand_total = 0;?>
+                    @foreach($data as $item)
                         <tr>
                             <td align="center">{{ $loop->iteration }}.</td>
                             <td align="left">{{ $item['receipt_number'] }}</td>
+                            <td align="left">{{date('Y-m-d', strtotime($item['date']))}}</td>
                             <td align="left">{{$item['customer_name']}}</td>
-                            <td align="left">{{ date('Y-m-d', strtotime($item['sales_date'])) }}</td>
-                            <td align="right">{{number_format($item['total'], 2)}}</td>
-                            <td align="right">{{number_format($item['paid'], 2)}}</td>
-                            <td align="right">{{number_format($item['balance'], 2)}}</td>
                             <td align="left">{{$item['sold_by']}}</td>
-                            <td align="left">
-                                @if ($item['status'] === 'Unpaid')
-                                    <span style="color: red;">{{$item['status']}}</span>
-                                @elseif($item['status'] === 'Paid')
-                                    <span style="color: rgb(2, 202, 2);">{{$item['status']}}</span>
-                                @else
-                                    <span>{{$item['status']}}</span>
-                                @endif
+                            <td align="right">
+                                <div>{{number_format($item['sub_total'], 2)}}</div>
                             </td>
+                            <td align="right">{{number_format($item['vat'], 2)}}</td>
+                            @if ($enable_discount === 'YES')
+                                <td align="right">{{number_format($item['discount'], 2)}}</td>
+                            @endif
+                            <td align="right">{{number_format($item['total'], 2)}}</td>
 
                         </tr>
-
+                        <?php    $total_sub_total += $item['sub_total'];?>
+                        <?php    $total_vat += $item['vat'];?>
+                        <?php    $total_discount += $item['discount'];?>
+                        <?php    $grand_total += $item['total'] - $item['discount'];?>
                     @endforeach
                 </tbody>
             </table>
-            <hr>
-            <div style="margin-top: 10px; padding-top: 5px;">
-                <h3 align="center"><b>Total Summary</b></h3>
-                <table
-                    style="width: auto; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
+            <table style="width: 101%;">
+                <tr>
+                    <td colspan="10" align="right" style="padding-top: -3%; width: 85%;"><b>Sub Total:</b></td>
+                    <td align="right" style="padding-top: -3%;">
+                        {{number_format($total_sub_total, 2)}}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="10" align="right" style="padding-top: -3%; width: 85%;"><b>VAT:</b></td>
+                    <td align="right" style="padding-top: -3%">{{number_format($total_vat, 2)}}</td>
+                </tr>
+                @if ($enable_discount === 'YES')
                     <tr>
-                        <td style="padding: 8px; text-align: right;"><b>Total Amount</b></td>
-                        <td style="padding: 8px; text-align: center;"><b>:</b></td>
-                        <td style="padding: 8px; text-align: right;"><b>{{ number_format($data['grand_total'], 2) }}</b>
-                        </td>
+                        <td colspan="10" align="right" style="padding-top: -3%; width: 85%;"><b>Discount:</b></td>
+                        <td align="right" style="padding-top: -3%">{{number_format($total_discount, 2)}}</td>
                     </tr>
-                    <tr>
-                        <td style="padding: 8px; text-align: right;"><b>Total Paid</b></td>
-                        <td style="padding: 8px; text-align: center;"><b>:</b></td>
-                        <td style="padding: 8px; text-align: right;"><b>{{ number_format($data['total_paid'], 2) }}</b>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px; text-align: right;"><b>Balance</b></td>
-                        <td style="padding: 8px; text-align: center;"><b>:</b></td>
-                        <td style="padding: 8px; text-align: right; color: red;">
-                            <b>{{ number_format($data['total_balance'], 2) }}</b></td>
-                    </tr>
-                </table>
-            </div>
+                @endif
+                <tr>
+                    <td colspan="10" align="right" style="padding-top: -3%; width: 85%;"><b>Total:</b></td>
+                    <td align="right" style="padding-top: -3%">{{number_format($grand_total, 2)}}</td>
+                </tr>
+            </table>
         </div>
     </div>
     <script type="text/php">
