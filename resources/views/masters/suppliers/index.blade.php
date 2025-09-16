@@ -52,28 +52,25 @@
                                         <td>{{$supplier->address}}</td>
                                         @if(auth()->user()->checkPermission('Manage Suppliers'))
                                             <td>
-                                                <a href="#">
-                                                    <button class="btn btn-sm btn-rounded btn-primary"
-                                                            data-id="{{$supplier->id}}"
-                                                            data-name="{{$supplier->name}}"
-                                                            data-contact_person="{{$supplier->contact_person}}"
-                                                            data-address="{{$supplier->address}}"
-                                                            data-phone="{{$supplier->mobile}}"
-                                                            data-email="{{$supplier->email}}"
-                                                            type="button"
-                                                            data-toggle="modal" data-target="#edit">Edit
-                                                    </button>
-                                                </a>
-                                                <a href="#">
-                                                    <button class="btn btn-sm btn-rounded btn-danger"
-                                                            data-id="{{$supplier->id}}"
-                                                            data-name="{{$supplier->name}}"
-                                                            type="button"
-                                                            data-toggle="modal"
-                                                            data-target="#delete">
-                                                        Delete
-                                                    </button>
-                                                </a>
+                                                <button class="btn btn-sm btn-rounded btn-primary"
+                                                        data-id="{{$supplier->id}}"
+                                                        data-name="{{$supplier->name}}"
+                                                        data-contact_person="{{$supplier->contact_person}}"
+                                                        data-address="{{$supplier->address}}"
+                                                        data-phone="{{$supplier->mobile}}"
+                                                        data-email="{{$supplier->email}}"
+                                                        type="button"
+                                                        data-toggle="modal" data-target="#edit">
+                                                    Edit
+                                                </button>
+                                                <button class="btn btn-sm btn-rounded btn-danger"
+                                                        data-id="{{$supplier->id}}"
+                                                        data-name="{{$supplier->name}}"
+                                                        type="button"
+                                                        data-toggle="modal"
+                                                        data-target="#delete">
+                                                    Delete
+                                                </button>
                                             </td>
                                         @endif
                                     </tr>
@@ -100,84 +97,135 @@
     <script>
         $(document).ready(function(){
             $('#save_btn, #save_btns').prop('disabled', true);
+
+            // EDIT modal
+            $('#edit').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var modal = $(this);
+
+                modal.find('.modal-body #id').val(button.data('id'));
+                modal.find('.modal-body #name_edit').val(button.data('name'));
+                modal.find('.modal-body #address_edit').val(button.data('address'));
+                modal.find('.modal-body #contact_edit').val(button.data('contact_person'));
+                modal.find('.modal-body #phone_edits').val(button.data('phone'));
+                modal.find('.modal-body #email_edit').val(button.data('email'));
+
+                initPhoneValidation("#phone_edits", "#save_btns", modal);
+            });
+
+            // DELETE modal
+            $('#delete').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var message = "Are you sure you want to delete '".concat(button.data('name'), "'?");
+                var modal = $(this);
+                modal.find('.modal-body #message').text(message);
+                modal.find('.modal-body #id').val(button.data('id'));
+            });
+
+            // CREATE modal
+            $('#create').on('show.bs.modal', function () {
+                var modal = $(this);
+                initPhoneValidation("#phone_edit", "#save_btn", modal);
+            });
         });
 
-
-        $('#edit').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var modal = $(this);
-
-            modal.find('.modal-body #id').val(button.data('id'));
-            modal.find('.modal-body #name_edit').val(button.data('name'));
-            modal.find('.modal-body #address_edit').val(button.data('address'));
-            modal.find('.modal-body #contact_edit').val(button.data('contact_person'));
-            modal.find('.modal-body #phone_edits').val(button.data('phone'));
-            modal.find('.modal-body #email_edit').val(button.data('email'))
-
-        });
-
-        $('#delete').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var message = "Are you sure you want to delete '".concat(button.data('name'), "'?");
-            var modal = $(this);
-            modal.find('.modal-body #message').text(message);
-            modal.find('.modal-body #id').val(button.data('id'));
-
-        });
-
-        //Create Modal
-        $('#edit').on('show.bs.modal', function () {
-            initPhoneValidation("#phone_edits", "#save_btns");
-        });
-
-        //Create Modal
-        $('#create').on('show.bs.modal', function () {
-            initPhoneValidation("#phone_edit", "#save_btn");
-        });
-
-
-        function initPhoneValidation(inputSelector, saveBtnSelector) {
+        // Safe Phone Validation Init
+        function initPhoneValidation(inputSelector, saveBtnSelector, modal) {
             const input = document.querySelector(inputSelector);
-            const validMsg = input.parentElement.querySelector('.hide'); // assuming first span is valid-msg
-            const errorMsg = validMsg.nextElementSibling; // next span is error-msg
+            if (!input) return;
+
+            // Avoid multiple inits
+            if (input._itiInstance) {
+                return;
+            }
+
+            const validMsg = input.parentElement.querySelector('.valid-msg') || input.parentElement.querySelector('.hide');
+            const errorMsg = input.parentElement.querySelector('.error-msg') || (validMsg ? validMsg.nextElementSibling : null);
             const errorMap = ["Invalid Phone Number", "Invalid Country Code", "Too Short", "Too Long", "Invalid Phone Number"];
 
-            const iti = window.intlTelInput(input, {
-                initialCountry: "tz",
-                onlyCountries: ["tz", "ug", "ke", "rw", "bi", "sd"],
-                nationalMode: false,
-                utilsScript: "{{asset('assets/plugins/intl-tel-input/js/utils.js?1562189064761')}}"
+            try {
+                const iti = window.intlTelInput(input, {
+                    initialCountry: "tz",
+                    onlyCountries: ["tz", "ug", "ke", "rw", "bi", "sd"],
+                    nationalMode: false,
+                    utilsScript: "{{asset('assets/plugins/intl-tel-input/js/utils.js?1562189064761')}}"
+                });
+                input._itiInstance = iti;
+
+                // Auto-fill initial country code if empty
+                if (!input.value.trim()) {
+                    input.value = iti.getNumber().replace(/\D/g,'').length === 0 ? iti.getSelectedCountryData().dialCode : input.value;
+                    input.value = "+" + input.value;
+                }
+
+                // Ensure when user types starting with 0, it converts to full country code
+                input.addEventListener('input', function(e) {
+                // Remove any non-digit characters except the leading '+'
+                let val = input.value;
+                if (val.startsWith("+")) {
+                    val = "+" + val.slice(1).replace(/\D/g, '');
+                } else {
+                    val = val.replace(/\D/g, '');
+                }
+
+                // Handle numbers starting with 0 -> replace with country code
+                if (val.startsWith("0")) {
+                    val = "+" + iti.getSelectedCountryData().dialCode + val.substring(1);
+                }
+
+                // Limit max length based on intlTelInput's example length
+                const maxLength = iti.getNumber().replace(/\D/g,'').length + 12; 
+                if (val.length > maxLength) {
+                    val = val.slice(0, maxLength);
+                }
+
+                input.value = val;
             });
+
+
+            } catch (e) {
+                console.error("intlTelInput init failed", e);
+                return;
+            }
 
             function reset() {
                 input.classList.remove("error");
-                validMsg.classList.add("hide");
-                errorMsg.classList.add("hide");
-                errorMsg.innerHTML = "";
+                if (validMsg) validMsg.classList.add("hide");
+                if (errorMsg) { errorMsg.classList.add("hide"); errorMsg.innerHTML = ""; }
                 $(saveBtnSelector).prop('disabled', true);
             }
 
             function validateNumber() {
                 reset();
                 if (input.value.trim()) {
-                    if (iti.isValidNumber()) {
-                        validMsg.classList.remove("hide");
+                    if (input._itiInstance.isValidNumber()) {
+                        if (validMsg) validMsg.classList.remove("hide");
                         $(saveBtnSelector).prop('disabled', false);
-                        input.value = iti.getNumber();
+                        input.value = input._itiInstance.getNumber();
                     } else {
                         input.classList.add("error");
                         $(saveBtnSelector).prop('disabled', true);
-                        const errorCode = iti.getValidationError();
-                        errorMsg.innerHTML = errorMap[errorCode] || "Invalid Number";
-                        errorMsg.classList.remove("hide");
+                        const errorCode = input._itiInstance.getValidationError();
+                        if (errorMsg) errorMsg.innerHTML = errorMap[errorCode] || "Invalid Number";
+                        if (errorMsg) errorMsg.classList.remove("hide");
                     }
                 }
             }
 
             input.addEventListener('blur', validateNumber);
             input.addEventListener('change', reset);
-        }
 
+            // Cleanup when modal closes
+            modal.one('hidden.bs.modal', function () {
+                input.removeEventListener('blur', validateNumber);
+                input.removeEventListener('change', reset);
+                if (input._itiInstance && typeof input._itiInstance.destroy === 'function') {
+                    input._itiInstance.destroy();
+                }
+                delete input._itiInstance;
+                $(saveBtnSelector).prop('disabled', true);
+            });
+        }
     </script>
 
     <!-- Input mask Js -->
@@ -189,7 +237,6 @@
     <script src="{{asset("assets/plugins/select2/js/select2.full.min.js")}}"></script>
     <!-- form-select-custom Js -->
     <script src="{{asset("assets/js/pages/form-select-custom.js")}}"></script>
-
 
     <!-- form-picker-custom Js -->
     <script src="{{asset("assets/js/pages/form-masking-custom.js")}}"></script>
