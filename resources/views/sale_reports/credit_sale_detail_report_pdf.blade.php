@@ -90,22 +90,23 @@
         </h3>
         <h2 align="center" style="margin-top: -1%">Credit Sales Details Report</h2>
         <h4 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['date_range']}}</h4>
-
+        {{-- @dd($data) --}}
         @foreach($data as $dat)
             <table id="table-detail-main">
                 <tr>
-                    <td><b>Date:</b> {{ date('j M, Y', strtotime($dat['date'])) }}</td>
+                    <td><b>Date:</b> {{ date('Y-m-d', strtotime($dat['date'])) }}</td>
                 </tr>
             </table>
 
             <table id="table-detail" align="center" style="margin-top: -1%; padding-top: 0%;">
                 <thead>
                     <tr style="background: #1f273b; color: white;">
-                        <th align="left" style="width: 1%;">#</th>
+                        <th align="center" style="width: 1%;">#</th>
+                        <th align="left" style="width: 1%;">Receipt #</th>
                         <th align="left" style="width: 20%">Product Name</th>
                         <th align="left">Batch #</th>
                         <th align="left">Sold By</th>
-                        <th align="right" style="width: 2%">Qty</th>
+                        <th align="center" style="width: 2%">Qty</th>
                         <th align="right">Sell Price</th>
                         <th align="right">Sub Total</th>
                         <th align="right">VAT</th>
@@ -121,10 +122,11 @@
                     @foreach($dat['grouped_data'] as $itm)
                         <tr>
                             <td>{{$i++}}.</td>
+                            <td>{{$itm['receipt']}}</td>
                             <td>{{$itm['name']}}</td>
                             <td>{{$itm['batch']}}</td>
                             <td>{{$itm['sold_by']}}</td>
-                            <td align="right">{{ number_format($itm['quantity'], 0) }}</td>
+                            <td align="center">{{ number_format($itm['quantity'], 0) }}</td>
                             <td align="right">{{ number_format($itm['price'], 2) }}</td>
                             <td align="right">{{ number_format($itm['sub_total'], 2) }}</td>
                             <td align="right">{{ number_format($itm['vat'], 2) }}</td>
@@ -167,6 +169,7 @@
         @php
             $overallTotals = [
                 'total_count' => 0,
+                'grand_subtotal' => 0.0,
                 'grand_total' => 0.0,
                 'total_paid' => 0.0,
                 'total_balance' => 0.0,
@@ -190,6 +193,7 @@
 
                 $overallTotals['total_count'] += $count;
                 $overallTotals['grand_total'] += (float) ($tot['grand_total'] ?? 0);
+                $overallTotals['grand_subtotal'] += (float) (($tot['grand_total'] ?? 0)-($tot['total_vat'] ?? 0));
                 $overallTotals['total_paid'] += (float) ($tot['total_paid'] ?? 0);
                 $overallTotals['total_balance'] += (float) ($tot['total_balance'] ?? 0);
                 $overallTotals['total_vat'] += (float) ($tot['total_vat'] ?? 0);
@@ -197,6 +201,7 @@
             }
 
             // round for neatness
+            $overallTotals['grand_subtotal'] = round($overallTotals['grand_subtotal'], 2);
             $overallTotals['grand_total'] = round($overallTotals['grand_total'], 2);
             $overallTotals['total_paid'] = round($overallTotals['total_paid'], 2);
             $overallTotals['total_balance'] = round($overallTotals['total_balance'], 2);
@@ -205,9 +210,27 @@
         @endphp
 
         <div style="margin-top: 10px; padding-top: 5px;">
-            <h3 align="center">Overall Period Summary</h3>
+            <h3 align="center"><b>Total Summary</b></h3>
             <table
-                style="width: auto; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
+                style="width: auto; min-width: 25%; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 8px; text-align: right;"><b>Subtotal</b></td>
+                    <td style="padding: 8px; text-align: center;"><b>:</b></td>
+                    <td style="padding: 8px; text-align: right;">
+                        <b>{{ number_format($overallTotals['grand_subtotal'], 2) }}</b></td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; text-align: right;"><b>VAT</b></td>
+                    <td style="padding: 8px; text-align: center;"><b>:</b></td>
+                    <td style="padding: 8px; text-align: right;">
+                        <b>{{ number_format($overallTotals['total_vat'], 2) }}</b></td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; text-align: right;"><b>Discount</b></td>
+                    <td style="padding: 8px; text-align: center;"><b>:</b></td>
+                    <td style="padding: 8px; text-align: right;">
+                        <b>{{ number_format($overallTotals['total_discount'], 2) }}</b></td>
+                </tr>
                 <tr>
                     <td style="padding: 8px; text-align: right;"><b>Total Amount</b></td>
                     <td style="padding: 8px; text-align: center;"><b>:</b></td>
@@ -215,13 +238,13 @@
                         <b>{{ number_format($overallTotals['grand_total'], 2) }}</b></td>
                 </tr>
                 <tr>
-                    <td style="padding: 8px; text-align: right;"><b>Total Paid</b></td>
+                    <td style="padding: 8px; text-align: right;"><b>Paid</b></td>
                     <td style="padding: 8px; text-align: center;"><b>:</b></td>
                     <td style="padding: 8px; text-align: right;">
                         <b>{{ number_format($overallTotals['total_paid'], 2) }}</b></td>
                 </tr>
                 <tr>
-                    <td style="padding: 8px; text-align: right;"><b>Outstanding Balance</b></td>
+                    <td style="padding: 8px; text-align: right;"><b>Balance</b></td>
                     <td style="padding: 8px; text-align: center;"><b>:</b></td>
                     <td style="padding: 8px; text-align: right; color: red;">
                         <b>{{ number_format($overallTotals['total_balance'], 2) }}</b></td>

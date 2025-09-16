@@ -19,7 +19,7 @@
 @section("content")
 
     <style>
-        .datepicker > .datepicker-days {
+        .datepicker>.datepicker-days {
             display: block;
         }
 
@@ -56,14 +56,12 @@
             border-color: #748892;
             color: white;
         }
-
     </style>
 
     <div class="col-sm-12">
         <div class="card">
             <div class="card-body">
-                <form id="inventory_report_form" action="{{route('sale-report-filter')}}"
-                      method="get" target="_blank">
+                <form id="inventory_report_form" action="{{route('sale-report-filter')}}" method="get" target="_blank">
                     @csrf()
                     <div class="row">
                         <div class="col-md-8">
@@ -71,22 +69,23 @@
                                 <div class="form-group">
                                     <label for="report_option">Select Sale Report<font color="red">*</font></label>
                                     <select id="report_option" name="report_option" onchange="reportOption()"
-                                            class="js-example-basic-single form-control drop" required>
+                                        class="js-example-basic-single form-control drop" required>
                                         <option selected="true" value="" disabled="disabled">Select report</option>
                                         <option value="9">Sales Details Report</option>
                                         <option value="10">Sales Summary Report</option>
                                         <option value="7">Sales Total Report</option>
                                         <option value="1">Cash Sales Details Report</option>
                                         <option value="2">Cash Sales Summary Report</option>
+                                        <option value="13">Cash Sales Total Report</option>
                                         <option value="3">Credit Sales Details Report</option>
                                         <option value="4">Credit Sales Summary Report</option>
+                                        <option value="14">Credit Sales Total Report</option>
                                         <option value="5">Credit Payments Report</option>
                                         <option value="6">Customer Payments Statement</option>
                                         <!-- <option value="6">Bill Sales Details Report</option>
-                                        <option value="7">Company Billing Report</option> -->
+                                                <option value="7">Company Billing Report</option> -->
                                         <option value="8">Price List Report</option>
-                                                                           {{-- <option value="9">Category Price List Report</option> --}}
-                                    <!--   <option value="10">Sales Trend Chart</option> -->
+                                        <!--   <option value="10">Sales Trend Chart</option> -->
                                         <option value="11">Sales Return Report</option>
                                         <option value="12">Sales Comparison Report</option>
                                     </select>
@@ -98,23 +97,33 @@
                         <div class="col-md-4">
                             <div id="range">
                                 <label for="filter">Date<font color="red">*</font></label>
-                                <input type="text" class="form-control" name="date_range" id="daterange" readonly/>
+                                <input type="text" class="form-control" name="date_range" id="daterange" readonly />
                             </div>
                             <div id="price_category" style="display: none">
                                 <label for="product">Price Category<font color="red">*</font></label>
                                 <select id="product" name="category" onchange=""
-                                        class="js-example-basic-single form-control drop">
+                                    class="js-example-basic-single form-control drop">
                                     <option value="" selected="true" disabled="disabled">Select category</option>
-                                        <option value="all">
-                                            All</option>
+                                    <option value="all">
+                                        All</option>
                                     @foreach($price_category as $category)
                                         <option value="{{$category->id}}">
-                                            {{$category->name}}</option>
+                                            {{$category->name}}
+                                        </option>
                                     @endforeach
                                 </select>
-                                <span id="warning"
-                                      style="color: #ff0000; display: none">Please select a category</span>
+                                <span id="warning" style="color: #ff0000; display: none">Please select a category</span>
                             </div>
+                        </div>
+
+                        <div class="col-md-4" id="selling_price" style="display: none">
+                            <label for="code">Type<font color="red">*</font></label>
+                            <select name="price_type" id="price_type" class="js-example-basic-single form-control">
+                                <option value="">Select type</option>
+                                <option value="1">With Buy Price</option>
+                                <option value="2">Without Buy Price</option>
+                            </select>
+                            <span id="price-type-warning" style="color: #ff0000; display: none">Please select type</span>
                         </div>
 
                         <div class="col-md-4" id="customer_statement" style="display: none">
@@ -136,10 +145,10 @@
                         </div>
                         <div class="col-md-2">
                             {{--<a href="" target="_blank">--}}
-                            <button class="btn btn-secondary" style="width: 100%">
-                                Show
-                            </button>
-                            {{--</a>--}}
+                                <button class="btn btn-secondary" style="width: 100%">
+                                    Show
+                                </button>
+                                {{--</a>--}}
                         </div>
                     </div>
                 </form>
@@ -191,17 +200,20 @@
 
             }
 
-
-            //if credit Report
             if (Number(report_option_index) === Number(6)) {
                 document.getElementById('customer_statement').style.display = 'block';
-                $("#product").prop("required", false);
-                $("#product").val("");
-                $("#product").change();
                 $('#customer_id').prop('required', true);
             } else {
                 document.getElementById('customer_statement').style.display = 'none';
+                $('#customer_id').prop('required', false);
+            }
 
+            if (Number(report_option_index) === Number(8)) {
+                document.getElementById('selling_price').style.display = 'block';
+                $('#price_type').prop('required', true);
+            } else {
+                document.getElementById('selling_price').style.display = 'none';
+                $('#price_type').prop('required', false);
             }
 
         }
@@ -213,17 +225,22 @@
 
             var product_option = document.getElementById("product");
             var product_option_index = product_option.options[product_option.selectedIndex].value;
+            var price_type = document.getElementById('price_type').value;
 
-
-            if (Number(report_option_index) === Number(8) && Number(product_option_index) !== Number(0)) {
+            if (Number(report_option_index) === Number(8) && Number(product_option_index) !== '') {
                 document.getElementById('warning').style.display = 'none';
-                //make request
 
-            } else if (Number(report_option_index) === Number(8) && Number(product_option_index) === Number(0)) {
+            } else if (Number(report_option_index) === Number(8) && Number(product_option_index) === '') {
                 document.getElementById('warning').style.display = 'block';
                 return false;
             }
 
+            if (Number(report_option_index) === 8 && (price_type !== '' && price_type !== null)) {
+                document.getElementById('price-type-warning').style.display = 'none';
+            } else if (Number(report_option_index) === 8 && (price_type !== '' && price_type !== null)) {
+                document.getElementById('price-type-warning').style.display = 'block';
+                return false;
+            }
         });
 
     </script>
@@ -243,7 +260,7 @@
                 endDate: end,
                 autoUpdateInput: true,
                 locale: {
-                    format: 'YYYY/MM/DD' 
+                    format: 'YYYY/MM/DD'
                 },
                 ranges: {
                     'Today': [moment(), moment()],

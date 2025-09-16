@@ -206,8 +206,8 @@
             var start = moment();
             var end = moment();
 
-            function cb(start, end) {
-                $('#expense_date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            function cb(start, end) {  
+                    $('#expense_date').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
             }
 
             $('#expense_date').daterangepicker({
@@ -243,7 +243,7 @@
         /*to date*/
         $('#d_auto_7').datepicker({
             todayHighlight: true,
-            format: 'yyyy-mm-dd',
+            format: 'YYYY-MM-DD',
             changeYear: true
         }).on('change', function () {
             //filterExpenseDate();
@@ -253,7 +253,7 @@
         /*from date*/
         $('#d_auto_8').datepicker({
             todayHighlight: true,
-            format: 'yyyy-mm-dd',
+            format: 'YYYY-MM-DD',
             changeYear: true
         }).on('change', function () {
             //filterExpenseDate();
@@ -262,7 +262,7 @@
 
         $('#d_auto_9').datepicker({
             todayHighlight: true,
-            format: 'yyyy-mm-dd',
+            format: 'YYYY-MM-DD',
             changeYear: true,
             maxDate: '+0m +0w'
         }).on('change', function () {
@@ -279,7 +279,7 @@
                 maxDate: end,
                 autoUpdateInput: true,
                 locale: {
-                    format: 'DD-M-YYYY'
+                    format: 'YYYY-MM-DD'
                 }
             });
         });
@@ -294,7 +294,7 @@
                 maxDate: end,
                 autoUpdateInput: true,
                 locale: {
-                    format: 'DD-M-YYYY'
+                    format: 'YYYY-MM-DD'
                 }
             });
         });

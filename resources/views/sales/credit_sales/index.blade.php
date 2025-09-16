@@ -45,6 +45,7 @@
             opacity: 0;
             z-index: 1;
         }
+
         #loading {
             width: 100%;
             height: 100%;
@@ -184,6 +185,7 @@
 
                                     </div>
                                     <hr>
+                                    <input type="hidden" name="" id="is_backdate_enabled" value="{{$back_date}}">
                                     @if($back_date == "NO")
                                         <div class="row">
                                             @if($enable_discount === "YES")
@@ -380,10 +382,10 @@
                         </div>
                     @endif
 
-                        <!-- ajax loading gif -->
-                        <div id="loading">
-                            <img id="loading-image" src="{{asset('assets/images/spinner.gif')}}" />
-                        </div>
+                    <!-- ajax loading gif -->
+                    <div id="loading">
+                        <img id="loading-image" src="{{asset('assets/images/spinner.gif')}}" />
+                    </div>
 
                     @if(!Auth::user()->checkPermission('View Credit Sales'))
                         <div class="tab-pane fade show" id="credit-sale-receiving" role="tabpanel"

@@ -1224,8 +1224,6 @@ $("#credit_payment_table tbody").on("click", "#pay_btn", function () {
 
 $("#sales_form").on("submit", function (e) {
     e.preventDefault();
-    // window.open('#', '_blank');
-    // window.open(this.href, '_self');
     var cart = document.getElementById("order_cart").value;
 
     if (cart === "" || cart === "undefined") {
@@ -1265,10 +1263,21 @@ $("#credit_sales_form").on("submit", function (e) {
     e.preventDefault();
 
     var cart = document.getElementById("order_cart").value;
+    var is_backdate_enabled = document.getElementById(
+        "is_backdate_enabled"
+    ).value;
+    var saleDate = document.getElementById("credit_sale_date").value;
 
     if (cart === "" || cart === "undefined") {
         notify("Credit Sales list empty", "top", "right", "warning");
         return false;
+    }
+    
+    if (is_backdate_enabled === "YES") {
+        if (saleDate === "" || saleDate == null) {
+            notify("Sales date is required", "top", "right", "warning");
+            return false;
+        }
     }
 
     $("#save_btn").attr("disabled", true);
