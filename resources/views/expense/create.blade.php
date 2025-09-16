@@ -34,15 +34,19 @@
                             </div>
                             <div class="form-group row">
                                 <label for="payment_method"
-                                       class="col-md-4 col-form-label text-md-right">{{ __('Payment Method') }}<span
-                                        style="color: red;">*</span></label>
+                                    class="col-md-4 col-form-label text-md-right">
+                                    {{ __('Payment Method') }}
+                                    <span style="color: red;">*</span>
+                                </label>
                                 <div class="col-md-8">
                                     <div id="method" style="border: 2px solid white; border-radius: 6px;">
-                                        <select id="payment_method" name="payment_method" class="form-control"
-                                                required="true">
-                                            {{--                                            <option selected="true" value="0" disabled="disabled">Select method</option>--}}
-                                            <option value="1" selected="true">CASH</option>
-                                            {{--                                            <option value="2">BILL</option>--}}
+                                        <select id="payment_method" name="payment_method" class="form-control" required>
+                                            <option value="" disabled selected>Select method</option>
+                                            <option value="1">CASH</option>
+                                            <option value="2">MOBILE MONEY</option>
+                                            <option value="3">BANK</option>
+                                            <option value="4">CHEQUE</option>
+                                            <option value="5">OTHER</option>
                                         </select>
                                     </div>
                                 </div>

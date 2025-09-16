@@ -76,7 +76,7 @@ class ExpenseController extends Controller
                     $method = "BILL";
                 array_push($results_mod, array(
                     "id" => $result->id,
-                    "created_at" => date('d-m-Y', strtotime($result->created_at)),
+                    "created_at" => date('Y-m-d', strtotime($result->created_at)),
                     "expense_Category" => $result->accExpenseCategory['name'],
                     "expense_category_id" => $result->expense_category_id,
                     "description" => $result->expense_description,
