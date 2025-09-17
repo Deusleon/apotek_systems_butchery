@@ -90,8 +90,8 @@ class InvoiceController extends Controller
 
         foreach ($invoice_history as $value) {
             $value->supplier;
-            $value->date = date('d-m-Y', strtotime($value->invoice_date));
-            $value->due_date = date('d-m-Y', strtotime($value->payment_due_date));
+            $value->date = date('Y-m-d', strtotime($value->invoice_date));
+            $value->due_date = date('Y-m-d', strtotime($value->payment_due_date));
         }
         $data = json_decode($invoice_history, true);
 
@@ -113,8 +113,8 @@ class InvoiceController extends Controller
 
         foreach ($invoice_history as $value) {
             $value->supplier;
-            $value->date = date('d-m-Y', strtotime($value->invoice_date));
-            $value->due_date = date('d-m-Y', strtotime($value->payment_due_date));
+            $value->date = date('Y-m-d', strtotime($value->invoice_date));
+            $value->due_date = date('Y-m-d', strtotime($value->payment_due_date));
         }
         $data = json_decode($invoice_history, true);
 
