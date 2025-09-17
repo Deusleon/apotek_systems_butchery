@@ -6,7 +6,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            font-size: 10px;
+            font-size: 14px;
             margin: 0;
             /* border-left: 2px dashed #949393; */
             /* min-height: 135mm; */
@@ -34,11 +34,11 @@
 
         .company-name {
             font-weight: bold;
-            font-size: 16px;
+            font-size: 18px;
         }
 
         .company-address {
-            font-size: 12px;
+            font-size: 14px;
             line-height: 1.2;
         }
 
@@ -49,35 +49,35 @@
 
         .receipt-title {
             font-weight: bold;
-            font-size: 15px;
+            font-size: 17px;
             margin: 0;
         }
 
         .receipt-number {
             font-weight: bold;
-            font-size: 10px;
+            font-size: 12px;
             margin: 2px 0;
             color: red;
         }
 
         .bill-to-label {
             font-weight: bold;
-            font-size: 10px;
+            font-size: 12px;
             margin-bottom: 5px;
         }
 
         .bill-to-line1 {
             border-bottom: 1.5px solid #a19f9f;
-            width: 50%;
-            height: 12px;
-            margin-top: -30px;
+            width: 40%;
+            height: 15px;
+            margin-top: -25px;
         }
 
         .bill-to-line2 {
             border-bottom: 1.5px solid #a19f9f;
-            width: 50%;
-            height: 12px;
-            margin-top: -20px;
+            width: 40%;
+            height: 15px;
+            margin-top: -18px;
         }
 
         .date-section {
@@ -87,7 +87,7 @@
         }
 
         .date-label {
-            font-size: 10px;
+            font-size: 12px;
             font-weight: bold;
             margin-top: 41px;
         }
@@ -99,8 +99,8 @@
             padding-left: 8px;
             padding-right: 30px;
             padding-top: 40px;
-            font-size: 11px;
-            height: 12px;
+            font-size: 13px;
+            height: 15px;
         }
 
         /* Table styling */
@@ -115,7 +115,7 @@
             background-color: #000;
             color: white;
             font-weight: bold;
-            font-size: 11px;
+            font-size: 13px;
             text-align: center;
         }
 
@@ -127,7 +127,7 @@
         .items-table td {
             padding: 8px 2px;
             border: 1px solid #858484;
-            font-size: 12px;
+            font-size: 14px;
             height: 15px;
         }
 
@@ -155,7 +155,7 @@
         .summary-section {
             width: 40%;
             margin-left: auto;
-            font-size: 11px;
+            font-size: 13px;
         }
 
         .summary-row {
@@ -173,26 +173,17 @@
             background-color: #f0f0f0;
         }
 
-        .footer-note {
-            text-align: left;
-            font-size: 9px;
-            width: 55%;
-            text-align: justify;
-            margin-bottom: 3px;
-            margin-top: -90px;
-        }
-
         .sold-by {
             text-align: left;
-            font-size: 9px;
+            font-size: 11px;
             font-weight: bold;
             margin-bottom: 3px;
-            margin-top: 10px;
+            margin-top: -40px;
         }
 
         .slogan {
             text-align: left;
-            font-size: 8px;
+            font-size: 10px;
             font-style: italic;
         }
 
@@ -205,7 +196,7 @@
         .info-row {
             display: flex;
             justify-content: space-between;
-            font-size: 9px;
+            font-size: 11px;
             margin-bottom: 2px;
         }
 
@@ -247,9 +238,9 @@
 
     <!-- Receipt Header -->
     <div class="receipt-header">
-        <div class="receipt-title">CREDIT RECEIPT</div>
+        <div class="receipt-title">RECEIPT</div>
         @foreach($data as $datas => $dat)
-            <span style="font-size: 10px; font-weight: 400;">NO.</span><span class="receipt-number"> {{$datas}}</span>
+            <span style="font-size: 12px; font-weight: 400;">NO.</span><span class="receipt-number"> {{$datas}}</span>
             @break
         @endforeach
     </div>
@@ -300,6 +291,7 @@
                         <td class="amount-col">{{number_format($item['price'] * $item['quantity'], 2)}}</td>
                     </tr>
                 @endforeach
+
                 @if(count($dat) < 5)
                     <!-- Empty rows for spacing -->
                     @for($i = 0; $i < 7 - count($dat); $i++)
@@ -339,7 +331,7 @@
             </div>
 
             @if($page == -1)
-                <div class="summary-row">
+                <div class="summary-row" style="margin-top: 10px;">
                     <span>PAID:</span>
                     <span style="float: right;">{{number_format($dat[0]['paid'], 2)}}</span>
                 </div>
@@ -355,8 +347,6 @@
 
     <!-- Footer Section -->
     <div class="footer-section">
-        <div class="footer-note"><b>Remark:</b> {{$dat[0]['remark']}} </div>
-
         @foreach($data as $datas => $dat)
             <div class="sold-by">Issued By: {{$dat[0]['sold_by']}}</div>
             <div class="slogan">{{$pharmacy['slogan'] ?? 'Thank you for your business'}}</div>

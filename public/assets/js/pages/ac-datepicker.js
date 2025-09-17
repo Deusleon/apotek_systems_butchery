@@ -60,7 +60,7 @@ $(document).ready(function () {
     $("#credit_sale_date").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: "YYYY-MM-DD",
+        format: "yyyy-mm-dd",
         changeYear: true,
         endDate: new Date(),
     });
@@ -69,7 +69,7 @@ $(document).ready(function () {
     $("#cash_sale_date").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: "YYYY-MM-DD",
+        format: "yyyy-mm-dd",
         changeYear: true,
         endDate: new Date(),
     });
