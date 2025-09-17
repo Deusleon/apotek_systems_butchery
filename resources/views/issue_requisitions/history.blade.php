@@ -147,7 +147,7 @@
                             <div class="mt-1">
                                 ${requisition.evidence_document ? 
                                     `<a href="/storage/${requisition.evidence_document}" target="_blank" class="btn btn-warning btn-sm rounded-pill">
-                                        <i class="feather icon-file-text mr-1"></i>View Document
+                                        View
                                     </a>` : 
                                     '<span class="text-muted">No document attached</span>'
                                 }
