@@ -127,7 +127,7 @@ Invoice Management
         $('#edit').find('.modal-body #balance_edit').val(formatMoney(data.remain_balance));
         $('#edit').find('.modal-body #period_edit').val(data.grace_period);
         $('#edit').find('.modal-body #received_status_edit').val(data.received_status);
-        $('#edit').find('.modal-body #due_date_edit').val(moment(data.payment_due_date).format('D-M-YYYY'));
+        $('#edit').find('.modal-body #due_date_edit').val(moment(data.payment_due_date).format('YYYY-MM-DD'));
         $('#edit').find('.modal-body #remarks_edit').val(data.remarks);
 
     });
@@ -210,7 +210,7 @@ Invoice Management
         var end = moment();
 
         function cb(start, end) {
-            $('#date_filter span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            $('#date_filter').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
         }
 
         $('#date_filter').daterangepicker({
@@ -237,7 +237,7 @@ Invoice Management
         var end = moment();
 
         function cb(start, end) {
-            $('#due_date_filter span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            $('#due_date_filter span').val(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
         }
 
         $('#due_date_filter').daterangepicker({
@@ -258,7 +258,7 @@ Invoice Management
     });
 
     $('input[name="invoice_filter_due_date"]').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.endDate.format('MM/DD/YYYY') + ' - ' + picker.startDate.format('MM/DD/YYYY'));
+        $(this).val(picker.endDate.format('YYYY/MM/DD') + ' - ' + picker.startDate.format('YYYY/MM/DD'));
         filterByDueDate();
     });
 
