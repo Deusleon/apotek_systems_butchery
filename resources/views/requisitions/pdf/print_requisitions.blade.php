@@ -52,7 +52,7 @@
         </colgroup>
         <thead>
             <tr class="bg-navy disabled">
-                <th class="px-1 py-1 text-center">S/n</th>
+                <th class="px-1 py-1 text-center">#</th>
                 <th align="left">Product</th>
                 <th>Unit</th>
                 <th class="px-1 py-1 text-center">Qty Req</th>
