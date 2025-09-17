@@ -178,11 +178,6 @@
             }
         });
 
-        // $('#sale_history_table tbody').on('click', '#sale_receipt_reprint', function () {
-        //     var row_data = $('#sale_history_table').DataTable().row($(this).parents('tr')).data();
-        //     document.getElementById("print").value = row_data.receipt_number;
-        // });
-
     </script>
     <script type="text/javascript">
         $(function () {

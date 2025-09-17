@@ -60,7 +60,6 @@ class SaleController extends Controller
             ->with(compact('default_customer'))
             ->with(compact('vat'))->with(compact('fixed_price'));
     }
-
     public function creditSale()
     {
         if (!Auth()->user()->checkPermission('View Credit Sales')) {
@@ -97,14 +96,12 @@ class SaleController extends Controller
             ->with(compact('default_sale_type'))
             ->with(compact('vat'))->with(compact('fixed_price'));
     }
-
     public function getCreditsCustomers()
     {
         $customers = Customer::where('total_credit', '>', 0)->get();
         return View::make('sales.credit_sales.payment')
             ->with(compact('customers'));
     }
-
     public function getPaymentsHistory()
     {
         $customers = Customer::orderBy('name', 'asc')->get();
@@ -115,7 +112,6 @@ class SaleController extends Controller
             ->get();
         return view('sales.payment_history.index', compact('payments', 'customers'));
     }
-
     public function paymentHistoryFilter(Request $request)
     {
         if ($request->ajax()) {
@@ -151,7 +147,6 @@ class SaleController extends Controller
 
         }
     }
-
     public function CreditSalePayment(Request $request)
     {
         //Validating amount before submitting
@@ -176,7 +171,6 @@ class SaleController extends Controller
         return back();
 
     }
- 
     public function getCreditSale(Request $request)
     {
         $store_id = current_store_id();
@@ -230,7 +224,6 @@ class SaleController extends Controller
             return $data;
         }
     }
-
     public function selectProducts(Request $request)
     {
         /*get default store*/
@@ -284,7 +277,6 @@ class SaleController extends Controller
             "data"    => $output
         ]);
     }
-
     public function filterProductByWord(Request $request)
     {
         $default_store_id = current_store_id();
@@ -365,7 +357,6 @@ class SaleController extends Controller
             ]);
         }
     }
-
     public function store(Request $request)
     {
         $default_store = current_store_id();
@@ -475,7 +466,6 @@ class SaleController extends Controller
         }
 
     }
-
     public function receiptReprint($receipt, Request $request)
     {
         try {
@@ -571,19 +561,23 @@ class SaleController extends Controller
 
             if ($receipt_size == '58mm Thermal Paper') {
                 $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
-                    compact('data', 'pharmacy', 'page'));
+                    compact('data', 'pharmacy', 'page'))
+                    ->setPaper([0, 0, 163, 600], '');
                 return $pdf->stream($request->reprint_receipt . '.pdf');
             } else if ($receipt_size == 'A4 / Letter') {
-                $pdf = PDF::loadView('sales.cash_sales.receipt',
-                    compact('data', 'pharmacy', 'page'));
+                $pdf = PDF::loadView('sales.cash_sales.receipt_A4',
+                    compact('data', 'pharmacy', 'page'))
+                    ->setPaper('a4', '');
                 return $pdf->stream($request->reprint_receipt . '.pdf');
             } else if ($receipt_size == '80mm Thermal Paper') {
                 $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
-                    compact('data', 'pharmacy', 'page'));
+                    compact('data', 'pharmacy', 'page'))
+                    ->setPaper([0, 0, 227, 600], '');
                 return $pdf->stream($request->reprint_receipt . '.pdf');
             } else if ($receipt_size == 'A5 / Half Letter') {
                 $pdf = PDF::loadView('sales.cash_sales.receipt_A5',
-                    compact('data', 'pharmacy', 'page'));
+                    compact('data', 'pharmacy', 'page'))
+                    ->setPaper('a5', '');
                 return $pdf->stream($request->reprint_receipt . '.pdf');
             } else {
                 echo "<script>window.close();</script>";
@@ -596,7 +590,6 @@ class SaleController extends Controller
 
 
     }
-
     public function storeCreditSale(Request $request)
     {
         if ($request->ajax()) {
@@ -614,7 +607,6 @@ class SaleController extends Controller
         }
 
     }
-
     public function getSalesHistory(Request $request)
     {
         $from = $request->range[0] ?? null;
@@ -667,7 +659,6 @@ class SaleController extends Controller
             "data" => $sales
         ]);
     }
-
     public function getSalesHistoryData(Request $request)
     {
         $saleReceipt = $request->receipt;
@@ -689,8 +680,7 @@ class SaleController extends Controller
         return response()->json([
             "data" => $results
         ]);
-    }
-    
+    } 
     public function salesDetailsData(Request $request)
     {
 
@@ -705,7 +695,6 @@ class SaleController extends Controller
 
         return $data;
     }
-
     public function SalesHistory()
     {
         if (!Auth()->user()->checkPermission('View Sales History')) {

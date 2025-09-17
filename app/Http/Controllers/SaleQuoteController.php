@@ -669,17 +669,21 @@ class SaleQuoteController extends Controller {
             $data = $grouped_sales;
 
             if ( $receipt_size === '58mm Thermal Paper' ) {
-                $pdf = PDF::loadView( 'sales.cash_sales.receipt_thermal',
-                compact( 'data', 'pharmacy', 'page' ) );
+                $pdf = PDF::loadView( 'sales.sale_quotes.quote_receipt_thermal_58',
+                compact( 'data', 'pharmacy', 'page' ) )
+                    ->setPaper([0, 0, 163, 600], '');
             } else if ( $receipt_size === '80mm Thermal Paper' ) {
-                $pdf = PDF::loadView( 'sales.cash_sales.receipt_thermal',
-                compact( 'data', 'pharmacy', 'page' ) );
+                $pdf = PDF::loadView( 'sales.sale_quotes.quote_receipt_thermal_80',
+                compact( 'data', 'pharmacy', 'page' ) )
+                    ->setPaper([0, 0, 227, 600], '');
             } else if ( $receipt_size === 'A4 / Letter' ) {
-                $pdf = PDF::loadView( 'sales.sale_quotes.quote_receipt',
-                compact( 'data', 'pharmacy', 'page' ) );
-            } else {
-                $pdf = PDF::loadView( 'sales.sale_quotes.quote_receipt',
-                compact( 'data', 'pharmacy', 'page' ) );
+                $pdf = PDF::loadView( 'sales.sale_quotes.quote_receipt_A4',
+                compact( 'data', 'pharmacy', 'page' ) )
+                    ->setPaper('a4', '');
+            } else if ( $receipt_size === 'A5 / Half Letter' )  {
+                $pdf = PDF::loadView( 'sales.sale_quotes.quote_receipt_A5',
+                compact( 'data', 'pharmacy', 'page' ) )
+                    ->setPaper('a5', '');
             }
             return $pdf->stream( $id . '.pdf' );
         } catch ( Exception $e ) {
