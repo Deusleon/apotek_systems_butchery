@@ -542,6 +542,7 @@ Route::middleware(["auth","main_branch"])->group(function () {
 
     /* Requisition */
     Route::get('purchases/requisitions', 'RequisitionController@index')->name('requisitions.index');
+    Route::get('requisitions/issue-history/print/{id}', 'RequisitionController@printIssueHistory')->name('requisitions.issue-history.print');
     Route::get('purchases/requisitions-create', 'RequisitionController@create')->name('requisitions.create');
     Route::get('search_items', 'RequisitionController@search_items')->name('search_items');
     Route::post('requisitions-store', 'RequisitionController@store')->name('requisitions.store');

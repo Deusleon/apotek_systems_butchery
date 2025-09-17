@@ -470,7 +470,8 @@ class RequisitionController extends Controller
                 })
                 ->addColumn('action', function ($row) {
                     return '
-                        <button type="button" class="btn btn-sm btn-info btn-view btn-rounded" data-id="'.$row->id.'">Show</button>
+                        <button type="button" class="btn btn-sm btn-success btn-view btn-rounded" data-id="'.$row->id.'">Show</button>
+                        <a href="'.route('requisitions.issue-history.print', $row->id).'" target="_blank" class="btn btn-sm btn-primary btn-print btn-rounded"><span class="fa fa-print" aria-hidden="true"></span> Print</a>
                     ';
                 })
 
@@ -479,6 +480,33 @@ class RequisitionController extends Controller
         }
     }
 
+
+    public function printIssueHistory($id)
+{
+    if (!Auth()->user()->checkPermission('View Requisitions Issue')) {
+        abort(403, 'Access Denied');
+    }
+
+    $requisition = Requisition::with(['reqDetails', 'creator'])->findOrFail($id);
+    $fromStore = Store::find($requisition->from_store);
+    $toStore = Store::find($requisition->to_store);
+    $pharmacy = $this->companyInfo();
+    
+    // Get requisition details with product information
+    $requisitionDetails = RequisitionDetail::with('products_')
+        ->where('req_id', $id)
+        ->get();
+    
+    // Check receipt size setting
+    $receipt_size = Setting::where('id', 119)->value('value');
+    
+    $view = 'issue_requisitions.pdf.print_history';
+    $output = 'requisition_issue_history_'.$requisition->req_no.'.pdf';
+    
+    $pdf = PDF::loadView($view, compact('requisition', 'requisitionDetails', 'fromStore', 'toStore', 'pharmacy'));
+    
+    return $pdf->stream($output);
+}
 
     public function getRequisitionsIssue(Request $request)
 {
