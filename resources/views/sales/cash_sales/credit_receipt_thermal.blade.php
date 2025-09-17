@@ -1,228 +1,142 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Receipt</title>
     <style>
+        @page {
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-size: 10px;
+            margin: 0;
+            padding: 10px;
+            /* width: 58mm; */
         }
 
         * {
-            font-family: MingLiu, MingLiU-ExtB, sans-serif;
-        }
-
-        table, th, td {
-            /*border: 1px solid black;*/
-            /*border-collapse: collapse;*/
-            padding: 10px;
+            font-family: 'Courier New', monospace;
         }
 
         table {
-            page-break-inside: auto;
-            border-collapse: collapse;
-        }
-
-        tr {
-            page-break-inside: avoid;
-            page-break-after: auto
-        }
-
-        thead {
-            display: table-header-group
-        }
-
-        tfoot {
-            display: table-footer-group
-        }
-
-        #table-detail {
-            /*border-spacing: 5px;*/
             width: 100%;
-            margin-top: -2%;
-            border-top: 1px solid black;
+            border-collapse: collapse;
+            font-size: 9px;
         }
 
-        #table-detail thead tr th {
-            border-bottom: 1px solid #000000;
+        th,
+        td {
+            padding: 2px;
+            word-wrap: break-word;
         }
 
-        #table-detail-main {
-            width: 103%;
-            margin-top: -2%;
-            margin-bottom: -2%;
-            /*border-collapse: collapse;*/
-
+        #table-detail thead th {
+            border-bottom: 1px solid #000;
         }
 
-        #table-detail tr > {
-            /*line-height: 13px;*/
-            background: white;
+        hr {
+            border: none;
+            border-top: 1px dashed #000;
+            margin: 4px 0;
         }
 
-        #table-detail-main tr > {
-            line-height: 15px;
-        }
-
-        #table-detail tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        #category {
-            text-transform: uppercase;
-        }
-
-        h3 {
-            font-weight: normal;
-        }
-
-        h4 {
-            font-weight: normal;
-        }
-
-        h5 {
-            font-weight: normal;
-        }
-
+        h3,
+        h4,
+        h5,
         h6 {
+            margin: 2px 0;
             font-weight: normal;
-        }
-
-        #container .logo-container {
-            padding-top: -2%;
             text-align: center;
-            vertical-align: middle;
         }
-
-        #container .logo-container img {
-            max-width: 160px;
-            max-height: 160px;
-        }
-
-
     </style>
 </head>
+
 <body>
-{{--<div class="row" style="width: 50%">--}}
-{{--    <div id="container">--}}
-{{--        <div class="logo-container">--}}
-{{--            @if($pharmacy['logo'])--}}
-{{--                <img src="{{public_path('fileStore/logo/'.$pharmacy['logo'])}}"/>--}}
-{{--            @endif--}}
-{{--        </div>--}}
-{{--    </div>--}}
-{{--</div>--}}
-<div class="row" style="padding-top: -4%; width: 38%; margin-left: -6.5%">
-    <h3 align="center"><b>CREDIT RECEIPT</b></h3>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['name']}}</h3>
-    <h5 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h5>
-    <h5 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h5>
-    <h5 align="center" style="margin-top: -1%">TIN: {{$pharmacy['tin_number']}}</h5>
+    <div style="width: 100%;">
+        <h3><b>CREDIT RECEIPT</b></h3>
+        <h4>{{$pharmacy['name']}}</h4>
+        <h5>{{$pharmacy['address']}}</h5>
+        <h5>{{$pharmacy['phone']}}</h5>
+        <h5>TIN: {{$pharmacy['tin_number']}}</h5>
 
-    @foreach($data as $datas => $dat)
-        <table id="table-detail-main">
-            <tr>
-                <td>
-                    <b>Receipt #</b>: {{$datas}} <br>
-                    @if($data[$datas][0]['customer'])
-                        <b>Customer</b>: {{$data[$datas][0]['customer']}}
-                    @else
-                        <b>Customer</b>: CASH
-                    @endif
-                    <br>
-                    <b>TIN</b>: {{$data[$datas][0]['customer_tin']}}
-                    <br>
-                    <b>Date</b>: {{date('j M, Y', strtotime($dat[0]['created_at']))}}
-                </td>
-            </tr>
-        </table>
-        <table id="table-detail" align="center">
-            <!-- loop the product names here -->
-            <thead>
-            <tr>
-                <th align="left" style="width: 50%">Description</th>
-                <th align="right">Qty</th>
-                <th align="right" style="width: 25%">Amount</th>
-            </tr>
-            </thead>
-            @foreach($dat as $item)
+        @foreach($data as $datas => $dat)
+            <table>
                 <tr>
-                    <td align="left">{{$item['name']}}</td>
-                    <td align="right">{{number_format($item['quantity'],0) }}</td>
-                    <td align="right">{{number_format($item['sub_total'],2)}}</td>
+                    <td>
+                        <span>Receipt #:</span> {{$datas}}<br>
+                        <span>Customer:</span> {{$dat[0]['customer'] ?? 'CASH'}}<br>
+                        <span>TIN:</span> {{$dat[0]['customer_tin']}}<br>
+                        <span>Date:</span> {{date('Y-m-d', strtotime($dat[0]['created_at']))}}
+                    </td>
                 </tr>
-            @endforeach
-        </table>
-        <hr style="margin-left: 4%; margin-right: -4%; margin-top: -1%">
-        <div style="margin-left: 8%;width: 29.6%;margin-top: 1%; padding: -1.6%"><b>Sub Total</b>
-        </div>
-        <div align="right"
-             style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
-            {{number_format(($dat[0]['grand_total']-$dat[0]['total_vat'] + $dat[0]['discount_total']),2)}}
-        </div>
-        <div style="margin-left: 8%;width: 29.6%;margin-top: 1%; padding: -1.6%"><b>Discount</b>
-        </div>
-        <div align="right"
-             style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
-            {{number_format($dat[0]['discount_total'],2)}}
-        </div>
-        <div style="margin-left: 8%;width: 29.6%;margin-top: 1%; padding: -1.6%"><b>VAT</b>
-        </div>
-        <div align="right"
-             style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
-            {{number_format($dat[0]['total_vat'],2)}}
-        </div>
-        <hr style="margin-left: 4%; margin-right: -4%; margin-top: 2%">
-        <div style="margin-left: 8%;width: 29.6%;margin-top: 1%; padding: -1.6%"><b>Total</b>
-        </div>
-        <div align="right"
-             style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
-            {{number_format(($dat[0]['grand_total']),2)}}
-        </div>
+            </table>
 
+            <table id="table-detail">
+                <thead>
+                    <tr>
+                        <th align="left">Description</th>
+                        <th align="center">Qty</th>
+                        <th align="right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($dat as $item)
+                        <tr>
+                            <td>{{$item['name']}} {{$item['pack_size']}}{{$item['sales_uom']}}</td>
+                            <td align="center">{{number_format($item['quantity'], 0)}}</td>
+                            <td align="right">{{number_format($item['sub_total'], 2)}}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
 
-        @if($page === "-1")
-            <div style="margin-left: 8%;width: 29.6%;margin-top: 1%; padding: -1.6%"><b>Paid</b>
-            </div>
-            <div align="right"
-                 style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
-                {{number_format($dat[0]['paid'],2)}}
-            </div>
+            <hr>
+            <table id="footer-detail">
+                <tbody>
+                        <tr>
+                            <td align="left">Sub Total</td>
+                            <td align="right">{{number_format($dat[0]['grand_total'] - $dat[0]['total_vat'] + $dat[0]['discount_total'], 2)}}</td>
+                        </tr>
+                        @if($dat[0]['discount_total'] > 0)
+                            <tr>
+                                <td align="left">Discount</td>
+                                <td align="right">{{number_format($dat[0]['discount_total'], 2)}}</td>
+                            </tr>
+                        @endif
+                        <tr>
+                            <td align="left">VAT</td>
+                            <td align="right">{{number_format($dat[0]['total_vat'], 2)}}</td>
+                        </tr>
+                        <tr>
+                            <td align="left"><b>Total</b></td>
+                            <td align="right"><b>{{number_format($dat[0]['grand_total'], 2)}}</b></td>
+                        </tr>
+                </tbody>
+            </table>
+            <hr>
+            @if($page === "-1")
+            <table id="footer-detail">
+                <tbody>
+                        <tr>
+                            <td align="left">Paid</td>
+                            <td align="right">{{number_format($dat[0]['paid'], 2)}}</td>
+                        </tr>
+                            <tr>
+                                <td align="left">Balance</td>
+                                <td align="right">{{number_format($dat[0]['grand_total'] - $dat[0]['paid'], 2)}}</td>
+                            </tr>
+                </tbody>
+            </table>
+            <hr>
+                <div class="summary-row" style="font-size: 9px;"><span>Remark</span><span>{{$dat[0]['remark']}}</span></div>
+            @endif
 
-            <hr style="margin-left: 4%; margin-right: -4%; margin-top: 2%">
-
-            <div style="margin-left: 8%;width: 29.6%;margin-top: 1%; padding: -1.6%"><b>Balance</b>
-            </div>
-            <div align="right"
-                 style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
-                {{number_format($dat[0]['grand_total'] - $dat[0]['paid'],2)}}
-            </div>
-{{--            <div style="margin-left: 10%;width: 29.6%;margin-top: 2%; padding: -1.6%"><b>Remark</b>--}}
-{{--            </div>--}}
-{{--            <div align="right"--}}
-{{--                 style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">--}}
-{{--                {{$dat[0]['remark']}}--}}
-{{--            </div>--}}
-
-
-        @endif
-
-        <h5 align="center" style="margin-top: -0%">Sold By {{$dat[0]['sold_by']}}</h5>
-        <h5 align="center" style="margin-top: -1%; font-style: italic">{{$pharmacy['slogan']}}</h5>
-
-    @endforeach
-
-</div>
-
+            <h5>Issued By {{$dat[0]['sold_by']}}</h5>
+            <h5 style="font-style: italic">{{$pharmacy['slogan']}}</h5>
+        @endforeach
+    </div>
 </body>
 
-{{--<script type="text/javascript">--}}
-{{--    try {--}}
-{{--        this.print();--}}
-{{--    } catch (e) {--}}
-{{--        window.onload = window.print;--}}
-{{--    }--}}
-{{--</script>--}}
-
 </html>
-

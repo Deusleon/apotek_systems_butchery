@@ -4,222 +4,355 @@
 <head>
     <title>Receipt</title>
     <style>
-        * {
-            font-family: Verdana, Arial, sans-serif;
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+            margin: 0;
+            /* border-left: 2px dashed #949393; */
+            /* min-height: 135mm; */
         }
 
-        table,
-        th,
-        td {
-            border: 1px solid black;
-            border-collapse: collapse;
-            padding: 10px;
-            font-size: x-small;
+        .header-section {
+            display: flex;
+            align-items: center;
+            /* margin-bottom: 10px; */
         }
 
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
+        .logo-container {
+            margin-right: 10px;
         }
 
-        .full-row {
-            width: 100%;
-            padding-left: 3%;
-            padding-right: 2%;
+        .logo-container img {
+            max-width: 100px;
+            max-height: 100px;
         }
 
-        .col-50 {
-            display: inline-block;
-            font-size: 13px;
+        .company-info {
+            flex: 1;
+            margin-left: 110px;
+        }
+
+        .company-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .company-address {
+            font-size: 12px;
+            line-height: 1.2;
+        }
+
+        .receipt-header {
+            text-align: right;
+            margin-top: -5%;
+        }
+
+        .receipt-title {
+            font-weight: bold;
+            font-size: 15px;
+            margin: 0;
+        }
+
+        .receipt-number {
+            font-weight: bold;
+            font-size: 10px;
+            margin: 2px 0;
+            color: red;
+        }
+
+        .bill-to-label {
+            font-weight: bold;
+            font-size: 10px;
+            margin-bottom: 5px;
+        }
+
+        .bill-to-line1 {
+            border-bottom: 1.5px solid #a19f9f;
             width: 50%;
+            height: 12px;
+            margin-top: -30px;
         }
 
-        .col-100 {
-            display: inline-block;
-            font-size: 13px;
-            width: 90%;
+        .bill-to-line2 {
+            border-bottom: 1.5px solid #a19f9f;
+            width: 50%;
+            height: 12px;
+            margin-top: -20px;
         }
 
-        .col-25 {
-            display: inline-block;
-            font-size: 13px;
-            width: 25%;
+        .date-section {
+            float: right;
+            display: inline-flex;
+            text-align: left;
         }
 
+        .date-label {
+            font-size: 10px;
+            font-weight: bold;
+            margin-top: 41px;
+        }
 
-        #table-detail {
-            border-spacing: 6%;
-            width: 96%;
-            margin-top: -13%;
+        .date-line {
+            margin-left: 30px;
+            margin-top: 50px;
+            border-bottom: 1.5px solid #a19f9f;
+            padding-left: 8px;
+            padding-right: 30px;
+            padding-top: 40px;
+            font-size: 11px;
+            height: 12px;
+        }
+
+        /* Table styling */
+        .items-table {
+            width: 100%;
             border: none;
+            border-collapse: collapse;
+            margin-top: 30px;
         }
 
-        #container .logo-container {
-            padding-top: -2%;
+        .table-header {
+            background-color: #000;
+            color: white;
+            font-weight: bold;
+            font-size: 11px;
             text-align: center;
-            vertical-align: middle;
         }
 
-        #container .logo-container img {
-            max-width: 160px;
-            max-height: 160px;
+        .table-header th {
+            padding: 8px 2px;
+            border: 1px solid #dbdada;
+        }
+
+        .items-table td {
+            padding: 8px 2px;
+            border: 1px solid #858484;
+            font-size: 12px;
+            height: 15px;
+        }
+
+        .index-col {
+            width: auto;
+            text-align: center;
+        }
+
+        .description-col {
+            width: 45%;
+        }
+
+        .qty-col {
+            width: 10.33%;
+            text-align: center;
+        }
+
+        .unit-col,
+        .amount-col {
+            width: 20.33%;
+            text-align: right;
+        }
+
+        /* Summary section */
+        .summary-section {
+            width: 40%;
+            margin-left: auto;
+            font-size: 11px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            /* margin-bottom: 3px; */
+            padding: 2px 5px;
+        }
+
+
+        .summary-row.total {
+            font-weight: bold;
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            background-color: #f0f0f0;
+        }
+
+        .sold-by {
+            text-align: left;
+            font-size: 9px;
+            font-weight: bold;
+            margin-bottom: 3px;
+            margin-top: -40px;
+        }
+
+        .slogan {
+            text-align: left;
+            font-size: 8px;
+            font-style: italic;
+        }
+
+        /* Customer info inline */
+        .customer-info {
+            padding-left: 12mm;
+            margin-bottom: 10px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            margin-bottom: 2px;
+        }
+
+        .info-left,
+        .info-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .info-left2 {
+            margin-top: 10px;
+        }
+
+        .info-right {
+            margin-right: 20px;
         }
     </style>
 </head>
 
 <body>
-    <div class="row">
-        <div id="container">
-            @if($pharmacy['logo'])
-                <div class="logo-container">
-                    <img src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
+
+    <!-- Header Section -->
+    <div class="header-section">
+        @if($pharmacy['logo'])
+            <div class="logo-container">
+                <img src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
+            </div>
+        @endif
+        <div class="company-info">
+            <div class="company-name">{{$pharmacy['name']}}</div>
+            <div class="company-address">
+                {{$pharmacy['address']}}<br>
+                {{$pharmacy['phone']}}<br>
+                <span>TIN: {{$pharmacy['tin_number']}}</span> |
+                <span>VRN: {{$pharmacy['vrn_number']}}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt Header -->
+    <div class="receipt-header">
+        <div class="receipt-title">RECEIPT</div>
+        @foreach($data as $datas => $dat)
+            <span style="font-size: 10px; font-weight: 400;">NO.</span><span class="receipt-number"> {{$datas}}</span>
+            @break
+        @endforeach
+    </div>
+    <div style="display: inline-flex;">
+        {{-- @dd($data) --}}
+        @foreach($data as $datas => $dat)
+            <!-- Bill To Section -->
+            <div class="bill-to-section">
+                <div class="bill-to-label">BILL TO:</div>
+                <div class="info-left">
+                    {{$dat[0]['customer'] ?? 'CASH'}}
+                </div>
+                <div class="bill-to-line1"></div>
+                <div class="info-left2">
+                    TIN: {{$dat[0]['customer_tin'] ?? 'N/A'}}
+                </div>
+                <div class="bill-to-line2"></div>
+            </div>
+
+            <!-- Date Section -->
+            <div class="date-section">
+                <div class="date-label">DATE:</div>
+                <div class="date-line">{{date('Y-m-d', strtotime($dat[0]['created_at']))}}</div>
+            </div>
+        @endforeach
+    </div>
+
+    <!-- Customer Information -->
+    @foreach($data as $datas => $dat)
+        <!-- Items Table -->
+        <table class="items-table">
+            <thead>
+                <tr class="table-header">
+                    <th class="index-col">#</th>
+                    <th class="description-col">DESCRIPTION</th>
+                    <th class="qty-col">QTY</th>
+                    <th class="unit-col">UNIT PRICE</th>
+                    <th class="amount-col">AMOUNT</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($dat as $item)
+                    <tr>
+                        <td class="index-col">{{$loop->iteration}}.</td>
+                        <td class="description-col">{{$item['name']}}</td>
+                        <td class="qty-col">{{number_format($item['quantity'], 0)}}</td>
+                        <td class="unit-col">{{number_format($item['price'] / $item['quantity'], 2)}}</td>
+                        <td class="amount-col">{{number_format($item['price'] * $item['quantity'], 2)}}</td>
+                    </tr>
+                @endforeach
+
+                @if(count($dat) < 5)
+                    <!-- Empty rows for spacing -->
+                    @for($i = 0; $i < 7 - count($dat); $i++)
+                        <tr>
+                            <td class="index-col"></td>
+                            <td class="description-col">&nbsp;</td>
+                            <td class="qty-col">&nbsp;</td>
+                            <td class="unit-col">&nbsp;</td>
+                            <td class="amount-col">&nbsp;</td>
+                        </tr>
+                    @endfor
+                @endif
+            </tbody>
+        </table>
+
+        <!-- Summary Section -->
+        <div class="summary-section" style="margin-top: 5px;">
+            <div class="summary-row">
+                <div>SUB TOTAL:</div>
+                <div style="float: right;">
+                    {{number_format(($dat[0]['grand_total'] - $dat[0]['total_vat'] + $dat[0]['discount_total']), 2)}}
+                </div>
+            </div>
+            @if($dat[0]['discount_total'] > 0)
+                <div class="summary-row">
+                    <div>DISCOUNT:</div>
+                    <div style="float: right;">{{number_format($dat[0]['discount_total'], 2)}}</div>
+                </div>
+            @endif
+            <div class="summary-row">
+                <span>VAT:</span>
+                <span style="float: right;">{{number_format($dat[0]['total_vat'], 2)}}</span>
+            </div>
+            <div class="summary-row total">
+                <span>TOTAL:</span>
+                <span style="float: right;">{{number_format($dat[0]['grand_total'], 2)}}</span>
+            </div>
+
+            @if($page == -1)
+                <div class="summary-row" style="margin-top: 10px;">
+                    <span>PAID:</span>
+                    <span style="float: right;">{{number_format($dat[0]['paid'], 2)}}</span>
+                </div>
+                <div class="summary-row">
+                    <span>BALANCE:</span>
+                    <span style="float: right;">{{number_format($dat[0]['grand_total'] - $dat[0]['paid'], 2)}}</span>
                 </div>
             @endif
         </div>
-    </div>
-    <div class="row" style="padding-top: -2%">
-        <h3 align="center">RECEIPT</h3>
-        <h3 align="center" style="margin-top: -2%">{{$pharmacy['name']}}</h3>
-        <h5 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h5>
-        <h6 align="center" style="margin-top: -2%">{{$pharmacy['phone']}}</h6>
-        <h5 align="center" style="margin-top: -2%">TIN: {{$pharmacy['tin_number']}}</h5>
-        <h5 align="center" style="margin-top: -2%">VRN: {{$pharmacy['vrn_number']}}</h5>
 
+        @break
+    @endforeach
+
+    <!-- Footer Section -->
+    <div class="footer-section">
         @foreach($data as $datas => $dat)
-
-                <!-- Container for the first row -->
-                <div
-                    style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-top: 10px;">
-                    <div style="flex: 1; padding-left: 3%;text-align: left;">
-                        <b>Customer TIN:</b>{{$data[$datas][0]['customer_tin'] ?? ' N/A'}}
-                    </div>
-                    <div style="text-align: right;">
-                        <b>Receipt #:</b> {{$datas}}
-                    </div>
-                </div>
-
-                <!-- Container for the customer information -->
-                <div
-                    style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-top: 5px;">
-                    <div style="flex: 1; padding-left: 3%;text-align: left;">
-
-                        @if($dat[0]['customer'])
-                            @if($dat[0]['customer'] == "CASH")
-                                <b>Payment Term: </b> CASH
-                            @endif
-
-                            @if($dat[0]['customer'] != "CASH")
-                                <b>Customer Name: </b> {{$dat[0]['customer']}}
-                            @endif
-                        @else
-                            <b>Payment Term: </b> CASH
-                        @endif
-                    </div>
-                    <div style="text-align: right;">
-                        <b>Sales Date:</b> {{date('j M, Y', strtotime($dat[0]['created_at']))}}
-                    </div>
-                </div>
-
-
-            </div>
-
-            <div class="row" style="margin-top: 13%">
-                <table class="table table-sm" id="table-detail" align="center">
-                    <tr>
-                        <th align="left">SN</th>
-                        <th align="left">Description</th>
-                        <th align="right">Quantity</th>
-                        <th align="right">Price</th>
-                        <th align="right">VAT</th>
-                        <th align="right">Amount</th>
-                    </tr>
-
-                    @foreach($dat as $item)
-                        <tr>
-                            <td align="left">{{$item['sn']}}</td>
-                            <td align="left">
-                                {{$item['name']}}
-                                {{ $item['brand'] ? $item['brand'] . " " : ""}}
-                                {{ $item['pack_size'] ? $item['pack_size'] : ""}}{{ $item['sales_uom'] ? $item['sales_uom'] : ""}}
-                            </td>
-                            <td align="right">{{$item['quantity']}}</td>
-                            <td align="right">{{number_format($item['price'], 2)}}</td>
-                            <td align="right">{{number_format($item['vat'], 2)}}</td>
-                            <td align="right">{{number_format($item['amount'], 2)}}</td>
-                        </tr>
-                    @endforeach
+            <div class="sold-by">Issued By: {{$dat[0]['sold_by']}}</div>
+            <div class="slogan">{{$pharmacy['slogan'] ?? 'Thank you for your business'}}</div>
+            @break
         @endforeach
-        </table>
     </div>
-    <div class="full-row" style="padding-top: 0%">
-        <div class="col-25"></div>
-        <div class="col-50"></div>
-        <div class="col-25">
-            <div class="full-row" style="background-color: #f2f2f2; padding: 6px;">
-                <div class="col-50" align="left"><b>Sub Total: </b></div>
-                <div class="col-50" align="right">
-                    {{number_format(($dat[0]['grand_total'] - $dat[0]['total_vat'] + $dat[0]['discount_total']), 2)}}</div>
-            </div>
-        </div>
-    </div>
-    <div class="full-row" style="padding-top: 0%">
-        <div class="col-25"></div>
-        <div class="col-50"></div>
-        <div class="col-25">
-            <div class="full-row" style=" padding: 6px;">
-                <div class="col-50" align="left"><b>Discount: </b></div>
-                <div class="col-50" align="right">{{number_format(($dat[0]['discount_total']), 2)}}</div>
-            </div>
-        </div>
-    </div>
-    <div class="full-row">
-        <div class="col-25"></div>
-        <div class="col-50"></div>
-        <div class="col-25">
-            <div class="full-row" style="background-color: #f2f2f2; padding: 6px;">
-                <div class="col-50" align="left"><b>VAT: </b></div>
-                <div class="col-50" align="right">{{number_format($dat[0]['total_vat'], 2)}}</div>
-            </div>
-        </div>
-    </div>
-    <div class="full-row">
-        <div class="col-25"></div>
-        <div class="col-50"></div>
-        <div class="col-25">
-            <div class="full-row" style=" padding: 6px;">
-                <div class="col-50" align="left"><b>Total:</b></div>
-                <div class="col-50" align="right">{{number_format(($dat[0]['grand_total']), 2)}}</div>
-            </div>
-        </div>
-    </div>
-
-    @if($page == -1)
-        <hr>
-        <div class="full-row" style="padding-top: 1%">
-            <div class="col-25"></div>
-            <div class="col-50"></div>
-            <div class="col-25">
-                <div class="full-row" style="background-color: #f2f2f2;">
-                    <div class="col-50" align="left"><b>Paid: </b></div>
-                    <div class="col-50" align="right">{{number_format($dat[0]['paid'], 2)}}</div>
-                </div>
-            </div>
-        </div>
-        <div class="full-row" style="padding-top: 0%">
-            <div class="col-25"></div>
-            <div class="col-50"></div>
-            <div class="col-25">
-                <div class="full-row">
-                    <div class="col-50" align="left"><b>Balance: </b></div>
-                    <div class="col-50" align="right">{{number_format($dat[0]['grand_total'] - $dat[0]['paid'], 2)}}</div>
-                </div>
-            </div>
-        </div>
-        <hr>
-        <p><b>Remarks:</b> {{$dat[0]['remark']}}</p>
-    @endif
-
-    <h6 align="center">Sold By: {{$dat[0]['sold_by']}}</h6>
-    <h6 align="center" style="font-style: italic; margin-top: -2%">{{$pharmacy['slogan']}}</h6>
 
 </body>
 

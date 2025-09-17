@@ -10,9 +10,9 @@
         }
 
         body {
-            font-size: 10px;
+            font-size: 12px;
             margin: 0;
-            padding: 10px;
+            padding: 12px;
         }
 
         * {
@@ -22,7 +22,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 9px;
+            font-size: 10px;
         }
 
         th,
@@ -38,7 +38,7 @@
         hr {
             border: none;
             border-bottom: 1px dashed #000;
-            margin: 4px 0;
+            margin: 3px 0;
         }
 
         h3,
@@ -48,6 +48,20 @@
             margin: 2px 0;
             font-weight: normal;
             text-align: center;
+        }
+
+        /* Align numeric columns */
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        /* Reduce spacing for thermal */
+        #footer-detail td {
+            padding: 2px 0;
         }
     </style>
 </head>
@@ -66,7 +80,7 @@
                     <td>
                         <span>Receipt #:</span> {{$datas}}<br>
                         <span>Customer:</span> {{$dat[0]['customer'] ?? 'CASH'}}<br>
-                        <span>TIN:</span> {{$dat[0]['customer_tin']}}<br>
+                        <span>TIN:</span> {{$dat[0]['customer_tin'] ?? 'N/A'}}<br>
                         <span>Date:</span> {{date('Y-m-d', strtotime($dat[0]['created_at']))}}
                     </td>
                 </tr>
@@ -76,16 +90,16 @@
                 <thead>
                     <tr>
                         <th align="left">Description</th>
-                        <th align="center">Qty</th>
-                        <th align="right">Amount</th>
+                        <th class="text-center">Qty</th>
+                        <th class="text-right">Amount</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($dat as $item)
                         <tr>
-                            <td>{{$item['name']}} {{$item['pack_size']}}{{$item['sales_uom']}}</td>
-                            <td align="center">{{number_format($item['quantity'], 0)}}</td>
-                            <td align="right">{{number_format($item['sub_total'], 2)}}</td>
+                            <td>{{$item['name']}} {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}</td>
+                            <td class="text-center">{{number_format($item['quantity'], 0)}}</td>
+                            <td class="text-right">{{number_format($item['sub_total'], 2)}}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -93,29 +107,29 @@
             <hr>
             <table id="footer-detail">
                 <tbody>
+                    <tr>
+                        <td>Sub Total</td>
+                        <td class="text-right">{{number_format($dat[0]['grand_total'] - $dat[0]['total_vat'] + $dat[0]['discount_total'], 2)}}</td>
+                    </tr>
+                    @if($dat[0]['discount_total'] > 0)
                         <tr>
-                            <td align="left">Sub Total</td>
-                            <td align="right">{{number_format($dat[0]['grand_total'] - $dat[0]['total_vat'] + $dat[0]['discount_total'], 2)}}</td>
+                            <td>Discount</td>
+                            <td class="text-right">{{number_format($dat[0]['discount_total'], 2)}}</td>
                         </tr>
-                        @if($dat[0]['discount_total'] > 0)
-                            <tr>
-                                <td align="left">Discount</td>
-                                <td align="right">{{number_format($dat[0]['discount_total'], 2)}}</td>
-                            </tr>
-                        @endif
-                        <tr>
-                            <td align="left">VAT</td>
-                            <td align="right">{{number_format($dat[0]['total_vat'], 2)}}</td>
-                        </tr>
-                        <tr>
-                            <td align="left"><b>Total</b></td>
-                            <td align="right"><b>{{number_format($dat[0]['grand_total'], 2)}}</b></td>
-                        </tr>
+                    @endif
+                    <tr>
+                        <td>VAT</td>
+                        <td class="text-right">{{number_format($dat[0]['total_vat'], 2)}}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Total</b></td>
+                        <td class="text-right"><b>{{number_format($dat[0]['grand_total'], 2)}}</b></td>
+                    </tr>
                 </tbody>
             </table>
             <hr>
-            <h5>Issued By {{$dat[0]['sold_by']}}</h5>
-            <h5 style="font-style: italic">{{$pharmacy['slogan']}}</h5>
+            <h5>Issued By: {{$dat[0]['sold_by']}}</h5>
+            <h5 style="font-style: italic;">{{$pharmacy['slogan'] ?? 'Thank you for your business'}}</h5>
         @endforeach
     </div>
 </body>

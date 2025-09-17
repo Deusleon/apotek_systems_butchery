@@ -176,49 +176,7 @@ class SaleController extends Controller
         return back();
 
     }
-
-    // public function getCreditSale(Request $request)
-    // {
-
-    //     $from = $request->date[0];
-    //     $to = $request->date[1];
-
-    //     if ($request->ajax()) {
-    //         if ($request->id) {
-    //             $sales = Sale::join('sales_credits', 'sales_credits.sale_id', '=', 'sales.id')
-    //                 ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '>=', $from)
-    //                 ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '<=', $to)
-    //                 ->join('customers', 'customers.id', '=', 'sales.customer_id')
-    //                 ->where('customer_id', $request->id)
-    //                 ->groupBy('sale_id')
-    //                 ->orderBy('sales.id', 'DESC')
-    //                 ->get();
-    //         } else {
-    //             $sales = Sale::where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '>=', $from)
-    //                 ->where(DB::Raw("DATE_FORMAT(date,'%Y/%m/%d')"), '<=', $to)
-    //                 ->join('sales_credits', 'sales_credits.sale_id', '=', 'sales.id')
-    //                 ->join('customers', 'customers.id', '=', 'sales.customer_id')
-    //                 ->groupBy('sale_id')
-    //                 ->orderBy('sales.id', 'DESC')
-    //                 ->get();
-    //         }
-
-    //         foreach ($sales as $sale) {
-    //             $outstanding = SalesCredit::where('sale_id', $sale->sale_id)->orderBy('id', 'desc')->first('balance');
-    //             $discount = SalesDetail::where('sale_id', $sale->sale_id)->sum('discount');
-    //             $amount = SalesDetail::where('sale_id', $sale->sale_id)->sum('amount');
-    //             $sale->paid_amount = SalesCredit::where('sale_id', $sale->sale_id)->sum('paid_amount');
-    //             $sale->balance = $outstanding->balance;
-    //             $sale->total_amount = $amount - $discount;
-    //         }
-
-    //         $data = json_decode($sales, true);
-
-    //         return $data;
-    //     }
-    // }
-
-      
+ 
     public function getCreditSale(Request $request)
     {
         $store_id = current_store_id();
@@ -759,14 +717,12 @@ class SaleController extends Controller
         return View::make('sales.sales_history.index')
             ->with(compact('vat'))->with(compact('customers'));
     }
-
     public function creditsTracking()
     {
         $customers = Customer::where('total_credit', '>', 0)->get();
         return View::make('sales.credit_tracking.index')
             ->with(compact('customers'));
     }
-
     public function getCashReceipt($page)
     {
 
@@ -798,6 +754,8 @@ class SaleController extends Controller
         }
 
         $sale_detail = SalesDetail::where('sale_id', $id)->get();
+        // $sale_date = Sale::select('date')->where('id', $id)->get();
+            // dd($id);
         $sales = array();
         $grouped_sales = array();
         $sn = 0;
@@ -835,7 +793,7 @@ class SaleController extends Controller
                 'paid' => $paid,
                 'balance' => $balance,
                 'remark' => $remark,
-                'created_at' => date('Y/m/d', strtotime($item->sale['date']))
+                'created_at' => $item->sale['date']
             ));
         }
         Log::info('Details', $sales);
@@ -852,10 +810,12 @@ class SaleController extends Controller
         if ($receipt_size === '58mm Thermal Paper') {
             if ($page === "-1") {
                 $pdf = PDF::loadView('sales.cash_sales.credit_receipt_thermal',
-                    compact('data', 'pharmacy', 'page'));
+                    compact('data', 'pharmacy', 'page'))
+                    ->setPaper([0, 0, 163, 600], '');
             } else {
                 $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
-                    compact('data', 'pharmacy', 'page'));
+                    compact('data', 'pharmacy', 'page'))
+                    ->setPaper([0, 0, 163, 600], '');
             }
 
             return $pdf->stream($receipt_no . '.pdf');
@@ -863,11 +823,13 @@ class SaleController extends Controller
         }
         else if ($receipt_size === '80mm Thermal Paper') {
             if ($page === "-1") {
-                $pdf = PDF::loadView('sales.cash_sales.credit_receipt_thermal',
-                    compact('data', 'pharmacy', 'page'));
+                $pdf = PDF::loadView('sales.cash_sales.credit_receipt_thermal_80',
+                    compact('data', 'pharmacy', 'page'))
+                    ->setPaper([0, 0, 227, 600], '');
             } else {
-                $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
-                    compact('data', 'pharmacy', 'page'));
+                $pdf = PDF::loadView('sales.cash_sales.receipt_thermal_80',
+                    compact('data', 'pharmacy', 'page'))
+                    ->setPaper([0, 0, 227, 600], '');
             }
 
             return $pdf->stream($receipt_no . '.pdf');
@@ -875,11 +837,13 @@ class SaleController extends Controller
         }
         else if ($receipt_size === 'A4 / Letter') {
             if ($page === "-1") {
-                $pdf = PDF::loadView('sales.cash_sales.credit_receipt',
-                    compact('data', 'pharmacy', 'page'));
+                $pdf = PDF::loadView('sales.cash_sales.credit_receipt_A4',
+                    compact('data', 'pharmacy', 'page'))
+                    ->setPaper( 'a4', '' );
             } else {
-                $pdf = PDF::loadView('sales.cash_sales.receipt',
-                    compact('data', 'pharmacy', 'page'));
+                $pdf = PDF::loadView('sales.cash_sales.receipt_A4',
+                    compact('data', 'pharmacy', 'page'))
+                    ->setPaper( 'a4', '' );
             }
 
             return $pdf->stream($receipt_no . '.pdf');
@@ -888,10 +852,12 @@ class SaleController extends Controller
         else if ($receipt_size === 'A5 / Half Letter') {
             if ($page === "-1") {
                 $pdf = PDF::loadView('sales.cash_sales.credit_receipt',
-                    compact('data', 'pharmacy', 'page'));
+                    compact('data', 'pharmacy', 'page'))
+                    ->setPaper( 'a5', '' );
             } else {
                 $pdf = PDF::loadView('sales.cash_sales.receipt',
-                    compact('data', 'pharmacy', 'page'));
+                    compact('data', 'pharmacy', 'page'))
+                    ->setPaper( 'a5', '' );
             }
 
             return $pdf->stream($receipt_no . '.pdf');
@@ -903,7 +869,6 @@ class SaleController extends Controller
         }
 
     }
-
     public function getCreditReceipt()
     {
         $receipt_size = Setting::where('id', 119)->value('value');
@@ -959,5 +924,4 @@ class SaleController extends Controller
             compact('data', 'pharmacy'));
         return $pdf->download('Recept.pdf');
     }
-
 }
