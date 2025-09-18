@@ -659,7 +659,6 @@ function discount() {
         } else {
             customer = JSON.parse(document.getElementById("customer_id").value);
         }
-
         max_credit = customer.credit_limit - customer.total_credit || 0;
         balance = total - sale_paid_amount;
         if (balance > max_credit) {
