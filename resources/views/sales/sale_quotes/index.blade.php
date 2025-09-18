@@ -270,7 +270,7 @@
                     }
 
                     sub_total += (price * quantity);
-                    total_vat += (vat * quantity);
+                    total_vat += vat;
                     total += (amount);
                 });
 
@@ -551,7 +551,6 @@
                 discount();
 
                 $("#products").val(null).trigger("change");
-                // console.log('Product added to cart:', item);
             }
 
             // Function to load products based on price category

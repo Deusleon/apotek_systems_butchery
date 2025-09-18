@@ -575,7 +575,7 @@ class SaleController extends Controller
                     ->setPaper([0, 0, 227, 600], '');
                 return $pdf->stream($request->reprint_receipt . '.pdf');
             } else if ($receipt_size == 'A5 / Half Letter') {
-                $pdf = PDF::loadView('sales.cash_sales.receipt_A5',
+                $pdf = PDF::loadView('sales.cash_sales.receipt',
                     compact('data', 'pharmacy', 'page'))
                     ->setPaper('a5', '');
                 return $pdf->stream($request->reprint_receipt . '.pdf');

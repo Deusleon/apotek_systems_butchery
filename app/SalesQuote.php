@@ -24,7 +24,7 @@ class SalesQuote extends Model
                 ->select('sales_quotes.id', 'quote_id', 'name',DB::raw('COALESCE(sum(discount),0.00) as discount'),
                 	     DB::raw('COALESCE(sum(amount),0.00) as sub_total'),
                 	     DB::raw('COALESCE(sum(vat),0.00) as vat'),
-                	     DB::raw('COALESCE(sum(amount+vat-discount),0.00) as amount')
+                	     DB::raw('COALESCE(sum(amount-discount),0.00) as amount')
                 	 )
                 ->groupBy('quote_id');
    }

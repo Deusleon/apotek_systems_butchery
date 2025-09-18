@@ -267,7 +267,12 @@
             </div>
         @endforeach
     </div>
-
+    @php
+        $subTotal = 0;
+        $vat = 0;
+        $discount = 0;
+        $grandTotal = 0;
+    @endphp
     <!-- Customer Information -->
     @foreach($data as $datas => $dat)
         <!-- Items Table -->
@@ -287,9 +292,15 @@
                         <td class="index-col">{{$loop->iteration}}.</td>
                         <td class="description-col">{{$item['name']}}</td>
                         <td class="qty-col">{{number_format($item['quantity'], 0)}}</td>
-                        <td class="unit-col">{{number_format($item['price'] / $item['quantity'], 2)}}</td>
+                        <td class="unit-col">{{number_format($item['price'], 2)}}</td>
                         <td class="amount-col">{{number_format($item['price'] * $item['quantity'], 2)}}</td>
                     </tr>
+                    @php
+                    $subTotal += $item['sub_total'];
+                    $vat += $item['vat'];
+                    $discount += $item['discount'];
+                    $grandTotal += ($item['sub_total']-$item['discount'])+$item['vat'];
+                    @endphp
                 @endforeach
 
                 @if(count($dat) < 5)
@@ -312,22 +323,22 @@
             <div class="summary-row">
                 <div>SUB TOTAL:</div>
                 <div style="float: right;">
-                    {{number_format(($dat[0]['grand_total'] - $dat[0]['total_vat'] + $dat[0]['discount_total']), 2)}}
+                    {{number_format(($subTotal), 2)}}
                 </div>
+            </div>
+            <div class="summary-row">
+                <span>VAT:</span>
+                <span style="float: right;">{{number_format($vat, 2)}}</span>
             </div>
             @if($dat[0]['discount_total'] > 0)
                 <div class="summary-row">
                     <div>DISCOUNT:</div>
-                    <div style="float: right;">{{number_format($dat[0]['discount_total'], 2)}}</div>
+                    <div style="float: right;">{{number_format($discount, 2)}}</div>
                 </div>
             @endif
-            <div class="summary-row">
-                <span>VAT:</span>
-                <span style="float: right;">{{number_format($dat[0]['total_vat'], 2)}}</span>
-            </div>
             <div class="summary-row total">
                 <span>TOTAL:</span>
-                <span style="float: right;">{{number_format($dat[0]['grand_total'], 2)}}</span>
+                <span style="float: right;">{{number_format($grandTotal, 2)}}</span>
             </div>
 
             @if($page == -1)
