@@ -644,6 +644,9 @@ class SaleQuoteController extends Controller {
                 array_push( $sales, array(
                     'receipt_number' => $item->quote[ 'quote_number' ],
                     'name' => $item->product[ 'name' ],
+                    'brand' => $item->product[ 'brand' ],
+                    'pack_size' => $item->product[ 'pack_size' ],
+                    'sales_uom' => $item->product[ 'sales_uom' ],
                     'sn' => $sn,
                     'quantity' => $item->quantity,
                     'vat' => $vat,
