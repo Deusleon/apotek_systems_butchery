@@ -345,9 +345,7 @@ Invoice Management
             {
                 data: "action",
                 defaultContent: "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm' size='2'/>" +
-                    "@if(auth()->user()->checkPermission('Manage Invoice'))" +
-                    "<input type='button' value='Edit' id='edit_btn' class='btn btn-primary btn-rounded btn-sm' size='2' />" +
-                    "@endif"
+                    "<input type='button' value='Edit' id='edit_btn' class='btn btn-primary btn-rounded btn-sm' size='2' />" 
             }
             //
             ,
