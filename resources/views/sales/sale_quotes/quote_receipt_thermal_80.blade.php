@@ -58,7 +58,12 @@
     <h5>{{$pharmacy['phone']}}</h5>
     <h5>TIN: {{$pharmacy['tin_number']}}</h5>
     <h5>VRN: {{$pharmacy['vrn_number']}}</h5>
-
+    @php
+        $subTotal = 0;
+        $vat = 0;
+        $discount = 0;
+        $grandTotal = 0;
+    @endphp
     @foreach($data as $datas => $dat)
         <table>
             <tr>
@@ -86,10 +91,16 @@
                     <tr>
                         <td>{{$item['name']}} {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}</td>
                         <td class="text-center">{{number_format($item['quantity'], 0)}}</td>
-                        <td class="text-right">{{number_format($item['price']/$item['quantity'], 2)}}</td>
+                        <td class="text-right">{{number_format($item['price'], 2)}}</td>
                         {{-- <td class="text-right">{{number_format($item['vat'], 2)}}</td> --}}
-                        <td class="text-right">{{number_format($item['amount'], 2)}}</td>
+                        <td class="text-right">{{number_format($item['quantity'] * $item['price'], 2)}}</td>
                     </tr>
+                    @php
+                    $subTotal += $item['sub_total'];
+                    $vat += $item['vat'];
+                    $discount += $item['discount'];
+                    $grandTotal += ($item['sub_total']-$item['discount'])+$item['vat'];
+                    @endphp
                 @endforeach
             </tbody>
         </table>
@@ -100,22 +111,22 @@
                 <tr>
                     <td>Sub Total</td>
                     <td class="text-right">
-                        {{number_format(($dat[0]['grand_total'] - $dat[0]['total_vat'] + $dat[0]['discount_total']), 2)}}
+                        {{number_format($subTotal, 2)}}
                     </td>
+                </tr>
+                <tr>
+                    <td>VAT</td>
+                    <td class="text-right">{{number_format($vat, 2)}}</td>
                 </tr>
                 @if($dat[0]['discount_total'] > 0)
                 <tr>
                     <td>Discount</td>
-                    <td class="text-right">{{number_format($dat[0]['discount_total'], 2)}}</td>
+                    <td class="text-right">{{number_format($discount, 2)}}</td>
                 </tr>
                 @endif
                 <tr>
-                    <td>VAT</td>
-                    <td class="text-right">{{number_format($dat[0]['total_vat'], 2)}}</td>
-                </tr>
-                <tr>
                     <td><b>Total</b></td>
-                    <td class="text-right"><b>{{number_format($dat[0]['grand_total'], 2)}}</b></td>
+                    <td class="text-right"><b>{{number_format($grandTotal, 2)}}</b></td>
                 </tr>
             </tbody>
         </table>

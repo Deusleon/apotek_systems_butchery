@@ -32,7 +32,7 @@ function getHistory(range) {
 
 var saleHistoryTable = $("#sale_history_dataTable").DataTable({
     responsive: true,
-    order: [[0, "asc"]],
+    order: [[2, "desc"]],
     searching: true,
     columns: [
         { title: "Receipt #", searchable: true },

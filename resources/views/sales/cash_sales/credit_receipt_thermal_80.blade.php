@@ -105,7 +105,7 @@
                         <tr>
                             <td>{{$item['name']}} {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}</td>
                             <td class="text-center">{{number_format($item['quantity'], 0)}}</td>
-                            <td class="text-right">{{number_format($item['sub_total'], 2)}}</td>
+                            <td class="text-right">{{number_format($item['price'] * $item['quantity'], 2)}}</td>
                         </tr>
                     @endforeach
                 </tbody>

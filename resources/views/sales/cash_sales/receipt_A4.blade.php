@@ -287,7 +287,7 @@
                         <td class="index-col">{{$loop->iteration}}.</td>
                         <td class="description-col">{{$item['name']}}</td>
                         <td class="qty-col">{{number_format($item['quantity'], 0)}}</td>
-                        <td class="unit-col">{{number_format($item['price'] / $item['quantity'], 2)}}</td>
+                        <td class="unit-col">{{number_format($item['price'], 2)}}</td>
                         <td class="amount-col">{{number_format($item['price'] * $item['quantity'], 2)}}</td>
                     </tr>
                 @endforeach

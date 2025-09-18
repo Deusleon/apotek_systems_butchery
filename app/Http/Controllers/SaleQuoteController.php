@@ -327,7 +327,6 @@ class SaleQuoteController extends Controller {
 
     //Convert Sales Order to Sale ( Cash or Credit )
     public function convertToSale( $id ) {
-
     }
 
     //Store sales order data
@@ -364,15 +363,16 @@ class SaleQuoteController extends Controller {
             //Saving Quote Details
             foreach ( $cart as $bought ) {
                 $bought[ 'quantity' ] = str_replace( ',', '', $bought[ 'quantity' ] );
-                $discount_share = (($bought['price'] / $total) * $discount)*$bought['quantity'];
+                $qty = $bought['quantity'];
+                $unit_discount = (($bought['amount'] / ($total ?: 1)) * $discount) / $bought['quantity'];
                 $details = new SalesQuoteDetail;
                 $details->quote_id = $quote;
                 $details->product_id = $bought[ 'product_id' ];
                 $details->quantity = $bought[ 'quantity' ];
                 $details->price = $bought['price'];
-                $details->vat = $details->price * $vat;
+                $details->vat = ($details->price * $vat)*$bought['quantity'];
                 $details->amount = ($bought['price'] * $bought['quantity']) + $details->vat;
-                $details->discount = round($discount_share, 2);
+                $details->discount = $unit_discount * $qty;
                 $details->save();
             }
 
@@ -407,7 +407,7 @@ class SaleQuoteController extends Controller {
         ->where( 'sales_quote_details.status', '1' )
         ->get();
 
-        $sub_total = $quote_details->sum( 'amount' );
+        $sub_amount = $quote_details->sum( 'amount' );
             
         $total_vat = $quote_details->sum( 'vat' );
 
@@ -430,7 +430,8 @@ class SaleQuoteController extends Controller {
             $default_sale_type = PriceCategory::first()->value( 'id' );
         }
 
-        $total = ($sub_total + $total_vat)-$discount;
+        $total = $sub_amount - $discount;
+        $sub_total = $sub_amount - $total_vat;
 
         $price_category = PriceCategory::all();
         $sale_quotes = SalesQuote::where( 'id', $id )->orderBy( 'id', 'DESC' )->get();
@@ -563,7 +564,7 @@ class SaleQuoteController extends Controller {
             } else {
                 $vat_percent = $item->vat / $item->price;
             }
-            $sub_total = ( $amount / ( 1 + $vat_percent ) );
+            $sub_total = $item->price * $item->quantity;
             $vat = $amount - $sub_total;
             $sn++;
 
@@ -578,7 +579,7 @@ class SaleQuoteController extends Controller {
                 'price' => $item->price,
                 'amount' => $amount,
                 'sub_total' => $sub_total,
-                'grand_total' => ( $item->quote[ 'cost' ][ 'amount' ] ) - ( $item->quote[ 'cost' ][ 'discount' ] ),
+                'grand_total' => ( $item->quote[ 'amount' ] - $item->quote[ 'discount' ] ),
                 'total_vat' => ( $item->quote[ 'cost' ][ 'vat' ] ),
                 'sold_by' => $item->quote[ 'user' ][ 'name' ],
                 'customer' => $item->quote[ 'customer' ][ 'name' ],
@@ -637,8 +638,8 @@ class SaleQuoteController extends Controller {
                 } else {
                     $vat_percent = $item->vat / $item->price;
                 }
-                $sub_total = ( $amount / ( 1 + $vat_percent ) );
-                $vat = $amount - $sub_total;
+                $sub_total = $item->amount  - $item->vat;
+                $vat = $item->amount - $sub_total;
                 $sn++;
                 array_push( $sales, array(
                     'receipt_number' => $item->quote[ 'quote_number' ],
@@ -649,7 +650,7 @@ class SaleQuoteController extends Controller {
                     'discount' => $item->discount,
                     'discount_total' => $item->quote[ 'cost' ][ 'discount' ],
                     'price' => $item->price,
-                    'amount' => $amount,
+                    'amount' => $item->amount,
                     'sub_total' => $sub_total,
                     'grand_total' => ( $item->quote[ 'cost' ][ 'amount' ] ) - ( $item->quote[ 'cost' ][ 'discount' ] ),
                     'total_vat' => ( $item->quote[ 'cost' ][ 'vat' ] ),
