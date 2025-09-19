@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Product Details Report</title>
 
     <style>
-
         body {
             font-size: 12px;
         }
@@ -14,10 +14,15 @@
         }
 
 
-        table, th, td {
+        table,
+        th,
+        td {
             /*border: 1px solid black;*/
             border-collapse: collapse;
             padding: 10px;
+        }
+        th{
+            text-align: left;
         }
 
         table {
@@ -33,7 +38,7 @@
             display: table-header-group;
             background: #1f273b;
             color: white;
-            font-size: 0.9em
+            font-size: 12px;
         }
 
         tfoot {
@@ -67,52 +72,43 @@
         h4 {
             font-weight: normal;
         }
-
     </style>
 
 </head>
+
 <body>
 
 
-<div class="row" style="padding-top: -2%">
-    <h1 align="center">{{$pharmacy['name']}}</h1>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
-    <h2 align="center" style="margin-top: -1%">Product Details Report</h2>
-    <h4 align="center" style="margin-top: -1%">For {{$data[0]['category']}} Category</h4>
+    <div class="row" style="padding-top: -2%">
+        <h1 align="center">{{$pharmacy['name']}}</h1>
+        <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
+        <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
+        <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}</h3>
+        <h2 align="center" style="margin-top: -1%">Product Details Report</h2>
+        <h4 align="center" style="margin-top: -1%">Category: {{$data[0]['category']}}</h4>
 
-    <div class="row" style="margin-top: 10%;">
-        <div class="col-md-12">
-            <table id="table-detail" align="center">
-                <thead>
-                <tr style="background: #1f273b; color: white;">
-                    <th>Code</th>
-                    <th>Product Name</th>
-                    {{--                <th>Generic Name</th>--}}
-                    {{--                <th>Indication</th>--}}
-                </tr>
-                </thead>
-                <!-- loop the product names here -->
-                {{--            @foreach($data as $datas => $dat)--}}
-                {{--                <tr>--}}
-                {{--                    <td style="border: none" colspan="5" id="category"><b>{{$datas}}</b></td>--}}
-                {{--                </tr>--}}
-                @foreach($data as $item)
-                    <tr>
-                        <td>{{$item['product_id']}}</td>
-                        <td>{{$item['name']}}</td>
-                    {{--                    <td align="right">{{$item['generic_name']}}</td>--}}
-                    {{--                    <td align="right">{{$item['indication']}}</td>--}}
-                    {{--                </tr>--}}
-                @endforeach
-                {{--            @endforeach--}}
-            </table>
+        <div class="row" style="margin-top: 8%;">
+            <div class="col-md-12">
+                <table id="table-detail" align="center">
+                    <thead>
+                        <tr style="background: #1f273b; color: white;">
+                            <th>#</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                        </tr>
+                    </thead>
+                    @foreach($data as $item)
+                        <tr>
+                            <td>{{$loop->iteration}}.</td>
+                            <td>{{$item['name'].' ' ?? ''}}{{$item['brand'].' ' ?? ''}}{{$item['pack_size'] ?? ''}}{{$item['sales_uom']}}</td>
+                            <td>{{$item['category']}}</td>
+                    @endforeach
+                </table>
+            </div>
         </div>
     </div>
-</div>
 
-<script type="text/php">
+    <script type="text/php">
     if ( isset($pdf) ) {
         $x = 280;
         $y = 820;
@@ -124,12 +120,10 @@
         $char_space = 0.0;  //  default
         $angle = 0.0;   //  default
         $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
-
-
-     }
+    }
 
 </script>
 
 </body>
-</html>
 
+</html>

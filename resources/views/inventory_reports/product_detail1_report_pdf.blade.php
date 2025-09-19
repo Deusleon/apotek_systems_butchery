@@ -19,6 +19,9 @@
             border-collapse: collapse;
             padding: 10px;
         }
+        th{
+            text-align: left;
+        }
 
         table {
             page-break-inside: auto
@@ -33,7 +36,7 @@
             display: table-header-group;
             background: #1f273b;
             color: white;
-            font-size: 0.9em
+            font-size: 12px;
         }
 
         tfoot {
@@ -80,12 +83,13 @@
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
     <h2 align="center" style="margin-top: -1%">Product Details Report</h2>
 
-    <div class="row" style="margin-top: 10%;">
+    <div class="row" style="margin-top: 8%;">
         <div class="col-md-12">
-            <table id="table-detail" align="center">
+            <table id="table-detail" align="">
                 <thead>
                 <tr style="background: #1f273b; color: white;">
-                    <th>Code</th>
+                    {{-- <th>Code</th> --}}
+                    <th>#</th>
                     <th>Product Name</th>
                     <th>Category</th>
                     {{--                <th>Indication</th>--}}

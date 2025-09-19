@@ -224,7 +224,7 @@
 
     <!-- Receipt Header -->
     <div class="receipt-header">
-        <div class="receipt-title">RECEIPT</div>
+        <div class="receipt-title">CASH RECEIPT</div>
         @foreach($data as $datas => $dat)
             <span style="font-size: 10px; font-weight: 400;">NO.</span><span class="receipt-number"> {{$datas}}</span>
             @break

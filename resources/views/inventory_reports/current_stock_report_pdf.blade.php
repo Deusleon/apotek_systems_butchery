@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Current Stock Report</title>
 
     <style>
-
         body {
             font-size: 12px;
         }
@@ -14,10 +14,16 @@
         }
 
 
-        table, th, td {
+        table,
+        th,
+        td {
             /*border: 1px solid black;*/
             border-collapse: collapse;
             padding: 10px;
+        }
+
+        th {
+            text-align: left;
         }
 
         table {
@@ -33,7 +39,7 @@
             display: table-header-group;
             background: #1f273b;
             color: white;
-            font-size: 0.9em
+            font-size: 12px;
         }
 
         tfoot {
@@ -67,57 +73,59 @@
         h4 {
             font-weight: normal;
         }
-
     </style>
 
 </head>
+
 <body>
 
-<div class="row" style="padding-top: -2%">
-    <h1 align="center">{{$pharmacy['name']}}</h1>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
-    <h2 align="center" style="margin-top: -1%">Current Stock Report</h2>
-    <h4 align="center" style="margin-top: -1%">For {{$data[0]['category']}} Category</h4>
+    <div class="row" style="padding-top: -2%">
+        <h1 align="center">{{$pharmacy['name']}}</h1>
+        <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
+        <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
+        <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}</h3>
+        <h2 align="center" style="margin-top: -1%">Current Stock Report</h2>
+        <h4 align="center" style="margin-top: -1%">Branch: {{$store}} Category: {{$category}}</h4>
 
-    <div class="row" style="margin-top: 10%;">
-        <div class="col-md-12">
-            <table id="table-detail" align="center">
-                <thead>
-                <tr style="background: #1f273b; color: white;">
-                    <th>Code</th>
-                    <th>Product Name</th>
-                    <th>Expiry Date</th>
-                    <th>Quantity</th>
-                    <th>Batch No</th>
-                    <th>Shelf No</th>
-                </tr>
-                </thead>
+        <div class="row" style="margin-top: 8%;">
+            <div class="col-md-12">
+                <table id="table-detail">
+                    <thead>
+                        <tr style="background: #1f273b; color: white;">
+                            <th>#</th>
+                            {{-- <th>Code</th> --}}
+                            <th>Product Name</th>
+                            {{-- <th>Batch No</th> --}}
+                            {{-- <th style="text-align: center">Expiry Date</th> --}}
+                            <th style="text-align: center">Quantity</th>
+                        </tr>
+                    </thead>
 
-                @foreach($data as $item)
-                    <tr>
-                        <td>{{ $item['product_id'] }}</td>
-                        <td>{{$item['name']}}</td>
-                        @if($item['expiry_date'] === null)
-                            <td align="" style="font-size: 0.9em"></td>
-                        @else
-                            <td align="" style="font-size: 0.9em">{{date('d-m-Y',strtotime($item['expiry_date']))}}</td>
-                        @endif
-                        <td align="right">
-                            <div style="margin-right: 50%">{{number_format($item['quantity'])}}</div>
-                        </td>
-                        <td align="">{{$item['batch_number']}}</td>
-                        <td align="">{{$item['shelf_no']}}</td>
-                    </tr>
-                @endforeach
-                {{--            @endforeach--}}
-            </table>
+                    @foreach($data as $item)
+                        <tr>
+                            <td>{{$loop->iteration}}.</td>
+                            {{-- <td>{{ $item['product_id'] }}</td> --}}
+                            <td>{{$item['name']}} {{$item['brand'] ?? ''}}
+                                {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}
+                            </td>
+                            {{-- <td>{{$item['batch_number']}}</td> --}}
+                            {{-- @if($item['expiry_date'] === null) --}}
+                                {{-- <td align="center"></td>
+                            @else
+                                <td align="center">{{date('Y-m-d', strtotime($item['expiry_date']))}}</td>
+                            @endif --}}
+                            <td align="center">
+                                <div>{{number_format($item['quantity'])}}</div>
+                            </td>
+                        </tr>
+                    @endforeach
+                    {{-- @endforeach--}}
+                </table>
+            </div>
         </div>
     </div>
-</div>
 
-<script type="text/php">
+    <script type="text/php">
     if ( isset($pdf) ) {
         $x = 280;
         $y = 820;
@@ -138,5 +146,5 @@
 </script>
 
 </body>
-</html>
 
+</html>

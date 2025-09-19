@@ -525,8 +525,8 @@ class SaleController extends Controller
                 $sn++;
                 array_push($sales, array(
                     'receipt_number' => $item->sale['receipt_number'],
-                    'name' => $item->currentStock['product']['brand'],
-                    'brand' => $item->currentStock['product']['name'],
+                    'name' => $item->currentStock['product']['name'],
+                    'brand' => $item->currentStock['product']['brand'],
                     'pack_size' => $item->currentStock['product']['pack_size'],
                     'sales_uom' => $item->currentStock['product']['sales_uom'],
                     'sn' => $sn,
