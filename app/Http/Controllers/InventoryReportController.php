@@ -14,13 +14,12 @@ use App\StockTracking;
 use App\StockTransfer;
 use App\StockCountSchedule;
 use App\Store;
-use FPDF;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade as PDF;
-use PDFMerger;
 
 ini_set('max_execution_time', 500);
 set_time_limit(500);
@@ -33,8 +32,9 @@ class InventoryReportController extends Controller
     {
 
         $products = DB::table('product_ledger')
-            ->select('product_id', 'product_name')
-            ->groupby('product_id', 'product_name')
+            ->join('inv_products', 'inv_products.id', '=', 'product_ledger.product_id')
+            ->select('product_id', 'product_name', 'brand', 'pack_size', 'sales_uom')
+            ->groupby(['product_id', 'product_name'])
             ->get();
 
         $store = Store::all();
@@ -51,83 +51,95 @@ class InventoryReportController extends Controller
 
     protected function reportOption(Request $request)
     {
+    $pharmacy['name'] = Setting::where('id', 100)->value('value');
+    $pharmacy['address'] = Setting::where('id', 106)->value('value');
+    $pharmacy['phone'] = Setting::where('id', 107)->value('value');
+    $pharmacy['email'] = Setting::where('id', 108)->value('value');
+    $pharmacy['website'] = Setting::where('id', 109)->value('value');
+    $pharmacy['logo'] = Setting::where('id', 105)->value('value');
+    $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
 
         switch ($request->report_option) {
             case 1:
-                //current stock by store
+                $store_name = Store::where('id', $request->store_name)
+                            ->first();
+                $store = $store_name->name;
+                //current stock
                 if ($request->category_name == null) {
-                    $data_og = $this->currentStockByStoreReport($request->store_name);
-                    if ($data_og == []) {
+                    $data = $this->currentStockByStoreReport($request->store_name);
+                    if ($data == []) {
                         return response()->view('error_pages.pdf_zero_data');
                     }
-                    $view = 'inventory_reports.current_stock_by_store_report_pdf';
-                    $output = 'current_stock_by_store_report.pdf';
-                    $this->splitPdf($data_og, $view, $output);
-                    break;
+                    $pdf = PDF::loadView( 'inventory_reports.current_stock_by_store_report_pdf',
+                    compact( 'data', 'store', 'pharmacy' ) )
+                    ->setPaper( 'a4', '' );
+                    return $pdf->stream( 'current_stock_by_store_report.pdf' );
                 } else {
-                    //current stock
-                    $data_og = $this->currentStockReport($request->category_name);
-                    if ($data_og == []) {
+                    $category_name = Category::where('id', $request->category_name)
+                                ->first();
+                    $category = $category_name->name;
+                    $data = $this->currentStockReport($request->store_name, $request->category_name);
+                    if ($data == []) {
                         return response()->view('error_pages.pdf_zero_data');
                     }
-                    $view = 'inventory_reports.current_stock_report_pdf';
-                    $output = 'current_stock_report.pdf';
-                    $this->splitPdf($data_og, $view, $output);
-                    break;
+                    $pdf = PDF::loadView( 'inventory_reports.current_stock_report_pdf',
+                    compact( 'data', 'store', 'category', 'pharmacy' ) )
+                    ->setPaper( 'a4', '' );
+                    return $pdf->stream( 'current_stock_report.pdf' );
                 }
             case 2:
-                //product detail
-                $data_og = $this->productDetailReport($request->category_name_detail);
-                if ($data_og == []) {
+                $data = $this->productDetailReport($request->category_name_detail);
+                if ($data == []) {
                     return response()->view('error_pages.pdf_zero_data');
                 }
                 if ($request->category_name_detail != null) {
-                    $view = 'inventory_reports.product_detail_report_pdf';
-                    $output = 'product_details_report.pdf';
+                    $pdf = PDF::loadView( 'inventory_reports.product_detail_report_pdf',
+                    compact( 'data',  'pharmacy' ) )
+                    ->setPaper( 'a4', '' );
+                    return $pdf->stream( 'product_details_report.pdf' );
                 } else {
-                    $view = 'inventory_reports.product_detail1_report_pdf';
-                    $output = 'product_details_report.pdf';
+                    $pdf = PDF::loadView( 'inventory_reports.product_detail1_report_pdf',
+                    compact( 'data',  'pharmacy' ) )
+                    ->setPaper( 'a4', '' );
+                    return $pdf->stream( 'product_details_report.pdf' );
                 }
-
-                $this->splitPdf($data_og, $view, $output);
-                break;
             case 3:
                 //product ledger
-                $data_og = $this->productLedgerReport($request->product);
-                $view = 'inventory_reports.product_ledger_report_pdf';
-                $output = 'product_ledger_report.pdf';
-                $this->splitPdf($data_og, $view, $output);
-                break;
+                $data = $this->productLedgerReport($request->product);
+                $pdf = PDF::loadView( 'inventory_reports.product_ledger_report_pdf',
+                compact( 'data',  'pharmacy' ) )
+                ->setPaper( 'a4', '' );
+                return $pdf->stream( 'product_ledger_report.pdf' );
             case 4:
                 //expired product
-                $data_og = $this->expiredProductReport();
-                if ($data_og->isEmpty()) {
+                $data = $this->expiredProductReport();
+                if ($data->isEmpty()) {
                     return response()->view('error_pages.pdf_zero_data');
                 }
-                $view = 'inventory_reports.expiry_product_report_pdf';
-                $output = 'expiry_product.pdf';
-                $this->splitPdf($data_og, $view, $output);
-                break;
+                $pdf = PDF::loadView( 'inventory_reports.expiry_product_report_pdf',
+                compact( 'data',  'pharmacy' ) )
+                ->setPaper( 'a4', '' );
+                return $pdf->stream( 'expiry_product.pdf' );
             case 5:
                 //out of stock
-                $data_og = $this->outOfStockReport();
-                if ($data_og->isEmpty()) {
+                $data = $this->outOfStockReport();
+                if ($data->isEmpty()) {
                     return response()->view('error_pages.pdf_zero_data');
                 }
-                $view = 'inventory_reports.outofstock_report_pdf';
-                $output = 'outofstock_report.pdf';
-                $this->splitPdf($data_og, $view, $output);
-                break;
+                $pdf = PDF::loadView( 'inventory_reports.outofstock_report_pdf',
+                compact( 'data',  'pharmacy' ) )
+                ->setPaper( 'a4', '' );
+                return $pdf->stream( 'outofstock_report.pdf' );
             case 6:
                 //outgoing tracking report
-                $data_og = $this->outgoingTrackingReport();
-                if ($data_og->isEmpty()) {
+                $data = $this->outgoingTrackingReport();
+                if ($data->isEmpty()) {
                     return response()->view('error_pages.pdf_zero_data');
                 }
-                $view = 'inventory_reports.outgoing_stocktracking_report_pdf';
-                $output = 'outgoing_stocktracking_report.pdf';
-                $this->splitPdf($data_og, $view, $output);
-                break;
+                $pdf = PDF::loadView( 'inventory_reports.outgoing_stocktracking_report_pdf',
+                compact( 'data',  'pharmacy' ) )
+                ->setPaper( 'a4', '' );
+                return $pdf->stream( 'outgoing_stocktracking_report.pdf' );
             case 7:
                 //stock adjustment report
                 $dates = explode(" - ", $request->adjustment_date);
@@ -226,149 +238,211 @@ class InventoryReportController extends Controller
         }
     }
 
+    // private function currentStockByStoreReport($store)
+    // {
+    //     $query = CurrentStock::with(['product', 'store'])
+    //             ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+    //             ->join('inv_categories', 'inv_categories.id', '=', 'inv_products.category_id')
+    //             ->select('inv_current_stock.*', 'inv_products.*','inv_categories.name as category');
+
+    //     if (!($store == 1 || $store === '1')) {
+    //         $query->where('store_id', $store);
+    //     }
+        
+    //     $current_stocks = $query->orderBy('product_id', 'asc')->get();
+    //     $results_data = array();
+    //     // dd($current_stocks);
+
+    //     foreach ($current_stocks as $current_stock) {
+    //         array_push($results_data, array(
+    //             'stock_id' => $current_stock->id,
+    //             'product_id' => $current_stock->product->id ?? '',
+    //             'store' => $current_stock->store->name ?? '',
+    //             'name' => $current_stock->product->name ?? '',
+    //             'brand' => $current_stock->product->brand ?? '',
+    //             'pack_size' => $current_stock->product->pack_size ?? '',
+    //             'sales_uom' => $current_stock->product->sales_uom ?? '',
+    //             'category' => $current_stock->category ?? '',
+    //             'expiry_date' => $current_stock->expiry_date,
+    //             'quantity' => $current_stock->quantity,
+    //             'batch_number' => $current_stock->batch_number,
+    //             'shelf_no' => $current_stock->shelf_number
+    //         ));
+    //     }
+
+    //     return $results_data;
+    // }
+
     private function currentStockByStoreReport($store)
     {
-        $current_stocks = CurrentStock::where('store_id', $store)->get();
-        $stores = Store::all();
-        $ungrouped_result = array();
-        $grouped_result = array();
+        $query = CurrentStock::with(['product', 'store'])
+            ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+            ->join('inv_categories', 'inv_categories.id', '=', 'inv_products.category_id')
+            ->select(
+                'inv_current_stock.product_id',
+                'inv_current_stock.store_id',
+                'inv_products.name',
+                'inv_products.brand',
+                'inv_products.pack_size',
+                'inv_products.sales_uom',
+                'inv_categories.name as category',
+                DB::raw('SUM(inv_current_stock.quantity) as total_quantity'),
+            );
 
+        if (!($store == 1 || $store === '1')) {
+            $query->where('inv_current_stock.store_id', $store);
+        }
+
+        $current_stocks = $query->groupBy(
+            ['inv_current_stock.product_id',
+            ]
+        )
+        ->orderBy('inv_current_stock.product_id', 'asc')
+        ->get();
+
+        $results_data = [];
 
         foreach ($current_stocks as $current_stock) {
-            array_push($ungrouped_result, array(
-                'product_id' => $current_stock->product['id'],
-                'store' => $current_stock->store['name'],
-                'name' => $current_stock->product['name'],
-                'expiry_date' => $current_stock->expiry_date,
-                'quantity' => $current_stock->quantity,
+            array_push($results_data, [
+                'product_id'   => $current_stock->product_id,
+                'store'        => $current_stock->store->name ?? '',
+                'name'         => $current_stock->name ?? '',
+                'brand'        => $current_stock->brand ?? '',
+                'pack_size'    => $current_stock->pack_size ?? '',
+                'sales_uom'    => $current_stock->sales_uom ?? '',
+                'category'     => $current_stock->category ?? '',
+                'expiry_date'  => $current_stock->expiry_date,
+                'quantity'     => $current_stock->total_quantity,
                 'batch_number' => $current_stock->batch_number,
-                'shelf_no' => $current_stock->shelf_number
-            ));
+                'shelf_no'     => $current_stock->shelf_number
+            ]);
         }
 
-//        foreach ($ungrouped_result as $val) {
-//            if (array_key_exists('store', $val)) {
-//                $grouped_result[$val['store']][] = $val;
-//            }
-//        }
-
-        return $ungrouped_result;
+        return $results_data;
     }
+    
+    // private function currentStockReport($store, $category)
+    // {
+    //     $query = CurrentStock::with(['product', 'store']);
 
-    public function splitPdf($data_og, $view, $output_file)
+    //     if (!($store == 1 || $store === '1')) {
+    //         $query->where('store_id', $store);
+    //     }
+        
+    //     $current_stocks = $query->orderBy('product_id', 'asc')->get();
+    //     $categories = Category::where('id', $category)->get();
+    //     $results_data = array();
+
+    //     foreach ($current_stocks as $current_stock) {
+    //         foreach ($categories as $category) {
+    //             if ($category->id == $current_stock->product->category_id ?? '') {
+    //                 array_push($results_data, array(
+    //                     'stock_id' => $current_stock->id,
+    //                     'product_id' => $current_stock->product->id ?? '',
+    //                     'category' => $category->name,
+    //                     'name' => $current_stock->product->name ?? '',
+    //                     'brand' => $current_stock->product->brand ?? '',
+    //                     'pack_size' => $current_stock->product->pack_size ?? '',
+    //                     'sales_uom' => $current_stock->product->sales_uom ?? '',
+    //                     'expiry_date' => $current_stock->expiry_date,
+    //                     'quantity' => $current_stock->quantity,
+    //                     'batch_number' => $current_stock->batch_number,
+    //                     'shelf_no' => $current_stock->shelf_number
+    //                 ));
+    //             }
+    //         }
+    //     }
+
+    //     return $results_data;
+
+    // }
+    private function currentStockReport($store, $category)
     {
+        $query = CurrentStock::join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+            ->join('inv_categories', 'inv_categories.id', '=', 'inv_products.category_id')
+            ->select(
+                'inv_current_stock.product_id',
+                'inv_current_stock.store_id',
+                'inv_products.name',
+                'inv_products.brand',
+                'inv_products.pack_size',
+                'inv_products.sales_uom',
+                'inv_categories.id as category_id',
+                'inv_categories.name as category',
+                DB::raw('SUM(inv_current_stock.quantity) as total_quantity')
+            );
 
-        $pharmacy['name'] = Setting::where('id', 100)->value('value');
-        $pharmacy['address'] = Setting::where('id', 106)->value('value');
-        $pharmacy['phone'] = Setting::where('id', 107)->value('value');
-        $pharmacy['email'] = Setting::where('id', 108)->value('value');
-        $pharmacy['website'] = Setting::where('id', 109)->value('value');
-        $pharmacy['logo'] = Setting::where('id', 105)->value('value');
-        $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
-
-        $pdfs = new PDFMerger();
-//        $pharmacy = GeneralSetting::all();
-        $count = 0;
-
-        if ($data_og instanceof Collection) {
-            /*if collection then chunk*/
-            $datas = $data_og->chunk(500);
-            ob_end_clean();
-            (new FPDF)->AddPage();
-        } else {
-            /*chunk the array*/
-            $datas = array_chunk($data_og, 500);
-            ob_end_clean();
-            (new FPDF)->AddPage();
+        if (!($store == 1 || $store === '1')) {
+            $query->where('inv_current_stock.store_id', $store);
         }
 
-        foreach ($datas as $data) {
-            $count = $count + 1;
-            $pdf = PDF::loadView($view,
-                compact('data', 'pharmacy'));
-            $output = $pdf->output();
-            Storage::put('pdfs/pdf' . $count . '.pdf', $output);
-
+        if (!($category == 0 || $category === '0')) {
+            $query->where('inv_categories.id', $category);
         }
 
+        $current_stocks = $query->groupBy(
+            'inv_current_stock.product_id'
+        )
+        ->orderBy('inv_current_stock.product_id', 'asc')
+        ->get();
 
-        /*load files to merge*/
-        $pdf_files = Storage::files('pdfs');
-        if (sizeof($pdf_files) != 0) {
-            foreach ($pdf_files as $pdf_file) {
-                $pdfs->addPDF(Storage::path($pdf_file), 'all');
-
-            }
-            $pdfs->merge('stream', $output_file);
-            Storage::delete(Storage::files('pdfs'));
-
-        }
-
-
-    }
-
-    private function currentStockReport($category)
-    {
-        $current_stocks = CurrentStock::all();
-        $categories = Category::where('id', $category)->get();
-        $ungrouped_result = array();
-        $grouped_result = array();
-
+        $results_data = [];
 
         foreach ($current_stocks as $current_stock) {
-            foreach ($categories as $category) {
-                if ($category->id == $current_stock->product['category_id']) {
-                    array_push($ungrouped_result, array(
-                        'product_id' => $current_stock->product['id'],
-                        'category' => $category->name,
-                        'name' => $current_stock->product['name'],
-                        'expiry_date' => $current_stock->expiry_date,
-                        'quantity' => $current_stock->quantity,
-                        'batch_number' => $current_stock->batch_number,
-                        'shelf_no' => $current_stock->shelf_number
-                    ));
-                }
-            }
+            array_push($results_data, [
+                'product_id'   => $current_stock->product_id,
+                'category'     => $current_stock->category,
+                'name'         => $current_stock->name ?? '',
+                'brand'        => $current_stock->brand ?? '',
+                'pack_size'    => $current_stock->pack_size ?? '',
+                'sales_uom'    => $current_stock->sales_uom ?? '',
+                'expiry_date'  => $current_stock->expiry_date,
+                'quantity'     => $current_stock->total_quantity,
+                'batch_number' => $current_stock->batch_number,
+                'shelf_no'     => $current_stock->shelf_number
+            ]);
         }
 
-//        foreach ($ungrouped_result as $val) {
-//            if (array_key_exists('category', $val)) {
-//                $grouped_result[$val['category']][] = $val;
-//            }
-//        }
-
-        return $ungrouped_result;
-
+        return $results_data;
     }
+
 
     private function productDetailReport($category)
     {
-        if ($category != null) {
-            $products = Product::where('category_id', $category)->get();
-        } else {
-            $products = Product::all();
+        $store_id = current_store_id();
+        if (!is_all_store()) {
+            if ($category != null) {
+                $products = Product::join('inv_current_stock', 'inv_current_stock.product_id', '=', 'products.id')
+                            ->where('category_id', $category)
+                            ->where('inv_current_stock.store_id', $store_id)
+                            ->get();
+            } else {
+                $products = Product::join('inv_current_stock', 'inv_current_stock.product_id', '=', 'products.id')
+                            ->where('inv_current_stock.store_id', $store_id)
+                            ->get();
+            }
+        }else{
+            if ($category != null) {
+                $products = Product::where('category_id', $category)
+                            ->get();
+            } else {
+                $products = Product::all();
+            }
         }
-        $ungrouped_result = array();
-        $grouped_result = array();
+        $results_data = array();
 
         foreach ($products as $product) {
-            array_push($ungrouped_result, array(
+            array_push($results_data, array(
                 'product_id' => $product->id,
                 'name' => $product->name,
-                'category' => $product->category['name'],
-                'generic_name' => $product->generic_name,
-                'indication' => $product->indication
+                'brand' => $product->brand,
+                'pack_size' => $product->pack_size,
+                'sales_uom' => $product->sales_uom,
+                'category' => $product->category->name ?? ''
             ));
         }
 
-//        foreach ($ungrouped_result as $val) {
-//            if (array_key_exists('category', $val)) {
-//                $grouped_result[$val['category']][] = $val;
-//            }
-//        }
-
-        return $ungrouped_result;
-
+        return $results_data;
     }
 
     private function productLedgerReport($product_id)
@@ -385,12 +459,6 @@ class InventoryReportController extends Controller
             ->get();
 
         $ungrouped_result = $this->sumProductFilterTotal($product_ledger, $current_stock);
-
-//        foreach ($ungrouped_result as $val) {
-//            if (array_key_exists('name', $val)) {
-//                $grouped_result[$val['name']][] = $val;
-//            }
-//        }
 
         return $ungrouped_result;
 

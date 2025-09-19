@@ -252,7 +252,7 @@
 
     <!-- Receipt Header -->
     <div class="receipt-header">
-        <div class="receipt-title">CREDIT RECEIPT</div>
+        <div class="receipt-title">CREDIT INVOICE</div>
         @foreach($data as $datas => $dat)
             <span style="font-size: 12px; font-weight: 400;">NO.</span><span class="receipt-number"> {{$datas}}</span>
             @break

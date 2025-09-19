@@ -12,7 +12,8 @@
         body {
             font-size: 10px;
             margin: 0;
-            padding: 10px;
+            padding: 10px 30px 10px 10px;
+            font-weight: bold;
         }
 
         * {
@@ -55,11 +56,11 @@
 <body>
     <div style="width: 100%;">
         <h3><b>CASH RECEIPT</b></h3>
-        <h4>{{$pharmacy['name']}}</h4>
-        <h5>{{$pharmacy['address']}}</h5>
-        <h5>{{$pharmacy['phone']}}</h5>
-        <h5>TIN: {{$pharmacy['tin_number']}}</h5>
-
+        <h4><b>{{$pharmacy['name']}}</b></h4>
+        <h5><b>{{$pharmacy['address']}}</b></h5>
+        <h5><b>{{$pharmacy['phone']}}</b></h5>
+        <h5><b>TIN: {{$pharmacy['tin_number']}}</b></h5>
+        {{-- @dd($data) --}}
         @foreach($data as $datas => $dat)
             <table>
                 <tr>
@@ -114,8 +115,8 @@
                 </tbody>
             </table>
             <hr>
-            <h5>Issued By {{$dat[0]['sold_by']}}</h5>
-            <h5 style="font-style: italic">{{$pharmacy['slogan']}}</h5>
+            <h5><b>Issued By {{$dat[0]['sold_by']}}</b></h5>
+            <h5 style="font-style: italic; font-weight: bold;">{{$pharmacy['slogan']}}</h5>
         @endforeach
     </div>
 </body>

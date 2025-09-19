@@ -19,7 +19,7 @@
 @section("content")
 
     <style>
-        .datepicker > .datepicker-days {
+        .datepicker>.datepicker-days {
             display: block;
         }
 
@@ -56,14 +56,12 @@
             border-color: #748892;
             color: white;
         }
-
     </style>
 
     <div class="col-sm-12">
         <div class="card">
             <div class="card-body">
-                <form id="inventory_report_form" action="{{route('inventory-report-filter')}}"
-                      method="get" target="_blank">
+                <form id="inventory_report_form" action="{{route('inventory-report-filter')}}" method="get" target="_blank">
                     @csrf()
                     <div class="row">
                         <div class="col-md-8">
@@ -72,7 +70,7 @@
                                     <label for="report_option">Select Inventory Report</label>
                                     <div id="border" style="border: 2px solid white; border-radius: 6px;">
                                         <select id="report_option" name="report_option" onchange="reportOption()"
-                                                class="js-example-basic-single form-control drop">
+                                            class="js-example-basic-single form-control drop">
                                             <option selected="true" value="0" disabled="disabled">Select report</option>
                                             <option value="1">Current Stock</option>
                                             <option value="2">Product Details Report</option>
@@ -102,15 +100,15 @@
                                 <div class="form-group">
                                     <label for="product">Products<font color="red">*</font></label>
                                     <select id="product" name="product" onchange=""
-                                            class="js-example-basic-single form-control drop">
+                                        class="js-example-basic-single form-control drop">
                                         <option value="0" selected="true" disabled="disabled">Select product</option>
                                         @foreach($products as $product)
                                             <option value="{{$product->product_id}}">
-                                                {{$product->product_name}}</option>
+                                                {{$product->product_name.' ' ?? ''}}{{$product->brand.' ' ?? ''}}{{$product->pack_size ?? ''}}{{$product->sales_uom ?? ''}}
+                                            </option>
                                         @endforeach
                                     </select>
-                                    <span id="warning"
-                                          style="color: #ff0000; display: none">Please select a product</span>
+                                    <span id="warning" style="color: #ff0000; display: none">Please select a product</span>
                                 </div>
                             </div>
                         </div>
@@ -118,30 +116,34 @@
                     {{--current stock--}}
                     <div id="current-stock" style="display: none">
                         <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="store">Store<font color="red">*</font></label>
-                                    <select id="store-name" name="store_name" onchange=""
+                            @if (is_all_store())
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="store">Branch<font color="red">*</font></label>
+                                        <select id="store-name" name="store_name" onchange=""
                                             class="js-example-basic-single form-control drop">
-                                        <option value="0" selected="true" disabled="disabled">Select store</option>
-                                        @foreach($stores as $store)
-                                            <option value="{{$store->id}}">
-                                                {{$store->name}}</option>
-                                        @endforeach
-                                    </select>
-                                    <span id="warning-store"
-                                          style="color: #ff0000; display: none">Please select a store</span>
+                                            <option value="0" selected="true" disabled="disabled">Select Branch</option>
+                                            @foreach($stores as $store)
+                                                <option value="{{$store->id}}">
+                                                    {{$store->name}}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <span id="warning-store" style="color: #ff0000; display: none">Please select a
+                                            Branch</span>
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="category">Product Category</label>
                                     <select id="category-name" name="category_name" onchange=""
-                                            class="js-example-basic-single form-control drop">
+                                        class="js-example-basic-single form-control drop">
                                         <option value="0" selected="true" disabled="disabled">Select category</option>
                                         @foreach($categories as $category)
                                             <option value="{{$category->id}}">
-                                                {{$category->name}}</option>
+                                                {{$category->name}}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -154,15 +156,16 @@
                             <div class="form-group">
                                 <label for="category-detail">Product Category</label>
                                 <select id="category-name-detail" name="category_name_detail" onchange=""
-                                        class="js-example-basic-single form-control drop">
+                                    class="js-example-basic-single form-control drop">
                                     <option value="0" selected="true" disabled="disabled">Select category</option>
                                     @foreach($categories as $category)
                                         <option value="{{$category->id}}">
-                                            {{$category->name}}</option>
+                                            {{$category->name}}
+                                        </option>
                                     @endforeach
                                 </select>
-                                <span id="warning-detail"
-                                      style="color: #ff0000; display: none">Please select a category</span>
+                                <span id="warning-detail" style="color: #ff0000; display: none">Please select a
+                                    category</span>
                             </div>
                         </div>
                     </div>
@@ -173,8 +176,8 @@
                                 <div class="form-group">
                                     <label for="stock-issue-date">Date<font color="red">*</font></label>
                                     <div id="issue_date" style="border: 2px solid white; border-radius: 6px;">
-                                        <input type="text" name="issue_date" class="form-control"
-                                               id="d_auto_912" autocomplete="off" readonly>
+                                        <input type="text" name="issue_date" class="form-control" id="d_auto_912"
+                                            autocomplete="off" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -182,7 +185,7 @@
                                 <div class="form-group">
                                     <label for="stock-issue">Status</label>
                                     <select id="stock-issues" name="stock_issue" onchange=""
-                                            class="js-example-basic-single form-control drop">
+                                        class="js-example-basic-single form-control drop">
                                         <option value="0" selected="true" disabled="disabled">Select status</option>
                                         <option value="1">Issued</option>
                                         <option value="2">Returned</option>
@@ -198,8 +201,8 @@
                                 <div class="form-group">
                                     <label for="stock-transfer-date">Date<font color="red">*</font></label>
                                     <div id="transfer_date" style="border: 2px solid white; border-radius: 6px;">
-                                        <input type="text" name="transfer_date" class="form-control"
-                                               id="d_auto_9121" autocomplete="off" readonly>
+                                        <input type="text" name="transfer_date" class="form-control" id="d_auto_9121"
+                                            autocomplete="off" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -207,7 +210,7 @@
                                 <div class="form-group">
                                     <label for="stock-transfer">Status</label>
                                     <select id="stock-transfers" name="stock_transfer" onchange=""
-                                            class="js-example-basic-single form-control drop">
+                                        class="js-example-basic-single form-control drop">
                                         <option value="0" selected="true" disabled="disabled">Select status</option>
                                         <option value="2">Completed</option>
                                         <option value="1">Pending</option>
@@ -223,21 +226,21 @@
                                 <div class="form-group">
                                     <label for="stock-adjustment">Adjustment Type<font color="red">*</font></label>
                                     <select id="stock-adjustments" name="stock_adjustment" onchange=""
-                                            class="js-example-basic-single form-control drop">
+                                        class="js-example-basic-single form-control drop">
                                         <option value="0" selected="true" disabled="disabled">Select type</option>
                                         <option value="Negative">Negative</option>
                                         <option value="Positive">Positive</option>
                                     </select>
-                                    <span id="warning-details"
-                                          style="color: #ff0000; display: none">Please select a type</span>
+                                    <span id="warning-details" style="color: #ff0000; display: none">Please select a
+                                        type</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="stock-adjustment-date">Date<font color="red">*</font></label>
                                     <div id="date" style="border: 2px solid white; border-radius: 6px;">
-                                        <input type="text" name="adjustment_date" class="form-control"
-                                               id="d_auto_91" autocomplete="off" readonly>
+                                        <input type="text" name="adjustment_date" class="form-control" id="d_auto_91"
+                                            autocomplete="off" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -245,7 +248,7 @@
                                 <div class="form-group">
                                     <label for="stock-adjustment-reason">Adjustment Type</label>
                                     <select id="stock-adjustments-reason" name="stock_adjustment_reason" onchange=""
-                                            class="js-example-basic-single form-control drop">
+                                        class="js-example-basic-single form-control drop">
                                         <option value="0" selected="true" disabled="disabled">Select reason</option>
                                         @foreach($reasons as $reason)
                                             <option value="{{$reason->reason}}">{{$reason->reason}}</option>
@@ -263,10 +266,10 @@
                         </div>
                         <div class="col-md-2">
                             {{--<a href="" target="_blank">--}}
-                            <button class="btn btn-secondary" style="width: 100%">
-                                Show
-                            </button>
-                            {{--</a>--}}
+                                <button class="btn btn-secondary" style="width: 100%">
+                                    Show
+                                </button>
+                                {{--</a>--}}
                         </div>
                     </div>
                 </form>
