@@ -11,27 +11,27 @@ $(document).ready(function () {
     $("#d_auto").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: "YYYY-MM-DD",
+        format: "yyyy-mm-dd",
         changeYear: true,
     });
 
     $("#date_edit").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: "YYYY-MM-DD",
+        format: "yyyy-mm-dd",
         changeYear: true,
     });
 
     $("#due_date").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: "YYYY-MM-DD",
+        format: "yyyy-mm-dd",
         changeYear: true,
     });
     $("#expire_d").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: "YYYY-MM-DD",
+        format: "yyyy-mm-dd",
         changeYear: true,
         startDate: tomorrow,
     });
@@ -53,14 +53,14 @@ $(document).ready(function () {
     $("#expire_date_2").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: "YYYY-MM-DD",
+        format: "yyyy-mm-dd",
         changeYear: true,
     });
 
     $("#credit_sale_date").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: "YYYY-MM-DD",
+        format: "yyyy-mm-dd",
         changeYear: true,
         endDate: new Date(),
     });
@@ -69,7 +69,7 @@ $(document).ready(function () {
     $("#cash_sale_date").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: "YYYY-MM-DD",
+        format: "yyyy-mm-dd",
         changeYear: true,
         endDate: new Date(),
     });
@@ -78,49 +78,49 @@ $(document).ready(function () {
     $("#rec_d").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: "YYYY-MM-DD",
+        format: "yyyy-mm-dd",
         changeYear: true,
     });
 
     $("#d_auto_1").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: "YYYY-MM-DD",
+        format: "yyyy-mm-dd",
         changeYear: true,
     });
 
     $("#d_auto_2").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: "YYYY-MM-DD",
+        format: "yyyy-mm-dd",
         changeYear: true,
     });
 
     $("#d_auto_3").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: "YYYY-MM-DD",
+        format: "yyyy-mm-dd",
         changeYear: true,
     });
 
     $("#d_auto_4").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: "YYYY-MM-DD",
+        format: "yyyy-mm-dd",
         changeYear: true,
     });
 
     $("#d_auto_5").datepicker({
         autoclose: true,
         todayHighlight: true,
-        format: "YYYY-MM-DD",
+        format: "yyyy-mm-dd",
         changeYear: true,
     });
 
     $("#d_auto_6")
         .datepicker({
             todayHighlight: true,
-            format: "YYYY-MM-DD",
+            format: "yyyy-mm-dd",
             changeYear: true,
         })
         .on("change", function () {

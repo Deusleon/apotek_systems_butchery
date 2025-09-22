@@ -203,11 +203,12 @@
 
         $(function () {
 
-            var start = moment();
-            var end = moment();
+            var start = moment().startOf('month');
+            var end = moment().endOf('month');
 
             function cb(start, end) {  
                     $('#expense_date').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
+                    getExpenseDate();
             }
 
             $('#expense_date').daterangepicker({
@@ -215,6 +216,9 @@
                 endDate: moment().endOf('month'),
                 maxDate: end,
                 autoUpdateInput: true,
+                locale: {
+                    format: 'YYYY/MM/DD'
+                },
                 ranges: {
                     'Today': [moment(), moment()],
                     'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -227,6 +231,11 @@
             }, cb);
 
             cb(start, end);
+
+            $('#expense_date').on('apply.daterangepicker', function (ev, picker) {
+                $(this).val(picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD'));
+                getExpenseDate(); // update table on selection
+            });
 
         });
 
@@ -299,42 +308,41 @@
             });
         });
 
-        /*get expense date*/
+        /* Get expense date range and call AJAX */
         function getExpenseDate() {
-            var dates = document.querySelector('input[name=date_of_expense]').value;
-            dates = dates.split('-');
+            var value = $('#expense_date').val();
+            if (!value) return;
+
+            var dates = value.split('-').map(d => d.trim()); // trim spaces
             filterExpenseDate(dates);
-            // console.log(dates);
         }
 
-        /*ajax request from, to dates */
+        /* AJAX request to backend */
         function filterExpenseDate(dates) {
+            var from_date = moment(dates[0], 'YYYY/MM/DD').format('YYYY-MM-DD');
+            var to_date   = moment(dates[1], 'YYYY/MM/DD').format('YYYY-MM-DD');
 
-            var ajaxurl = '{{route('expense-date-filter')}}';
             $('#loading').show();
+
             $.ajax({
-                url: ajaxurl,
-                type: "get",
-                dataType: "json",
+                url: '{{ route("expense-date-filter") }}',
+                type: 'GET',
+                dataType: 'json',
                 data: {
-                    from_date: dates[0],
-                    to_date: dates[1]
+                    from_date: from_date,
+                    to_date: to_date
                 },
                 success: function (data) {
-                    document.getElementById("tbody-header-expense").style.display = 'block';
-
+                    $('#tbody-header-expense').show();
                     bindDataFilter(data[0][0]);
-
-
                 },
                 complete: function () {
                     $('#loading').hide();
                 }
             });
-
         }
 
-        /*bind expense filter results*/
+        /* Bind filtered data to DataTable */
         function bindDataFilter(data) {
             table_expense_filter.clear();
             table_expense_filter.rows.add(data);

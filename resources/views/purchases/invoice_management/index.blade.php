@@ -206,8 +206,8 @@ Invoice Management
 
 
     $(function() {
-        var start = moment();
-        var end = moment();
+        var start = moment().startOf('month');
+        var end = moment().endOf('month');
 
         function cb(start, end) {
             $('#date_filter').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
@@ -217,6 +217,9 @@ Invoice Management
             startDate: moment().startOf('month'),
             endDate: moment().endOf('month'),
             autoUpdateInput: true,
+            locale: {
+                format: 'YYYY/MM/DD'
+            },
             ranges: {
                 'Today': [moment(), moment()],
                 'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -229,6 +232,13 @@ Invoice Management
         }, cb);
 
         cb(start, end);
+
+        $('#date_filter').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(
+                picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD')
+            );
+            getInvoice();
+        });
 
     });
 
@@ -258,20 +268,28 @@ Invoice Management
     });
 
     $('input[name="invoice_filter_due_date"]').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.endDate.format('YYYY/MM/DD') + ' - ' + picker.startDate.format('YYYY/MM/DD'));
+        $(this).val(
+            picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD')
+        );
         filterByDueDate();
     });
 
 
     function getInvoice() {
+        var range = document.getElementById("date_filter").value.trim();
+        if (!range) return;
 
-        var range = document.getElementById("date_filter").value;
-        var date = range.split('-');
+        var dates = range.split(' - ');
+
+        // Convert for backend (DB expects YYYY-MM-DD)
+        var start = moment(dates[0], 'YYYY/MM/DD').format('YYYY-MM-DD');
+        var end   = moment(dates[1], 'YYYY/MM/DD').format('YYYY-MM-DD');
+
         $.ajax({
             url: "{{ route('getInvoice') }}",
             data: {
                 "_token": '{{ csrf_token() }}',
-                "date": date
+                "date": [start, end]
             },
             type: 'get',
             dataType: 'json',
@@ -281,23 +299,29 @@ Invoice Management
                 invoice_data_table.draw();
             }
         });
-
     }
 
+
     function filterByDueDate() {
+        var range = document.getElementById("due_date_filter").value.trim();
+        var range1 = document.getElementById("date_filter").value.trim();
+        if (!range || !range1) return;
 
-        var range = document.getElementById("due_date_filter").value;
-        var date = range.split('-');
+        var dueDates = range.split(' - ');
+        var invoiceDates = range1.split(' - ');
 
-        var range1 = document.getElementById("date_filter").value;
-        var date1 = range1.split('-');
+        var dueStart = moment(dueDates[0], 'YYYY/MM/DD').format('YYYY-MM-DD');
+        var dueEnd   = moment(dueDates[1], 'YYYY/MM/DD').format('YYYY-MM-DD');
+
+        var invStart = moment(invoiceDates[0], 'YYYY/MM/DD').format('YYYY-MM-DD');
+        var invEnd   = moment(invoiceDates[1], 'YYYY/MM/DD').format('YYYY-MM-DD');
 
         $.ajax({
             url: '{{ route("get-invoice-by-due-date") }}',
             data: {
                 "_token": '{{ csrf_token() }}',
-                "date": date,
-                'date1': date1
+                "date": [dueStart, dueEnd],
+                "date1": [invStart, invEnd]
             },
             type: 'get',
             dataType: 'json',
@@ -306,9 +330,8 @@ Invoice Management
                 invoice_data_table.rows.add(data);
                 invoice_data_table.draw();
             }
-        });
-
-    }
+    });
+}
 
     var invoice_data_table = $('#invoice_data_table').DataTable({
         searching: true,
