@@ -104,7 +104,7 @@
                                         <option value="0" selected="true" disabled="disabled">Select product</option>
                                         @foreach($products as $product)
                                             <option value="{{$product->product_id}}">
-                                                {{$product->product_name.' ' ?? ''}}{{$product->brand.' ' ?? ''}}{{$product->pack_size ?? ''}}{{$product->sales_uom ?? ''}}
+                                                {{$product->product_name . ' ' ?? ''}}{{$product->brand . ' ' ?? ''}}{{$product->pack_size ?? ''}}{{$product->sales_uom ?? ''}}
                                             </option>
                                         @endforeach
                                     </select>
@@ -224,24 +224,25 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="stock-adjustment">Adjustment Type<font color="red">*</font></label>
-                                    <select id="stock-adjustments" name="stock_adjustment" onchange=""
-                                        class="js-example-basic-single form-control drop">
-                                        <option value="0" selected="true" disabled="disabled">Select type</option>
-                                        <option value="Negative">Negative</option>
-                                        <option value="Positive">Positive</option>
-                                    </select>
-                                    <span id="warning-details" style="color: #ff0000; display: none">Please select a
-                                        type</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
                                     <label for="stock-adjustment-date">Date<font color="red">*</font></label>
                                     <div id="date" style="border: 2px solid white; border-radius: 6px;">
                                         <input type="text" name="adjustment_date" class="form-control" id="d_auto_91"
                                             autocomplete="off" readonly>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="stock-adjustment">Adjustment Type</label>
+                                    <select id="stock-adjustments" name="stock_adjustment" onchange=""
+                                        class="js-example-basic-single form-control drop">
+                                        <option value="0" selected="true" disabled="disabled">Select type</option>
+                                        <option value="">All</option>
+                                        <option value="decrease">Negative</option>
+                                        <option value="increase">Positive</option>
+                                    </select>
+                                    <span id="warning-details" style="color: #ff0000; display: none">Please select a
+                                        type</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -306,9 +307,11 @@
             $('#d_auto_91').daterangepicker({
                 showDropdowns: true,
                 maxDate: end,
-                autoUpdateInput: false,
+                autoUpdateInput: true,
+                startDate: moment().startOf('month'),
+                endDate: moment().endOf('month'),
                 locale: {
-                    format: 'DD-M-YYYY'
+                    format: 'YYYY/MM/DD'
                 },
                 ranges: {
                     'Today': [moment(), moment()],
@@ -323,7 +326,7 @@
         });
 
         $('input[name="adjustment_date"]').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+            $(this).val(picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD'));
         });
 
         $(function () {
@@ -333,9 +336,11 @@
             $('#d_auto_912').daterangepicker({
                 showDropdowns: true,
                 maxDate: end,
-                autoUpdateInput: false,
+                autoUpdateInput: true,
+                startDate: moment().startOf('month'),
+                endDate: moment().endOf('month'),
                 locale: {
-                    format: 'DD-M-YYYY'
+                    format: 'YYYY/MM/DD'
                 },
                 ranges: {
                     'Today': [moment(), moment()],
@@ -350,7 +355,7 @@
         });
 
         $('input[name="issue_date"]').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+            $(this).val(picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD'));
         });
 
         $(function () {
@@ -360,9 +365,11 @@
             $('#d_auto_9121').daterangepicker({
                 showDropdowns: true,
                 maxDate: end,
-                autoUpdateInput: false,
+                autoUpdateInput: true,
+                startDate: moment().startOf('month'),
+                endDate: moment().endOf('month'),
                 locale: {
-                    format: 'DD-M-YYYY'
+                    format: 'YYYY/MM/DD'
                 },
                 ranges: {
                     'Today': [moment(), moment()],
@@ -377,65 +384,128 @@
         });
 
         $('input[name="transfer_date"]').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+            $(this).val(picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD'));
         });
+
+        // function reportOption() {
+        //     var report_option = document.getElementById("report_option");
+        //     var report_option_index = report_option.options[report_option.selectedIndex].value;
+
+        //     if (Number(report_option_index) !== Number(0)) {
+        //         document.getElementById('border').style.borderColor = 'white';
+        //     }
+
+        //     //if product ledger
+        //     if (Number(report_option_index) === Number(3)) {
+        //         document.getElementById('product_ledger').style.display = 'block';
+        //     } else {
+        //         document.getElementById('product_ledger').style.display = 'none';
+        //         document.getElementById('warning').style.display = 'none';
+
+        //     }
+
+        //     //if current stock
+        //     if (Number(report_option_index) === Number(1)) {
+        //         document.getElementById('current-stock').style.display = 'block';
+        //     } else {
+        //         document.getElementById('current-stock').style.display = 'none';
+        //         document.getElementById('warning-store').style.display = 'none';
+
+        //     }
+
+        //     /*product detail*/
+        //     if (Number(report_option_index) === Number(2)) {
+        //         document.getElementById('product-detail').style.display = 'block';
+        //     } else {
+        //         document.getElementById('product-detail').style.display = 'none';
+        //         document.getElementById('warning-detail').style.display = 'none';
+
+        //     }
+
+        //     /*stock issue*/
+        //     if (Number(report_option_index) === Number(8)) {
+        //         document.getElementById('stock-issue').style.display = 'block';
+        //     } else {
+        //         document.getElementById('stock-issue').style.display = 'none';
+        //     }
+
+        //     /*stock transfer*/
+        //     if (Number(report_option_index) === Number(9)) {
+        //         document.getElementById('stock-transfer').style.display = 'block';
+        //     } else {
+        //         document.getElementById('stock-transfer').style.display = 'none';
+        //     }
+
+        //     /*stock adjustment*/
+        //     if (Number(report_option_index) === Number(7)) {
+        //         document.getElementById('stock-adjustment').style.display = 'block';
+        //     } else {
+        //         document.getElementById('stock-adjustment').style.display = 'none';
+        //     }
+
+        // }
 
         function reportOption() {
             var report_option = document.getElementById("report_option");
             var report_option_index = report_option.options[report_option.selectedIndex].value;
 
-            if (Number(report_option_index) !== Number(0)) {
+            if (Number(report_option_index) !== 0) {
                 document.getElementById('border').style.borderColor = 'white';
             }
 
-            //if product ledger
-            if (Number(report_option_index) === Number(3)) {
-                document.getElementById('product_ledger').style.display = 'block';
+            // product ledger
+            let ledgerDiv = document.getElementById('product_ledger');
+            let warning = document.getElementById('warning');
+            if (Number(report_option_index) === 3) {
+                if (ledgerDiv) ledgerDiv.style.display = 'block';
             } else {
-                document.getElementById('product_ledger').style.display = 'none';
-                document.getElementById('warning').style.display = 'none';
-
+                if (ledgerDiv) ledgerDiv.style.display = 'none';
+                if (warning) warning.style.display = 'none';
             }
 
-            //if current stock
-            if (Number(report_option_index) === Number(1)) {
-                document.getElementById('current-stock').style.display = 'block';
+            // current stock
+            let stockDiv = document.getElementById('current-stock');
+            let warningStore = document.getElementById('warning-store');
+            if (Number(report_option_index) === 1) {
+                if (stockDiv) stockDiv.style.display = 'block';
             } else {
-                document.getElementById('current-stock').style.display = 'none';
-                document.getElementById('warning-store').style.display = 'none';
-
+                if (stockDiv) stockDiv.style.display = 'none';
+                if (warningStore) warningStore.style.display = 'none';
             }
 
-            /*product detail*/
-            if (Number(report_option_index) === Number(2)) {
-                document.getElementById('product-detail').style.display = 'block';
+            // product detail
+            let detailDiv = document.getElementById('product-detail');
+            let warningDetail = document.getElementById('warning-detail');
+            if (Number(report_option_index) === 2) {
+                if (detailDiv) detailDiv.style.display = 'block';
             } else {
-                document.getElementById('product-detail').style.display = 'none';
-                document.getElementById('warning-detail').style.display = 'none';
-
+                if (detailDiv) detailDiv.style.display = 'none';
+                if (warningDetail) warningDetail.style.display = 'none';
             }
 
-            /*stock issue*/
-            if (Number(report_option_index) === Number(8)) {
-                document.getElementById('stock-issue').style.display = 'block';
+            // stock issue
+            let issueDiv = document.getElementById('stock-issue');
+            if (Number(report_option_index) === 8) {
+                if (issueDiv) issueDiv.style.display = 'block';
             } else {
-                document.getElementById('stock-issue').style.display = 'none';
+                if (issueDiv) issueDiv.style.display = 'none';
             }
 
-            /*stock transfer*/
-            if (Number(report_option_index) === Number(9)) {
-                document.getElementById('stock-transfer').style.display = 'block';
+            // stock transfer
+            let transferDiv = document.getElementById('stock-transfer');
+            if (Number(report_option_index) === 9) {
+                if (transferDiv) transferDiv.style.display = 'block';
             } else {
-                document.getElementById('stock-transfer').style.display = 'none';
+                if (transferDiv) transferDiv.style.display = 'none';
             }
 
-            /*stock adjustment*/
-            if (Number(report_option_index) === Number(7)) {
-                document.getElementById('stock-adjustment').style.display = 'block';
+            // stock adjustment
+            let adjustDiv = document.getElementById('stock-adjustment');
+            if (Number(report_option_index) === 7) {
+                if (adjustDiv) adjustDiv.style.display = 'block';
             } else {
-                document.getElementById('stock-adjustment').style.display = 'none';
+                if (adjustDiv) adjustDiv.style.display = 'none';
             }
-
         }
 
         $('#inventory_report_form').on('submit', function () {
@@ -545,12 +615,7 @@
                 }
                 location.reload();
 
-            } else if (Number(report_option_index) === Number(7) && Number(adj_option_index) === Number(0)) {
-                document.getElementById('warning-details').style.display = 'block';
-                document.getElementById('date').style.borderColor = 'white';
-
-                return false;
-            }
+            } 
 
 
         });

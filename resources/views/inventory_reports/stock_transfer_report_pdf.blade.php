@@ -1,22 +1,21 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Stock Transfer Report</title>
 
     <style>
-        @page {
-            size: A4 landscape;
-        }
-
         body {
-            font-size: 12px;
+            font-size: 13px;
         }
 
         * {
             font-family: Verdana, Arial, sans-serif;
         }
 
-        table, th, td {
+        table,
+        th,
+        td {
             /*border: 1px solid black;*/
             border-collapse: collapse;
             padding: 10px;
@@ -52,7 +51,7 @@
             border-collapse: collapse;
         }
 
-        #table-detail tr > {
+        #table-detail tr> {
             line-height: 13px;
         }
 
@@ -71,62 +70,69 @@
         h4 {
             font-weight: normal;
         }
-
     </style>
 
 </head>
+
 <body>
 
-<div class="row" style="padding-top: -2%">
-    <h1 align="center">{{$pharmacy['name']}}</h1>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
-    <h2 align="center" style="margin-top: -1%">Stock Transfer Report</h2>
-    <div class="row" style="margin-top: 10%;">
-        <div class="col-md-12">
-            <table id="table-detail-main">
-                <tr>
-                    <td style="background: #1f273b; color: white"><b>From
-                            Date:</b> {{date('d-m-Y',strtotime($data[0]['from']))}}
-                    </td>
-                    <td style="background: #1f273b; color: white"><b>To
-                            Date:</b> {{date('d-m-Y',strtotime($data[0]['to']))}}
-                    </td>
-                </tr>
-            </table>
-            <table id="table-detail" align="center">
-                <!-- loop the product names here -->
-                <thead>
-                <tr style="background: #1f273b; color: white;">
-                    <th>Code</th>
-                    <th>Product Name</th>
-                    <th>Transfer No</th>
-                    <th>Transferred Qty</th>
-                    <th>From</th>
-                    <th>To</th>
-                    <th>Date</th>
-                </tr>
-                </thead>
-                @foreach($data as $item)
-                    <tr>
-                        <td>{{$item->currentStock['product']['id']}}</td>
-                        <td>{{$item->currentStock['product']['name']}}</td>
-                        <td align="">{{$item->transfer_no}}</td>
-                        <td align="right">
-                            <div style="margin-right: 50%">{{number_format($item->transfer_qty)}}</div>
-                        </td>
-                        <td align="">{{$item->fromStore['name']}}</td>
-                        <td align="">{{$item->toStore['name']}}</td>
-                        <td align="">{{date('d-m-Y',strtotime($item->created_at))}}</td>
-                    </tr>
-                @endforeach
-            </table>
+    <div class="row" style="padding-top: -2%">
+        <h1 align="center">{{$pharmacy['name']}}</h1>
+        <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
+        <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
+        <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}</h3>
+        <h2 align="center" style="margin-top: -1%">Stock Transfer Report</h2>
+        <h3 align="center" style="margin-top: -1%">From: <b>{{date('Y-m-d', strtotime($data[0]['from']))}}</b> To:
+            <b>{{date('Y-m-d', strtotime($data[0]['to']))}}</b>
+        </h3>
+        <div class="row">
+            <div class="col-md-12">
+                <table id="table-detail" align="center">
+                    <!-- loop the product names here -->
+                    <thead>
+                        <tr style="background: #1f273b; color: white;">
+                            <th align="center">#</th>
+                            <th align="left">Date</th>
+                            <th align="left">Product Name</th>
+                            <th align="left">Transfer #</th>
+                            <th align="center">Quantity</th>
+                            <th align="left">From</th>
+                            <th align="left">To</th>
+                            <th align="left">Status</th>
+                        </tr>
+                    </thead>
+                    @foreach($data as $item)
+                        <tr>
+                            <td align="center">{{$loop->iteration}}.</td>
+                            <td align="left">{{date('Y-m-d', strtotime($item->created_at))}}</td>
+                            <td>{{($item->currentStock['product']['name'] . ' ' ?? '') . ($item->currentStock['product']['brand'] . ' ' ?? '') . ($item->currentStock['product']['pack_size'] ?? '') . $item->currentStock['product']['sales_uom'] ?? ''}}
+                            </td>
+                            <td align="left">{{$item->transfer_no}}</td>
+                            <td align="center">{{number_format($item->transfer_qty)}}</td>
+                            <td align="left">{{$item->fromStore['name']}}</td>
+                            <td align="left">{{$item->toStore['name']}}</td>
+                            <td align="left">
+                                @php
+                                    $status = ucfirst($item->status ?? '');
+                                    $color = 'black';
+                                    if ($status === 'Created') {
+                                        $color = 'blue';
+                                        $status = 'Pending';
+                                    } elseif ($status === 'Completed') {
+                                        $color = 'green';
+                                    }
+                                @endphp
+                                <span style="color: {{$color}}; font-weight: bold;">{{$status}}</span>
+                            </td>
+
+                        </tr>
+                    @endforeach
+                </table>
+            </div>
         </div>
     </div>
-</div>
 
-<script type="text/php">
+    <script type="text/php">
     if ( isset($pdf) ) {
         $x = 400;
         $y = 560;
@@ -146,5 +152,5 @@
 </script>
 
 </body>
-</html>
 
+</html>

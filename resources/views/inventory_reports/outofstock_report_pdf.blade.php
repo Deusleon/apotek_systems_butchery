@@ -1,22 +1,27 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Products Out of Stock Report</title>
 
     <style>
-
         body {
-            font-size: 12px;
+            font-size: 12=px;
         }
 
         * {
             font-family: Verdana, Arial, sans-serif;
         }
 
-        table, th, td {
+        table,
+        th,
+        td {
             /*border: 1px solid black;*/
             border-collapse: collapse;
             padding: 10px;
+        }
+        th{
+            font-size: 12px;
         }
 
         table {
@@ -42,7 +47,7 @@
             margin-top: -10%;
         }
 
-        #table-detail tr > {
+        #table-detail tr> {
             line-height: 13px;
         }
 
@@ -61,43 +66,44 @@
         h4 {
             font-weight: normal;
         }
-
     </style>
 
 </head>
+
 <body>
 
-<div class="row" style="padding-top: -2%">
-    <h1 align="center">{{$pharmacy['name']}}</h1>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
-    <h2 align="center" style="margin-top: -1%">Products Out of Stock Report</h2>
+    <div class="row" style="padding-top: -2%">
+        <h1 align="center">{{$pharmacy['name']}}</h1>
+        <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
+        <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
+        <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}</h3>
+        <h2 align="center" style="margin-top: -1%">Products Out of Stock Report</h2>
 
-    <div class="row" style="margin-top: 10%;">
-        <div class="col-md-12">
-            <table id="table-detail" align="center">
-                <!-- loop the product names here -->
-                <thead>
-                <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                    <th>Code</th>
-                    <th>Product Name</th>
-                    <th>Category</th>
-                </tr>
-                </thead>
-                @foreach($data as $item)
-                    <tr>
-                        <td>{{$item->product['id']}}</td>
-                        <td>{{$item->product['name']}}</td>
-                        <td align="">{{$item->product['category']['name']}}</td>
-                    </tr>
-                @endforeach
-            </table>
+        <div class="row" style="margin-top: 8%;">
+            <div class="col-md-12">
+                <table id="table-detail" align="center">
+                    <!-- loop the product names here -->
+                    <thead>
+                        <tr style="background: #1f273b; color: white; font-size: 0.9em">
+                            <th align="center">#</th>
+                            <th align="left">Product Name</th>
+                            <th align="left">Category</th>
+                        </tr>
+                    </thead>
+                    {{-- @dd($data); --}}
+                    @foreach($data as $item)
+                        <tr>
+                            <td align="center">{{ $loop->iteration }}.</td>
+                            <td align="left">{{ $item->product->name.' '.($item->product->brand.' ' ?? '').($item->product->pack_size ?? '').($item->product->sales_uom ?? '') }}</td>
+                            <td align="left">{{ $item->product->category->name ?? '' }}</td>
+                        </tr>
+                    @endforeach
+                </table>
+            </div>
         </div>
     </div>
-</div>
 
-<script type="text/php">
+    <script type="text/php">
     if ( isset($pdf) ) {
         $x = 280;
         $y = 820;
@@ -117,5 +123,5 @@
 </script>
 
 </body>
-</html>
 
+</html>

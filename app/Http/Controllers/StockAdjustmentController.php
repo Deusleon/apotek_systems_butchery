@@ -186,14 +186,14 @@ class StockAdjustmentController extends Controller
             ->get();
         
         // Debug the data
-        Log::info('Stocks count: ' . $stocks->count()); 
-        foreach ($stocks as $stock) {
-            Log::info('Stock ID: ' . $stock->id);
-            Log::info('Product relationship: ' . ($stock->product ? 'exists' : 'null'));
-            if ($stock->product) {
-                Log::info('Product name: ' . $stock->product->name);
-            }
-        }
+        // Log::info('Stocks count: ' . $stocks->count()); 
+        // foreach ($stocks as $stock) {
+        //     Log::info('Stock ID: ' . $stock->id);
+        //     Log::info('Product relationship: ' . ($stock->product ? 'exists' : 'null'));
+        //     if ($stock->product) {
+        //         Log::info('Product name: ' . $stock->product->name);
+        //     }
+        // }
         
         $reasons = AdjustmentReason::all();
         return view('stock_management.adjustments.create', compact('stocks', 'reasons'));
@@ -255,7 +255,18 @@ class StockAdjustmentController extends Controller
             // $adjustment->notes = $request->notes;
             $adjustment->reference_number = 'ADJ-' . time(); // Generate a reference number
             $adjustment->save();
-            
+
+            // Create adjustment with all necessary fields
+            $adjust = new StockAdjustment();
+            $adjust->stock_id = $request->stock_id;
+            $adjust->quantity = $adjustmentQuantity;
+            $adjust->type = $adjustmentType;
+            $adjust->reason = $request->reason;
+            $adjust->description = $request->notes;
+            $adjust->created_by = Auth::id();
+            $adjust->created_at = now();
+            $adjust->save();            
+
             // Add to stock tracking
             StockTracking::create([
                 'product_id' => $currentStock->product_id,
