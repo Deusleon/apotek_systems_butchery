@@ -74,31 +74,31 @@
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
     <h2 align="center" style="margin-top: -1%">Expiry Products Report</h2>
 
-    <div class="row" style="margin-top: 10%;">
+    <div class="row" style="margin-top: 8%;">
         <div class="col-md-12">
             <table id="table-detail" align="center">
                 <!-- loop the product names here -->
                 <thead>
                 <tr style="background: #1f273b; color: white;">
-                    <th>Code</th>
-                    <th>Product Name</th>
-                    <th>Batch No</th>
-                    <th>Date</th>
-                    <th>Quantity</th>
+                    <th align="center">#</th>
+                    <th align="left">Product Name</th>
+                    <th align="left">Batch No</th>
+                    <th align="left">Expiry Date</th>
+                    <th align="center">Quantity</th>
                 </tr>
                 </thead>
                 @foreach($data as $item)
                     <tr>
-                        <td>{{$item->product['id']}}</td>
-                        <td>{{$item->product['name']}}</td>
-                        <td align="">{{$item->batch_number}}</td>
+                        <td align="center">{{$loop->iteration}}.</td>
+                        <td>{{$item->product['name'].($item->product['brand'].' ' ?? '').($item->product['pack_size'] ?? '').($item->product['sales_uom'] ?? '')}}</td>
+                        <td align="left">{{$item->batch_number}}</td>
                         @if($item->expiry_date === null)
-                            <td align="" style="font-size: 0.7em"></td>
+                            <td align="left" style="font-size: 0.7em"></td>
                         @else
-                            <td align="">{{date('d-m-Y',strtotime($item->expiry_date))}}</td>
+                            <td align="left">{{date('Y-m-d',strtotime($item->expiry_date))}}</td>
                         @endif
-                        <td align="right">
-                            <div style="margin-right: 50%">{{number_format($item->quantity)}}</div>
+                        <td align="center">
+                            <div>{{number_format($item->quantity)}}</div>
                         </td>
                     </tr>
                 @endforeach

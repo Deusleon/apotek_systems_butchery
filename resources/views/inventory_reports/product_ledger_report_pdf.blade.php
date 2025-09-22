@@ -79,22 +79,24 @@
                 <table id="table-detail" align="center">
                     <thead>
                         <tr style="background: #1f273b; color: white">
-                            <th>Transaction Date</th>
-                            <th style="text-align: center">Transaction Method</th>
-                            <th style="text-align: center">Received</th>
-                            <th style="text-align: center">Outgoing</th>
-                            <th style="text-align: center">Balance</th>
+                            <th>#</th>
+                            <th style="text-align: left">Date</th>
+                            <th style="text-align: left">Transaction Method</th>
+                            <th style="text-align: right">Received</th>
+                            <th style="text-align: right">Outgoing</th>
+                            <th style="text-align: right">Balance</th>
                         </tr>
                     </thead>
                     @foreach($data as $item)
                         <tr>
-                            <td>{{$item['date']}}</td>
-                            <td>{{$item['method']}}</td>
+                            <td style="text-align: center">{{$loop->iteration}}.</td>
+                            <td style="text-align: left">{{$item['date']}}</td>
+                            <td style="text-align: left">{{$item['method']}}</td>
                             <td style="text-align: right;">
-                                <div style="margin-right: 50%">{{number_format($item['received'], 2)}}</div>
+                                {{number_format($item['received'], 2)}}
                             </td>
                             <td style="text-align: right;">
-                                <div style="margin-right: 50%">{{number_format($item['outgoing'], 2)}}</div>
+                                {{number_format($item['outgoing'], 2)}}
                             </td>
                             <td style="text-align: right;">{{number_format($item['balance'], 2)}}</td>
                         </tr>

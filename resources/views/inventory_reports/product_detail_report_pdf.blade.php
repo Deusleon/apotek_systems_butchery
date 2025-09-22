@@ -94,14 +94,14 @@
                         <tr style="background: #1f273b; color: white;">
                             <th>#</th>
                             <th>Product Name</th>
-                            <th>Category</th>
+                            {{-- <th>Category</th> --}}
                         </tr>
                     </thead>
                     @foreach($data as $item)
                         <tr>
                             <td>{{$loop->iteration}}.</td>
                             <td>{{$item['name'].' ' ?? ''}}{{$item['brand'].' ' ?? ''}}{{$item['pack_size'] ?? ''}}{{$item['sales_uom']}}</td>
-                            <td>{{$item['category']}}</td>
+                            {{-- <td>{{$item['category']}}</td> --}}
                     @endforeach
                 </table>
             </div>

@@ -74,28 +74,24 @@
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
     <h2 align="center" style="margin-top: -1%">Stock Below Minimum Level Report</h2>
 
-    <div class="row" style="margin-top: 10%;">
+    <div class="row" style="margin-top: 8%;">
         <div class="col-md-12">
             <table id="table-detail" align="center">
                 <!-- loop the product names here -->
                 <thead>
                 <tr style="background: #1f273b; color: white;">
-                    <th>Code</th>
-                    <th>Product Name</th>
+                    <th align="left">#</th>
+                    <th align="left">Product Name</th>
                     <th>Min. Quantity</th>
                     <th>Available Quantity</th>
                 </tr>
                 </thead>
                 @foreach($data as $item)
                     <tr>
-                        <td>{{$item->id}}</td>
-                        <td>{{$item->name}}</td>
-                        <td align="right">
-                            <div style="margin-right: 50%">{{number_format($item->min_quantinty)}}</div>
-                        </td>
-                        <td align="right">
-                            <div style="margin-right: 50%">{{number_format($item->qty)}}</div>
-                        </td>
+                        <td>{{$loop->iteration}}.</td>
+                        <td>{{($item->name.' ' ?? '').($item->brand.' ' ?? '').$item->pack_size ?? ''.$item->sales_uom}}</td>
+                        <td align="center">{{number_format($item->min_quantinty)}}</td>
+                        <td align="center">{{number_format($item->qty)}}</td>
                     </tr>
                 @endforeach
             </table>

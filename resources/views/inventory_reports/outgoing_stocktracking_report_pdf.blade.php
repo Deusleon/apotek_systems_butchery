@@ -74,30 +74,30 @@
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
     <h2 align="center" style="margin-top: -1%">Outgoing Stock Tracking Report</h2>
 
-    <div class="row" style="margin-top: 10%;">
+    <div class="row" style="margin-top: 8%;">
         <div class="col-md-12">
             <table id="table-detail" align="center">
                 <!-- loop the product names here -->
                 <thead>
                 <tr style="background: #1f273b; color: white;">
-                    <th>Code</th>
-                    <th>Product Name</th>
-                    <th>Method Out</th>
+                    <th align="center">#</th>
+                    <th align="left">Date</th>
+                    <th align="left">Product Name</th>
+                    <th align="left">Method Out</th>
                     <th>Quantity</th>
-                    <th>User</th>
-                    <th>Date</th>
+                    <th align="left">Made By</th>
                 </tr>
                 </thead>
                 @foreach($data as $item)
                     <tr>
-                        <td>{{$item->currentStock['product']['id']}}</td>
-                        <td>{{$item->currentStock['product']['name']}}</td>
+                        <td align="center">{{$loop->iteration}}.</td>
+                        <td>{{$item->date}}</td>
+                        <td>{{$item->product->name.' '.($item->product->brand.' ' ?? '').($item->product->pack_size ?? '').($item->product->sales_uom ?? '')}}</td>
                         <td>{{$item->out_mode}}</td>
-                        <td align="right">
-                            <div style="margin-right: 50%">{{number_format($item->quantity)}}</div>
+                        <td align="center">
+                            <div>{{number_format($item->quantity)}}</div>
                         </td>
                         <td>{{$item->user['name']}}</td>
-                        <td>{{date('d-m-Y',strtotime($item->updated_at))}}</td>
                     </tr>
                 @endforeach
             </table>
