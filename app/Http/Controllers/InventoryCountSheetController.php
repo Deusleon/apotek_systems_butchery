@@ -6,6 +6,7 @@ use App\Setting;
 use App\Store;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Http\Request;
 
 ini_set( 'max_execution_time', 500 );
 set_time_limit( 500 );
@@ -13,8 +14,12 @@ ini_set( 'memory_limit', '512M' );
 
 class InventoryCountSheetController extends Controller
  {
-    public function generateInventoryCountSheetPDF()
+    public function generateInventoryCountSheetPDF(Request $request)
  {
+        $showQoH = $request->query('showQoH', 1);
+
+        $showQoH = $showQoH == 1 ? true : false;
+
         /* get default store */
         $default_store = current_store()->name ?? 'Unknown Store';
         $default_store_id = current_store_id();
@@ -71,8 +76,23 @@ class InventoryCountSheetController extends Controller
         // Generate PDF
         $pdf = PDF::loadView(
             'stock_management.daily_stock_count.inventory_count_sheet',
-            compact( 'data', 'pharmacy', 'default_store' )
+            compact( 'data',  'showQoH', 'pharmacy', 'default_store' )
         );
         return $pdf->stream( 'inventory_count_sheet.pdf' );
+    }
+
+    public function generateDailyStockCountPDF($request)
+    {
+
+        $data = $this->summation($request->sale_date);
+        $new_data = array_values($data);
+        // $showQoH = $request->show_qoh ? true : false;
+        $showQoH = 'true';
+
+        $pdf = PDF::loadView( 'stock_management.daily_stock_count.daily_stock_count',
+        compact( 'data', 'new_data', 'showQoH' ) )
+        ->setPaper( 'a4', '' );
+        return $pdf->stream( 'daily_stock_count.pdf' );
+
     }
 }
