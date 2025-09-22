@@ -269,28 +269,17 @@ class StockAdjustmentController extends Controller
 
             // Add to stock tracking
             StockTracking::create([
+                'stock_id' => $currentStock->id,
                 'product_id' => $currentStock->product_id,
+                'out_mode' => 'Stock adjustment: ' . $request->reason,
+                'quantity' =>  $adjustmentQuantity,
                 'store_id' => current_store_id(),
-                'quantity' => ($adjustmentType === 'increase' ? $adjustmentQuantity : -$adjustmentQuantity),
-                'tracking_type' => 'adjustment',
-                'tracking_id' => $adjustment->id,
-                'user_id' => Auth::id(),
-                'description' => 'Stock adjustment: ' . $request->reason
+                'created_by' => Auth::id(),
+                'updated_at' => date('Y-m-d'),
+                'movement' => ($adjustmentType === 'increase' ? 'IN' : 'OUT'),
             ]);
 
             DB::commit();
-            
-            // Log the action
-            // Log::info('Stock adjustment created', [
-            //     'user' => Auth::user()->name,
-            //     'product_id' => $currentStock->product_id,
-            //     'product_name' => $currentStock->product->name ?? 'Unknown Product',
-            //     'adjustment_type' => $adjustmentType,
-            //     'adjustment_quantity' => $adjustmentQuantity,
-            //     'previous_quantity' => $previousQuantity,
-            //     'new_quantity' => $newQuantity,
-            //     'reason' => $request->reason
-            // ]);
             
             // Create detailed success message
             $productName = $currentStock->product->name ?? 'Unknown Product';

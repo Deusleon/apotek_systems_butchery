@@ -19,7 +19,7 @@ class StockTracking extends Model
         'created_by',
         'updated_by',
         'movement',
-        'created_at',
+        'updated_at',
     ];
 
     public function currentStock()

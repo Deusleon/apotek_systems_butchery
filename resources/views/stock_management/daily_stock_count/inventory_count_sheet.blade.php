@@ -7,7 +7,11 @@
 
     <style>
         body {
-            /*font-size: 30px;*/
+            font-size: 14px;
+        }
+
+        * {
+            font-family: Verdana, Arial, sans-serif;
         }
 
         table,
@@ -95,7 +99,7 @@
 </head>
 
 <body>
-
+    {{-- @dd($data) --}}
     <h2 align="center">{{$pharmacy['name']}}</h2>
     <h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
     <h2 align="center" style="margin-top: -2%">Inventory Count Sheet</h2>
@@ -123,22 +127,28 @@
             <table id="table-detail" align="center">
                 <thead>
                     <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                        <th>Code</th>
-                        <th>Product Name</th>
-                        <th>Shelf No</th>
-                        <th>QOH</th>
-                        <th>Physical</th>
+                        <th align="left">#</th>
+                        <th align="left">Product Name</th>
+                        @if ($showQoH)
+                            <th align="center">QOH</th>
+                            <th align="center">Physical</th>
+                        @else
+                            <th align="center">Qty</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($groupedData as $stock)
                         <tr>
-                            <td>{{ $stock['product_id'] }}</td>
-                            <td>{{ $stock['product_name'] . ' ' . $stock['brand'] . ' ' . $stock['pack_size'] . $stock['sales_uom'] }}
+                            <td align="left">{{ $loop->iteration }}.</td>
+                            <td align="left">{{ $stock['product_name'] . ' ' . $stock['brand'] . ' ' . $stock['pack_size'] . $stock['sales_uom'] }}
                             </td>
-                            <td>{{ $stock['shelf_no'] }}</td>
-                            <td align="right">{{ number_format($stock['quantity_on_hand']) }}</td>
+                        @if ($showQoH)
+                            <td align="center">{{ number_format($stock['quantity_on_hand']) }}</td>
                             <td></td>
+                        @else
+                            <td></td>
+                        @endif
                         </tr>
                     @endforeach
                 </tbody>
