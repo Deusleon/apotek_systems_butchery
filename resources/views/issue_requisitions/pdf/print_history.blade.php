@@ -162,9 +162,8 @@
                 <tr>
                     <th style="width: 5%">#</th>
                     <th style="width: 55%">Product</th>
-                    <th style="width: 15%" class="text-center">Qty Requested</th>
-                    <th style="width: 15%" class="text-center">Qty Given</th>
-                    <th style="width: 10%" class="text-center">Difference</th>
+                    <th style="width: 15%" class="text-center">Requested</th>
+                    <th style="width: 15%" class="text-center">Given</th>
                 </tr>
             </thead>
             <tbody>
@@ -192,7 +191,6 @@
                         </td>
                         <td class="text-center">{{ number_format($item->quantity, 0) }}</td>
                         <td class="text-center">{{ number_format($item->quantity_given, 0) }}</td>
-                        <td class="text-center {{ $diffClass }}">{{ $diffSymbol }}{{ $difference }}</td>
                     </tr>
                 @endforeach
             </tbody>
