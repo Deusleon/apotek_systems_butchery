@@ -80,45 +80,41 @@ class InvoiceController extends Controller
 
     public function getInvoice(Request $request)
     {
-
         $from = $request->date[0];
-        $to = $request->date[1];
-        $invoice_history = Invoice::where(DB::Raw("DATE_FORMAT(created_at,'%m/%d/%Y')"), '>=', $from)
-            ->where(DB::Raw("DATE_FORMAT(created_at,'%m/%d/%Y')"), '<=', $to)
+        $to   = $request->date[1];
+
+        $invoice_history = Invoice::whereBetween('invoice_date', [$from, $to])
             ->orderBy('invoice_date', 'DESC')
             ->get();
 
         foreach ($invoice_history as $value) {
             $value->supplier;
-            $value->date = date('Y-m-d', strtotime($value->invoice_date));
+            $value->date     = date('Y-m-d', strtotime($value->invoice_date));
             $value->due_date = date('Y-m-d', strtotime($value->payment_due_date));
         }
-        $data = json_decode($invoice_history, true);
 
-        return $data;
+        return response()->json($invoice_history);
     }
 
     public function getInvoiceByDueDate(Request $request)
     {
-
-        $from = $request->date[0];
-        $to = $request->date[1];
+        $from  = $request->date[0];
+        $to    = $request->date[1];
         $from1 = $request->date1[0];
-        $to1 = $request->date1[1];
-        $invoice_history = Invoice::whereBetween(DB::raw('date(payment_due_date)'), [date('Y-m-d', strtotime($from))
-            , date('Y-m-d', strtotime($to))])
-            ->whereBetween(DB::raw('date(created_at)'), [date('Y-m-d', strtotime($from1))
-                , date('Y-m-d', strtotime($to1))])
+        $to1   = $request->date1[1];
+
+        $invoice_history = Invoice::whereBetween('payment_due_date', [$from, $to])
+            ->whereBetween('invoice_date', [$from1, $to1])
+            ->orderBy('invoice_date', 'DESC')
             ->get();
 
         foreach ($invoice_history as $value) {
             $value->supplier;
-            $value->date = date('Y-m-d', strtotime($value->invoice_date));
+            $value->date     = date('Y-m-d', strtotime($value->invoice_date));
             $value->due_date = date('Y-m-d', strtotime($value->payment_due_date));
         }
-        $data = json_decode($invoice_history, true);
 
-        return $data;
+        return response()->json($invoice_history);
     }
 
 }
