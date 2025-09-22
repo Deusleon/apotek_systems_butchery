@@ -98,14 +98,13 @@
         ]
     });
 
-    // 📌 Intercept View button and show modal
+   // Intercept View button and show modal
     $(document).on('click', '.btn-view', function(e){
         e.preventDefault();
-        var reqId = $(this).data('id');  // Get requisition ID
+        var reqId = $(this).data('id');
         $('#requisitionDetails').html('<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div><p class="mt-2 text-muted">Loading details...</p></div>');
         $('#requisitionModal').modal('show');
 
-        // Fetch requisition details via AJAX
         $.ajax({
             url: "{{ route('requisitions.data') }}",
             type: "POST",
@@ -116,7 +115,6 @@
 
                 let html = `
                 <div class="row mb-4">
-                    <!-- Column 1 -->
                     <div class="col-md-4">
                         <div class="detail-item">
                             <label class="font-weight-bold">Req #:</label>
@@ -127,8 +125,6 @@
                             <p>${requisition.from_store}</p>
                         </div>
                     </div>
-
-                    <!-- Column 2 -->
                     <div class="col-md-4">
                         <div class="detail-item">
                             <label class="font-weight-bold">To Store:</label>
@@ -139,16 +135,12 @@
                             <p>${requisition.issued_by}</p>
                         </div>
                     </div>
-
-                    <!-- Column 3 -->
                     <div class="col-md-4">
                         <div class="detail-item">
                             <label class="font-weight-bold">Evidence:</label>
                             <div class="mt-1">
                                 ${requisition.evidence_document ? 
-                                    `<a href="/storage/${requisition.evidence_document}" target="_blank" class="btn btn-warning btn-sm rounded-pill">
-                                        View
-                                    </a>` : 
+                                    `<a href="/storage/${requisition.evidence_document}" target="_blank" class="btn btn-warning btn-sm color-body">View</a>` : 
                                     '<span class="text-muted">No document attached</span>'
                                 }
                             </div>
@@ -159,9 +151,12 @@
                     <label class="font-weight-bold">Remarks:</label>
                     <p>${requisition.remarks || 'No remarks provided'}</p>
                 </div>
-                <h6 class="pb-2 font-weight-bold">Products Information</h6>
+               <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="font-weight-bold mb-0">Products Information</h6>
+                    <div id="modalProductsSearch"></div> <!-- Search input will be moved here -->
+                </div>
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover table-sm">
+                    <table id="modalProductsTable" class="table table-striped table-hover table-sm">
                         <thead>
                             <tr>
                                 <th class="font-weight-bold">Product Name</th>
@@ -173,10 +168,6 @@
                 `;
 
                 $.each(products, function(i, item){
-                    const difference = item.quantity_given - item.quantity;
-                    const diffClass = difference < 0 ? 'text-danger' : (difference > 0 ? 'text-success' : 'text-muted');
-                    const diffSymbol = difference > 0 ? '+' : '';
-                    
                     html += `<tr>
                                 <td class="font-weight-medium">${item.full_product_name || item.name}</td>
                                 <td class="text-center">${item.quantity}</td>
@@ -184,17 +175,29 @@
                             </tr>`;
                 });
 
-                html += `</tbody>
-                    </table>
-                </div>`;
-                
+                html += `</tbody></table></div>`;
                 $('#requisitionDetails').html(html);
+
+                // Initialize DataTable for modal products with search
+                if ( $.fn.DataTable.isDataTable('#modalProductsTable') ) {
+                    $('#modalProductsTable').DataTable().destroy();
+                }
+                $('#modalProductsTable').DataTable({
+                    paging: true,
+                    pageLength: 5,
+                    lengthChange: false,
+                    searching: true,       // Enable search input
+                    ordering: true,
+                    info: false,
+                    dom: '<"top"f>rt<"bottom"p><"clear">' // Places search box on top nicely
+                });
             },
             error: function() {
                 $('#requisitionDetails').html('<div class="alert alert-danger text-center">Failed to load requisition details. Please try again.</div>');
             }
         });
     });
+
 
     // Redirect tabs to separate routes
     $('#issue-list-tab').on('click', function(e){
