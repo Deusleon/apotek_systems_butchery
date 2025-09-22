@@ -189,8 +189,8 @@
                                 {{ $item->products_->pack_size }}{{ $item->products_->sales_uom }}
                             @endif
                         </td>
-                        <td class="text-center">{{ number_format($item->quantity, 0) }}</td>
-                        <td class="text-center">{{ number_format($item->quantity_given, 0) }}</td>
+                        <td class="text-left-zero">{{ number_format($item->quantity, 0) }}</td>
+                        <td class="text-left-zero">{{ number_format($item->quantity_given, 0) }}</td>
                     </tr>
                 @endforeach
             </tbody>

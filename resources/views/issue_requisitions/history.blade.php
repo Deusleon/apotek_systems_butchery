@@ -152,7 +152,6 @@
                     <p>${requisition.remarks || 'No remarks provided'}</p>
                 </div>
                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h6 class="font-weight-bold mb-0">Products Information</h6>
                     <div id="modalProductsSearch"></div> <!-- Search input will be moved here -->
                 </div>
                 <div class="table-responsive">
