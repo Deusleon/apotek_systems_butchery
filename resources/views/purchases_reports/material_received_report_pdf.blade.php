@@ -102,11 +102,31 @@
             width: 15%;
         }
 
+         #container .logo-container {
+            padding-top: -2%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        #container .logo-container img {
+            max-width: 160px;
+            max-height: 160px;
+        }
+
     </style>
 
 </head>
 <body>
 
+<div class="row">
+    <div id="container">
+        <div class="logo-container">
+            @if($pharmacy['logo'])
+                <img src="{{public_path('fileStore/logo/'.$pharmacy['logo'])}}"/>
+            @endif
+        </div>
+    </div>
+</div>
 <div class="row" style="padding-top: -2%">
     <h1 align="center">{{$pharmacy['name']}}</h1>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
@@ -123,9 +143,9 @@
                         <td style="background: #1f273b; color: white">Invoice: {{$data->first()->invoice_nos}}</td>
                     @endif
                     <td style="background: #1f273b; color: white"><b>From
-                            Date:</b> {{date('d-m-Y',strtotime($data->first()->dates[0]))}}</td>
+                            Date:</b> {{date('Y-m-d',strtotime($data->first()->dates[0]))}}</td>
                     <td style="background: #1f273b; color: white"><b>To
-                            Date:</b> {{date('d-m-Y',strtotime($data->first()->dates[1]))}}</td>
+                            Date:</b> {{date('Y-m-d',strtotime($data->first()->dates[1]))}}</td>
                 </tr>
             </table>
 
@@ -133,29 +153,27 @@
                 <!-- loop the product names here -->
                 <thead>
                 <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                    <th>Code</th>
-                    <th>Product Name</th>
-                    <th>Quantity</th>
-                    <th align="right">Buy Price</th>
-                    <th align="right">Sell Price</th>
-                    <th align="right">Profit</th>
-                    <th>Receive Date</th>
-                    <th>Received By</th>
+                    <th align="left">Product Name</th>
+                    <th align="left">Quantity</th>
+                    <th align="left">Buy Price</th>
+                    <th align="left">Sell Price</th>
+                    <th align="left">Profit</th>
+                    <th align="left">Receive Date</th>
+                    <th align="left">Received By</th>
                 </tr>
                 </thead>
                 @foreach($data as $item)
                     <tr>
-                        <td>{{$item->product['id']}}</td>
-                        <td>{{$item->product['name']}}</td>
-                        <td align="right">
-                            <div style="margin-right: 50%">{{number_format($item->quantity,0)}}</div>
+                        <td align="left">{{$item->product['name']}}</td>
+                        <td align="left">
+                            {{number_format($item->quantity,0)}}
                         </td>
-                        <td align="right">{{number_format($item->unit_cost,2)}}</td>
-                        <td align="right">{{number_format($item->sell_price,2)}}</td>
-                        <td align="right">{{number_format($item->item_profit,2)}}</td>
-                        <td>{{date('d-m-Y',strtotime($item->created_at))}}
+                        <td align="left">{{number_format($item->unit_cost,2)}}</td>
+                        <td align="left">{{number_format($item->sell_price,2)}}</td>
+                        <td align="left">{{number_format($item->item_profit,2)}}</td>
+                        <td align="left">{{date('Y-m-d',strtotime($item->created_at))}}
                         </td>
-                        <td>{{$item->user['name']}}</td>
+                        <td align="left">{{$item->user['name']}}</td>
                     </tr>
                 @endforeach
             </table>

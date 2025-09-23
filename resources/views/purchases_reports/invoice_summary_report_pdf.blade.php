@@ -72,11 +72,32 @@
             font-weight: normal;
         }
 
+        #container .logo-container {
+            padding-top: -2%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        #container .logo-container img {
+            max-width: 160px;
+            max-height: 160px;
+        }
+
+
     </style>
 
 </head>
 <body>
 
+<div class="row">
+    <div id="container">
+        <div class="logo-container">
+            @if($pharmacy['logo'])
+                <img src="{{public_path('fileStore/logo/'.$pharmacy['logo'])}}"/>
+            @endif
+        </div>
+    </div>
+</div>
 <div class="row" style="padding-top: -2%">
     <h1 align="center">{{$pharmacy['name']}}</h1>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
@@ -100,7 +121,7 @@
                 <!-- loop the product names here -->
                 <thead>
                 <tr style="background: #1f273b; color: white;">
-                    <th style="text-align: center">Invoice No.</th>
+                    <th style="text-align: center">Invoice #</th>
                     <th style="text-align: center">Supplier</th>
                     <th style="text-align: center">Invoice Date</th>
                     <th style="text-align: center">Invoice Amount</th>

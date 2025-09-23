@@ -64,11 +64,31 @@
             font-weight: normal;
         }
 
+         #container .logo-container {
+            padding-top: -2%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        #container .logo-container img {
+            max-width: 160px;
+            max-height: 160px;
+        }
+
     </style>
 
 </head>
 <body>
 
+<div class="row">
+    <div id="container">
+        <div class="logo-container">
+            @if($pharmacy['logo'])
+                <img src="{{public_path('fileStore/logo/'.$pharmacy['logo'])}}"/>
+            @endif
+        </div>
+    </div>
+</div>
 <h4 align="center">{{$pharmacy['name']}}</h4>
 <h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
 <h2 align="center" style="margin-top: -2%">Supplier Price Comparison Report</h2>

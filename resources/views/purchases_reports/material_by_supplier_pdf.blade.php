@@ -61,11 +61,30 @@
             font-weight: normal;
         }
 
+         #container .logo-container {
+            padding-top: -2%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        #container .logo-container img {
+            max-width: 160px;
+            max-height: 160px;
+        }
+
     </style>
 
 </head>
 <body>
-
+<div class="row">
+    <div id="container">
+        <div class="logo-container">
+            @if($pharmacy['logo'])
+                <img src="{{public_path('fileStore/logo/'.$pharmacy['logo'])}}"/>
+            @endif
+        </div>
+    </div>
+</div>
 <h4 align="center">{{$pharmacy['name']}}</h4>
 <h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
 <h2 align="center" style="margin-top: -2%">Material Received Report</h2>
@@ -75,28 +94,26 @@
             <!-- loop the product names here -->
             <thead>
             <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                <th>Code</th>
-                <th>Product Name</th>
-                <th style="text-align: center">Quantity</th>
-                <th style="text-align: center">Buy Price</th>
-                <th style="text-align: center">Sell Price</th>
-                <th style="text-align: center">Expire Date</th>
-                <th style="text-align: center">Receive Date</th>
+                <th align="left">Product Name</th>
+                <th align="left">Quantity</th>
+                <th align="left">Buy Price</th>
+                <th align="left">Sell Price</th>
+                <th align="left">Expire Date</th>
+                <th align="left">Receive Date</th>
 
             </tr>
             </thead>
             @foreach($data as $item)
                 <tr>
-                    <td>{{$item->product['id']}}</td>
                     <td>{{$item->product['name']}}</td>
-                    <td align="right">
-                        <div style="margin-right: 50%">{{number_format($item->quantity,0)}}</div>
+                    <td align="left">
+                        {{number_format($item->quantity,0)}}
                     </td>
-                    <td align="">{{number_format($item->unit_cost,2)}}</td>
-                    <td align="">{{number_format($item->sell_price,2)}}</td>
-                    <td align="">{{$item->expire_date}}</td>
-                    <td align="right">
-                        <div style="margin-right: 50%">{{date('Y-m-d',strtotime($item->created_at))}}</div>
+                    <td align="left">{{number_format($item->unit_cost,2)}}</td>
+                    <td align="left">{{number_format($item->sell_price,2)}}</td>
+                    <td align="left">{{$item->expire_date}}</td>
+                    <td align="left">
+                        {{date('Y-m-d',strtotime($item->created_at))}}
                     </td>
                 </tr>
             @endforeach
