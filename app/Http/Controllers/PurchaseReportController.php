@@ -64,7 +64,7 @@ class PurchaseReportController extends Controller
                     $view = 'purchases_reports.material_received_report_pdf';
                     $output = 'material_received_report.pdf';
                     $report = new InventoryReportController();
-                    $report->splitPdf($data_og, $view, $output);
+                    return $report->splitPdf($data_og, $view, $output, $pharmacy ?? null);
                 } else {
                     if ($data_og == []) {
                         return response()->view('error_pages.pdf_zero_data');
@@ -86,7 +86,7 @@ class PurchaseReportController extends Controller
                 $view = 'purchases_reports.invoice_summary_report_pdf';
                 $output = 'invoice_summary_report.pdf';
                 $report = new InventoryReportController();
-                $report->splitPdf($data_og, $view, $output);
+                return $report->splitPdf($data_og, $view, $output, $pharmacy ?? null);
                 break;
             case 3:
                 break;
@@ -95,14 +95,14 @@ class PurchaseReportController extends Controller
                 $view = 'purchases_reports.supplier_list_pdf';
                 $output = 'supplier_list_report.pdf';
                 $report = new InventoryReportController();
-                $report->splitPdf($data_og, $view, $output);
+                return $report->splitPdf($data_og, $view, $output, $pharmacy ?? null);
                 break;
             case 5:
                 $data_og = $this->supplierPriceComparison();
                 $view = 'purchases_reports.supplier_price_comparison_report_pdf';
                 $output = 'supplier_price_comparison_report.pdf';
                 $report = new InventoryReportController();
-                $report->splitPdf($data_og, $view, $output);
+                return $report->splitPdf($data_og, $view, $output, $pharmacy ?? null);
             default;
         }
     }

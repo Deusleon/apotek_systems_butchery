@@ -103,11 +103,31 @@
             width: 15%;
         }
 
+         #container .logo-container {
+            padding-top: -2%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        #container .logo-container img {
+            max-width: 160px;
+            max-height: 160px;
+        }
+
     </style>
 
 </head>
 <body>
 
+<div class="row">
+    <div id="container">
+        <div class="logo-container">
+            @if($pharmacy['logo'])
+                <img src="{{public_path('fileStore/logo/'.$pharmacy['logo'])}}"/>
+            @endif
+        </div>
+    </div>
+</div>
 <div class="row" style="padding-top: -2%">
     <h1 align="center">{{$pharmacy['name']}}</h1>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
@@ -127,29 +147,27 @@
                     <!-- loop the product names here -->
                     <thead>
                     <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                        <th>Code</th>
-                        <th>Product Name</th>
-                        <th>Quantity</th>
-                        <th align="right">Buy Price</th>
-                        <th align="right">Sell Price</th>
-                        <th align="right">Profit</th>
-                        <th>Receive Date</th>
-                        <th>Received By</th>
+                        <th align="left">Product Name</th>
+                        <th align="left">Quantity</th>
+                        <th align="left">Buy Price</th>
+                        <th align="left">Sell Price</th>
+                        <th align="left">Profit</th>
+                        <th align="left">Receive Date</th>
+                        <th align="left">Received By</th>
                     </tr>
                     </thead>
                     @foreach($items as $item)
                         <tr>
-                            <td>{{$item['code']}}</td>
-                            <td>{{$item['product_name']}}</td>
-                            <td align="right">
-                                <div style="margin-right: 50%">{{number_format($item['quantity'],0)}}</div>
+                            <td align="left">{{$item['product_name']}}</td>
+                            <td align="left">
+                                {{number_format($item['quantity'],0)}}
                             </td>
-                            <td align="right">{{number_format($item['unit_cost'],2)}}</td>
-                            <td align="right">{{number_format($item['sell_price'],2)}}</td>
-                            <td align="right">{{number_format($item['profit'],2)}}</td>
-                            <td>{{date('d-m-Y',strtotime($item['date']))}}
+                            <td align="left">{{number_format($item['unit_cost'],2)}}</td>
+                            <td align="left">{{number_format($item['sell_price'],2)}}</td>
+                            <td align="left">{{number_format($item['profit'],2)}}</td>
+                            <td align="left">{{date('Y-m-d',strtotime($item['date']))}}
                             </td>
-                            <td>{{$item['received_by']}}</td>
+                            <td align="left">{{$item['received_by']}}</td>
                         </tr>
                     @endforeach
                 </table>

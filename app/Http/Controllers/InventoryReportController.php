@@ -155,8 +155,8 @@ class InventoryReportController extends Controller
                     $output = 'stock_adjustment_report.pdf';
                 }
 
-                $this->splitPdf($data_og, $view, $output);
-                break;
+                return $this->splitPdf($data_og, $view, $output);
+                
             case 8:
                 //stock issue report
                 $dates = explode(" - ", $request->issue_date);
@@ -168,9 +168,9 @@ class InventoryReportController extends Controller
                     }
                     $view = 'inventory_reports.stock_issue_report_pdf';
                     $output = 'stock_issue_report.pdf';
-                    $this->splitPdf($data_og, $view, $output);
-                    break;
-                } else {
+                    return $this->splitPdf($data_og, $view, $output);
+
+                    } else {
 
                     //stock issue return report
                     if ($request->stock_issue == 2) {
@@ -180,17 +180,17 @@ class InventoryReportController extends Controller
                         }
                         $view = 'inventory_reports.issue_return_report_pdf';
                         $output = 'issue_return_report.pdf';
-                        $this->splitPdf($data_og, $view, $output);
-                        break;
-                    } else {
+                        return $this->splitPdf($data_og, $view, $output);
+    
+                        } else {
                         $data_og = $this->stockIssueReturnReport($request->stock_issue, $dates);
                         if ($data_og->isEmpty()) {
                             return response()->view('error_pages.pdf_zero_data');
                         }
                         $view = 'inventory_reports.issue_issued_report_pdf';
                         $output = 'issue_return_report.pdf';
-                        $this->splitPdf($data_og, $view, $output);
-                        break;
+                        return $this->splitPdf($data_og, $view, $output);
+
                     }
                 }
             case 9:
@@ -203,8 +203,8 @@ class InventoryReportController extends Controller
                     }
                     $view = 'inventory_reports.stock_transfer_report_pdf';
                     $output = 'stock_transfer_report.pdf';
-                    $this->splitPdf($data_og, $view, $output);
-                    break;
+                    return $this->splitPdf($data_og, $view, $output);
+                    
                 } else {
                     $data_og = $this->stockTransferStatusReport($request->stock_transfer, $dates);
                     if ($data_og->isEmpty()) {
@@ -212,8 +212,8 @@ class InventoryReportController extends Controller
                     }
                     $view = 'inventory_reports.stock_transfer_status_report_pdf';
                     $output = 'stock_transfer_status_report.pdf';
-                    $this->splitPdf($data_og, $view, $output);
-                    break;
+                    return $this->splitPdf($data_og, $view, $output);
+                    
                 }
             case 10:
                 $data_og = $this->stockMaxLevel();
@@ -222,8 +222,8 @@ class InventoryReportController extends Controller
                 }
                 $view = 'inventory_reports.stock_max_level_pdf';
                 $output = 'stock_max_level.pdf';
-                $this->splitPdf($data_og, $view, $output);
-                break;
+                return $this->splitPdf($data_og, $view, $output);
+                
             case 11:
                 $data_og = $this->stockMinLevel();
                 if ($data_og == []) {
@@ -231,8 +231,7 @@ class InventoryReportController extends Controller
                 }
                 $view = 'inventory_reports.stock_min_level_pdf';
                 $output = 'stock_min_level.pdf';
-                $this->splitPdf($data_og, $view, $output);
-                break;
+                return $this->splitPdf($data_og, $view, $output);
 
             default:
         }
@@ -795,5 +794,51 @@ class InventoryReportController extends Controller
             'decreaseAdjustments'
         ));
     }
+
+
+        /**
+     * Unified PDF generator used by multiple report cases.
+     *
+     * @param mixed  $data_og  Array|Collection|Eloquent collection of data to pass to blade
+     * @param string $view     Blade view path (e.g. 'inventory_reports.stock_issue_report_pdf')
+     * @param string $output   Filename to stream (e.g. 'stock_issue_report.pdf')
+     * @param array|null $pharmacy Optional pharmacy meta (if null, method will build from settings)
+     * @return \Illuminate\Http\Response
+     */
+    public function splitPdf($data_og, $view, $output, $pharmacy = null)
+    {
+        // Build pharmacy metadata if not supplied
+        if ($pharmacy === null) {
+            $pharmacy = [];
+            $pharmacy['name'] = Setting::where('id', 100)->value('value');
+            $pharmacy['address'] = Setting::where('id', 106)->value('value');
+            $pharmacy['phone'] = Setting::where('id', 107)->value('value');
+            $pharmacy['email'] = Setting::where('id', 108)->value('value');
+            $pharmacy['website'] = Setting::where('id', 109)->value('value');
+            $pharmacy['logo'] = Setting::where('id', 105)->value('value');
+            $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
+        }
+
+        // Normalize data variables for blade templates (some blades expect 'data', others 'data_og')
+        $params = [
+            'pharmacy' => $pharmacy,
+            'data'     => $data_og,
+            'data_og'  => $data_og,
+        ];
+
+        // If the dataset is empty return the pdf_zero_data view (keeps behaviour consistent)
+        // Works for arrays and Eloquent Collections
+        if ((is_array($data_og) && count($data_og) === 0)
+            || ($data_og instanceof \Illuminate\Support\Collection && $data_og->isEmpty())
+            || ($data_og instanceof \Illuminate\Database\Eloquent\Collection && $data_og->isEmpty())
+        ) {
+            return response()->view('error_pages.pdf_zero_data');
+        }
+
+        // Generate and stream pdf
+        $pdf = PDF::loadView($view, $params)->setPaper('a4', '');
+        return $pdf->stream($output);
+    }
+
 
 }
