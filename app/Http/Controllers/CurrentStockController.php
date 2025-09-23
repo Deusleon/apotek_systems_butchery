@@ -21,6 +21,9 @@ class CurrentStockController extends Controller
 
     public function currentStock()
     {
+        if (!Auth()->user()->checkPermission('View Current Stock')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $stocks = DB::table('inv_current_stock')
             ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')

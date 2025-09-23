@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Log;
 class OutGoingStockController extends Controller {
 
     public function index(){
+        if (!Auth()->user()->checkPermission('View Outgoing Stock')) {
+            abort(403, 'Access Denied');
+        }
         return view('stock_management.out_going_stock.index');
     }
 

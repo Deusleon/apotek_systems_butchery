@@ -101,7 +101,9 @@
                                     <th>Buy Price</th>
                                     <th>Sell Price</th>
                                     <th>Profit%</th>
-                                    <th>Action</th>
+                                    @if(auth()->user()->checkPermission('Edit Price List'))
+                                        <th>Action</th>
+                                    @endif
                                     <th hidden>Category ID</th>
                                 </tr>
                             </thead>
@@ -120,7 +122,9 @@
                                     <th>Buy Price</th>
                                     <th>Sell Price</th>
                                     <th>Profit%</th>
-                                    <th>Action</th>
+                                    @if(auth()->user()->checkPermission('Edit Price List'))
+                                        <th>Action</th>
+                                    @endif
                                     <th hidden>Category ID</th>
                                 </tr>
                             </thead>
@@ -397,22 +401,24 @@
                         { data: "unit_cost", render: data => formatMoney(data) },
                         { data: "price", render: data => formatMoney(data) },
                         { data: "profit", render: data => (data ? `${Math.round(data)}%` : '0%') },
-                        {
-                            data: "id", render: function (data, type, row) {
-                                return `
-                                <button id='pricing' class='btn btn-sm btn-rounded btn-primary'
-                                    type='button' data-toggle="modal" data-target="#edit"
-                                    data-name='${row.product_name ?? ''}'
-                                    data-unit-cost='${row.unit_cost ?? ''}'
-                                    data-price='${row.price ?? ''}'
-                                    data-id='${row.id ?? ''}'
-                                    data-brand='${row.brand ?? ''}'
-                                    data-pack-size='${row.pack_size ?? ''}'
-                                    data-sales-uom='${row.sales_uom ?? ''}'
-                                    data-price-category-id='${row.price_category_id ?? ''}'>Edit</button>
-                            `;
-                            }
-                        },
+                        @if(auth()->user()->checkPermission('Edit Price List'))
+                                {
+                                data: "id", render: function (data, type, row) {
+                                    return `
+                                                <button id='pricing' class='btn btn-sm btn-rounded btn-primary'
+                                                    type='button' data-toggle="modal" data-target="#edit"
+                                                    data-name='${row.product_name ?? ''}'
+                                                    data-unit-cost='${row.unit_cost ?? ''}'
+                                                    data-price='${row.price ?? ''}'
+                                                    data-id='${row.id ?? ''}'
+                                                    data-brand='${row.brand ?? ''}'
+                                                    data-pack-size='${row.pack_size ?? ''}'
+                                                    data-sales-uom='${row.sales_uom ?? ''}'
+                                                    data-price-category-id='${row.price_category_id ?? ''}'>Edit</button>
+                                            `;
+                                }
+                            },
+                        @endif
                         { data: "price_category_id", visible: false } // hidden but present
                     ]
                 });
@@ -432,9 +438,9 @@
                         { data: "batch_number", render: data => data ?? '' },
                         { data: "unit_cost", render: data => formatMoney(data) },
                         { data: "price", render: data => formatMoney(data) },
-                        { data: "purchased_at", render: data => data ? data.split(' ')[0] : '' }, 
+                        { data: "purchased_at", render: data => data ? data.split(' ')[0] : '' },
                         // { data: "updated_at", render: data => data ? data.split(' ')[0] : '' }, 
-                        { data: "price_category_id", visible: false } 
+                        { data: "price_category_id", visible: false }
                     ]
                 });
             }

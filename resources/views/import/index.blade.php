@@ -102,16 +102,18 @@
                 <a class="nav-link text-uppercase" id="invoice-received" href="{{ route('import-data') }}" role="tab"
                     aria-controls="quotes_list" aria-selected="false">Import Stocks</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link text-uppercase" id="order-received" href="{{ route('download-products-template') }}"
-                    role="tab" aria-controls="new_quotes" aria-selected="true">  Products Template
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-uppercase" id="order-received" href="{{ route('download-template') }}" role="tab"
-                    aria-controls="new_quotes" aria-selected="true">  Stock Template
-                </a>
-            </li>
+            @if (auth()->user()->checkPermission('Download Import Templates'))
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" id="order-received" href="{{ route('download-products-template') }}"
+                        role="tab" aria-controls="new_quotes" aria-selected="true"> Products Template
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" id="order-received" href="{{ route('download-template') }}" role="tab"
+                        aria-controls="new_quotes" aria-selected="true"> Stock Template
+                    </a>
+                </li>
+            @endif
         </ul>
         <div class="card">
             <div class="card-body">
@@ -230,13 +232,13 @@
                     fileInput.val('');
                     label.html('Choose file');
                     form.prepend(`
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="feather icon-alert-circle"></i> File size exceeds 20MB limit
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        `);
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <i class="feather icon-alert-circle"></i> File size exceeds 20MB limit
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            `);
                     return;
                 }
 
@@ -246,13 +248,13 @@
                     fileInput.val('');
                     label.html('Choose file');
                     form.prepend(`
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="feather icon-alert-circle"></i> Invalid file type. Please upload an Excel file (xlsx, xls) or CSV file
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                        `);
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <i class="feather icon-alert-circle"></i> Invalid file type. Please upload an Excel file (xlsx, xls) or CSV file
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            `);
                     return;
                 }
 
@@ -272,13 +274,13 @@
                         isValid = false;
                         const fieldName = $(this).prev('label').text().replace(' *', '');
                         form.prepend(`
-                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                    <i class="feather icon-alert-circle"></i> Please select ${fieldName}
-                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                            `);
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                        <i class="feather icon-alert-circle"></i> Please select ${fieldName}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                `);
                     }
                 });
 

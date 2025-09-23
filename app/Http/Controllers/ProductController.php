@@ -19,7 +19,9 @@ class ProductController extends Controller
 
     public function index()
     {
-
+        if (!Auth()->user()->checkPermission('View Products List')) {
+            abort(403, 'Access Denied');
+        }
         $products = Product::all();
         $category = Category::all();
         $sub_category = SubCategory::all();

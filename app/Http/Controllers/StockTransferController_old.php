@@ -26,9 +26,6 @@ class StockTransferController extends Controller
 
     public function index()
     {
-
-
-
         $stores = Store::where('name','<>','ALL')->get();
         $products = CurrentStock::select(DB::raw('sum(quantity) as quantity'),
             DB::raw('product_id'), DB::raw('max(id) as stock_id'))

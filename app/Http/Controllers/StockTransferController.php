@@ -24,7 +24,9 @@ use PDF;
 class StockTransferController extends Controller {
 
     public function index() {
-
+        if (!Auth()->user()->checkPermission('Create Stock Transfer')) {
+            abort(403, 'Access Denied');
+        }
         $storeId = current_store_id();
 
         if ( is_all_store() ) {
@@ -416,6 +418,9 @@ class StockTransferController extends Controller {
 
     public function stockTransferHistory()
     {
+        if (!Auth()->user()->checkPermission('View Stock Transfer')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $stores = Store::where('name', '<>', 'ALL')->get();
 

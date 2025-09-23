@@ -55,10 +55,10 @@
             @if(auth()->user()->checkPermission('View Current Stock'))
                 <li class=""><a href="{{ route('current-stocks') }}" class="">Current Stock</a></li>
             @endif
-            @if(auth()->user()->checkPermission('View Products'))
+            @if(auth()->user()->checkPermission('View Products List'))
                 <li class=""><a href="{{route('products.index')}}" class="">Product List</a></li>
             @endif
-            @if(auth()->user()->checkPermission('View Data Import'))
+            @if(auth()->user()->checkPermission('Products Import'))
                 <li class="nav-item"><a href="{{route('import-products')}}" class="nav-link"><span
                             class="pcoded-mtext">Products Import</span></a>
                 </li>
@@ -79,7 +79,7 @@
             @if(auth()->user()->checkPermission('View Stock Adjustment'))
                 <li class=""><a href="{{ route('new-stock-adjustment') }}" class="">Stock Adjustment</a></li>
             @endif
-            @if(auth()->user()->checkPermission('View Daily Stock Count'))
+            @if(auth()->user()->checkPermission('View Stock Count'))
                 <li class=""><a href="{{ route('daily-stock-count.index') }}" class="">Stock Count</a></li>
             @endif
             @if(auth()->user()->checkPermission('View Stock Discrepancy Report'))

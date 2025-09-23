@@ -19,7 +19,9 @@ use Yajra\DataTables\DataTables;
 class PriceListController extends Controller {
 
     public function index( Request $request ) {
-
+        if (!Auth()->user()->checkPermission('View Price List')) {
+            abort(403, 'Access Denied');
+        }
         $price_categories = PriceCategory::all();
 
         $current_stocks = DB::table( 'inv_current_stock' )
