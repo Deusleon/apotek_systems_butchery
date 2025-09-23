@@ -77,15 +77,13 @@ function populateTable(data) {
         );
         let actions = "";
 
-        if (typeof canViewSalesHistory !== "undefined" && canViewSalesHistory) {
-            actions += `<button type='button' class='btn btn-sm show-sales btn-rounded btn-success'
+        actions += `<button type='button' class='btn btn-sm show-sales btn-rounded btn-success'
                     data-receipt='${item.receipt_number}'
                     data-customer='${item.customer.name}'
                     data-sale-id='${item.id}'
                     data-date='${moment(item.date).format("YYYY-MM-DD")}'>
                     Show
                 </button>`;
-        }
 
         if (
             typeof canPrintSalesHistory !== "undefined" &&

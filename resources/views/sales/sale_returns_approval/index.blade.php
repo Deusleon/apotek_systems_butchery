@@ -96,7 +96,7 @@
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table id="return_table" class="display table nowrap table-striped table-hover" style="width:100%">
+                    <table id="return_table" class="display table table-striped table-hover" style="width:100%">
                         <thead>
                             <tr>
                                 <th>Product Name</th>
@@ -105,10 +105,10 @@
                                 <th>Return Date</th>
                                 <th>Qty Returned</th>
                                 <th>Refund</th>
-                                @if (Auth::user()->checkPermission('Approve Sales Return'))
+                                @if(Auth::user()->checkPermission('Approve Sales Return'))
                                     <th>Action</th>
                                 @else
-                                    <th></th>
+                                    <th style="display: none"></th>
                                 @endif
                             </tr>
                         </thead>
@@ -192,54 +192,6 @@
             getRetunedProducts('reject', product.item_returned)
         });
 
-
-        function getRetunedProducts(action, product) {
-            var status = document.getElementById("retun_status").value;
-            var range = document.getElementById("returned_date").value;
-            var date = range.split('-');
-            if (date) {
-                $('#loading').show();
-                $.ajax({
-                    url: '{{route('getRetunedProducts')}}',
-                    data: {
-                        "_token": '{{ csrf_token() }}',
-                        "date": date,
-                        "status": status,
-                        "action": action,
-                        "product": product
-                    },
-                    type: 'get',
-                    dataType: 'json',
-                    cache: false,
-                    success: function (data) {
-                        // console.log('NewData:', data);
-                        if (status == 3) {
-
-                            return_table.column(6).visible(false);
-                            data.forEach(function (data) {
-                                if (data.status == 5) {
-                                    data.item_returned.bought_qty += Number(data.item_returned.rtn_qty); //This calculate the original bought qty
-                                    data.item_returned.amount = (data.item_returned.amount / data.item_returned.rtn_qty) * data.item_returned.bought_qty;
-                                }
-
-                            });
-                        } else if (status == 4) {
-                            return_table.column(6).visible(false);
-                        } else {
-                            return_table.column(6).visible(true);
-                        }
-                        return_table.clear();
-                        return_table.rows.add(data);
-                        return_table.draw();
-
-                    },
-                    complete: function () {
-                        $('#loading').hide();
-                    }
-                });
-            }
-        }
-
         var return_table = $('#return_table').DataTable({
             bPaginate: true,
             bInfo: true,
@@ -283,17 +235,64 @@
                 @if(Auth::user()->checkPermission('Approve Sales Return'))
                                         {
                         data: "action",
-                        defaultContent: "<button type='button' id='approve' class='btn btn-sm btn-rounded btn-primary'>Approve</button>" +
-                            "<button type='button' id='reject' class='btn btn-sm btn-rounded btn-danger'>Reject</button>"
+                        defaultContent: "<button type='button' id='approve' class='btn btn-sm btn-rounded btn-primary'>Approve</button><button type='button' id='reject' class='btn btn-sm btn-rounded btn-danger'>Reject</button>"
                     }
-                @else{
+                @else
+                        {
                             data: "",
-                            defaultContent: ""
+                            defaultContent: "", visible: false
                         }
                     @endif
 
                         ], aaSorting: [[1, "desc"]]
         });
+
+        function getRetunedProducts(action, product) {
+            var status = document.getElementById("retun_status").value;
+            var range = document.getElementById("returned_date").value;
+            var date = range.split('-');
+            if (date) {
+                $('#loading').show();
+                $.ajax({
+                    url: '{{route('getRetunedProducts')}}',
+                    data: {
+                        "_token": '{{ csrf_token() }}',
+                        "date": date,
+                        "status": status,
+                        "action": action,
+                        "product": product
+                    },
+                    type: 'get',
+                    dataType: 'json',
+                    cache: false,
+                    success: function (data) {
+                        // console.log('NewData:', data);
+                        if (status == 3) {
+
+                            return_table.column(6).visible(false);
+                            data.forEach(function (data) {
+                                if (data.status == 5) {
+                                    data.item_returned.bought_qty += Number(data.item_returned.rtn_qty);
+                                    data.item_returned.amount = (data.item_returned.amount / data.item_returned.rtn_qty) * data.item_returned.bought_qty;
+                                }
+
+                            });
+                        } else if (status == 4) {
+                            return_table.column(6).visible(false);
+                        } else {
+                            return_table.column(6).visible(true);
+                        }
+                        return_table.clear();
+                        return_table.rows.add(data);
+                        return_table.draw();
+
+                    },
+                    complete: function () {
+                        $('#loading').hide();
+                    }
+                });
+            }
+        }
 
         $('#searching_returns').on('keyup', function () {
             return_table.search(this.value).draw();

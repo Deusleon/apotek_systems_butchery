@@ -62,7 +62,7 @@ class SaleController extends Controller
     }
     public function creditSale()
     {
-        if (!Auth()->user()->checkPermission('View Credit Sales')) {
+        if (!Auth::user()->checkPermission('View Credit Sales')) {
             abort(403, 'Access Denied');
         }
 
@@ -473,7 +473,7 @@ class SaleController extends Controller
                 $customer->total_credit += $credit->balance;
                 $credit->save();
                 $customer->save();
-//                session()->flash("alert-success", "Sale recorded successfully!");
+              // session()->flash("alert-success", "Sale recorded successfully!");
             }
 
         }
