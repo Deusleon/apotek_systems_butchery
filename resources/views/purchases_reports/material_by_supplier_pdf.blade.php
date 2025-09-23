@@ -105,7 +105,7 @@
             </thead>
             @foreach($data as $item)
                 <tr>
-                    <td>{{$item->product['name']}}</td>
+                    <td>{{$item->product_name}}</td>
                     <td align="left">
                         {{number_format($item->quantity,0)}}
                     </td>
