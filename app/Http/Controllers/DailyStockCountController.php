@@ -25,6 +25,9 @@ class DailyStockCountController extends Controller
 
     public function index()
     {
+        if (!Auth()->user()->checkPermission('View Stock Count')) {
+            abort(403, 'Access Denied');
+        }
 
         return view('stock_management.daily_stock_count.index');
 

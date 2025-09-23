@@ -24,17 +24,21 @@
 
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link text-uppercase" id="current-stock-tablist" href="{{ route('new-stock-adjustment') }}"
-                    aria-controls="current-stock" aria-selected="true">Stock
-                    Adjustment</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active text-uppercase" id="all-stock-tablist"
-                    href="{{ route('stock-adjustments-history') }}" aria-controls="stock_list"
-                    aria-selected="false">Adjustment History
-                </a>
-            </li>
+            @if(auth()->user()->checkPermission('Create Stock Adjustment'))
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" id="current-stock-tablist" href="{{ route('new-stock-adjustment') }}"
+                        aria-controls="current-stock" aria-selected="true">Stock
+                        Adjustment</a>
+                </li>
+            @endif
+            @if(auth()->user()->checkPermission('View Stock Adjustment'))
+                <li class="nav-item">
+                    <a class="nav-link active text-uppercase" id="all-stock-tablist"
+                        href="{{ route('stock-adjustments-history') }}" aria-controls="stock_list"
+                        aria-selected="false">Adjustment History
+                    </a>
+                </li>
+            @endif
         </ul>
         <div class="card">
             <div class="card-body">
@@ -49,7 +53,7 @@
                             <tr>
                                 <th>Product Name</th>
                                 <th>Category</th>
-                                @if (userCan('view stock adjustments'))
+                                @if(auth()->user()->checkPermission('View Stock Adjustment'))
                                     <th>Actions</th>
                                 @endif
                             </tr>
@@ -64,18 +68,20 @@
                                         {{ $adjustment->pack_size ?? '' }}{{ $adjustment->sales_uom ?? '' }}
                                     </td>
                                     <td>{{ $adjustment->category_name }}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-success btn-sm btn-rounded btn-show-adjustment"
-                                            data-toggle="modal" data-target="#showStockAdjustment"
-                                            data-product-id="{{ $adjustment->product_id }}"
-                                            data-product-name="{{ $adjustment->name }}"
-                                            data-product-brand="{{ $adjustment->brand }}"
-                                            data-product-pack-size="{{ $adjustment->pack_size }}"
-                                            data-product-sales-uom="{{ $adjustment->sales_uom }}"
-                                            data-more-details='@json($detailed[$adjustment->product_id] ?? [])'>
-                                            Show
-                                        </button>
-                                    </td>
+                                    @if(auth()->user()->checkPermission('View Stock Adjustment'))
+                                        <td>
+                                            <button type="button" class="btn btn-success btn-sm btn-rounded btn-show-adjustment"
+                                                data-toggle="modal" data-target="#showStockAdjustment"
+                                                data-product-id="{{ $adjustment->product_id }}"
+                                                data-product-name="{{ $adjustment->name }}"
+                                                data-product-brand="{{ $adjustment->brand }}"
+                                                data-product-pack-size="{{ $adjustment->pack_size }}"
+                                                data-product-sales-uom="{{ $adjustment->sales_uom }}"
+                                                data-more-details='@json($detailed[$adjustment->product_id] ?? [])'>
+                                                Show
+                                            </button>
+                                        </td>
+                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>
@@ -139,8 +145,8 @@
                     // header row for batch
                     $tbody.append(
                         `<tr class="table-active">
-                                            <td colspan="7"><strong>Batch #:</strong> ${batchNo}</td>
-                                        </tr>`
+                                                        <td colspan="7"><strong>Batch #:</strong> ${batchNo}</td>
+                                                    </tr>`
                     );
 
                     logs.forEach(log => {
@@ -161,18 +167,18 @@
 
                         $tbody.append(
                             `<tr>
-                                <td>${created}</td>
-                                <td>
-                                    <span class="badge p-2" style="${type === 'Postive' ? 'background-color:#BBF7D0; color:#48bb78;' : 'background-color:#FECACA; color:#f56565;'}width:60px;" >
-                                        ${capitalize(type)}
-                                    </span>
-                                </td>
-                                <td>${qty}</td>
-                                <td>${prevqty}</td>
-                                <td>${newqty}</td>
-                                <td>${reason}</td>
-                                <td>${userNm}</td>
-                            </tr>`
+                                            <td>${created}</td>
+                                            <td>
+                                                <span class="badge p-2" style="${type === 'Postive' ? 'background-color:#BBF7D0; color:#48bb78;' : 'background-color:#FECACA; color:#f56565;'}width:60px;" >
+                                                    ${capitalize(type)}
+                                                </span>
+                                            </td>
+                                            <td>${qty}</td>
+                                            <td>${prevqty}</td>
+                                            <td>${newqty}</td>
+                                            <td>${reason}</td>
+                                            <td>${userNm}</td>
+                                        </tr>`
                         );
                     });
                 });

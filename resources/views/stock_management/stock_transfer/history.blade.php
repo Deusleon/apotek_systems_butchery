@@ -68,15 +68,19 @@
     </style>
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link text-uppercase" id="invoice-received" href="{{ route('stock-transfer.index') }}"
-                    role="tab" aria-controls="quotes_list" aria-selected="false">New Transfer</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active text-uppercase" id="order-received" href="{{ route('stock-transfer-history') }}"
-                    role="tab" aria-controls="new_quotes" aria-selected="true">Transfer History
-                </a>
-            </li>
+            @if(auth()->user()->checkPermission('Create Stock Transfer'))
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" id="invoice-received" href="{{ route('stock-transfer.index') }}"
+                        role="tab" aria-controls="quotes_list" aria-selected="false">New Transfer</a>
+                </li>
+            @endif
+            @if(auth()->user()->checkPermission('View Stock Transfer'))
+                <li class="nav-item">
+                    <a class="nav-link active text-uppercase" id="order-received" href="{{ route('stock-transfer-history') }}"
+                        role="tab" aria-controls="new_quotes" aria-selected="true">Transfer History
+                    </a>
+                </li>
+            @endif
         </ul>
         <div class="tab-content" id="myTabContent">
             {{-- Stock Transfer History Start --}}
@@ -146,10 +150,10 @@
                                                                         $statuses = [
                                                                             'created' => ['name' => 'Pending', 'class' => 'background-color: #bfdbfe; color:#3B82F6;'],
                                                                             'assigned' => ['name' => 'Assigned', 'class' => 'background-color: #FDBA74; color:#FF2A00;'],
-                                                                            'approved' => ['name' => 'Approved', 'class' => 'background-color: #FCE300; color:#FFEB3B;'],
+                                                                            'approved' => ['name' => 'Approved', 'class' => 'background-color: #FCE300; color:#ffffff;'],
                                                                             'in_transit' => ['name' => 'In Transit', 'class' => 'background-color: #67E8F9; color: #00BCD4;'],
                                                                             'acknowledged' => ['name' => 'Acknowledged', 'class' => 'background-color:#BBF7D0; color:#48bb78;'],
-                                                                            'completed' => ['name' => 'Completed', 'class' => 'background-color: #d8b4fe; color:#8B5CF6;'],
+                                                                            'completed' => ['name' => 'Completed', 'class' => 'background-color: #BBF7D0; color:#48bb78;'],
                                                                             'cancelled' => ['name' => 'Cancelled', 'class' => 'background-color:#FECACA; color:#f56565;']
                                                                         ];
                                                                         $currentStatus = $transfer->status ?? 1;
@@ -171,8 +175,7 @@
                                                                         data-approved-by="{{ $transfer->approved_by ? $transfer->approved_by_name : '' }}"
                                                                         data-cancelled-by="{{ $transfer->cancelled_by ? $transfer->cancelled_by_name : '' }}"
                                                                         data-acknowledged-by="{{ $transfer->acknowledged_by ? $transfer->acknowledged_by_name : '' }}"
-                                                                        data-remarks="{{ $transfer->remarks }}"
-                                                                        data-notes="{{ $transfer->notes }}"
+                                                                        data-remarks="{{ $transfer->remarks }}" data-notes="{{ $transfer->notes }}"
                                                                         data-items='{{ json_encode($transfer->all_items->map(function ($item) {
                                         return [
                                             'id' => $item->id,
@@ -187,7 +190,7 @@
                                     })) }}' title="Show Details">
                                                                         Show
                                                                     </button>
-                                                                    @if (userCan('stock_transfer.edit'))
+                                                                    @if (Auth()->user()->checkPermission('Edit Stock Transfer'))
                                                                         <!-- Edit Button -->
                                                                         @if ($transfer->status === 'created')
                                                                             <a href="{{ route('stock-transfer.edit', $transfer->transfer_no) }}"
@@ -197,14 +200,9 @@
                                                                         @endif
 
                                                                     @endif
-                                                                    @if (userCan('stock_transfer.acknowledge'))
+                                                                    @if (Auth()->user()->checkPermission('Acknowledge Stock Transfer'))
                                                                         <!-- Acknowledge Button -->
                                                                         @if ($transfer->status === 'approved')
-                                                                            {{-- <a
-                                                                                href="{{ route('stock-transfer-acknowledge.index', $transfer->transfer_no) }}"
-                                                                                class="mt-2 btn btn-sm btn-rounded btn-primary">
-                                                                                Acknowledge
-                                                                            </a> --}}
                                                                             <button type="button" class="btn btn-primary btn-sm btn-rounded btn-acknowledge"
                                                                                 data-toggle="modal" data-target="#acknowledgeModal"
                                                                                 data-transfer-no="{{ $transfer->transfer_no }}"
@@ -286,7 +284,12 @@
             approveBtn.hide();
             rejectBtn.hide();
             closeBtn.hide();
-            const canApprove = @json(userCan('stock_transfer.approve'));
+            @if (Auth::user()->checkPermission('Approve Stock Transfer'))
+                const canApprove = true;
+            @else
+                const canApprove = false;
+            @endif
+
             if (status === 'Pending' && canApprove) {
                 approveBtn.show().data({
                     'transfer-no': transferNo,
@@ -310,7 +313,7 @@
                 $('#acknowledge_remark_div').attr('hidden', true);
                 $('#show_approved_by_label').text('Approved By:');
                 $('#show_approved_by').text(approvedBy);
-            }else if (status === 'Approved') {
+            } else if (status === 'Approved') {
                 $('#show_remarks_label').text('Remarks:');
                 $('#show_remarks_textarea').text(remarks || 'N/A');
                 $('#acknowledge_remark_div').attr('hidden', true);
@@ -346,15 +349,15 @@
                 }
                 items.forEach(item => {
                     let row = `
-                <tr>
-                    <td>${item.product_name}</td>
-                    <td>${Number(item.quantity ?? 0).toFixed(0)}</td>
-            `;
+                                            <tr>
+                                                <td>${item.product_name}</td>
+                                                <td>${Number(item.quantity ?? 0).toFixed(0)}</td>
+                                        `;
 
                     if (status === 'Completed' || status === 'Acknowledged') {
                         row += `
-                    <td>${Number(item.accepted_qty ?? 0).toFixed(0)}</td>
-                `;
+                                                <td>${Number(item.accepted_qty ?? 0).toFixed(0)}</td>
+                                            `;
                     }
 
                     row += `</tr>`;
@@ -427,16 +430,16 @@
                 const tbody = table.find('tbody');
                 items.forEach((item, index) => {
                     tbody.append(`
-                                                                                                                                        <tr>
-                                                                                                                                            <td>
-                                                                                                                                                ${item.product_name}
-                                                                                                                                                <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
-                                                                                                                                            </td>
-                                                                                                                                            <td>
-                                                                                                                                                <input type="number" name="transfers[${index}][transfer_qty]" class="form-control" value="${item.quantity}" required>
-                                                                                                                                            </td>
-                                                                                                                                        </tr>
-                                                                                                                                    `);
+                                                                                                                                                                    <tr>
+                                                                                                                                                                        <td>
+                                                                                                                                                                            ${item.product_name}
+                                                                                                                                                                            <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
+                                                                                                                                                                        </td>
+                                                                                                                                                                        <td>
+                                                                                                                                                                            <input type="number" name="transfers[${index}][transfer_qty]" class="form-control" value="${item.quantity}" required>
+                                                                                                                                                                        </td>
+                                                                                                                                                                    </tr>
+                                                                                                                                                                `);
                 });
                 itemsContainer.append(table);
             }
@@ -483,18 +486,18 @@
                             $('#acknowledge_to_store').text(item.to_store.name);
 
                             $('#acknowledge_items_body').append(`
-                                                <tr data-item-id="${item.id}">
-                                                    <td>
-                                                        ${productLabel}
-                                                        <!-- Hidden inputs for id and original transfer_qty so they are submitted -->
-                                                        <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
-                                                        <input type="hidden" name="transfers[${index}][transfer_qty]" value="${transferQty}">
-                                                    </td>
-                                                    <td class="transferred">${transferQty}</td>
-                                                    <td class="received">${acceptedQty}</td>
-                                                    <td class="receive text-center" data-original="${transferQty}" contenteditable="false">${receiveDefault}</td>
-                                                </tr>
-                                            `);
+                                                                            <tr data-item-id="${item.id}">
+                                                                                <td>
+                                                                                    ${productLabel}
+                                                                                    <!-- Hidden inputs for id and original transfer_qty so they are submitted -->
+                                                                                    <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
+                                                                                    <input type="hidden" name="transfers[${index}][transfer_qty]" value="${transferQty}">
+                                                                                </td>
+                                                                                <td class="transferred">${transferQty}</td>
+                                                                                <td class="received">${acceptedQty}</td>
+                                                                                <td class="receive text-center" data-original="${transferQty}" contenteditable="false">${receiveDefault}</td>
+                                                                            </tr>
+                                                                        `);
                         });
                     } else {
                         notify(

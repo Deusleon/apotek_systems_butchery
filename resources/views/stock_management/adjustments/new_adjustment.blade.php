@@ -25,16 +25,20 @@
 
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active text-uppercase" id="current-stock-tablist"
-                    href="{{ route('new-stock-adjustment') }}" aria-controls="current-stock" aria-selected="true">Stock
-                    Adjustment</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-uppercase" id="all-stock-tablist" href="{{ route('stock-adjustments-history') }}"
-                    aria-controls="stock_list" aria-selected="false">Adjustment History
-                </a>
-            </li>
+            @if(auth()->user()->checkPermission('Create Stock Adjustment'))
+                <li class="nav-item">
+                    <a class="nav-link active text-uppercase" id="current-stock-tablist"
+                        href="{{ route('new-stock-adjustment') }}" aria-controls="current-stock" aria-selected="true">Stock
+                        Adjustment</a>
+                </li>
+            @endif
+            @if(auth()->user()->checkPermission('View Stock Adjustment'))
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" id="all-stock-tablist" href="{{ route('stock-adjustments-history') }}"
+                        aria-controls="stock_list" aria-selected="false">Adjustment History
+                    </a>
+                </li>
+            @endif
         </ul>
         <div class="card">
             <div class="card-body">
@@ -70,7 +74,7 @@
                                 <th>Category</th>
                                 <th hidden>Pack Size</th>
                                 <th>Quantity</th>
-                                @if (userCan('create stock adjustments'))
+                                @if(auth()->user()->checkPermission('Create Stock Adjustment'))
                                     <th>Actions</th>
                                 @endif
                             </tr>
@@ -87,7 +91,7 @@
                                     <td id="category_{{ $allstock->product_id }}">{{ $allstock->cat_name }}</td>
                                     <td id="pack_size_{{ $allstock->product_id }}" hidden>{{ $allstock->pack_size }}</td>
                                     <td id="quantity_{{ $allstock->product_id }}">{{ number_format($allstock->quantity) }}</td>
-                                    @if (userCan('create stock adjustments'))
+                        @if(auth()->user()->checkPermission('Create Stock Adjustment'))
                                                         <td id="actions_{{ $allstock->product_id }}">
                                                             <!-- Adjustment Button -->
                                                             <button type="button" class="btn btn-primary btn-sm btn-rounded btn-adjust-stock"
@@ -122,7 +126,7 @@
                                 <th>Batch Number</th>
                                 <th>Expire Date</th>
                                 <th>Quantity</th>
-                                @if (userCan('create stock adjustments'))
+                                @if(auth()->user()->checkPermission('Create Stock Adjustment'))
                                     <th>Actions</th>
                                 @endif
                             </tr>
@@ -144,7 +148,7 @@
                                     <td id="d_quantity_{{ $allDet->product_id }}">
                                         {{ floor($allDet->quantity) == $allDet->quantity ? number_format($allDet->quantity, 0) : number_format($allDet->quantity, 1) }}
                                     </td>
-                                    @if (userCan('create stock adjustments'))
+                                     @if(auth()->user()->checkPermission('Create Stock Adjustment'))
                                                         <td id="actions_{{ $allDet->product_id }}">
                                                             <!-- Adjustment Button -->
                                                             <button type="button" class="btn btn-primary btn-sm btn-rounded btn-adjust-stock"
@@ -177,7 +181,7 @@
                                 <th>Category</th>
                                 <th hidden>Pack Size</th>
                                 <th>Quantity</th>
-                                @if (userCan('create stock adjustments'))
+                                @if(auth()->user()->checkPermission('Create Stock Adjustment'))
                                     <th>Actions</th>
                                 @endif
                             </tr>
@@ -194,7 +198,7 @@
                                     <td id="category_{{ $stock->product_id }}">{{ $stock->cat_name }}</td>
                                     <td id="pack_size_{{ $stock->product_id }}" hidden>{{ $stock->pack_size }}</td>
                                     <td id="quantity_{{ $stock->product_id }}">{{ number_format($stock->quantity) }}</td>
-                                    @if (userCan('create stock adjustments'))
+                                    @if(auth()->user()->checkPermission('Create Stock Adjustment'))
                                                         <td id="actions_{{ $stock->product_id }}">
                                                             <!-- Adjustment Button -->
                                                             <button type="button" class="btn btn-primary btn-sm btn-rounded btn-adjust-stock"
@@ -229,7 +233,7 @@
                                 <th>Batch Number</th>
                                 <th>Expire Date</th>
                                 <th>Quantity</th>
-                                @if (userCan('create stock adjustments'))
+                                @if(auth()->user()->checkPermission('Create Stock Adjustment'))
                                     <th>Actions</th>
                                 @endif
                             </tr>
@@ -251,7 +255,7 @@
                                     <td id="d_quantity_{{ $data->product_id }}">
                                         {{ floor($data->quantity) == $data->quantity ? number_format($data->quantity, 0) : number_format($data->quantity, 1) }}
                                     </td>
-                                    @if (userCan('create stock adjustments'))
+                                    @if(auth()->user()->checkPermission('Create Stock Adjustment'))
                                                         <td id="actions_{{ $data->product_id }}">
                                                             <!-- Adjustment Button -->
                                                             <button type="button" class="btn btn-primary btn-sm btn-rounded btn-adjust-stock"
@@ -283,7 +287,7 @@
                                 <th>Product Name</th>
                                 <th>Category</th>
                                 <th>Quantity</th>
-                                @if (userCan('create stock adjustments'))
+                                @if(auth()->user()->checkPermission('Create Stock Adjustment'))
                                     <th>Actions</th>
                                 @endif
                             </tr>
@@ -304,7 +308,7 @@
                                     <td id="o_quantity_{{ $out->product_id }}">
                                         {{ floor($out->quantity) == $out->quantity ? number_format($out->quantity, 0) : number_format($out->quantity, 1) }}
                                     </td>
-                                    @if (userCan('create stock adjustments'))
+                                    @if(auth()->user()->checkPermission('Create Stock Adjustment'))
                                                         <td id="actions_{{ $out->product_id }}">
                                                             <!-- Adjustment Button -->
                                                             <button type="button" class="btn btn-primary btn-sm btn-rounded btn-adjust-stock"
@@ -337,7 +341,7 @@
                                 <th>Batch Number</th>
                                 <th>Expire Date</th>
                                 <th>Quantity</th>
-                                @if (userCan('create stock adjustments'))
+                                @if(auth()->user()->checkPermission('Create Stock Adjustment'))
                                     <th>Actions</th>
                                 @endif
                             </tr>
@@ -359,7 +363,7 @@
                                     <td id="o_detal_quantity_{{ $outDet->product_id }}">
                                         {{ floor($outDet->quantity) == $outDet->quantity ? number_format($outDet->quantity, 0) : number_format($outDet->quantity, 1) }}
                                     </td>
-                                    @if (userCan('create stock adjustments'))
+                                    @if(auth()->user()->checkPermission('Create Stock Adjustment'))
                                                         <td id="actions_{{ $outDet->product_id }}">
                                                             <!-- Adjustment Button -->
                                                             <button type="button" class="btn btn-primary btn-sm btn-rounded btn-adjust-stock"

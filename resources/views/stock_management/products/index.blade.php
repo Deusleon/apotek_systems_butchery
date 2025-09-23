@@ -50,23 +50,23 @@
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                     <div class="row mb-3">
                         <!-- <div class="col-md-6">
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <i class="fas fa-download mr-1"></i> Export
-                                        </button>
-                                        <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'pdf']) }}" target="_blank">
-                                                <i class="far fa-file-pdf text-danger mr-2"></i>PDF
-                                            </a>
-                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'excel']) }}">
-                                                <i class="far fa-file-excel text-success mr-2"></i>Excel
-                                            </a>
-                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'csv']) }}">
-                                                <i class="fas fa-file-csv text-info mr-2"></i>CSV
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div> -->
+                                                    <div class="btn-group">
+                                                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            <i class="fas fa-download mr-1"></i> Export
+                                                        </button>
+                                                        <div class="dropdown-menu">
+                                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'pdf']) }}" target="_blank">
+                                                                <i class="far fa-file-pdf text-danger mr-2"></i>PDF
+                                                            </a>
+                                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'excel']) }}">
+                                                                <i class="far fa-file-excel text-success mr-2"></i>Excel
+                                                            </a>
+                                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'csv']) }}">
+                                                                <i class="fas fa-file-csv text-info mr-2"></i>CSV
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div> -->
                     </div>
                     <div class="row justify-content-end align-items-end mb-3">
                         <!-- Status Filter -->
@@ -95,7 +95,7 @@
                             </div>
                         </div>
                         <div class="col-md-3 text-right">
-                            @if(auth()->user()->checkPermission('Manage Products'))
+                            @if(auth()->user()->checkPermission('Add Products'))
                                 <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#create">
                                     <i class="fas fa-plus mr-1"></i>Add Product
                                 </button>
@@ -111,7 +111,7 @@
                                     <th hidden>Brand</th>
                                     <th hidden>Pack Size</th>
                                     <th>Category</th>
-                                    @if(auth()->user()->checkPermission('Manage Products'))
+                                    @if(auth()->user()->checkPermission('Edit Products') || auth()->user()->checkPermission('Delete Products'))
                                         <th>Actions</th>
                                     @endif
                                 </tr>
@@ -280,27 +280,38 @@
                         // {"data": "brand"},
                         // {"data": "pack_size"},
                         { "data": "category.name", "defaultContent": "" },
-                        @if(auth()->user()->checkPermission('Manage Products'))
-                                            {
-                                "data": "id",
-                                "orderable": false,
-                                "searchable": false,
-                                "render": function (data, type, row) {
-                                    return `
-                                                        <button type="button" class="btn btn-success btn-sm btn-rounded show-modal">
-                                                            Show
-                                                        </button>
-                                                        <button type="button" class="btn btn-primary btn-sm btn-rounded" id="edits">
-                                                            Edit
-                                                        </button>
-                                                        <button type="button" class="btn btn-danger btn-sm btn-rounded" id="deletes">
-                                                            Delete
-                                                        </button>
-                                                    `;
-                                }
+                        {
+                            "data": "id",
+                            "orderable": false,
+                            "searchable": false,
+                            "render": function (data, type, row) {
+                                let buttons = `
+                                        <button type="button" class="btn btn-success btn-sm btn-rounded show-modal">
+                                            Show
+                                        </button>
+                                    `;
+
+                                @if(auth()->user()->checkPermission('Edit Products'))
+                                    buttons += `
+                                                <button type="button" class="btn btn-primary btn-sm btn-rounded" id="edits">
+                                                    Edit
+                                                </button>
+                                            `;
+                                @endif
+
+                                @if(auth()->user()->checkPermission('Delete Products'))
+                                    buttons += `
+                                                <button type="button" class="btn btn-danger btn-sm btn-rounded" id="deletes">
+                                                    Delete
+                                                </button>
+                                            `;
+                                @endif
+
+                                    return buttons;
                             }
-                        @endif
-                                ],
+
+                        }
+                    ],
                     "order": [[0, 'asc']],
                     "pageLength": 10,
                     "drawCallback": function (settings) {

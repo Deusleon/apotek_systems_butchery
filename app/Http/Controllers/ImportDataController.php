@@ -28,6 +28,10 @@ use PhpOffice\PhpSpreadsheet\Writer\Xls;
 
 class ImportDataController extends Controller {
     public function index() {
+        if (!Auth()->user()->checkPermission('Products Import')) {
+            abort(403, 'Access Denied');
+        }
+
         $stores = Store::where( 'name', '<>', 'ALL' )->get();
         $import_history = ImportHistory::with( [ 'store', 'priceCategory', 'supplier', 'creator' ] )
         ->orderBy( 'created_at', 'desc' )

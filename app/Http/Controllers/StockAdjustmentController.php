@@ -21,14 +21,17 @@ use Illuminate\Support\Facades\Validator;
 
 class StockAdjustmentController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('permission:View Stock Adjustment|Stock Adjustment', ['only' => ['index', 'show']]);
-        $this->middleware('permission:Stock Adjustment', ['only' => ['create', 'store']]);
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('permission:View Stock Adjustment|Stock Adjustment', ['only' => ['index', 'show']]);
+    //     $this->middleware('permission:Stock Adjustment', ['only' => ['create', 'store']]);
+    // }
 
     public function index()
     {
+        if (!Auth()->user()->checkPermission('View Stock Adjustment')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         // Summary per product (grouped)
         $adjustments = StockAdjustmentLog::join('inv_current_stock', 'stock_adjustment_logs.current_stock_id', '=', 'inv_current_stock.id')
@@ -184,17 +187,7 @@ class StockAdjustmentController extends Controller
             ->whereHas('product') // Only get stocks that have a valid product
             ->where('store_id', session('store_id', 1))
             ->get();
-        
-        // Debug the data
-        // Log::info('Stocks count: ' . $stocks->count()); 
-        // foreach ($stocks as $stock) {
-        //     Log::info('Stock ID: ' . $stock->id);
-        //     Log::info('Product relationship: ' . ($stock->product ? 'exists' : 'null'));
-        //     if ($stock->product) {
-        //         Log::info('Product name: ' . $stock->product->name);
-        //     }
-        // }
-        
+                
         $reasons = AdjustmentReason::all();
         return view('stock_management.adjustments.create', compact('stocks', 'reasons'));
     }
