@@ -94,9 +94,7 @@
                                         <th>VAT</th>
                                         <th>Discount</th>
                                         <th>Amount</th>
-                                        @if(Auth::user()->checkPermission('Show Sales History Details') || Auth::user()->checkPermission('Print Sales History'))
-                                            <th>Action</th>
-                                        @endif
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -174,7 +172,6 @@
                 receiptBaseUrl: "{{ route('sale-reprint-receipt-get', ['receipt' => ':receipt']) }}"
             }
         };
-        var canViewSalesHistory = {{ auth()->user()->checkPermission('Show Sales History Details') ? 'true' : 'false' }};
         var canPrintSalesHistory = {{ auth()->user()->checkPermission('Print Sales History') ? 'true' : 'false' }};
 
     </script>

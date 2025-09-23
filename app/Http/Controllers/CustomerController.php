@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\DB;
 class CustomerController extends Controller {
 
     public function index() {
+        if (!Auth()->user()->checkPermission('View Customers')) {
+            abort(403, 'Access Denied');
+        }
         $customers = Customer::orderBy( 'id', 'ASC' )->get();
         foreach ( $customers as $customer ) {
             $customer_count = DB::table( 'sales' )->where( 'customer_id', $customer->id )->count();

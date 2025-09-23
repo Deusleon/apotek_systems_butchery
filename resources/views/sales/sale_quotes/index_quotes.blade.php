@@ -197,9 +197,7 @@
                                 <th>Customer</th>
                                 <th>Date</th>
                                 <th>Amount</th>
-                                @if(auth()->user()->checkPermission('Edit Sales Orders') || auth()->user()->checkPermission('Show Order Details') || auth()->user()->checkPermission('Print Sales Orders') || auth()->user()->checkPermission('Convert Sales Orders'))
-                                    <th>Action</th>
-                                @endif
+                                <th>Action</th>
                                 {{-- <th>Sale Type</th>--}}
                                 {{-- <th>VAT</th>--}}
                                 {{-- <th>Discount</th>--}}
@@ -405,61 +403,55 @@
                         render: function (data) {
                             return formatMoney(data);
                         }
-                    },
-                    @if(auth()->user()->checkPermission('Edit Sales Orders') || auth()->user()->checkPermission('Show Order Details') || auth()->user()->checkPermission('Print Sales Orders') || auth()->user()->checkPermission('Convert Sales Orders'))
-                                    {
-                            data: null,
-                            render: function (data, type, row) {
-                                let receipt_url = '{{ route('receiptReprint', 'receipt_id') }}'.replace('receipt_id', row.id);
-                                let update_url = '{{ route('updateSale', 'receipt_id') }}'.replace('receipt_id', row.id);
+                    }, {
+                        data: null,
+                        render: function (data, type, row) {
+                            let receipt_url = '{{ route('receiptReprint', 'receipt_id') }}'.replace('receipt_id', row.id);
+                            let update_url = '{{ route('updateSale', 'receipt_id') }}'.replace('receipt_id', row.id);
 
-                                let buttons = ``;
+                            let buttons = ``;
 
-                                @if(auth()->user()->checkPermission('Show Order Details'))
+                            buttons += `
+                                                                                    <button class="btn btn-sm btn-rounded btn-success" type="button"
+                                                                                            onclick="showQuoteDetails(event)"
+                                                                                            id="quote_details">Show
+                                                                                    </button>`;
+                            @if(auth()->user()->checkPermission('Print Sales Orders'))
+                                buttons += `
+                                                                                                    <a href="${receipt_url}" target="_blank">
+                                                                                                        <button class="btn btn-sm btn-rounded btn-secondary" type="button">
+                                                                                                            <span class="fa fa-print" aria-hidden="true"></span>
+                                                                                                            Print
+                                                                                                        </button>
+                                                                                                    </a>`;
+                            @endif
+
+                                                                if (row.status === 1) {
+                                @if(auth()->user()->checkPermission('Edit Sales Orders'))
                                     buttons += `
-                                                        <button class="btn btn-sm btn-rounded btn-success" type="button"
-                                                                onclick="showQuoteDetails(event)"
-                                                                id="quote_details">Show
-                                                        </button>`;
+                                                                                                <a class="btn btn-sm btn-rounded btn-info" href="${update_url}">
+                                                                                                    Edit
+                                                                                                </a>`;
                                 @endif
-
-                                @if(auth()->user()->checkPermission('Print Sales Orders'))
+                                @if(auth()->user()->checkPermission('Convert Sales Orders'))
                                     buttons += `
-                                                        <a href="${receipt_url}" target="_blank">
-                                                            <button class="btn btn-sm btn-rounded btn-secondary" type="button">
-                                                                <span class="fa fa-print" aria-hidden="true"></span>
-                                                                Print
-                                                            </button>
-                                                        </a>`;
+                                                                                            <button class="btn btn-sm btn-rounded btn-warning"
+                                                                                                    type="button"
+                                                                                                    onclick="convertQuoteToSale(${row.id})">
+                                                                                                Convert
+                                                                                            </button>`;
                                 @endif
-
-                                    if (row.status === 1) {
-                                    @if(auth()->user()->checkPermission('Edit Sales Orders'))
-                                        buttons += `
-                                                    <a class="btn btn-sm btn-rounded btn-info" href="${update_url}">
-                                                        Edit
-                                                    </a>`;
-                                    @endif
-                                    @if(auth()->user()->checkPermission('Convert Sales Orders'))
-                                         buttons += `
-                                                <button class="btn btn-sm btn-rounded btn-warning"
-                                                        type="button"
-                                                        onclick="convertQuoteToSale(${row.id})">
-                                                    Convert
-                                                </button>`;
-                                    @endif
-                                            } else {
-                                    buttons += `
-                                            <button class="btn btn-sm btn-rounded btn-primary opacity-75"
-                                                    type="button" disabled>
-                                                Sold
-                                            </button>`;
-                                }
-
-                                return buttons;
+                                                                        } else {
+                                buttons += `
+                                                                        <button class="btn btn-sm btn-rounded btn-primary opacity-75"
+                                                                                type="button" disabled>
+                                                                            Sold
+                                                                        </button>`;
                             }
-                        },
-                    @endif
+
+                            return buttons;
+                        }
+                    },
                     {
                         data: 'cost.name',
                         render: function (data) {

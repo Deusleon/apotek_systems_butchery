@@ -24,6 +24,9 @@ use Illuminate\Support\Facades\View;
 class SaleQuoteController extends Controller {
 
     public function index() {
+        if (!Auth()->user()->checkPermission('View Sales Orders')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $vat = Setting::where( 'id', 120 )->value( 'value' ) / 100;
         //Get VAT %
