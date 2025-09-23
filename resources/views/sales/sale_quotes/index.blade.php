@@ -26,181 +26,197 @@
         }
     </style>
     <div class="col-sm-12">
-        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active" id="new-order" data-toggle="pill" href="{{ route('sale-quotes.index') }}"
-                    role="tab" aria-controls="pills-home" aria-selected="true">New Order</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="order-list" data-toggle="pill" href="{{ route('sale-quotes.order_list') }}"
-                    role="tab" aria-controls="pills-profile" aria-selected="false">Order List</a>
-            </li>
-        </ul>
-        <div class="tab-content" id="pills-tabContent">
-            <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                <form id="quote_sale_form">
-                    @if (auth()->user()->checkPermission('Manage Customers'))
+        @if(Auth::user()->checkPermission('View Sales Orders'))
+            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                @if(Auth::user()->checkPermission('View Sales Orders'))
+                    <li class="nav-item">
+                        <a class="nav-link active" id="new-order" data-toggle="pill" href="{{ route('sale-quotes.index') }}"
+                            role="tab" aria-controls="pills-home" aria-selected="true">New Order</a>
+                    </li>
+                @endif
+                @if(Auth::user()->checkPermission('View Order List'))
+                    <li class="nav-item">
+                        <a class="nav-link" id="order-list" data-toggle="pill" href="{{ route('sale-quotes.order_list') }}"
+                            role="tab" aria-controls="pills-profile" aria-selected="false">Order List</a>
+                    </li>
+                @endif
+            </ul>
+
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                    <form id="quote_sale_form">
+                        @if (auth()->user()->checkPermission('Manage Customers'))
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-secondary btn-sm"
+                                        data-toggle="modal" data-target="#create"> Add
+                                        New Customer
+                                    </button>
+                                </div>
+
+                            </div>
+                        @endif
+                        @csrf()
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label id="cat_label">Sales Type<font color="red">*</font></label>
+                                    <select id="price_category" class="js-example-basic-single form-control">
+                                        <option value="">Select Sales Type</option>
+                                        @foreach ($price_category as $price)
+                                            <!-- <option value="{{ $price->id }}">{{ $price->name }}</option> -->
+                                            <option value="{{ $price->id }}" {{ $default_sale_type === $price->id ? 'selected' : '' }}>{{ $price->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Products<font color="red">*</font></label>
+                                    <select id="products" class="form-control">
+                                        <option value="" disabled selected style="display:none;">Select Product</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="code">Customer Name <font color="red">*</font></label>
+                                    <select id="customer_id" name="customer_id" class="js-example-basic-single form-control"
+                                        required>
+                                        <option value="" disabled selected="true">Select Customer</option>
+                                        @foreach ($customers as $customer)
+                                            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="detail">
+                            <hr>
+                            <div class="table-responsive" style="width: 100%;">
+                                <table id="cart_table" class="table nowrap table-striped table-hover" width="100%"></table>
+                            </div>
+
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-4">
+                                @if ($enable_discount === 'YES')
+                                    <div style="width: 99%">
+                                        <label>Discount</label>
+                                        <input type="text" onchange="discount()" id="sale_discount" class="form-control"
+                                            value="0.00" />
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="col-md-4">
+
+                            </div>
+                            <div class="col-md-4">
+                                <div class="row">
+                                    <label class="col-md-6 col-form-label text-md-right"><b>Sub Total:</b></label>
+                                    <div class="col-md-6" style="display: flex; justify-content: flex-end">
+                                        <input type="text" id="sub_total" class="form-control-plaintext text-md-right" readonly
+                                            value="0.00" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label class="col-md-6 col-form-label text-md-right"><b>VAT:</b></label>
+                                    <div class="col-md-6" style="display: flex; justify-content: flex-end">
+                                        <input type="text" id="total_vat" class="form-control-plaintext text-md-right" readonly
+                                            value="0.00" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label class="col-md-6 col-form-label text-md-right"><b>Total
+                                            Amount:</b></label>
+                                    <div class="col-md-6" style="display: flex; justify-content: flex-end">
+                                        <input type="text" id="total" class="form-control-plaintext text-md-right" readonly
+                                            value="0.00" />
+                                    </div>
+                                    <span class="help-inline text text-danger" style="display: none; margin-left: 63%"
+                                        id="discount_error">Invalid Amount</span>
+                                </div>
+                            </div>
+
+
+                            <input type="hidden" value="{{ $vat }}" id="vat">
+                            <input type="hidden" value="0.00" id="sale_paid">
+                            <input type="hidden" value="Yes" id="quotes_page">
+                            <input type="hidden" value="0.00" id="change_amount">
+                            <input type="hidden" id="price_cat" name="price_category_id">
+                            <input type="hidden" id="discount_value" name="discount_amount">
+                            <input type="hidden" id="order_cart" name="cart">
+                            <input type="hidden" value="" id="fixed_price">
+
+                            <input type="hidden" value="" id="category">
+                            <input type="hidden" value="" id="customers">
+                            <input type="hidden" value="" id="print">
+                            <input type="hidden" value="{{ $enable_discount }}" id="enable_discount">
+
+                        </div>
+                        <hr>
                         <div class="row">
                             <div class="col-md-12">
-                                <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-secondary btn-sm"
-                                    data-toggle="modal" data-target="#create"> Add
-                                    New Customer
-                                </button>
-                            </div>
+                                <div class="form-group">
+                                    <label>Remarks</label>
+                                    <textarea name="remark" id="remark" class="form-control"></textarea>
+                                </div>
 
-                        </div>
-                    @endif
-                    @csrf()
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label id="cat_label">Sales Type<font color="red">*</font></label>
-                                <select id="price_category" class="js-example-basic-single form-control">
-                                    <option value="">Select Sales Type</option>
-                                    @foreach ($price_category as $price)
-                                        <!-- <option value="{{ $price->id }}">{{ $price->name }}</option> -->
-                                        <option value="{{ $price->id }}" {{ $default_sale_type === $price->id ? 'selected' : '' }}>{{ $price->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Products<font color="red">*</font></label>
-                                <select id="products" class="form-control">
-                                    <option value="" disabled selected style="display:none;">Select Product</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="code">Customer Name <font color="red">*</font></label>
-                                <select id="customer_id" name="customer_id" class="js-example-basic-single form-control"
-                                    required>
-                                    <option value="" disabled selected="true">Select Customer</option>
-                                    @foreach ($customers as $customer)
-                                        <option value="{{ $customer->id }}">{{ $customer->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row" id="detail">
                         <hr>
-                        <div class="table-responsive" style="width: 100%;">
-                            <table id="cart_table" class="table nowrap table-striped table-hover" width="100%"></table>
-                        </div>
 
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-md-4">
-                            @if ($enable_discount === 'YES')
-                                <div style="width: 99%">
-                                    <label>Discount</label>
-                                    <input type="text" onchange="discount()" id="sale_discount" class="form-control"
-                                        value="0.00" />
-                                </div>
-                            @endif
-                        </div>
-                        <div class="col-md-4">
-
-                        </div>
-                        <div class="col-md-4">
-                            <div class="row">
-                                <label class="col-md-6 col-form-label text-md-right"><b>Sub Total:</b></label>
-                                <div class="col-md-6" style="display: flex; justify-content: flex-end">
-                                    <input type="text" id="sub_total" class="form-control-plaintext text-md-right" readonly
-                                        value="0.00" />
+                        <div class="row">
+                            <div class="col-md-6"></div>
+                            <div class="col-md-6">
+                                <div class="btn-group" style="float: right;">
+                                    <button type="button" class="btn btn-danger" id="deselect-all-quote">Cancel</button>
+                                    <button id="save_btn" class="btn btn-primary">Save</button>
                                 </div>
                             </div>
-                            <div class="row">
-                                <label class="col-md-6 col-form-label text-md-right"><b>VAT:</b></label>
-                                <div class="col-md-6" style="display: flex; justify-content: flex-end">
-                                    <input type="text" id="total_vat" class="form-control-plaintext text-md-right" readonly
-                                        value="0.00" />
-                                </div>
-                            </div>
-                            <div class="row">
-                                <label class="col-md-6 col-form-label text-md-right"><b>Total
-                                        Amount:</b></label>
-                                <div class="col-md-6" style="display: flex; justify-content: flex-end">
-                                    <input type="text" id="total" class="form-control-plaintext text-md-right" readonly
-                                        value="0.00" />
-                                </div>
-                                <span class="help-inline text text-danger" style="display: none; margin-left: 63%"
-                                    id="discount_error">Invalid Amount</span>
-                            </div>
                         </div>
 
-
-                        <input type="hidden" value="{{ $vat }}" id="vat">
-                        <input type="hidden" value="0.00" id="sale_paid">
-                        <input type="hidden" value="Yes" id="quotes_page">
-                        <input type="hidden" value="0.00" id="change_amount">
-                        <input type="hidden" id="price_cat" name="price_category_id">
-                        <input type="hidden" id="discount_value" name="discount_amount">
-                        <input type="hidden" id="order_cart" name="cart">
-                        <input type="hidden" value="" id="fixed_price">
-
-                        <input type="hidden" value="" id="category">
-                        <input type="hidden" value="" id="customers">
-                        <input type="hidden" value="" id="print">
-                        <input type="hidden" value="{{ $enable_discount }}" id="enable_discount">
-
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label>Remarks</label>
-                                <textarea name="remark" id="remark" class="form-control"></textarea>
-                            </div>
-
-                        </div>
-                    </div>
-                    <hr>
-
-                    <div class="row">
-                        <div class="col-md-6"></div>
-                        <div class="col-md-6">
-                            <div class="btn-group" style="float: right;">
-                                <button type="button" class="btn btn-danger" id="deselect-all-quote">Cancel</button>
-                                <button id="save_btn" class="btn btn-primary">Save</button>
-                            </div>
-                        </div>
-                    </div>
-
-                </form>
-            </div>
-
-            <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-
-                <div class="d-flex justify-content-end mb-2 align-items-center">
-                    <label class="mr-2" for="">Date:</label>
-                    <input type="text" id="date_range" class="form-control w-auto" onchange="getQuotes()">
-                </div>
-                <div class="table-responsive">
-                    <table id="quote_table" class="table table-striped table-bordered" width="100%">
-                        <thead>
-                            <tr>
-                                <th>Quote ID</th>
-                                <th>Customer</th>
-                                <th>Total Amount</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
+                    </form>
                 </div>
 
+                <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+
+                    <div class="d-flex justify-content-end mb-2 align-items-center">
+                        <label class="mr-2" for="">Date:</label>
+                        <input type="text" id="date_range" class="form-control w-auto" onchange="getQuotes()">
+                    </div>
+                    <div class="table-responsive">
+                        <table id="quote_table" class="table table-striped table-bordered" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>Quote ID</th>
+                                    <th>Customer</th>
+                                    <th>Total Amount</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
             </div>
-        </div>
+        @endif
+        @if(!Auth::user()->checkPermission('View Sales Orders'))
+            <div class="" style="background-color: #fff; min-height: 80px; ">
+                <div class="tab-pane fade show" id="credit-sale-receiving" role="tabpanel" aria-labelledby="credit_sales-tab">
+                    <div class="row" style="padding: 10px 0px 0px 30px;">
+                        <p>You do not have permission to View This Page</p>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
     @include('sales.sale_quotes.details')
     @include('sales.customers.create')

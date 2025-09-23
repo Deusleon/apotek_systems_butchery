@@ -35,23 +35,29 @@
     <div class="col-md-12">
         <div class="card-block">
             <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
-                <li class="nav-item">
-                    <a class="nav-link active text-uppercase" id="sales-history-tablist" data-toggle="pill"
-                        href="{{ route('sale-histories.SalesHistory') }}" role="tab" aria-controls="sales_history"
-                        aria-selected="true">Sales History</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-uppercase" id="sales-return-tablist" data-toggle="pill"
-                        href="{{ route('sale-returns.index') }}" role="tab" aria-controls="sales_returns"
-                        aria-selected="false">Returns
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-uppercase" id="sales-approval-tablist" data-toggle="pill"
-                        href="{{ route('sale-returns-approval.getSalesReturn') }}" role="tab" aria-controls="sales_returns"
-                        aria-selected="false">Approval
-                    </a>
-                </li>
+                @if(Auth::user()->checkPermission('View Sales History'))
+                    <li class="nav-item">
+                        <a class="nav-link active text-uppercase" id="sales-history-tablist" data-toggle="pill"
+                            href="{{ route('sale-histories.SalesHistory') }}" role="tab" aria-controls="sales_history"
+                            aria-selected="true">Sales History</a>
+                    </li>
+                @endif
+                @if(Auth::user()->checkPermission('View Sales Return'))
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase" id="sales-return-tablist" data-toggle="pill"
+                            href="{{ route('sale-returns.index') }}" role="tab" aria-controls="sales_returns"
+                            aria-selected="false">Returns
+                        </a>
+                    </li>
+                @endif
+                @if(Auth::user()->checkPermission('View Sales Return Approval'))
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase" id="sales-approval-tablist" data-toggle="pill"
+                            href="{{ route('sale-returns-approval.getSalesReturn') }}" role="tab" aria-controls="sales_returns"
+                            aria-selected="false">Approval
+                        </a>
+                    </li>
+                @endif
             </ul>
             <div class="tab-content" id="myTabContent">
 
@@ -88,7 +94,9 @@
                                         <th>VAT</th>
                                         <th>Discount</th>
                                         <th>Amount</th>
-                                        <th>Action</th>
+                                        @if(Auth::user()->checkPermission('Show Sales History Details') || Auth::user()->checkPermission('Print Sales History'))
+                                            <th>Action</th>
+                                        @endif
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -166,6 +174,8 @@
                 receiptBaseUrl: "{{ route('sale-reprint-receipt-get', ['receipt' => ':receipt']) }}"
             }
         };
+        var canViewSalesHistory = {{ auth()->user()->checkPermission('Show Sales History Details') ? 'true' : 'false' }};
+        var canPrintSalesHistory = {{ auth()->user()->checkPermission('Print Sales History') ? 'true' : 'false' }};
 
     </script>
 
@@ -195,7 +205,7 @@
                 endDate: end,
                 autoUpdateInput: true,
                 locale: {
-                    format: 'YYYY/MM/DD' 
+                    format: 'YYYY/MM/DD'
                 },
                 ranges: {
                     'Today': [moment(), moment()],
@@ -243,7 +253,7 @@
                 endDate: moment().endOf('month'),
                 autoUpdateInput: true,
                 locale: {
-                    format: 'YYYY/MM/DD' 
+                    format: 'YYYY/MM/DD'
                 },
                 ranges: {
                     'Today': [moment(), moment()],
@@ -367,7 +377,7 @@
                 endDate: end,
                 autoUpdateInput: true,
                 locale: {
-                    format: 'YYYY/MM/DD' 
+                    format: 'YYYY/MM/DD'
                 },
                 ranges: {
                     'Today': [moment(), moment()],

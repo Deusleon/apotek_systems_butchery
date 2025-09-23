@@ -80,18 +80,8 @@
                         </li>
                     @endif
 
-                    @if(Auth::user()->checkPermission('View Credit Tracking'))
-
-                        @if(!Auth::user()->checkPermission('View Credit Sales'))
-                            <li class="nav-item">
-                                <a class="nav-link text-uppercase" id="credit-tracking-tablist" data-toggle="pill"
-                                    href="#credit-tracking" role="tab" aria-controls="credit_tracking"
-                                    aria-selected="false">Tracking
-                                </a>
-                            </li>
-                        @endif
-
-                        @if(Auth::user()->checkPermission('View Credit Sales'))
+                    @if(Auth::user()->checkPermission('View Credit Sales'))
+                        @if(Auth::user()->checkPermission('View Credit Tracking'))
                             <li class="nav-item">
                                 <a class="nav-link text-uppercase" id="credit-tracking-tablist" data-toggle="pill"
                                     href="#credit-tracking" role="tab" aria-controls="credit_tracking"
@@ -126,7 +116,7 @@
                             aria-labelledby="credit_sales-tab">
                             <form id="credit_sales_form">
                                 @csrf()
-                                @if(auth()->user()->checkPermission('Manage Customers'))
+                                @if(auth()->user()->checkPermission('Add Customers'))
                                     <div class="row">
                                         <div class="col-md-12">
                                             <button style="float: right;margin-bottom: 2%;" type="button"
@@ -445,7 +435,7 @@
 
                             <div class="row" id="detail">
                                 <hr>
-                                @if(auth()->user()->checkPermission('Credit Payment'))
+                                @if(auth()->user()->checkPermission('View Credit Payment'))
                                     <div id="can_pay"></div>
                                 @endif
                                 <div class="table teble responsive" style="width: 100%;">
@@ -460,7 +450,9 @@
                                                 <th>Total</th>
                                                 <th>Paid</th>
                                                 <th>Balance</th>
-                                                <th>Action</th>
+                                                @if(auth()->user()->checkPermission('Add Credit Payment'))
+                                                    <th>Action</th>
+                                                @endif
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -626,6 +618,7 @@
                 getCreditSale: '{{route('getCreditSale')}}'
             }
         };
+        var canAddCreditPayment = {{ auth()->user()->checkPermission('Add Credit Payment') ? 'true' : 'false' }};
 
     </script>
     <script src="{{asset("assets/plugins/moment/js/moment.js")}}"></script>
