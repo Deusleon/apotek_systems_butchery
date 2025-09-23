@@ -164,7 +164,9 @@
                 </thead>
                 @foreach($data as $item)
                     <tr>
-                        <td align="left">{{$item->product['name']}}</td>
+                        <td align="left">
+                            {{$item->product['name'].' '.$item->product['brand'].' '.$item->product['pack_size'].$item->product['sales_uom']}}
+                        </td>
                         <td align="left">
                             {{number_format($item->quantity,0)}}
                         </td>

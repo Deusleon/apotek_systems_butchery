@@ -162,7 +162,10 @@ class PurchaseReportController extends Controller
         foreach ($datas as $datum) {
             array_push($raw_data, array(
                 'code' => $datum->product_id,
-                'product_name' => $datum->product['name'],
+                'product_name' => $datum->product['name'] . ' ' .
+                          $datum->product['brand'] . ' ' .
+                          $datum->product['pack_size'] .
+                          $datum->product['sales_uom'],
                 'quantity' => $datum->quantity,
                 'unit_cost' => $datum->unit_cost,
                 'sell_price' => $datum->sell_price,
