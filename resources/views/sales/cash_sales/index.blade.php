@@ -26,7 +26,7 @@
             <div class="col-sm-12">
                 <div class="tab-content" id="myTabContent">
                     <form id="sales_form">
-                        @if (auth()->user()->checkPermission('Manage Customers'))
+                        @if (auth()->user()->checkPermission('Add Customers'))
                             <div class="row">
                                 <div class="col-md-12">
                                     <button style="float: right;margin-bottom: 2%;" type="button"
@@ -250,6 +250,13 @@
 @push("page_scripts")
     @include('partials.notification')
     <script type="text/javascript">
+        
+        // Connect to QZ Tray when page loads
+        // qz.websocket.connect().then(function() {
+        //     console.log("Connected to QZ Tray");
+        // }).catch(function(err) {
+        //     console.error("Error connecting to QZ Tray:", err);
+        // });
 
         $.ajaxSetup({
             headers: {
@@ -273,5 +280,6 @@
     <script src="{{asset('assets/apotek/js/customer.js') }}"></script>
     <script src="{{asset('assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js')}}"></script>
     <script src="{{asset('assets/js/pages/ac-datepicker.js')}}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qz-tray/2.1.0/qz-tray.js"></script>
 
 @endpush

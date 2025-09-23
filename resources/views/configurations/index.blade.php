@@ -272,7 +272,7 @@
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="invoice"><option value="YES">YES</option><option value="NO">NO</option></select>';
                     break;
                 case 117:
-                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata"><option value="YES">YES</option><option value="NO">NO</option></select>';
+                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata"><option value="AUTO">AUTO PRINT</option><option value="YES">SHOW FIRST</option><option value="NO">NO</option></select>';
                     break;
                 case 119:
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="receipt_size">' +

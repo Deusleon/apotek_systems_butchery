@@ -109,7 +109,8 @@
         <i class="feather icon-dollar-sign"></i>
         <span>Payments</span>
     </a>
-</li>    </ul>
+</li>
+    </ul>
 </li>
 
 <li class="nav-item pcoded-hasmenu">
@@ -189,9 +190,9 @@
             @if(auth()->user()->checkPermission('View Products Categories'))
                 <li class=""><a href="{{route('product-categories.index')}}" class="">Product Categories</a></li>
             @endif
-            @if('View Product Subcategories')
+            {{-- @if('View Product Subcategories')
                 <li class=""><a href="{{route('sub-categories.index')}}" class="">Product Subcategories</a></li>
-            @endif
+            @endif --}}
             @if(auth()->user()->checkPermission('View Price Categories'))
                 <li class=""><a href="{{route('price-categories.index')}}" class="">Price Categories</a></li>
             @endif

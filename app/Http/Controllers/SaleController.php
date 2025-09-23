@@ -352,6 +352,19 @@ class SaleController extends Controller
     {
         if ($request->ajax()) {
             $this->store($request);
+            
+            // // Check if auto print enabled (example from settings)
+            // $auto_print = Setting::where('id', 117)->value('value');
+            // Log::info('AutoPrintSetting', ['AutoPrint' => $auto_print]);
+
+            // if ($auto_print === 'AUTO') {
+            //     $pdf_url = route('getCashReceipt', '1'); // Route to generate PDF
+            //     return response()->json([
+            //         'auto_print' => true,
+            //         'pdf_url' => $pdf_url,
+            //     ]);
+            // }
+            
             return response()->json([
                 'redirect_to' => route('getCashReceipt', '1')
             ]);

@@ -1277,14 +1277,14 @@ $("#sales_form").on("submit", function (e) {
     var is_backdate_enabled = document.getElementById(
         "is_backdate_enabled"
     ).value;
-    var saleDate = document.getElementById('cash_sale_date').value;
-    
+    var saleDate = document.getElementById("cash_sale_date").value;
+
     if (cart === "" || cart === "undefined") {
         notify("Sale list empty", "top", "right", "warning");
         return false;
     }
-    if (is_backdate_enabled === 'YES') {
-        if (saleDate === '' || saleDate == null) {
+    if (is_backdate_enabled === "YES") {
+        if (saleDate === "" || saleDate == null) {
             notify("Sales date is required", "top", "right", "warning");
             return false;
         }
@@ -1304,9 +1304,10 @@ function saveCashSale() {
         dataType: "json",
         cache: "false",
         data: form,
-        success: function (data) {
-            window.open(data.redirect_to);
+        success: function (response) {
+            window.open(response.redirect_to);
             $("#save_btn").attr("disabled", false);
+            printReceipt(response.redirect_to);
         },
         complete: function () {
             notify("Sale recorded successfully", "top", "right", "success");
@@ -1316,6 +1317,25 @@ function saveCashSale() {
         },
         timeout: 20000,
     });
+}
+
+function printReceipt(pdfUrl) {
+    fetch(pdfUrl)
+        .then((res) => res.blob())
+        .then((blob) => {
+            const reader = new FileReader();
+            reader.onload = function () {
+                const pdfData = new Uint8Array(this.result);
+                var config = qz.configs.create("Your Thermal Printer Name");
+
+                var printData = [{ type: "raw", format: "pdf", data: pdfData }];
+
+                qz.print(config, printData).catch(function (e) {
+                    console.error(e);
+                });
+            };
+            reader.readAsArrayBuffer(blob);
+        });
 }
 
 $("#credit_sales_form").on("submit", function (e) {

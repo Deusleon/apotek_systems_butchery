@@ -53,6 +53,7 @@
 
 
                 <div class="card">
+                    {{-- @dd($permissionsAll) --}}
                     @foreach ($permissionsAll as $key=>$item)
                         <h5 class="card-header" style="background-color: #F4F7FA">{{$key ?? ''}}</h5>
                         <div class="card-body">

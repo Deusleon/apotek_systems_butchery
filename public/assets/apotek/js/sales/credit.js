@@ -139,11 +139,11 @@ var credit_payment_table = $("#credit_payment_table").DataTable({
                 return formatMoney(balance);
             },
         },
-        {
+        ...(typeof canAddCreditPayment !== 'undefined' && canAddCreditPayment ? [{
             data: "action",
             defaultContent:
                 "<button type='button' id='pay_btn' class='btn btn-sm btn-rounded btn-primary'>Pay</button>",
-        },
+        }] : []),
     ],
     aaSorting: [[2, "desc"]],
 });

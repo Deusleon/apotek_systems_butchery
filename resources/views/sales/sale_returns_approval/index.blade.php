@@ -40,23 +40,29 @@
 
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link text-uppercase" id="sales-history-tablist" data-toggle="pill"
-                    href="{{ route('sale-histories.SalesHistory') }}" role="tab" aria-controls="sales_history"
-                    aria-selected="true">Sales History</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-uppercase" id="sales-return-tablist" data-toggle="pill"
-                    href="{{ route('sale-returns.index') }}" role="tab" aria-controls="sales_returns"
-                    aria-selected="false">Returns
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active text-uppercase" id="sales-approval-tablist" data-toggle="pill"
-                    href="{{ route('sale-returns-approval.getSalesReturn') }}" role="tab" aria-controls="sales_returns"
-                    aria-selected="false">Approval
-                </a>
-            </li>
+            @if(Auth::user()->checkPermission('View Sales History'))
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" id="sales-history-tablist" data-toggle="pill"
+                        href="{{ route('sale-histories.SalesHistory') }}" role="tab" aria-controls="sales_history"
+                        aria-selected="true">Sales History</a>
+                </li>
+            @endif
+            @if(Auth::user()->checkPermission('View Sales Return'))
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" id="sales-return-tablist" data-toggle="pill"
+                        href="{{ route('sale-returns.index') }}" role="tab" aria-controls="sales_returns"
+                        aria-selected="false">Returns
+                    </a>
+                </li>
+            @endif
+            @if(Auth::user()->checkPermission('View Sales Return Approval'))
+                <li class="nav-item">
+                    <a class="nav-link active text-uppercase" id="sales-approval-tablist" data-toggle="pill"
+                        href="{{ route('sale-returns-approval.getSalesReturn') }}" role="tab" aria-controls="sales_returns"
+                        aria-selected="false">Approval
+                    </a>
+                </li>
+            @endif
         </ul>
 
         @if(Auth::user()->checkPermission('View Sales Return Approval'))
@@ -99,7 +105,11 @@
                                 <th>Return Date</th>
                                 <th>Qty Returned</th>
                                 <th>Refund</th>
-                                <th>Action</th>
+                                @if (Auth::user()->checkPermission('Approve Sales Return'))
+                                    <th>Action</th>
+                                @else
+                                    <th></th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -270,12 +280,19 @@
                         return formatMoney((item_returned.rtn_qty / item_returned.bought_qty) * (item_returned.amount - item_returned.discount));
                     }
                 },
-                {
-                    data: "action",
-                    defaultContent: "<button type='button' id='approve' class='btn btn-sm btn-rounded btn-primary'>Approve</button><button type='button' id='reject' class='btn btn-sm btn-rounded btn-danger'>Reject</button>"
-                }
+                @if(Auth::user()->checkPermission('Approve Sales Return'))
+                                        {
+                        data: "action",
+                        defaultContent: "<button type='button' id='approve' class='btn btn-sm btn-rounded btn-primary'>Approve</button>" +
+                            "<button type='button' id='reject' class='btn btn-sm btn-rounded btn-danger'>Reject</button>"
+                    }
+                @else{
+                            data: "",
+                            defaultContent: ""
+                        }
+                    @endif
 
-            ], aaSorting: [[1, "desc"]]
+                        ], aaSorting: [[1, "desc"]]
         });
 
         $('#searching_returns').on('keyup', function () {

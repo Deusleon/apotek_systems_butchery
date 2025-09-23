@@ -67,37 +67,49 @@ if (!$.fn.DataTable.isDataTable("#sales_history_table")) {
 
 function populateTable(data) {
     // Clear old rows
-    saleHistoryTable.clear()
+    saleHistoryTable.clear();
 
     // Add new rows
     data.forEach(function (item) {
-        let receipt_url = config.routes.receiptBaseUrl.replace(":receipt", item.receipt_number)
+        let receipt_url = config.routes.receiptBaseUrl.replace(
+            ":receipt",
+            item.receipt_number
+        );
+        let actions = "";
+
+        if (typeof canViewSalesHistory !== "undefined" && canViewSalesHistory) {
+            actions += `<button type='button' class='btn btn-sm show-sales btn-rounded btn-success'
+                    data-receipt='${item.receipt_number}'
+                    data-customer='${item.customer.name}'
+                    data-sale-id='${item.id}'
+                    data-date='${moment(item.date).format("YYYY-MM-DD")}'>
+                    Show
+                </button>`;
+        }
+
+        if (
+            typeof canPrintSalesHistory !== "undefined" &&
+            canPrintSalesHistory
+        ) {
+            actions += `<a href="${receipt_url}" target="_blank">
+                    <button class="btn btn-sm btn-rounded btn-secondary" type="button">
+                        <span class="fa fa-print"></span>
+                        Print
+                    </button>
+                </a>`;
+        }
+
         saleHistoryTable.row.add([
             item.receipt_number,
             item.customer.name,
             moment(item.date).format("YYYY-MM-DD"),
-            formatMoney(Number(item.total_amount)-Number(item.total_vat)),
+            formatMoney(Number(item.total_amount) - Number(item.total_vat)),
             formatMoney(Number(item.total_vat)),
             formatMoney(Number(item.total_discount)),
             formatMoney(
-                Number(item.total_amount) -
-                    Number(item.total_discount)
+                Number(item.total_amount) - Number(item.total_discount)
             ),
-            "<button type='button' class='btn btn-sm show-sales btn-rounded btn-success' data-receipt='" +
-                item.receipt_number +
-                "' data-customer='" +
-                item.customer.name +
-                "' data-sale-id='" +
-                item.id +
-                "' data-date='" +
-                moment(item.date).format("YYYY-MM-DD") +
-                "'>Show</button>" +
-                `<a href="${receipt_url}" target="_blank">
-                    <button class="btn btn-sm btn-rounded btn-secondary" type="button">
-                        <span class="fa fa-print" aria-hidden="true"></span>
-                        Print
-                    </button>
-                </a>`,
+            actions,
         ]);
     });
 
