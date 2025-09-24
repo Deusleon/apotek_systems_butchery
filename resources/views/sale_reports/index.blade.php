@@ -71,23 +71,51 @@
                                     <select id="report_option" name="report_option" onchange="reportOption()"
                                         class="js-example-basic-single form-control drop" required>
                                         <option selected="true" value="" disabled="disabled">Select report</option>
-                                        <option value="9">Sales Details Report</option>
-                                        <option value="10">Sales Summary Report</option>
-                                        <option value="7">Sales Total Report</option>
-                                        <option value="1">Cash Sales Details Report</option>
-                                        <option value="2">Cash Sales Summary Report</option>
-                                        <option value="13">Cash Sales Total Report</option>
-                                        <option value="3">Credit Sales Details Report</option>
-                                        <option value="4">Credit Sales Summary Report</option>
-                                        <option value="14">Credit Sales Total Report</option>
-                                        <option value="5">Credit Payments Report</option>
-                                        <option value="6">Customer Payments Statement</option>
+                                        @if(auth()->user()->checkPermission('Sales Details Report'))
+                                            <option value="9">Sales Details Report</option>
+                                        @endif
+                                        @if(auth()->user()->checkPermission('Sales Summary Report'))
+                                            <option value="10">Sales Summary Report</option>
+                                        @endif
+                                        @if(auth()->user()->checkPermission('Sales Total Report'))
+                                            <option value="7">Sales Total Report</option>
+                                        @endif
+                                        @if(auth()->user()->checkPermission('Cash Sales Details Report'))
+                                            <option value="1">Cash Sales Details Report</option>
+                                        @endif
+                                        @if(auth()->user()->checkPermission('Cash Sales Summary Report'))
+                                            <option value="2">Cash Sales Summary Report</option>
+                                        @endif
+                                        @if(auth()->user()->checkPermission('Cash Sales Total Report'))
+                                            <option value="13">Cash Sales Total Report</option>
+                                        @endif
+                                        @if(auth()->user()->checkPermission('Credit Sales Details Report'))
+                                            <option value="3">Credit Sales Details Report</option>
+                                        @endif
+                                        @if(auth()->user()->checkPermission('Credit Sales Summary Report'))
+                                            <option value="4">Credit Sales Summary Report</option>
+                                        @endif
+                                        @if(auth()->user()->checkPermission('Credit Sales Total Report'))
+                                            <option value="14">Credit Sales Total Report</option>
+                                        @endif
+                                        @if(auth()->user()->checkPermission('Credit Payments Report'))
+                                            <option value="5">Credit Payments Report</option>
+                                        @endif
+                                        @if(auth()->user()->checkPermission('Customer Payment Statement'))
+                                            <option value="6">Customer Payments Statement</option>
+                                        @endif
                                         <!-- <option value="6">Bill Sales Details Report</option>
-                                                <option value="7">Company Billing Report</option> -->
-                                        <option value="8">Price List Report</option>
+                                                        <option value="7">Company Billing Report</option> -->
+                                        @if(auth()->user()->checkPermission('Price List Report'))
+                                            <option value="8">Price List Report</option>
+                                        @endif
                                         <!--   <option value="10">Sales Trend Chart</option> -->
-                                        <option value="11">Sales Return Report</option>
-                                        <option value="12">Sales Comparison Report</option>
+                                        @if(auth()->user()->checkPermission('Sales Return Report'))
+                                            <option value="11">Sales Return Report</option>
+                                        @endif
+                                        @if(auth()->user()->checkPermission('Sales Comparison Report'))
+                                            <option value="12">Sales Comparison Report</option>
+                                        @endif
                                     </select>
                                 </div>
                             </div>

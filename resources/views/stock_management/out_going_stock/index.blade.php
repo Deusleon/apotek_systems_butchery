@@ -152,6 +152,29 @@
             </div>
         </div>
 
+        <!-- Modal -->
+        <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Inventory Count Sheet</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Do you want to show Quantity on Hand (QoH) on print?
+                    </div>
+                    <div class="modal-footer">
+                        {{-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button> --}}
+                        <button type="button" id="confirmNo" class="btn btn-secondary">No </button>
+                        <button type="button" id="confirmYes" class="btn btn-primary">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
 @endsection
 
 
@@ -184,6 +207,25 @@
                     window.location.href = redirectUrl; // Redirect to the URL
                 });
 
+            });
+            
+            $(document).ready(function () {
+                var baseUrl = $('#count-sheet-tablist').attr('href');
+
+                $('#count-sheet-tablist').on('click', function (e) {
+                    e.preventDefault();
+                    $('#confirmModal').modal('show');
+                });
+
+                $('#confirmYes').on('click', function () {
+                    $('#confirmModal').modal('hide');
+                    window.open(baseUrl + '?showQoH=1', '_blank');
+                });
+
+                $('#confirmNo').on('click', function () {
+                    $('#confirmModal').modal('hide');
+                    window.open(baseUrl + '?showQoH=0', '_blank');
+                });
             });
         </script>
 
