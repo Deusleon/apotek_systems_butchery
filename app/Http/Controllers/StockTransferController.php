@@ -25,7 +25,10 @@ class StockTransferController extends Controller {
 
     public function index() {
         if (!Auth()->user()->checkPermission('Create Stock Transfer')) {
-            abort(403, 'Access Denied');
+            if (!Auth()->user()->checkPermission('View Stock Transfer')) {
+                abort(403, 'Access Denied');
+            }
+            return redirect()->route('stock-transfer-history');
         }
         $storeId = current_store_id();
 

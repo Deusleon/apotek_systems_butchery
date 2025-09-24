@@ -50,19 +50,25 @@
     </style>
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link text-uppercase" href="{{ route('stock-transfer.index') }}" role="tab"
-                    aria-controls="quotes_list" aria-selected="true">New Transfer</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active text-uppercase" role="tab" aria-controls="quotes_list" aria-selected="true">Edit
-                    Transfer</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-uppercase" href="{{ route('stock-transfer-history') }}" role="tab"
-                    aria-controls="new_quotes" aria-selected="false">Transfer History
-                </a>
-            </li>
+            @if(auth()->user()->checkPermission('Create Stock Transfer'))
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" href="{{ route('stock-transfer.index') }}" role="tab"
+                        aria-controls="quotes_list" aria-selected="true">New Transfer</a>
+                </li>
+            @endif
+            @if(auth()->user()->checkPermission('Edit Stock Transfer'))
+                <li class="nav-item">
+                    <a class="nav-link active text-uppercase" role="tab" aria-controls="quotes_list" aria-selected="true">Edit
+                        Transfer</a>
+                </li>
+            @endif
+            @if(auth()->user()->checkPermission('View Stock Transfer'))
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" href="{{ route('stock-transfer-history') }}" role="tab"
+                        aria-controls="new_quotes" aria-selected="false">Transfer History
+                    </a>
+                </li>
+            @endif
         </ul>
         <div class="card">
             <div class="card-body">

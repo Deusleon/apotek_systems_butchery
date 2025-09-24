@@ -77,6 +77,12 @@ class StockAdjustmentController extends Controller
     }
       public function newAdjustment()
     {
+        if (!Auth()->user()->checkPermission('Create Stock Adjustment')) {
+            if (!Auth()->user()->checkPermission('View Stock Adjustment')) {
+                abort(403, 'Access Denied');
+            }
+            return redirect()->route('stock-adjustments-history');
+        }
         $store_id = current_store_id();
         $stocks = DB::table('inv_current_stock')
             ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
@@ -194,6 +200,9 @@ class StockAdjustmentController extends Controller
 
     public function store(Request $request)
     {
+        if (!Auth()->user()->checkPermission('Create Stock Adjustment')) {
+                abort(403, 'Access Denied');
+        }
         $validator = Validator::make($request->all(), [
         'stock_id' => 'required|exists:inv_current_stock,id',
         'product_id' => 'required|exists:inv_products,id',

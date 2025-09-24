@@ -124,12 +124,12 @@
                                                             Password
                                                         </button>
                                                     </a>
-                                                    <a href="#">
+                                                    {{-- <a href="#">
                                                         <button  class="dropdown-item "
                                                                  data-toggle="modal" data-target="#add-permission">
                                                             User Permissions
                                                         </button>
-                                                    </a>
+                                                    </a> --}}
                                                     @if ($user->status == 1)
                                                         <a href="#">
                                                             <button class="dropdown-item " type="button"

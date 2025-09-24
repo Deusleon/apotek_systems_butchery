@@ -52,7 +52,7 @@ class CreatePermissionsTable extends Migration
             ['id' => 27, 'name' => 'View Price List', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
             ['id' => 28, 'name' => 'Edit Price List', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
             ['id' => 29, 'name' => 'Products Import', 'guard_name' => 'web', 'created_at' => null, 'updated_at' => null, 'category' => 'INVENTORY'],
-            ['id' => 30, 'name' => 'Download Import Templates', 'guard_name' => 'web', 'created_at' => null, 'updated_at' => null, 'category' => 'INVENTORY'],
+            // ['id' => 30, 'name' => 'Download Import Templates', 'guard_name' => 'web', 'created_at' => null, 'updated_at' => null, 'category' => 'INVENTORY'],
             ['id' => 31, 'name' => 'View Stock Transfer', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
             ['id' => 32, 'name' => 'Create Stock Transfer', 'guard_name' => 'web', 'created_at' => '2025-07-06 19:12:58', 'updated_at' => '2025-07-06 19:12:58', 'category' => 'INVENTORY'],
             ['id' => 33, 'name' => 'Edit Stock Transfer', 'guard_name' => 'web', 'created_at' => '2025-07-06 19:12:58', 'updated_at' => '2025-07-06 19:12:58', 'category' => 'INVENTORY'],

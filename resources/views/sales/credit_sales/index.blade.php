@@ -72,46 +72,45 @@
 
             <div class="col-sm-12">
                 <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
-                    @if(Auth::user()->checkPermission('View Credit Sales'))
+                    @if(auth()->user()->checkPermission('View Credit Sales'))
                         <li class="nav-item">
                             <a class="nav-link text-uppercase" id="credit-sale-receiving-tablist" data-toggle="pill"
                                 href="#credit-sale-receiving" role="tab" aria-controls="credit_sales"
-                                aria-selected="true">New</a>
+                                aria-selected="true">New sale</a>
                         </li>
                     @endif
 
-                    @if(Auth::user()->checkPermission('View Credit Sales'))
-                        @if(Auth::user()->checkPermission('View Credit Tracking'))
-                            <li class="nav-item">
-                                <a class="nav-link text-uppercase" id="credit-tracking-tablist" data-toggle="pill"
-                                    href="#credit-tracking" role="tab" aria-controls="credit_tracking"
-                                    aria-selected="false">Tracking
-                                </a>
-                            </li>
-                        @endif
+                    @if(auth()->user()->checkPermission('View Credit Tracking'))
+                        <li class="nav-item">
+                            <a class="nav-link text-uppercase" id="credit-tracking-tablist" data-toggle="pill"
+                                href="#credit-tracking" role="tab" aria-controls="credit_tracking"
+                                aria-selected="false">Tracking
+                            </a>
+                        </li>
                     @endif
 
-                    @if(Auth::user()->checkPermission('View Credit Payment'))
-                        @if(!Auth::user()->checkPermission('View Credit Sales') && !Auth::user()->checkPermission('View Credit Tracking'))
-                            <li class="nav-item">
-                                <a class="nav-link text-uppercase" id="credit-payment-tablist" data-toggle="pill"
-                                    href="#credit-payment" role="tab" aria-controls="credit_payment" aria-selected="false">Payments
-                                </a>
-                            </li>
-                        @endif
+                    @if(auth()->user()->checkPermission('View Credit Payment'))
+                        {{-- @if(!auth()->user()->checkPermission('View Credit Sales') && !auth()->user()->checkPermission('View
+                        Credit Tracking')) --}}
+                        <li class="nav-item">
+                            <a class="nav-link text-uppercase" id="credit-payment-tablist" data-toggle="pill"
+                                href="#credit-payment" role="tab" aria-controls="credit_payment" aria-selected="false">Payments
+                            </a>
+                        </li>
+                        {{-- @endif --}}
 
-                        @if(Auth::user()->checkPermission('View Credit Sales') || Auth::user()->checkPermission('View Credit Tracking'))
-                            <li class="nav-item">
-                                <a class="nav-link text-uppercase" id="credit-payment-tablist" data-toggle="pill"
-                                    href="#credit-payment" role="tab" aria-controls="credit_payment" aria-selected="false">Payments
-                                </a>
-                            </li>
-                        @endif
+                        {{-- @if(auth()->user()->checkPermission('View Credit Tracking'))
+                        <li class="nav-item">
+                            <a class="nav-link text-uppercase" id="credit-payment-tablist" data-toggle="pill"
+                                href="#credit-payment" role="tab" aria-controls="credit_payment" aria-selected="false">Payments
+                            </a>
+                        </li>
+                        @endif --}}
                     @endif
                 </ul>
                 <div class="tab-content" id="myTabContent">
                     {{-- Credit Sales--}}
-                    @if(Auth::user()->checkPermission('View Credit Sales'))
+                    @if(auth()->user()->checkPermission('View Credit Sales'))
                         <div class="tab-pane fade" id="credit-sale-receiving" role="tabpanel"
                             aria-labelledby="credit_sales-tab">
                             <form id="credit_sales_form">
@@ -377,12 +376,12 @@
                         <img id="loading-image" src="{{asset('assets/images/spinner.gif')}}" />
                     </div>
 
-                    @if(!Auth::user()->checkPermission('View Credit Sales'))
+                    @if(!auth()->user()->checkPermission('View Credit Sales') && !auth()->user()->checkPermission('View Credit Payment') && !auth()->user()->checkPermission('View Credit Tracking'))
                         <div class="tab-pane fade show" id="credit-sale-receiving" role="tabpanel"
                             aria-labelledby="credit_sales-tab">
                             <div class="row">
 
-                                <p>You do not have permission to View New Credit Sales</p>
+                                {{-- <p>You do not have permission to View New Credit Sales</p> --}}
 
                             </div>
                         </div>
@@ -390,7 +389,7 @@
                     {{-- End Credit Sales--}}
 
                     {{-- Credit Tracking--}}
-                    @if(Auth::user()->checkPermission('View Credit Tracking'))
+                    @if(auth()->user()->checkPermission('View Credit Tracking'))
                         <div class="tab-pane fade" id="credit-tracking" role="tabpanel" aria-labelledby="credit_tracking-tab">
                             <div class="row">
                                 <div class="col-md-5">
@@ -466,12 +465,12 @@
                         </div>
                     @endif
 
-                    @if(!Auth::user()->checkPermission('View Credit Tracking'))
+                    @if(!auth()->user()->checkPermission('View Credit Tracking'))
                         <div class="tab-pane fade" id="credit-sale-receiving" role="tabpanel"
                             aria-labelledby="credit_sales-tab">
                             <div class="row">
 
-                                <p>You do not have permission to View Credit Tracking</p>
+                                {{-- <p>You do not have permission to View Credit Tracking</p> --}}
 
                             </div>
                         </div>
@@ -479,7 +478,7 @@
                     {{-- End Credit Tracking--}}
 
                     {{-- Start Credit Payment--}}
-                    @if(Auth::user()->checkPermission('View Credit Payment'))
+                    @if(auth()->user()->checkPermission('View Credit Payment'))
                         <div class="tab-pane fade" id="credit-payment" role="tabpanel" aria-labelledby="credit_payment-tab">
                             <div class="form-group row">
                                 <div class="col-md-6">
@@ -550,11 +549,11 @@
                         </div>
                     @endif
 
-                    @if(!Auth::user()->checkPermission('View Credit Payment'))
+                    @if(!auth()->user()->checkPermission('View Credit Payment'))
                         <div class="tab-pane fade" id="credit-payment" role="tabpanel" aria-labelledby="credit_payment-tab">
                             <div class="row">
 
-                                <p>You do not have permission to View Credit Payment</p>
+                                {{-- <p>You do not have permission to View Credit Payment</p> --}}
 
                             </div>
                         </div>

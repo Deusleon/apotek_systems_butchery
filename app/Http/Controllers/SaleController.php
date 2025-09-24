@@ -62,7 +62,9 @@ class SaleController extends Controller
     }
     public function creditSale()
     {
-        if (!Auth::user()->checkPermission('View Credit Sales')) {
+        if (!auth()->user()->checkPermission('View Credit Sales') && 
+            !auth()->user()->checkPermission('View Credit Tracking') && 
+            !auth()->user()->checkPermission('View Credit Payment')) {
             abort(403, 'Access Denied');
         }
 

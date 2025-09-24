@@ -33,14 +33,18 @@
     </style>
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link" id="new-order" data-toggle="pill" href="{{ route('sale-quotes.index') }}" role="tab"
-                    aria-controls="pills-home" aria-selected="true">New Order</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link active" id="order-list" data-toggle="pill" href="{{ route('sale-quotes.order_list') }}"
-                    role="tab" aria-controls="pills-profile" aria-selected="false">Order List</a>
-            </li>
+            @if(auth()->user()->checkPermission('View Sales Orders'))
+                <li class="nav-item">
+                    <a class="nav-link" id="new-order" data-toggle="pill" href="{{ route('sale-quotes.index') }}" role="tab"
+                        aria-controls="pills-home" aria-selected="true">New Order</a>
+                </li>
+            @endif
+            @if(auth()->user()->checkPermission('View Order List'))
+                <li class="nav-item">
+                    <a class="nav-link active" id="order-list" data-toggle="pill" href="{{ route('sale-quotes.order_list') }}"
+                        role="tab" aria-controls="pills-profile" aria-selected="false">Order List</a>
+                </li>
+            @endif
         </ul>
         <div class="tab-content" id="pills-tabContent">
             <div class="tab-pane fade" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
@@ -412,41 +416,41 @@
                             let buttons = ``;
 
                             buttons += `
-                                                                                    <button class="btn btn-sm btn-rounded btn-success" type="button"
-                                                                                            onclick="showQuoteDetails(event)"
-                                                                                            id="quote_details">Show
-                                                                                    </button>`;
+                                                                                        <button class="btn btn-sm btn-rounded btn-success" type="button"
+                                                                                                onclick="showQuoteDetails(event)"
+                                                                                                id="quote_details">Show
+                                                                                        </button>`;
                             @if(auth()->user()->checkPermission('Print Sales Orders'))
                                 buttons += `
-                                                                                                    <a href="${receipt_url}" target="_blank">
-                                                                                                        <button class="btn btn-sm btn-rounded btn-secondary" type="button">
-                                                                                                            <span class="fa fa-print" aria-hidden="true"></span>
-                                                                                                            Print
-                                                                                                        </button>
-                                                                                                    </a>`;
+                                                                                                            <a href="${receipt_url}" target="_blank">
+                                                                                                                <button class="btn btn-sm btn-rounded btn-secondary" type="button">
+                                                                                                                    <span class="fa fa-print" aria-hidden="true"></span>
+                                                                                                                    Print
+                                                                                                                </button>
+                                                                                                            </a>`;
                             @endif
 
-                                                                if (row.status === 1) {
+                                                                    if (row.status === 1) {
                                 @if(auth()->user()->checkPermission('Edit Sales Orders'))
                                     buttons += `
-                                                                                                <a class="btn btn-sm btn-rounded btn-info" href="${update_url}">
-                                                                                                    Edit
-                                                                                                </a>`;
+                                                                                                        <a class="btn btn-sm btn-rounded btn-info" href="${update_url}">
+                                                                                                            Edit
+                                                                                                        </a>`;
                                 @endif
                                 @if(auth()->user()->checkPermission('Convert Sales Orders'))
                                     buttons += `
-                                                                                            <button class="btn btn-sm btn-rounded btn-warning"
-                                                                                                    type="button"
-                                                                                                    onclick="convertQuoteToSale(${row.id})">
-                                                                                                Convert
-                                                                                            </button>`;
+                                                                                                    <button class="btn btn-sm btn-rounded btn-warning"
+                                                                                                            type="button"
+                                                                                                            onclick="convertQuoteToSale(${row.id})">
+                                                                                                        Convert
+                                                                                                    </button>`;
                                 @endif
-                                                                        } else {
+                                                                            } else {
                                 buttons += `
-                                                                        <button class="btn btn-sm btn-rounded btn-primary opacity-75"
-                                                                                type="button" disabled>
-                                                                            Sold
-                                                                        </button>`;
+                                                                            <button class="btn btn-sm btn-rounded btn-primary opacity-75"
+                                                                                    type="button" disabled>
+                                                                                Sold
+                                                                            </button>`;
                             }
 
                             return buttons;

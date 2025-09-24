@@ -26,15 +26,15 @@
         }
     </style>
     <div class="col-sm-12">
-        @if(Auth::user()->checkPermission('View Sales Orders'))
+        @if(auth()->user()->checkPermission('View Sales Orders'))
             <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-                @if(Auth::user()->checkPermission('View Sales Orders'))
+                @if(auth()->user()->checkPermission('View Sales Orders'))
                     <li class="nav-item">
                         <a class="nav-link active" id="new-order" data-toggle="pill" href="{{ route('sale-quotes.index') }}"
                             role="tab" aria-controls="pills-home" aria-selected="true">New Order</a>
                     </li>
                 @endif
-                @if(Auth::user()->checkPermission('View Order List'))
+                @if(auth()->user()->checkPermission('View Order List'))
                     <li class="nav-item">
                         <a class="nav-link" id="order-list" data-toggle="pill" href="{{ route('sale-quotes.order_list') }}"
                             role="tab" aria-controls="pills-profile" aria-selected="false">Order List</a>
