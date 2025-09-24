@@ -411,12 +411,12 @@ class InventoryReportController extends Controller
         $store_id = current_store_id();
         if (!is_all_store()) {
             if ($category != null) {
-                $products = Product::join('inv_current_stock', 'inv_current_stock.product_id', '=', 'products.id')
+                $products = Product::join('inv_current_stock', 'inv_current_stock.product_id', '=', 'inv_products.id')
                             ->where('category_id', $category)
                             ->where('inv_current_stock.store_id', $store_id)
                             ->get();
             } else {
-                $products = Product::join('inv_current_stock', 'inv_current_stock.product_id', '=', 'products.id')
+                $products = Product::join('inv_current_stock', 'inv_current_stock.product_id', '=', 'inv_products.id')
                             ->where('inv_current_stock.store_id', $store_id)
                             ->get();
             }
