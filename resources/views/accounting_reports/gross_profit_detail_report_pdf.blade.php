@@ -106,11 +106,31 @@
             width: 15%;
         }
 
+         #container .logo-container {
+            padding-top: -2%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        #container .logo-container img {
+            max-width: 160px;
+            max-height: 160px;
+        }
+
     </style>
 
 </head>
 <body>
 
+<div class="row">
+    <div id="container">
+        <div class="logo-container">
+            @if($pharmacy['logo'])
+                <img src="{{public_path('fileStore/logo/'.$pharmacy['logo'])}}"/>
+            @endif
+        </div>
+    </div>
+</div>
 <div class="row" style="padding-top: -2%">
     <h1 align="center">{{$pharmacy['name']}}</h1>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
@@ -123,15 +143,15 @@
             <table id="table-detail-main-1">
                 <tr>
                     <td style="background: #1f273b; color: white"><b>From
-                            Date:</b> {{date('d-m-Y',strtotime($data[0]['from']))}}</td>
+                            Date:</b> {{date('Y-m-d',strtotime($data[0]['from']))}}</td>
                     <td style="background: #1f273b; color: white"><b>To
-                            Date:</b> {{date('d-m-Y',strtotime($data[0]['to']))}}</td>
+                            Date:</b> {{date('Y-m-d',strtotime($data[0]['to']))}}</td>
                 </tr>
             </table>
             @foreach($data[0]['data'] as $key => $items)
                 <table id="table-detail-main">
                     <tr>
-                        <td><b>Date:</b> {{date('d-m-Y',strtotime($key))}}</td>
+                        <td><b>Date:</b> {{date('Y-m-d',strtotime($key))}}</td>
                     </tr>
                 </table>
 
@@ -139,7 +159,7 @@
                     <!-- loop the product names here -->
                     <thead>
                     <tr style="background: #1f273b; color: white;">
-                        <th>Product Name</th>
+                        <th align="left">Product Name</th>
                         <th align="right">Buy Price</th>
                         <th align="right">Sell Price</th>
                         <th>Qty</th>
@@ -149,7 +169,7 @@
                     </thead>
                     @foreach($items as $item)
                         <tr>
-                            <td>{{$item['name']}}</td>
+                            <td align="left">{{$item['name']}}</td>
                             <td align="right">{{number_format($item['buy_price'],2)}}</td>
                             <td align="right">{{number_format($item['sell_price'],2)}}</td>
                             <td align="right">

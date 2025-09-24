@@ -316,109 +316,84 @@ class AccountingReportController extends Controller
 
     private function grossProfitSummary(array $dates)
     {
-        $date[0] = date('Y-m-d', strtotime($dates[0]));
-        $date[1] = date('Y-m-d', strtotime($dates[1]));
+        $from = date('Y-m-d', strtotime($dates[0]));
+        $to = date('Y-m-d', strtotime($dates[1]));
 
-        /*Sales Date only*/
-        $user_sales_date = Sale::select(DB::Raw("date(date) as date"))
-            ->whereBetween(DB::Raw("date(date)"), [$date[0], $date[1]])
-            ->orderby('id', 'asc')->groupby(DB::Raw("date(date)"))->get();
+        // Prepare all dates in the range
+        $period = new \DatePeriod(
+            new \DateTime($from),
+            new \DateInterval('P1D'),
+            (new \DateTime($to))->modify('+1 day')
+        );
 
-        /*get only date for comparison and mapping*/
-        $dates_only = array();
-        foreach ($user_sales_date as $dates) {
-            array_push($dates_only, $dates->date);
+        $dates_only = [];
+        foreach ($period as $day) {
+            $dates_only[] = $day->format('Y-m-d');
         }
 
-        /*total sold items amount*/
+        // Fetch total sales grouped by date
         $sale_detail = DB::table('sales_details')
             ->select(
                 DB::raw('sum(amount) as amount'),
                 DB::raw('sum(vat) as vat'),
                 DB::raw('sum(price) as price'),
                 DB::raw('sum(discount) as discount'),
-                DB::raw('date(date) as dates'))
+                DB::raw('date(date) as dates')
+            )
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
-            ->whereBetween(DB::raw('date(date)'), [$date[0], $date[1]])
+            ->whereBetween(DB::raw('date(date)'), [$from, $to])
             ->where('sales_details.status', '!=', 3)
             ->join('users', 'users.id', '=', 'sales.created_by')
-            ->groupby(DB::Raw('date(date)'))
+            ->groupBy(DB::raw('date(date)'))
             ->get();
 
-        /*put total sell amount into array*/
-        $total_sell_amount = array();
+        // Prepare total sell per date
+        $total_sell_by_key_date = [];
         foreach ($sale_detail as $item) {
             $value = $item->amount - $item->discount;
-            if (intVal($item->vat) === 0) {
-                $vat_percent = 0;
-            } else {
-                $vat_percent = $item->vat / $item->price;
-            }
-            $sub_total = ($value / (1 + $vat_percent));
-
-            array_push($total_sell_amount, array(
-                'amount' => $item->amount,
-                'vat' => $item->vat,
-                'price' => $item->price,
-                'discount' => $item->discount,
-                'date' => $item->dates,
-                'total_sell' => $sub_total
-            ));
+            $vat_percent = $item->vat == 0 ? 0 : $item->vat / $item->price;
+            $sub_total = $value / (1 + $vat_percent);
+            $total_sell_by_key_date[$item->dates][] = ['total_sell' => $sub_total];
         }
 
-        /*sold items only*/
+        // Fetch sold items for total buy
         $sold_items = DB::table('sales_details')
-            ->select(DB::raw('sales_details.id as sales_details_id'),
-                DB::raw('sales.id as sale_id'),
-                DB::raw('stock_id as stock_id'),
-                DB::raw('quantity'),
-                DB::raw('price_category_id'),
-                DB::raw('date(date) as dates'))
+            ->select(
+                'sales_details.id as sales_details_id',
+                'sales.id as sale_id',
+                'stock_id',
+                'quantity',
+                'price_category_id',
+                DB::raw('date(date) as dates')
+            )
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
-            ->whereBetween(DB::raw('date(date)'), [$date[0], $date[1]])
+            ->whereBetween(DB::raw('date(date)'), [$from, $to])
             ->where('sales_details.status', '!=', 3)
             ->join('users', 'users.id', '=', 'sales.created_by')
             ->get();
 
-        /*both price and sell price*/
-        $raw_prices_data = array();
+        $raw_prices_data = [];
         foreach ($sold_items as $detail) {
-            /*get the product*/
             $product = PriceList::where('price_category_id', $detail->price_category_id)
                 ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
                 ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                 ->where('stock_id', $detail->stock_id)
-                ->Where('inv_products.status', '1')
+                ->where('inv_products.status', '1')
                 ->orderBy('stock_id', 'desc')
                 ->select('inv_products.id as id', 'name', 'price', 'stock_id')
                 ->first('price');
 
-
             if ($product) {
-                array_push($raw_prices_data, array(
-                    'stock_id' => $product->stock_id,
-                    'sales_details_id' => $detail->sales_details_id,
-                    'sale_id' => $detail->sale_id,
-                    'quantity' => $detail->quantity,
-                    'buy_price' => $product->currentStock['unit_cost'],
-                    'total_buy' => $product->currentStock['unit_cost'] * $detail->quantity,
-                    'date' => $detail->dates
-                ));
-            }
-
-        }
-
-        /*total sell make date key*/
-        $total_sell_by_key_date = array();
-        foreach ($total_sell_amount as $details) {
-            if (array_key_exists('date', $details)) {
-                $total_sell_by_key_date[$details['date']][] = $details;
+                $raw_prices_data[] = [
+                    'date' => $detail->dates,
+                    'total_buy' => $product->currentStock['unit_cost'] * $detail->quantity
+                ];
             }
         }
 
-        /*buy price sum by key*/
-        $total_buy_amount = array();
+        // Sum total buy per date
         $sum_by_key = new CommonFunctions();
+        $total_buy_amount = [];
         foreach ($raw_prices_data as $value) {
             $index = $sum_by_key->sumByKey($value['date'], $total_buy_amount, 'date');
             if ($index < 0) {
@@ -428,44 +403,43 @@ class AccountingReportController extends Controller
             }
         }
 
-        /*total buy make date key*/
-        $total_buy_by_key_date = array();
+        $total_buy_by_key_date = [];
         foreach ($total_buy_amount as $buy) {
-            if (array_key_exists('date', $buy)) {
-                $total_buy_by_key_date[$buy['date']][] = $buy;
+            $total_buy_by_key_date[$buy['date']][] = ['total_buy' => $buy['total_buy']];
+        }
+
+        // Fill missing dates with zero
+        foreach ($dates_only as $d) {
+            if (!isset($total_sell_by_key_date[$d])) {
+                $total_sell_by_key_date[$d] = [['total_sell' => 0]];
+            }
+            if (!isset($total_buy_by_key_date[$d])) {
+                $total_buy_by_key_date[$d] = [['total_buy' => 0]];
             }
         }
 
-        /*sum total sell for the total*/
+        // Compute grand totals
         $grand_total_sell = 0;
-        foreach ($total_sell_by_key_date as $key => $value) {
-            foreach ($value as $item) {
-                $grand_total_sell = $grand_total_sell + $item['total_sell'];
-            }
+        foreach ($total_sell_by_key_date as $items) {
+            foreach ($items as $i) $grand_total_sell += $i['total_sell'];
         }
 
-        /*sum total buy for the total*/
         $grand_total_buy = 0;
-        foreach ($total_buy_by_key_date as $key => $value) {
-            foreach ($value as $item) {
-                $grand_total_buy = $grand_total_buy + $item['total_buy'];
-            }
+        foreach ($total_buy_by_key_date as $items) {
+            foreach ($items as $i) $grand_total_buy += $i['total_buy'];
         }
 
-        $to_print = array();
-        array_push($to_print, array(
+        return [[
             'dates' => $dates_only,
             'total_buy' => $total_buy_by_key_date,
             'total_sell' => $total_sell_by_key_date,
             'grand_total_buy' => $grand_total_buy,
             'grand_total_sell' => $grand_total_sell,
-            'from' => $date[0],
-            'to' => $date[1]
-        ));
-
-        return $to_print;
-
+            'from' => $from,
+            'to' => $to
+        ]];
     }
+
 
     private function grossProfitDetail(array $dates)
     {

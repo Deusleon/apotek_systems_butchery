@@ -178,89 +178,93 @@
 
 
     <script type="text/javascript">
-        $(function () {
+    $(function () {
 
-            var start = moment();
-            var end = moment();
+        // Expired Products Date Range Picker
+        var startExpired = moment();
+        var endExpired = moment();
 
-            $('#expiredaterange').daterangepicker({
-                autoUpdateInput: false,
-                locale: {
-                    cancelLabel: 'Clear'
-                },
-                ranges: {
-                    'Today': [moment(), moment()],
-                    'Next 2 Weeks': [start, moment().add(13, 'days')],
-                    'Next 3 Weeks': [start, moment().add(20, 'days')],
-                    'Next 4 Weeks': [start, moment().add(27, 'days')]
-                }
-            });
+        $('#expiredaterange').daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Clear',
+                format: 'YYYY/MM/DD'
+            },
+            ranges: {
+                'Today': [moment(), moment()],
+                'Next 2 Weeks': [startExpired, moment().add(13, 'days')],
+                'Next 3 Weeks': [startExpired, moment().add(20, 'days')],
+                'Next 4 Weeks': [startExpired, moment().add(27, 'days')]
+            }
         });
 
         $('input[name="expire_date_range"]').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+            $(this).val(picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD'));
         });
 
+    });
 
-        $(function () {
+    $(function () {
 
-            var start = moment().startOf('month');
-            var end = moment();
+        // Main Accounting Report Date Range Picker
+        var startMain = moment().startOf('month');
+        var endMain = moment();
 
-            function cb(start, end) {
-                $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-            }
-
-            $('#daterange').daterangepicker({
-                startDate: start,
-                endDate: end,
-                ranges: {
-                    'Today': [moment(), moment()],
-                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                    'This Month': [moment().startOf('month'), moment().endOf('month')],
-                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-                    'This Year': [moment().startOf('year'), moment()]
-                }
-            }, cb);
-
-            cb(start, end);
-
-        });
-
-
-        function reportOption() {
-            var report_option = document.getElementById("report_option");
-            var report_option_index = report_option.options[report_option.selectedIndex].value;
-
-            if (Number(report_option_index) === Number(1)) {
-                $("#price-category").prop("required", true);
-                $("#store").prop("required", true);
-                document.getElementById('date-row').style.display = 'none';
-                document.getElementById('current-stock-value').style.display = 'block';
-            } else {
-                $("#price-category").prop("required", false);
-                $("#store").prop("required", false);
-                document.getElementById('current-stock-value').style.display = 'none';
-                document.getElementById('date-row').style.display = 'block';
-
-            }
-
-            if (Number(report_option_index) === Number(6)) {
-                $("#price-category-expire").prop("required", true);
-                document.getElementById('expired-product-cost').style.display = 'block';
-                document.getElementById('date-row').style.display = 'none';
-                document.getElementById('current-stock-value').style.display = 'none';
-            } else {
-                $("#price-category-expire").prop("required", false);
-                document.getElementById('expired-product-cost').style.display = 'none';
-
-            }
-
-
+        function cb(start, end) {
+            $('#reportrange span').html(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
         }
-    </script>
+
+        $('#daterange').daterangepicker({
+            startDate: startMain,
+            endDate: endMain,
+            locale: {
+                format: 'YYYY/MM/DD',
+                cancelLabel: 'Clear'
+            },
+            ranges: {
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'This Year': [moment().startOf('year'), moment()]
+            }
+        }, cb);
+
+        cb(startMain, endMain);
+
+    });
+
+    // Report Option Logic
+    function reportOption() {
+        var report_option = document.getElementById("report_option");
+        var report_option_index = report_option.options[report_option.selectedIndex].value;
+
+        if (Number(report_option_index) === 1) {
+            $("#price-category").prop("required", true);
+            $("#store").prop("required", true);
+            $('#date-row').hide();
+            $('#current-stock-value').show();
+        } else {
+            $("#price-category").prop("required", false);
+            $("#store").prop("required", false);
+            $('#current-stock-value').hide();
+            $('#date-row').show();
+        }
+
+        if (Number(report_option_index) === 6) {
+            $("#price-category-expire").prop("required", true);
+            $('#expired-product-cost').show();
+            $('#date-row').hide();
+            $('#current-stock-value').hide();
+        } else {
+            $("#price-category-expire").prop("required", false);
+            $('#expired-product-cost').hide();
+        }
+    }
+</script>
+
 
 
 @endpush

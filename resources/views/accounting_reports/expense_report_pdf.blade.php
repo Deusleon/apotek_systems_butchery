@@ -99,11 +99,31 @@
             width: 15%;
         }
 
+         #container .logo-container {
+            padding-top: -2%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        #container .logo-container img {
+            max-width: 160px;
+            max-height: 160px;
+        }
+
     </style>
 
 </head>
 <body>
 
+<div class="row">
+    <div id="container">
+        <div class="logo-container">
+            @if($pharmacy['logo'])
+                <img src="{{public_path('fileStore/logo/'.$pharmacy['logo'])}}"/>
+            @endif
+        </div>
+    </div>
+</div>
 <div class="row" style="padding-top: -2%">
     <h1 align="center">{{$pharmacy['name']}}</h1>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
@@ -115,28 +135,28 @@
             <table id="table-detail-main">
                 <tr>
                     <td style="background: #1f273b; color: white"><b>From
-                            Date:</b> {{date('d-m-Y',strtotime($data->first()->from))}}</td>
+                            Date:</b> {{date('Y-m-d',strtotime($data->first()->from))}}</td>
                     <td style="background: #1f273b; color: white"><b>To
-                            Date:</b> {{date('d-m-Y',strtotime($data->first()->to))}}</td>
+                            Date:</b> {{date('Y-m-d',strtotime($data->first()->to))}}</td>
                 </tr>
             </table>
             <table id="table-detail" align="center">
                 <!-- loop the product names here -->
                 <thead>
                 <tr style="background: #1f273b; color: white;">
-                    <th>Expense Date</th>
-                    <th>Expense Category</th>
-                    <th>Description</th>
-                    <th align="right">Amount</th>
+                    <th align="left">Expense Date</th>
+                    <th align="left">Expense Category</th>
+                    <th align="left">Description</th>
+                    <th align="left">Amount</th>
                     {{--                <th>Payment Method</th>--}}
                 </tr>
                 </thead>
                 @foreach($data as $item)
                     <tr>
-                        <td>{{date('d-m-Y',strtotime($item->created_at))}}</td>
-                        <td>{{$item->accExpenseCategory['name']}}</td>
-                        <td align="">{{$item->expense_description}}</td>
-                        <td align="right">{{number_format($item->amount,2)}}</td>
+                        <td align="left">{{date('d-m-Y',strtotime($item->created_at))}}</td>
+                        <td align="left">{{$item->accExpenseCategory['name']}}</td>
+                        <td align="left">{{$item->expense_description}}</td>
+                        <td align="left">{{number_format($item->amount,2)}}</td>
                         {{--                    @if($item->payment_method_id == 1)--}}
                         {{--                        <td align="">CASH</td>--}}
                         {{--                    @else--}}
