@@ -73,12 +73,31 @@
         h4 {
             font-weight: normal;
         }
+
+        #container .logo-container {
+            padding-top: -2%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        #container .logo-container img {
+            max-width: 160px;
+            max-height: 160px;
+        }
     </style>
 
 </head>
 
 <body>
-
+    <div class="row">
+        <div id="container">
+            <div class="logo-container">
+                @if($pharmacy['logo'])
+                    <img src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
+                @endif
+            </div>
+        </div>
+    </div>
     <div class="row" style="padding-top: -2%">
         <h1 align="center">{{$pharmacy['name']}}</h1>
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
@@ -110,9 +129,9 @@
                             </td>
                             {{-- <td>{{$item['batch_number']}}</td> --}}
                             {{-- @if($item['expiry_date'] === null) --}}
-                                {{-- <td align="center"></td>
+                            {{-- <td align="center"></td>
                             @else
-                                <td align="center">{{date('Y-m-d', strtotime($item['expiry_date']))}}</td>
+                            <td align="center">{{date('Y-m-d', strtotime($item['expiry_date']))}}</td>
                             @endif --}}
                             <td align="center">
                                 <div>{{number_format($item['quantity'])}}</div>

@@ -23,6 +23,9 @@ ini_set( 'memory_limit', '512M' );
 
 class SaleReportController extends Controller {
     public function index() {
+        if (!Auth()->user()->checkPermission('View Sales Reports')) {
+            abort(403, 'Access Denied');
+        }
         $price_category = PriceCategory::all();
         $customers = Customer::join( 'sales', 'sales.customer_id', '=', 'customers.id' )
         ->join( 'sales_credits', 'sales_credits.sale_id', '=', 'sales.id' )
@@ -32,6 +35,9 @@ class SaleReportController extends Controller {
     }
 
     protected function reportOption( Request $request ) {
+        if (!Auth()->user()->checkPermission('View Sales Reports')) {
+            abort(403, 'Access Denied');
+        }
         // dd( 'Data is', $request->all() );
         $date_range = explode( '-', $request->date_range );
         $from = trim( $date_range[ 0 ] );
@@ -204,6 +210,9 @@ class SaleReportController extends Controller {
         }
     }
     private function saleDetailReport( $from, $to ) {
+        if (!Auth()->user()->checkPermission('Sales Details Report')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $from = date( 'Y-m-d', strtotime( $from ) );
         $to = date( 'Y-m-d', strtotime( $to ) );
@@ -331,6 +340,9 @@ class SaleReportController extends Controller {
         return $to_print;
     }
     private function cashSaleDetailReport( $from, $to ) {
+        if (!Auth()->user()->checkPermission('Cash Sales Details Report')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $from = date( 'Y-m-d', strtotime( $from ) );
         $to = date( 'Y-m-d', strtotime( $to ) );
@@ -461,7 +473,10 @@ class SaleReportController extends Controller {
         return $to_print;
     }
     private function cashSaleSummaryReport( $from, $to )
- {
+    {
+        if (!Auth()->user()->checkPermission('Cash Sales Summary Report')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $from = date( 'Y-m-d', strtotime( $from ) );
         $to = date( 'Y-m-d', strtotime( $to ) );
@@ -513,6 +528,9 @@ class SaleReportController extends Controller {
     }
     private function cashSalesTotalReport( $from, $to )
     {
+        if (!Auth()->user()->checkPermission('Cash Sales Total Report')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $from = date( 'Y-m-d', strtotime( $from ) );
         $to = date( 'Y-m-d', strtotime( $to ) );
@@ -560,6 +578,9 @@ class SaleReportController extends Controller {
     }
     private function saleSummaryReport( $from, $to )
     {
+        if (!Auth()->user()->checkPermission('Sales Summary Report')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $from = date( 'Y-m-d', strtotime( $from ) );
         $to = date( 'Y-m-d', strtotime( $to ) );
@@ -609,6 +630,9 @@ class SaleReportController extends Controller {
     }
     private function salesTotalReport( $from, $to )
     {
+        if (!Auth()->user()->checkPermission('Sales Total Report')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $from = date( 'Y-m-d', strtotime( $from ) );
         $to = date( 'Y-m-d', strtotime( $to ) );
@@ -654,6 +678,9 @@ class SaleReportController extends Controller {
         return $sale_detail_to_pdf;
     }
     private function creditSaleDetailReport( $from, $to ) {
+        if (!Auth()->user()->checkPermission('Credit Sales Details Report')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $from = date( 'Y-m-d', strtotime( $from ) );
         $to = date( 'Y-m-d', strtotime( $to ) );
@@ -886,6 +913,9 @@ unset($dayData);
     }
     private function creditSaleSummaryReport($from, $to)
     {
+        if (!Auth()->user()->checkPermission('Credit Sales Summary Report')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $from = date('Y-m-d', strtotime($from));
         $to   = date('Y-m-d', strtotime($to));
@@ -985,6 +1015,9 @@ unset($dayData);
     }
     private function creditSalesTotalReport( $from, $to )
     {
+        if (!Auth()->user()->checkPermission('Credit Sales Total Report')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $from = date('Y-m-d', strtotime($from));
         $to = date('Y-m-d', strtotime($to));
@@ -1039,6 +1072,9 @@ unset($dayData);
         return $sale_detail_to_pdf;
     }
     private function creditPaymentReport($from, $to) {
+        if (!Auth()->user()->checkPermission('Credit Payments Report')) {
+            abort(403, 'Access Denied');
+        }
     $store_id = current_store_id();
     $from = date('Y-m-d', strtotime($from));
     $to   = date('Y-m-d', strtotime($to));
@@ -1072,6 +1108,9 @@ unset($dayData);
     }
     private function customerStatement($from, $to, $customer_id)
     {
+        if (!Auth()->user()->checkPermission('Customer Payment Statement')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $from = date('Y-m-d', strtotime($from));
         $to   = date('Y-m-d', strtotime($to));
@@ -1143,6 +1182,9 @@ unset($dayData);
         ];
     }
     private function priceListReport( $category ) {
+        if (!Auth()->user()->checkPermission('Price List Report')) {
+            abort(403, 'Access Denied');
+        }
         $max_prices = array();
         $products = PriceList::where( 'price_category_id', $category )
         ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id' )
@@ -1236,6 +1278,9 @@ unset($dayData);
         ];
     }
     private function saleReturnReport($from, $to) {
+        if (!Auth()->user()->checkPermission('Sales Return Report')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $query = SalesReturn::join( 'sales_details', 'sales_details.id', '=', 'sales_returns.sale_detail_id' )
         ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
@@ -1254,6 +1299,9 @@ unset($dayData);
         return $returns;
     }
     private function salesComparison( $from, $to ) {
+        if (!Auth()->user()->checkPermission('Sales Comparison Report')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $initial = array();
         $dates_only = array();
