@@ -69,11 +69,31 @@
             font-weight: normal;
         }
 
+         #container .logo-container {
+            padding-top: -2%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        #container .logo-container img {
+            max-width: 160px;
+            max-height: 160px;
+        }
+
     </style>
 
 </head>
 <body>
 
+<div class="row">
+    <div id="container">
+        <div class="logo-container">
+            @if($pharmacy['logo'])
+                <img src="{{public_path('fileStore/logo/'.$pharmacy['logo'])}}"/>
+            @endif
+        </div>
+    </div>
+</div>
 <div class="row" style="padding-top: -2%">
     <h1 align="center">{{$pharmacy['name']}}</h1>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
@@ -85,16 +105,16 @@
             <table id="table-detail-main">
                 <tr>
                     <td style="background: #1f273b; color: white"><b>From
-                            Date:</b> {{date('d-m-Y',strtotime($data[0]['from']))}}</td>
+                            Date:</b> {{date('Y-m-d',strtotime($data[0]['from']))}}</td>
                     <td style="background: #1f273b; color: white"><b>To
-                            Date:</b> {{date('d-m-Y',strtotime($data[0]['to']))}}</td>
+                            Date:</b> {{date('Y-m-d',strtotime($data[0]['to']))}}</td>
                 </tr>
             </table>
             <table id="table-detail" align="center">
                 <!-- loop the product names here -->
                 <thead>
                 <tr style="background: #1f273b; color: white;">
-                    <th>Date</th>
+                    <th align="left">Date</th>
                     <th align="right">Total Buy</th>
                     <th align="right">Total Sell</th>
                     <th align="right">Total Profit</th>
@@ -102,7 +122,7 @@
                 </thead>
                 @foreach($data[0]['dates'] as $items)
                     <tr>
-                        <td>{{date('d-m-Y',strtotime($items))}}</td>
+                        <td align="left">{{date('Y-m-d',strtotime($items))}}</td>
                         <td align="right">{{number_format($data[0]['total_buy'][$items][0]['total_buy'],2)}}</td>
                         <td align="right">{{number_format($data[0]['total_sell'][$items][0]['total_sell'],2)}}</td>
                         <td align="right">

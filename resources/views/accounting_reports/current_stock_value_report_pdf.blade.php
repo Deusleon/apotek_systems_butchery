@@ -99,11 +99,31 @@
             width: 15%;
         }
 
+         #container .logo-container {
+            padding-top: -2%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        #container .logo-container img {
+            max-width: 160px;
+            max-height: 160px;
+        }
+
     </style>
 
 </head>
 <body>
 
+<div class="row">
+    <div id="container">
+        <div class="logo-container">
+            @if($pharmacy['logo'])
+                <img src="{{public_path('fileStore/logo/'.$pharmacy['logo'])}}"/>
+            @endif
+        </div>
+    </div>
+</div>
 <div class="row" style="padding-top: -2%">
     <h1 align="center">{{$pharmacy['name']}}</h1>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
@@ -121,16 +141,16 @@
                 <!-- loop the product names here -->
                 <thead>
                 <tr style="background: #1f273b; color: white;">
-                    <th>Product Category</th>
-                    <th align="right">SubTotal Buy</th>
-                    <th align="right">SubTotal Sell</th>
+                    <th align="left">Product Category</th>
+                    <th align="left">SubTotal Buy</th>
+                    <th align="left">SubTotal Sell</th>
                 </tr>
                 </thead>
                 @foreach($data as $item)
                     <tr>
-                        <td>{{$item['category_name']}}</td>
-                        <td align="right">{{number_format($item['buy_price'],2)}}</td>
-                        <td align="right">{{number_format($item['sell_price'],2)}}</td>
+                        <td align="left">{{$item['category_name']}}</td>
+                        <td align="left">{{number_format($item['buy_price'],2)}}</td>
+                        <td align="left">{{number_format($item['sell_price'],2)}}</td>
                     </tr>
                 @endforeach
             </table>

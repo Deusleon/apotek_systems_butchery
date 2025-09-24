@@ -109,11 +109,31 @@
             width: 15%;
         }
 
+         #container .logo-container {
+            padding-top: -2%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        #container .logo-container img {
+            max-width: 160px;
+            max-height: 160px;
+        }
+
     </style>
 
 </head>
 <body>
 
+<div class="row">
+    <div id="container">
+        <div class="logo-container">
+            @if($pharmacy['logo'])
+                <img src="{{public_path('fileStore/logo/'.$pharmacy['logo'])}}"/>
+            @endif
+        </div>
+    </div>
+</div>
 <div class="row" style="padding-top: -2%">
     <h1 align="center">{{$pharmacy['name']}}</h1>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
@@ -125,9 +145,9 @@
             <table id="table-detail-main">
                 <tr>
                     <td style="background: #1f273b; color: white"><b>From
-                            Date:</b> {{date('d-m-Y',strtotime($data->first()->from))}}</td>
+                            Date:</b> {{date('Y-d-m',strtotime($data->first()->from))}}</td>
                     <td style="background: #1f273b; color: white"><b>To
-                            Date:</b> {{date('d-m-Y',strtotime($data->first()->to))}}</td>
+                            Date:</b> {{date('Y-d-m',strtotime($data->first()->to))}}</td>
                 </tr>
             </table>
             <table id="table-detail" align="center">
