@@ -72,17 +72,39 @@
                                         <select id="report_option" name="report_option" onchange="reportOption()"
                                             class="js-example-basic-single form-control drop">
                                             <option selected="true" value="0" disabled="disabled">Select report</option>
-                                            <option value="1">Current Stock</option>
-                                            <option value="2">Product Details Report</option>
-                                            <option value="3">Product Ledger Report</option>
-                                            <option value="4">Expired Product Report</option>
-                                            <option value="5">Out Of Stock Report</option>
-                                            <option value="6">Outgoing Tracking Report</option>
-                                            <option value="7">Stock Adjustment Report</option>
-                                            <option value="8">Stock Issue Report</option>
-                                            <option value="9">Stock Transfer Report</option>
-                                            <option value="10">Stock Above Maximum Level Report</option>
-                                            <option value="11">Stock Below Minimum Level Report</option>
+                                            @if(auth()->user()->checkPermission('Current Stock Report'))
+                                                <option value="1">Current Stock Report</option>
+                                            @endif
+                                            @if(auth()->user()->checkPermission('Product Details Report'))
+                                                <option value="2">Product Details Report</option>
+                                            @endif
+                                            @if(auth()->user()->checkPermission('Product Ledger Report'))
+                                                <option value="3">Product Ledger Report</option>
+                                            @endif
+                                            @if(auth()->user()->checkPermission('Expired Products Report'))
+                                                <option value="4">Expired Products Report</option>
+                                            @endif
+                                            @if(auth()->user()->checkPermission('Out Of Stock Report'))
+                                                <option value="5">Out Of Stock Report</option>
+                                            @endif
+                                            @if(auth()->user()->checkPermission('Outgoing Tracking Report'))
+                                                <option value="6">Outgoing Tracking Report</option>
+                                            @endif
+                                            @if(auth()->user()->checkPermission('Stock Adjustment Report'))
+                                                <option value="7">Stock Adjustment Report</option>
+                                            @endif
+                                            @if(auth()->user()->checkPermission('Stock Issue Report'))
+                                                <option value="8">Stock Issue Report</option>
+                                            @endif
+                                            @if(auth()->user()->checkPermission('Stock Transfer Report'))
+                                                <option value="9">Stock Transfer Report</option>
+                                            @endif
+                                            @if(auth()->user()->checkPermission('Stock Above Max. Level'))
+                                                <option value="10">Stock Above Maximum Level Report</option>
+                                            @endif
+                                            @if(auth()->user()->checkPermission('Stock Below Min. Level'))
+                                                <option value="11">Stock Below Minimum Level Report</option>
+                                            @endif
                                         </select>
                                     </div>
                                 </div>

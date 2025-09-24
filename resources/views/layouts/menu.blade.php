@@ -69,7 +69,7 @@
             @if(auth()->user()->checkPermission('View Requisition'))
                 <li class=""><a href="{{ route('requisitions.create')}}" class="">Stock Requisition</a></li>
             @endif
-            @if(auth()->user()->checkPermission('View Requisition Issue'))
+            @if(auth()->user()->checkPermission('View Stock Issue'))
                 <li class=""><a href="{{ route('issue.index') }}" class="">Stock Issue</a></li>
             @endif
 
