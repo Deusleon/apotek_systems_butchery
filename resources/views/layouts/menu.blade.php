@@ -11,10 +11,10 @@
             @if(auth()->user()->checkPermission('View Cash Sales'))
                 <li class=""><a href="{{route('cash-sales.cashSale')}}" class="">Cash Sales</a></li>
             @endif
-            @if(auth()->user()->checkPermission('View Credit Sales'))
+            @if(auth()->user()->checkPermission('View Credit Sales') || auth()->user()->checkPermission('View Credit Tracking') || auth()->user()->checkPermission('View Credit Payment'))
                 <li class=""><a href="{{route('credit-sales.creditSale')}}" class="">Credit Sales</a></li>
             @endif
-            @if(auth()->user()->checkPermission('View Sales Orders'))
+            @if(auth()->user()->checkPermission('View Sales Orders') || auth()->user()->checkPermission('View Order List'))
                 <li class=""><a href="{{route('sale-quotes.index')}}" class="">Sales Order</a></li>
             @endif
             @if(auth()->user()->checkPermission('View Sales History'))

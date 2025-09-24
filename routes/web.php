@@ -317,10 +317,6 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::post('inventory/current-stock/in-stock',
         'CurrentStockController@allInStock')->name('all-in-stock');
 
-
-
-
-
     /*stock adjustment routes*/
     Route::group(['middleware' => ['permission:View Stock Adjustment|Stock Adjustment']], function () {
         Route::get('inventory/stock-adjustment', [StockAdjustmentController::class, 'index'])->name('stock-adjustments-history');
@@ -330,9 +326,6 @@ Route::middleware(["auth","main_branch"])->group(function () {
         Route::get('inventory/stock-adjustment/{adjustment}', [StockAdjustmentController::class, 'show'])->name('stock-adjustments.show');
         Route::post('inventory/stock-adjustment/all', [StockAdjustmentController::class, 'allAdjustments'])->name('all-adjustments');
     });
-
-
-
 
     /*price list route*/
     Route::resource('inventory/price-list', 'PriceListController')->only([

@@ -25,7 +25,10 @@ class SaleQuoteController extends Controller {
 
     public function index() {
         if (!Auth()->user()->checkPermission('View Sales Orders')) {
-            abort(403, 'Access Denied');
+            if (!Auth()->user()->checkPermission('View Order List')) {
+                abort(403, 'Access Denied');
+            }
+            return redirect()->route('sale-quotes.order_list');
         }
         $store_id = current_store_id();
         $vat = Setting::where( 'id', 120 )->value( 'value' ) / 100;
