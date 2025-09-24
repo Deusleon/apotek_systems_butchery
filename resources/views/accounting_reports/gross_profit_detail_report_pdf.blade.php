@@ -137,17 +137,14 @@
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
     <h2 align="center" style="margin-top: -1%">Gross Profit Detail Report</h2>
+     <!-- Display From and To dates as an H4 below the heading -->
+    <h4 align="center" style="margin-top: 0.5%">
+        From {{ date('Y-m-d', strtotime($data[0]['from'])) }} 
+        To {{ date('Y-m-d', strtotime($data[0]['to'])) }}
+    </h4>
 
     <div class="row">
         <div class="col-md-12">
-            <table id="table-detail-main-1">
-                <tr>
-                    <td style="background: #1f273b; color: white"><b>From
-                            Date:</b> {{date('Y-m-d',strtotime($data[0]['from']))}}</td>
-                    <td style="background: #1f273b; color: white"><b>To
-                            Date:</b> {{date('Y-m-d',strtotime($data[0]['to']))}}</td>
-                </tr>
-            </table>
             @foreach($data[0]['data'] as $key => $items)
                 <table id="table-detail-main">
                     <tr>
