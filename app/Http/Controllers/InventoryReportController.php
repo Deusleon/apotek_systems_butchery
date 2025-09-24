@@ -30,7 +30,9 @@ class InventoryReportController extends Controller
 
     public function index()
     {
-
+        if (!Auth()->user()->checkPermission('View Inventory Reports')) {
+            abort(403, 'Access Denied');
+        }
         $products = DB::table('product_ledger')
             ->join('inv_products', 'inv_products.id', '=', 'product_ledger.product_id')
             ->select('product_id', 'product_name', 'brand', 'pack_size', 'sales_uom')
@@ -51,6 +53,9 @@ class InventoryReportController extends Controller
 
     protected function reportOption(Request $request)
     {
+        if (!Auth()->user()->checkPermission('View Inventory Reports')) {
+            abort(403, 'Access Denied');
+        }
     $pharmacy['name'] = Setting::where('id', 100)->value('value');
     $pharmacy['address'] = Setting::where('id', 106)->value('value');
     $pharmacy['phone'] = Setting::where('id', 107)->value('value');
@@ -246,6 +251,9 @@ class InventoryReportController extends Controller
 
     private function currentStockByStoreReport($store)
     {
+        if (!Auth()->user()->checkPermission('Current Stock Report')) {
+            abort(403, 'Access Denied');
+        }
         $query = CurrentStock::with(['product', 'store'])
             ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
             ->join('inv_categories', 'inv_categories.id', '=', 'inv_products.category_id')
@@ -294,6 +302,9 @@ class InventoryReportController extends Controller
     
     private function currentStockReport($store, $category)
     {
+        if (!Auth()->user()->checkPermission('Current Stock Report')) {
+            abort(403, 'Access Denied');
+        }
         $query = CurrentStock::join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
             ->join('inv_categories', 'inv_categories.id', '=', 'inv_products.category_id')
             ->select(
@@ -343,6 +354,9 @@ class InventoryReportController extends Controller
     }
     private function productDetailReport($category)
     {
+        if (!Auth()->user()->checkPermission('Product Details Report')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         if (!is_all_store()) {
             if ($category != null) {
@@ -378,9 +392,11 @@ class InventoryReportController extends Controller
 
         return $results_data;
     }
-
     private function productLedgerReport($product_id)
     {
+        if (!Auth()->user()->checkPermission('Product Ledger Report')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $query = DB::table('stock_details')
             ->select('product_id')
@@ -408,7 +424,6 @@ class InventoryReportController extends Controller
         return $result;
 
     }
-
     protected function sumProductFilterTotal($ledger, $current_stock)
     {
         $total = 0;
@@ -466,9 +481,11 @@ class InventoryReportController extends Controller
 
         return $toMainView;
     }
-
     private function expiredProductReport()
     {
+        if (!Auth()->user()->checkPermission('Expired Products Report')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $query = CurrentStock::where(DB::raw('date(expiry_date)'), '<', date('Y-m-d'))
             ->orderby('expiry_date', 'DESC');
@@ -481,9 +498,11 @@ class InventoryReportController extends Controller
         
         return $expired_products;
     }
-
     private function outOfStockReport()
     {
+        if (!Auth()->user()->checkPermission('Out Of Stock Report')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $query = CurrentStock::where('quantity', 0)
             ->groupby('product_id');
@@ -496,12 +515,14 @@ class InventoryReportController extends Controller
 
         return $out_of_stock;
     }
-
     private function outgoingTrackingReport() 
     {
+        if (!Auth()->user()->checkPermission('Outgoing Tracking Report')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $query = StockTracking::where('movement', 'OUT')
-            ->with(['currentStock.product', 'user']); // hakikisha unaload relationships
+            ->with(['currentStock.product', 'user']);
 
         if (!is_all_store()) {
             $query->where('store_id', $store_id);
@@ -531,9 +552,11 @@ class InventoryReportController extends Controller
 
         return $merged;
     }
-
     private function stockAdjustmentReport($dates, $type, $reason)
-    {            
+    {  
+        if (!Auth()->user()->checkPermission('Stock Adjustment Report')) {
+            abort(403, 'Access Denied');
+        }          
         $start = date('Y-m-d', strtotime($dates[0]));
         $end = date('Y-m-d', strtotime($dates[1]));
 
@@ -585,6 +608,9 @@ class InventoryReportController extends Controller
     }
     private function stockIssueReport($issue_date)
     {
+        if (!Auth()->user()->checkPermission('Stock Issue Report')) {
+            abort(403, 'Access Denied');
+        }
         $to_pdf = array();
         $total_bp = 0;
         $total_sp = 0;
@@ -624,9 +650,11 @@ class InventoryReportController extends Controller
 
         return $to_pdf;
     }
-
     private function stockIssueReturnReport($status, $dates)
     {
+        if (!Auth()->user()->checkPermission('Stock Issue Return Report')) {
+            abort(403, 'Access Denied');
+        }
         if ($status == 2) {
             $issue_return = IssueReturn::all();
             return $issue_return;
@@ -638,9 +666,11 @@ class InventoryReportController extends Controller
         }
 
     }
-
     private function stockTransferReport($dates)
     {
+        if (!Auth()->user()->checkPermission('Stock Transfer Report')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $query = StockTransfer::whereBetween(DB::raw('date(created_at)'),
             [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))]);
@@ -660,7 +690,6 @@ class InventoryReportController extends Controller
 
         return $transfers;
     }
-
     private function stockTransferStatusReport($status, $dates)
     {
 
@@ -691,9 +720,11 @@ class InventoryReportController extends Controller
 
         return $transfers;
     }
-
     private function stockMaxLevel()
     {
+        if (!Auth()->user()->checkPermission('Stock Above Max. Level')) {
+            abort(403, 'Access Denied');
+        }
         $stock_max = [];
         $store_id = current_store_id();
         $query = CurrentStock::select('product_id', DB::raw('sum(quantity) as qty'))
@@ -718,9 +749,11 @@ class InventoryReportController extends Controller
         }
         return $stock_max;
     }
-
     private function stockMinLevel()
     {
+        if (!Auth()->user()->checkPermission('Stock Below Min. Level')) {
+            abort(403, 'Access Denied');
+        }
         $stock_max = [];
         $store_id = current_store_id();
 
@@ -747,7 +780,6 @@ class InventoryReportController extends Controller
         return $stock_max;
 
     }
-
     public function stockDiscrepancyReport()
     {
         $auditLogs = DB::table('stock_adjustment_logs')
@@ -772,7 +804,6 @@ class InventoryReportController extends Controller
 
         return view('inventory_reports.stock_discrepancy', compact('auditLogs'));
     }
-
     public function stockCountAnalytics()
     {
         // Total number of scheduled stock counts

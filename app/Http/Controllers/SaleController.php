@@ -98,12 +98,20 @@ class SaleController extends Controller
     }
     public function getCreditsCustomers()
     {
+        if (!Auth()->user()->checkPermission('View Credit Sales')) {
+            abort(403, 'Access Denied');
+        }
+
         $customers = Customer::where('total_credit', '>', 0)->get();
         return View::make('sales.credit_sales.payment')
             ->with(compact('customers'));
     }
     public function getPaymentsHistory()
     {
+        if (!Auth()->user()->checkPermission('View Credit Sales')) {
+            abort(403, 'Access Denied');
+        }
+
         $customers = Customer::orderBy('name', 'asc')->get();
 
         $payments = SalesCredit::join('sales', 'sales.id', '=', 'sales_credits.sale_id')
@@ -114,6 +122,10 @@ class SaleController extends Controller
     }
     public function paymentHistoryFilter(Request $request)
     {
+        if (!Auth()->user()->checkPermission('View Credit Sales')) {
+            abort(403, 'Access Denied');
+        }
+
         if ($request->ajax()) {
             $dates = explode(" - ", $request->date);
             if ($request->customer_id === null) {
@@ -149,6 +161,9 @@ class SaleController extends Controller
     }
     public function CreditSalePayment(Request $request)
     {
+        if (!Auth()->user()->checkPermission('View Credit Sales')) {
+            abort(403, 'Access Denied');
+        }
         //Validating amount before submitting
         if($request->paid_amount>$request->balance)
         {
@@ -173,6 +188,9 @@ class SaleController extends Controller
     }
     public function getCreditSale(Request $request)
     {
+        if (!Auth()->user()->checkPermission('View Credit Sales')) {
+            abort(403, 'Access Denied');
+        }
         $store_id = current_store_id();
         $from = $request->date[0];
         $to = $request->date[1];
@@ -350,6 +368,10 @@ class SaleController extends Controller
     }
     public function storeCashSale(Request $request)
     {
+        if (!Auth()->user()->checkPermission('View Cash Sales')) {
+            abort(403, 'Access Denied');
+        }
+
         if ($request->ajax()) {
             $this->store($request);
             
@@ -605,6 +627,9 @@ class SaleController extends Controller
     }
     public function storeCreditSale(Request $request)
     {
+        if (!Auth()->user()->checkPermission('View Credit Sales')) {
+            abort(403, 'Access Denied');
+        }
         if ($request->ajax()) {
             $customer = json_decode($request->customer_id, true);
             if ($customer) {
@@ -622,6 +647,9 @@ class SaleController extends Controller
     }
     public function getSalesHistory(Request $request)
     {
+        if (!Auth()->user()->checkPermission('View Sales History')) {
+            abort(403, 'Access Denied');
+        }
         $from = $request->range[0] ?? null;
         $to = $request->range[1] ?? null;
         $storeId = current_store_id();
@@ -674,6 +702,9 @@ class SaleController extends Controller
     }
     public function getSalesHistoryData(Request $request)
     {
+        if (!Auth()->user()->checkPermission('View Sales History')) {
+            abort(403, 'Access Denied');
+        }
         $saleReceipt = $request->receipt;
         $storeId = current_store_id();
 
@@ -721,13 +752,18 @@ class SaleController extends Controller
     }
     public function creditsTracking()
     {
+        if (!Auth()->user()->checkPermission('View Credit Sales')) {
+            abort(403, 'Access Denied');
+        }
         $customers = Customer::where('total_credit', '>', 0)->get();
         return View::make('sales.credit_tracking.index')
             ->with(compact('customers'));
     }
     public function getCashReceipt($page)
     {
-
+        if (!Auth()->user()->checkPermission('View Cash Sales')) {
+            abort(403, 'Access Denied');
+        }
         $receipt_size = Setting::where('id', 119)->value('value');
         $pharmacy['name'] = Setting::where('id', 100)->value('value');
         $pharmacy['logo'] = Setting::where('id', 105)->value('value');
@@ -873,6 +909,9 @@ class SaleController extends Controller
     }
     public function getCreditReceipt()
     {
+        if (!Auth()->user()->checkPermission('View Credit Sales')) {
+            abort(403, 'Access Denied');
+        }
         $receipt_size = Setting::where('id', 119)->value('value');
         $pharmacy['name'] = Setting::where('id', 100)->value('value');
         $pharmacy['logo'] = Setting::where('id', 105)->value('value');

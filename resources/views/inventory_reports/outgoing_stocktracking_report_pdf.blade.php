@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Outgoing Stock Tracking Report</title>
 
     <style>
-
         body {
             font-size: 12px;
         }
@@ -13,7 +13,9 @@
             font-family: Verdana, Arial, sans-serif;
         }
 
-        table, th, td {
+        table,
+        th,
+        td {
             /*border: 1px solid black;*/
             border-collapse: collapse;
             padding: 10px;
@@ -42,7 +44,7 @@
             margin-top: -10%;
         }
 
-        #table-detail tr > {
+        #table-detail tr> {
             line-height: 13px;
         }
 
@@ -62,50 +64,70 @@
             font-weight: normal;
         }
 
+        #container .logo-container {
+            padding-top: -2%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        #container .logo-container img {
+            max-width: 160px;
+            max-height: 160px;
+        }
     </style>
 
 </head>
+
 <body>
-
-<div class="row" style="padding-top: -2%">
-    <h1 align="center">{{$pharmacy['name']}}</h1>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
-    <h2 align="center" style="margin-top: -1%">Outgoing Stock Tracking Report</h2>
-
-    <div class="row" style="margin-top: 8%;">
-        <div class="col-md-12">
-            <table id="table-detail" align="center">
-                <!-- loop the product names here -->
-                <thead>
-                <tr style="background: #1f273b; color: white;">
-                    <th align="center">#</th>
-                    <th align="left">Date</th>
-                    <th align="left">Product Name</th>
-                    <th align="left">Method Out</th>
-                    <th>Quantity</th>
-                    <th align="left">Made By</th>
-                </tr>
-                </thead>
-                @foreach($data as $item)
-                    <tr>
-                        <td align="center">{{$loop->iteration}}.</td>
-                        <td>{{$item->date}}</td>
-                        <td>{{$item->product->name.' '.($item->product->brand.' ' ?? '').($item->product->pack_size ?? '').($item->product->sales_uom ?? '')}}</td>
-                        <td>{{$item->out_mode}}</td>
-                        <td align="center">
-                            <div>{{number_format($item->quantity)}}</div>
-                        </td>
-                        <td>{{$item->user['name']}}</td>
-                    </tr>
-                @endforeach
-            </table>
+    <div class="row">
+        <div id="container">
+            <div class="logo-container">
+                @if($pharmacy['logo'])
+                    <img src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
+                @endif
+            </div>
         </div>
     </div>
-</div>
+    <div class="row" style="padding-top: -2%">
+        <h1 align="center">{{$pharmacy['name']}}</h1>
+        <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
+        <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
+        <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}</h3>
+        <h2 align="center" style="margin-top: -1%">Outgoing Stock Tracking Report</h2>
 
-<script type="text/php">
+        <div class="row" style="margin-top: 8%;">
+            <div class="col-md-12">
+                <table id="table-detail" align="center">
+                    <!-- loop the product names here -->
+                    <thead>
+                        <tr style="background: #1f273b; color: white;">
+                            <th align="center">#</th>
+                            <th align="left">Date</th>
+                            <th align="left">Product Name</th>
+                            <th align="left">Method Out</th>
+                            <th>Quantity</th>
+                            <th align="left">Made By</th>
+                        </tr>
+                    </thead>
+                    @foreach($data as $item)
+                        <tr>
+                            <td align="center">{{$loop->iteration}}.</td>
+                            <td>{{$item->date}}</td>
+                            <td>{{$item->product->name . ' ' . ($item->product->brand . ' ' ?? '') . ($item->product->pack_size ?? '') . ($item->product->sales_uom ?? '')}}
+                            </td>
+                            <td>{{$item->out_mode}}</td>
+                            <td align="center">
+                                <div>{{number_format($item->quantity)}}</div>
+                            </td>
+                            <td>{{$item->user['name']}}</td>
+                        </tr>
+                    @endforeach
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/php">
     if ( isset($pdf) ) {
         $x = 280;
         $y = 820;
@@ -124,5 +146,5 @@
 </script>
 
 </body>
-</html>
 
+</html>
