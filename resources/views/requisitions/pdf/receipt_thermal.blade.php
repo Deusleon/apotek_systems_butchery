@@ -35,7 +35,6 @@
 
         #items {
             width: 100%;
-            margin-top: 2%;
         }
 
         #items tr:nth-child(even) {
@@ -122,7 +121,7 @@
     </table>
 
     <!-- Requisition Items -->
-    <div style="margin-top: 2%;">
+    <div>
         <table id="items" align="center">
             <thead>
                 <tr>
