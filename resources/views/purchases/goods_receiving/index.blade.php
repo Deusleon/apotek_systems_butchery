@@ -46,18 +46,22 @@
                     href="{{ route('goods-receiving.index') }}" role="tab" aria-controls="quotes_list"
                     aria-selected="true">Invoice Receiving</a>
             </li>
+            @if (auth()->user()->checkPermission('View Order Receiving'))
             <li class="nav-item">
                 <a class="nav-link text-uppercase" id="order-received" data-toggle="pill"
                     href="{{ route('orders-receiving.index') }}" role="tab" aria-controls="new_quotes"
                     aria-selected="false">Order Receiving
                 </a>
             </li>
+            @endif
+            @if (auth()->user()->checkPermission('View Material Received'))
             <li class="nav-item">
                 <a class="nav-link text-uppercase" id="material-received" data-toggle="pill"
                     href="{{ url('purchases/material-received') }}" role="tab" aria-controls="new_quotes"
                     aria-selected="false">Material Received
                 </a>
             </li>
+            @endif
         </ul>
         <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade show active" id="invoice-receiving" role="tabpanel"

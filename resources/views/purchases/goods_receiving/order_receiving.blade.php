@@ -68,18 +68,24 @@
 
         <!-- Navigation Tabs -->
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
+            @if (auth()->user()->checkPermission('View Invoice Receiving'))
             <li class="nav-item">
                 <a class="nav-link text-uppercase" id="invoice-received"
                    href="{{ route('goods-receiving.index') }}">Invoice Receiving</a>
             </li>
+            @endif
+            @if (auth()->user()->checkPermission('View Order Receiving'))
             <li class="nav-item">
                 <a class="nav-link active text-uppercase" id="order-received"
                    href="{{ route('orders-receiving.index') }}">Order Receiving</a>
             </li>
+            @endif
+            @if (auth()->user()->checkPermission('View Material Received'))
             <li class="nav-item">
                 <a class="nav-link text-uppercase" id="material-received"
                    href="{{ url('purchases/material-received') }}">Material Received</a>
             </li>
+            @endif
         </ul>
 
         <!-- Orders Table -->
