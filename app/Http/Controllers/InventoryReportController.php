@@ -174,35 +174,35 @@ class InventoryReportController extends Controller
                 $dates = explode(" - ", $request->issue_date);
                 if ($request->stock_issue == null) {
 
-                    $data_og = $this->stockIssueReport($dates);
-                    if ($data_og == []) {
+                    $data = $this->stockIssueReport($dates);
+                    if ($data == []) {
                         return response()->view('error_pages.pdf_zero_data');
                     }
-                    $view = 'inventory_reports.stock_issue_report_pdf';
-                    $output = 'stock_issue_report.pdf';
-                    $this->splitPdf($data_og, $view, $output);
-                    break;
+                $pdf = PDF::loadView( 'inventory_reports.stock_issue_report_pdf',
+                compact( 'data', 'pharmacy' ) )
+                ->setPaper( 'a4', '' );
+                return $pdf->stream( 'stock_issue_report.pdf' );
                 } else {
 
                     //stock issue return report
                     if ($request->stock_issue == 2) {
-                        $data_og = $this->stockIssueReturnReport($request->stock_issue, $dates);
-                        if ($data_og->isEmpty()) {
+                        $data = $this->stockIssueReturnReport($request->stock_issue, $dates);
+                        if ($data->isEmpty()) {
                             return response()->view('error_pages.pdf_zero_data');
                         }
-                        $view = 'inventory_reports.issue_return_report_pdf';
-                        $output = 'issue_return_report.pdf';
-                        $this->splitPdf($data_og, $view, $output);
-                        break;
+                $pdf = PDF::loadView( 'inventory_reports.issue_return_report_pdf',
+                compact( 'data', 'pharmacy' ) )
+                ->setPaper( 'a4', '' );
+                return $pdf->stream( 'issue_return_report.pdf' );
                     } else {
-                        $data_og = $this->stockIssueReturnReport($request->stock_issue, $dates);
-                        if ($data_og->isEmpty()) {
+                        $data = $this->stockIssueReturnReport($request->stock_issue, $dates);
+                        if ($data->isEmpty()) {
                             return response()->view('error_pages.pdf_zero_data');
                         }
-                        $view = 'inventory_reports.issue_issued_report_pdf';
-                        $output = 'issue_return_report.pdf';
-                        $this->splitPdf($data_og, $view, $output);
-                        break;
+                $pdf = PDF::loadView( 'inventory_reports.issue_issued_report_pdf',
+                compact( 'data', 'pharmacy' ) )
+                ->setPaper( 'a4', '' );
+                return $pdf->stream( 'issue_return_report.pdf' );
                     }
                 }
             case 9:

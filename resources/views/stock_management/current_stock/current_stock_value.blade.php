@@ -80,7 +80,13 @@
                         @foreach ($stocks as $stock)
                             @if($stock->buying_price>0)
                             <tr>
-                                <td id="name_{{ $stock->product_id }}">{{ ($stock->name ?? '') . (!empty($stock->brand) ? ' (' . $stock->brand . ')' : '') . (!empty($stock->pack_size) ? ' - ' . $stock->pack_size : '') }}</td>
+                                <td id="name_{{ $stock->product_id }}">
+                                    {{ trim(($stock->name ?? '') . 
+                                            (!empty($stock->brand) ? ' ' . $stock->brand : '') . 
+                                            (!empty($stock->pack_size) ? ' ' . $stock->pack_size : '') . 
+                                            (!empty($stock->sales_uom) ? '' . $stock->sales_uom : '')
+                                    ) }}
+                                </td>
                                 <td id="quantity_{{ $stock->product_id }}">{{ floor($stock->quantity) == $stock->quantity ? number_format($stock->quantity,0) : number_format($stock->quantity,1) }}</td>
                                 <td id="unitcost_{{ $stock->product_id }}">{{ number_format($stock->unit_cost,2) ?? '' }}</td>
                                 <td id="price_{{ $stock->product_id }}">{{ number_format($stock->price,2) ?? '' }}</td>

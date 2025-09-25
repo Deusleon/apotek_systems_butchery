@@ -24,7 +24,7 @@
 
 
             <div class="card-body">
-                @if(auth()->user()->checkPermission('Manage Roles'))
+                @if(auth()->user()->checkPermission('View Settings'))
                     <a href="{{route('roles.create')}}">
                         <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-secondary btn-sm">
                             Add Role
@@ -37,7 +37,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Description</th>
-                            @if(auth()->user()->checkPermission('Manage Roles'))
+                            @if(auth()->user()->checkPermission('View Settings'))
                                 <th>Actions</th>
                             @endif
                         </tr>
@@ -47,7 +47,7 @@
                             <tr>
                                 <td>{{$role->name}}</td>
                                 <td>{{$role->description}}</td>
-                                @if(auth()->user()->checkPermission('Manage Roles'))
+                                @if(auth()->user()->checkPermission('View Settings'))
                                     <td>
                                         <a href="{{route('roles.edit',$role->id)}}">
                                             <button class="btn btn-primary btn-rounded btn-sm" type="button">Edit
