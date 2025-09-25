@@ -119,11 +119,7 @@
             var isApprovedByClient = !!data.clientApproved; // set by our Approve in modal
             var isApprovedByBackend = (data.status === '2' || data.status === '3' || data.status === 'Approved');
 
-            if (!(isApprovedByClient || isApprovedByBackend)) {
-                alert('Order must be approved before printing.');
-                return;
-            }
-
+            
             // ORIGINAL LOGIC (unchanged)
             let url = '{{route('printOrder','id','Purchase Order')}}';
             url = url.replace('id', data.details[0].order_id);

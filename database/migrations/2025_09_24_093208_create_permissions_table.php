@@ -72,6 +72,7 @@ class CreatePermissionsTable extends Migration
             ['name' => 'View Requisition Issue', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
             ['name' => 'View Requisitions Details', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
             ['name' => 'Create Requisitions', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
+            ['name' => 'Edit Requisitions', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
             ['name' => 'Delete Requisitions', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
             ['name' => 'Approve Requisitions', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
             ['name' => 'Print Requisitions', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
