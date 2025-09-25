@@ -24,7 +24,7 @@
 
 
             <div class="card-body">
-                @if(auth()->user()->checkPermission('View Settings'))
+                @if(auth()->user()->checkPermission('Add Roles'))
                     <a href="{{route('roles.create')}}">
                         <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-secondary btn-sm">
                             Add Role
@@ -34,35 +34,41 @@
                 <div class="table-responsive">
                     <table id="fixed-header" class="display table nowrap table-striped table-hover" style="width:100%">
                         <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            @if(auth()->user()->checkPermission('View Settings'))
-                                <th>Actions</th>
-                            @endif
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($roles as $role)
                             <tr>
-                                <td>{{$role->name}}</td>
-                                <td>{{$role->description}}</td>
-                                @if(auth()->user()->checkPermission('View Settings'))
-                                    <td>
-                                        <a href="{{route('roles.edit',$role->id)}}">
-                                            <button class="btn btn-primary btn-rounded btn-sm" type="button">Edit
-                                            </button>
-                                        </a>
-                                        <a href="#">
-                                            <button class="btn btn-danger btn-rounded btn-sm" data-id="{{$role->id}}"
-                                                    data-name="{{$role->name}}" type="button" data-toggle="modal"
-                                                    data-target="#deleteModal"> Delete
-                                            </button>
-                                        </a>
-                                    </td>
+                                <th>Name</th>
+                                <th>Description</th>
+                                @if(auth()->user()->checkPermission('Edit Roles') || auth()->user()->checkPermission('Delete Roles'))
+                                    <th>Actions</th>
                                 @endif
                             </tr>
-                        @endforeach
+                        </thead>
+                        <tbody>
+                            @foreach($roles as $role)
+                                <tr>
+                                    <td>{{$role->name}}</td>
+                                    <td>{{$role->description}}</td>
+                                    @if(auth()->user()->checkPermission('Edit Roles') || auth()->user()->checkPermission('Delete Roles'))
+                                        <td>
+                                            @if(auth()->user()->checkPermission('Edit Roles'))
+                                                <a href="{{route('roles.edit', $role->id)}}">
+                                                    <button class="btn btn-primary btn-rounded btn-sm" type="button">Edit
+                                                    </button>
+                                                </a>
+                                            @endif
+                                            @if(auth()->user()->checkPermission('Delete Roles'))
+                                                @if($role->is_used === 'no')
+                                                    <a href="#">
+                                                        <button class="btn btn-danger btn-rounded btn-sm" data-id="{{$role->id}}"
+                                                            data-name="{{$role->name}}" type="button" data-toggle="modal"
+                                                            data-target="#deleteModal"> Delete
+                                                        </button>
+                                                    </a>
+                                                @endif
+                                            @endif
+                                        </td>
+                                    @endif
+                                </tr>
+                            @endforeach
 
                         </tbody>
                     </table>

@@ -15,8 +15,18 @@ class RoleController extends Controller
     {
         $roles = Role::get();
         $permissions = Permission::get();
+        foreach ($roles as $role) {
+            $role_count = DB::table('role_has_permissions')->where('role_id', $role->id)->count();
 
+            if ($role_count > 0) {
+                $role['is_used'] = 'yes';
+            }
 
+            if ($role_count == 0) {
+                $role['is_used'] = 'no';
+            }
+
+        }
         return view("roles.index", compact("roles", "permissions"));
     }
 

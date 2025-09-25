@@ -37,127 +37,125 @@
 
 
             <div class="card-body">
-                @if(auth()->user()->checkPermission('Manage Users'))
+                @if(auth()->user()->checkPermission('Add Users'))
                     <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-primary btn-sm"
-                            data-toggle="modal" data-target="#add-permission" hidden>
+                        data-toggle="modal" data-target="#add-permission" hidden>
                         Add User Permission
                     </button>
                     <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-secondary btn-sm"
-                            data-toggle="modal" data-target="#register">
+                        data-toggle="modal" data-target="#register">
                         Add User
                     </button>
 
                 @endif
                 <div class="table-responsive">
-                    <table id="fixed-header-users" class="display table nowrap table-striped table-hover" style="width:100%">
+                    <table id="fixed-header-users" class="display table nowrap table-striped table-hover"
+                        style="width:100%">
                         <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>E-mail</th>
-                            <th hidden>Mobile</th>
-                            <th>Role</th>
-                            <th hidden>Position</th>
-                            <th>Branch</th>
-                            <th>Status</th>
-                            @if(auth()->user()->checkPermission('Manage Users'))
-                                <th>Actions</th>
-                            @endif
-                            <th hidden>Created At</th>
-                        </tr>
+                            <tr>
+                                <th>Name</th>
+                                <th>E-mail</th>
+                                <th hidden>Mobile</th>
+                                <th>Role</th>
+                                <th hidden>Position</th>
+                                <th>Branch</th>
+                                <th>Status</th>
+                                @if(auth()->user()->checkPermission('Edit Users') || auth()->user()->checkPermission('Delete Users'))
+                                    <th>Actions</th>
+                                @endif
+                                <th hidden>Created At</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        @foreach($users as $user)
-                            <tr>
-                                <td>{{$user->name}} </td>
-                                <td>{{$user->email}}</td>
-                                <td hidden>{{$user->mobile}}</td>
-                                <td>{{ implode(", ", $user->getRoleNames()->toArray()) }}</td>
-                                <td hidden>{{$user->position}}</td>
-                                <td>{{$user->store->name ?? '' }}</td>
-                                <td>
-                                    @if ($user->status == 1)
-                                        <span class='badge badge-success'>Active</span>
-                                    @endif
-                                    @if ($user->status == -1)
-                                        <span class='badge badge-info'>In-active</span>
-                                    @endif
-                                    @if ($user->status == 0)
-                                        <span class='badge badge-danger'>De-activated</span>
-                                    @endif
-                                </td>
-
-                                @if(auth()->user()->checkPermission('Manage Users'))
-                                    <td style='white-space: nowrap'>
-                                        <a href="#">
-                                            <button class="btn btn-success btn-sm btn-rounded"
-                                                    data-name="{{$user->name}}"
-                                                    data-email="{{$user->email}}" data-id="{{$user->id}}"
-                                                    data-job="{{$user->position}}" data-mobile="{{$user->mobile}}"
-                                                    data-role="{{ implode(", ", $user->getRoleNames()->toArray()) }}"
-                                                    data-store="{{$user->store->id ?? 0}}"
-                                                    type="button" data-toggle="modal" data-target="#showUser">Show
-                                            </button>
-                                        </a>
-                                        <a href="#">
-                                            <button class="btn btn-primary btn-sm btn-rounded"
-                                                    data-name="{{$user->name}}"
-                                                    data-email="{{$user->email}}" data-id="{{$user->id}}"
-                                                    data-job="{{$user->position}}" data-mobile="{{$user->mobile}}"
-                                                    data-role="{{ implode(", ", $user->getRoleNames()->toArray()) }}"
-                                                    data-store="{{$user->store->id ?? 0}}"
-                                                    type="button" data-toggle="modal" data-target="#editUser">Edit
-                                            </button>
-                                        </a>
-
-
-                                        @if(auth()->user()->isAdmin('admin'))
-                                            <div class="btn-group">
-                                                <button type="button" class="btn" data-toggle="dropdown"
-                                                        aria-haspopup="true" aria-expanded="false">
-                                                    <i class="feather icon-more-horizontal"></i>
-                                                </button>
-                                                <div class="dropdown-menu">
-                                                    <a id="reset_btn"
-                                                       href="{{ route('password.reset.admin', $user->email) }}">
-                                                        <button class="dropdown-item "><span
-                                                                class="feather feather icon-unlock" hidden></span> Reset
-                                                            Password
-                                                        </button>
-                                                    </a>
-                                                    {{-- <a href="#">
-                                                        <button  class="dropdown-item "
-                                                                 data-toggle="modal" data-target="#add-permission">
-                                                            User Permissions
-                                                        </button>
-                                                    </a> --}}
-                                                    @if ($user->status == 1)
-                                                        <a href="#">
-                                                            <button class="dropdown-item " type="button"
-                                                                    data-toggle="modal"
-                                                                    data-target="#disableUser" data-id="{{$user->id}}"
-                                                                    data-status="{{$user->status}}" data-name="{{$user->name}}">Deactivate
-                                                            </button>
-                                                        </a>
-                                                    @endif
-                                                    @if ($user->status == 0 || $user->status == -1)
-                                                        <a href="#">
-                                                            <button class="dropdown-item " type="button"
-                                                                    data-toggle="modal"
-                                                                    data-target="#disableUser" data-id="{{$user->id}}"
-                                                                    data-status="{{$user->status}}" data-name="{{$user->name}}">
-                                                                Activate
-                                                            </button>
-                                                        </a>
-                                                    @endif
-
-                                                </div>
-                                            </div>
+                            @foreach($users as $user)
+                                <tr>
+                                    <td>{{$user->name}} </td>
+                                    <td>{{$user->email}}</td>
+                                    <td hidden>{{$user->mobile}}</td>
+                                    <td>{{ implode(", ", $user->getRoleNames()->toArray()) }}</td>
+                                    <td hidden>{{$user->position}}</td>
+                                    <td>{{$user->store->name ?? '' }}</td>
+                                    <td>
+                                        @if ($user->status == 1)
+                                            <span class='badge badge-success'>Active</span>
+                                        @endif
+                                        @if ($user->status == -1)
+                                            <span class='badge badge-info'>In-active</span>
+                                        @endif
+                                        @if ($user->status == 0)
+                                            <span class='badge badge-danger'>De-activated</span>
                                         @endif
                                     </td>
-                                    <td hidden>{{ $user->created_at ?? '' }}</td>
-                                @endif
-                            </tr>
-                        @endforeach
+
+                                    @if(auth()->user()->checkPermission('Edit Users') || auth()->user()->checkPermission('Delete Users'))
+                                        <td style='white-space: nowrap'>
+                                            <a href="#">
+                                                <button class="btn btn-success btn-sm btn-rounded" data-name="{{$user->name}}"
+                                                    data-email="{{$user->email}}" data-id="{{$user->id}}"
+                                                    data-job="{{$user->position}}" data-mobile="{{$user->mobile}}"
+                                                    data-role="{{ implode(", ", $user->getRoleNames()->toArray()) }}"
+                                                    data-store="{{$user->store->id ?? 0}}" type="button" data-toggle="modal"
+                                                    data-target="#showUser">Show
+                                                </button>
+                                            </a>
+                                            @if(auth()->user()->checkPermission('Edit Users'))
+                                                <a href="#">
+                                                    <button class="btn btn-primary btn-sm btn-rounded" data-name="{{$user->name}}"
+                                                        data-email="{{$user->email}}" data-id="{{$user->id}}"
+                                                        data-job="{{$user->position}}" data-mobile="{{$user->mobile}}"
+                                                        data-role="{{ implode(", ", $user->getRoleNames()->toArray()) }}"
+                                                        data-store="{{$user->store->id ?? 0}}" type="button" data-toggle="modal"
+                                                        data-target="#editUser">Edit
+                                                    </button>
+                                                </a>
+                                            @endif
+
+                                            @if(auth()->user()->isAdmin('admin'))
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn" data-toggle="dropdown" aria-haspopup="true"
+                                                        aria-expanded="false">
+                                                        <i class="feather icon-more-horizontal"></i>
+                                                    </button>
+                                                    <div class="dropdown-menu">
+                                                        <a id="reset_btn" href="{{ route('password.reset.admin', $user->email) }}">
+                                                            <button class="dropdown-item "><span class="feather feather icon-unlock"
+                                                                    hidden></span> Reset
+                                                                Password
+                                                            </button>
+                                                        </a>
+                                                        {{-- <a href="#">
+                                                            <button class="dropdown-item " data-toggle="modal"
+                                                                data-target="#add-permission">
+                                                                User Permissions
+                                                            </button>
+                                                        </a> --}}
+                                                        @if(auth()->user()->checkPermission('Permit Users'))
+                                                            @if ($user->status == 1)
+                                                                <a href="#">
+                                                                    <button class="dropdown-item " type="button" data-toggle="modal"
+                                                                        data-target="#disableUser" data-id="{{$user->id}}"
+                                                                        data-status="{{$user->status}}" data-name="{{$user->name}}">Deactivate
+                                                                    </button>
+                                                                </a>
+                                                            @endif
+                                                            @if ($user->status == 0 || $user->status == -1)
+                                                                <a href="#">
+                                                                    <button class="dropdown-item " type="button" data-toggle="modal"
+                                                                        data-target="#disableUser" data-id="{{$user->id}}"
+                                                                        data-status="{{$user->status}}" data-name="{{$user->name}}">
+                                                                        Activate
+                                                                    </button>
+                                                                </a>
+                                                            @endif
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </td>
+                                        <td hidden>{{ $user->created_at ?? '' }}</td>
+                                    @endif
+                                </tr>
+                            @endforeach
 
                         </tbody>
                     </table>
@@ -217,7 +215,7 @@
                 $.ajax({
                     url: "{{route('getRoleID')}}",
                     method: "POST",
-                    data: {role: role, _token: _token},
+                    data: { role: role, _token: _token },
                     success: function (result) {
                         $('#role1').val(result).change();
                     }
@@ -249,7 +247,7 @@
                 $.ajax({
                     url: "{{route('getRoleID')}}",
                     method: "POST",
-                    data: {role: role, _token: _token},
+                    data: { role: role, _token: _token },
                     success: function (result) {
                         $('#role1').val(result).change();
                     }
@@ -291,7 +289,7 @@
             })//end
 
             // Fade out alerts after 3 seconds (3000ms)
-            setTimeout(function() {
+            setTimeout(function () {
                 $('.alert').fadeOut('slow');
             }, 3000); // Adjust the time (3000 ms) as needed
 

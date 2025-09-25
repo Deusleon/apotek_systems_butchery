@@ -7,14 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class PriceCategory extends Model
 {
     protected $table = 'price_categories';
-    public $timestamps = true;
+    public $timestamps = false;
 
     protected $fillable = [
         'name',
-        'default_markup_percentage',
-        'status',
-        'created_by',
-        'updated_by'
+        'type',
     ];
 
     protected $casts = [

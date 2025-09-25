@@ -22,54 +22,53 @@
         <div class="card">
             <div class="card-body">
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                    @if(auth()->user()->checkPermission('Manage Price Categories'))
+                    @if(auth()->user()->checkPermission('Add Price Categories'))
                         <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-secondary btn-sm"
-                                data-toggle="modal"
-                                data-target="#create">
+                            data-toggle="modal" data-target="#create">
                             Add Category
                         </button>
                     @endif
                     <div class="table-responsive">
-                        <table id="fixed-header" class="display table nowrap table-striped table-hover"
-                               style="width:100%">
+                        <table id="fixed-header" class="display table nowrap table-striped table-hover" style="width:100%">
                             <thead>
-                            <tr>
-                                <th>Category Name</th>
-                                <th>Price Type</th>
-                                @if(auth()->user()->checkPermission('Manage Price Categories'))
-                                    <th>Actions</th>
-                                @endif
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($price_category as $price)
                                 <tr>
-                                    <td>{{$price->name}}</td>
-                                    <td>{{$price->type}}</td>
-                                    @if(auth()->user()->checkPermission('Manage Price Categories'))
-                                        <td>
-                                            <a href="#">
-                                                <button class="btn btn-sm btn-rounded btn-primary"
-                                                        data-id="{{$price->id}}"
-                                                        data-name="{{$price->name}}"
-                                                        data-type="{{$price->type}}"
-                                                        type="button"
-                                                        data-toggle="modal" data-target="#edit">Edit
-                                                </button>
-                                            </a>
-                                            <a href="#">
-                                                <button class="btn btn-sm btn-rounded btn-danger"
-                                                        data-id="{{ $price->id }}"
-                                                        data-name="{{$price->name}}" type="button"
-                                                        data-toggle="modal"
-                                                        data-target="#delete">
-                                                    Delete
-                                                </button>
-                                            </a>
-                                        </td>
+                                    <th>Category Name</th>
+                                    <th>Price Type</th>
+                                    @if(auth()->user()->checkPermission('Edit Price Categories') || auth()->user()->checkPermission('Delete Price Categories'))
+                                        <th>Actions</th>
                                     @endif
                                 </tr>
-                            @endforeach
+                            </thead>
+                            <tbody>
+                                @foreach($price_category as $price)
+                                    <tr>
+                                        <td>{{$price->name}}</td>
+                                        <td>{{$price->type}}</td>
+                                        @if(auth()->user()->checkPermission('Edit Price Categories') || auth()->user()->checkPermission('Delete Price Categories'))
+                                            <td>
+                                                @if(auth()->user()->checkPermission('Edit Price Categories'))
+                                                    <a href="#">
+                                                        <button class="btn btn-sm btn-rounded btn-primary" data-id="{{$price->id}}"
+                                                            data-name="{{$price->name}}" data-type="{{$price->type}}" type="button"
+                                                            data-toggle="modal" data-target="#edit">Edit
+                                                        </button>
+                                                    </a>
+                                                @endif
+                                                @if(auth()->user()->checkPermission('Delete Price Categories'))
+                                                    @if($price->is_used === "no")
+                                                        <a href="#">
+                                                            <button class="btn btn-sm btn-rounded btn-danger" data-id="{{ $price->id }}"
+                                                                data-name="{{$price->name}}" type="button" data-toggle="modal"
+                                                                data-target="#delete">
+                                                                Delete
+                                                            </button>
+                                                        </a>
+                                                    @endif
+                                                @endif
+                                            </td>
+                                        @endif
+                                    </tr>
+                                @endforeach
                             </tbody>
 
                         </table>

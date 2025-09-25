@@ -14,6 +14,18 @@ class CategoryController extends Controller
     {
         $categories = Category::orderBy('id', 'DESC')->get();
         $count = $categories->count();
+        foreach ( $categories as $category ) {
+            $category_count = DB::table( 'inv_products' )->where( 'category_id', $category->id )->count();
+
+            if ( $category_count > 0 ) {
+                $category[ 'is_used' ] = 'yes';
+            }
+
+            if ( $category_count == 0 ) {
+                $category[ 'is_used' ] = 'no';
+            }
+
+        }
         return view('masters.categories.index', compact('categories', 'count'));
     }
 
