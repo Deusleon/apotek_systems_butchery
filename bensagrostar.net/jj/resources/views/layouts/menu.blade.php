@@ -129,7 +129,7 @@
 </li>
 
 <li class="nav-item pcoded-hasmenu">
-    @if(auth()->user()->checkPermission('View Masters'))
+    @if(auth()->user()->checkPermission('View Accounting'))
         <a href="#!" class="nav-link"><span class="pcoded-micon"><i class="fas fa-stream"></i></span>
             <span class="pcoded-mtext">Accounting</span>
         </a>
@@ -206,7 +206,7 @@
 
 
 <li class="nav-item pcoded-hasmenu">
-    @if(auth()->user()->checkPermission('View Masters'))
+    @if(auth()->user()->checkPermission('View Settings'))
         <a href="#!" class="nav-link"><span class="pcoded-micon"><i class="fas fa-stream"></i></span>
             <span class="pcoded-mtext">Settings</span>
         </a>
