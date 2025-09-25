@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class CurrentStockController extends Controller
 {
@@ -172,7 +173,7 @@ class CurrentStockController extends Controller
         $stocks = DB::table('inv_current_stock')
             ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
             ->join('sales_prices','inv_current_stock.id','=','sales_prices.stock_id')
-            ->select('inv_current_stock.product_id','inv_products.name', 'inv_products.brand', 'inv_products.pack_size',
+            ->select('inv_current_stock.product_id','inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom',
                 DB::raw('sum(inv_current_stock.quantity) as quantity'),
                 'inv_current_stock.batch_number',
                 'inv_current_stock.expiry_date',
@@ -184,7 +185,7 @@ class CurrentStockController extends Controller
                 DB::raw('sales_prices.price  - inv_current_stock.unit_cost AS unit_profit'),
                 DB::raw('(inv_current_stock.quantity * sales_prices.price) - (inv_current_stock.quantity * inv_current_stock.unit_cost) AS profit'))
             ->where('inv_current_stock.store_id',$store_id)
-            ->groupBy(['inv_current_stock.product_id', 'inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_current_stock.batch_number', 'inv_current_stock.expiry_date', 'inv_current_stock.created_at', 'inv_current_stock.unit_cost', 'sales_prices.price'])
+            ->groupBy(['inv_current_stock.product_id', 'inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom', 'inv_current_stock.batch_number', 'inv_current_stock.expiry_date', 'inv_current_stock.created_at', 'inv_current_stock.unit_cost', 'sales_prices.price'])
             ->havingRaw(DB::raw('sum(quantity) > 0'))
             ->get();
         }
@@ -385,7 +386,7 @@ class CurrentStockController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            \Log::error('Error in currentStockApi: ' . $e->getMessage());
+            Log::error('Error in currentStockApi: ' . $e->getMessage());
             return response()->json([
                 'error' => 'An error occurred while fetching stock data'
             ], 500);
@@ -443,7 +444,7 @@ class CurrentStockController extends Controller
 
     public function update(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'product_id' => 'required|exists:inv_products,id',
             'brand' => 'required|string|max:255',
             'pack_size' => 'required|string|max:255',
@@ -943,7 +944,7 @@ class CurrentStockController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Error updating price: ' . $e->getMessage());
+            Log::error('Error updating price: ' . $e->getMessage());
             return back()->with('error', 'Error updating price: ' . $e->getMessage());
         }
     }
