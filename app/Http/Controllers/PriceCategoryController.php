@@ -6,19 +6,32 @@ use App\PriceCategory;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PriceCategoryController extends Controller
 {
     public function index()
     {
 
-        $price_category = PriceCategory::orderBy('id', 'ASC')->get();
+        $price_category = PriceCategory::orderBy('id', 'DESC')->get();
+        foreach ( $price_category as $category ) {
+            $category_count = DB::table( 'sales_prices' )->where( 'price_category_id', $category->id )->count();
+
+            if ( $category_count > 0 ) {
+                $category[ 'is_used' ] = 'yes';
+            }
+
+            if ( $category_count == 0 ) {
+                $category[ 'is_used' ] = 'no';
+            }
+
+        }
         return view('masters.price_category.index')->with('price_category', $price_category);
     }
 
     public function store(Request $request)
     {
-        $existing = PriceCategory::where('name',$request->name)->count();
+        $existing = PriceCategory::where('name', $request->name)->count();
 
         if($existing > 0)
         {
@@ -31,7 +44,8 @@ class PriceCategoryController extends Controller
             $price_category->type = $request->code;
             $price_category->save();
         } catch (Exception $exception) {
-            session()->flash("alert-danger", "Price Category Name Exists!");
+            // Log::error($exception->getMessage());
+            session()->flash("alert-danger", "An error occurred!");
             return back();
         }
 

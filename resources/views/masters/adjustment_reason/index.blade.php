@@ -17,52 +17,52 @@
             <div class="col-sm-12">
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                        @if(auth()->user()->checkPermission('Manage Adjustment Reasons'))
-                            <button style="float: right;margin-bottom: 2%;" type="button"
-                                    class="btn btn-secondary btn-sm"
-                                    data-toggle="modal"
-                                    data-target="#exampleModalCenter">
+                        @if(auth()->user()->checkPermission('Add Adjustment Reasons'))
+                            <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-secondary btn-sm"
+                                data-toggle="modal" data-target="#exampleModalCenter">
                                 Add Reason
                             </button>
                         @endif
                         <div class="table-responsive">
                             <table id="fixed-header" class="display table nowrap table-striped table-hover"
-                                   style="width:100%">
+                                style="width:100%">
                                 <thead>
-                                <tr>
-                                    <th>Reason</th>
-                                    @if(auth()->user()->checkPermission('Manage Adjustment Reasons'))
-                                        <th>Actions</th>
-                                    @endif
-                                </tr>
-                                </thead>
-                                <tbody>
-                                @foreach($adjustment as $adjustments)
                                     <tr>
-                                        <td>{{$adjustments->reason}}</td>
-                                        @if(auth()->user()->checkPermission('Manage Adjustment Reasons'))
-                                            <td>
-                                                <a href="#">
-                                                    <button class="btn btn-sm btn-rounded btn-primary"
-                                                            data-id="{{$adjustments->id}}"
-                                                            data-name="{{$adjustments->reason}}"
-                                                            type="button"
-                                                            data-toggle="modal" data-target="#edit">Edit
-                                                    </button>
-                                                </a>
-                                                <a href="#">
-                                                    <button class="btn btn-sm btn-rounded btn-danger"
-                                                            data-id="{{$adjustments->id}}"
-                                                            data-name="{{$adjustments->reason}}" type="button"
-                                                            data-toggle="modal"
-                                                            data-target="#delete">
-                                                        Delete
-                                                    </button>
-                                                </a>
-                                            </td>
+                                        <th>Reason</th>
+                                        @if(auth()->user()->checkPermission('Edit Adjustment Reasons') || auth()->user()->checkPermission('Delete Adjustment Reasons'))
+                                            <th>Actions</th>
                                         @endif
                                     </tr>
-                                @endforeach
+                                </thead>
+                                <tbody>
+                                    @foreach($adjustment as $adjustments)
+                                        <tr>
+                                            <td>{{$adjustments->reason}}</td>
+                                            @if(auth()->user()->checkPermission('Edit Adjustment Reasons') || auth()->user()->checkPermission('Delete Adjustment Reasons'))
+                                                <td>
+                                                    @if(auth()->user()->checkPermission('Edit Adjustment Reasons'))
+                                                        <a href="#">
+                                                            <button class="btn btn-sm btn-rounded btn-primary"
+                                                                data-id="{{$adjustments->id}}" data-name="{{$adjustments->reason}}"
+                                                                type="button" data-toggle="modal" data-target="#edit">Edit
+                                                            </button>
+                                                        </a>
+                                                    @endif
+                                                    @if(auth()->user()->checkPermission('Delete Adjustment Reasons'))
+                                                        @if($adjustments->is_used === "no")
+                                                            <a href="#">
+                                                                <button class="btn btn-sm btn-rounded btn-danger"
+                                                                    data-id="{{$adjustments->id}}" data-name="{{$adjustments->reason}}"
+                                                                    type="button" data-toggle="modal" data-target="#delete">
+                                                                    Delete
+                                                                </button>
+                                                            </a>
+                                                        @endif
+                                                    @endif
+                                                </td>
+                                            @endif
+                                        </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>

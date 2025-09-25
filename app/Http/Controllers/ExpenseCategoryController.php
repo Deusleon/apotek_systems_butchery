@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\AccExpenseCategory;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ExpenseCategoryController extends Controller
 {
@@ -13,6 +14,18 @@ class ExpenseCategoryController extends Controller
     {
         $expense_categories = AccExpenseCategory::orderBy('id', 'ASC')->get();
         $count = $expense_categories->count();
+        foreach ( $expense_categories as $category ) {
+            $category_count = DB::table( 'acc_expenses' )->where( 'expense_category_id', $category->id )->count();
+
+            if ( $category_count > 0 ) {
+                $category[ 'is_used' ] = 'yes';
+            }
+
+            if ( $category_count == 0 ) {
+                $category[ 'is_used' ] = 'no';
+            }
+
+        }
         return view('masters.expense_category.index', compact("expense_categories", 'count'));
 
     }

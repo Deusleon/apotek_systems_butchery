@@ -5,12 +5,25 @@ namespace App\Http\Controllers;
 use App\AdjustmentReason;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdjustmentReasonController extends Controller
 {
     public function index()
     {
         $adjustment = AdjustmentReason::orderBy('id', 'ASC')->get();
+        foreach ( $adjustment as $reason ) {
+            $reason_count = DB::table( 'inv_stock_adjustments' )->where( 'reason', $reason->reason )->count();
+
+            if ( $reason_count > 0 ) {
+                $reason[ 'is_used' ] = 'yes';
+            }
+
+            if ( $reason_count == 0 ) {
+                $reason[ 'is_used' ] = 'no';
+            }
+
+        }
         return view('masters.adjustment_reason.index')->with('adjustment', $adjustment);
     }
 

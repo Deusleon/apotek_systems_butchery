@@ -189,7 +189,7 @@
                                     <span class="pcoded-mtext">Configurations</span></a>
                             </li>
                         @endif
-                        @if(auth()->user()->checkPermission('View Products Categories'))
+                        @if(auth()->user()->checkPermission('View Product Categories'))
                             <li class=""><a href="{{route('product-categories.index')}}" class="">Product Categories</a></li>
                         @endif
                         {{-- @if('View Product Subcategories')
@@ -207,7 +207,7 @@
                         @if(auth()->user()->checkPermission('View Adjustment Reasons'))
                             <li class=""><a href="{{route('adjustment-reasons.index')}}" class="">Adjustment Reasons</a></li>
                         @endif
-                        @if(auth()->user()->checkPermission('View Stores'))
+                        @if(auth()->user()->checkPermission('View Branches'))
                             <li class=""><a href="{{route('stores.index')}}" class="">Branches</a></li>
                         @endif
                         @if(auth()->user()->checkPermission('View Terms and Conditions'))

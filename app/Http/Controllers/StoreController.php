@@ -7,6 +7,7 @@ use App\Store;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class StoreController extends Controller
 {
@@ -15,6 +16,18 @@ class StoreController extends Controller
     {
         $stores = Store::orderBy('id', 'DESC')->get();
         $count = $stores->count();
+        foreach ( $stores as $store ) {
+            $store_count = DB::table( 'users' )->where( 'store_id', $store->id )->count();
+
+            if ( $store_count > 0 ) {
+                $store[ 'is_used' ] = 'yes';
+            }
+
+            if ( $store_count == 0 ) {
+                $store[ 'is_used' ] = 'no';
+            }
+
+        }
         return view('masters.stores.index', compact("stores", 'count'));
     }
 
