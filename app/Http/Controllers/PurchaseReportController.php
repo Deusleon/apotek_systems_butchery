@@ -55,16 +55,16 @@ class PurchaseReportController extends Controller
 
         switch ($request->report_option) {
             case 1:
-                $data_og = $this->materialReceivedReport($request->supplier, $request->expire_dates, $request->invoice_no);
+                $data = $this->materialReceivedReport($request->supplier, $request->expire_dates, $request->invoice_no);
 
                 if ($request->supplier != null) {
-                    if ($data_og->isEmpty()) {
+                    if ($data->isEmpty()) {
                         return response()->view('error_pages.pdf_zero_data');
                     }
-                    $view = 'purchases_reports.material_received_report_pdf';
-                    $output = 'material_received_report.pdf';
-                    $report = new InventoryReportController();
-                    return $report->splitPdf($data_og, $view, $output, $pharmacy ?? null);
+                $pdf = PDF::loadView( 'purchases_reports.material_received_report_pdf',
+                compact( 'data', 'pharmacy') )
+                ->setPaper( 'a4', '' );
+                return $pdf->stream( 'material_received_report.pdf' );
                 } else {
                     if ($data_og == []) {
                         return response()->view('error_pages.pdf_zero_data');
@@ -78,31 +78,29 @@ class PurchaseReportController extends Controller
 
                 break;
             case 2:
-                $data_og = $this->InvoiceSummaryReport($request->suppliers, $request->expire_date,
+                $data = $this->InvoiceSummaryReport($request->suppliers, $request->expire_date,
                     $request->received_status, $request->period);
-                if ($data_og->isEmpty()) {
+                if ($data->isEmpty()) {
                     return response()->view('error_pages.pdf_zero_data');
                 }
-                $view = 'purchases_reports.invoice_summary_report_pdf';
-                $output = 'invoice_summary_report.pdf';
-                $report = new InventoryReportController();
-                return $report->splitPdf($data_og, $view, $output, $pharmacy ?? null);
-                break;
+                $pdf = PDF::loadView( 'purchases_reports.invoice_summary_report_pdf',
+                compact( 'data', 'pharmacy') )
+                ->setPaper( 'a4', '' );
+                return $pdf->stream( 'invoice_summary_report.pdf' );
             case 3:
                 break;
             case 4:
-                $data_og = $this->supplierList();
-                $view = 'purchases_reports.supplier_list_pdf';
-                $output = 'supplier_list_report.pdf';
-                $report = new InventoryReportController();
-                return $report->splitPdf($data_og, $view, $output, $pharmacy ?? null);
-                break;
+                $data = $this->supplierList();
+                $pdf = PDF::loadView( 'purchases_reports.supplier_list_pdf',
+                compact( 'data', 'pharmacy') )
+                ->setPaper( 'a4', '' );
+                return $pdf->stream( 'supplier_list_report.pdf' );
             case 5:
-                $data_og = $this->supplierPriceComparison();
-                $view = 'purchases_reports.supplier_price_comparison_report_pdf';
-                $output = 'supplier_price_comparison_report.pdf';
-                $report = new InventoryReportController();
-                return $report->splitPdf($data_og, $view, $output, $pharmacy ?? null);
+                $data = $this->supplierPriceComparison();
+                $pdf = PDF::loadView( 'purchases_reports.supplier_price_comparison_report_pdf',
+                compact( 'data', 'pharmacy') )
+                ->setPaper( 'a4', '' );
+                return $pdf->stream( 'supplier_price_comparison_report.pdf' );
             default;
         }
     }

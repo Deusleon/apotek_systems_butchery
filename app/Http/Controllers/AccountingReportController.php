@@ -42,15 +42,14 @@ class AccountingReportController extends Controller
         switch ($request->report_option) {
             case 1:
                 $dates = explode(" - ", $request->date_range);
-                $data_og = $this->currentStockValue($dates, $request->price_category_id, $request->store_id);
-                if ($data_og == []) {
+                $data = $this->currentStockValue($dates, $request->price_category_id, $request->store_id);
+                if ($data == []) {
                     return response()->view('error_pages.pdf_zero_data');
                 }
-                $view = 'accounting_reports.current_stock_value_report_pdf';
-                $output = 'current_stock_value_report.pdf';
-                $pdf_print = new InventoryReportController();
-                $pdf_print->splitPdf($data_og, $view, $output);
-                break;
+                $pdf = PDF::loadView( 'accounting_reports.current_stock_value_report_pdf',
+                compact( 'data', 'pharmacy') )
+                ->setPaper( 'a4', '' );
+                return $pdf->stream( 'current_stock_value_report.pdf' );
             case 2:
                 $dates = explode(" - ", $request->date_range);
                 $data = $this->grossProfitDetail($dates);
@@ -68,32 +67,31 @@ class AccountingReportController extends Controller
                     return response()->view('error_pages.pdf_zero_data');
                 }
                 $pdf = PDF::loadView('accounting_reports.gross_profit_summary_report_pdf',
-                    compact('data', 'pharmacy'));
+                    compact('data', 'pharmacy'))
+                    ->setPaper('a4', '');
                 return $pdf->stream('gross_profit_summary_report.pdf');
-                break;
 
             case 4:
                 $dates = explode(" - ", $request->date_range);
-                $data_og = $this->expenseReport($dates);
-                if ($data_og->isEmpty()) {
+                $data = $this->expenseReport($dates);
+                if ($data->isEmpty()) {
                     return response()->view('error_pages.pdf_zero_data');
                 }
-                $view = 'accounting_reports.expense_report_pdf';
-                $output = 'expense_report.pdf';
-                $pdf_print = new InventoryReportController();
-                $pdf_print->splitPdf($data_og, $view, $output);
-                break;
+                $pdf = PDF::loadView('accounting_reports.expense_report_pdf',
+                    compact('data', 'pharmacy'))
+                    ->setPaper('a4', '');
+                return $pdf->stream('expense_report.pdf');
+         
             case 5:
                 $dates = explode(" - ", $request->date_range);
-                $data_og = $this->incomeStatementReport($dates);
-                if ($data_og->isEmpty()) {
+                $data = $this->incomeStatementReport($dates);
+                if ($data->isEmpty()) {
                     return response()->view('error_pages.pdf_zero_data');
                 }
-                $view = 'accounting_reports.income_statement_report_pdf';
-                $output = 'income_statement_report.pdf';
-                $pdf_print = new InventoryReportController();
-                $pdf_print->splitPdf($data_og, $view, $output);
-                break;
+                $pdf = PDF::loadView('accounting_reports.income_statement_report_pdf',
+                    compact('data', 'pharmacy'))
+                    ->setPaper('a4', '');
+                return $pdf->stream('income_statement_report.pdf');
             case 6:
 
                 if ($request->expire_date_range != null) {
@@ -101,15 +99,14 @@ class AccountingReportController extends Controller
                 } else {
                     $dates = [];
                 }
-                $data_og = $this->costOfExpiredProduct($dates, $request->price_category_id_expire);
-                if ($data_og == []) {
+                $data = $this->costOfExpiredProduct($dates, $request->price_category_id_expire);
+                if ($data == []) {
                     return response()->view('error_pages.pdf_zero_data');
                 }
-                $view = 'accounting_reports.expired_products_cost_report_pdf';
-                $output = 'expired_products_cost_report.pdf';
-                $pdf_print = new InventoryReportController();
-                $pdf_print->splitPdf($data_og, $view, $output);
-                break;
+                $pdf = PDF::loadView('accounting_reports.expired_products_cost_report_pdf',
+                    compact('data', 'pharmacy'))
+                    ->setPaper('a4', '');
+                return $pdf->stream('expired_products_cost_report.pdf');
             default:
         }
     }
