@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Order;
 use App\OrderDetail;
+use App\Setting;
 use DB;
 use Illuminate\Http\Request;
 use View;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class PurchaseOrderListController extends Controller
 {
@@ -45,6 +47,14 @@ class PurchaseOrderListController extends Controller
 
     public function printOrder($order_no)
     {
+    $pharmacy['name'] = Setting::where('id', 100)->value('value');
+    $pharmacy['address'] = Setting::where('id', 106)->value('value');
+    $pharmacy['phone'] = Setting::where('id', 107)->value('value');
+    $pharmacy['email'] = Setting::where('id', 108)->value('value');
+    $pharmacy['website'] = Setting::where('id', 109)->value('value');
+    $pharmacy['logo'] = Setting::where('id', 105)->value('value');
+    $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
+
         $order_details = OrderDetail::where('order_id', $order_no)->get();
         $sub_total = 0;
         $vat = 0;
@@ -59,11 +69,11 @@ class PurchaseOrderListController extends Controller
             $order_detail->vats = $vat;
             $order_detail->total = $total;
         }
-
-        $print = new InventoryReportController();
-        $view = 'purchases.purchase_order_list.purchase_order_pdf1';
-        $output = 'purchase_order.pdf';
-        $print->splitPdf($order_details, $view, $output);
+        $data = $order_details;
+                $pdf = PDF::loadView( 'purchases.purchase_order_list.purchase_order_pdf1',
+                compact( 'data', 'pharmacy') )
+                ->setPaper( 'a4', '' );
+                return $pdf->stream( 'purchase_order.pdf' );
     }
 
 
