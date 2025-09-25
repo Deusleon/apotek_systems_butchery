@@ -2917,7 +2917,6 @@ INSERT INTO `permissions` (`id`, `name`, `guard_name`, `created_at`, `updated_at
 (602, 'Manage Users', 'web', '2019-10-17 20:25:55', '2019-10-17 20:25:55', 'SETTINGS'),
 (603, 'View Roles', 'web', '2019-10-17 20:25:55', '2019-10-17 20:25:55', 'SETTINGS'),
 (604, 'Manage Roles', 'web', '2019-10-17 20:25:55', '2019-10-17 20:25:55', 'SETTINGS'),
-(700, 'View Masters', 'web', '2019-10-17 20:25:55', '2019-10-17 20:25:55', 'SETTINGS'),
 (701, 'View Products', 'web', '2019-10-17 20:25:55', '2019-10-17 20:25:55', 'INVENTORY'),
 (702, 'Manage Products', 'web', '2019-10-17 20:25:55', '2019-10-17 20:25:55', 'INVENTORY'),
 (703, 'View Products Categories', 'web', '2019-10-17 20:25:55', '2019-10-17 20:25:55', 'INVENTORY'),

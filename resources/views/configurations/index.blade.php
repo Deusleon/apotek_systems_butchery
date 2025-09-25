@@ -29,43 +29,45 @@
         <div class="card">
             <div class="card-body">
                 <diwev class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                    {{--                    <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-secondary btn-sm"--}}
-                    {{--                            data-toggle="modal"--}}
-                    {{--                            data-target="#create">--}}
-                    {{--                        Add Setting--}}
-                    {{--                    </button>--}}
+                    {{-- <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-secondary btn-sm" --}}
+                        {{-- data-toggle="modal" --}} {{-- data-target="#create">--}}
+                        {{-- Add Setting--}}
+                        {{-- </button>--}}
 
                     <div class="table-responsive">
-                        <table id="setting_table" class="display table nowrap table-striped table-hover"
-                               style="width:100%">
+                        <table id="setting_table" class="display table nowrap table-striped table-hover" style="width:100%">
                             <thead>
-                            <tr>
-                                <th hidden>ID</th>
-                                <th>Name</th>
-                                <th>Value</th>
-                                <th>Actions</th>
-                            </tr>
+                                <tr>
+                                    <th hidden>ID</th>
+                                    <th>Name</th>
+                                    <th>Value</th>
+                                    @if (auth()->user()->checkPermission('Edit Configurations'))
+                                        <th>Actions</th>
+                                    @endif
+                                </tr>
                             </thead>
                             <tbody>
-                            <tr>
-                                @foreach($configurations as $setting)
-                                    <td hidden>{{$setting->id}}</td>
-                                    <td>{{$setting->display_name}}</td>
-                                    @if($setting->id == 105)
-                                        <td><img src="/fileStore/logo/{{$setting->value}}"/></td>
-                                    @elseif($setting->id == 120)
-                                        <td>{{$setting->value.'%'}}</td>
-                                    @else
-                                        <td>{{$setting->value}}</td>
-                                    @endif
-                                    <td>
-                                        <a href="#">
-                                            <button class="btn btn-sm btn-rounded btn-primary" id="edit_btn">Edit
-                                            </button>
-                                        </a>
-                                    </td>
-                            </tr>
-                            @endforeach
+                                <tr>
+                                    @foreach($configurations as $setting)
+                                            <td hidden>{{$setting->id}}</td>
+                                            <td>{{$setting->display_name}}</td>
+                                            @if($setting->id == 105)
+                                                <td><img src="/fileStore/logo/{{$setting->value}}" /></td>
+                                            @elseif($setting->id == 120)
+                                                <td>{{$setting->value . '%'}}</td>
+                                            @else
+                                                <td>{{$setting->value}}</td>
+                                            @endif
+                                            @if (auth()->user()->checkPermission('Edit Configurations'))
+                                                <td>
+                                                    <a href="#">
+                                                        <button class="btn btn-sm btn-rounded btn-primary" id="edit_btn">Edit
+                                                        </button>
+                                                    </a>
+                                                </td>
+                                            @endif
+                                        </tr>
+                                    @endforeach
 
 
                             </tbody>

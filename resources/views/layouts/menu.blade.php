@@ -1,5 +1,5 @@
 <li class="nav-item"><a href="{{route('home')}}" class="nav-link"><span class="pcoded-micon">
-    <i class="fas fa-tachometer-alt"></i></span><span class="pcoded-mtext">Dashboard</span></a>
+            <i class="fas fa-tachometer-alt"></i></span><span class="pcoded-mtext">Dashboard</span></a>
 </li>
 
 <li class="nav-item pcoded-hasmenu">
@@ -59,8 +59,8 @@
                 <li class=""><a href="{{route('products.index')}}" class="">Product List</a></li>
             @endif
             @if(auth()->user()->checkPermission('Products Import'))
-                <li class="nav-item"><a href="{{route('import-products')}}" class="nav-link"><span
-                            class="pcoded-mtext">Products Import</span></a>
+                <li class="nav-item"><a href="{{route('import-products')}}" class="nav-link"><span class="pcoded-mtext">Products
+                            Import</span></a>
                 </li>
             @endif
             @if(auth()->user()->checkPermission('View Price List'))
@@ -97,20 +97,22 @@
 
 
 <li class="nav-item pcoded-hasmenu">
-    <a href="#!" class="nav-link"><span class="pcoded-micon"><i class="fas fa-truck"></i></span>
-        <span class="pcoded-mtext">Transport</span>
-    </a>
-    <ul class="pcoded-submenu">
-        <li class=""><a href="{{ route('transport-logistics.transporters.index') }}" class="">Transporters</a></li>
-        <li class=""><a href="{{ route('vehicles.index') }}" class="">Vehicles</a></li>
-        <li class=""><a href="{{ route('transport-orders.index') }}" class="">Orders</a></li>
-        <li class="nav-item">
-    <a class="nav-link" href="{{ route('payments.index') }}">
-        <i class="feather icon-dollar-sign"></i>
-        <span>Payments</span>
-    </a>
-</li>
-    </ul>
+    @if(auth()->user()->checkPermission('View Transport'))
+        <a href="#!" class="nav-link"><span class="pcoded-micon"><i class="fas fa-truck"></i></span>
+            <span class="pcoded-mtext">Transport</span>
+        </a>
+        <ul class="pcoded-submenu">
+            <li class=""><a href="{{ route('transport-logistics.transporters.index') }}" class="">Transporters</a></li>
+            <li class=""><a href="{{ route('vehicles.index') }}" class="">Vehicles</a></li>
+            <li class=""><a href="{{ route('transport-orders.index') }}" class="">Orders</a></li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('payments.index') }}">
+                    <i class="feather icon-dollar-sign"></i>
+                    <span>Payments</span>
+                </a>
+            </li>
+        </ul>
+    @endif
 </li>
 
 <li class="nav-item pcoded-hasmenu">
@@ -119,21 +121,21 @@
             <span class="pcoded-mtext">Accounting</span>
         </a>
         <ul class="pcoded-submenu">
-                    @if(auth()->user()->checkPermission('View Expenses'))
-                        <li class="nav-item"><a href="{{route('expense.index')}}" class="nav-link">
-                                <span class="pcoded-mtext">Expenses</span></a>
-                        </li>
-                    @endif
-                    @if(auth()->user()->checkPermission('View Invoices'))
-                        <li class=""><a href="{{route('invoice-management.index')}}" class="">Invoices</a></li>
-                    @endif
-                   {{-- @if(auth()->user()->checkPermission('View Assets'))
-                        <li class=""><a href="#" class="">Assets</a></li>
-                    @endif
-                    @if(auth()->user()->checkPermission('View Cash Flow'))
-                        <li class=""><a href="#" class="">Cash Flow</a></li>
-                    @endif
-                    --}}
+            @if(auth()->user()->checkPermission('View Expenses'))
+                <li class="nav-item"><a href="{{route('expense.index')}}" class="nav-link">
+                        <span class="pcoded-mtext">Expenses</span></a>
+                </li>
+            @endif
+            @if(auth()->user()->checkPermission('View Invoices'))
+                <li class=""><a href="{{route('invoice-management.index')}}" class="">Invoices</a></li>
+            @endif
+            {{-- @if(auth()->user()->checkPermission('View Assets'))
+            <li class=""><a href="#" class="">Assets</a></li>
+            @endif
+            @if(auth()->user()->checkPermission('View Cash Flow'))
+            <li class=""><a href="#" class="">Cash Flow</a></li>
+            @endif
+            --}}
         </ul>
 
 
@@ -164,7 +166,7 @@
             @if(auth()->user()->checkPermission('View Stock Count Analytics'))
                 <li class=""><a href="{{ route('stock-count-analytics') }}" class="">Stock Count Analytics</a></li>
             @endif
-            @if(auth()->user()->checkPermission('View Inventory Reports'))
+            @if(auth()->user()->checkPermission('View Transport Reports'))
                 <li class=""><a href="{{route('transport-report-index')}}" class="">Transport Reports</a></li>
             @endif
         </ul>
@@ -179,79 +181,79 @@
         </a>
         <ul class="pcoded-submenu">
             @if(auth()->user()->checkPermission('View General'))
-            <li>
-                <a href="#">General</a>
-                <ul class="pcoded-submenu">
-            @if(auth()->user()->checkPermission('View Settings'))
-            <li class="nav-item"><a href="{{route('configurations.index')}}" class="nav-link">
-                    <span class="pcoded-mtext">Configurations</span></a>
-            </li>
-            @endif
-            @if(auth()->user()->checkPermission('View Products Categories'))
-                <li class=""><a href="{{route('product-categories.index')}}" class="">Product Categories</a></li>
-            @endif
-            {{-- @if('View Product Subcategories')
-                <li class=""><a href="{{route('sub-categories.index')}}" class="">Product Subcategories</a></li>
-            @endif --}}
-            @if(auth()->user()->checkPermission('View Price Categories'))
-                <li class=""><a href="{{route('price-categories.index')}}" class="">Price Categories</a></li>
-            @endif
-            @if(auth()->user()->checkPermission('View Expense Categories'))
-                <li class=""><a href="{{route('expense-categories.index')}}" class="">Expense Categories</a></li>
-            @endif
-            @if(auth()->user()->checkPermission('View Expense Sub Categories'))
-            <li class=""><a href="{{route('expense-subcategories.index')}}" class="">Expense Subcategories</a></li>
-            @endif
-            @if(auth()->user()->checkPermission('View Adjustment Reasons'))
-                <li class=""><a href="{{route('adjustment-reasons.index')}}" class="">Adjustment Reasons</a></li>
-            @endif
-            @if(auth()->user()->checkPermission('View Stores'))
-                <li class=""><a href="{{route('stores.index')}}" class="">Branches</a></li>
-            @endif
-            @if(auth()->user()->checkPermission('View Terms and Conditions'))
-             <li class="">
-                 <a href="{{route('general-settings.index')}}" class="">Terms and Conditions</a>
-             </li>
-            @endif
-            </ul>
-            </li>
+                <li>
+                    <a href="#">General</a>
+                    <ul class="pcoded-submenu">
+                        @if(auth()->user()->checkPermission('View Configurations'))
+                            <li class="nav-item"><a href="{{route('configurations.index')}}" class="nav-link">
+                                    <span class="pcoded-mtext">Configurations</span></a>
+                            </li>
+                        @endif
+                        @if(auth()->user()->checkPermission('View Products Categories'))
+                            <li class=""><a href="{{route('product-categories.index')}}" class="">Product Categories</a></li>
+                        @endif
+                        {{-- @if('View Product Subcategories')
+                        <li class=""><a href="{{route('sub-categories.index')}}" class="">Product Subcategories</a></li>
+                        @endif --}}
+                        @if(auth()->user()->checkPermission('View Price Categories'))
+                            <li class=""><a href="{{route('price-categories.index')}}" class="">Price Categories</a></li>
+                        @endif
+                        @if(auth()->user()->checkPermission('View Expense Categories'))
+                            <li class=""><a href="{{route('expense-categories.index')}}" class="">Expense Categories</a></li>
+                        @endif
+                        @if(auth()->user()->checkPermission('View Expense Sub Categories'))
+                            <li class=""><a href="{{route('expense-subcategories.index')}}" class="">Expense Subcategories</a></li>
+                        @endif
+                        @if(auth()->user()->checkPermission('View Adjustment Reasons'))
+                            <li class=""><a href="{{route('adjustment-reasons.index')}}" class="">Adjustment Reasons</a></li>
+                        @endif
+                        @if(auth()->user()->checkPermission('View Stores'))
+                            <li class=""><a href="{{route('stores.index')}}" class="">Branches</a></li>
+                        @endif
+                        @if(auth()->user()->checkPermission('View Terms and Conditions'))
+                            <li class="">
+                                <a href="{{route('general-settings.index')}}" class="">Terms and Conditions</a>
+                            </li>
+                        @endif
+                    </ul>
+                </li>
             @endif
             @if(auth()->user()->checkPermission('View Security'))
-            <li>
-                <a href="#">Security</a>
-                <ul class="pcoded-submenu">
-                    @if(auth()->user()->checkPermission('View Roles'))
-                        <li class=""><a href="{{route('roles.index')}}" class="">Roles</a></li>
-                    @endif
-                    @if(auth()->user()->checkPermission('View Users'))
-                        <li class=""><a href="{{route('users.index')}}" class="">Users</a></li>
-                    @endif
-                    @if(auth()->user()->checkPermission('View Activities'))
-                        <li class=""><a href="{{route('user-activities')}}" class="">Activities</a></li>
-                    @endif
-                </ul>
-            </li>
+                <li>
+                    <a href="#">Security</a>
+                    <ul class="pcoded-submenu">
+                        @if(auth()->user()->checkPermission('View Roles'))
+                            <li class=""><a href="{{route('roles.index')}}" class="">Roles</a></li>
+                        @endif
+                        @if(auth()->user()->checkPermission('View Users'))
+                            <li class=""><a href="{{route('users.index')}}" class="">Users</a></li>
+                        @endif
+                        @if(auth()->user()->checkPermission('View Activities'))
+                            <li class=""><a href="{{route('user-activities')}}" class="">Activities</a></li>
+                        @endif
+                    </ul>
+                </li>
             @endif
             @if(auth()->user()->checkPermission('View Alerts'))
-            <li>
-                <a href="#">Alerts</a>
-                <ul class="pcoded-submenu">
+                <li>
+                    <a href="#">Alerts</a>
+                    <ul class="pcoded-submenu">
                         <li class=""><a href="#" class="">Alerts</a></li>
                         <li class=""><a href="#" class="">Alerts Details</a></li>
                         <li class=""><a href="#" class="">Min/Max Levels</a></li>
-                </ul>
-            </li>
+                    </ul>
+                </li>
             @endif
             @if(auth()->user()->checkPermission('View Tools'))
-            <li>
-                <a href="#">Tools</a>
-                <ul class="pcoded-submenu">
-                    <li class=""><a href="#" class="">Database Backup</a></li>
-                    <li class=""><a href="#" class="">Export to Excel</a></li>
-                    <li class=""><a href="#" class="">Send Report</a></li>
-                    <li class=""><a href="#" class="">Reset Stock</a></li>
-                </ul>
-            </li>
+                <li>
+                    <a href="#">Tools</a>
+                    <ul class="pcoded-submenu">
+                        <li class=""><a href="#" class="">Database Backup</a></li>
+                        <li class=""><a href="#" class="">Export to Excel</a></li>
+                        <li class=""><a href="#" class="">Send Report</a></li>
+                        <li class=""><a href="#" class="">Reset Stock</a></li>
+                    </ul>
+                </li>
             @endif
         </ul>
 
@@ -267,10 +269,3 @@
 <li class="nav-item"><a href="{{ url('help/support') }}" class="nav-link"><span class="pcoded-micon"><i
                 class="fas fa-question"></i></span><span class="pcoded-mtext">Support</span></a>
 </li>
-
-
-
-
-
-
-
