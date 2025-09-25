@@ -85,7 +85,7 @@
                 <a class="nav-link active text-uppercase" id="invoice-received" href="{{ route('import-data') }}"
                     role="tab" aria-controls="quotes_list" aria-selected="false">Import Stocks</a>
             </li>
-            @if (auth()->user()->checkPermission('Download Import Templates'))
+            {{-- @if (auth()->user()->checkPermission('Download Import Templates')) --}}
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" id="order-received" href="{{ route('download-products-template') }}"
                         role="tab" aria-controls="new_quotes" aria-selected="true"> Products Template
@@ -96,7 +96,7 @@
                         role="tab" aria-controls="new_quotes" aria-selected="true"> Stock Template
                     </a>
                 </li>
-            @endif
+            {{-- @endif --}}
         </ul>
         <div class="card">
             <div class="card-body">
