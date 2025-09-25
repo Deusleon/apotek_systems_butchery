@@ -43,21 +43,42 @@ class RequisitionController extends Controller
                 ->orderBy('requisitions.id', 'DESC');
             return DataTables::of($data)
                 ->addColumn('action', function ($row) {
-                    $btn_view = '';
-                    if (Auth()->user()->can('Manage Product Categories')) {
-                        if (Auth()->user()->can('Manage Product Categories')) {
+                    $buttons = '';
 
-                            $btn_view =
-                              '<form action="'. route('print-requisitions')  .'" method="GET" target="_blank">
-                                <input type="hidden" name="req_id" value="'.$row->id .'">
-                                <button type="button"  data-toggle="modal" data-target="#requisition-details" data-id="'.$row->id.'" class="btn btn-rounded btn-success btn-sm">Show</button>
-                                <a href="' . route('requisitions.view', $row->id) . '" class="btn btn-rounded btn-primary btn-sm" title="EDIT">Edit</a>
-                                <button type="submit" name="save" class="btn btn-rounded btn-secondary btn-sm">Print <span class="fa fa-print"></span></button>
-                             </form>';
-                        }
+                    // Start form wrapper (for Print button)
+                    $buttons .= '<form action="'. route('print-requisitions')  .'" method="GET" target="_blank" style="display:inline-block;">';
+                    $buttons .= '<input type="hidden" name="req_id" value="'.$row->id .'">';
+
+                    // Show button (depends on View Requisitions Details)
+                    if (Auth()->user()->checkPermission('View Requisitions Details')) {
+                        $buttons .= '<button type="button" data-toggle="modal" data-target="#requisition-details" 
+                                        data-id="'.$row->id.'" 
+                                        class="btn btn-rounded btn-success btn-sm">
+                                        Show
+                                    </button> ';
                     }
 
-                    return $btn_view;
+                    // Edit button (depends on Edit Requisitions)
+                    if (Auth()->user()->checkPermission('Edit Requisitions')) {
+                        $buttons .= '<a href="' . route('requisitions.view', $row->id) . '" 
+                                        class="btn btn-rounded btn-primary btn-sm" 
+                                        title="EDIT">
+                                        Edit
+                                    </a> ';
+                    }
+
+                    // Print button (depends on Print Requisitions)
+                    if (Auth()->user()->checkPermission('Print Requisitions')) {
+                        $buttons .= '<button type="submit" name="save" 
+                                        class="btn btn-rounded btn-secondary btn-sm">
+                                        Print <span class="fa fa-print"></span>
+                                    </button>';
+                    }
+
+                    // Close form wrapper
+                    $buttons .= '</form>';
+
+                    return $buttons;
                 })
                 ->addColumn('products', function ($row) {
                     // Get first 2-3 product names for display
@@ -525,7 +546,7 @@ class RequisitionController extends Controller
             ->addColumn('action', function ($row) {
                 $btn_view = '';
 
-                if (Auth()->user()->can('Manage Product Categories')) {
+                if (Auth()->user()->checkPermission('View Requisitions Issue')) {
                     if ($row->status == 0) {
                         // Pending → show active Issue button
                         $btn_view = '<a href="' . route('requisitions.issue', $row->id) . '" 

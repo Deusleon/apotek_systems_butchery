@@ -40,9 +40,9 @@
                                         <th>From</th>
                                         <th>To</th>
                                         <th>Date</th>
-                                        @can('View Requisitions Details')
+                                        @if(auth()->user()->checkPermission('View Requisitions Details'))
                                             <th>Action</th>
-                                        @endcan
+                                        @endif
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -205,13 +205,13 @@
                     },
                     orderable: false,
                 },
-                @can('View Requisitions Details')
+                @if(auth()->user()->checkPermission('View Requisitions Details'))
                     {
                         data: 'action',
                         orderable: false,
                         searchable: false
                     }
-                @endcan
+                @endif
             ]
         });
 
