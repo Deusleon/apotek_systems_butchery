@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade as PDF;
 use App\Exports\ProductsExport;
+use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
@@ -61,19 +62,29 @@ class ProductController extends Controller
 
 
     public function store(Request $request)
-    {
+    {   
+        $min_quantinty = str_replace(',', '', $request->input('min_quantinty'));
+        $max_quantinty = str_replace(',', '', $request->input('max_quantinty'));
+        
         $this->validate($request, [
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:inv_products,name,NULL,id,category_id,' . $request->category,
             'barcode' => 'nullable|string|max:50',
-            'brand' => 'required|string|max:100',
-            'pack_size' => 'required|string|max:50',
+            'brand' => 'nullable|string|max:100',
+            'pack_size' => 'nullable|string|max:50',
             'category' => 'required|exists:inv_categories,id',
-            'sale_uom' => 'required|string|max:50',
-            'min_quantinty' => 'required|numeric|min:0',
-            'max_quantinty' => 'required|numeric|min:0',
-            'product_type' => 'required|in:stockable,consumable',
-            'status' => 'required|in:0,1'
+            'sale_uom' => 'nullable|string|max:50',
+            'min_quantinty' => 'nullable|numeric|min:0',
+            'max_quantinty' => 'nullable|numeric|min:0',
+            'product_type' => 'nullable|in:stockable,consumable',
+            'status' => 'nullable|in:0,1'
         ]);
+        $product_exists = Product::where('name', $request->name)
+                            ->where('category_id', $request->category)
+                            ->first();
+        if($product_exists){
+            session()->flash("alert-success", "Product already registered!");
+            return back();
+        }
 
         try {
             $product = new Product();
@@ -83,8 +94,8 @@ class ProductController extends Controller
             $product->pack_size = $request->pack_size;
             $product->category_id = $request->category;
             $product->sales_uom = $request->sale_uom;
-            $product->min_quantinty = str_replace(',', '', $request->min_quantinty);
-            $product->max_quantinty = str_replace(',', '', $request->max_quantinty);
+            $product->min_quantinty = $min_quantinty;
+            $product->max_quantinty = $max_quantinty;
             $product->type = $request->product_type;
             $product->status = $request->status;
             $product->save();
@@ -100,29 +111,33 @@ class ProductController extends Controller
 
     public function update(Request $request)
     {
+        
         $this->validate($request, [
             'name' => 'required|string|max:255',
             'barcode' => 'nullable|string|max:50',
             'brand' => 'nullable|string|max:100',
-            'pack_size' => 'required|string|max:50',
+            // 'pack_size' => 'nullable|string|max:50',
             'category' => 'required|exists:inv_categories,id',
-            'sale_uom' => 'required|string|max:50',
-            'min_quantinty' => 'nullable|numeric|min:0',
-            'max_quantinty' => 'nullable|numeric|min:0',
+            'sale_uom' => 'nullable|string|max:50',
+            // 'min_quantinty' => 'nullable|numeric|min:0',
+            // 'max_quantinty' => 'nullable|numeric|min:0',
             // 'product_type' => 'nullable|in:stockable,consumable',
             'status' => 'nullable|in:0,1'
         ]);
+        $min_quantinty = str_replace(',', '', $request->input('min_quantinty'));
+        $max_quantinty = str_replace(',', '', $request->input('max_quantinty'));
+        $pack_size = str_replace(',', '', $request->input('pack_size'));
 
         try {
             $product = Product::findOrFail($request->id);
             $product->name = $request->name;
             $product->barcode = $request->barcode;
             $product->brand = $request->brand;
-            $product->pack_size = $request->pack_size;
+            $product->pack_size = $pack_size;
             $product->category_id = $request->category;
             $product->sales_uom = $request->sale_uom;
-            $product->min_quantinty = str_replace(',', '', $request->min_quantinty);
-            $product->max_quantinty = str_replace(',', '', $request->max_quantinty);
+            $product->min_quantinty = $min_quantinty;
+            $product->max_quantinty = $max_quantinty;
             $product->type = $request->product_type;
             $product->status = $request->status;
             $product->save();
@@ -251,11 +266,11 @@ class ProductController extends Controller
                     'category_id' => $product->category_id
                 ];
                 // Debugging: Log the product data before sending
-                Log::info('Product Data for ' . $product->name, [
-                    'min_quantinty' => $product->min_quantinty,
-                    'max_quantinty' => $product->max_quantinty,
-                    'sales_uom' => $product->sales_uom
-                ]);
+                // Log::info('Product Data for ' . $product->name, [
+                //     'min_quantinty' => $product->min_quantinty,
+                //     'max_quantinty' => $product->max_quantinty,
+                //     'sales_uom' => $product->sales_uom
+                // ]);
             }
 
             return response()->json([
@@ -285,12 +300,26 @@ class ProductController extends Controller
     public function storeProduct(Request $request)
     {
         if ($request->ajax()) {
+
+        $this->validate($request, [
+            'name' => 'required|string|max:255|unique:inv_products,name,NULL,id,category_id,' . $request->category,
+            'barcode' => 'nullable|string|max:50',
+            'brand' => 'nullable|string|max:100',
+            'pack_size' => 'nullable|string|max:50',
+            'category' => 'required|exists:inv_categories,id',
+            'sale_uom' => 'nullable|string|max:50',
+            // 'min_quantinty' => 'nullable|numeric|min:0',
+            // 'max_quantinty' => 'nullable|numeric|min:0',
+            'product_type' => 'nullable|in:stockable,consumable',
+            'status' => 'nullable|in:0,1'
+        ]);
+        
             $product = new Product;
             $product->name = $request->name;
             $product->barcode = $request->barcode;
             $product->npk_ratio = $request->npk_ratio;
             $product->brand = $request->brand;
-            $product->pack_size = $request->pack_size;
+            $product->pack_size = str_replace(',', '', $request->pack_size);
             $product->category_id = $request->category;
             $product->sub_category_id = $request->sub_category;
             $product->generic_name = $request->generic_name;
@@ -373,7 +402,7 @@ class ProductController extends Controller
         
         try {
             Log::info('Starting export process');
-            Log::info('Export format: ' . $request->format);
+            Log::info('Export format: ' . $request->input('format'));
 
             // Only select the columns we need
             $query = Product::select('name', 'brand', 'pack_size', 'category_id', 'type', 'status', 'min_quantinty', 'max_quantinty')
@@ -397,7 +426,7 @@ class ProductController extends Controller
                 return back()->with('error', 'No products found to export');
             }
 
-            switch ($request->format) {
+            switch ($request->input('format')) {
                 case 'pdf':
                     Log::info('Generating PDF');
                     try {

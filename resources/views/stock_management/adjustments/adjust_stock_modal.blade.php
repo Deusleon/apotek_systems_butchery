@@ -25,7 +25,8 @@
           <div class="col pl-3">
             <div class="row">
                 <label>New Quantity</label>
-                <input type="number" class="form-control" name="new_quantity" required>
+                <input type="hidden" class="form-control" name="new_quantity" id="new_quantity" required>
+                <input type="text" class="form-control" name="new_qty" id="new_qty_to_show" required>
             </div>
             <div class="row mt-3">
                 <label>Reason</label>
@@ -48,7 +49,7 @@
           </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save Adjustment</button>
+          <button type="submit" class="btn btn-primary">Save</button>
         </div>
       </div>
     </form>
