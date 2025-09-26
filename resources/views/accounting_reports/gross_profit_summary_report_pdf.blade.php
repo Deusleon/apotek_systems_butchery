@@ -102,7 +102,7 @@
         To {{ date('Y-m-d', strtotime($data[0]['to'])) }}
     </h4>
 
-    <div class="row" style="margin-top: 10%;">
+    <div class="row" style="margin-top: 5px;">
         <div class="col-md-12">
             <table id="table-detail" align="center">
                 <thead>
