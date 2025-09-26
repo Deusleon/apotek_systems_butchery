@@ -89,16 +89,28 @@ $("#cart_table tbody").on("change", "#edit_price", function () {
     set_button = 0;
     var row_data = cart_table.row($(this).parents("tr")).data();
     var index = cart_table.row($(this).parents("tr")).index();
+
+    var newPrice = parseFloat(
+        document.getElementById("edit_price").value.replace(/\,/g, ""),
+        10
+    );
+
     row_data[1] = numberWithCommas(
         document.getElementById("edit_quantity").value
     );
-    row_data[2] = document.getElementById("edit_price").value;
-    default_cart[index][1] = parseFloat(row_data[2].replace(/\,/g, ""), 10);
-    row_data[2] = default_cart[index][1];
+    row_data[2] = formatMoney(newPrice);
 
-    row_data[3] = formatMoney(default_cart[index][1] * row_data[2] * tax);
-    row_data[4] = formatMoney(default_cart[index][1] * row_data[2] * (1 + tax));
-    row_data[2] = formatMoney(row_data[2]);
+    // Update the default_cart with the new price and product ID
+    default_cart[index][1] = newPrice;
+    default_cart[index].price = newPrice; // Store the actual price
+    default_cart[index].productId = row_data[6]; // Store product ID from row data
+
+    row_data[3] = formatMoney(
+        parseFloat(row_data[1].replace(/\,/g, ""), 10) * newPrice * tax
+    );
+    row_data[4] = formatMoney(
+        parseFloat(row_data[1].replace(/\,/g, ""), 10) * newPrice * (1 + tax)
+    );
 
     cart[index] = row_data;
 
@@ -164,9 +176,9 @@ function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
 
 function discount() {
     sale_dicount = document.getElementById("purchase_discount").value;
-    var sub_total,
-        total_vat,
-        total = 0;
+    var sub_total = 0, // Initialize to 0
+        total_vat = 0, // Initialize to 0
+        total = 0; // Initialize to 0
     var purchase_order_cart = [];
     var stringified_cart;
 
@@ -175,54 +187,33 @@ function discount() {
             incremental_cart;
 
         for (var i = 0, c; (c = cart[i]); ++i) {
+            var quantity = parseFloat(c[1].toString().replace(/,/g, ""), 10);
+            var price =
+                default_cart[i] && default_cart[i].price
+                    ? default_cart[i].price
+                    : parseFloat(c[2].replace(/\,/g, ""), 10);
+
             if (undefined === reduced__obj_cart[c[0]]) {
                 reduced__obj_cart[c[0]] = c;
                 reduced__obj_cart[c[0]][4] = formatMoney(
-                    Number(
-                        reduced__obj_cart[c[0]][1].toString().replace(",", "") *
-                            parseFloat(
-                                reduced__obj_cart[c[0]][2].replace(/\,/g, ""),
-                                10
-                            )
-                    ) *
-                        (1 + tax)
+                    quantity * price * (1 + tax)
                 );
                 reduced__obj_cart[c[0]][3] = formatMoney(
-                    Number(
-                        reduced__obj_cart[c[0]][1].toString().replace(",", "") *
-                            parseFloat(
-                                reduced__obj_cart[c[0]][2].replace(/\,/g, ""),
-                                10
-                            ) *
-                            tax
-                    )
+                    quantity * price * tax
                 );
             } else {
-                reduced__obj_cart[c[0]][1] =
-                    Number(
-                        reduced__obj_cart[c[0]][1].toString().replace(",", "")
-                    ) + Number(c[1].toString().replace(",", ""));
+                // Existing product - add quantity
+                var existingQuantity = parseFloat(
+                    reduced__obj_cart[c[0]][1].toString().replace(/,/g, ""),
+                    10
+                );
+                reduced__obj_cart[c[0]][1] = existingQuantity + quantity;
                 reduced__obj_cart[c[0]][4] = formatMoney(
-                    Number(
-                        reduced__obj_cart[c[0]][1].toString().replace(",", "")
-                    ) *
-                        parseFloat(
-                            reduced__obj_cart[c[0]][2].replace(/\,/g, ""),
-                            10
-                        ) *
-                        (1 + tax)
+                    (existingQuantity + quantity) * price * (1 + tax)
                 );
                 reduced__obj_cart[c[0]][3] = formatMoney(
-                    Number(
-                        reduced__obj_cart[c[0]][1].toString().replace(",", "")
-                    ) *
-                        parseFloat(
-                            reduced__obj_cart[c[0]][2].replace(/\,/g, ""),
-                            10
-                        ) *
-                        tax
+                    (existingQuantity + quantity) * price * tax
                 );
-
                 reduced__obj_cart[c[0]][1] = numberWithCommas(
                     reduced__obj_cart[c[0]][1]
                 );
@@ -237,17 +228,29 @@ function discount() {
 
         cart.forEach(function (item, index, arr) {
             var purchase_product = {};
-            sub_total += parseFloat(item[2].replace(/\,/g, ""), 10);
-            total_vat += parseFloat(item[3].replace(/\,/g, ""), 10);
-            total += parseFloat(item[4].replace(/\,/g, ""), 10);
+            var itemQuantity = parseFloat(
+                item[1].toString().replace(/,/g, ""),
+                10
+            );
+            var itemPrice = default_cart.find((dc) => dc.productId === item[6])
+                ? default_cart.find((dc) => dc.productId === item[6]).price
+                : parseFloat(item[2].replace(/\,/g, ""), 10);
+
+            var itemSubTotal = itemQuantity * itemPrice;
+            var itemVat = itemSubTotal * tax;
+            var itemTotal = itemSubTotal + itemVat;
+
+            sub_total += itemSubTotal;
+            total_vat += itemVat;
+            total += itemTotal;
 
             purchase_product.quantity = item[1];
             purchase_product.stock_id = item[5];
             purchase_product.product_id = item[6];
             purchase_product.item_name = item[0];
-            purchase_product.price = item[2];
-            purchase_product.vat = item[3];
-            purchase_product.amount = item[4];
+            purchase_product.price = formatMoney(itemPrice);
+            purchase_product.vat = formatMoney(itemVat);
+            purchase_product.amount = formatMoney(itemTotal);
             purchase_order_cart.push(purchase_product);
         });
 
@@ -257,6 +260,15 @@ function discount() {
 
         stringified_cart = JSON.stringify(purchase_order_cart);
     }
+
+    // Handle case when cart is empty
+    if (!cart[0]) {
+        sub_total = 0;
+        total_vat = 0;
+        total = 0;
+        stringified_cart = "[]";
+    }
+
     document.getElementById("order_cart").value = stringified_cart;
     document.getElementById("id_vat").value = formatMoney(total_vat);
     document.getElementById("purchase_discount").value = sale_dicount;
@@ -266,13 +278,12 @@ function discount() {
     document.getElementById("total").value = formatMoney(total);
     document.getElementById("sub_total").value = formatMoney(sub_total);
 
-    // document.getElementById("paid_value").value = sale_paid_amount;
     $("div.sub-total").text(formatMoney(sub_total)).css("font-weight", "Bold");
     $("div.tax-amount").text(formatMoney(total_vat)).css("font-weight", "Bold");
     $("div.total-amount").text(formatMoney(total)).css("font-weight", "Bold");
 
     var carts = document.getElementById("order_cart").value;
-    if (carts === "" || carts === "undefined") {
+    if (carts === "" || carts === "undefined" || carts === "[]") {
         $("#supplier").prop("disabled", false);
         $("#select_id").prop("disabled", false);
     }
@@ -295,10 +306,24 @@ function val() {
     console.log(product);
     var selected_fields = product.split(",");
     var item_name = selected_fields[0];
-    var price = Number(selected_fields[1]);
+    var product_id = selected_fields[2]; // Get product ID
+
+    // Check if product already exists in cart with edited price
+    var existingPrice = null;
+    for (var i = 0; i < default_cart.length; i++) {
+        if (default_cart[i].productId === product_id) {
+            existingPrice = default_cart[i].price;
+            break;
+        }
+    }
+
+    // Use existing edited price if available, otherwise use database price
+    var price =
+        existingPrice !== null ? existingPrice : Number(selected_fields[1]);
     var vat = Number((price * tax).toFixed(2));
     var unit_total = Number(price + vat);
     var quantity = 1;
+
     item.push(item_name);
     item.push(quantity);
     item.push(formatMoney(price));
@@ -306,10 +331,15 @@ function val() {
     item.push(formatMoney(unit_total));
     item.push(selected_fields[3]);
     item.push(selected_fields[2]);
+
+    // Store product ID with the cart data for future reference
     cart_data.push(formatMoney(price));
     cart_data.push(formatMoney(vat));
     cart_data.push(quantity);
     cart_data.push(formatMoney(unit_total));
+    cart_data.productId = product_id; // Store product ID
+    cart_data.price = price; // Store the actual price value (not formatted)
+
     default_cart.push(cart_data);
     cart.unshift(item);
     discount();
