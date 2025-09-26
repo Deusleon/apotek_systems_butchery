@@ -5,13 +5,31 @@ namespace App\Http\Controllers;
 use App\Supplier;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; // Add this import
 
 class SupplierController extends Controller
 {
     public function index()
     {
-        $suppliers = Supplier::orderby('id', 'DESC')->get();
-
+        $suppliers = Supplier::orderBy('id', 'DESC')->get();
+        
+        // Add transaction checking like in CustomerController
+        foreach ($suppliers as $supplier) {
+            // Check purchase orders
+            $order_count = DB::table('orders')->where('supplier_id', $supplier->id)->count();
+            
+            // Check goods receiving
+            $receiving_count = DB::table('inv_incoming_stock')->where('supplier_id', $supplier->id)->count();
+            
+            $total_count = $order_count + $receiving_count;
+            
+            if ($total_count > 0) {
+                $supplier['active_user'] = 'has transactions';
+            } else {
+                $supplier['active_user'] = 'no transactions';
+            }
+        }
+        
         return view('masters.suppliers.index', compact("suppliers"));
     }
 
@@ -31,7 +49,6 @@ class SupplierController extends Controller
             session()->flash("alert-danger", "Supplier exists!");
             return back();
         }
-
     }
 
     public function update(Request $request)
@@ -56,13 +73,22 @@ class SupplierController extends Controller
     public function destroy(Request $request)
     {
         try {
+            // Add transaction checking before deletion like in CustomerController
+            $order_count = DB::table('orders')->where('supplier_id', $request->id)->count();
+            $receiving_count = DB::table('inv_incoming_stock')->where('supplier_id', $request->id)->count();
+            $total_count = $order_count + $receiving_count;
+            
+            if ($total_count > 0) {
+                session()->flash("alert-danger", "Supplier has pending transactions!");
+                return back();
+            }
+            
             Supplier::destroy($request->id);
-            session()->flash("alert-danger", "Supplier Deleted Successfully!");
+            session()->flash("alert-success", "Supplier Deleted Successfully!");
             return back();
         } catch (Exception $exception) {
             session()->flash("alert-danger", "Supplier In Use!");
             return back();
         }
-
     }
 }

@@ -63,6 +63,7 @@
                                                         data-toggle="modal" data-target="#edit">
                                                     Edit
                                                 </button>
+                                                @if($supplier->active_user != "has transactions")
                                                 <button class="btn btn-sm btn-rounded btn-danger"
                                                         data-id="{{$supplier->id}}"
                                                         data-name="{{$supplier->name}}"
@@ -71,6 +72,7 @@
                                                         data-target="#delete">
                                                     Delete
                                                 </button>
+                                                @endif
                                             </td>
                                         @endif
                                     </tr>
