@@ -375,13 +375,13 @@ class GoodsReceivingController extends Controller
         // Conditional validation based on settings
         if ($batch_setting === 'YES') {
             $request->validate([
-                'items.*.batch_number' => 'required|string|max:255'
+                'items.*.batch_number' => 'nullable|string|max:255'
             ]);
         }
 
         if ($expire_date === 'YES') {
             $request->validate([
-                'items.*.expiry_date' => 'required|date'
+                'items.*.expiry_date' => 'nullable|date'
             ]);
         }
 
