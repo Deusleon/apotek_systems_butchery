@@ -53,7 +53,7 @@ class HomeController extends Controller {
 
         session( [ 'current_store_id' => $store->id, 'store' => $store->name ] );
 
-        return redirect()->back()->with( 'success', "Store changed to {$store->name}" );
+        return redirect()->back()->with( 'success', "Branch changed to {$store->name}" );
     }
 
     //login form
@@ -72,11 +72,11 @@ class HomeController extends Controller {
 
         /*return default store*/
 
-        $store_id = Auth::user()->store_id;
+        $store_id = current_store_id();
         $all_stores = Store::all();
 
         //Admin Users
-        if ( auth()->user()->checkPermission( 'Manage All Stores' ) && $store_id == 0 ) {
+        if ( auth()->user()->checkPermission( 'Manage All Branches' ) && $store_id == 1 ) {
             session()->put( 'store', 'ALL' );
             $outOfStock = CurrentStock::where( 'quantity', 0 )
             ->groupby( 'product_id' )->get();
@@ -84,7 +84,7 @@ class HomeController extends Controller {
             $outOfStockList = CurrentStock::where( 'quantity', 0 )
             ->groupby( 'product_id' )->get();
 
-            $fast_moving = DB::table( 'sales_details' )->select( 'sales.receipt_number as receipt_number', 'inv_products.name as product_name',
+            $fast_moving = DB::table( 'sales_details' )->select( 'sales.receipt_number as receipt_number', 'inv_products.name as product_name', 'inv_products.brand as brand', 'inv_products.pack_size as pack_size', 'inv_products.sales_uom as sales_uom',
             DB::raw( 'count(inv_products.name) as occurrence' ), 'inv_products.id as product_id' )
             ->join( 'sales', 'sales.id', '=', 'sales_details.sale_id' )
             ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
@@ -108,9 +108,10 @@ class HomeController extends Controller {
             $pharmacy_data = $this->pharmacyDashboard();
             $purchase_data = $this->purchaseDashboard();
             $expense_data = $this->expenseDashboard();
+            $transport_data = $this->transportDashboard();
 
             return view( 'home', compact( [ 'outOfStock', 'outOfStockList', 'expired', 'fast_moving', 'pharmacy_data'
-            , 'purchase_data', 'expense_data', 'all_stores', 'store_id' ] ) );
+            , 'purchase_data', 'expense_data', 'all_stores', 'store_id', 'transport_data' ] ) );
         }
 
         //Others Users
@@ -130,7 +131,7 @@ class HomeController extends Controller {
         $outOfStockList = CurrentStock::where( 'quantity', 0 )
         ->where( 'store_id', $store_id )->groupby( 'product_id' )->get();
 
-        $fast_moving = DB::table( 'sales_details' )->select( 'sales.receipt_number as receipt_number', 'inv_products.name as product_name',
+        $fast_moving = DB::table( 'sales_details' )->select( 'sales.receipt_number as receipt_number', 'inv_products.name as product_name', 'inv_products.brand as brand', 'inv_products.pack_size as pack_size', 'inv_products.sales_uom as sales_uom',
         DB::raw( 'count(inv_products.name) as occurrence' ), 'inv_products.id as product_id' )
         ->join( 'sales', 'sales.id', '=', 'sales_details.sale_id' )
         ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
@@ -171,7 +172,7 @@ class HomeController extends Controller {
             array_push( $ungrouped_result, array(
                 'receipt_number' => $value->receipt_number,
                 'product_id' => $value->product_id,
-                'product_name' => $value->product_name,
+                'product_name' => $value->product_name.' '.($value->brand.' ' ?? '').($value->pack_size ?? '').($value->sales_uom ?? ''),
                 'occurrence' => $value->occurrence
             ) );
         }
@@ -203,10 +204,10 @@ class HomeController extends Controller {
         $data = array();
 
         //Applying dashboard details per store
-        $store_id = Auth::user()->store_id;
+        $store_id = current_store_id();
 
         //Admin User
-        if ( auth()->user()->checkPermission( 'Manage All Stores' ) && $store_id == 0 ) {
+        if ( auth()->user()->checkPermission( 'Manage All Branches' ) && $store_id == 1 ) {
             $totalSales = DB::table( 'sales_details' )
             ->sum( 'amount' );
 
@@ -230,8 +231,10 @@ class HomeController extends Controller {
             $totalDailySales = DB::table( 'sales_details' )
             ->select( DB::raw( 'date(sales.date) date, sum(amount) value' ) )
             ->join( 'sales', 'sales.id', '=', 'sales_details.sale_id' )
-            ->wherenull( 'status' )
-            ->orwhere( 'status', '!=', 3 )
+            ->where(function ($q) {
+                $q->whereNull('status')
+                ->orWhere('status', '!=', 3);
+            })
             ->groupBy( DB::raw( 'date(sales.date)' ) )
             // ->limit( '60' )
             ->get();
@@ -240,8 +243,10 @@ class HomeController extends Controller {
 
             ->select( DB::raw( "DATE_FORMAT(sales.date, '%b %y') month,sum(amount) amount" ) )
             ->join( 'sales', 'sales.id', '=', 'sales_details.sale_id' )
-            ->wherenull( 'status' )
-            ->orwhere( 'status', '!=', 3 )
+            ->where(function ($q) {
+                $q->whereNull('status')
+                  ->orWhere('status', '!=', 3);
+            })
             ->groupBy( DB::raw( "DATE_FORMAT(sales.date, '%Y%m')" ) )
             ->get();
 
@@ -265,15 +270,15 @@ class HomeController extends Controller {
         }
 
         $totalSales = DB::table( 'sales_details' )
-        ->join( 'inv_stock_tracking', 'inv_stock_tracking.id', '=', 'sales_details.stock_id' )
-        ->where( 'inv_stock_tracking.store_id', '=', $store_id )
+        ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
+        ->where( 'inv_current_stock.store_id', '=', $store_id )
         ->sum( 'amount' );
 
         $days = DB::table( 'sales_details' )
         ->select( DB::raw( 'date(sales.date)' ) )
-        ->join( 'inv_stock_tracking', 'inv_stock_tracking.id', '=', 'sales_details.stock_id' )
+        ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
         ->join( 'sales', 'sales.id', '=', 'sales_details.sale_id' )
-        ->where( 'inv_stock_tracking.store_id', '=', $store_id )
+        ->where( 'inv_current_stock.store_id', '=', $store_id )
         ->distinct()
         ->get();
 
@@ -285,18 +290,20 @@ class HomeController extends Controller {
 
         $todaySales = DB::table( 'sales_details' )
         ->join( 'sales', 'sales.id', '=', 'sales_details.sale_id' )
-        ->join( 'inv_stock_tracking', 'inv_stock_tracking.id', '=', 'sales_details.stock_id' )
+        ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
         ->whereRaw( 'date(sales.date) = date(now()) and (status != 3 or status is null)' )
-        ->where( 'inv_stock_tracking.store_id', '=', $store_id )
+        ->where( 'inv_current_stock.store_id', '=', $store_id )
         ->sum( 'amount' );
 
         $totalDailySales = DB::table( 'sales_details' )
         ->select( DB::raw( 'date(sales.date) date, sum(amount) value' ) )
         ->join( 'sales', 'sales.id', '=', 'sales_details.sale_id' )
-        ->join( 'inv_stock_tracking', 'inv_stock_tracking.id', '=', 'sales_details.stock_id' )
-        ->wherenull( 'status' )
-        ->orwhere( 'status', '!=', 3 )
-        ->where( 'inv_stock_tracking.store_id', '=', $store_id )
+        ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
+        ->where(function ($q) {
+            $q->whereNull('status')
+              ->orWhere('status', '!=', 3);
+        })
+        ->where( 'inv_current_stock.store_id', '=', $store_id )
         ->groupBy( DB::raw( 'date(sales.date)' ) )
         // ->limit( '60' )
         ->get();
@@ -305,10 +312,12 @@ class HomeController extends Controller {
 
         ->select( DB::raw( "DATE_FORMAT(sales.date, '%b %y') month,sum(amount) amount" ) )
         ->join( 'sales', 'sales.id', '=', 'sales_details.sale_id' )
-        ->join( 'inv_stock_tracking', 'inv_stock_tracking.id', '=', 'sales_details.stock_id' )
-        ->wherenull( 'status' )
-        ->orwhere( 'status', '!=', 3 )
-        ->where( 'inv_stock_tracking.store_id', '=', $store_id )
+        ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
+        ->where(function ($q) {
+            $q->whereNull('status')
+              ->orWhere('status', '!=', 3);
+        })
+        ->where( 'inv_current_stock.store_id', '=', $store_id )
         ->groupBy( DB::raw( "DATE_FORMAT(sales.date, '%Y%m')" ) )
         ->get();
 
@@ -317,10 +326,9 @@ class HomeController extends Controller {
         ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
         ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
         ->join( 'inv_categories', 'inv_categories.id', '=', 'inv_products.category_id' )
-        ->join( 'inv_stock_tracking', 'inv_stock_tracking.id', '=', 'sales_details.stock_id' )
         ->wherenull( 'sales_details.status' )
         ->orwhere( 'sales_details.status', '!=', 3 )
-        ->where( 'inv_stock_tracking.store_id', '=', $store_id )
+        ->where( 'inv_current_stock.store_id', '=', $store_id )
         ->groupBy( 'category' )
         ->get();
 
@@ -337,10 +345,10 @@ class HomeController extends Controller {
     private function purchaseDashboard() {
         $data = array();
 
-        $store_id = Auth::user()->store_id;
+        $store_id = current_store_id();
 
         //Admin User
-        if ( auth()->user()->checkPermission( 'Manage All Stores' ) && $store_id == 0 ) {
+        if ( auth()->user()->checkPermission( 'Manage All Branches' ) && $store_id == 1 ) {
 
             $totalPurchases = GoodsReceiving::sum( 'total_cost' );
 
@@ -430,10 +438,10 @@ class HomeController extends Controller {
     private function expenseDashboard() {
         $data = array();
 
-        $store_id = Auth::user()->store_id;
+        $store_id = current_store_id();
 
         //Admin User
-        if ( auth()->user()->checkPermission( 'Manage All Stores' ) && $store_id == 0 ) {
+        if ( auth()->user()->checkPermission( 'Manage All Branches' ) && $store_id == 1 ) {
             $totalExpenses = Expense::sum( 'amount' );
 
             $days = Expense::select( DB::raw( 'date(created_at)' ) )
@@ -542,34 +550,37 @@ class HomeController extends Controller {
     }
 
     public function stockSummary( Request $request ) {
-        $request[ 'store_id' ] = Auth::user()->store_id;
+        $request[ 'store_id' ] = current_store_id();
         if ( $request->ajax() ) {
 
             switch ( $request->summary_no ) {
                 case 1:
                 return $this->outOfStock( $request );
-                break;
                 case 2:
                 return $this->fastMoving( $request );
-                break;
                 case 3:
                 return $this->expired( $request );
-                break;
-                default;
+                default:
             }
         }
     }
 
     public function outOfStock( $request ) {
+        $store_id = current_store_id();
         $columns = array(
             0 => 'product_id',
             1 => 'product_id',
             2 => 'batch_number'
         );
 
-        $totalData = CurrentStock::where( 'quantity', 0 )
-        ->groupby( 'product_id' )
-        ->get();
+        $query = CurrentStock::where( 'quantity', 0 )
+        ->groupby( 'product_id' );
+
+        if(!is_all_store()){
+            $query->where('store_id', $store_id);
+        }
+
+        $totalData = $query->get();
 
         $totalFiltered = $totalData->count();
 
@@ -579,13 +590,15 @@ class HomeController extends Controller {
         $dir = $request->input( 'order.0.dir' );
 
         if ( empty( $request->input( 'search.value' ) ) ) {
-            $out_of_stock = CurrentStock::where( 'quantity', 0 )
-            ->where( 'store_id', $request->input( 'store_id' ) )
+            $query = CurrentStock::where( 'quantity', 0 )
             ->groupby( 'product_id' )
             ->offset( $start )
             ->limit( $limit )
-            ->orderBy( $order, $dir )
-            ->get();
+            ->orderBy( $order, $dir );
+            if(!is_all_store()){
+                $query->where('store_id', $store_id);
+            }
+            $out_of_stock = $query->get();
         } else {
             $search = $request->input( 'search.value' );
 
@@ -611,12 +624,13 @@ class HomeController extends Controller {
         $data = array();
         if ( !empty( $out_of_stock ) ) {
             foreach ( $out_of_stock as $adjustment ) {
-
-                $nestedData[ 'name' ] = $adjustment->product[ 'name' ];
+                $nestedData[ 'name' ] = $adjustment->product[ 'name' ].' '.($adjustment->product[ 'brand' ].' ' ?? '').($adjustment->product[ 'pack_size' ] ?? '').($adjustment->product[ 'sales_uom' ] ?? '');
                 $nestedData[ 'batch_number' ] = $adjustment->batch_number;
-                $nestedData[ 'code' ] = $adjustment->product[ 'name' ];
+                $nestedData[ 'brand' ] = $adjustment->product[ 'brand' ];
+                $nestedData[ 'pack_size' ] = $adjustment->product[ 'pack_size' ];
+                $nestedData[ 'sales_uom' ] = $adjustment->product[ 'sales_uom' ];
                 $nestedData[ 'product_id' ] = $adjustment->product[ 'id' ];
-                $nestedData[ 'category' ] = $adjustment->product[ 'category' ][ 'name' ];
+                $nestedData[ 'category' ] = $adjustment->product[ 'category' ][ 'name' ] ?? '';
 
                 $data[] = $nestedData;
 
@@ -634,6 +648,8 @@ class HomeController extends Controller {
     }
 
     public function fastMoving( $request ) {
+        $store_id = current_store_id();
+         //Admin User
         try {
             $columns = array(
                 0 => 'product_id',
@@ -642,15 +658,20 @@ class HomeController extends Controller {
             );
 
             //Troubleshooting error on query
-            $totalData = DB::table( 'sales_details' )->select( 'sales.receipt_number as receipt_number', 'inv_products.name as product_name',
+            $query = DB::table( 'sales_details' )->select( 'sales.receipt_number as receipt_number', 'inv_products.name as product_name', 'inv_products.brand as brand', 'inv_products.pack_size as pack_size', 'inv_products.sales_uom as sales_uom',
             DB::raw( 'count(inv_products.name) as occurrence' ), 'inv_products.id as product_id' )
             ->join( 'sales', 'sales.id', '=', 'sales_details.sale_id' )
             ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
             ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
             ->whereRaw( 'date(sales.date) >= date(now()) - interval 90 day' )
-            ->where( 'inv_current_stock.store_id', $request->input( 'store_id' ) )
-            ->groupBy( [ 'sales.receipt_number', 'inv_products.name' ] )
-            ->get();
+            // ->where( 'inv_current_stock.store_id', $request->input( 'store_id' ) )
+            ->groupBy( [ 'sales.receipt_number', 'inv_products.name' ] );
+            // ->get();
+            if(!is_all_store()){
+                $query->where('inv_current_stock.store_id', $store_id);
+            }
+
+            $totalData = $query->get();
 
             $sum_by_product_name = $this->fastMovingCalculation( $totalData );
 
@@ -663,31 +684,40 @@ class HomeController extends Controller {
 
             if ( empty( $request->input( 'search.value' ) ) ) {
                 //Troubleshooting error on query
-                $fast_moving = DB::table( 'sales_details' )->select( 'sales.receipt_number as receipt_number', 'inv_products.name as product_name',
+                $query = DB::table( 'sales_details' )->select( 'sales.receipt_number as receipt_number', 'inv_products.name as product_name', 'inv_products.brand as brand', 'inv_products.pack_size as pack_size', 'inv_products.sales_uom as sales_uom',
                 DB::raw( 'count(inv_products.name) as occurrence' ), 'inv_products.id as product_id' )
                 ->join( 'sales', 'sales.id', '=', 'sales_details.sale_id' )
                 ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
                 ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
                 ->whereRaw( 'date(sales.date) >= date(now()) - interval 90 day' )
-                ->where( 'inv_current_stock.store_id', $request->input( 'store_id' ) )
+                // ->where( 'inv_current_stock.store_id', $request->input( 'store_id' ) )
                 ->groupBy( [ 'sales.receipt_number', 'inv_products.name' ] )
-                ->orderBy( $order, $dir )
-                ->get();
+                ->orderBy( $order, $dir );
+                // ->get();
+                if(!is_all_store()){
+                    $query->where('inv_current_stock.store_id', $store_id);
+                }
+                $fast_moving = $query->get();
+                
             } else {
                 $search = $request->input( 'search.value' );
 
                 //Troubleshooting error on query
-                $fast_moving = DB::table( 'sales_details' )->select( 'sales.receipt_number as receipt_number', 'inv_products.name as product_name',
+                $query = DB::table( 'sales_details' )->select( 'sales.receipt_number as receipt_number', 'inv_products.name as product_name', 'inv_products.brand as brand', 'inv_products.pack_size as pack_size', 'inv_products.sales_uom as sales_uom',
                 DB::raw( 'count(inv_products.name) as occurrence' ), 'inv_products.id as product_id' )
                 ->join( 'sales', 'sales.id', '=', 'sales_details.sale_id' )
                 ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
                 ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
                 ->whereRaw( 'date(sales.date) >= date(now()) - interval 90 day' )
                 ->orWhere( 'product_name', 'LIKE', "%{$search}%" )
-                ->orWhere( 'inv_current_stock.store_id', $request->input( 'store_id' ) )
+                // ->orWhere( 'inv_current_stock.store_id', $request->input( 'store_id' ) )
                 ->groupBy( [ 'sales.receipt_number', 'inv_products.name' ] )
-                ->orderBy( $order, $dir )
-                ->get();
+                ->orderBy( $order, $dir );
+                // ->get();
+                if(!is_all_store()){
+                    $query->where('inv_current_stock.store_id', $store_id);
+                }
+                $fast_moving = $query->get();
 
                 $totalFiltered = DB::table( 'sales_details' )->select( 'receipt_number', 'product_name',
                 DB::raw( 'count(product_name) as occurrence' ), 'product_id' )
@@ -716,7 +746,7 @@ class HomeController extends Controller {
                 'recordsFiltered' => intval( $totalFiltered ),
                 'data' => $data
             );
-
+            Log::info('Fast moving', $json_data);
             echo json_encode( $json_data );
         } catch ( Exception $e ) {
             Log::info( 'FastMovingError', [ 'ErrorMessage'=>$e ] );
@@ -724,6 +754,8 @@ class HomeController extends Controller {
     }
 
     public function expired( $request ) {
+        $store_id = current_store_id();
+        
         $columns = array(
             0 => 'product_id',
             1 => 'product_id',
@@ -732,9 +764,14 @@ class HomeController extends Controller {
 
         );
 
-        $totalData = CurrentStock::where( 'quantity', '>', 0 )
-        ->whereRaw( 'expiry_date <  date(now())' )
-        ->get();
+        $query = CurrentStock::where( 'quantity', '>', 0 )
+        ->whereRaw( 'expiry_date <  date(now())' );
+        // ->get();
+        if(!is_all_store()){
+            $query->where('store_id', $store_id);
+        }
+
+        $totalData = $query->get();
 
         $totalFiltered = $totalData->count();
 
@@ -744,54 +781,69 @@ class HomeController extends Controller {
         $dir = $request->input( 'order.0.dir' );
 
         if ( empty( $request->input( 'search.value' ) ) ) {
-            $expired = CurrentStock::select( 'name', 'quantity', 'inv_current_stock.id', 'product_id', 'expiry_date' )
+            $query = CurrentStock::select( 'name', 'brand', 'pack_size', 'sales_uom', 'quantity', 'inv_current_stock.id', 'product_id', 'expiry_date' )
             ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
             ->whereRaw( 'expiry_date <  date(now())' )
             ->where( 'quantity', '>', 0 )
-            ->where( 'inv_current_stock.store_id', $request->input( 'store_id' ) )
+            // ->where( 'inv_current_stock.store_id', $request->input( 'store_id' ) )
             ->offset( $start )
             ->limit( $limit )
             ->orderby( 'expiry_date', 'desc' )
-            ->orderBy( $order, $dir )
-            ->get();
+            ->orderBy( $order, $dir );
+            // ->get();
+
+            if(!is_all_store()){
+                $query->where('inv_current_stock.store_id', $store_id);
+            }
+            $expired = $query->get();
+
         } else {
             $search = $request->input( 'search.value' );
 
-            $expired = CurrentStock::select( 'name', 'quantity', 'inv_current_stock.id', 'product_id', 'expiry_date' )
+            $query = CurrentStock::select( 'name', 'brand', 'pack_size', 'sales_uom', 'quantity', 'inv_current_stock.id', 'product_id', 'expiry_date' )
             ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
             ->orWhere( 'name', 'LIKE', "%{$search}%" )
             ->orwhereRaw( 'expiry_date <  date(now())' )
             ->where( 'quantity', '>', 0 )
-            ->where( 'inv_current_stock.store_id', $request->input( 'store_id' ) )
+            // ->where( 'inv_current_stock.store_id', $request->input( 'store_id' ) )
             ->offset( $start )
             ->limit( $limit )
             ->orderby( 'expiry_date', 'desc' )
-            ->orderBy( $order, $dir )
-            ->get();
+            ->orderBy( $order, $dir );
+            // ->get();
 
-            $totalFiltered = CurrentStock::select( 'name', 'quantity', 'inv_current_stock.id', 'product_id', 'expiry_date' )
+            if(!is_all_store()){
+                $query->where('inv_current_stock.store_id', $store_id);
+            }
+            $expired = $query->get();
+
+            $query = CurrentStock::select( 'name', 'brand', 'pack_size', 'sales_uom', 'quantity', 'inv_current_stock.id', 'product_id', 'expiry_date' )
             ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
             ->orWhere( 'name', 'LIKE', "%{$search}%" )
             ->orwhereRaw( 'expiry_date <  date(now())' )
-            ->where( 'quantity', '>', 0 )
-            ->where( 'inv_current_stock.store_id', $request->input( 'store_id' ) )
-            ->get();
+            ->where( 'quantity', '>', 0 );
+            // ->where( 'inv_current_stock.store_id', $request->input( 'store_id' ) )
+            // ->get();
+            if(!is_all_store()){
+                $query->where('inv_current_stock.store_id', $store_id);
+            }
+            $totalFiltered = $query->get();
             $totalFiltered = $totalFiltered->count();
         }
 
         $data = array();
         if ( !empty( $expired ) ) {
             foreach ( $expired as $item ) {
-
-                $nestedData[ 'name' ] = $item->name;
+                $nestedData[ 'name' ] = $item->name.' '.($item->brand.' ' ?? '').($item->pack_size ?? '').($item->sales_uom ?? '');
                 $nestedData[ 'quantity' ] = $item->quantity;
                 $nestedData[ 'product_id' ] = $item->product_id;
-                $nestedData[ 'expiry_date' ] = $item->expiry_date;
+                $nestedData[ 'expiry_date' ] = date_format($item->expiry_date, 'Y-m-d');
 
                 $data[] = $nestedData;
 
             }
         }
+                Log::info('Expired'.print_r($data,true));
 
         $json_data = array(
             'draw' => intval( $request->input( 'draw' ) ),
@@ -811,10 +863,10 @@ class HomeController extends Controller {
     }
 
     private function transportDashboard() {
-        $store_id = Session::get( 'store_id' );
+        $store_id = current_store_id();
         $query = TransportOrder::query();
 
-        if ( $store_id && !Auth::user()->checkPermission( 'Manage All Stores' ) ) {
+        if ( $store_id && !Auth::user()->checkPermission( 'Manage All Branches' ) ) {
             $query->where( 'store_id', $store_id );
         }
 
