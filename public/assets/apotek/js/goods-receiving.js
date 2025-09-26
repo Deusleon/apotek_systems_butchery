@@ -1203,10 +1203,14 @@ function invoicesaveInvoiceForm() {
                 $("#invoicesave_id").attr("disabled", false);
                 document.getElementById("invoice_received_cart").value = "";
 
+                // ✅ CLEAR TOTALS FIRST (OUTSIDE TRY-CATCH TO ENSURE IT RUNS)
+                $("#total_buying_price").val("0.00");
+                $("#total_selling_price").val("0.00");
+                $("#sub_total").val("0.00");
+
                 try {
                     document.getElementById("goodreceving_invoice_id").value =
                         "";
-                    document.getElementById("invoicing_batch_n").value = "";
                     document.getElementById("invoiceselected-product").value =
                         "";
                     // $('#invoicing_purchase_date').val('');
@@ -1225,6 +1229,12 @@ function invoicesaveInvoiceForm() {
                 document.getElementById("invoiceselected-product").value = "";
                 document.getElementById("invoice_price_category").value = "";
                 document.getElementById("invoice_received_cart").value = "";
+
+                // ✅ CLEAR TOTALS ON ERROR TOO
+                $("#total_buying_price").val("0.00");
+                $("#total_selling_price").val("0.00");
+                $("#sub_total").val("0.00");
+
                 deselect();
                 $("#invoicesave_id").attr("disabled", false);
             }

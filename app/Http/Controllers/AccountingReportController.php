@@ -294,7 +294,10 @@ class AccountingReportController extends Controller
                 $total_sell = $total_sell + ($data->price * $quantity);
 
                 array_push($max_prices, array(
-                    'name' => $data->currentStock['product']['name'],
+                    'name' => $data->currentStock['product']['name'] 
+                            . ' ' . ($data->currentStock['product']['brand'] ?? '') 
+                            . ' ' . ($data->currentStock['product']['pack_size'] ?? '') 
+                            . '' . ($data->currentStock['product']['sales_uom'] ?? ''),
                     'cost_buy_price' => $data->currentStock['unit_cost'] * $quantity,
                     'cost_sell_price' => $data->price * $quantity,
                     'quantity' => $quantity,
