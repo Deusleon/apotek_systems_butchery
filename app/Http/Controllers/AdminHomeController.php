@@ -164,8 +164,10 @@ class AdminHomeController extends Controller
             ->select(DB::raw('date(sales.date) date, sum(amount) value'))
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
             ->join('inv_stock_tracking','inv_stock_tracking.id','=','sales_details.stock_id')
-            ->wherenull('status')
-            ->orwhere('status', '!=', 3)
+            ->where(function ($q) {
+                $q->whereNull('status')
+                    ->orWhere('status', '!=', 3);
+            })
             ->groupBy(DB::raw('date(sales.date)'))
             // ->limit('60')
             ->get();
@@ -175,8 +177,10 @@ class AdminHomeController extends Controller
             ->select(DB::raw("DATE_FORMAT(sales.date, '%b %y') month,sum(amount) amount"))
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
             ->join('inv_stock_tracking','inv_stock_tracking.id','=','sales_details.stock_id')
-            ->wherenull('status')
-            ->orwhere('status', '!=', 3)
+            ->where(function ($q) {
+                $q->whereNull('status')
+                ->orWhere('status', '!=', 3);
+            })
             ->groupBy(DB::raw("DATE_FORMAT(sales.date, '%Y%m')"))
             ->get();
 
@@ -186,8 +190,10 @@ class AdminHomeController extends Controller
             ->join('inv_products', 'inv_products.id', '=','inv_current_stock.product_id')
             ->join('inv_categories', 'inv_categories.id', '=','inv_products.category_id')
             ->join('inv_stock_tracking','inv_stock_tracking.id','=','sales_details.stock_id')
-            ->wherenull('sales_details.status')
-            ->orwhere('sales_details.status', '!=', 3)
+            ->where(function ($q) {
+                $q->whereNull('sales_details.status')
+                  ->orWhere('sales_details.status', '!=', 3);
+            })
             ->groupBy('category')
             ->get();
 

@@ -69,8 +69,8 @@
 
 
         /**
-              Component
-            **/
+                          Component
+                        **/
 
         label {
             width: 100%;
@@ -169,7 +169,6 @@
                             <a class="nav-link" data-toggle="pill" href="#pills-expense" role="tab" aria-selected="false">Accounting
                                 Summary</a>
                         @endif
-
 
                     </li>
                 @endif
@@ -348,8 +347,8 @@
                                             style="width:100%">
                                             <thead>
                                                 <tr>
-                                                    <th>Product Code</th>
-                                                    <th>Product</th>
+                                                    <th style="width: 1%;">#</th>
+                                                    <th>Product Name</th>
                                                     <th>Category</th>
                                                 </tr>
                                             </thead>
@@ -364,8 +363,8 @@
                                             style="width:100%">
                                             <thead>
                                                 <tr>
-                                                    <th>Product Code</th>
-                                                    <th>Product</th>
+                                                    <th style="width: 1%;">#</th>
+                                                    <th>Product Name</th>
                                                     <th>Sold Times</th>
                                                 </tr>
                                             </thead>
@@ -380,8 +379,8 @@
                                             style="width:100%">
                                             <thead>
                                                 <tr>
-                                                    <th>Product Code</th>
-                                                    <th>Product</th>
+                                                    <th style="width: 1%;">#</th>
+                                                    <th>Product Name</th>
                                                     <th>Quantity</th>
                                                     <th>Expiry Date</th>
                                                 </tr>
@@ -472,8 +471,8 @@
                                             style="width:100%">
                                             <thead>
                                                 <tr>
-                                                    <th>Product Code</th>
-                                                    <th>Product</th>
+                                                    <th style="width: 1%;">#</th>
+                                                    <th>Product Name</th>
                                                     <th>Category</th>
                                                 </tr>
                                             </thead>
@@ -488,8 +487,8 @@
                                             style="width:100%">
                                             <thead>
                                                 <tr>
-                                                    <th>Product Code</th>
-                                                    <th>Product</th>
+                                                    <th style="width: 1%;">#</th>
+                                                    <th>Product Name</th>
                                                     <th>Sold Times</th>
                                                 </tr>
                                             </thead>
@@ -504,8 +503,8 @@
                                             style="width:100%">
                                             <thead>
                                                 <tr>
-                                                    <th>Product Code</th>
-                                                    <th>Product</th>
+                                                    <th style="width: 1%;">#</th>
+                                                    <th>Product Name</th>
                                                     <th>Quantity</th>
                                                     <th>Expiry Date</th>
                                                 </tr>
@@ -979,8 +978,6 @@
 
     @endsection
 
-
-
     @push("page_scripts")
 
         <script src="{{asset("assets/plugins/amcharts4/core.js")}}"></script>
@@ -1000,8 +997,6 @@
                 var a = document.getElementById('out_of_stock');
                 a.click();
             });
-
-
 
             $('#out_of_stock').on('click', function () {
 
@@ -1024,11 +1019,22 @@
                         }
                     },
                     'columns': [
-                        { 'data': 'product_id' },
+                        {
+                            'data': null,
+                            'render': function (data, type, row, meta) {
+                                return meta.row + 1 + ('.');
+                            }
+                        },
                         { 'data': 'name' },
                         { 'data': 'category' }
                     ],
-                    'searching': false
+                    'searching': false,
+                    "columnDefs": [
+                        {
+                            "targets": 0,
+                            "orderable": false,
+                        }
+                    ]
 
                 });
 
@@ -1055,11 +1061,22 @@
                         }
                     },
                     'columns': [
-                        { 'data': 'product_id' },
+                        {
+                            'data': null,
+                            'render': function (data, type, row, meta) {
+                                return meta.row + 1 + ('.');
+                            }
+                        },
                         { 'data': 'product_name' },
                         { 'data': 'occurrence' }
                     ],
-                    'searching': false
+                    'searching': false,
+                    "columnDefs": [
+                        {
+                            "targets": 0,
+                            "orderable": false,
+                        }
+                    ]
 
                 });
             });
@@ -1084,12 +1101,23 @@
                         }
                     },
                     'columns': [
-                        { 'data': 'product_id' },
+                        {
+                            'data': null,
+                            'render': function (data, type, row, meta) {
+                                return meta.row + 1 + ('.');
+                            }
+                        },
                         { 'data': 'name' },
                         { 'data': 'quantity' },
                         { 'data': 'expiry_date' }
                     ],
-                    'searching': false
+                    'searching': false,
+                    "columnDefs": [
+                        {
+                            "targets": 0,
+                            "orderable": false,
+                        }
+                    ]
 
                 });
             });
@@ -1317,18 +1345,7 @@
                 });
             }
 
-
-
-
-
-
-
         </script>
-
-
-
-
-
 
     @endpush
 

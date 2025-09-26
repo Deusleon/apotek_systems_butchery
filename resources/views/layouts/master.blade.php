@@ -256,27 +256,6 @@ $store_id = Auth::user()->store_id;
             </ul>
 
             <ul class="navbar-nav ml-auto">
-                {{-- @php
-                $userStore = Auth::user()->store;
-                $canAccessAll = $userStore->name === 'ALL';
-                @endphp
-
-                @if($canAccessAll)
-                <li>
-                    <div class="form-group" style="width: 200px!important; max-width: 100%; text-overflow: ellipsis;">
-                        <select name="store_id" id="store_id" class="js-example-basic-single form-control">
-                            <option value="" disabled>Select Branch</option>
-
-                            @foreach($all_stores as $store)
-                            <option value="{{ $store->id }}" {{ $store->id === ($userStore->id ?? 0) ? 'selected' : ''
-                                }}>
-                                {{ $store->name }}
-                            </option>
-                            @endforeach
-                        </select>
-                    </div>
-                </li>
-                @endif --}}
                 @php
                     $userStore = Auth::user()->store;
                     $canAccessAll = $userStore->name === 'ALL';
