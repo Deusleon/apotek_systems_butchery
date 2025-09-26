@@ -97,7 +97,9 @@
                             <thead>
                                 <tr>
                                     <th>Product Name</th>
-                                    <th>Batch Number</th>
+                                    @if($batch_enabled === 'YES')
+                                        <th>Batch Number</th>
+                                    @endif
                                     <th>Buy Price</th>
                                     <th>Sell Price</th>
                                     <th>Profit%</th>
@@ -118,7 +120,9 @@
                             <thead>
                                 <tr>
                                     <th>Product Name</th>
-                                    <th>Batch Number</th>
+                                    @if($batch_enabled === 'YES')
+                                        <th>Batch Number</th>
+                                    @endif
                                     <th>Buy Price</th>
                                     <th>Sell Price</th>
                                     <th>Profit%</th>
@@ -141,7 +145,9 @@
                             <thead>
                                 <tr>
                                     <th>Product Name</th>
-                                    <th>Batch Number</th>
+                                    @if($batch_enabled === 'YES')
+                                        <th>Batch Number</th>
+                                    @endif
                                     <th>Buy Price</th>
                                     <th>Sell Price</th>
                                     <th>Purchase Date</th>
@@ -330,7 +336,9 @@
                     }
                 },
                 { 'data': 'price_category_name' },
+                @if($batch_enabled === 'YES')
                 { 'data': 'batch_number' }
+                @endif
             ]
         });
 
@@ -397,7 +405,9 @@
                                 return `${row.product_name} ${row.brand ?? ''} ${row.pack_size ?? ''}${row.sales_uom ?? ''}`;
                             }
                         },
-                        { data: "batch_number", render: data => data ?? '' },
+                        @if($batch_enabled === 'YES')
+                            { data: "batch_number", render: data => data ?? '' },
+                        @endif
                         { data: "unit_cost", render: data => formatMoney(data) },
                         { data: "price", render: data => formatMoney(data) },
                         { data: "profit", render: data => (data ? `${Math.round(data)}%` : '0%') },
@@ -435,7 +445,9 @@
                                 return `${row.product_name} ${row.brand ?? ''} ${row.pack_size ?? ''}${row.sales_uom ?? ''}`;
                             }
                         },
-                        { data: "batch_number", render: data => data ?? '' },
+                        @if($batch_enabled === 'YES')
+                            { data: "batch_number", render: data => data ?? '' },
+                        @endif
                         { data: "unit_cost", render: data => formatMoney(data) },
                         { data: "price", render: data => formatMoney(data) },
                         { data: "purchased_at", render: data => data ? data.split(' ')[0] : '' },

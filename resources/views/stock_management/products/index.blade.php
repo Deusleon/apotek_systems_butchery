@@ -8,7 +8,7 @@
 @endsection
 
 @section('content-title')
-    Products List
+    Product List
 @endsection
 
 @section('content-sub-title')
@@ -50,23 +50,23 @@
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                     <div class="row mb-3">
                         <!-- <div class="col-md-6">
-                                                    <div class="btn-group">
-                                                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            <i class="fas fa-download mr-1"></i> Export
-                                                        </button>
-                                                        <div class="dropdown-menu">
-                                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'pdf']) }}" target="_blank">
-                                                                <i class="far fa-file-pdf text-danger mr-2"></i>PDF
-                                                            </a>
-                                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'excel']) }}">
-                                                                <i class="far fa-file-excel text-success mr-2"></i>Excel
-                                                            </a>
-                                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'csv']) }}">
-                                                                <i class="fas fa-file-csv text-info mr-2"></i>CSV
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div> -->
+                                                                <div class="btn-group">
+                                                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        <i class="fas fa-download mr-1"></i> Export
+                                                                    </button>
+                                                                    <div class="dropdown-menu">
+                                                                        <a class="dropdown-item" href="{{ route('products.export', ['format' => 'pdf']) }}" target="_blank">
+                                                                            <i class="far fa-file-pdf text-danger mr-2"></i>PDF
+                                                                        </a>
+                                                                        <a class="dropdown-item" href="{{ route('products.export', ['format' => 'excel']) }}">
+                                                                            <i class="far fa-file-excel text-success mr-2"></i>Excel
+                                                                        </a>
+                                                                        <a class="dropdown-item" href="{{ route('products.export', ['format' => 'csv']) }}">
+                                                                            <i class="fas fa-file-csv text-info mr-2"></i>CSV
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                            </div> -->
                     </div>
                     <div class="row justify-content-end align-items-end mb-3">
                         <!-- Status Filter -->
@@ -154,7 +154,7 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label>Product Name</label>
+                                    <label>Product Name<span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="name_edit" disabled>
                                 </div>
                             </div>
@@ -286,28 +286,28 @@
                             "searchable": false,
                             "render": function (data, type, row) {
                                 let buttons = `
-                                        <button type="button" class="btn btn-success btn-sm btn-rounded show-modal">
-                                            Show
-                                        </button>
-                                    `;
+                                                    <button type="button" class="btn btn-success btn-sm btn-rounded show-modal">
+                                                        Show
+                                                    </button>
+                                                `;
 
                                 @if(auth()->user()->checkPermission('Edit Products'))
                                     buttons += `
-                                                <button type="button" class="btn btn-primary btn-sm btn-rounded" id="edits">
-                                                    Edit
-                                                </button>
-                                            `;
+                                                                        <button type="button" class="btn btn-primary btn-sm btn-rounded" id="edits">
+                                                                            Edit
+                                                                        </button>
+                                                                    `;
                                 @endif
 
                                 @if(auth()->user()->checkPermission('Delete Products'))
                                     buttons += `
-                                                <button type="button" class="btn btn-danger btn-sm btn-rounded" id="deletes">
-                                                    Delete
-                                                </button>
-                                            `;
+                                                                        <button type="button" class="btn btn-danger btn-sm btn-rounded" id="deletes">
+                                                                            Delete
+                                                                        </button>
+                                                                    `;
                                 @endif
 
-                                    return buttons;
+                                                return buttons;
                             }
 
                         }
@@ -434,9 +434,6 @@
             });
             /*end barcode*/
 
-
-
-
             function createOption() {
                 var category = document.getElementById('category_option');
                 var category_id = category.options[category.selectedIndex].value;
@@ -511,14 +508,32 @@
                     dataType: "json",
                     data: form,
                     success: function (data) {
+                        console.log('Response Data', data);
                         if (data[0].message === 'success') {
                             notify('Product added successfully', 'top', 'right', 'success');
-                            $('#category_option').val('0').change();
-                            document.getElementById('form_product').reset();
+                            // document.getElementById('form_product').reset();
+                            let categoryVal = $('#category_option').val();
+                            $('#form_product')[0].reset();
+                            $('#category_option').val(categoryVal).change();
                         } else {
                             notify('Product name exists', 'top', 'right', 'danger');
-                            $('#category_option').val('0').change();
+                            // $('#category_option').val('0').change();
                             document.getElementById('form_product').reset();
+                        }
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            console.log('Validation Errors:', errors);
+
+                            let firstError = Object.values(errors)[0][0];
+                            if (firstError === 'The name has already been taken.') {
+                                notify('Product name exists', 'top', 'right', 'danger');
+                            } else {
+                                notify(firstError, 'top', 'right', 'danger');
+                            }
+                        } else {
+                            notify('Something went wrong', 'top', 'right', 'danger');
                         }
                     }
                 });
@@ -552,6 +567,28 @@
                 }
 
                 document.getElementById('category_borders').style.display = 'none';
+
+            });
+
+            $('#pack_size_edit').on('change', function () {
+                var val = document.getElementById('pack_size_edit').value;
+                if (val !== '') {
+                    document.getElementById('pack_size_edit').value =
+                        numberWithCommas(parseFloat(val.replace(/\,/g, ''), 10));
+                } else {
+                    document.getElementById('pack_size_edit').value = '';
+                }
+
+            });
+
+            $('#pack_size_edits').on('change', function () {
+                var val = document.getElementById('pack_size_edits').value;
+                if (val !== '') {
+                    document.getElementById('pack_size_edits').value =
+                        numberWithCommas(parseFloat(val.replace(/\,/g, ''), 10));
+                } else {
+                    document.getElementById('pack_size_edits').value = '';
+                }
 
             });
 

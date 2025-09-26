@@ -2,7 +2,6 @@
 
 @section('page_css')
     <style>
-
         .small-table table td,
         .small-table table th {
             padding: 0.35rem 0.5rem;
@@ -91,12 +90,12 @@
                                     <td id="category_{{ $allstock->product_id }}">{{ $allstock->cat_name }}</td>
                                     <td id="pack_size_{{ $allstock->product_id }}" hidden>{{ $allstock->pack_size }}</td>
                                     <td id="quantity_{{ $allstock->product_id }}">{{ number_format($allstock->quantity) }}</td>
-                        @if(auth()->user()->checkPermission('Create Stock Adjustment'))
+                                    @if(auth()->user()->checkPermission('Create Stock Adjustment'))
                                                         <td id="actions_{{ $allstock->product_id }}">
                                                             <!-- Adjustment Button -->
                                                             <button type="button" class="btn btn-primary btn-sm btn-rounded btn-adjust-stock"
-                                                                data-toggle="modal" data-target="#adjustStockModal"
-                                                                data-id="{{ $allstock->id }}" data-product-id="{{ $allstock->product_id }}" data-product-name="{{ $allstock->name
+                                                                data-toggle="modal" data-target="#adjustStockModal" data-id="{{ $allstock->id }}"
+                                                                data-product-id="{{ $allstock->product_id }}" data-product-name="{{ $allstock->name
                                         . (!empty($allstock->brand) ? ' ' . $allstock->brand : '')
                                         . (!empty($allstock->pack_size) ? ' ' . $allstock->pack_size : '')
                                         . (!empty($allstock->sales_uom) ? $allstock->sales_uom : '') }}"
@@ -148,12 +147,12 @@
                                     <td id="d_quantity_{{ $allDet->product_id }}">
                                         {{ floor($allDet->quantity) == $allDet->quantity ? number_format($allDet->quantity, 0) : number_format($allDet->quantity, 1) }}
                                     </td>
-                                     @if(auth()->user()->checkPermission('Create Stock Adjustment'))
+                                    @if(auth()->user()->checkPermission('Create Stock Adjustment'))
                                                         <td id="actions_{{ $allDet->product_id }}">
                                                             <!-- Adjustment Button -->
                                                             <button type="button" class="btn btn-primary btn-sm btn-rounded btn-adjust-stock"
-                                                                data-toggle="modal" data-target="#adjustStockModal"
-                                                                data-id="{{ $allDet->id }}" data-product-id="{{ $allDet->product_id }}" data-product-name="{{ $allDet->name
+                                                                data-toggle="modal" data-target="#adjustStockModal" data-id="{{ $allDet->id }}"
+                                                                data-product-id="{{ $allDet->product_id }}" data-product-name="{{ $allDet->name
                                         . (!empty($allDet->brand) ? ' ' . $allDet->brand : '')
                                         . (!empty($allDet->pack_size) ? ' ' . $allDet->pack_size : '')
                                         . (!empty($allDet->sales_uom) ? $allDet->sales_uom : '') }}"
@@ -202,8 +201,8 @@
                                                         <td id="actions_{{ $stock->product_id }}">
                                                             <!-- Adjustment Button -->
                                                             <button type="button" class="btn btn-primary btn-sm btn-rounded btn-adjust-stock"
-                                                                data-toggle="modal" data-target="#adjustStockModal"
-                                                                data-id="{{ $stock->id }}" data-product-id="{{ $stock->product_id }}" data-product-name="{{ $stock->name
+                                                                data-toggle="modal" data-target="#adjustStockModal" data-id="{{ $stock->id }}"
+                                                                data-product-id="{{ $stock->product_id }}" data-product-name="{{ $stock->name
                                         . (!empty($stock->brand) ? ' ' . $stock->brand : '')
                                         . (!empty($stock->pack_size) ? ' ' . $stock->pack_size : '')
                                         . (!empty($stock->sales_uom) ? $stock->sales_uom : '') }}"
@@ -259,8 +258,8 @@
                                                         <td id="actions_{{ $data->product_id }}">
                                                             <!-- Adjustment Button -->
                                                             <button type="button" class="btn btn-primary btn-sm btn-rounded btn-adjust-stock"
-                                                                data-toggle="modal" data-target="#adjustStockModal"
-                                                                data-id="{{ $data->id }}" data-product-id="{{ $data->product_id }}" data-product-name="{{ $data->name
+                                                                data-toggle="modal" data-target="#adjustStockModal" data-id="{{ $data->id }}"
+                                                                data-product-id="{{ $data->product_id }}" data-product-name="{{ $data->name
                                         . (!empty($data->brand) ? ' ' . $data->brand : '')
                                         . (!empty($data->pack_size) ? ' ' . $data->pack_size : '')
                                         . (!empty($data->sales_uom) ? $data->sales_uom : '') }}"
@@ -312,8 +311,8 @@
                                                         <td id="actions_{{ $out->product_id }}">
                                                             <!-- Adjustment Button -->
                                                             <button type="button" class="btn btn-primary btn-sm btn-rounded btn-adjust-stock"
-                                                                data-toggle="modal" data-target="#adjustStockModal"
-                                                                data-id="{{ $out->id }}" data-product-id="{{ $out->product_id }}" data-product-name="{{ $out->name
+                                                                data-toggle="modal" data-target="#adjustStockModal" data-id="{{ $out->id }}"
+                                                                data-product-id="{{ $out->product_id }}" data-product-name="{{ $out->name
                                         . (!empty($out->brand) ? ' ' . $out->brand : '')
                                         . (!empty($out->pack_size) ? ' ' . $out->pack_size : '')
                                         . (!empty($out->sales_uom) ? $out->sales_uom : '') }}"
@@ -367,8 +366,8 @@
                                                         <td id="actions_{{ $outDet->product_id }}">
                                                             <!-- Adjustment Button -->
                                                             <button type="button" class="btn btn-primary btn-sm btn-rounded btn-adjust-stock"
-                                                                data-toggle="modal" data-target="#adjustStockModal"
-                                                                data-id="{{ $outDet->id }}" data-product-id="{{ $outDet->product_id }}" data-product-name="{{ $outDet->name
+                                                                data-toggle="modal" data-target="#adjustStockModal" data-id="{{ $outDet->id }}"
+                                                                data-product-id="{{ $outDet->product_id }}" data-product-name="{{ $outDet->name
                                         . (!empty($outDet->brand) ? ' ' . $outDet->brand : '')
                                         . (!empty($outDet->pack_size) ? ' ' . $outDet->pack_size : '')
                                         . (!empty($outDet->sales_uom) ? $outDet->sales_uom : '') }}"
@@ -619,5 +618,32 @@
             });
         }
 
+        $('#new_qty_to_show').on('keyup', function () {
+            var newValue = document.getElementById('new_qty_to_show').value;
+            if (newValue !== '') {
+                document.getElementById('new_qty_to_show').value =
+                    numberWithCommas(parseFloat(newValue.replace(/\,/g, ''), 10));
+                document.getElementById('new_quantity').value = parseFloat(newValue.replace(/\,/g, ''), 10);
+            } else {
+                document.getElementById('new_qty_to_show').value = '';
+                document.getElementById('new_quantity').value = '';
+            }
+
+        });
+
+        // $('#new_quantity').on('change', function () {
+        //     var newValue = document.getElementById('new_quantity').value;
+        //     if (newValue !== '') {
+        //         document.getElementById('new_quantity').value =
+        //             numberWithCommas(parseFloat(newValue.replace(/\,/g, ''), 10));
+        //     } else {
+        //         document.getElementById('new_quantity').value = '';
+        //     }
+
+        // });
+
+        function numberWithCommas(digit) {
+            return String(parseFloat(digit)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
     </script>
 @endpush

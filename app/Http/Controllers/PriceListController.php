@@ -6,6 +6,7 @@ use App\CurrentStock;
 use App\PriceCategory;
 use App\Product;
 use App\PriceList;
+use App\Setting;
 use App\Sale;
 use App\SalesDetail;
 use Exception;
@@ -23,6 +24,7 @@ class PriceListController extends Controller {
             abort(403, 'Access Denied');
         }
         $price_categories = PriceCategory::all();
+        $batch_enabled = Setting::where( 'id', 110 )->value( 'value' );
 
         $current_stocks = DB::table( 'inv_current_stock' )
         ->join( 'inv_products', 'inv_current_stock.product_id', '=', 'inv_products.id' )
@@ -54,7 +56,8 @@ class PriceListController extends Controller {
         return view( 'stock_management.price_list.index' )->with( [
             'price_categories' => $price_categories,
             'stocks' => $stocks,
-            'current_stocks' => $current_stocks
+            'current_stocks' => $current_stocks,
+            'batch_enabled' => $batch_enabled
         ] );
     }
 
