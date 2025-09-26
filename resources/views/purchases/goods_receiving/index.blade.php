@@ -139,7 +139,7 @@
                             <div class="form-group">
                                 @if($batch_setting === 'YES')
                                     <label for="code">Batch # <font color="red">*</font></label>
-                                    <input type="text" name="batch_number" class="form-control" id="invoicing_batch_n"
+                                    <input type="text" name="batch_number" class="form-control" id="invoicing_batch_n" autocomplete="off"
                                         required="true" value="{{session('batch_number')}}" />
                                 @else
                                     

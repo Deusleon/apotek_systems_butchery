@@ -29,7 +29,7 @@
             padding: 6px 10px !important;  
             vertical-align: middle !important;
             white-space: nowrap;
-            font-size: 13px;
+            font-size: 14px;
         }
 
         /* Fix table header without background color */
@@ -45,13 +45,23 @@
         .receive-items-table input {
             height: 30px;
             padding: 2px 6px;
-            font-size: 13px;
+            font-size: 14px;
         }
 
         .edit-mode-hidden {
             display: none !important;
         }
 
+        #orders_table th,
+        #orders_table td {
+            font-size: 14px; /* same as modal table */
+        }
+        #orders_table input,
+        #orders_table select {
+            font-size: 14px;
+            height: 30px;
+            padding: 2px 6px;
+        }
 
     </style>
     <div class="col-sm-12">
