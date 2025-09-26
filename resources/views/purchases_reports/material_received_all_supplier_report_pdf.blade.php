@@ -136,7 +136,7 @@
     <h2 align="center" style="margin-top: -1%">Material Received Report</h2>
     <div class="row">
         <div class="col-md-12">
-            @foreach($data_og[0]['data'] as $key => $items)
+            @foreach($data[0]['data'] as $key => $items)
                 <table id="table-detail-main">
                     <tr>
                         <td style="background: #1f273b; color: white"><b>Supplier: </b>{{$key}}</td>
@@ -186,7 +186,7 @@
                         <div class="full-row">
                             <div class="col-50" align="left"><b>Total </b></div>
                             <div class="col-50"
-                                 align="right">{{number_format($data_og[0]['cost_by_supplier'][$key][0]['total_cost'],2)}}</div>
+                                 align="right">{{number_format($data[0]['cost_by_supplier'][$key][0]['total_cost'],2)}}</div>
                         </div>
                     </div>
                 </div>
@@ -202,7 +202,7 @@
                         <div class="full-row">
                             <div class="col-50" align="left"><b>Total Sell: </b></div>
                             <div class="col-50"
-                                 align="right">{{number_format($data_og[0]['cost_by_supplier'][$key][0]['total_sell'],2)}}</div>
+                                 align="right">{{number_format($data[0]['cost_by_supplier'][$key][0]['total_sell'],2)}}</div>
                         </div>
                     </div>
                 </div>
@@ -217,7 +217,7 @@
                         <div class="full-row">
                             <div class="col-50" align="left"><b>Total Profit: </b></div>
                             <div class="col-50"
-                                 align="right">{{number_format($data_og[0]['cost_by_supplier'][$key][0]['profit'],2)}}</div>
+                                 align="right">{{number_format($data[0]['cost_by_supplier'][$key][0]['profit'],2)}}</div>
                         </div>
                     </div>
                 </div>

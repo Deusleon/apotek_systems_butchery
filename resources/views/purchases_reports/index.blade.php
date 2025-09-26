@@ -242,6 +242,9 @@
                 startDate: start,
                 endDate: end,
                 autoUpdateInput: true,
+                locale: {
+                    format: 'YYYY/MM/DD'   // 👈 Force YYYY/MM/DD format
+                },
                 ranges: {
                     'Today': [moment(), moment()],
                     'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -252,6 +255,7 @@
                     'This Year': [moment().startOf('year'), moment()]
                 }
             }, cb);
+
 
             cb(start, end);
 
@@ -268,6 +272,9 @@
                 startDate: start,
                 endDate: end,
                 autoUpdateInput: true,
+                locale: {
+                    format: 'YYYY/MM/DD'   // 👈 Force YYYY/MM/DD format
+                },
                 ranges: {
                     'Today': [moment(), moment()],
                     'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],

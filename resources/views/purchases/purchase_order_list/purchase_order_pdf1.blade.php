@@ -65,11 +65,31 @@
             font-weight: normal;
         }
 
+        #container .logo-container {
+            padding-top: -2%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        #container .logo-container img {
+            max-width: 160px;
+            max-height: 160px;
+        }
+
+
     </style>
 
 </head>
 <body>
-
+<div class="row">
+    <div id="container">
+        <div class="logo-container">
+            @if($pharmacy['logo'])
+                <img src="{{public_path('fileStore/logo/'.$pharmacy['logo'])}}"/>
+            @endif
+        </div>
+    </div>
+</div>
 <h4 align="center">{{$pharmacy['name']}}</h4>
 <h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
 <h4 align="center" style="margin-top: -2%">{{$pharmacy['phone']}}</h4>
@@ -84,7 +104,7 @@
             </tr>
             <tr style="background: white; color: black; font-size: 0.9em">
                 <th>Order Date</th>
-                <td>{{date('d-m-Y', strtotime($data[0]->order['ordered_at']))}}</td>
+                <td>{{date('Y-m-d', strtotime($data[0]->order['ordered_at']))}}</td>
             </tr>
             {{--            <tr style="background: #f2f2f2; color: black; font-size: 0.9em">--}}
             {{--                <th>Note</th>--}}

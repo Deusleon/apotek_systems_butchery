@@ -66,12 +66,12 @@ class PurchaseReportController extends Controller
                 ->setPaper( 'a4', '' );
                 return $pdf->stream( 'material_received_report.pdf' );
                 } else {
-                    if ($data_og == []) {
+                    if ($data == []) {
                         return response()->view('error_pages.pdf_zero_data');
                     }
 
                     $pdf = PDF::loadView('purchases_reports.material_received_all_supplier_report_pdf',
-                        compact('data_og', 'pharmacy'));
+                        compact('data', 'pharmacy'));
                     return $pdf->stream('material_received_all_supplier.pdf');
                 }
 

@@ -37,11 +37,10 @@
                             </div>
                             @if($expire_date === "YES")
                                 <div class="form-group row">
-                                    <label for="code" class="col-md-4 col-form-label text-md-right">Expire Date <font
-                                            color="red">*</font></label>
+                                    <label for="code" class="col-md-4 col-form-label text-md-right">Expire Date</label>
                                     <div class="col-md-8">
                                         <input type="text" class="form-control" id="expire_date_edit"
-                                               name="expire_date_edit" autocomplete="off" required>
+                                               name="expire_date_edit" autocomplete="off">
                                     </div>
                                 </div>
                             @else
