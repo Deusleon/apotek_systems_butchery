@@ -170,56 +170,151 @@ class PriceListController extends Controller {
         }
     }
 
-    public function update( Request $request ) {
-        $request->validate( [
-            'unit_cost' => 'required|numeric|min:0',
-            'sell_price' => 'required|numeric|min:0',
-            'price_category_id' => 'required|exists:price_categories,id',
-            'selected_type' => 'required|string',
-        ] );
+    // public function update( Request $request ) {
+    //     $request->validate( [
+    //         'unit_cost' => 'required|numeric|min:0',
+    //         'sell_price' => 'required|numeric|min:0',
+    //         'price_category_id' => 'required|exists:price_categories,id',
+    //         'selected_type' => 'required|string',
+    //     ] );
 
-        if ( !isset( $request->id ) ) {
-            return redirect()->back()->with( 'alert-danger', 'Invalid request.' );
-        }
+    //     if ( !isset( $request->id ) ) {
+    //         return redirect()->back()->with( 'alert-danger', 'Invalid request.' );
+    //     }
 
-        DB::beginTransaction();
-        try {
-            $current_stock = CurrentStock::findOrFail( $request->id );
+    //     DB::beginTransaction();
+    //     try {
+    //         $current_stock = CurrentStock::findOrFail( $request->id );
 
-            $current_stock->update( [
-                'unit_cost' => $request->unit_cost
-            ] );
+    //         $current_stock->update( [
+    //             'unit_cost' => $request->unit_cost
+    //         ] );
 
-            if ( $request->selected_type === 'pending' ) {
-                // Insert new price record
-                PriceList::create( [
-                    'stock_id' => $request->id,
-                    'price_category_id' => $request->price_category_id,
-                    'price' => $request->sell_price,
-                    'created_by' => Auth::user()->id,
-                    'updated_by' => Auth::user()->id,
-                ] );
-            } else if ( $request->selected_type === '1' ) {
-                // Update existing record
-                PriceList::where( 'stock_id', $request->id )
-                ->update( [
-                    'price_category_id' => $request->price_category_id,
-                    'price' => $request->sell_price,
-                    'updated_by' => Auth::user()->id,
-                ] );
-            }
-            DB::commit();
+    //         if ( $request->selected_type === 'pending' ) {
+    //             // Insert new price record
+    //             PriceList::create( [
+    //                 'stock_id' => $request->id,
+    //                 'price_category_id' => $request->price_category_id,
+    //                 'price' => $request->sell_price,
+    //                 'created_by' => Auth::user()->id,
+    //                 'updated_by' => Auth::user()->id,
+    //             ] );
+    //         } else if ( $request->selected_type === '1' ) {
+    //             // Update existing record
+    //             PriceList::where( 'stock_id', $request->id )
+    //             ->update( [
+    //                 'price_category_id' => $request->price_category_id,
+    //                 'price' => $request->sell_price,
+    //                 'updated_by' => Auth::user()->id,
+    //             ] );
+    //         }
+    //         DB::commit();
 
-            session()->flash( 'alert-success', 'Price updated successfully!' );
-            return redirect()->route( 'price-list.index' );
+    //         session()->flash( 'alert-success', 'Price updated successfully!' );
+    //         return redirect()->route( 'price-list.index' );
 
-        } catch ( \Exception $e ) {
-            DB::rollBack();
-            Log::error( 'Error updating price list: ' . $e->getMessage() );
-            session()->flash( 'alert-danger', 'Failed to update price. Please try again.' );
-            return redirect()->back()->withInput();
-        }
+    //     } catch ( \Exception $e ) {
+    //         DB::rollBack();
+    //         Log::error( 'Error updating price list: ' . $e->getMessage() );
+    //         session()->flash( 'alert-danger', 'Failed to update price. Please try again.' );
+    //         return redirect()->back()->withInput();
+    //     }
+    // }
+
+    public function update(Request $request)
+{
+    $request->validate([
+        'unit_cost' => 'required|numeric|min:0',
+        'sell_price' => 'required|numeric|min:0',
+        'price_category_id' => 'required|exists:price_categories,id',
+        'selected_type' => 'required|string',
+    ]);
+
+    if (!isset($request->id)) {
+        return redirect()->back()->with('alert-danger', 'Invalid request.');
     }
+
+    DB::beginTransaction();
+    try {
+        // load the current stock (the batch being edited)
+        $current_stock = CurrentStock::findOrFail($request->id);
+
+        // update unit cost for this batch only (as before)
+        $current_stock->update([
+            'unit_cost' => $request->unit_cost
+        ]);
+
+        // get all stock ids for the same product (all batches of this product)
+        $productId = $current_stock->product_id;
+        $allStockIds = CurrentStock::where('product_id', $productId)->pluck('id')->toArray();
+
+        $priceCategoryId = $request->price_category_id;
+        $newPrice = $request->sell_price;
+        $userId = Auth::user()->id;
+
+        if ($request->selected_type === 'pending') {
+            // Create PriceList for the current stock if not exists
+            if (!PriceList::where('stock_id', $current_stock->id)
+                          ->where('price_category_id', $priceCategoryId)
+                          ->exists()) {
+                PriceList::create([
+                    'stock_id' => $current_stock->id,
+                    'price_category_id' => $priceCategoryId,
+                    'price' => $newPrice,
+                    'created_by' => $userId,
+                    'updated_by' => $userId,
+                ]);
+            } else {
+                // if it already exists, update it
+                PriceList::where('stock_id', $current_stock->id)
+                    ->where('price_category_id', $priceCategoryId)
+                    ->update([
+                        'price' => $newPrice,
+                        'updated_by' => $userId,
+                    ]);
+            }
+
+            // For all other batches of the same product: create PriceList only where it DOES NOT exist
+            $otherStockIds = array_diff($allStockIds, [$current_stock->id]);
+
+            foreach ($otherStockIds as $sid) {
+                $exists = PriceList::where('stock_id', $sid)
+                    ->where('price_category_id', $priceCategoryId)
+                    ->exists();
+
+                if (! $exists) {
+                    PriceList::create([
+                        'stock_id' => $sid,
+                        'price_category_id' => $priceCategoryId,
+                        'price' => $newPrice,
+                        'created_by' => $userId,
+                        'updated_by' => $userId,
+                    ]);
+                }
+            }
+        } elseif ($request->selected_type === '1') {
+            // Update existing PriceList records for this price category across ALL batches of same product
+            PriceList::whereIn('stock_id', $allStockIds)
+                ->where('price_category_id', $priceCategoryId)
+                ->update([
+                    'price' => $newPrice,
+                    'updated_by' => $userId,
+                ]);
+        }
+
+        DB::commit();
+
+        session()->flash('alert-success', 'Price updated successfully!');
+        return redirect()->route('price-list.index');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Error updating price list: ' . $e->getMessage());
+        session()->flash('alert-danger', 'Failed to update price. Please try again.');
+        return redirect()->back()->withInput();
+    }
+}
+
 
     public function store( Request $request ) {
         $prices = new PriceList;

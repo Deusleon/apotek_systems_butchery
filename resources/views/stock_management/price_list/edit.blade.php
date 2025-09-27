@@ -28,14 +28,18 @@
                             <div class="form-group row">
                                 <label for="name" class="col-md-4 col-form-label text-md-right">Buy Price</label>
                                 <div class="col-md-8">
-                                    <input type="text" class="form-control" name="unit_cost" id="unit_cost_edit"
+                                    <input type="hidden" class="form-control" name="unit_cost" id="unit_cost_edit"
+                                        value="{{ old('unit_cost') }}" required autofocus>
+                                    <input type="text" class="form-control" name="unit_cost_show" id="unit_cost_edit_to_show"
                                         value="{{ old('unit_cost') }}" required autofocus>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label for="name" class="col-md-4 col-form-label text-md-right">Sell Price</label>
                                 <div class="col-md-8">
-                                    <input type="text" class="form-control" name="sell_price" id="sell_price_edit"
+                                    <input type="hidden" class="form-control" name="sell_price" id="sell_price_edit"
+                                        value="{{ old('sell_price') }}" required autofocus>
+                                    <input type="text" class="form-control" name="sell_price_show" id="sell_price_edit_to_show"
                                         value="{{ old('sell_price') }}" required autofocus>
                                 </div>
                             </div>

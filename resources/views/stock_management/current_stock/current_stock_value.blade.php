@@ -77,11 +77,11 @@
                         </thead>
 
                         <tbody>
+                            {{-- @dd($stocks) --}}
                         @foreach ($stocks as $stock)
                             @if($stock->buying_price>0)
                             <tr>
                                 <td id="name_{{ $stock->product_id }}">
-                                    {{-- @dd($stock) --}}
                                     {{ trim(($stock->name ?? '') . 
                                             (!empty($stock->brand) ? ' ' . $stock->brand : '') . 
                                             (!empty($stock->pack_size) ? ' ' . $stock->pack_size : '') . 

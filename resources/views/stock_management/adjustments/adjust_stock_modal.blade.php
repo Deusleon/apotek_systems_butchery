@@ -27,6 +27,7 @@
                 <label>New Quantity</label>
                 <input type="hidden" class="form-control" name="new_quantity" id="new_quantity" required>
                 <input type="text" class="form-control" name="new_qty" id="new_qty_to_show" required>
+                <input type="hidden" name="from_type" id="from_type">
             </div>
             <div class="row mt-3">
                 <label>Reason</label>

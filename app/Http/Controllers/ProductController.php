@@ -73,8 +73,8 @@ class ProductController extends Controller
             'pack_size' => 'nullable|string|max:50',
             'category' => 'required|exists:inv_categories,id',
             'sale_uom' => 'nullable|string|max:50',
-            'min_quantinty' => 'nullable|numeric|min:0',
-            'max_quantinty' => 'nullable|numeric|min:0',
+            'min_quantinty' => 'nullable|min:1',
+            'max_quantinty' => 'nullable|min:1',
             'product_type' => 'nullable|in:stockable,consumable',
             'status' => 'nullable|in:0,1'
         ]);
@@ -116,9 +116,9 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'barcode' => 'nullable|string|max:50',
             'brand' => 'nullable|string|max:100',
-            // 'pack_size' => 'nullable|string|max:50',
             'category' => 'required|exists:inv_categories,id',
             'sale_uom' => 'nullable|string|max:50',
+            // 'pack_size' => 'nullable|string|max:50',
             // 'min_quantinty' => 'nullable|numeric|min:0',
             // 'max_quantinty' => 'nullable|numeric|min:0',
             // 'product_type' => 'nullable|in:stockable,consumable',
@@ -265,12 +265,6 @@ class ProductController extends Controller
                     'status' => $product->status,
                     'category_id' => $product->category_id
                 ];
-                // Debugging: Log the product data before sending
-                // Log::info('Product Data for ' . $product->name, [
-                //     'min_quantinty' => $product->min_quantinty,
-                //     'max_quantinty' => $product->max_quantinty,
-                //     'sales_uom' => $product->sales_uom
-                // ]);
             }
 
             return response()->json([

@@ -152,42 +152,74 @@ class CurrentStockController extends Controller
         $store_id = current_store_id();
         if(is_all_store()) {
         $stocks = DB::table('inv_current_stock')
-            ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
-            ->join('sales_prices','inv_current_stock.id','=','sales_prices.stock_id')
-            ->select('inv_current_stock.product_id','inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom',
-                DB::raw('sum(inv_current_stock.quantity) as quantity'),
-                'inv_current_stock.batch_number',
-                'inv_current_stock.expiry_date',
-                'inv_current_stock.created_at',
-                'inv_current_stock.unit_cost',
+            ->join('inv_products', 'inv_current_stock.product_id', '=', 'inv_products.id')
+            ->join(DB::raw('(
+                SELECT stock_id, MAX(created_at) as latest_date
+                FROM sales_prices
+                GROUP BY stock_id
+            ) as sp_max'), 'inv_current_stock.id', '=', 'sp_max.stock_id')
+            ->join('sales_prices', function($join) {
+                $join->on('inv_current_stock.id', '=', 'sales_prices.stock_id')
+                    ->on('sales_prices.created_at', '=', 'sp_max.latest_date');
+            })
+            ->select(
+                'inv_current_stock.product_id',
+                'inv_products.name',
+                'inv_products.brand',
+                'inv_products.pack_size',
+                'inv_products.sales_uom',
                 'sales_prices.price',
-                DB::raw('inv_current_stock.quantity * inv_current_stock.unit_cost AS buying_price'),
-                DB::raw('inv_current_stock.quantity * sales_prices.price AS selling_price'),
-                DB::raw('sales_prices.price  - inv_current_stock.unit_cost AS unit_profit'),
-                DB::raw('(inv_current_stock.quantity * sales_prices.price) - (inv_current_stock.quantity * inv_current_stock.unit_cost) AS profit'))
-            // ->where('inv_current_stock.store_id',$store_id)
-            ->groupBy(['inv_current_stock.product_id', 'inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom', 'inv_current_stock.batch_number', 'inv_current_stock.expiry_date', 'inv_current_stock.created_at', 'inv_current_stock.unit_cost', 'sales_prices.price'])
-            ->havingRaw(DB::raw('sum(quantity) > 0'))
+                DB::raw('SUM(inv_current_stock.quantity) as quantity'),
+                DB::raw('SUM(inv_current_stock.quantity * inv_current_stock.unit_cost) as buying_price'),
+                DB::raw('SUM(inv_current_stock.quantity * sales_prices.price) as selling_price'),
+                DB::raw('SUM(inv_current_stock.quantity * sales_prices.price) - SUM(inv_current_stock.quantity * inv_current_stock.unit_cost) as profit')
+            )
+            ->where('inv_current_stock.store_id', $store_id)
+            ->groupBy(
+                ['inv_current_stock.product_id',
+                'inv_products.name',
+                'inv_products.brand',
+                'inv_products.pack_size',
+                'inv_products.sales_uom']
+            )
+            ->havingRaw('SUM(quantity) > 0')
             ->get();
         }else{
         $stocks = DB::table('inv_current_stock')
-            ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
-            ->join('sales_prices','inv_current_stock.id','=','sales_prices.stock_id')
-            ->select('inv_current_stock.product_id','inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom',
-                DB::raw('sum(inv_current_stock.quantity) as quantity'),
-                'inv_current_stock.batch_number',
-                'inv_current_stock.expiry_date',
-                'inv_current_stock.created_at',
+            ->join('inv_products', 'inv_current_stock.product_id', '=', 'inv_products.id')
+            ->join(DB::raw('(
+                SELECT stock_id, MAX(created_at) as latest_date
+                FROM sales_prices
+                GROUP BY stock_id
+            ) as sp_max'), 'inv_current_stock.id', '=', 'sp_max.stock_id')
+            ->join('sales_prices', function($join) {
+                $join->on('inv_current_stock.id', '=', 'sales_prices.stock_id')
+                    ->on('sales_prices.created_at', '=', 'sp_max.latest_date');
+            })
+            ->select(
+                'inv_current_stock.product_id',
                 'inv_current_stock.unit_cost',
+                'inv_products.name',
+                'inv_products.brand',
+                'inv_products.pack_size',
+                'inv_products.sales_uom',
                 'sales_prices.price',
-                DB::raw('inv_current_stock.quantity * inv_current_stock.unit_cost AS buying_price'),
-                DB::raw('inv_current_stock.quantity * sales_prices.price AS selling_price'),
-                DB::raw('sales_prices.price  - inv_current_stock.unit_cost AS unit_profit'),
-                DB::raw('(inv_current_stock.quantity * sales_prices.price) - (inv_current_stock.quantity * inv_current_stock.unit_cost) AS profit'))
-            ->where('inv_current_stock.store_id',$store_id)
-            ->groupBy(['inv_current_stock.product_id', 'inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom', 'inv_current_stock.batch_number', 'inv_current_stock.expiry_date', 'inv_current_stock.created_at', 'inv_current_stock.unit_cost', 'sales_prices.price'])
-            ->havingRaw(DB::raw('sum(quantity) > 0'))
+                DB::raw('SUM(inv_current_stock.quantity) as quantity'),
+                DB::raw('SUM(inv_current_stock.quantity * inv_current_stock.unit_cost) as buying_price'),
+                DB::raw('SUM(inv_current_stock.quantity * sales_prices.price) as selling_price'),
+                DB::raw('SUM(inv_current_stock.quantity * sales_prices.price) - SUM(inv_current_stock.quantity * inv_current_stock.unit_cost) as profit')
+            )
+            ->where('inv_current_stock.store_id', $store_id)
+            ->groupBy(
+                ['inv_current_stock.product_id',
+                'inv_products.name',
+                'inv_products.brand',
+                'inv_products.pack_size',
+                'inv_products.sales_uom']
+            )
+            ->havingRaw('SUM(quantity) > 0')
             ->get();
+
         }
 
 
@@ -248,8 +280,6 @@ class CurrentStockController extends Controller
                 ->havingRaw(DB::raw('sum(quantity) > 0'))
                 ->get();
 
-//            ->whereBetween(DB::raw('date(inv_current_stock.created_at)'),
-//                [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
         }
 
         //When no date is filtered
