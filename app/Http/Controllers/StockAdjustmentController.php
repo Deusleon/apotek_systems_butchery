@@ -200,108 +200,229 @@ class StockAdjustmentController extends Controller
 
     public function store(Request $request)
     {
-        if (!Auth()->user()->checkPermission('Create Stock Adjustment')) {
-                abort(403, 'Access Denied');
-        }
-        $validator = Validator::make($request->all(), [
-        'stock_id' => 'required|exists:inv_current_stock,id',
-        'product_id' => 'required|exists:inv_products,id',
-        'current_stock' => 'required|numeric|min:0',
-        'new_quantity' => 'required|numeric|min:0',
-        'reason' => 'required|string|max:255',
-    ]);
+        $storeId = current_store_id();
 
-    if ($validator->fails()) {
-        return response()->json([
-            'success' => false,
-            'errors'  => $validator->errors()
-        ], 422); 
-    }
-        // Log::info('Store Stock Adjustment Request:', $request->all());
+        if (!Auth::user()->checkPermission('Create Stock Adjustment')) {
+            abort(403, 'Access Denied');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'stock_id' => 'required|exists:inv_current_stock,id',
+            'product_id' => 'required|exists:inv_products,id',
+            'current_stock' => 'required|numeric|min:0',
+            'new_quantity' => 'required',
+            'reason' => 'required|string|max:255',
+            'from_type' => 'required|in:detailed,summary',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $newQuantity = (float) str_replace(',', '', $request->new_quantity);
+
+        if ($newQuantity < 0) {
+            return response()->json(['success' => false, 'message' => 'Invalid new quantity.'], 422);
+        }
 
         DB::beginTransaction();
         try {
-            $currentStock = CurrentStock::findOrFail($request->stock_id);
-            $previousQuantity = $currentStock->quantity;
-            
-            // Calculate new quantity
-            $newQuantity = $request->new_quantity;
-            
-            if ($newQuantity > $previousQuantity) {
-                $adjustmentType = 'increase';
-                $adjustmentQuantity = $newQuantity - $previousQuantity;
-            } else {
-                $adjustmentType = 'decrease';
-                $adjustmentQuantity = $previousQuantity - $newQuantity;
+            $reference = 'ADJ-' . time();
 
-                // Check if we have enough stock for decrease
-                if ($adjustmentType === 'decrease' && $adjustmentQuantity > $previousQuantity) {
-                    return back()->with('error', 'Not enough stock available for adjustment. Current stock: ' . $previousQuantity);
+            // DETAILED flow: adjust only the given batch (stock_id)
+            if ($request->from_type === 'detailed') {
+                // lock the specific batch
+                $batch = CurrentStock::where('id', $request->stock_id)->lockForUpdate()->firstOrFail();
+                $prev = (float) $batch->quantity;
+
+                if ($newQuantity == $prev) {
+                    DB::commit();
+                    return response()->json(['success' => true, 'message' => 'No change.'], 200);
                 }
+
+                $type = $newQuantity > $prev ? 'increase' : 'decrease';
+                $adjQty = abs($newQuantity - $prev);
+
+                // update batch
+                $batch->quantity = $newQuantity;
+                $batch->save();
+
+                // logs
+                StockAdjustment::create([
+                    'stock_id' => $batch->id,
+                    'quantity' => $adjQty,
+                    'type' => $type,
+                    'reason' => $request->reason,
+                    'description' => $request->notes ?? null,
+                    'created_by' => Auth::id(),
+                ]);
+
+                StockTracking::create([
+                    'stock_id' => $batch->id,
+                    'product_id' => $batch->product_id,
+                    'out_mode' => 'Stock adjustment: ' . $request->reason,
+                    'quantity' => $adjQty,
+                    'store_id' => $storeId,
+                    'created_by' => Auth::id(),
+                    'movement' => $type === 'increase' ? 'IN' : 'OUT',
+                ]);
+
+                StockAdjustmentLog::create([
+                    'current_stock_id' => $batch->id,
+                    'user_id' => Auth::id(),
+                    'store_id' => $storeId,
+                    'previous_quantity' => $prev,
+                    'new_quantity' => $newQuantity,
+                    'adjustment_quantity' => $adjQty,
+                    'adjustment_type' => $type,
+                    'reason' => $request->reason,
+                    'reference_number' => $reference,
+                ]);
+
+                DB::commit();
+                return response()->json(['success' => true, 'message' => ucfirst($type) . " of {$adjQty} units for batch ID {$batch->id}. Reference: {$reference}"], 200);
             }
-            
-            // Update current stock
-            $currentStock->quantity = $newQuantity;
-            $currentStock->save();
-            
-            // Create adjustment log with all necessary fields
-            $adjustment = new StockAdjustmentLog();
-            $adjustment->current_stock_id = $request->stock_id;
-            $adjustment->user_id = Auth::id();
-            $adjustment->store_id = current_store_id();
-            $adjustment->previous_quantity = $previousQuantity;
-            $adjustment->new_quantity = $newQuantity;
-            $adjustment->adjustment_quantity = $adjustmentQuantity;
-            $adjustment->adjustment_type = $adjustmentType;
-            $adjustment->reason = $request->reason;
-            // $adjustment->notes = $request->notes;
-            $adjustment->reference_number = 'ADJ-' . time(); // Generate a reference number
-            $adjustment->save();
 
-            // Create adjustment with all necessary fields
-            $adjust = new StockAdjustment();
-            $adjust->stock_id = $request->stock_id;
-            $adjust->quantity = $adjustmentQuantity;
-            $adjust->type = $adjustmentType;
-            $adjust->reason = $request->reason;
-            $adjust->description = $request->notes;
-            $adjust->created_by = Auth::id();
-            $adjust->created_at = now();
-            $adjust->save();            
+            // ===== SUMMARY flow =====
+            // total across all batches for product in that store
+            $totalAvailable = (float) CurrentStock::where('product_id', $request->product_id)
+                ->where('store_id', $storeId)
+                ->sum('quantity');
 
-            // Add to stock tracking
-            StockTracking::create([
-                'stock_id' => $currentStock->id,
-                'product_id' => $currentStock->product_id,
-                'out_mode' => 'Stock adjustment: ' . $request->reason,
-                'quantity' =>  $adjustmentQuantity,
-                'store_id' => current_store_id(),
-                'created_by' => Auth::id(),
-                'updated_at' => date('Y-m-d'),
-                'movement' => ($adjustmentType === 'increase' ? 'IN' : 'OUT'),
-            ]);
+            if ($newQuantity == $totalAvailable) {
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'No change in total quantity.'], 200);
+            }
 
-            DB::commit();
-            
-            // Create detailed success message
-            $productName = $currentStock->product->name ?? 'Unknown Product';
-            $adjustmentType = ucfirst($adjustmentType);
-            $successMessage = "Stock adjustment created successfully! {$adjustmentType} of {$adjustmentQuantity} units for '{$productName}'. Previous stock: {$previousQuantity}, New stock: {$newQuantity}. Reference: {$adjustment->reference_number}";
-            
-            return response()->json([
-                'success' => true,
-                'message' => $successMessage
-            ]);
+            if ($newQuantity > $totalAvailable) {
+                // INCREASE summary:
+                // set all older batches to 0, set latest batch quantity = newQuantity (or create new batch)
+                $adjustmentAmount = $newQuantity - $totalAvailable;
+
+                // lock all batches for this product
+                $batches = CurrentStock::where('product_id', $request->product_id)
+                    ->where('store_id', $storeId)
+                    ->orderBy('created_at', 'asc') 
+                    ->lockForUpdate()
+                    ->get();
+
+                $latest = $batches->last(); // newest
+                // update latest batch to newQuantity
+                $prevLatest = (float) $latest->quantity;
+                $latest->quantity = $latest->quantity + $adjustmentAmount;
+                $latest->save();
+
+                $typeLatest = $newQuantity > $totalAvailable ? 'increase' : ($newQuantity < $totalAvailable ? 'decrease' : null);
+
+                if ($adjustmentAmount > 0) {
+                    StockAdjustment::create([
+                        'stock_id' => $latest->id,
+                        'quantity' => $adjustmentAmount,
+                        'type' => $typeLatest,
+                        'reason' => $request->reason,
+                        'created_by' => Auth::id(),
+                    ]);
+
+                    StockTracking::create([
+                        'stock_id' => $latest->id,
+                        'product_id' => $latest->product_id,
+                        'out_mode' => $request->reason,
+                        'quantity' => $adjustmentAmount,
+                        'store_id' => $storeId,
+                        'created_by' => Auth::id(),
+                        'movement' => $typeLatest === 'increase' ? 'IN' : 'OUT',
+                    ]);
+
+                    StockAdjustmentLog::create([
+                        'current_stock_id' => $latest->id,
+                        'user_id' => Auth::id(),
+                        'store_id' => $storeId,
+                        'previous_quantity' => $prevLatest,
+                        'new_quantity' => $latest->quantity,
+                        'adjustment_quantity' => $adjustmentAmount,
+                        'adjustment_type' => $typeLatest,
+                        'reason' => $request->reason,
+                        'reference_number' => $reference,
+                    ]);
+                }
+
+                DB::commit();
+                return response()->json(['success' => true, 'message' => "Consolidated stock to latest batch (ID: {$latest->id}). Total is now {$newQuantity}. Reference: {$reference}"], 200);
+            } else {
+                // DECREASE summary:
+                // need to remove (totalAvailable - newQuantity) starting from oldest
+                $toRemove = $totalAvailable - $newQuantity;
+                if ($toRemove <= 0) {
+                    DB::commit();
+                    return response()->json(['success' => true, 'message' => 'No decrease needed.'], 200);
+                }
+
+                $batches = CurrentStock::where('product_id', $request->product_id)
+                    ->where('store_id', $storeId)
+                    ->where('quantity', '>', 0)
+                    ->orderBy('created_at', 'asc') // oldest first
+                    ->lockForUpdate()
+                    ->get();
+
+                $remaining = $toRemove;
+                $removedTotal = 0;
+
+                foreach ($batches as $batch) {
+                    if ($remaining <= 0) break;
+                    $avail = (float) $batch->quantity;
+                    if ($avail <= 0) continue;
+
+                    $deduct = min($avail, $remaining);
+                    $prevQty = $batch->quantity;
+                    $batch->quantity = $prevQty - $deduct;
+                    $batch->save();
+
+                    StockAdjustment::create([
+                        'stock_id' => $batch->id,
+                        'quantity' => $deduct,
+                        'type' => 'decrease',
+                        'reason' => $request->reason,
+                        'description' => $request->notes ?? null,
+                        'created_by' => Auth::id(),
+                    ]);
+
+                    StockTracking::create([
+                        'stock_id' => $batch->id,
+                        'product_id' => $batch->product_id,
+                        'out_mode' => 'Stock adjustment: ' . $request->reason,
+                        'quantity' => $deduct,
+                        'store_id' => $storeId,
+                        'created_by' => Auth::id(),
+                        'movement' => 'OUT',
+                    ]);
+
+                    StockAdjustmentLog::create([
+                        'current_stock_id' => $batch->id,
+                        'user_id' => Auth::id(),
+                        'store_id' => $storeId,
+                        'previous_quantity' => $prevQty,
+                        'new_quantity' => $batch->quantity,
+                        'adjustment_quantity' => $deduct,
+                        'adjustment_type' => 'decrease',
+                        'reason' => $request->reason,
+                        'reference_number' => $reference,
+                    ]);
+
+                    $removedTotal += $deduct;
+                    $remaining -= $deduct;
+                }
+
+                DB::commit();
+                return response()->json(['success' => true, 'message' => "Removed {$removedTotal} units from oldest batches. New total: {$newQuantity}. Reference: {$reference}"], 200);
+            }
+
         } catch (\Exception $e) {
-            DB::rollback();
+            DB::rollBack();
             Log::error('Error creating stock adjustment: ' . $e->getMessage(), [
                 'exception' => $e,
                 'request_data' => $request->all()
             ]);
-            return response()->json([
-                'success' => false,
-                'message' => 'Error creating stock adjustment: ' . $e->getMessage()
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Error processing stock adjustment: ' . $e->getMessage()], 500);
         }
     }
 

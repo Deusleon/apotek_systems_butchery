@@ -66,7 +66,7 @@
                         <div class="col-md-3" style="margin-left: -2.6%;">
                             <select name="price_category" class="js-example-basic-single form-control" id="price_category">
                                 @foreach($price_categories as $price_category)
-                                    <option value="{{$price_category->id}}" {{ $loop->first ? 'selected' : '' }}>
+                                    <option value="{{$price_category->id}}">
                                         {{ $price_category->name }}
                                     </option>
                                 @endforeach
@@ -83,7 +83,7 @@
                         </div>
                         <div class="col-md-3" style="margin-left: -2.6%;">
                             <select name="type_id" class="js-example-basic-single form-control" id="type_id">
-                                <option readonly value="0" id="store_name_edit" disabled>Select Type...
+                                <option readonly value="" id="store_name_edit" disabled>Select Type...
                                 </option>
                                 <option name="store_name" value="1" selected>Current</option>
                                 <option name="store_name" value="pending">Pending</option>
@@ -186,6 +186,28 @@
 
     <script>
 
+        // On page load, restore from localStorage (if present)
+        $(document).ready(function () {
+            var savedCategory = localStorage.getItem('price_category');
+            var savedType = localStorage.getItem('type_id');
+
+            if (savedCategory !== null) {
+                $('#price_category').val(savedCategory);
+            }
+            if (savedType !== null) {
+                $('#type_id').val(savedType);
+            }
+
+            // Trigger change once to load the table using saved values
+            $('#price_category, #type_id').trigger('change');
+        });
+
+        // Save on change
+        $('#price_category, #type_id').on('change', function () {
+            localStorage.setItem('price_category', $('#price_category').val());
+            localStorage.setItem('type_id', $('#type_id').val());
+        });
+
         $('#tbody1').on('click', '#detail', function () {
             var data = $('#fixed-header2').DataTable().row($(this).parents('tr')).data();
 
@@ -259,9 +281,11 @@
 
             modal.find('.modal-body #name').val(name + ' ' + brand + ' ' + pack_size + sales_uom);
             modal.find('.modal-body #brand_edit').val(brand);
-            modal.find('.modal-body #unit_cost_edit').val(unit_cost_edit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+            modal.find('.modal-body #unit_cost_edit').val(unit_cost_edit);
+            modal.find('.modal-body #unit_cost_edit_to_show').val(unit_cost_edit.toLocaleString('en-US'));
             modal.find('.modal-body #price_category_edit').val(price_category);
-            modal.find('.modal-body #sell_price_edit').val(sell_price_edit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+            modal.find('.modal-body #sell_price_edit').val(sell_price_edit);
+            modal.find('.modal-body #sell_price_edit_to_show').val(sell_price_edit.toLocaleString('en-US'));
             modal.find('.modal-body #pack_size_edit').val(pack_size);
             modal.find('.modal-body #id').val(id);
             modal.find('.modal-body #price_category').val(price_category);
@@ -337,9 +361,9 @@
                 },
                 { 'data': 'price_category_name' },
                 @if($batch_enabled === 'YES')
-                { 'data': 'batch_number' }
+                    { 'data': 'batch_number' }
                 @endif
-            ]
+                ]
         });
 
         function bindData(data) {
@@ -392,6 +416,34 @@
             $('#test').modal('show');
         }
 
+        $('#unit_cost_edit_to_show').on('change', function () {
+            var newValue = document.getElementById('unit_cost_edit_to_show').value;
+            if (newValue !== '') {
+                document.getElementById('unit_cost_edit_to_show').value =
+                    numberWithCommas(parseFloat(newValue.replace(/\,/g, ''), 10));
+                document.getElementById('unit_cost_edit').value = parseFloat(newValue.replace(/\,/g, ''), 10)
+            } else {
+                document.getElementById('unit_cost_edit_to_show').value = '';
+            }
+
+        });
+
+        $('#sell_price_edit_to_show').on('change', function () {
+            var newValue = document.getElementById('sell_price_edit_to_show').value;
+            if (newValue !== '') {
+                document.getElementById('sell_price_edit_to_show').value =
+                    numberWithCommas(parseFloat(newValue.replace(/\,/g, ''), 10));
+                document.getElementById('sell_price_edit').value = parseFloat(newValue.replace(/\,/g, ''), 10)
+            } else {
+                document.getElementById('sell_price_edit_to_show').value = '';
+            }
+
+        });
+
+        function numberWithCommas(digit) {
+            return String(parseFloat(digit)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
         $(document).ready(function () {
 
             function initPriceTable(selector) {
@@ -412,20 +464,20 @@
                         { data: "price", render: data => formatMoney(data) },
                         { data: "profit", render: data => (data ? `${Math.round(data)}%` : '0%') },
                         @if(auth()->user()->checkPermission('Edit Price List'))
-                                {
+                                        {
                                 data: "id", render: function (data, type, row) {
                                     return `
-                                                <button id='pricing' class='btn btn-sm btn-rounded btn-primary'
-                                                    type='button' data-toggle="modal" data-target="#edit"
-                                                    data-name='${row.product_name ?? ''}'
-                                                    data-unit-cost='${row.unit_cost ?? ''}'
-                                                    data-price='${row.price ?? ''}'
-                                                    data-id='${row.id ?? ''}'
-                                                    data-brand='${row.brand ?? ''}'
-                                                    data-pack-size='${row.pack_size ?? ''}'
-                                                    data-sales-uom='${row.sales_uom ?? ''}'
-                                                    data-price-category-id='${row.price_category_id ?? ''}'>Edit</button>
-                                            `;
+                                                        <button id='pricing' class='btn btn-sm btn-rounded btn-primary'
+                                                            type='button' data-toggle="modal" data-target="#edit"
+                                                            data-name='${row.product_name ?? ''}'
+                                                            data-unit-cost='${row.unit_cost ?? ''}'
+                                                            data-price='${row.price ?? ''}'
+                                                            data-id='${row.id ?? ''}'
+                                                            data-brand='${row.brand ?? ''}'
+                                                            data-pack-size='${row.pack_size ?? ''}'
+                                                            data-sales-uom='${row.sales_uom ?? ''}'
+                                                            data-price-category-id='${row.price_category_id ?? ''}'>Edit</button>
+                                                    `;
                                 }
                             },
                         @endif

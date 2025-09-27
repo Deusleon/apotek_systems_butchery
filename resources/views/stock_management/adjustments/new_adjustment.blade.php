@@ -99,6 +99,7 @@
                                         . (!empty($allstock->brand) ? ' ' . $allstock->brand : '')
                                         . (!empty($allstock->pack_size) ? ' ' . $allstock->pack_size : '')
                                         . (!empty($allstock->sales_uom) ? $allstock->sales_uom : '') }}"
+                                                                data-from-type="summary"
                                                                 data-current-stock="{{ $allstock->quantity }}">
                                                                 Adjust
                                                             </button>
@@ -156,6 +157,7 @@
                                         . (!empty($allDet->brand) ? ' ' . $allDet->brand : '')
                                         . (!empty($allDet->pack_size) ? ' ' . $allDet->pack_size : '')
                                         . (!empty($allDet->sales_uom) ? $allDet->sales_uom : '') }}"
+                                                                data-from-type="detailed"
                                                                 data-current-stock="{{ $allDet->quantity }}">
                                                                 Adjust
                                                             </button>
@@ -206,6 +208,7 @@
                                         . (!empty($stock->brand) ? ' ' . $stock->brand : '')
                                         . (!empty($stock->pack_size) ? ' ' . $stock->pack_size : '')
                                         . (!empty($stock->sales_uom) ? $stock->sales_uom : '') }}"
+                                                                data-from-type="summary"
                                                                 data-current-stock="{{ $stock->quantity }}">
                                                                 Adjust
                                                             </button>
@@ -263,6 +266,7 @@
                                         . (!empty($data->brand) ? ' ' . $data->brand : '')
                                         . (!empty($data->pack_size) ? ' ' . $data->pack_size : '')
                                         . (!empty($data->sales_uom) ? $data->sales_uom : '') }}"
+                                                                data-from-type="detailed"
                                                                 data-current-stock="{{ $data->quantity }}">
                                                                 Adjust
                                                             </button>
@@ -316,6 +320,7 @@
                                         . (!empty($out->brand) ? ' ' . $out->brand : '')
                                         . (!empty($out->pack_size) ? ' ' . $out->pack_size : '')
                                         . (!empty($out->sales_uom) ? $out->sales_uom : '') }}"
+                                                                data-from-type="summary"
                                                                 data-current-stock="{{ $out->quantity }}">
                                                                 Adjust
                                                             </button>
@@ -371,6 +376,7 @@
                                         . (!empty($outDet->brand) ? ' ' . $outDet->brand : '')
                                         . (!empty($outDet->pack_size) ? ' ' . $outDet->pack_size : '')
                                         . (!empty($outDet->sales_uom) ? $outDet->sales_uom : '') }}"
+                                                                data-from-type="detailed"
                                                                 data-current-stock="{{ $outDet->quantity }}">
                                                                 Adjust
                                                             </button>
@@ -502,13 +508,15 @@
             const current_stock = $btn.data('current-stock');
             const id = $btn.data('id');
             const product_id = $btn.data('product-id');
+            const from_type = $btn.data('from-type');
             let stock = Number(current_stock);
             let displayStock = (stock % 1 === 0) ? stock : stock.toFixed(1);
             $('#show_product_name').text(product_name);
-            $('#show_current_stock').text(displayStock);
+            $('#show_current_stock').text(numberWithCommas(displayStock));
             $('#confirmAdjustmentProductName').text(product_name);
             $('#product_id').val(product_id);
             $('#stock_id').val(id);
+            $('#from_type').val(from_type);
             $('#current_stock_input').val(current_stock);
 
             $('#adjustStockModal').modal('show');
