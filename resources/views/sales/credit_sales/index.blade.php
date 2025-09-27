@@ -75,8 +75,8 @@
                     @if(auth()->user()->checkPermission('View Credit Sales'))
                         <li class="nav-item">
                             <a class="nav-link text-uppercase" id="credit-sale-receiving-tablist" data-toggle="pill"
-                                href="#credit-sale-receiving" role="tab" aria-controls="credit_sales"
-                                aria-selected="true">New sale</a>
+                                href="#credit-sale-receiving" role="tab" aria-controls="credit_sales" aria-selected="true">New
+                                sale</a>
                         </li>
                     @endif
 
@@ -142,6 +142,8 @@
                                                 </select>
                                             </div>
                                         </div>
+                                        <input type="text" id="credit_barcode_input" style="position:absolute; left:-9999px;"
+                                            autofocus>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Products<font color="red">*</font></label>
@@ -630,6 +632,7 @@
     {{-- For credit tracking --}}
     <script type="text/javascript">
         $(document).ready(function () {
+            setTimeout(function () { $('#credit_barcode_input').focus(); }, 150);
             var start = moment();
             var end = moment();
 
@@ -667,7 +670,7 @@
         $('#credit-sale-receiving-tablist').on('click', function () {
             // console.log('New credit tab clicked');
             localStorage.setItem('creditActiveTab', 'credit-sale-receiving');
-            // getCredits();
+            setTimeout(function () { $('#credit_barcode_input').focus(); }, 150);
 
         });
 

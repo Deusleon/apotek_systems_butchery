@@ -71,6 +71,8 @@
                                     </select>
                                 </div>
                             </div>
+                            <input type="text" id="quote_barcode_input" autocomplete="off"
+                                style="position:absolute; left:-9999px;">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Products<font color="red">*</font></label>
@@ -226,6 +228,7 @@
     @include('partials.notification')
     <script type="text/javascript">
         $(document).ready(function () {
+            setTimeout(function () { $('#quote_barcode_input').focus(); }, 150);
             // Global variables
             var cart = [];
             var default_cart = [];
@@ -386,6 +389,7 @@
                     } else {
                         alert('Quantity is required');
                     }
+                    setTimeout(function () { $('#quote_barcode_input').focus(); }, 150);
                     return false;
                 }
 
@@ -434,6 +438,7 @@
 
                 cart[index] = row_data;
                 discount();
+                setTimeout(function () { $('#quote_barcode_input').focus(); }, 150);
             });
 
             // Edit price change handler (if fixed price is NO)
@@ -470,6 +475,7 @@
                 cart.splice(index, 1);
                 default_cart.splice(index, 1);
                 discount();
+                setTimeout(function () { $('#quote_barcode_input').focus(); }, 150);
             });
 
             // Helper function for number validation
@@ -567,6 +573,7 @@
                 discount();
 
                 $("#products").val(null).trigger("change");
+                $("#quote_barcode_input").focus();
             }
 
             // Function to load products based on price category
@@ -615,6 +622,169 @@
                 });
             }
 
+            $("#quote_barcode_input").on("keypress", function (e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    let barcode = $(this).val().trim();
+                    console.log("Barcode", barcode);
+                    if (barcode !== "") {
+                        fetchProductByBarcode(barcode);
+                        $(this).val("");
+                    }
+                }
+            });
+
+            function fetchProductByBarcode(barcode) {
+                var price_category = $("#price_category").val();
+
+                $.ajax({
+                    url: "{{ route('filter-product-by-word')}}",
+                    method: "GET",
+                    data: {
+                        word: barcode,
+                        price_category_id: price_category,
+                    },
+                    dataType: "json",
+                    success: function (res) {
+                        console.log("Res Data:", res);
+
+                        // ensure array + at least one result
+                        if (res && Array.isArray(res.data) && res.data.length > 0) {
+                            const prod = res.data[0];
+
+                            // Build normalized product object expected by addProductToCartScan
+                            const product = {
+                                id: prod.id,
+                                // server returns a combined name string already from your controller
+                                name: prod.name || prod.product_name || "",
+                                // ensure price is number
+                                price: Number(prod.price) || parseFloat(prod.price) || 0,
+                                // quantity field from server might be "quantity" (sum) or "stock_qty"
+                                quantity: Number(prod.quantity) || Number(prod.stock_qty) || 0,
+                                stock_qty: Number(prod.quantity) || Number(prod.stock_qty) || 0,
+                                // optional
+                                type: prod.type || "",
+                            };
+
+                            // For credit sales require customer selected
+                            let customer_id = $("#customer_id").val();
+                            if (!customer_id || customer_id === "") {
+                                notify("Select Customer First", "top", "right", "warning");
+                                return;
+                            }
+
+                            addProductToCartScan(product);
+                        } else {
+                            notify("Product not found", "top", "right", "danger");
+                        }
+                    },
+                    error: function (err) {
+                        console.error("Error fetching product by barcode", err);
+                        notify("Error fetching product", "top", "right", "danger");
+                    },
+                });
+            }
+            // ===== addProductToCartScan =====
+            function addProductToCartScan(product) {
+                // console.log("Item Receive", product);
+
+                // Normalize numeric fields
+                const priceNum = Number(product.price) || 0;
+                const stockQty = Number(product.quantity || product.stock_qty || 0);
+                const vatUnit = Number((priceNum * tax).toFixed(2));
+                const unitTotal = Number(priceNum + vatUnit);
+
+                // Find existing product in cart by productId (index 6)
+                let idx = cart.findIndex((r) => String(r[6]) == String(product.id));
+
+                if (idx !== -1) {
+                    // Existing row -> increment quantity numerically and recalc totals
+                    let row = cart[idx];
+
+                    // Normalize existing qty to number (strip commas and any "< Max" HTML)
+                    let existingQtyRaw = String(row[1] || "0").split("<")[0];
+                    // let existingPriceRaw = String(row[2] || "0").split("<")[0];
+                    let existingVatRaw = String(row[2] || "0").split("<")[0];
+                    let existingPriceRaw = String(row[2] || "0").split("<")[0];
+                    let existingQty = Number(existingQtyRaw.replace(/\,/g, "")) || 0;
+                    let existingPrice = Number(existingPriceRaw.replace(/\,/g, "")) || 0;
+                    let newVat = Number((existingPrice * tax).toFixed(2)) || 0;
+                    let newTotal = Number(existingPrice + newVat);
+
+                    // Incoming increment (scanner adds 1 each time)
+                    let incomingQty = 1;
+
+                    let newQty = existingQty + incomingQty;
+
+                    // Check stock limit (if not quotes page)
+                    if (!$("#quotes_page").length && stockQty && newQty > stockQty) {
+                        // set to max and show Max label
+                        row[1] =
+                            numberWithCommas(stockQty) +
+                            " <span class='text text-danger'>Max</span>";
+                        // use stockQty for calculations
+                        row[2] = formatMoney(existingPrice);
+                        row[3] = formatMoney(newVat * stockQty);
+                        row[4] = formatMoney(newTotal * stockQty);
+                    } else {
+                        row[1] = numberWithCommas(newQty);
+                        row[2] = formatMoney(existingPrice);
+                        row[3] = formatMoney(newVat * newQty);
+                        row[4] = formatMoney(newTotal * newQty);
+                    }
+
+                    row[5] = stockQty;
+                    row[6] = product.id;
+                    row[7] = product.type || "";
+
+                    // Move to top
+                    cart.splice(idx, 1);
+                    cart.unshift(row);
+
+                    // Keep default_cart in sync (move matching entry to top if exists)
+                    if (default_cart && default_cart.length && default_cart[idx]) {
+                        const dc = default_cart.splice(idx, 1)[0];
+                        default_cart.unshift(dc);
+                    }
+                } else {
+                    // New item: create array-format row to match existing code
+                    var item = [
+                        product.name,
+                        1,
+                        formatMoney(priceNum),
+                        formatMoney(vatUnit),
+                        formatMoney(unitTotal),
+                        stockQty,
+                        product.id,
+                        product.type || "",
+                    ];
+
+                    var cart_data = [
+                        formatMoney(priceNum),
+                        formatMoney(vatUnit),
+                        formatMoney(unitTotal),
+                    ];
+
+                    default_cart.unshift(cart_data);
+                    cart.unshift(item);
+                }
+
+                // Recalculate totals (uses your discount() which expects array-based cart)
+                if (typeof discount === "function") {
+                    discount();
+                } else {
+                    // minimal fallback (shouldn't be needed if discount exists)
+                    cart_table.clear();
+                    cart_table.rows.add(cart);
+                    cart_table.draw();
+                }
+
+                // redraw UI
+                cart_table.clear();
+                cart_table.rows.add(cart);
+                cart_table.draw();
+            }
+
             // Product selection event handler
             $("#products").on('change', function (event) {
                 let customer_id = document.getElementById("customer_id").value;
@@ -640,6 +810,7 @@
                     setTimeout(() => {
                         $(this).val('').trigger('change');
                     }, 100);
+                    setTimeout(function () { $('#quote_barcode_input').focus(); }, 150);
                 }
             });
 
@@ -682,6 +853,7 @@
             });
 
             $('#customer_id').on('change', function () {
+                setTimeout(function () { $('#quote_barcode_input').focus(); }, 150);
                 if ($('#price_category').val()) {
                     loadProducts();
                 }
@@ -700,6 +872,14 @@
                 } else {
                     deselectQuote();
                 }
+            });
+
+            $("#sale_discount").on("blur", function () {
+                $("#quote_barcode_input").focus();
+            });
+
+            $("#remark").on("blur", function () {
+                $("#quote_barcode_input").focus();
             });
 
             // Save button

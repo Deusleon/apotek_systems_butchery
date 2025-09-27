@@ -11,14 +11,13 @@
 
 @section("content")
     <style>
-        .datepicker > .datepicker-days {
+        .datepicker>.datepicker-days {
             display: block;
         }
 
         ol.linenums {
             margin: 0 0 0 -8px;
         }
-
     </style>
 
     <div class="col-sm-12">
@@ -44,12 +43,12 @@
                                     <select id="price_category" class="js-example-basic-single form-control" required>
                                         <option value="" selected="true" disabled>Select Type</option>
                                         @foreach($price_category as $price)
-                                            <option
-                                                value="{{$price->id}}" {{$default_sale_type === $price->id  ? 'selected' : ''}}>{{$price->name}}</option>
+                                            <option value="{{$price->id}}" {{$default_sale_type === $price->id ? 'selected' : ''}}>{{$price->name}}</option>
                                         @endforeach
                                     </select>
                                 </div>
                             </div>
+                            <input type="text" id="barcode_input" style="position:absolute; left:-9999px;" autofocus>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Products<font color="red">*</font></label>
@@ -62,12 +61,11 @@
                                 <div class="form-group">
                                     <label for="code">Customer Name </label>
                                     <select name="customer_id" id="customer_id"
-                                            class="js-example-basic-single form-control">
+                                        class="js-example-basic-single form-control">
                                         <option value="" disabled>Select Customer</option>
                                         @foreach($customers as $customer)
                                             <!-- <option value="{{$customer->id}}">{{$customer->name}}</option> -->
-                                            <option
-                                                value="{{$customer->id}}" {{$default_customer === $customer->id  ? 'selected' : ''}}>{{$customer->name}}</option>
+                                            <option value="{{$customer->id}}" {{$default_customer === $customer->id ? 'selected' : ''}}>{{$customer->name}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -78,29 +76,28 @@
                         {{-- <div id="loading">
                             <img id="loading-image" src="{{asset('assets/images/spinner.gif')}}" />
                         </div> --}}
-                        
+
                         <div class="row" id="detail">
                             <hr>
                             <div class="table teble responsive" style="width: 100%;">
-                                <table id="cart_table" class="table nowrap table-striped table-hover"
-                                       width="100%"></table>
+                                <table id="cart_table" class="table nowrap table-striped table-hover" width="100%"></table>
                             </div>
 
                         </div>
                         <hr>
                         <input type="hidden" name="" id="is_backdate_enabled" value="{{$back_date}}">
-                        @if($back_date=="NO")
+                        @if($back_date == "NO")
                             <div class="row">
                                 <div class="col-md-4">
                                     @if($enable_discount === "YES")
                                         <div style="width: 99%">
                                             <label>Discount</label>
-                                            <input type="text" onchange="discount()" id="sale_discount"
-                                                   class="form-control"
-                                                   value="0.00"/>
+                                            <input type="text" onchange="discount()" id="sale_discount" class="form-control"
+                                                value="0.00" />
                                             <span class="help-inline">
-                                          <div class="text text-danger" style="display: none;" id="discount_error">Invalid Discount</div>
-                                           </span>
+                                                <div class="text text-danger" style="display: none;" id="discount_error">Invalid
+                                                    Discount</div>
+                                            </span>
                                         </div>
                                     @endif
                                 </div>
@@ -112,26 +109,23 @@
                                     <div class="row">
                                         <label class="col-md-6 col-form-label text-md-right"><b>Sub Total:</b></label>
                                         <div class="col-md-6" style="display: flex; justify-content: flex-end">
-                                            <input type="text" id="sub_total"
-                                                   class="form-control-plaintext text-md-right"
-                                                   readonly value="0.00"/>
+                                            <input type="text" id="sub_total" class="form-control-plaintext text-md-right"
+                                                readonly value="0.00" />
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <label
-                                            class="col-md-6 col-form-label text-md-right"><b>VAT:</b></label>
+                                        <label class="col-md-6 col-form-label text-md-right"><b>VAT:</b></label>
                                         <div class="col-md-6" style="display: flex; justify-content: flex-end">
-                                            <input type="text" id="total_vat"
-                                                   class="form-control-plaintext text-md-right"
-                                                   readonly value="0.00"/>
+                                            <input type="text" id="total_vat" class="form-control-plaintext text-md-right"
+                                                readonly value="0.00" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <label class="col-md-6 col-form-label text-md-right"><b>Total
                                                 Amount:</b></label>
                                         <div class="col-md-6" style="display: flex; justify-content: flex-end">
-                                            <input type="text" id="total" class="form-control-plaintext text-md-right"
-                                                   readonly value="0.00"/>
+                                            <input type="text" id="total" class="form-control-plaintext text-md-right" readonly
+                                                value="0.00" />
 
                                         </div>
                                     </div>
@@ -147,47 +141,43 @@
                                     <div style="width: 99%">
                                         <label>Sales Date<font color="red">*</font></label>
                                         <input type="text" name="sale_date" class="form-control" id="cash_sale_date"
-                                               autocomplete="off" required="true">
+                                            autocomplete="off" required="true">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     @if($enable_discount === "YES")
                                         <div style="width: 99%">
                                             <label>Discount</label>
-                                            <input type="text" onchange="discount()" id="sale_discount"
-                                                   class="form-control"
-                                                   value="0.00"/>
+                                            <input type="text" onchange="discount()" id="sale_discount" class="form-control"
+                                                value="0.00" />
                                         </div>
                                         <span class="help-inline">
-                                                        <div class="text text-danger" style="display: none;"
-                                                             id="discount_error">Invalid Discount</div>
-                                                    </span>
+                                            <div class="text text-danger" style="display: none;" id="discount_error">Invalid
+                                                Discount</div>
+                                        </span>
                                     @endif
                                 </div>
                                 <div class="col-md-4">
                                     <div class="row">
                                         <label class="col-md-6 col-form-label text-md-right"><b>Sub Total:</b></label>
                                         <div class="col-md-6" style="display: flex; justify-content: flex-end">
-                                            <input type="text" id="sub_total"
-                                                   class="form-control-plaintext text-md-right"
-                                                   readonly value="0.00"/>
+                                            <input type="text" id="sub_total" class="form-control-plaintext text-md-right"
+                                                readonly value="0.00" />
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <label
-                                            class="col-md-6 col-form-label text-md-right"><b>VAT:</b></label>
+                                        <label class="col-md-6 col-form-label text-md-right"><b>VAT:</b></label>
                                         <div class="col-md-6" style="display: flex; justify-content: flex-end">
-                                            <input type="text" id="total_vat"
-                                                   class="form-control-plaintext text-md-right"
-                                                   readonly value="0.00"/>
+                                            <input type="text" id="total_vat" class="form-control-plaintext text-md-right"
+                                                readonly value="0.00" />
                                         </div>
                                     </div>
                                     <div class="row">
                                         <label class="col-md-6 col-form-label text-md-right"><b>Total
                                                 Amount:</b></label>
                                         <div class="col-md-6" style="display: flex; justify-content: flex-end">
-                                            <input type="text" id="total" class="form-control-plaintext text-md-right"
-                                                   readonly value="0.00"/>
+                                            <input type="text" id="total" class="form-control-plaintext text-md-right" readonly
+                                                value="0.00" />
 
                                         </div>
                                     </div>
@@ -212,13 +202,13 @@
                                     <div style="width: 99%">
                                         <label><b>Paid</b></label>
                                         <input type="text" onchange="discount()" id="sale_paid" class="form-control"
-                                               value="0.00"/>
+                                            value="0.00" />
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div style="width: 99%">
                                         <label><b>Change</b></label>
-                                        <input type="text" id="change_amount" class="form-control" value="0.00" readonly/>
+                                        <input type="text" id="change_amount" class="form-control" value="0.00" readonly />
                                     </div>
                                 </div>
                             </div>
@@ -245,12 +235,12 @@
         </div>
     </div>
 
-@include('sales.customers.create')
+    @include('sales.customers.create')
 @endsection
 @push("page_scripts")
     @include('partials.notification')
     <script type="text/javascript">
-        
+
         // Connect to QZ Tray when page loads
         // qz.websocket.connect().then(function() {
         //     console.log("Connected to QZ Tray");
@@ -280,6 +270,5 @@
     <script src="{{asset('assets/apotek/js/customer.js') }}"></script>
     <script src="{{asset('assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js')}}"></script>
     <script src="{{asset('assets/js/pages/ac-datepicker.js')}}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qz-tray/2.1.0/qz-tray.js"></script>
 
 @endpush

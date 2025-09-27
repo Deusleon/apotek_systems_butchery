@@ -310,7 +310,7 @@ class SaleController extends Controller
                 ->where('inv_current_stock.store_id', $default_store_id)
                 ->where(function ($query) use ($request) {
                     $query->where('inv_products.name', 'LIKE', "%{$request->word}%")
-                        ->orWhere('inv_products.barcode', 'LIKE', "%{$request->word}%")
+                        ->orWhere('inv_products.barcode',$request->word)
                         ->orWhere('inv_products.brand', 'LIKE', "%{$request->word}%")
                         ->orWhere('inv_products.pack_size', 'LIKE', "%{$request->word}%")
                         ->orWhere('inv_products.sales_uom', 'LIKE', "%{$request->word}%");
@@ -363,7 +363,7 @@ class SaleController extends Controller
             }
 
             return response()->json([
-                "message" => "Select Product",
+                "message" => "Product Selected",
                 "data"    => $output
             ]);
         }

@@ -139,11 +139,15 @@ var credit_payment_table = $("#credit_payment_table").DataTable({
                 return formatMoney(balance);
             },
         },
-        ...(typeof canAddCreditPayment !== 'undefined' && canAddCreditPayment ? [{
-            data: "action",
-            defaultContent:
-                "<button type='button' id='pay_btn' class='btn btn-sm btn-rounded btn-primary'>Pay</button>",
-        }] : []),
+        ...(typeof canAddCreditPayment !== "undefined" && canAddCreditPayment
+            ? [
+                  {
+                      data: "action",
+                      defaultContent:
+                          "<button type='button' id='pay_btn' class='btn btn-sm btn-rounded btn-primary'>Pay</button>",
+                  },
+              ]
+            : []),
     ],
     aaSorting: [[2, "desc"]],
 });
@@ -163,6 +167,9 @@ $("#products").on("change", function (e) {
 
     if (customer_id !== "") {
         valueCollection();
+        setTimeout(function () {
+            $("#credit_barcode_input").focus();
+        }, 30);
     } else {
         notify("Select Customer First", "top", "right", "warning");
 
@@ -172,8 +179,200 @@ $("#products").on("change", function (e) {
     }
 });
 
+$('#products').on('select2:close', function () {
+  $('#credit_barcode_input').focus();
+});
+
+$("#credit_barcode_input").on("keypress", function (e) {
+    if (e.which === 13) {
+        e.preventDefault();
+        let barcode = $(this).val().trim();
+        // console.log("Barcode", barcode);
+        if (barcode !== "") {
+            fetchProductByBarcode(barcode);
+            $(this).val("");
+        }
+    }
+});
+
+function fetchProductByBarcode(barcode) {
+    var price_category = $("#price_category").val();
+
+    $.ajax({
+        url: config.routes.filterProductByWord,
+        method: "GET",
+        data: {
+            word: barcode,
+            price_category_id: price_category,
+        },
+        dataType: "json",
+        success: function (res) {
+            // console.log("Res Data:", res);
+
+            // ensure array + at least one result
+            if (res && Array.isArray(res.data) && res.data.length > 0) {
+                const prod = res.data[0];
+
+                // Build normalized product object expected by addProductToCart
+                const product = {
+                    id: prod.id,
+                    // server returns a combined name string already from your controller
+                    name: prod.name || prod.product_name || "",
+                    // ensure price is number
+                    price: Number(prod.price) || parseFloat(prod.price) || 0,
+                    // quantity field from server might be "quantity" (sum) or "stock_qty"
+                    quantity:
+                        Number(prod.quantity) || Number(prod.stock_qty) || 0,
+                    stock_qty:
+                        Number(prod.quantity) || Number(prod.stock_qty) || 0,
+                    // optional
+                    type: prod.type || "",
+                };
+
+                // For credit sales require customer selected
+                let customer_id = $("#customer_id").val();
+                if (!customer_id || customer_id === "") {
+                    notify("Select Customer First", "top", "right", "warning");
+                    return;
+                }
+
+                addProductToCart(product);
+            } else {
+                notify("Product not found", "top", "right", "danger");
+            }
+        },
+        error: function (err) {
+            console.error("Error fetching product by barcode", err);
+            notify("Error fetching product", "top", "right", "danger");
+        },
+    });
+}
+
+function addProductToCart(product) {
+    // console.log("Item Receive", product);
+
+    // Normalize numeric fields
+    const priceNum = Number(product.price) || 0;
+    const stockQty = Number(product.quantity || product.stock_qty || 0);
+    const vatUnit = Number((priceNum * tax).toFixed(2));
+    const unitTotal = Number(priceNum + vatUnit);
+
+    // Find existing product in cart by productId (index 6)
+    let idx = cart.findIndex((r) => String(r[6]) == String(product.id));
+
+    if (idx !== -1) {
+        // Existing row -> increment quantity numerically and recalc totals
+        let row = cart[idx];
+
+        // Normalize existing qty to number (strip commas and any "< Max" HTML)
+        let existingQtyRaw = String(row[1] || "0").split("<")[0];
+        // let existingPriceRaw = String(row[2] || "0").split("<")[0];
+        let existingVatRaw = String(row[2] || "0").split("<")[0];
+        let existingPriceRaw = String(row[2] || "0").split("<")[0];
+        let existingQty = Number(existingQtyRaw.replace(/\,/g, "")) || 0;
+        let existingPrice = Number(existingPriceRaw.replace(/\,/g, "")) || 0;
+        let newVat = Number((existingPrice * tax).toFixed(2)) || 0;
+        let newTotal = Number(existingPrice + newVat);
+
+        // Incoming increment (scanner adds 1 each time)
+        let incomingQty = 1;
+
+        let newQty = existingQty + incomingQty;
+
+        // Check stock limit (if not quotes page)
+        if (!$("#quotes_page").length && stockQty && newQty > stockQty) {
+            // set to max and show Max label
+            row[1] =
+                numberWithCommas(stockQty) +
+                " <span class='text text-danger'>Max</span>";
+            // use stockQty for calculations
+            row[2] = formatMoney(existingPrice);
+            row[3] = formatMoney(newVat * stockQty);
+            row[4] = formatMoney(newTotal * stockQty);
+        } else {
+            row[1] = numberWithCommas(newQty);
+            row[2] = formatMoney(existingPrice);
+            row[3] = formatMoney(newVat * newQty);
+            row[4] = formatMoney(newTotal * newQty);
+        }
+
+        row[5] = stockQty;
+        row[6] = product.id;
+        row[7] = product.type || "";
+
+        // Move to top
+        cart.splice(idx, 1);
+        cart.unshift(row);
+
+        // Keep default_cart in sync (move matching entry to top if exists)
+        if (default_cart && default_cart.length && default_cart[idx]) {
+            const dc = default_cart.splice(idx, 1)[0];
+            default_cart.unshift(dc);
+        }
+    } else {
+        // New item: create array-format row to match existing code
+        var item = [
+            product.name,
+            1,
+            formatMoney(priceNum),
+            formatMoney(vatUnit),
+            formatMoney(unitTotal),
+            stockQty,
+            product.id,
+            product.type || "",
+        ];
+
+        var cart_data = [
+            formatMoney(priceNum),
+            formatMoney(vatUnit),
+            formatMoney(unitTotal),
+        ];
+
+        default_cart.unshift(cart_data);
+        cart.unshift(item);
+    }
+
+    // Recalculate totals (uses your discount() which expects array-based cart)
+    if (typeof discount === "function") {
+        discount();
+    } else {
+        // minimal fallback (shouldn't be needed if discount exists)
+        cart_table.clear();
+        cart_table.rows.add(cart);
+        cart_table.draw();
+    }
+
+    // redraw UI
+    cart_table.clear();
+    cart_table.rows.add(cart);
+    cart_table.draw();
+}
+
 $("#customer_id").on("change", function () {
     discount();
+    setTimeout(function () {
+        $("#credit_barcode_input").focus();
+    }, 30);
+});
+
+$("#credit_sale_date").on("blur", function(){
+        $("#credit_barcode_input").focus();
+})
+
+$("#sale_discount").on("blur", function () {
+    $("#credit_barcode_input").focus();
+});
+
+$("#sale_paid").on("blur", function () {
+    $("#credit_barcode_input").focus();
+});
+
+$("#grace_period").on("blur", function () {
+    $("#credit_barcode_input").focus();
+});
+
+$("#remark").on("blur", function () {
+    $("#credit_barcode_input").focus();
 });
 
 $("#cart_table tbody").on("click", "#edit_btn", function () {
@@ -328,6 +527,9 @@ $("#cart_table tbody").on("change", "#edit_quantity", function () {
 
     cart[index] = row_data;
     discount();
+    setTimeout(function () {
+        $("#credit_barcode_input").focus();
+    }, 30);
 });
 
 if (fixed_price === "NO") {
@@ -426,6 +628,9 @@ if (fixed_price === "NO") {
 
         cart[index] = row_data;
         discount();
+        setTimeout(function () {
+            $("#credit_barcode_input").focus();
+        }, 150);
     });
 }
 
@@ -437,6 +642,9 @@ $("#cart_table tbody").on("click", "#delete_btn", function () {
     cart.splice(index, 1);
     default_cart.splice(index, 1);
     discount();
+    setTimeout(function () {
+        $("#credit_barcode_input").focus();
+    }, 30);
 });
 
 $("#deselect-all").on("click", function () {
@@ -454,7 +662,7 @@ $("#deselect-all").on("click", function () {
     }
 
     setTimeout(function () {
-        $('input[name="input_products_b"]').focus();
+        $("#credit_barcode_input").focus();
     }, 30);
 });
 
@@ -473,7 +681,7 @@ $("#deselect-all-credit-sale").on("click", function () {
     }
 
     setTimeout(function () {
-        $('input[name="input_products_b"]').focus();
+        $("#credit_barcode_input").focus();
     }, 30);
 });
 
@@ -492,7 +700,7 @@ $("#deselect-all-quote").on("click", function () {
     }
 
     setTimeout(function () {
-        $('input[name="input_products_b"]').focus();
+        $("#credit_barcode_input").focus();
     }, 30);
 });
 
@@ -724,10 +932,10 @@ function deselect() {
     if (discount_enable === "YES") {
         document.getElementById("sale_discount").value = 0.0;
     }
-    document.getElementById('grace_period').value = "";
-    var backDate = document.getElementById('cash_sale_date');
+    document.getElementById("grace_period").value = "";
+    var backDate = document.getElementById("cash_sale_date");
     if (backDate) {
-        backDate.value = '';
+        backDate.value = "";
     }
     document.getElementById("sub_total").value = 0.0;
     document.getElementById("total_vat").value = 0.0;
@@ -1028,7 +1236,7 @@ function valueCollection() {
     let idx = cart.findIndex((r) => r[6] == productID);
 
     if (idx !== -1) {
-        var price =  parseFloat(cart[idx][2].replace(/,/g, ''));
+        var price = parseFloat(cart[idx][2].replace(/,/g, ""));
         // Unit calcs
         var vatUnit = Number((price * tax).toFixed(2));
         var unitTotal = Number(price + vatUnit);
@@ -1041,8 +1249,9 @@ function valueCollection() {
 
         let newQty = rawQty + 1;
         if (newQty > available_quantity) {
-            row[1] = numberWithCommas(rawQty) +
-            "<span class='text text-danger'> Max</span>";
+            row[1] =
+                numberWithCommas(rawQty) +
+                "<span class='text text-danger'> Max</span>";
         } else {
             row[1] = numberWithCommas(newQty);
         }
@@ -1068,13 +1277,13 @@ function valueCollection() {
         var unitTotal = Number(price + vatUnit);
         var item = [
             name,
-            1, 
-            formatMoney(price), 
-            formatMoney(vatUnit), 
-            formatMoney(unitTotal), 
-            available_quantity, 
+            1,
+            formatMoney(price),
+            formatMoney(vatUnit),
+            formatMoney(unitTotal),
+            available_quantity,
             productID,
-            "", 
+            "",
         ];
         cart.unshift(item);
 
@@ -1109,7 +1318,7 @@ $("#add-customer").click(function () {
 // if ($("#can_pay").length) {
 //     credit_payment_table.column(6).visible(true);
 // } else {
-    // credit_payment_table.column(6).visible(false);
+// credit_payment_table.column(6).visible(false);
 // }
 
 function getCredits() {
@@ -1271,7 +1480,7 @@ $("#credit_sales_form").on("submit", function (e) {
         notify("Credit Sales list empty", "top", "right", "warning");
         return false;
     }
-    
+
     if (is_backdate_enabled === "YES") {
         if (saleDate === "" || saleDate == null) {
             notify("Sales date is required", "top", "right", "warning");

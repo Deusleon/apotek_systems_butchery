@@ -32,6 +32,7 @@ $("#price_category").change(function () {
                         );
                     });
                     $("#products").trigger("change");
+                    $("#quote_barcode_input").focus();
                 }
             },
         });
@@ -40,7 +41,189 @@ $("#price_category").change(function () {
 
 $(document).ready(function () {
     fetchProducts();
+    $("#quote_barcode_input").focus();
 });
+
+$("#sale_discount").on("blur", function () {
+    $("#quote_barcode_input").focus();
+});
+
+
+$("#quote_barcode_input").on("keypress", function (e) {
+    if (e.which === 13) {
+        e.preventDefault();
+        let barcode = $(this).val().trim();
+        // console.log("Barcode", barcode);
+        if (barcode !== "") {
+            fetchProductByBarcode(barcode);
+            $(this).val("");
+        }
+    }
+});
+
+function fetchProductByBarcode(barcode) {
+    var price_category = $("#price_category").val();
+    // var customer_id = $("#customer_id").val();
+
+    $.ajax({
+        url: config.routes.filterProductByWord,
+        method: "GET",
+        data: {
+            word: barcode,
+            price_category_id: price_category,
+            // customer_id: customer_id,
+        },
+        dataType: "json",
+        success: function (res) {
+            // console.log("Res Data:", res);
+            if (res && Array.isArray(res.data) && res.data.length > 0) {
+                var id = res.data[0].id;
+                var price = res.data[0].price;
+                var qty = 1;
+                var quoteId = document.getElementById("quoted_id").value;
+                handleProductChange(id, price, qty, quoteId);
+            } else {
+                notify("Product not found", "top", "right", "danger");
+            }
+        },
+        error: function (err) {
+            console.error("Error fetching product by barcode", err);
+            notify("Error fetching product", "top", "right", "danger");
+        },
+    });
+}
+// ===== addProductToCartScan =====
+function addProductToCartScan(product) {
+    console.log("Item Receive", product);
+
+    // Normalize numeric fields
+    const priceNum = Number(product.price) || 0;
+    const stockQty = Number(product.quantity || product.stock_qty || 0);
+    const vatUnit = Number((priceNum * tax).toFixed(2));
+    const unitTotal = Number(priceNum + vatUnit);
+
+    // Find existing product in cart by productId (index 6)
+    let idx = cart.findIndex((r) => String(r[6]) == String(product.id));
+
+    if (idx !== -1) {
+        // Existing row -> increment quantity numerically and recalc totals
+        let row = cart[idx];
+
+        // Normalize existing qty to number (strip commas and any "< Max" HTML)
+        let existingQtyRaw = String(row[1] || "0").split("<")[0];
+        let existingQty = Number(existingQtyRaw.replace(/\,/g, "")) || 0;
+
+        // Incoming increment (scanner adds 1 each time)
+        let incomingQty = 1;
+
+        let newQty = existingQty + incomingQty;
+
+        // Check stock limit (if not quotes page)
+        if (!$("#quotes_page").length && stockQty && newQty > stockQty) {
+            // set to max and show Max label
+            row[1] =
+                numberWithCommas(stockQty) +
+                " <span class='text text-danger'>Max</span>";
+            // use stockQty for calculations
+            row[2] = formatMoney(priceNum);
+            row[3] = formatMoney(vatUnit * stockQty);
+            row[4] = formatMoney(unitTotal * stockQty);
+        } else {
+            row[1] = numberWithCommas(newQty);
+            row[2] = formatMoney(priceNum);
+            row[3] = formatMoney(vatUnit * newQty);
+            row[4] = formatMoney(unitTotal * newQty);
+        }
+
+        row[5] = stockQty;
+        row[6] = product.id;
+        row[7] = product.type || "";
+
+        // Move to top
+        cart.splice(idx, 1);
+        cart.unshift(row);
+
+        // Keep default_cart in sync (move matching entry to top if exists)
+        if (default_cart && default_cart.length && default_cart[idx]) {
+            const dc = default_cart.splice(idx, 1)[0];
+            default_cart.unshift(dc);
+        }
+    } else {
+        // New item: create array-format row to match existing code
+        var item = [
+            product.name,
+            1,
+            formatMoney(priceNum),
+            formatMoney(vatUnit),
+            formatMoney(unitTotal),
+            stockQty,
+            product.id,
+            product.type || "",
+        ];
+
+        var cart_data = [
+            formatMoney(priceNum),
+            formatMoney(vatUnit),
+            formatMoney(unitTotal),
+        ];
+
+        default_cart.unshift(cart_data);
+        cart.unshift(item);
+    }
+
+    // Recalculate totals (uses your discount() which expects array-based cart)
+    if (typeof discount === "function") {
+        discount();
+    } else {
+        // minimal fallback (shouldn't be needed if discount exists)
+        cart_table.clear();
+        cart_table.rows.add(cart);
+        cart_table.draw();
+    }
+
+    // redraw UI
+    cart_table.clear();
+    cart_table.rows.add(cart);
+    cart_table.draw();
+}
+function handleProductChange(id, price, qty, quoteId) {
+    if (id && id !== "") {
+        $.ajax({
+            url: config.routes.addQuoteItem,
+            method: "POST",
+            data: {
+                _token: config.token,
+                product_id: id,
+                price: price,
+                quantity: qty,
+                quote_id: quoteId,
+            },
+            success: function (response) {
+                fetchProducts();
+                refreshSalesTable(response.data);
+                isCartEmpty(response.data.sales_details.length);
+
+                // update totals
+                $("#sub_total").val(
+                    formatNumber(Number(response.data.sub_total), 2)
+                );
+                $("#total_vat").val(formatNumber(Number(response.data.vat), 2));
+                $("#total").val(formatNumber(Number(response.data.total), 2));
+
+                // optional notify
+                // notify(response.message, "top", "right", "success");
+            },
+            error: function () {
+                notify("Failed", "top", "right", "danger");
+            },
+        });
+    }
+
+    // always return focus back
+    setTimeout(function () {
+        $("#quote_barcode_input").focus();
+    }, 150);
+}
 
 $("#products").on("change", function () {
     var id = $(this).val();
@@ -82,6 +265,7 @@ $("#products").on("change", function () {
             },
         });
     }
+    $("#quote_barcode_input").focus();
 });
 
 $("#customer_id").on("change", function () {
@@ -98,6 +282,7 @@ $("#customer_id").on("change", function () {
             },
             success: function (response) {
                 fetchProducts();
+                $("#quote_barcode_input").focus();
                 // console.log("response", response);
             },
             error: function (xhr) {
@@ -154,6 +339,7 @@ $("#price_category").on("change", function () {
                         );
                     });
                     $("#products").trigger("change");
+                    $("#quote_barcode_input").focus();
                 }
             },
             error: function () {
@@ -163,13 +349,15 @@ $("#price_category").on("change", function () {
     }
 });
 
-function newDiscount(val){
-    var currentTotal = document.getElementById('total').value;
-    var sub_total = document.getElementById('sub_total').value;
-    var vat = document.getElementById('total_vat').value;
-    var newTotal = Number(unformatNumber(sub_total)-unformatNumber(val))+Number(unformatNumber(vat))
-    // console.log('NewDisc', currentTotal, sub_total, vat);
-    document.getElementById('total').value = formatNumber(newTotal, 2);
+function newDiscount(val) {
+    var currentTotal = document.getElementById("total").value;
+    var sub_total = document.getElementById("sub_total").value;
+    var vat = document.getElementById("total_vat").value;
+    var newTotal =
+        Number(unformatNumber(sub_total) - unformatNumber(val)) +
+        Number(unformatNumber(vat));
+    document.getElementById("total").value = formatNumber(newTotal, 2);
+    $("#quote_barcode_input").focus();
 }
 
 function fetchProducts() {
@@ -202,6 +390,7 @@ function fetchProducts() {
                         );
                     });
                     $("#products").trigger("change");
+                    $("#quote_barcode_input").focus();
                 }
             },
         });
@@ -215,7 +404,9 @@ function refreshSalesTable(data) {
     data.sales_details.forEach(function (item) {
         var row = `
         <tr data-id="${item.id}">
-            <td>${item.name} ${item.brand ? item.brand+' ' : ''} ${item.pack_size} ${item.sales_uom}</td>
+            <td>${item.name} ${item.brand ? item.brand + " " : ""} ${
+            item.pack_size
+        } ${item.sales_uom}</td>
             <td class="quantity">${formatNumber(item.quantity, 0)}</td>
             <td class="price">${formatNumber(item.price, 0)}</td>
             <td>${formatNumber(item.vat, 0)}</td>
@@ -231,7 +422,10 @@ function refreshSalesTable(data) {
         `;
         tbody.append(row);
     });
-    document.getElementById("sale_discount").value = formatNumber(Number(data.discount),2);
+    document.getElementById("sale_discount").value = formatNumber(
+        Number(data.discount),
+        2
+    );
     document.getElementById("sub_total").value = formatNumber(
         Number(data.sub_total),
         2
@@ -240,9 +434,12 @@ function refreshSalesTable(data) {
         Number(data.vat),
         2
     );
-    document.getElementById("total").value = formatNumber(Number(data.total),
+    document.getElementById("total").value = formatNumber(
+        Number(data.total),
         2
     );
+
+    $("#quote_barcode_input").focus();
 }
 
 function isCartEmpty(value) {
@@ -252,4 +449,5 @@ function isCartEmpty(value) {
     } else {
         priceSelect.disabled = false;
     }
+    $("#quote_barcode_input").focus();
 }

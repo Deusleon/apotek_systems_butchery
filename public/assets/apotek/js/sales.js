@@ -187,13 +187,37 @@ function val() {
     default_cart.push(cart_data);
     cart.unshift(item);
     discount();
+    $("#barcode_input").focus();
     cart_table.clear();
     cart_table.rows.add(cart);
     cart_table.draw();
 }
 
-$("#customer").on("change", function () {
+$("#customer_id").on("change", function () {
     discount();
+    setTimeout(function () {
+        $("#barcode_input").focus();
+    }, 30);
+});
+
+$("#customer_id").on("blur", function () {
+    setTimeout(function () {
+        $("#barcode_input").focus();
+    }, 30);
+});
+
+$("#products").on("select2:select", function () {
+    setTimeout(function () {
+        $("#barcode_input").focus();
+    }, 100);
+});
+
+$("#cash_sale_date").on("blur", function () {
+    $("#barcode_input").focus();
+});
+
+$("#sale_discount").on("blur", function () {
+    $("#barcode_input").focus();
 });
 
 $("#cart_table tbody").on("click", "#edit_btn", function () {
@@ -350,6 +374,7 @@ $("#cart_table tbody").on("change", "#edit_quantity", function () {
 
     cart[index] = row_data;
     discount();
+    $("#barcode_input").focus();
 });
 
 if (fixed_price === "NO") {
@@ -448,6 +473,7 @@ if (fixed_price === "NO") {
 
         cart[index] = row_data;
         discount();
+        $("#barcode_input").focus();
     });
 }
 
@@ -459,6 +485,7 @@ $("#cart_table tbody").on("click", "#delete_btn", function () {
     cart.splice(index, 1);
     default_cart.splice(index, 1);
     discount();
+    $("#barcode_input").focus();
 });
 
 $("#deselect-all").on("click", function () {
@@ -475,9 +502,7 @@ $("#deselect-all").on("click", function () {
         }
     }
 
-    setTimeout(function () {
-        $('input[name="input_products_b"]').focus();
-    }, 30);
+    $("#barcode_input").focus();
 });
 
 $("#deselect-all-credit-sale").on("click", function () {
@@ -494,9 +519,7 @@ $("#deselect-all-credit-sale").on("click", function () {
         }
     }
 
-    setTimeout(function () {
-        $('input[name="input_products_b"]').focus();
-    }, 30);
+    $("#barcode_input").focus();
 });
 
 $("#deselect-all-quote").on("click", function () {
@@ -513,9 +536,7 @@ $("#deselect-all-quote").on("click", function () {
         }
     }
 
-    setTimeout(function () {
-        $('input[name="input_products_b"]').focus();
-    }, 30);
+    $("#barcode_input").focus();
 });
 
 function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
@@ -562,18 +583,59 @@ function discount() {
             } else {
                 p = parseFloat(reducedCart[value[6]][2].replace(/\,/g, ""), 10);
 
-                reducedCart[value[6]][1] = reducedCart[value[6]][1].toString();
+                // --- Normalize existing qty to a number (remove commas and any "<Max" html)
+                let existingQtyRaw = String(
+                    reducedCart[value[6]][1] || "0"
+                ).split("<")[0];
+                let existingQty =
+                    Number(existingQtyRaw.replace(/\,/g, "")) || 0;
 
-                reducedCart[value[6]][1] = reducedCart[value[6]][1].split("<");
+                // --- Normalize incoming qty to a number as well
+                let incomingQtyRaw = String(value[1] || "0").split("<")[0];
+                let incomingQty =
+                    Number(incomingQtyRaw.replace(/\,/g, "")) || 0;
 
-                reducedCart[value[6]][1] = Number(
-                    reducedCart[value[6]][1][0].toString().replace(",", "")
-                );
-
-                if (typeof reducedCart[value[6]][1] != "number") {
-                    reducedCart[value[6]][1] = reducedCart[value[6]][5]; //avoid Max string
+                // If normalization failed (not a number), fallback to available stock
+                if (!isFinite(existingQty)) {
+                    existingQty = Number(reducedCart[value[6]][5]) || 0;
                 }
-                reducedCart[value[6]][1] += value[1];
+                if (!isFinite(incomingQty)) {
+                    incomingQty = 0;
+                }
+
+                // Sum quantities (numeric addition, no string concat)
+                let newQty = existingQty + incomingQty;
+
+                // Now set newQty and recompute price/vat/amount using p (unit price)
+                if ($("#quotes_page").length) {
+                    // Quotes: no max
+                    reducedCart[value[6]][2] = formatMoney(p);
+                    reducedCart[value[6]][3] = formatMoney(p * newQty * tax);
+                    reducedCart[value[6]][4] = formatMoney(
+                        p * newQty * (1 + tax)
+                    );
+                    reducedCart[value[6]][1] = numberWithCommas(newQty);
+                } else if (newQty > reducedCart[value[6]][5]) {
+                    // exceed available stock
+                    reducedCart[value[6]][1] =
+                        numberWithCommas(reducedCart[value[6]][5]) +
+                        " <span class='text text-danger'>Max</span>";
+                    reducedCart[value[6]][2] = formatMoney(p);
+                    reducedCart[value[6]][3] = formatMoney(
+                        p * reducedCart[value[6]][5] * tax
+                    );
+                    reducedCart[value[6]][4] = formatMoney(
+                        p * reducedCart[value[6]][5] * (1 + tax)
+                    );
+                } else {
+                    reducedCart[value[6]][1] = numberWithCommas(newQty);
+                    reducedCart[value[6]][2] = formatMoney(p);
+                    reducedCart[value[6]][3] = formatMoney(p * newQty * tax);
+                    reducedCart[value[6]][4] = formatMoney(
+                        p * newQty * (1 + tax)
+                    );
+                }
+
                 dif = reducedCart[value[6]][5] - reducedCart[value[6]][1];
                 if ($("#quotes_page").length) {
                     //Qoutes has no maximum quantity
@@ -733,7 +795,7 @@ function discount() {
         parseFloat(t.replace(/\,/g, ""), 10) -
             parseFloat(st.replace(/\,/g, ""), 10)
     );
-
+    $("#barcode_input").focus();
     cart_table.clear();
     cart_table.rows.add(cart);
     cart_table.draw();
@@ -761,11 +823,10 @@ function deselect() {
     order_cart = [];
     default_cart = [];
     discount();
+    $("#barcode_input").focus();
 }
 
 function deselect1() {
-    // document.getElementById("credit_sales_form").reset();
-    // $('#price_category').val('').change();
     $("#customer").val("").change();
     try {
         document.getElementById("sale_paid").value = 0;
@@ -780,6 +841,7 @@ function deselect1() {
     order_cart = [];
     default_cart = [];
     discount();
+    $("#barcode_input").focus();
 }
 
 function deselectQuote() {
@@ -793,6 +855,7 @@ function deselectQuote() {
     order_cart = [];
     default_cart = [];
     discount();
+    $("#barcode_input").focus();
 }
 
 function saleReturn(items, sale_id) {
@@ -970,6 +1033,7 @@ $("#products").on("change", function (event) {
 
     if (customer_id !== "") {
         valueCollection();
+        $("#barcode_input").focus();
     } else {
         notify("Select Customer First", "top", "right", "warning");
 
@@ -978,6 +1042,141 @@ $("#products").on("change", function (event) {
         });
     }
 });
+
+$("#barcode_input").on("keypress", function (e) {
+    if (e.which === 13) {
+        e.preventDefault();
+        let barcode = $(this).val().trim();
+        // console.log("Barcode", barcode);
+        if (barcode !== "") {
+            fetchProductByBarcode(barcode);
+            $(this).val(""); // clear input after scan
+        }
+    }
+});
+
+function fetchProductByBarcode(barcode) {
+    var price_category = $("#price_category").val();
+    $.ajax({
+        url: config.routes.filterProductByWord,
+        method: "GET",
+        data: {
+            word: barcode,
+            price_category_id: price_category,
+        },
+        success: function (res) {
+            // console.log("Res Data:", res);
+            if (res && res.data) {
+                addProductToCart(res.data[0]);
+            } else {
+                notify("Product not found", "top", "right", "danger");
+            }
+        },
+        error: function () {
+            notify("Error fetching product", "top", "right", "danger");
+        },
+    });
+}
+
+function addProductToCart(product) {
+    // console.log("Item Receive", product);
+
+    // Normalize numeric fields
+    const priceNum = Number(product.price) || 0;
+    const stockQty = Number(product.quantity || product.stock_qty || 0);
+    const vatUnit = Number((priceNum * tax).toFixed(2));
+    const unitTotal = Number(priceNum + vatUnit);
+
+    // Find existing product in cart by productId (index 6)
+    let idx = cart.findIndex((r) => String(r[6]) == String(product.id));
+
+    if (idx !== -1) {
+        // Existing row -> increment quantity numerically and recalc totals
+        let row = cart[idx];
+
+        // Normalize existing qty to number (strip commas and any "< Max" HTML)
+        let existingQtyRaw = String(row[1] || "0").split("<")[0];
+        // let existingPriceRaw = String(row[2] || "0").split("<")[0];
+        let existingVatRaw = String(row[2] || "0").split("<")[0];
+        let existingPriceRaw = String(row[2] || "0").split("<")[0];
+        let existingQty = Number(existingQtyRaw.replace(/\,/g, "")) || 0;
+        let existingPrice = Number(existingPriceRaw.replace(/\,/g, "")) || 0;
+        let newVat = Number((existingPrice * tax).toFixed(2)) || 0;
+        let newTotal = Number(existingPrice + newVat);
+
+        // Incoming increment (scanner adds 1 each time)
+        let incomingQty = 1;
+
+        let newQty = existingQty + incomingQty;
+
+        // Check stock limit (if not quotes page)
+        if (!$("#quotes_page").length && stockQty && newQty > stockQty) {
+            // set to max and show Max label
+            row[1] =
+                numberWithCommas(stockQty) +
+                " <span class='text text-danger'>Max</span>";
+            // use stockQty for calculations
+            row[2] = formatMoney(existingPrice);
+            row[3] = formatMoney(newVat * stockQty);
+            row[4] = formatMoney(newTotal * stockQty);
+        } else {
+            row[1] = numberWithCommas(newQty);
+            row[2] = formatMoney(existingPrice);
+            row[3] = formatMoney(newVat * newQty);
+            row[4] = formatMoney(newTotal * newQty);
+        }
+
+        row[5] = stockQty;
+        row[6] = product.id;
+        row[7] = product.type || "";
+
+        // Move to top
+        cart.splice(idx, 1);
+        cart.unshift(row);
+
+        // Keep default_cart in sync (move matching entry to top if exists)
+        if (default_cart && default_cart.length && default_cart[idx]) {
+            const dc = default_cart.splice(idx, 1)[0];
+            default_cart.unshift(dc);
+        }
+    } else {
+        // New item: create array-format row to match existing code
+        var item = [
+            product.name,
+            1,
+            formatMoney(priceNum),
+            formatMoney(vatUnit),
+            formatMoney(unitTotal),
+            stockQty,
+            product.id,
+            product.type || "",
+        ];
+
+        var cart_data = [
+            formatMoney(priceNum),
+            formatMoney(vatUnit),
+            formatMoney(unitTotal),
+        ];
+
+        default_cart.unshift(cart_data);
+        cart.unshift(item);
+    }
+
+    // Recalculate totals (uses your discount() which expects array-based cart)
+    if (typeof discount === "function") {
+        discount();
+    } else {
+        // minimal fallback (shouldn't be needed if discount exists)
+        cart_table.clear();
+        cart_table.rows.add(cart);
+        cart_table.draw();
+    }
+
+    // redraw UI
+    cart_table.clear();
+    cart_table.rows.add(cart);
+    cart_table.draw();
+}
 
 $("#price_category").change(function () {
     var id = $(this).val();
@@ -992,6 +1191,7 @@ $("#price_category").change(function () {
             dataType: "json",
             success: function (result) {
                 populateProducts(result.data || []);
+                $("#barcode_input").focus();
             },
         });
     }
@@ -1077,8 +1277,8 @@ function valueCollection() {
     }
 
     discount();
-
     $("#products").val(null).trigger("change");
+    $("#barcode_input").focus();
 }
 
 $(document).ready(function () {
@@ -1094,6 +1294,7 @@ $(document).ready(function () {
             dataType: "json",
             success: function (result) {
                 populateProducts(result.data || []);
+                $("#barcode_input").focus();
             },
         });
     }
@@ -1293,6 +1494,7 @@ $("#sales_form").on("submit", function (e) {
     $("#save_btn").attr("disabled", true);
 
     saveCashSale();
+    $("#barcode_input").focus();
 });
 
 function saveCashSale() {
@@ -1313,7 +1515,8 @@ function saveCashSale() {
             notify("Sale recorded successfully", "top", "right", "success");
             deselect();
             $("#save_btn").attr("disabled", false);
-            // $("#loading").hide();
+            $("#loading").hide();
+            $("#barcode_input").focus();
         },
         timeout: 20000,
     });

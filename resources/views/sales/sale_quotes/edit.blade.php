@@ -91,6 +91,7 @@
                                 </select>
                             </div>
                         </div>
+                        <input type="text" id="quote_barcode_input" autocomplete="off" style="position:absolute; left:-9999px;">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Products<font color="red">*</font></label>
@@ -293,6 +294,7 @@
 
                     tr.removeClass('editing');
                     $(this).text('Edit').removeClass('btn-close').addClass('btn-edit');
+                    $("#quote_barcode_input").focus();
                     return;
                 }
 
@@ -315,6 +317,7 @@
 
                 // change button label to Close
                 $(this).text('Close').removeClass('btn-edit').addClass('btn-close');
+    $("#quote_barcode_input").focus();
             });
 
             // When input loses focus (blur) update amount immediately and send AJAX
@@ -353,10 +356,12 @@
                             document.getElementById('sub_total').value = formatNumber(Number(response.data.sub_total), 2);
                             document.getElementById('total_vat').value = formatNumber(Number(response.data.vat), 2);
                             document.getElementById('total').value = formatNumber(Number(response.data.total), 2);
+    $("#quote_barcode_input").focus();
                         }
                     },
                     error: function(xhr) {
                         // notify('Update failed', 'top', 'right', 'danger');
+    $("#quote_barcode_input").focus();
                     }
                 });
             });
@@ -382,6 +387,7 @@
 
                         tr.removeClass('editing');
                         tr.find('.btn-close').text('Edit').removeClass('btn-close').addClass('btn-edit');
+    $("#quote_barcode_input").focus();
                     }
                 });
             });
@@ -422,6 +428,7 @@
                         discount: discount
                     },
                     success: function(response) {
+    $("#quote_barcode_input").focus();
                         // console.log('response', response);
                         if (response.status === 'success') {
                             notify(response.message, 'top', 'right', 'success');
@@ -432,6 +439,7 @@
                     },
                     error: function(xhr) {
                         notify('An error occured!', 'top', 'right', 'danger');
+    $("#quote_barcode_input").focus();
                     }
                 });
             })
