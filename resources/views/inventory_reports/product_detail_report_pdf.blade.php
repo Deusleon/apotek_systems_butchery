@@ -21,7 +21,8 @@
             border-collapse: collapse;
             padding: 10px;
         }
-        th{
+
+        th {
             text-align: left;
         }
 
@@ -72,40 +73,58 @@
         h4 {
             font-weight: normal;
         }
+
+        #container .logo-container {
+            padding-top: -2%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        #container .logo-container img {
+            max-width: 160px;
+            max-height: 160px;
+        }
     </style>
 
 </head>
 
 <body>
-
-
-    <div class="row" style="padding-top: -2%">
-        <h1 align="center">{{$pharmacy['name']}}</h1>
-        <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
-        <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
-        <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}</h3>
-        <h2 align="center" style="margin-top: -1%">Product Details Report</h2>
-        <h4 align="center" style="margin-top: -1%">Category: {{$data[0]['category']}}</h4>
-
-        <div class="row" style="margin-top: 8%;">
-            <div class="col-md-12">
-                <table id="table-detail" align="center">
-                    <thead>
-                        <tr style="background: #1f273b; color: white;">
-                            <th>#</th>
-                            <th>Product Name</th>
-                            {{-- <th>Category</th> --}}
-                        </tr>
-                    </thead>
-                    @foreach($data as $item)
-                        <tr>
-                            <td>{{$loop->iteration}}.</td>
-                            <td>{{$item['name'].' ' ?? ''}}{{$item['brand'].' ' ?? ''}}{{$item['pack_size'] ?? ''}}{{$item['sales_uom']}}</td>
-                            {{-- <td>{{$item['category']}}</td> --}}
-                    @endforeach
-                </table>
+    <div class="row">
+        <div id="container">
+            <div class="logo-container">
+                @if($pharmacy['logo'])
+                    <img src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
+                @endif
             </div>
         </div>
+    </div>
+    <h1 align="center">{{$pharmacy['name']}}</h1>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}</h3>
+    <h2 align="center" style="margin-top: -1%">Product Details Report</h2>
+    <h4 align="center" style="margin-top: -1%">Category: {{$data[0]['category']}}</h4>
+
+    <div class="row" style="margin-top: 8%;">
+        <div class="col-md-12">
+            <table id="table-detail" align="center">
+                <thead>
+                    <tr style="background: #1f273b; color: white;">
+                        <th>#</th>
+                        <th>Product Name</th>
+                        {{-- <th>Category</th> --}}
+                    </tr>
+                </thead>
+                @foreach($data as $item)
+                    <tr>
+                        <td>{{$loop->iteration}}.</td>
+                        <td>{{$item['name'] . ' ' ?? ''}}{{$item['brand'] . ' ' ?? ''}}{{$item['pack_size'] ?? ''}}{{$item['sales_uom']}}
+                        </td>
+                        {{-- <td>{{$item['category']}}</td> --}}
+                @endforeach
+            </table>
+        </div>
+    </div>
     </div>
 
     <script type="text/php">

@@ -18,22 +18,22 @@
                             <div class="col text-dark" id="name_edit"></div>
                         </div>
                         <div class="row mb-3 gap-3">
+                            <label class="col text-right">Barcode:</label>
+                            <div class="col text-dark" id="barcode_edit"></div>
+                        </div>
+                        <div class="row mb-3 gap-3">
                             <label class="col text-right">Brand:</label>
                             <div class="col text-dark" id="brand_show"></div>
                         </div>
                         <div class="row mb-3 gap-3">
-                            <label class="col text-right">Category:</label>
-                            <div class="col text-dark" id="category_edit"></div>
-                        </div>
-                        <div class="row mb-3 gap-3">
-                            <label class="col text-right">Barcode:</label>
-                            <div class="col text-dark" id="barcode_edit"></div>
+                            <label class="col text-right">Pack Size:</label>
+                            <div class="col text-dark" id="pack_size_show"></div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="row mb-3 gap-3">
-                            <label class="col text-right">Pack Size:</label>
-                            <div class="col text-dark" id="pack_size_show"></div>
+                            <label class="col text-right">Category:</label>
+                            <div class="col text-dark" id="category_edit"></div>
                         </div>
                         <div class="row mb-3 gap-3">
                             <label class="col text-right">Unit of Measure:</label>

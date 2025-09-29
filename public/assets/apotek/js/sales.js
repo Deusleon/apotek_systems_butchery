@@ -1293,7 +1293,7 @@ $(document).ready(function () {
             },
             dataType: "json",
             success: function (result) {
-                console.log('PRod', result);
+                // console.log('PRod', result);
                 populateProducts(result.data || []);
                 $("#barcode_input").focus();
             },
@@ -1479,18 +1479,19 @@ $("#sales_form").on("submit", function (e) {
     var is_backdate_enabled = document.getElementById(
         "is_backdate_enabled"
     ).value;
-    var saleDate = document.getElementById("cash_sale_date").value;
 
     if (cart === "" || cart === "undefined") {
         notify("Sale list empty", "top", "right", "warning");
         return false;
     }
     if (is_backdate_enabled === "YES") {
+        var saleDate = document.getElementById("cash_sale_date").value;
         if (saleDate === "" || saleDate == null) {
             notify("Sales date is required", "top", "right", "warning");
             return false;
         }
     }
+    console.log("BackDates", is_backdate_enabled);
 
     $("#save_btn").attr("disabled", true);
 

@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use PDF;
 
-class StockTransferController extends Controller
+class StockTransferController_old extends Controller
 {
 
     public function index()

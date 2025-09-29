@@ -77,7 +77,7 @@
                     </a>
                 </li>
             @endif
-            @if(auth()->user()->checkPermission('Download Inv. Count Sheet'))
+            @if(auth()->user()->checkPermission('View Inv. Count Sheet'))
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" id="count-sheet-tablist"
                         href="{{ url('inventory/inventory-count-sheet/Inventory Count Sheet') }}" role="tab"
@@ -325,7 +325,11 @@
                             .filter(item => item.store_id != null)
                             .map(item => {
                                 return {
-                                    product_name: item.product ? item.product.name + ' ' + item.product.brand + ' ' + item.product.pack_size + item.product.sales_uom : "N/A",
+                                    product_name:
+                                        (item.product ? item.product.name : "") + " " +
+                                        (item.product && item.product.brand ? item.product.brand + " " : "") +
+                                        (item.product && item.product.pack_size ? item.product.pack_size : "") +
+                                        (item.product && item.product.sales_uom ? item.product.sales_uom : ""),
                                     total_sold: item.total_sold,
                                     current_stock: item.current_stock,
                                 };
