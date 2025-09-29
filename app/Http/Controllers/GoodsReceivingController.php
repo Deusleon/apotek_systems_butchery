@@ -27,15 +27,8 @@ class GoodsReceivingController extends Controller
         $batch_setting = Setting::where('id', 110)->value('value');/*batch number setting*/
         $invoice_setting = Setting::where('id', 115)->value('value');/*invoice setting*/
 
-        /*get default store*/
-        $default_store = optional(Auth::user()->store->first())->name;
-        $stores = Store::where('name', $default_store)->first();
+        $default_store_id = $this->resolveStoreId($request ?? null);
 
-        if ($stores != null) {
-            $default_store_id = $stores->id;
-        } else {
-            $default_store_id = 1;
-        }
         $default_store_name = Store::where('id', $default_store_id)->value('name');
 
         $back_date = Setting::where('id', 114)->value('value');
@@ -67,6 +60,27 @@ class GoodsReceivingController extends Controller
     }
       
 
+        private function resolveStoreId($request = null)
+    {
+        // 1. request store (if passed directly)
+        if ($request && $request->filled('store')) {
+            return (int) $request->input('store');
+        }
+
+        // 2. current store selected in header (session)
+        if (session()->has('current_store_id') && session('current_store_id')) {
+            return (int) session('current_store_id');
+        }
+
+        // 3. user’s assigned store
+        if (!empty(Auth::user()->store_id)) {
+            return (int) Auth::user()->store_id;
+        }
+
+        // 4. fallback: first store id (never hard-code 1)
+        return (int) (Store::first()->id ?? 1);
+    }
+
 
 
     public function orderReceiving()
@@ -74,10 +88,14 @@ class GoodsReceivingController extends Controller
         $batch_setting = Setting::where('id', 110)->value('value');
         $invoice_setting = Setting::where('id', 115)->value('value');
 
-        $default_store = optional(Auth::user()->store->first())->name;
-        $store = Store::where('name', $default_store)->first();
-        $default_store_id = $store ? $store->id : 1;
+        $default_store_id = $this->resolveStoreId($request ?? null);
+
+        $default_store_id = $this->resolveStoreId($request ?? null);
+
+        // fetch the store record safely
+        $store = Store::find($default_store_id);
         $default_store_name = $store ? $store->name : 'Default Store';
+
 
         $back_date = Setting::where('id', 114)->value('value');
         $expire_date = Setting::where('id', 123)->value('value');
@@ -239,15 +257,8 @@ class GoodsReceivingController extends Controller
     public function itemReceive(Request $request)
     {
 
-        /*get default store*/
-        $default_store = optional(Auth::user()->store->first())->name;
-        $stores = Store::where('name', $default_store)->first();
+        $default_store_id = $this->resolveStoreId($request ?? null);
 
-        if ($stores != null) {
-            $default_store_id = $stores->id;
-        } else {
-            $default_store_id = 1;
-        }
 
         if ($request->ajax()) {
             // dd($request);
