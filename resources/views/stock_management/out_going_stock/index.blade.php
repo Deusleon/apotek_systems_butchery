@@ -65,7 +65,7 @@
                     </a>
                 </li>
             @endif
-            @if(auth()->user()->checkPermission('Download Inv. Count Sheet'))
+            @if(auth()->user()->checkPermission('View Inv. Count Sheet'))
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" id="count-sheet-tablist"
                         href="{{ url('inventory/inventory-count-sheet/Inventory Count Sheet') }}" role="tab"

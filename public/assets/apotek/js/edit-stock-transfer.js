@@ -144,10 +144,10 @@ function rePopulateSelect2() {
                 text:
                     detail.product.name +
                     " " +
-                    detail.brand +
+                    (detail.brand ?? '') +
                     " " +
-                    detail.pack_size +
-                    detail.sales_uom,
+                    (detail.pack_size ?? '') +
+                    (detail.sales_uom ?? ''),
             })
         );
     });
@@ -254,10 +254,10 @@ function val() {
     const item_name =
         selected_fields[0] +
         " " +
-        selected_fields[1] +
+        (selected_fields[1] ?? '') +
         " " +
-        selected_fields[2] +
-        selected_fields[3];
+        (selected_fields[2] ?? '') +
+        (selected_fields[3] ?? '');
     const QoH =
         parseFloat(String(selected_fields[4] || 0).replace(/,/g, "")) || 0;
     const product_id = Number(selected_fields[5]);
@@ -529,41 +529,14 @@ function saveStockTransfer() {
     // ensure order_cart is present and up-to-date (controller expects 'order_cart')
     formData.set("order_cart", $("#order_cart").val() || "");
 
-    // ===== DEBUG: console all FormData entries =====
     // console.groupCollapsed("Debug: FormData entries");
     for (const pair of formData.entries()) {
         const key = pair[0];
         const value = pair[1];
-
-        // If value is a File, print its name and size
-        // if (value instanceof File) {
-        //     console.log(
-        //         key + " (file):",
-        //         value.name,
-        //         "(" + value.size + " bytes)"
-        //     );
-        // } else {
-        //     console.log(key + ":", value);
-        // }
     }
-    console.groupEnd();
-
-    // Pretty-print order_cart if it's JSON
+    // console.groupEnd();
     try {
         const oc = formData.get("order_cart");
-        // if (oc) {
-        //     const parsed = JSON.parse(oc);
-        //     console.groupCollapsed("Debug: Parsed order_cart");
-        //     console.log("order_cart (as string):", oc);
-        //     if (Array.isArray(parsed)) {
-        //         console.table(parsed);
-        //     } else {
-        //         console.log(parsed);
-        //     }
-        //     console.groupEnd();
-        // } else {
-        //     console.warn("order_cart is empty or not set");
-        // }
     } catch (err) {
         console.error("Failed to parse order_cart JSON:", err);
     }
@@ -635,56 +608,6 @@ function saveStockTransfer() {
     });
 }
 
-// function saveStockTransfer() {
-//     $("#loading").show();
-//     var formData = new FormData($("#transfer")[0]);
-//     var errorMessage = false;
-//     $("#transfer_preview").attr("disabled", true);
-//     console.log("formData:", formData);
-//     $.ajax({
-//         url: config.routes.stockTransferSave,
-//         type: "POST",
-//         dataType: "json",
-//         data: formData,
-//         processData: false,
-//         contentType: false,
-//         success: function (response) {
-//             console.log("Stock transfer update response:", response);
-//             if (response.success) {
-//                 notify(
-//                     response.message || "Stock transfer updated successfully",
-//                     "top",
-//                     "right",
-//                     "success"
-//                 );
-//             } else {
-//                 notify(
-//                     response.message || "Failed to update stock transfer",
-//                     "top",
-//                     "right",
-//                     "danger"
-//                 );
-//             }
-//         },
-//         error: function (xhr, status, error) {
-//             errorMessage = true;
-//             var message = "Failed to update stock transfer!";
-//             if (xhr.responseJSON && xhr.responseJSON.message) {
-//                 message = xhr.responseJSON.message;
-//             }
-//             notify(message, "top", "right", "danger");
-//         },
-//         complete: function () {
-//             if (errorMessage === false) {
-//                 deselect();
-//             }
-//             $("#transfer_preview").attr("disabled", false);
-//             $("#loading").hide();
-//         },
-//         timeout: 20000,
-//     });
-// }
-
 function filterTransferByStore(from_id) {
     if (!from_id || from_id == 0) {
         return;
@@ -729,10 +652,10 @@ function filterTransferByStore(from_id) {
                         text:
                             detail.name +
                             " " +
-                            detail.brand +
+                            (detail.brand ?? '') +
                             " " +
-                            detail.pack_size +
-                            detail.sales_uom,
+                            (detail.pack_size ?? '') +
+                            (detail.sales_uom ?? ''),
                     })
                 );
             });

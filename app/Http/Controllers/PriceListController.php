@@ -158,7 +158,7 @@ class PriceListController extends Controller {
     }
 
     public function filteredPriceList() {
-        $store_id = Auth::user()->store_id;
+        $store_id = current_store_id();
         $stocks = DB::table( 'inv_current_stock' )
         ->join( 'inv_products', 'inv_current_stock.product_id', '=', 'inv_products.id' )
         ->join( 'sales_prices', 'inv_current_stock.id', '=', 'sales_prices.stock_id' )

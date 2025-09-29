@@ -145,10 +145,10 @@ function rePopulateSelect2() {
                 text:
                     detail.product.name +
                     " " +
-                    detail.brand +
+                    (detail.brand ?? '') +
                     " " +
-                    detail.pack_size +
-                    detail.sales_uom,
+                    (detail.pack_size ?? '') +
+                    (detail.sales_uom ?? ''),
             })
         );
     });
@@ -216,10 +216,10 @@ function val() {
     const item_name =
         selected_fields[0] +
         " " +
-        selected_fields[1] +
+        (selected_fields[1] ?? '') +
         " " +
-        selected_fields[2] +
-        selected_fields[3];
+        (selected_fields[2] ?? '') +
+        (selected_fields[3] ?? '');
     const QoH =
         parseFloat(String(selected_fields[4] || 0).replace(/,/g, "")) || 0;
     const product_id = Number(selected_fields[5]);
@@ -570,10 +570,10 @@ function filterTransferByStore(from_id) {
                         text:
                             detail.name +
                             " " +
-                            detail.brand +
+                            (detail.brand ?? '') +
                             " " +
-                            detail.pack_size +
-                            detail.sales_uom,
+                            (detail.pack_size ?? '') +
+                            (detail.sales_uom ?? ''),
                     })
                 );
             });

@@ -72,7 +72,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
-        <button type="button" id="confirmAdjustmentBtn" class="btn btn-primary btn-sm">Yes, Adjust</button>
+        <button type="button" id="confirmAdjustmentBtn" class="btn btn-primary btn-sm">Yes</button>
       </div>
     </div>
   </div>
