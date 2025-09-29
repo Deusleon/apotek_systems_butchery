@@ -24,7 +24,7 @@ class ProductController extends Controller
             abort(403, 'Access Denied');
         }
         $products = Product::all();
-        $category = Category::all();
+        $category = Category::orderBy('name', 'asc')->get();
         $sub_category = SubCategory::all();
 
 
@@ -68,7 +68,7 @@ class ProductController extends Controller
         
         $this->validate($request, [
             'name' => 'required|string|max:255|unique:inv_products,name,NULL,id,category_id,' . $request->category,
-            'barcode' => 'nullable|string|max:50',
+            'barcode' => 'nullable|string|max:50|unique:inv_products,barcode',
             'brand' => 'nullable|string|max:100',
             'pack_size' => 'nullable|string|max:50',
             'category' => 'required|exists:inv_categories,id',
@@ -113,8 +113,8 @@ class ProductController extends Controller
     {
         
         $this->validate($request, [
-            'name' => 'required|string|max:255',
-            'barcode' => 'nullable|string|max:50',
+            'name' => 'required|string|max:255',            
+            'barcode' => 'nullable|string|max:50|unique:inv_products,barcode,NULL,id',
             'brand' => 'nullable|string|max:100',
             'category' => 'required|exists:inv_categories,id',
             'sale_uom' => 'nullable|string|max:50',
@@ -286,7 +286,9 @@ class ProductController extends Controller
     public function productCategoryFilter(Request $request)
     {
         if ($request->ajax()) {
-            $sub_categories = SubCategory::where('category_id', $request->category_id)->get();
+            $sub_categories = SubCategory::where('category_id', $request->category_id)
+            ->orderBy('name', 'asc')            
+            ->get();
             return json_decode($sub_categories, true);
         }
     }
@@ -297,7 +299,7 @@ class ProductController extends Controller
 
         $this->validate($request, [
             'name' => 'required|string|max:255|unique:inv_products,name,NULL,id,category_id,' . $request->category,
-            'barcode' => 'nullable|string|max:50',
+            'barcode' => 'nullable|string|max:50|unique:inv_products,barcode',
             'brand' => 'nullable|string|max:100',
             'pack_size' => 'nullable|string|max:50',
             'category' => 'required|exists:inv_categories,id',

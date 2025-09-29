@@ -148,10 +148,10 @@ function bindStockCountData(data) {
                     product_name:
                         item.product_name +
                         " " +
-                        item.product.brand +
+                        (item.product.brand ?? '') +
                         " " +
-                        item.product.pack_size +
-                        item.product.sales_uom,
+                        (item.product.pack_size ?? '') +
+                        (item.product.sales_uom ?? ''),
                     out_mode: mv.out_mode || "",
                     out_total: mv.qty,
                     batch_number: item.batch_number || "",

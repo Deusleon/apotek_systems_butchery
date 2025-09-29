@@ -77,7 +77,7 @@
                                 <label for="saleUoM" class="col-md-4 col-form-label text-md-right">Unit</label>
                                 <div class="col-md-8">
                                     <input type="text" class="form-control" id="sale_edit" name="sale_uom"
-                                        placeholder="eg. Kg, mls" value="{{ old('sale_uom') }}">
+                                        placeholder="e.g. pcs, kg, ml" value="{{ old('sale_uom') }}">
                                 </div>
                             </div>
 

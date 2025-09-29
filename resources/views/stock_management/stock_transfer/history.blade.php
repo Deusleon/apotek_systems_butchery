@@ -90,11 +90,18 @@
                     <div class="row ml-1 text-right justify-content-end">
                         <div class="col-md-3">
                             <div class="form-group">
+                                {{-- @dd($stores) --}}
                                 <label for="from_id" class="justify-content-start">From:</label>
                                 <select name="from_id" id="from_id" class="form-control">
                                     <option value="">Select Branch...</option>
                                     @foreach($stores as $store)
-                                        <option value="{{$store->name}}">{{$store->name}}</option>
+                                        @if (!is_all_store())
+                                            @if ($store->id != current_store_id())
+                                                <option value="{{$store->name}}">{{$store->name}}</option>
+                                            @endif
+                                        @else
+                                            <option value="{{$store->name}}">{{$store->name}}</option>
+                                        @endif
                                     @endforeach
                                 </select>
                             </div>
@@ -105,7 +112,13 @@
                                 <select name="to_id" id="to_id" class="form-control">
                                     <option value="">Select Branch..</option>
                                     @foreach($stores as $store)
-                                        <option value="{{$store->name}}">{{$store->name}}</option>
+                                        @if (!is_all_store())
+                                            @if ($store->id == current_store_id())
+                                                <option value="{{$store->name}}" selected>{{$store->name}}</option>
+                                            @endif
+                                        @else
+                                            <option value="{{$store->name}}">{{$store->name}}</option>
+                                        @endif
                                     @endforeach
                                 </select>
                             </div>
@@ -295,7 +308,7 @@
                 const canApprove = false;
             @endif
 
-                if ((status === 'Pending') && canApprove && (fromStoreId === currentStore)) {
+                                    if ((status === 'Pending') && canApprove && (fromStoreId === currentStore)) {
                 approveBtn.show().data({
                     'transfer-no': transferNo,
                     'from-store': fromStore,
@@ -354,15 +367,15 @@
                 }
                 items.forEach(item => {
                     let row = `
-                                                <tr>
-                                                    <td>${item.product_name}</td>
-                                                    <td>${Number(item.quantity ?? 0).toFixed(0)}</td>
-                                            `;
+                                                                    <tr>
+                                                                        <td>${item.product_name}</td>
+                                                                        <td>${Number(item.quantity ?? 0).toFixed(0)}</td>
+                                                                `;
 
                     if (status === 'Completed' || status === 'Acknowledged') {
                         row += `
-                                                    <td>${Number(item.accepted_qty ?? 0).toFixed(0)}</td>
-                                                `;
+                                                                        <td>${Number(item.accepted_qty ?? 0).toFixed(0)}</td>
+                                                                    `;
                     }
 
                     row += `</tr>`;
@@ -403,7 +416,7 @@
 
             $('#reject_transfer_no').val(transferNo);
             $('#reject-modal-title').text('Reject Stock Transfer');
-            $('#reject-message').text('Are you sure you want to reject this transfer from ' + fromStore + ' to ' + toStore + '? Please enter rejection reason below:');
+            $('#reject-message').html('Are you sure you want to reject this transfer from ' + fromStore + ' to ' + toStore + '? Please enter rejection reason below: '+'<span class="text-danger">*</span>');
 
             $('#rejection_reason').val('');
 
@@ -435,16 +448,16 @@
                 const tbody = table.find('tbody');
                 items.forEach((item, index) => {
                     tbody.append(`
-                                                                                                                                                                        <tr>
-                                                                                                                                                                            <td>
-                                                                                                                                                                                ${item.product_name}
-                                                                                                                                                                                <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
-                                                                                                                                                                            </td>
-                                                                                                                                                                            <td>
-                                                                                                                                                                                <input type="number" name="transfers[${index}][transfer_qty]" class="form-control" value="${item.quantity}" required>
-                                                                                                                                                                            </td>
-                                                                                                                                                                        </tr>
-                                                                                                                                                                    `);
+                                                                                                                                                                                            <tr>
+                                                                                                                                                                                                <td>
+                                                                                                                                                                                                    ${item.product_name}
+                                                                                                                                                                                                    <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
+                                                                                                                                                                                                </td>
+                                                                                                                                                                                                <td>
+                                                                                                                                                                                                    <input type="number" name="transfers[${index}][transfer_qty]" class="form-control" value="${item.quantity}" required>
+                                                                                                                                                                                                </td>
+                                                                                                                                                                                            </tr>
+                                                                                                                                                                                        `);
                 });
                 itemsContainer.append(table);
             }
@@ -491,18 +504,18 @@
                             $('#acknowledge_to_store').text(item.to_store.name);
 
                             $('#acknowledge_items_body').append(`
-                                                                                <tr data-item-id="${item.id}">
-                                                                                    <td>
-                                                                                        ${productLabel}
-                                                                                        <!-- Hidden inputs for id and original transfer_qty so they are submitted -->
-                                                                                        <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
-                                                                                        <input type="hidden" name="transfers[${index}][transfer_qty]" value="${transferQty}">
-                                                                                    </td>
-                                                                                    <td class="transferred">${transferQty}</td>
-                                                                                    <td class="received">${acceptedQty}</td>
-                                                                                    <td class="receive text-center" data-original="${transferQty}" contenteditable="false">${receiveDefault}</td>
-                                                                                </tr>
-                                                                            `);
+                                                                                                    <tr data-item-id="${item.id}">
+                                                                                                        <td>
+                                                                                                            ${productLabel}
+                                                                                                            <!-- Hidden inputs for id and original transfer_qty so they are submitted -->
+                                                                                                            <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
+                                                                                                            <input type="hidden" name="transfers[${index}][transfer_qty]" value="${transferQty}">
+                                                                                                        </td>
+                                                                                                        <td class="transferred">${transferQty}</td>
+                                                                                                        <td class="received">${acceptedQty}</td>
+                                                                                                        <td class="receive text-center" data-original="${transferQty}" contenteditable="false">${receiveDefault}</td>
+                                                                                                    </tr>
+                                                                                                `);
                         });
                     } else {
                         notify(

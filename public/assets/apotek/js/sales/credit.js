@@ -179,8 +179,8 @@ $("#products").on("change", function (e) {
     }
 });
 
-$('#products').on('select2:close', function () {
-  $('#credit_barcode_input').focus();
+$("#products").on("select2:close", function () {
+    $("#credit_barcode_input").focus();
 });
 
 $("#credit_barcode_input").on("keypress", function (e) {
@@ -355,9 +355,9 @@ $("#customer_id").on("change", function () {
     }, 30);
 });
 
-$("#credit_sale_date").on("blur", function(){
-        $("#credit_barcode_input").focus();
-})
+$("#credit_sale_date").on("blur", function () {
+    $("#credit_barcode_input").focus();
+});
 
 $("#sale_discount").on("blur", function () {
     $("#credit_barcode_input").focus();
@@ -1474,14 +1474,13 @@ $("#credit_sales_form").on("submit", function (e) {
     var is_backdate_enabled = document.getElementById(
         "is_backdate_enabled"
     ).value;
-    var saleDate = document.getElementById("credit_sale_date").value;
-
     if (cart === "" || cart === "undefined") {
         notify("Credit Sales list empty", "top", "right", "warning");
         return false;
     }
 
     if (is_backdate_enabled === "YES") {
+        var saleDate = document.getElementById("credit_sale_date").value;
         if (saleDate === "" || saleDate == null) {
             notify("Sales date is required", "top", "right", "warning");
             return false;

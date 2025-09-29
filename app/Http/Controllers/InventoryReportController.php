@@ -37,11 +37,12 @@ class InventoryReportController extends Controller
             ->join('inv_products', 'inv_products.id', '=', 'product_ledger.product_id')
             ->select('product_id', 'product_name', 'brand', 'pack_size', 'sales_uom')
             ->groupby(['product_id', 'product_name'])
+            ->orderBy('product_name', 'asc')
             ->get();
 
         $store = Store::all();
-        $category = Category::all();
-        $adj_reasons = AdjustmentReason::all();
+        $category = Category::orderBy('name', 'asc')->get();
+        $adj_reasons = AdjustmentReason::orderBy('reason', 'asc')->get();
 
         return view('inventory_reports.index')->with([
             'products' => $products,

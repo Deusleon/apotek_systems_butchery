@@ -50,23 +50,23 @@
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                     <div class="row mb-3">
                         <!-- <div class="col-md-6">
-                                                                <div class="btn-group">
-                                                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                        <i class="fas fa-download mr-1"></i> Export
-                                                                    </button>
-                                                                    <div class="dropdown-menu">
-                                                                        <a class="dropdown-item" href="{{ route('products.export', ['format' => 'pdf']) }}" target="_blank">
-                                                                            <i class="far fa-file-pdf text-danger mr-2"></i>PDF
-                                                                        </a>
-                                                                        <a class="dropdown-item" href="{{ route('products.export', ['format' => 'excel']) }}">
-                                                                            <i class="far fa-file-excel text-success mr-2"></i>Excel
-                                                                        </a>
-                                                                        <a class="dropdown-item" href="{{ route('products.export', ['format' => 'csv']) }}">
-                                                                            <i class="fas fa-file-csv text-info mr-2"></i>CSV
-                                                                        </a>
+                                                                    <div class="btn-group">
+                                                                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                            <i class="fas fa-download mr-1"></i> Export
+                                                                        </button>
+                                                                        <div class="dropdown-menu">
+                                                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'pdf']) }}" target="_blank">
+                                                                                <i class="far fa-file-pdf text-danger mr-2"></i>PDF
+                                                                            </a>
+                                                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'excel']) }}">
+                                                                                <i class="far fa-file-excel text-success mr-2"></i>Excel
+                                                                            </a>
+                                                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'csv']) }}">
+                                                                                <i class="fas fa-file-csv text-info mr-2"></i>CSV
+                                                                            </a>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                            </div> -->
+                                                                </div> -->
                     </div>
                     <div class="row justify-content-end align-items-end mb-3">
                         <!-- Status Filter -->
@@ -286,28 +286,28 @@
                             "searchable": false,
                             "render": function (data, type, row) {
                                 let buttons = `
-                                                    <button type="button" class="btn btn-success btn-sm btn-rounded show-modal">
-                                                        Show
-                                                    </button>
-                                                `;
+                                                        <button type="button" class="btn btn-success btn-sm btn-rounded show-modal">
+                                                            Show
+                                                        </button>
+                                                    `;
 
                                 @if(auth()->user()->checkPermission('Edit Products'))
                                     buttons += `
-                                                                        <button type="button" class="btn btn-primary btn-sm btn-rounded" id="edits">
-                                                                            Edit
-                                                                        </button>
-                                                                    `;
+                                                                                <button type="button" class="btn btn-primary btn-sm btn-rounded" id="edits">
+                                                                                    Edit
+                                                                                </button>
+                                                                            `;
                                 @endif
 
                                 @if(auth()->user()->checkPermission('Delete Products'))
                                     buttons += `
-                                                                        <button type="button" class="btn btn-danger btn-sm btn-rounded" id="deletes">
-                                                                            Delete
-                                                                        </button>
-                                                                    `;
+                                                                                <button type="button" class="btn btn-danger btn-sm btn-rounded" id="deletes">
+                                                                                    Delete
+                                                                                </button>
+                                                                            `;
                                 @endif
 
-                                                return buttons;
+                                                    return buttons;
                             }
 
                         }
@@ -373,11 +373,11 @@
                 $('#edit').find('.modal-body #name_edit').val(row_data.name);
                 $('#edit').find('.modal-body #barcode_edits').val(row_data.barcode);
                 $('#edit').find('.modal-body #brand_edits').val(row_data.brand);
-                $('#edit').find('.modal-body #pack_size_edits').val(row_data.pack_size);
+                $('#edit').find('.modal-body #pack_size_edit').val(row_data.pack_size);
                 $('#edit').find('.modal-body #category_options').val(row_data.category_id);
                 $('#edit').find('.modal-body #sale_edit').val(row_data.sales_uom);
-                $('#edit').find('.modal-body #min_stock_edit').val(row_data.min_quantinty);
-                $('#edit').find('.modal-body #max_stock_edit').val(row_data.max_quantinty);
+                $('#edit').find('.modal-body #min_stock_edit').val(numberWithCommas(row_data.min_quantinty));
+                $('#edit').find('.modal-body #max_stock_edit').val(numberWithCommas(row_data.max_quantinty));
                 $('#edit').find('.modal-body #product_type').val(row_data.type);
                 $('#edit').find('.modal-body #status_edit').val(row_data.status);
                 $('#edit').find('.modal-body #id').val(row_data.id);
@@ -529,6 +529,8 @@
                             let firstError = Object.values(errors)[0][0];
                             if (firstError === 'The name has already been taken.') {
                                 notify('Product name exists', 'top', 'right', 'danger');
+                            } else if (firstError === 'The barcode has already been taken.') {
+                                notify('Product barcode exists', 'top', 'right', 'danger');
                             } else {
                                 notify(firstError, 'top', 'right', 'danger');
                             }
