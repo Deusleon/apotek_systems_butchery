@@ -238,9 +238,7 @@
                                 </button>`;
                     }
                     if (row.status == '1') {
-                        return `<button class="btn btn-primary btn-rounded btn-sm receive-btn" data-id="${row.id}">
-                                 Receive
-                                </button>`;
+                        return ` `;
 
                     }
                     if (row.status == '2') {
