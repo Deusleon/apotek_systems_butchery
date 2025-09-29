@@ -4,6 +4,7 @@
 <?php
 
 use App\Store;
+use App\Setting;
 use Illuminate\Support\Facades\Auth;
 
 $all_stores = Store::all();
@@ -194,7 +195,6 @@ $store_id = Auth::user()->store_id;
         .alert-top-right i {
             margin-right: 8px;
         }
-        
     </style>
 
 
@@ -259,26 +259,31 @@ $store_id = Auth::user()->store_id;
                 @php
                     $userStore = Auth::user()->store;
                     $canAccessAll = $userStore->name === 'ALL';
+                    $multiStore = Setting::where('id', 121)->value('value');
+                    $multiStoreEnabled = $multiStore === 'YES';
+                    $defaultStore = Setting::where('id', 122)->value('value');
                 @endphp
 
                 @if($canAccessAll)
-                    <li>
-                        <div class="form-group" style="width: 200px!important; max-width: 100%; text-overflow: ellipsis;">
-                            <form method="POST" action="{{ route('change_store') }}" id="storeForm">
-                                @csrf
-                                <select name="store_id" id="store_id" class="js-example-basic-single form-control"
-                                    onchange="this.form.submit()">
-                                    <option value="" disabled {{ !session('current_store_id') ? 'selected' : '' }}>Select
-                                        Branch</option>
-                                    @foreach($all_stores as $store)
-                                        <option value="{{ $store->id }}" {{ session('current_store_id') == $store->id ? 'selected' : '' }}>
-                                            {{ $store->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </form>
-                        </div>
-                    </li>
+                    @if ($multiStoreEnabled)
+                        <li>
+                            <div class="form-group" style="width: 200px!important; max-width: 100%; text-overflow: ellipsis;">
+                                <form method="POST" action="{{ route('change_store') }}" id="storeForm">
+                                    @csrf
+                                    <select name="store_id" id="store_id" class="js-example-basic-single form-control"
+                                        onchange="this.form.submit()">
+                                        <option value="" disabled {{ !session('current_store_id') ? 'selected' : '' }}>Select
+                                            Branch</option>
+                                        @foreach($all_stores as $store)
+                                            <option value="{{ $store->id }}" {{ session('current_store_id') == $store->id ? 'selected' : '' }}>
+                                                {{ $store->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </form>
+                            </div>
+                        </li>
+                    @endif
                 @endif
 
                 <li>

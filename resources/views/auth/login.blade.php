@@ -64,11 +64,6 @@
                         <input id="facility" type="text"
                                class="form-control" name="facility" required placeholder="Business Name" value="demo" hidden>
                     </div>
-                    {{--                    <div style="margin-top: -6%;">--}}
-                    {{--                        @if($errors->any())--}}
-                    {{--                            <span style="margin-left: -45%"><font color="red">{{$errors->first()}}</font></span>--}}
-                    {{--                        @endif--}}
-                    {{--                    </div>--}}
                     <div class="form-group text-left">
                         <div class="checkbox checkbox-fill d-inline">
                             <input class="form-check-input" type="checkbox" name="remember"

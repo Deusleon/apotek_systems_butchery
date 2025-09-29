@@ -11,60 +11,76 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 
 class ConfigurationsController extends Controller
-{
+ {
 
     public function index()
-    {
+ {
         /*return default store*/
-        $default_store = optional(Auth::user()->store->first())->name;
-        $stores = Store::where('name', $default_store)->first();
+        $default_store = optional( Auth::user()->store->first() )->name;
+        $stores = Store::where( 'name', $default_store )->first();
         $sale_types = PriceCategory::all();
 
-        if ($stores != null) {
+        if ( $stores != null ) {
             $default_store_id = $stores->name;
         } else {
-            $default_store_id = "Please Set Store";
+            $default_store_id = 'Please Set Store';
         }
-        session()->put('store', $default_store_id);
+        session()->put( 'store', $default_store_id );
 
-        $configurations = Setting::orderBy('id', 'ASC')->get();
+        $configurations = Setting::orderBy( 'id', 'ASC' )->get();
         $store = Store::all();
 
-        return View::make('configurations.index')
-            ->with(compact('configurations'))
-            ->with(compact('sale_types'))
-            ->with(compact('store'));
+        return View::make( 'configurations.index' )
+        ->with( compact( 'configurations' ) )
+        ->with( compact( 'sale_types' ) )
+        ->with( compact( 'store' ) );
     }
 
-    public function store(Request $request)
-    {
-        dd($request->all());
+    public function store( Request $request )
+ {
+        dd( $request->all() );
     }
 
-
-    public function update(Request $request) {
-        $logo=$request->file('logo');
-        $setting =Setting::find($request->setting_id);
-        if ($logo) {
-            File::delete(public_path() . '/fileStore/logo/' . $setting->value);
+    public function update( Request $request ) {
+        $logo = $request->file( 'logo' );
+        $setting = Setting::find( $request->setting_id );
+        if ( $logo ) {
+            File::delete( public_path() . '/fileStore/logo/' . $setting->value );
             $originalLogoName = $logo->getClientOriginalName();
             $logoExtension = $logo->getClientOriginalExtension();
             $logoStore = base_path() . '/public/fileStore/logo/';
             $logoName = $logo->getFilename() . '.' . $logoExtension;
-            $logo->move($logoStore, $logoName);
+            $logo->move( $logoStore, $logoName );
             $setting->value = $logoName;
         } else {
             $setting->value = $request->formdata;
         }
-        $setting->updated_by=Auth::user()->id;
+        $setting->updated_by = Auth::user()->id;
         $setting->save();
-        session()->flash("alert-success", "Changes saved successfully!");
+        if ( $request->setting_id == 122 ) {
+            $user = auth()->user();
+
+            if ( !$user || $user->store->name !== 'ALL' ) {
+                return response()->json( [ 'error' => 'Not allowed' ], 403 );
+            }
+
+            $storeName = $request->formdata;
+
+            $store = Store::where( 'name', $storeName )->value( 'id' );
+            if ( !$store ) {
+                return response()->json( [ 'error' => 'Branch not found' ], 422 );
+            }
+
+            session( [ 'current_store_id' => $store, 'store' => $storeName ] );
+
+            return redirect()->back()->with( 'success', "Branch changed to {$storeName}" );
+        }
+        session()->flash( 'alert-success', 'Changes saved successfully!' );
         return back();
     }
 
-
-    public function destroy($id)
-    {
+    public function destroy( $id )
+ {
         //
     }
 }

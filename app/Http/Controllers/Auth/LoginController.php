@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
+use App\Setting;
+use App\Store;
 
 class LoginController extends Controller {
     /*
@@ -59,12 +61,8 @@ class LoginController extends Controller {
         return $this->sendFailedLoginResponse($request);
     }
 
-
     protected function authenticated(Request $request, $user)
     {
-        // Example you already set db_connection earlier in login() — keep or move here if you prefer
-        // session()->put('db_connection', 'demo');
-
         // Ensure user has a store relationship
         $store = null;
         if ($user->relationLoaded('store')) {
@@ -84,17 +82,22 @@ class LoginController extends Controller {
             return null;
         }
 
+        $multiStore = Setting::where('id', 121)->value('value');
+        $multiStoreEnabled = $multiStore === 'YES';
+        $defaultStore = Setting::where('id', 122)->value('value');
+        $storeId = Store::where('name', $defaultStore)->value('id');
+
         // If store name is 'ALL' (DB shows id = 1 for ALL), set special value.
-        // Be consistent: we'll use id = 1 to represent ALL ( same as your DB )
-        if ( strtoupper( $store->name ) === 'ALL' || $store->id == 1 ) {
+        // we'll use id = 1 to represent ALL ( same as DB )
+        if ( (strtoupper( $store->name ) === 'ALL' || $store->id == 1) && $multiStoreEnabled) {
             session( [
                 'current_store_id' => 1,
                 'store' => 'ALL',
             ] );
         } else {
             session( [
-                'current_store_id' => $store->id,
-                'store' => $store->name,
+                'current_store_id' => $storeId,
+                'store' => $defaultStore,
             ] );
         }
 
