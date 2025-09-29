@@ -30,7 +30,7 @@ class SaleReportController extends Controller {
         $customers = Customer::join( 'sales', 'sales.customer_id', '=', 'customers.id' )
         ->join( 'sales_credits', 'sales_credits.sale_id', '=', 'sales.id' )
         ->groupby( 'customers.id' )
-        ->orderBy('customer.name', 'asc')
+        ->orderBy('customers.name', 'asc')
         ->get();
         return view( 'sale_reports.index', compact( 'price_category', 'customers' ) );
     }

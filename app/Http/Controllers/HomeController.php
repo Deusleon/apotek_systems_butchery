@@ -35,7 +35,6 @@ class HomeController extends Controller {
     /*Updating the store ID based on selection
     /made by logged in user
     */
-
     public function changeStore( Request $request ) {
 
         $user = auth()->user();
