@@ -132,7 +132,7 @@ class StockTransferAcknowledgeController extends Controller
     }
 
     public function update( Request $request )
-    {
+ {
 
     }
 
@@ -214,15 +214,6 @@ class StockTransferAcknowledgeController extends Controller
                 // 2b ) Get the source current stock ( the stock record referenced by stock_id )
                 $sourceStock = CurrentStock::find( $stockId );
 
-                // if ( $sourceStock ) {
-                // 4 ) Update current stock of the store transfer inapoelekea ( source adjustments ):
-                // Assumption: when transfer was created you previously reduced the source stock.
-                // Now we return the 'remaining' back to source stock quantity.
-                // ( If your flow is different adjust this logic. )
-                // $sourceStock->quantity = ( int )$sourceStock->quantity + $remaining;
-                // $sourceStock->save();
-                // }
-
                 // 4 ) Update or create current stock entry for the destination store ( to_store )
                 // Find existing CurrentStock for same product_id in the destination store.
                 $productId = $transfer->currentStock[ 'product_id' ] ?? ( $sourceStock->product_id ?? null );
@@ -232,18 +223,9 @@ class StockTransferAcknowledgeController extends Controller
                     continue;
                 }
 
-                // $destStock = CurrentStock::where( 'product_id', $productId )
-                // ->where( 'store_id', $toStore )
-                // ->first();
-
-                // if ( $destStock ) {
-                //     // add acceptedToday to existing destination stock
-                //     $destStock->quantity = ( int )$destStock->quantity + $acceptedToday;
-                // } else {
                 // create a new current stock record for the destination store
                 $destStock = new CurrentStock();
                 $destStock->product_id = $productId;
-                // no expiry, no batch ( as requested ). Set unit_cost to source if available, else 0
                 $destStock->expiry_date = null;
                 $destStock->batch_number = null;
                 $destStock->unit_cost = $sourceStock->unit_cost ?? 0;
@@ -251,16 +233,41 @@ class StockTransferAcknowledgeController extends Controller
                 $destStock->store_id = $toStore;
                 $destStock->mode = 'Stock Transfer';
                 $destStock->created_by = Auth::id();
-                // }
                 $destStock->save();
 
+                $sourcePrices = PriceList::where( 'stock_id', $sourceStock->id )->get();
+                $userId = Auth::id();
+
+                foreach ( $sourcePrices as $srcPrice ) {
+                    $priceCategoryId = $srcPrice->price_category_id;
+                    $newPrice = $srcPrice->price;
+
+                    // check if destStock already has price for this category
+                    $existing = PriceList::where( 'stock_id', $destStock->id )
+                    ->where( 'price_category_id', $priceCategoryId )
+                    ->first();
+
+                    if ( !$existing ) {
+                        PriceList::create( [
+                            'stock_id' => $destStock->id,
+                            'price_category_id' => $priceCategoryId,
+                            'price' => $newPrice,
+                            'created_by' => $userId,
+                            'updated_by' => $userId,
+                        ] );
+                    } else {
+                        $existing->update( [
+                            'price' => $newPrice,
+                            'updated_by' => $userId,
+                        ] );
+                    }
+                }
+                
                 // 3 ) Update StockTransfer record accepted_qty and status
                 $transfer->accepted_qty = $newAcceptedTotal;
                 $transfer->notes = $remarkText;
                 $transfer->acknowledged_by = Auth::id();
                 $transfer->acknowledged_at = now();
-                // Decide status: completed if fully accepted else acknowledged
-                // NOTE: adapt these status values to match your system ( strings vs numeric ).
                 if ( $newAcceptedTotal >= $transferedQty ) {
                     $transfer->status = 'completed';
                 } else {
@@ -286,7 +293,6 @@ class StockTransferAcknowledgeController extends Controller
                 // b ) If there is acceptedToday > 0, record IN to destination store
                 if ( $acceptedToday > 0 ) {
                     $stkTrack2 = new StockTracking();
-                    // we use the original stock_id reference to show source link;
                     $stkTrack2->stock_id = $stockId;
                     $stkTrack2->product_id = $productId;
                     $stkTrack2->quantity = $acceptedToday;
@@ -361,6 +367,7 @@ class StockTransferAcknowledgeController extends Controller
 
         return json_decode( $results, true );
     }
+
     public function transferFilter( Request $request )
  {
 

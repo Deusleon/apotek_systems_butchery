@@ -1293,6 +1293,7 @@ $(document).ready(function () {
             },
             dataType: "json",
             success: function (result) {
+                console.log('PRod', result);
                 populateProducts(result.data || []);
                 $("#barcode_input").focus();
             },

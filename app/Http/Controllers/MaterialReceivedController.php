@@ -9,6 +9,7 @@ use App\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use View;
 
 class MaterialReceivedController extends Controller
@@ -86,6 +87,7 @@ class MaterialReceivedController extends Controller
 
     $from = date('Y-m-d', strtotime($request->date[0]));
     $to = date('Y-m-d', strtotime($request->date[1]));
+    Log::info($from);
 
     if ($request->supplier_id) {
         $totalData = GoodsReceiving::select(

@@ -34,7 +34,7 @@
             left: 50%;
             z-index: 100;
         }
-        
+
         .filter-controls {
             display: flex;
             align-items: center;
@@ -43,23 +43,23 @@
             gap: 15px;
             flex-wrap: wrap;
         }
-        
+
         .filter-control {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
+
         .filter-control label {
             margin-bottom: 0;
             white-space: nowrap;
         }
-        
+
         @media (max-width: 768px) {
             .filter-controls {
                 justify-content: flex-start;
             }
-            
+
             .filter-control {
                 flex: 1 0 100%;
             }
@@ -69,27 +69,27 @@
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
             @if (auth()->user()->checkPermission('View Invoice Receiving'))
-            <li class="nav-item">
-                <a class="nav-link text-uppercase" id="invoice-received" data-toggle="pill"
-                   href="{{ route('goods-receiving.index') }}" role="tab"
-                   aria-controls="quotes_list" aria-selected="true">Invoice Receiving</a>
-            </li>
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" id="invoice-received" data-toggle="pill"
+                        href="{{ route('goods-receiving.index') }}" role="tab" aria-controls="quotes_list"
+                        aria-selected="true">Invoice Receiving</a>
+                </li>
             @endif
             @if (auth()->user()->checkPermission('View Order Receiving'))
-            <li class="nav-item">
-                <a class="nav-link text-uppercase" id="order-received" data-toggle="pill"
-                   href="{{ route('orders-receiving.index') }}"
-                   role="tab" aria-controls="new_quotes" aria-selected="false">Order Receiving
-                </a>
-            </li>
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" id="order-received" data-toggle="pill"
+                        href="{{ route('orders-receiving.index') }}" role="tab" aria-controls="new_quotes"
+                        aria-selected="false">Order Receiving
+                    </a>
+                </li>
             @endif
             @if (auth()->user()->checkPermission('View Material Received'))
-            <li class="nav-item">
-                <a class="nav-link active text-uppercase" id="material-received" data-toggle="pill"
-                   href="{{ url('purchases/material-received') }}"
-                   role="tab" aria-controls="new_quotes" aria-selected="false">Material Received
-                </a>
-            </li>
+                <li class="nav-item">
+                    <a class="nav-link active text-uppercase" id="material-received" data-toggle="pill"
+                        href="{{ url('purchases/material-received') }}" role="tab" aria-controls="new_quotes"
+                        aria-selected="false">Material Received
+                    </a>
+                </li>
             @endif
         </ul>
         <div class="card">
@@ -97,50 +97,50 @@
                 <div class="filter-controls">
                     <div class="filter-control">
                         <label for="supplier" class="col-form-label text-md-right">Supplier:</label>
-                        <select class="js-example-basic-single form-control" id="supplier"
-                                onchange="getMaterialsReceived()" style="min-width: 200px;">
+                        <select class="js-example-basic-single form-control" id="supplier" onchange="getMaterialsReceived()"
+                            style="min-width: 200px;">
                             <option value="">Select Supplier</option>
                             @foreach($suppliers as $supplier)
                                 <option value="{{$supplier->id}}">{{$supplier->name}}</option>
                             @endforeach
                         </select>
                     </div>
-                    
+
                     <div class="filter-control">
                         <label for="receive_date" class="col-form-label text-md-right">Date:</label>
-                        <input type="text" name="expire_date" class="form-control"
-                               id="receive_date" onchange="getMaterialsReceived()" style="min-width: 250px;">
+                        <input type="text" name="expire_date" class="form-control" id="receive_date"
+                            style="min-width: 250px;">
                     </div>
                 </div>
-                
+
                 <div class="col-md-4" hidden>
                     <label for="code">Product</label>
-                    <select id="received_product"
-                            class="js-example-basic-single form-control" onchange="getMaterialsReceived()">
+                    <select id="received_product" class="js-example-basic-single form-control"
+                        onchange="getMaterialsReceived()">
                         <option value="">Select Product</option>
                         @foreach($products as $stock)
                             <option value="{{$stock->id}}">{{$stock->name}}</option>
                         @endforeach
                     </select>
                 </div>
-                
-                <input type="hidden" id="expire_date_enabler" value = "{{$expire_date}}">
+
+                <input type="hidden" id="expire_date_enabler" value="{{$expire_date}}">
                 <div id="tbody1" class="table-responsive">
                     <table id="received_material_table" class="display table nowrap table-striped table-hover"
-                           style="width:100%">
+                        style="width:100%">
                         <thead>
-                        <tr>
-                            <th>id</th>
-                            <th>Product Name</th>
-                            <th class="d-none">Ordered</th>
-                            <th>Quantity</th>
-                            <th class="d-none">Remaining</th>
-                            <th>Price</th>
-                            <th>Amount</th>
-                            <th>Receive Date</th>
-                            <th>Received By</th>
-                            <th>Action</th>
-                        </tr>
+                            <tr>
+                                <th>id</th>
+                                <th>Product Name</th>
+                                <th class="d-none">Ordered</th>
+                                <th>Quantity</th>
+                                <th class="d-none">Remaining</th>
+                                <th>Price</th>
+                                <th>Amount</th>
+                                <th>Receive Date</th>
+                                <th>Received By</th>
+                                <th>Action</th>
+                            </tr>
                         </thead>
                         <tbody>
                         </tbody>
@@ -169,13 +169,21 @@
             }
         });
 
-       $(function () {
+        $(function () {
             var start = moment();
             var end = moment();
 
             function cb(start, end) {
                 $('#receive_date').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
             }
+
+            $('#receive_date').on('apply.daterangepicker', function (ev, picker) {
+                $(this).val(
+                    picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD')
+                );
+                getMaterialsReceived();
+            });
+
 
             $('#receive_date').daterangepicker({
                 startDate: moment().startOf('month'),
@@ -222,7 +230,7 @@
             $(this).val('');
         });
 
-       /*receive date*/
+        /*receive date*/
         $(function () {
             var start = moment();
             var end = moment();
@@ -256,7 +264,13 @@
             var product_id = document.getElementById("received_product").value;
             var supplier_id = document.getElementById("supplier").value;
             var range = document.getElementById("receive_date").value;
-            var date = range.split('-');
+            if (range) {
+                var date = range.split(" - ").map(function (d) {
+                    return d.trim();
+                });
+            } else {
+                var date = [];
+            }
             if (product_id || date || supplier_id) {
                 // $('#loading').show();
 
@@ -278,10 +292,10 @@
                         }
                     },
                     "columns": [
-                        {data: 'id'},
+                        { data: 'id' },
                         {
                             data: 'product',
-                            render: function(data) {
+                            render: function (data) {
                                 return (data.name || '') + ' ' + (data.brand || '') + ' ' + (data.pack_size || '') + (data.sales_uom || '');
                             }
                         },
@@ -315,14 +329,14 @@
                                 return moment(date).format('Y-MM-DD');
                             }
                         },
-                        {data: 'user.name'},
+                        { data: 'user.name' },
                         {
                             data: 'action',
                             defaultContent: "<div><input type='button' value='Edit' id='edit_btn' class='btn btn-info btn-rounded btn-sm'/><input type='button' value='Delete' id='delete_btn' class='btn btn-danger btn-rounded btn-sm'/></div>"
                         }
                     ], "columnDefs": [
                         {
-                            "targets": [0,2,4],
+                            "targets": [0, 2, 4],
                             "visible": false
                         }
                     ],
@@ -332,7 +346,7 @@
 
                 var expire_date_enabler = document.getElementById("expire_date_enabler").value;
                 console.log(expire_date_enabler);
-                if(expire_date_enabler === "NO") {
+                if (expire_date_enabler === "NO") {
                     received_material_table.column(4).visible(false);
                 }
             }
@@ -345,7 +359,7 @@
         $('#received_material_table tbody').on('click', '#edit_btn', function () {
             var row_data = $('#received_material_table').DataTable().row($(this).parents('tr')).data();
 
-           $('#edit').find('.modal-body #name_edit').val(
+            $('#edit').find('.modal-body #name_edit').val(
                 (row_data.product.name || '') + ' ' +
                 (row_data.product.brand || '') + ' ' +
                 (row_data.product.pack_size || '') +
@@ -428,22 +442,22 @@
     </script>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Listen for the click event on the Transfer History tab
             // Listen for the click event on the Transfer History tab
-            $('#material-received').on('click', function(e) {
+            $('#material-received').on('click', function (e) {
                 e.preventDefault(); // Prevent default tab switching behavior
                 var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
                 window.location.href = redirectUrl; // Redirect to the URL
             });
 
-            $('#order-received').on('click', function(e) {
+            $('#order-received').on('click', function (e) {
                 e.preventDefault(); // Prevent default tab switching behavior
                 var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
                 window.location.href = redirectUrl; // Redirect to the URL
             });
 
-            $('#invoice-received').on('click', function(e) {
+            $('#invoice-received').on('click', function (e) {
                 e.preventDefault(); // Prevent default tab switching behavior
                 var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
                 window.location.href = redirectUrl; // Redirect to the URL

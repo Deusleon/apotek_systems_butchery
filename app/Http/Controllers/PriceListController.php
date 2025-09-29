@@ -23,10 +23,11 @@ class PriceListController extends Controller {
         if (!Auth()->user()->checkPermission('View Price List')) {
             abort(403, 'Access Denied');
         }
+        $store_id = current_store_id();
         $price_categories = PriceCategory::all();
         $batch_enabled = Setting::where( 'id', 110 )->value( 'value' );
 
-        $current_stocks = DB::table( 'inv_current_stock' )
+        $query = DB::table( 'inv_current_stock' )
         ->join( 'inv_products', 'inv_current_stock.product_id', '=', 'inv_products.id' )
         ->join( 'sales_prices', 'inv_current_stock.id', '=', 'sales_prices.stock_id' )
         ->join( 'price_categories', 'sales_prices.price_category_id', '=', 'price_categories.id' )
@@ -37,16 +38,26 @@ class PriceListController extends Controller {
             'inv_products.sales_uom as sales_uom',
             'inv_current_stock.unit_cost as unit_cost',
             'sales_prices.price as price',
-            DB::raw( '((sales_prices.price - inv_current_stock.unit_cost) / inv_current_stock.unit_cost) * 100 as profit' ),
+            // DB::raw( '((sales_prices.price - inv_current_stock.unit_cost) / inv_current_stock.unit_cost) * 100 as profit' ),
+            DB::raw("
+                CASE 
+                    WHEN inv_current_stock.unit_cost > 0 
+                    THEN ((sales_prices.price - inv_current_stock.unit_cost) / inv_current_stock.unit_cost) * 100 
+                    ELSE 0 
+                END as profit
+            "),
             'inv_current_stock.id as id',
             'price_categories.name as price_category_name',
             'sales_prices.price_category_id as price_category_id'
         )
-        ->where( 'inv_current_stock.quantity', '>', 0 )
-        ->get();
+        ->where( 'inv_current_stock.quantity', '>', 0 );
+        if (!is_all_store()) {
+            $query->where('inv_current_stock.store_id', $store_id);
+        }
 
-        // This query is for the 'History' view, it should be separate
-        $store_id = Auth::user()->store_id;
+        $current_stocks = $query->get();
+
+        // This query is for the 'History' view
         $stocks = DB::table( 'stock_details' )
         ->join( 'inv_products', 'inv_products.id', '=', 'stock_details.product_id' )
         ->select( 'product_name as name', 'inv_products.brand as brand', 'inv_products.pack_size as pack_size', 'inv_products.sales_uom as sales_uom', 'unit_cost', 'selling_price as price', 'stock_details.updated_at', 'price_category_id' )
@@ -62,11 +73,12 @@ class PriceListController extends Controller {
     }
 
     public function fetchPriceList( Request $request ) {
+        $store_id = current_store_id();
         $categoryId = $request->category_id;
         $type = $request->type;
 
       if ($type === 'pending') {
-        $stocks = DB::table('inv_current_stock as cs')
+        $query = DB::table('inv_current_stock as cs')
         ->leftJoin('sales_prices as sp', function ($join) use ($categoryId) {
             $join->on('cs.id', '=', 'sp.stock_id')
                  ->where('sp.price_category_id', '=', $categoryId);
@@ -86,11 +98,14 @@ class PriceListController extends Controller {
         )
         ->where('cs.quantity', '>', 0)
         ->where('cs.unit_cost', '>', 0)
-        ->whereNull('sp.id')
-        ->get();
+        ->whereNull('sp.id');
+        if (!is_all_store()) {
+            $query->where('cs.store_id', $store_id);
+        }
+        $stocks = $query->get();
         } elseif ($type === '1') {
             // Current
-            $stocks = DB::table('inv_current_stock as cs')
+            $query = DB::table('inv_current_stock as cs')
                 ->join('sales_prices as sp', 'cs.id', '=', 'sp.stock_id')
                 ->join('inv_products as p', 'cs.product_id', '=', 'p.id')
                 ->select(
@@ -107,10 +122,13 @@ class PriceListController extends Controller {
                 )
                 ->where('sp.price_category_id', $categoryId)
                 ->where('cs.unit_cost', '>', 0)
-                ->where('cs.quantity', '>', 0)
-                ->get();
+                ->where('cs.quantity', '>', 0);
+                if (!is_all_store()) {
+                    $query->where('cs.store_id', $store_id);
+                }
+                $stocks = $query->get();
         } else {
-            $stocks = DB::table('inv_current_stock as cs')
+            $query = DB::table('inv_current_stock as cs')
                 ->join('sales_prices as sp', 'cs.id', '=', 'sp.stock_id')
                 ->join('inv_products as p', 'cs.product_id', '=', 'p.id')
                 ->select(
@@ -130,8 +148,11 @@ class PriceListController extends Controller {
                 ->where('sp.price_category_id', $categoryId)
                 ->where('cs.unit_cost', '>', 0)
                 ->orderBy('cs.batch_number', 'desc')
-                ->orderBy('sp.created_at', 'desc')
-                ->get();
+                ->orderBy('sp.created_at', 'desc');
+                if (!is_all_store()) {
+                    $query->where('cs.store_id', $store_id);
+                }
+                $stocks = $query->get();
         }
         return response()->json( $stocks );
     }
