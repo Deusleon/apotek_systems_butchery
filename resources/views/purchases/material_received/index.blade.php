@@ -170,7 +170,7 @@
         });
 
         $(function () {
-            var start = moment();
+            var start = moment().subtract(29, 'days');
             var end = moment();
 
             function cb(start, end) {
@@ -256,9 +256,9 @@
     </script>
     <script type="text/javascript">
 
-        // $(document).ready(function () {
-        //    getMaterialsReceived();
-        // });
+        $(document).ready(function () {
+           getMaterialsReceived();
+        });
 
         function getMaterialsReceived() {
             var product_id = document.getElementById("received_product").value;
