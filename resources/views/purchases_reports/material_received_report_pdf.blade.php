@@ -17,7 +17,6 @@
         }
 
         table, th, td {
-            /*border: 1px solid black;*/
             border-collapse: collapse;
             padding: 10px;
         }
@@ -40,15 +39,13 @@
         }
 
         #table-detail {
-            /*border-spacing: 5px;*/
             width: 100%;
-            /*margin-top: -10%;*/
         }
 
         #table-detail-main {
             width: 103%;
             margin-top: -10%;
-            margin-bottom: 1%;
+            margin-bottom: -6%;
             border-collapse: collapse;
         }
 
@@ -133,31 +130,28 @@
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
     <h2 align="center" style="margin-top: -1%">Material Received Report</h2>
+    <h4 align="center" style="margin-top: -1%">From: {{date('Y-m-d',strtotime($data->first()->dates[0]))}} To: {{date('Y-m-d',strtotime($data->first()->dates[1]))}}</h4>
+
     <div class="row" style="margin-top: 10%;">
         <div class="col-md-12">
 
             <table id="table-detail-main">
                 <tr>
-                    <td style="background: #1f273b; color: white">Supplier: {{$data->first()->supplier_name}}</td>
+                    <td>Supplier: {{$data->first()->supplier_name}}</td>
                     @if(!(empty($data->first()->invoice_nos)))
-                        <td style="background: #1f273b; color: white">Invoice: {{$data->first()->invoice_nos}}</td>
+                        <td>Invoice: {{$data->first()->invoice_nos}}</td>
                     @endif
-                    <td style="background: #1f273b; color: white"><b>From
-                            Date:</b> {{date('Y-m-d',strtotime($data->first()->dates[0]))}}</td>
-                    <td style="background: #1f273b; color: white"><b>To
-                            Date:</b> {{date('Y-m-d',strtotime($data->first()->dates[1]))}}</td>
                 </tr>
             </table>
 
             <table id="table-detail" align="center">
-                <!-- loop the product names here -->
                 <thead>
                 <tr style="background: #1f273b; color: white; font-size: 0.9em">
                     <th align="left">Product Name</th>
-                    <th align="left">Quantity</th>
-                    <th align="left">Buy Price</th>
-                    <th align="left">Sell Price</th>
-                    <th align="left">Profit</th>
+                    <th align="center">Quantity</th>
+                    <th align="right">Buy Price</th>
+                    <th align="right">Sell Price</th>
+                    <th align="right">Profit</th>
                     <th align="left">Receive Date</th>
                     <th align="left">Received By</th>
                 </tr>
@@ -167,14 +161,11 @@
                         <td align="left">
                             {{$item->product['name'].' '.$item->product['brand'].' '.$item->product['pack_size'].$item->product['sales_uom']}}
                         </td>
-                        <td align="left">
-                            {{number_format($item->quantity,0)}}
-                        </td>
-                        <td align="left">{{number_format($item->unit_cost,2)}}</td>
-                        <td align="left">{{number_format($item->sell_price,2)}}</td>
-                        <td align="left">{{number_format($item->item_profit,2)}}</td>
-                        <td align="left">{{date('Y-m-d',strtotime($item->created_at))}}
-                        </td>
+                        <td align="center">{{number_format($item->quantity,0)}}</td>
+                        <td align="right">{{number_format($item->unit_cost,2)}}</td>
+                        <td align="right">{{number_format($item->sell_price,2)}}</td>
+                        <td align="right">{{number_format($item->item_profit,2)}}</td>
+                        <td align="left">{{date('Y-m-d',strtotime($item->created_at))}}</td>
                         <td align="left">{{$item->user['name']}}</td>
                     </tr>
                 @endforeach
@@ -182,49 +173,37 @@
             <hr>
 
             <div class="full-row" style="padding-top: 1%">
-                <div class="col-35">
-                    <div class="full-row">
-                    </div>
-
-                </div>
+                <div class="col-35"><div class="full-row"></div></div>
                 <div class="col-15"></div>
                 <div class="col-25"></div>
                 <div class="col-25">
                     <div class="full-row">
                         <div class="col-50" align="left"><b>Total Buy: </b></div>
-                        <div class="col-50"
-                             align="right">{{number_format($data->first()->total_bp,2)}}</div>
+                        <div class="col-50" align="right">{{number_format($data->first()->total_bp,2)}}</div>
                     </div>
                 </div>
             </div>
-            <div class="full-row" style="padding-top: 1%">
-                <div class="col-35">
-                    <div class="full-row">
-                    </div>
 
-                </div>
+            <div class="full-row" style="padding-top: 1%">
+                <div class="col-35"><div class="full-row"></div></div>
                 <div class="col-15"></div>
                 <div class="col-25"></div>
                 <div class="col-25">
                     <div class="full-row">
-                        <div class="col-50" align="left"><b>Total Sell: </b></div>
-                        <div class="col-50"
-                             align="right">{{number_format($data->first()->total_sp,2)}}</div>
+                        <div class="col-50" align="left"><b>Total Sales: </b></div>
+                        <div class="col-50" align="right">{{number_format($data->first()->total_sp,2)}}</div>
                     </div>
                 </div>
             </div>
+
             <div class="full-row" style="padding-top: 1%">
-                <div class="col-35">
-                    <div class="full-row">
-                    </div>
-                </div>
+                <div class="col-35"><div class="full-row"></div></div>
                 <div class="col-15"></div>
                 <div class="col-25"></div>
                 <div class="col-25">
                     <div class="full-row">
                         <div class="col-50" align="left"><b>Total Profit: </b></div>
-                        <div class="col-50"
-                             align="right">{{number_format($data->first()->total_p,2)}}</div>
+                        <div class="col-50" align="right">{{number_format($data->first()->total_p,2)}}</div>
                     </div>
                 </div>
             </div>
@@ -241,22 +220,12 @@
         $font = null;
         $size = 10;
         $color = array(0,0,0);
-        $word_space = 0.0;  //  default
-        $char_space = 0.0;  //  default
-        $angle = 0.0;   //  default
+        $word_space = 0.0;
+        $char_space = 0.0;
+        $angle = 0.0;
         $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
-
-
      }
-
-
-
-
-
-
-
 </script>
 
 </body>
 </html>
-

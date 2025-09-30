@@ -61,7 +61,7 @@
             font-weight: normal;
         }
 
-         #container .logo-container {
+        #container .logo-container {
             padding-top: -2%;
             text-align: center;
             vertical-align: middle;
@@ -95,26 +95,21 @@
             <thead>
             <tr style="background: #1f273b; color: white; font-size: 0.9em">
                 <th align="left">Product Name</th>
-                <th align="left">Quantity</th>
-                <th align="left">Buy Price</th>
-                <th align="left">Sell Price</th>
+                <th align="center">Quantity</th>
+                <th align="right">Buy Price</th>
+                <th align="right">Sell Price</th>
                 <th align="left">Expire Date</th>
                 <th align="left">Receive Date</th>
-
             </tr>
             </thead>
             @foreach($data as $item)
                 <tr>
-                    <td>{{$item->product_name}}</td>
-                    <td align="left">
-                        {{number_format($item->quantity,0)}}
-                    </td>
-                    <td align="left">{{number_format($item->unit_cost,2)}}</td>
-                    <td align="left">{{number_format($item->sell_price,2)}}</td>
+                    <td align="left">{{$item->product_name}}</td>
+                    <td align="center">{{number_format($item->quantity,0)}}</td>
+                    <td align="right">{{number_format($item->unit_cost,2)}}</td>
+                    <td align="right">{{number_format($item->sell_price,2)}}</td>
                     <td align="left">{{$item->expire_date}}</td>
-                    <td align="left">
-                        {{date('Y-m-d',strtotime($item->created_at))}}
-                    </td>
+                    <td align="left">{{date('Y-m-d',strtotime($item->created_at))}}</td>
                 </tr>
             @endforeach
         </table>
@@ -134,10 +129,7 @@
         $angle = 0.0;   //  default
         $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
      }
-
-
 </script>
 
 </body>
 </html>
-
