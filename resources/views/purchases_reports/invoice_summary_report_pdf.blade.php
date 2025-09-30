@@ -138,14 +138,14 @@
                     <tr>
                         <td>{{$item->invoice_no}}</td>
                         <td>{{$item->supplier['name']}}</td>
-                        <td>{{date('d-m-Y',strtotime($item->invoice_date))}}</td>
+                        <td>{{date('Y-d-m',strtotime($item->invoice_date))}}</td>
                         <td align="right">{{number_format($item->invoice_amount,2)}}</td>
                         <td align="right">{{number_format($item->paid_amount,2)}}</td>
                         <td align="right">{{number_format($item->remain_balance,2)}}</td>
                         <td align="right">
                             <div style="margin-right: 50%"></div>{{$item->grace_period}}
                         </td>
-                        <td style="font-size: 0.9em">{{date('d-m-Y',strtotime($item->payment_due_date))}}</td>
+                        <td style="font-size: 0.9em">{{date('Y-m-d',strtotime($item->payment_due_date))}}</td>
                         <td>{{$item->received_status}}</td>
                     </tr>
                 @endforeach
