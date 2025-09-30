@@ -157,9 +157,9 @@
                     <thead>
                     <tr style="background: #1f273b; color: white;">
                         <th align="left">Product Name</th>
+                        <th align="center">Qty</th>
                         <th align="right">Buy Price</th>
                         <th align="right">Sell Price</th>
-                        <th>Qty</th>
                         <th align="right">Amount</th>
                         <th align="right">Profit</th>
                     </tr>
@@ -167,11 +167,11 @@
                     @foreach($items as $item)
                         <tr>
                             <td align="left">{{$item['name']}}</td>
+                            <td align="center">
+                                <div>{{ number_format($item['quantity'], 0) }}</div>
+                            </td>
                             <td align="right">{{number_format($item['buy_price'],2)}}</td>
                             <td align="right">{{number_format($item['sell_price'],2)}}</td>
-                            <td align="right">
-                                <div style="margin-right: 50%">{{number_format($item['quantity'],2)}}</div>
-                            </td>
                             <td align="right">{{number_format($item['amount'],2)}}</td>
                             <td align="right">{{number_format($item['profit'],2)}}</td>
                         </tr>
@@ -216,26 +216,27 @@
 
 
             <hr>
-            <h4 align="center"><b>Summary</b></h4>
-            <table align="center">
-                <thead>
+            <!-- SUMMARY - Centered like Cash Sales -->
+        <div style="margin-top: 20px; padding-top: 10px;">
+            <h3 align="center"><b>Summary</b></h3>
+            <table style="min-width: 25%; width: auto; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
                 <tr>
-                    <th>Capital Invested</th>
-                    <td align="right">{{number_format($data[0]['total_buy'],2)}}</td>
+                    <td style="padding: 6px; text-align: right;"><b>Total Buy</b></td>
+                    <td style="padding: 6px; text-align: center;"><b>:</b></td>
+                    <td style="padding: 6px; text-align: right;"><b>{{ number_format($data[0]['total_buy'], 2) }}</b></td>
                 </tr>
                 <tr>
-                    <th>Total Sales</th>
-                    <td align="right">{{number_format($data[0]['total_amount'],2)}}</td>
-
+                    <td style="padding: 6px; text-align: right;"><b>Total Sales</b></td>
+                    <td style="padding: 6px; text-align: center;"><b>:</b></td>
+                    <td style="padding: 6px; text-align: right;"><b>{{ number_format($data[0]['total_amount'], 2) }}</b></td>
                 </tr>
                 <tr>
-                    <th>Total Profit</th>
-                    <td align="right">{{number_format($data[0]['total_profit'],2)}}</td>
-
+                    <td style="padding: 6px; text-align: right;"><b>Total Profit</b></td>
+                    <td style="padding: 6px; text-align: center;"><b>:</b></td>
+                    <td style="padding: 6px; text-align: right;"><b>{{ number_format($data[0]['total_profit'], 2) }}</b></td>
                 </tr>
-                </thead>
             </table>
-
+        </div>
         </div>
 
     </div>

@@ -130,22 +130,16 @@
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
     <h2 align="center" style="margin-top: -1%">Expense Report</h2>
-    <div class="row" style="margin-top: 10%;">
+    <h4 align="center" style="margin-top: -1%">From: {{date('Y-m-d',strtotime($data->first()->from))}} To: {{date('Y-m-d',strtotime($data->first()->to))}}</h4>
+    <div class="row" style="margin-top: 3%;">
         <div class="col-md-12">
-            <table id="table-detail-main">
-                <tr>
-                    <td style="background: #1f273b; color: white"><b>From
-                            Date:</b> {{date('Y-m-d',strtotime($data->first()->from))}}</td>
-                    <td style="background: #1f273b; color: white"><b>To
-                            Date:</b> {{date('Y-m-d',strtotime($data->first()->to))}}</td>
-                </tr>
-            </table>
             <table id="table-detail" align="center">
                 <!-- loop the product names here -->
                 <thead>
                 <tr style="background: #1f273b; color: white;">
-                    <th align="left">Expense Date</th>
-                    <th align="left">Expense Category</th>
+                    <th align="left">Date</th>
+                    <th align="left">Pay Method</th>
+                    <th align="left">Category</th>
                     <th align="left">Description</th>
                     <th align="left">Amount</th>
                     {{--                <th>Payment Method</th>--}}
@@ -154,14 +148,24 @@
                 @foreach($data as $item)
                     <tr>
                         <td align="left">{{date('d-m-Y',strtotime($item->created_at))}}</td>
+                        <td align="left">
+                            @if($item->payment_method_id == 1)
+                                CASH
+                            @elseif($item->payment_method_id == 2)
+                                MOBILE MONEY
+                            @elseif($item->payment_method_id == 3)
+                                BANK
+                            @elseif($item->payment_method_id == 4)
+                                CHEQUE
+                            @elseif($item->payment_method_id == 5)
+                                OTHER
+                            @else
+                                UNKNOWN
+                            @endif
+                        </td>
                         <td align="left">{{$item->accExpenseCategory['name']}}</td>
                         <td align="left">{{$item->expense_description}}</td>
                         <td align="left">{{number_format($item->amount,2)}}</td>
-                        {{--                    @if($item->payment_method_id == 1)--}}
-                        {{--                        <td align="">CASH</td>--}}
-                        {{--                    @else--}}
-                        {{--                        <td align="">BILL</td>--}}
-                        {{--                    @endif--}}
 
                     </tr>
                 @endforeach
