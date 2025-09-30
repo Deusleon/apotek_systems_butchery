@@ -123,7 +123,7 @@
 
     <div class="row" style="margin-top: -2%">
         <div class="col-md-12">
-            <div align="center">Perfomed By: {{Auth::user()->name}}, on {{date('d-m-Y')}}</div>
+            <div align="center">Perfomed By: {{Auth::user()->name}}, on {{date('Y-m-d')}}</div>
             <div align="center">Branch: <b>{{ $default_store }}</b></div>
             @php
                 $groupedData = [];
@@ -147,10 +147,10 @@
                         <th align="left">#</th>
                         <th align="left">Product Name</th>
                         @if ($showQoH)
-                            <th align="center">QOH</th>
-                            <th align="center">Physical</th>
+                            <th align="center">QoH</th>
+                            <th align="center">CountedQty</th>
                         @else
-                            <th align="center">Qty</th>
+                            <th align="center">CountedQty</th>
                         @endif
                     </tr>
                 </thead>

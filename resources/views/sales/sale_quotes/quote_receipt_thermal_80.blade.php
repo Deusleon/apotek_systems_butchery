@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sale Quote Receipt</title>
+    <title>Proforma Invoice</title>
     <style>
         @page {
             margin: 0;
@@ -12,6 +12,7 @@
             font-size: 12px;
             margin: 0;
             padding: 10px;
+            font-weight: bold;
         }
 
         * {
@@ -41,7 +42,7 @@
 
         h3, h4, h5, h6 {
             margin: 2px 0;
-            font-weight: normal;
+            font-weight: bold;
             text-align: center;
         }
 
@@ -52,12 +53,12 @@
 </head>
 <body>
 <div style="width: 100%;">
-    <h3><b>SALES ORDER RECEIPT</b></h3>
+    <h3><b>PROFORMA INVOICE</b></h3>
     <h4>{{$pharmacy['name']}}</h4>
     <h5>{{$pharmacy['address']}}</h5>
     <h5>{{$pharmacy['phone']}}</h5>
-    <h5>TIN: {{$pharmacy['tin_number']}}</h5>
-    <h5>VRN: {{$pharmacy['vrn_number']}}</h5>
+    <h5>TIN: {{$pharmacy['tin_number'] ?? 'N/A'}}</h5>
+    <h5>VRN: {{$pharmacy['vrn_number'] ?? 'N/A'}}</h5>
     @php
         $subTotal = 0;
         $vat = 0;
@@ -70,8 +71,8 @@
                 <td>
                     <span>Receipt #:</span> {{$datas}}<br>
                     <span>Customer:</span> {{$dat[0]['customer'] ?? 'CASH'}}<br>
-                    <span>Customer TIN:</span> {{$dat[0]['customer_tin'] ?? 'N/A'}}<br>
-                    <span>Date:</span> {{date('Y-m-d', strtotime($dat[0]['created_at']))}}
+                    {{-- <span>Customer TIN:</span> {{$dat[0]['customer_tin'] ?? 'N/A'}}<br> --}}
+                    <span>Date:</span> {{date('Y-m-d H:i:s')}}
                 </td>
             </tr>
         </table>

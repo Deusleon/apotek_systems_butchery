@@ -107,7 +107,7 @@
                         <th align="left">Batch #</th>
                         <th align="left">Sold By</th>
                         <th align="center" style="width: 2%">Qty</th>
-                        <th align="right">Sell Price</th>
+                        <th align="right">Sales Price</th>
                         <th align="right">Sub Total</th>
                         <th align="right">VAT</th>
                         @if ($enable_discount === 'YES')
@@ -130,7 +130,9 @@
                             <td align="right">{{ number_format($itm['price'], 2) }}</td>
                             <td align="right">{{ number_format($itm['sub_total'], 2) }}</td>
                             <td align="right">{{ number_format($itm['vat'], 2) }}</td>
-                            <td align="right">{{ number_format($itm['discount'], 2) }}</td>
+                            @if ($enable_discount === 'YES')
+                                <td align="right">{{ number_format($itm['discount'], 2) }}</td>
+                            @endif
                             <td align="right">{{ number_format($itm['amount'], 2) }}</td>
                         </tr>
                     @endforeach
@@ -193,7 +195,7 @@
 
                 $overallTotals['total_count'] += $count;
                 $overallTotals['grand_total'] += (float) ($tot['grand_total'] ?? 0);
-                $overallTotals['grand_subtotal'] += (float) (($tot['grand_total'] ?? 0)-($tot['total_vat'] ?? 0));
+                $overallTotals['grand_subtotal'] += (float) (($tot['grand_total'] ?? 0) - ($tot['total_vat'] ?? 0));
                 $overallTotals['total_paid'] += (float) ($tot['total_paid'] ?? 0);
                 $overallTotals['total_balance'] += (float) ($tot['total_balance'] ?? 0);
                 $overallTotals['total_vat'] += (float) ($tot['total_vat'] ?? 0);
@@ -214,40 +216,48 @@
             <table
                 style="width: auto; min-width: 25%; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
                 <tr>
-                    <td style="padding: 8px; text-align: right;"><b>Subtotal</b></td>
+                    <td style="padding: 8px; text-align: right;"><b>Sub Total</b></td>
                     <td style="padding: 8px; text-align: center;"><b>:</b></td>
                     <td style="padding: 8px; text-align: right;">
-                        <b>{{ number_format($overallTotals['grand_subtotal'], 2) }}</b></td>
+                        <b>{{ number_format($overallTotals['grand_subtotal'], 2) }}</b>
+                    </td>
                 </tr>
                 <tr>
                     <td style="padding: 8px; text-align: right;"><b>VAT</b></td>
                     <td style="padding: 8px; text-align: center;"><b>:</b></td>
                     <td style="padding: 8px; text-align: right;">
-                        <b>{{ number_format($overallTotals['total_vat'], 2) }}</b></td>
+                        <b>{{ number_format($overallTotals['total_vat'], 2) }}</b>
+                    </td>
                 </tr>
+                @if ($enable_discount === 'YES')
+                    <tr>
+                        <td style="padding: 8px; text-align: right;"><b>Discount</b></td>
+                        <td style="padding: 8px; text-align: center;"><b>:</b></td>
+                        <td style="padding: 8px; text-align: right;">
+                            <b>{{ number_format($overallTotals['total_discount'], 2) }}</b>
+                        </td>
+                    </tr>
+                @endif
                 <tr>
-                    <td style="padding: 8px; text-align: right;"><b>Discount</b></td>
+                    <td style="padding: 8px; text-align: right;"><b>Total</b></td>
                     <td style="padding: 8px; text-align: center;"><b>:</b></td>
                     <td style="padding: 8px; text-align: right;">
-                        <b>{{ number_format($overallTotals['total_discount'], 2) }}</b></td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px; text-align: right;"><b>Total Amount</b></td>
-                    <td style="padding: 8px; text-align: center;"><b>:</b></td>
-                    <td style="padding: 8px; text-align: right;">
-                        <b>{{ number_format($overallTotals['grand_total'], 2) }}</b></td>
+                        <b>{{ number_format($overallTotals['grand_total'], 2) }}</b>
+                    </td>
                 </tr>
                 <tr>
                     <td style="padding: 8px; text-align: right;"><b>Paid</b></td>
                     <td style="padding: 8px; text-align: center;"><b>:</b></td>
                     <td style="padding: 8px; text-align: right;">
-                        <b>{{ number_format($overallTotals['total_paid'], 2) }}</b></td>
+                        <b>{{ number_format($overallTotals['total_paid'], 2) }}</b>
+                    </td>
                 </tr>
                 <tr>
                     <td style="padding: 8px; text-align: right;"><b>Balance</b></td>
                     <td style="padding: 8px; text-align: center;"><b>:</b></td>
                     <td style="padding: 8px; text-align: right; color: red;">
-                        <b>{{ number_format($overallTotals['total_balance'], 2) }}</b></td>
+                        <b>{{ number_format($overallTotals['total_balance'], 2) }}</b>
+                    </td>
                 </tr>
             </table>
         </div>

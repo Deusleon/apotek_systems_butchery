@@ -113,8 +113,22 @@ class ProductController extends Controller
     {
         
         $this->validate($request, [
-            'name' => 'required|string|max:255',            
-            'barcode' => 'nullable|string|max:50|unique:inv_products,barcode,NULL,id',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('inv_products', 'name')
+                    ->ignore($request->id) // iache product unayoedit
+                    ->where(function ($query) use ($request) {
+                        return $query->where('category_id', $request->category);
+                    }),
+            ],         
+            'barcode' => [
+                'nullable',
+                'string',
+                'max:50',
+                Rule::unique('inv_products', 'barcode')->ignore($request->id),
+            ],
             'brand' => 'nullable|string|max:100',
             'category' => 'required|exists:inv_categories,id',
             'sale_uom' => 'nullable|string|max:50',
@@ -123,7 +137,10 @@ class ProductController extends Controller
             // 'max_quantinty' => 'nullable|numeric|min:0',
             // 'product_type' => 'nullable|in:stockable,consumable',
             'status' => 'nullable|in:0,1'
-        ]);
+        ], [
+        'name.unique' => 'Product name exist',
+        'barcode.unique' => 'Product barcode exist',
+    ]);
         $min_quantinty = str_replace(',', '', $request->input('min_quantinty'));
         $max_quantinty = str_replace(',', '', $request->input('max_quantinty'));
         $pack_size = str_replace(',', '', $request->input('pack_size'));
@@ -150,22 +167,13 @@ class ProductController extends Controller
         }
     }
 
-
     public function destroy(Request $request)
     {
-        $stock_id = DB::table('inv_current_stock')->where('product_id',$request->product_id);
+        $stock_count = DB::table('inv_current_stock')->where('product_id',$request->product_id)->count();
+        
+        $stock_count2 = DB::table('inv_incoming_stock')->where('product_id', $request->product_id)->count();
 
-        if($stock_id->count() > 0){
-            $stock_count = DB::table('sales_details')->where('stock_id',$stock_id->first()->id)->count();
-        }
-
-        if($stock_id->count() == 0)
-        {
-            $stock_count = 0;
-        }
-
-
-        if($stock_count>0)
+        if($stock_count > 0 && $stock_count2 > 0 )
         {
             $product = Product::find($request->product_id);
             $product->status = 0;

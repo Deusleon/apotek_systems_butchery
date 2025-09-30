@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Receipt</title>
+    <title>Proforma Invoice</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -238,7 +238,7 @@
 
     <!-- Receipt Header -->
     <div class="receipt-header">
-        <div class="receipt-title">SALES ORDER</div>
+        <div class="receipt-title">PROFORMA INVOICE</div>
         @foreach($data as $datas => $dat)
             <span style="font-size: 10px; font-weight: 400;">NO.</span><span class="receipt-number"> {{$datas}}</span>
             @break

@@ -38,8 +38,10 @@
                                 <div class="col-md-8">
                                     <input type="text" class="form-control"
                                            id="phone_edit" name="phone" required>
-                                    <span id="valid-msg-edit" class="hide"></span>
-                                    <span id="error-msg-edit" class="text text-danger"></span>
+                                    {{-- <span id="valid-msg-edit" class="hide"></span> --}}
+                                    {{-- <span id="error-msg-edit" class="text text-danger"></span> --}}
+                                    <small id="valid-msg-edit" class="hide"></small>
+                                    <small id="error-msg-edit" class="hide"></small>
                                 </div>
                             </div>
                             <div class="form-group row">

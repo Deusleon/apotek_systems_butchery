@@ -59,7 +59,7 @@
         <h4>{{$pharmacy['name']}}</h4>
         <h5>{{$pharmacy['address']}}</h5>
         <h5>{{$pharmacy['phone']}}</h5>
-        <h5>TIN: {{$pharmacy['tin_number']}}</h5>
+        <h5>TIN: {{$pharmacy['tin_number'] ?? 'N/A'}}</h5>
 
         @foreach($data as $datas => $dat)
             <table>
@@ -67,8 +67,8 @@
                     <td>
                         <span>Receipt #:</span> {{$datas}}<br>
                         <span>Customer:</span> {{$dat[0]['customer'] ?? 'CASH'}}<br>
-                        <span>TIN:</span> {{$dat[0]['customer_tin']}}<br>
-                        <span>Date:</span> {{date('Y-m-d', strtotime($dat[0]['created_at']))}}
+                        <span>TIN:</span> {{$dat[0]['customer_tin'] ?? 'N/A'}}<br>
+                        <span>Date:</span> {{date('Y-m-d H:i:s')}}
                     </td>
                 </tr>
             </table>
@@ -86,7 +86,7 @@
                         <tr>
                             <td>{{$item['name']}} {{$item['brand'] ?? ''}} {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}</td>
                             <td align="center">{{number_format($item['quantity'], 0)}}</td>
-                            <td align="right">{{number_format($item['price'] * $item['quantity'], 2)}}</td>
+                            <td align="right">{{number_format($item['price'] * $item['quantity'], 0)}}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -97,21 +97,21 @@
                 <tbody>
                         <tr>
                             <td align="left">Sub Total</td>
-                            <td align="right">{{number_format($dat[0]['grand_total'] - $dat[0]['total_vat'] + $dat[0]['discount_total'], 2)}}</td>
+                            <td align="right">{{number_format($dat[0]['grand_total'] - $dat[0]['total_vat'] + $dat[0]['discount_total'], 0)}}</td>
                         </tr>
                         @if($dat[0]['discount_total'] > 0)
                             <tr>
                                 <td align="left">Discount</td>
-                                <td align="right">{{number_format($dat[0]['discount_total'], 2)}}</td>
+                                <td align="right">{{number_format($dat[0]['discount_total'], 0)}}</td>
                             </tr>
                         @endif
                         <tr>
                             <td align="left">VAT</td>
-                            <td align="right">{{number_format($dat[0]['total_vat'], 2)}}</td>
+                            <td align="right">{{number_format($dat[0]['total_vat'], 0)}}</td>
                         </tr>
                         <tr>
                             <td align="left"><b>Total</b></td>
-                            <td align="right"><b>{{number_format($dat[0]['grand_total'], 2)}}</b></td>
+                            <td align="right"><b>{{number_format($dat[0]['grand_total'], 0)}}</b></td>
                         </tr>
                 </tbody>
             </table>
@@ -121,11 +121,11 @@
                 <tbody>
                         <tr>
                             <td align="left">Paid</td>
-                            <td align="right">{{number_format($dat[0]['paid'], 2)}}</td>
+                            <td align="right">{{number_format($dat[0]['paid'], 0)}}</td>
                         </tr>
                             <tr>
                                 <td align="left">Balance</td>
-                                <td align="right">{{number_format($dat[0]['grand_total'] - $dat[0]['paid'], 2)}}</td>
+                                <td align="right">{{number_format($dat[0]['grand_total'] - $dat[0]['paid'], 0)}}</td>
                             </tr>
                 </tbody>
             </table>
@@ -133,7 +133,7 @@
                 <div class="summary-row" style="font-size: 9px;"><span>Remark</span><span>{{$dat[0]['remark']}}</span></div>
             @endif
 
-            <h5>Issued By {{$dat[0]['sold_by']}}</h5>
+            <h5>Issued By: {{$dat[0]['sold_by']}}</h5>
             <h5 style="font-style: italic">{{$pharmacy['slogan']}}</h5>
         @endforeach
     </div>

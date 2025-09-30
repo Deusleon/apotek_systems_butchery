@@ -208,7 +208,7 @@
             <hr style="margin-left: 4%; margin-right: -4%; margin-top: -2%">
         @endif
 
-        <h5 align="center" style="margin-top: -0%">Sold By {{$dat[0]['sold_by']}}</h5>
+        <h5 align="center" style="margin-top: -0%">Issued By: {{$dat[0]['sold_by']}}</h5>
         <h5 align="center" style="margin-top: -1%; font-style: italic">{{$pharmacy['slogan']}}</h5>
 
     @endforeach

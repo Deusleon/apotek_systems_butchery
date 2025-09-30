@@ -48,7 +48,7 @@
                                 <label for="pack_size" class="col-md-4 col-form-label text-md-right">Pack Size</label>
                                 <div class="col-md-8">
                                     <input type="text" class="form-control" id="pack_size_edit" name="pack_size"
-                                        value="{{ old('pack_size') }}" placeholder=""
+                                        value="{{ old('pack_size') }}" placeholder="e.g. 6, 12, 24"
                                         onkeypress="return isNumberKey(event,this)">
                                 </div>
                             </div>

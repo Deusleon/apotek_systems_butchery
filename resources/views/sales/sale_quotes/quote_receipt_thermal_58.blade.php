@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sale Quote Receipt</title>
+    <title>Proforma Invoice</title>
     <style>
         @page {
             margin: 0;
@@ -12,6 +12,7 @@
             font-size: 10px;
             margin: 0;
             padding: 10px;
+            font-weight: bold;
         }
 
         * {
@@ -41,7 +42,7 @@
 
         h3, h4, h5, h6 {
             margin: 2px 0;
-            font-weight: normal;
+            font-weight: bold;
             text-align: center;
         }
 
@@ -52,12 +53,12 @@
 </head>
 <body>
 <div style="width: 100%;">
-    <h3><b>SALES ORDER RECEIPT</b></h3>
+    <h3><b>PROFORMA INVOICE</b></h3>
     <h4>{{$pharmacy['name']}}</h4>
     <h5>{{$pharmacy['address']}}</h5>
     <h5>{{$pharmacy['phone']}}</h5>
-    <h5>TIN: {{$pharmacy['tin_number']}}</h5>
-    <h5>VRN: {{$pharmacy['vrn_number']}}</h5>
+    <h5>TIN: {{$pharmacy['tin_number'] ?? 'N/A'}}</h5>
+    <h5>VRN: {{$pharmacy['vrn_number'] ?? 'N/A'}}</h5>
     @php
         $subTotal = 0;
         $vat = 0;
@@ -72,7 +73,7 @@
                     <span>Receipt #:</span> {{$datas}}<br>
                     <span>Customer:</span> {{$dat[0]['customer'] ?? 'CASH'}}<br>
                     <span>Customer TIN:</span> {{$dat[0]['customer_tin'] ?? 'N/A'}}<br>
-                    <span>Date:</span> {{date('Y-m-d', strtotime($dat[0]['created_at']))}}
+                    <span>Date:</span> {{date('Y-m-d H:i:s')}}
                 </td>
             </tr>
         </table>
@@ -92,9 +93,9 @@
                     <tr>
                         <td>{{$item['name']}} {{$item['brand'] ?? ''}} {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}</td>
                         <td class="text-center">{{number_format($item['quantity'], 0)}}</td>
-                        <td class="text-right">{{number_format($item['price'], 2)}}</td>
+                        <td class="text-right">{{number_format($item['price'], 0)}}</td>
                         {{-- <td class="text-right">{{number_format($item['vat'], 2)}}</td> --}}
-                        <td class="text-right">{{number_format($item['sub_total'], 2)}}</td>
+                        <td class="text-right">{{number_format($item['sub_total'], 0)}}</td>
                     </tr>
                     @php
                     $subTotal += $item['sub_total'];
@@ -112,22 +113,22 @@
                 <tr>
                     <td>Sub Total</td>
                     <td class="text-right">
-                        {{number_format($subTotal, 2)}}
+                        {{number_format($subTotal, 0)}}
                     </td>
                 </tr>
                 <tr>
                     <td>VAT</td>
-                    <td class="text-right">{{number_format($vat, 2)}}</td>
+                    <td class="text-right">{{number_format($vat, 0)}}</td>
                 </tr>
                 @if($dat[0]['discount_total'] > 0)
                 <tr>
                     <td>Discount</td>
-                    <td class="text-right">{{number_format($discount, 2)}}</td>
+                    <td class="text-right">{{number_format($discount, 0)}}</td>
                 </tr>
                 @endif
                 <tr>
                     <td><b>Total</b></td>
-                    <td class="text-right"><b>{{number_format($grandTotal, 2)}}</b></td>
+                    <td class="text-right"><b>{{number_format($grandTotal, 0)}}</b></td>
                 </tr>
             </tbody>
         </table>

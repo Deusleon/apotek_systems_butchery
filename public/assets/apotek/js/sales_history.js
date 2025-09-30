@@ -155,9 +155,9 @@ function populateHistoryTable(data) {
             item.name +
                 " " +
                 (item.brand ? item.brand + " " : "") +
-                item.pack_size +
-                item.sales_uom,
-            Number(item.quantity).toFixed(0),
+                (item.pack_size ? item.pack_size : "") +
+                (item.sales_uom ? item.sales_uom : ""),
+            formatMoney(Number(item.quantity).toFixed(0)),
             formatMoney(Number(item.price)),
         ]);
     });

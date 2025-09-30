@@ -117,7 +117,9 @@
                                     <th>Product Name</th>
                                     <th>Category</th>
                                     <th>Batch Number</th>
-                                    <th>Expire Date</th>
+                                    @if ($expireEnabled)
+                                        <th>Expire Date</th>
+                                    @endif
                                     <th>Quantity</th>
                                 </tr>
                             </thead>
@@ -134,7 +136,9 @@
                                             {{ $allDet->cat_name }}
                                         </td>
                                         <td id="d_batch_{{ $allDet->product_id }}">{{ $allDet->batch_number ?? '' }}</td>
-                                        <td id="d_expiry_{{ $allDet->product_id }}">{{ $allDet->expiry_date ?? '' }}</td>
+                                        @if ($expireEnabled)
+                                            <td id="d_expiry_{{ $allDet->product_id }}">{{ $allDet->expiry_date ?? '' }}</td>
+                                        @endif
                                         <td id="d_quantity_{{ $allDet->product_id }}">
                                             {{ floor($allDet->quantity) == $allDet->quantity ? number_format($allDet->quantity, 0) : number_format($allDet->quantity, 1) }}
                                         </td>
@@ -199,7 +203,9 @@
                                     <th>Product Name</th>
                                     <th>Category</th>
                                     <th>Batch Number</th>
-                                    <th>Expire Date</th>
+                                    @if ($expireEnabled)
+                                        <th>Expire Date</th>
+                                    @endif
                                     <th>Quantity</th>
                                 </tr>
                             </thead>
@@ -216,7 +222,9 @@
                                             {{ $data->cat_name }}
                                         </td>
                                         <td id="d_batch_{{ $data->product_id }}">{{ $data->batch_number ?? '' }}</td>
-                                        <td id="d_expiry_{{ $data->product_id }}">{{ $data->expiry_date ?? '' }}</td>
+                                        @if ($expireEnabled)
+                                            <td id="d_expiry_{{ $data->product_id }}">{{ $data->expiry_date ?? '' }}</td>
+                                        @endif
                                         <td id="d_quantity_{{ $data->product_id }}">
                                             {{ floor($data->quantity) == $data->quantity ? number_format($data->quantity, 0) : number_format($data->quantity, 1) }}
                                         </td>
@@ -273,7 +281,9 @@
                                     <th>Product Name</th>
                                     <th>Category</th>
                                     <th>Batch Number</th>
-                                    <th>Expire Date</th>
+                                    @if ($expireEnabled)
+                                        <th>Expire Date</th>
+                                    @endif
                                     <th>Quantity</th>
                                 </tr>
                             </thead>
@@ -290,7 +300,9 @@
                                             {{ $out->cat_name }}
                                         </td>
                                         <td id="o_detal_batch_{{ $out->product_id }}">{{ $out->batch_number ?? '' }}</td>
-                                        <td id="o_detal_expiry_{{ $out->product_id }}">{{ $out->expiry_date ?? '' }}</td>
+                                        @if ($expireEnabled)
+                                            <td id="o_detal_expiry_{{ $out->product_id }}">{{ $out->expiry_date ?? '' }}</td>
+                                        @endif
                                         <td id="o_detal_quantity_{{ $out->product_id }}">
                                             {{ floor($out->quantity) == $out->quantity ? number_format($out->quantity, 0) : number_format($out->quantity, 1) }}
                                         </td>

@@ -216,8 +216,8 @@
             <div class="company-address">
                 {{$pharmacy['address']}}<br>
                 {{$pharmacy['phone']}}<br>
-                <span>TIN: {{$pharmacy['tin_number']}}</span> |
-                <span>VRN: {{$pharmacy['vrn_number']}}</span>
+                <span>TIN: {{$pharmacy['tin_number'] ?? 'N/A'}}</span> |
+                <span>VRN: {{$pharmacy['vrn_number'] ?? 'N/A'}}</span>
             </div>
         </div>
     </div>

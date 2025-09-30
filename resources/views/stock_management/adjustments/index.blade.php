@@ -11,12 +11,12 @@
 @endsection
 
 @section('content-title')
-    Stock Adjustments
+    Stock Adjustment
 @endsection
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#"> Inventory / Stock Adjustments</a></li>
+    <li class="breadcrumb-item"><a href="#"> Inventory / Stock Adjustment</a></li>
 @endsection
 
 @section("content")
