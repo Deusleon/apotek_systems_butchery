@@ -6,12 +6,13 @@ use App\Customer;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class CustomerController extends Controller {
 
     public function index() {
-        if (!Auth()->user()->checkPermission('View Customers')) {
-            abort(403, 'Access Denied');
+        if ( !Auth()->user()->checkPermission( 'View Customers' ) ) {
+            abort( 403, 'Access Denied' );
         }
         $customers = Customer::orderBy( 'id', 'ASC' )->get();
         foreach ( $customers as $customer ) {
@@ -33,6 +34,18 @@ class CustomerController extends Controller {
 
     public function store( Request $request ) {
 
+        $this->validate( $request, [
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique( 'customers', 'name' )
+                ->ignore( $request->id ),
+            ],
+            'email' => 'nullable|email',
+        ], [
+            'name.unique' => 'Customer name exist',
+        ] );
         if ( $request->credit_limit>0 ) {
             $payment_term = '2';
         }
@@ -61,6 +74,18 @@ class CustomerController extends Controller {
     }
 
     public function update( Request $request ) {
+        $this->validate( $request, [
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique( 'customers', 'name' )
+                ->ignore( $request->id ),
+            ],
+            'email' => 'nullable|email',
+        ], [
+            'name.unique' => 'Customer name exist',
+        ] );
         $customer = Customer::find( $request->id );
         $customer->name = $request->name;
         $customer->address = $request->address;

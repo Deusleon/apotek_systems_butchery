@@ -150,7 +150,7 @@
                                     @endif
                                     <th>Buy Price</th>
                                     <th>Sell Price</th>
-                                    <th>Purchase Date</th>
+                                    {{-- <th>Purchase Date</th> --}}
                                     <th hidden>Profit%</th>
                                     <th hidden>Real Time</th>
                                 </tr>
@@ -502,7 +502,7 @@
                         @endif
                         { data: "unit_cost", render: data => formatMoney(data) },
                         { data: "price", render: data => formatMoney(data) },
-                        { data: "purchased_at", render: data => data ? data.split(' ')[0] : '' },
+                        // { data: "purchased_at", render: data => data ? data.split(' ')[0] : '' },
                         // { data: "updated_at", render: data => data ? data.split(' ')[0] : '' }, 
                         { data: "price_category_id", visible: false }
                     ]

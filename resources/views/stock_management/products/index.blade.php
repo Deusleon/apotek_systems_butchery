@@ -355,8 +355,8 @@
                 $('#show #category_edit').html(row_data.category ? row_data.category.name : 'N/A');
                 $('#show #sale_edit').html(row_data.sales_uom || 'N/A');
                 $('#show #pack_size_show').html(row_data.pack_size || 'N/A');
-                $('#show #min_quantinty_show').html(row_data.min_quantinty || 'N/A');
-                $('#show #max_quantinty_show').html(row_data.max_quantinty || 'N/A');
+                $('#show #min_quantinty_show').html(numberWithCommas(row_data.min_quantinty) || 'N/A');
+                $('#show #max_quantinty_show').html(numberWithCommas(row_data.max_quantinty) || 'N/A');
                 $('#show #status').html(row_data.status === 1 ? 'Active' : 'Inactive');
             });
 

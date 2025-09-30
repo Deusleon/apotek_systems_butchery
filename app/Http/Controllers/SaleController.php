@@ -695,6 +695,7 @@ class SaleController extends Controller
                 'sales_summary.total_vat',
                 'sales_summary.items_count'
             ])
+            ->orderBy('sales.id', 'desc')
             ->get();
             Log::info('Data is'.json_encode($sales, JSON_PRETTY_PRINT));
             

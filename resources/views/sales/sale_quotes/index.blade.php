@@ -62,7 +62,7 @@
                                 <div class="form-group">
                                     <label id="cat_label">Sales Type<font color="red">*</font></label>
                                     <select id="price_category" class="js-example-basic-single form-control">
-                                        <option value="">Select Sales Type</option>
+                                        <option value="" selected="true" disabled>Select Type</option>
                                         @foreach ($price_category as $price)
                                             <!-- <option value="{{ $price->id }}">{{ $price->name }}</option> -->
                                             <option value="{{ $price->id }}" {{ $default_sale_type === $price->id ? 'selected' : '' }}>{{ $price->name }}
@@ -194,7 +194,7 @@
                         <table id="quote_table" class="table table-striped table-bordered" width="100%">
                             <thead>
                                 <tr>
-                                    <th>Quote ID</th>
+                                    <th>Order ID</th>
                                     <th>Customer</th>
                                     <th>Total Amount</th>
                                     <th>Date</th>
@@ -228,6 +228,7 @@
     @include('partials.notification')
     <script type="text/javascript">
         $(document).ready(function () {
+            loadProducts();
             setTimeout(function () { $('#quote_barcode_input').focus(); }, 150);
             // Global variables
             var cart = [];
@@ -492,6 +493,13 @@
 
             // Function to add product to cart
             function addProductToCart(productData) {
+                let customer_id = document.getElementById("customer_id").value;
+
+                if (!customer_id) {
+                    notify('Select Customer First', 'top', 'right', 'warning');
+                    $(this).val(null).trigger('change.select2');
+                    return;
+                }
                 if (!productData) return;
 
                 $("#edit_quantity").change();
@@ -579,10 +587,6 @@
             // Function to load products based on price category
             function loadProducts() {
                 var priceCategory = $('#price_category').val();
-                if (!priceCategory) {
-                    $('#products').empty().append('<option value="">Select Sales Type First</option>');
-                    return;
-                }
 
                 $.ajax({
                     url: '{{ route("selectProducts") }}',
@@ -787,21 +791,8 @@
 
             // Product selection event handler
             $("#products").on('change', function (event) {
-                let customer_id = document.getElementById("customer_id").value;
+                // let customer_id = document.getElementById("customer_id").value;
                 let selectedProduct = $(this).val();
-
-                // console.log('Product selected:', selectedProduct);
-                // console.log('Customer ID:', customer_id);
-
-                if (!customer_id) {
-                    if (typeof notify === 'function') {
-                        notify('Select Customer First', 'top', 'right', 'warning');
-                    } else {
-                        alert('Select Customer First');
-                    }
-                    $(this).val(null).trigger('change.select2');
-                    return;
-                }
 
                 if (selectedProduct && selectedProduct !== '') {
                     // console.log('Adding product to cart');
@@ -836,7 +827,7 @@
             // Initialize price category select2
             $('#price_category').select2({
                 placeholder: 'Select Sales Type',
-                allowClear: true
+                allowClear: false
             });
 
             // Initialize products select2
@@ -966,9 +957,9 @@
                         // console.log('Quote saved successfully:', response);
 
                         if (typeof notify === 'function') {
-                            notify('Quote saved successfully!', 'top', 'right', 'success');
+                            notify('Order saved successfully!', 'top', 'right', 'success');
                         } else {
-                            alert('Quote saved successfully!');
+                            alert('Order saved successfully!');
                         }
 
                         // Clear form

@@ -84,6 +84,8 @@ class StockAdjustmentController extends Controller
             return redirect()->route('stock-adjustments-history');
         }
         $store_id = current_store_id();
+        $expireSettings = Setting::where('id', 123)->value('value');
+        $expireEnabled = $expireSettings === 'YES';
         $stocks = DB::table('inv_current_stock')
             ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
             ->join('inv_categories','inv_products.category_id','=','inv_categories.id')
@@ -184,7 +186,8 @@ class StockAdjustmentController extends Controller
             'outstock' => $outstock,
             'outDetailed' => $outDetailed,
             'stores' => $stores,
-            'reasons' => $reasons
+            'reasons' => $reasons,
+            'expireEnabled' => $expireEnabled,
         ]);
     }
     public function create()

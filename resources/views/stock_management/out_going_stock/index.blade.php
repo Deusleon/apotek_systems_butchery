@@ -115,7 +115,7 @@
                                 <tr>
                                     <th>Product Name</th>
                                     <th>Quantity</th>
-                                    <th>QoH</th>
+                                    {{-- <th>QoH</th> --}}
                                 </tr>
                             </thead>
                             <tbody>
@@ -132,9 +132,9 @@
                                     <th>Product Name</th>
                                     <th>Out Mode</th>
                                     <th>Quantity</th>
-                                    <th>Batch #</th>
+                                    {{-- <th>Batch #</th> --}}
                                     <th>Date</th>
-                                    <th>QoH</th>
+                                    {{-- <th>QoH</th> --}}
                                 </tr>
                             </thead>
                             <tbody>
@@ -164,7 +164,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        Do you want to show Quantity on Hand (QoH) on print?
+                        Do you want to show Quantity on Hand (QoH) on the printout?
                     </div>
                     <div class="modal-footer">
                         {{-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button> --}}

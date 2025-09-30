@@ -179,7 +179,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        Do you want to show Quantity on Hand (QoH) on print?
+                        Do you want to show Quantity on Hand (QoH) on the printout?
                     </div>
                     <div class="modal-footer">
                         {{-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button> --}}
@@ -330,8 +330,8 @@
                                         (item.product && item.product.brand ? item.product.brand + " " : "") +
                                         (item.product && item.product.pack_size ? item.product.pack_size : "") +
                                         (item.product && item.product.sales_uom ? item.product.sales_uom : ""),
-                                    total_sold: item.total_sold,
-                                    current_stock: item.current_stock,
+                                    total_sold: numberWithCommas(item.total_sold),
+                                    current_stock: numberWithCommas(item.current_stock),
                                 };
                             });
                         dailyTable.rows.add(rows).draw();
@@ -362,5 +362,8 @@
                 });
             });
 
+            function numberWithCommas(digit) {
+                return String(parseFloat(digit)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
         </script>
     @endpush

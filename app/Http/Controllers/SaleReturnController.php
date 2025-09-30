@@ -21,7 +21,7 @@ class SaleReturnController extends Controller
         date_default_timezone_set('Africa/Nairobi');
         $date = date('m-d-Y');
         $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
-        $sales = Sale::where(DB::Raw("DATE_FORMAT(date,'%m-%d-%Y')"), '=', $date)->get();
+        $sales = Sale::where(DB::Raw("DATE_FORMAT(date,'%m-%d-%Y')"), '=', $date)->orderBy('id', 'desc')->get();
         $count = $sales->count();
         return View::make('sales.sale_returns.index')
             ->with(compact('vat'))
@@ -58,7 +58,7 @@ class SaleReturnController extends Controller
                 [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
                 ->offset($start)
                 ->limit($limit)
-                ->orderBy($order, $dir)
+                ->orderBy('id', 'desc')
                 ->get();
         } else {
             $search = $request->input('search.value');

@@ -26,6 +26,8 @@ class CurrentStockController extends Controller
             abort(403, 'Access Denied');
         }
         $store_id = current_store_id();
+        $expireSettings = Setting::where('id', 123)->value('value');
+        $expireEnabled = $expireSettings === 'YES';
         $stocks = DB::table('inv_current_stock')
             ->join('inv_products','inv_current_stock.product_id','=','inv_products.id')
             ->join('inv_categories','inv_products.category_id','=','inv_categories.id')
@@ -142,7 +144,8 @@ class CurrentStockController extends Controller
             'detailed' => $detailed,
             'outstock' => $outstock,
             'outDetailed' => $outDetailed,
-            'stores' => $stores
+            'stores' => $stores,
+            'expireEnabled' => $expireEnabled
         ]);
     }
 
@@ -150,6 +153,8 @@ class CurrentStockController extends Controller
     public function allStock()
     {
         $store_id = current_store_id();
+        $expireSettings = Setting::where('id', 123)->value('value');
+        $expireEnabled = $expireSettings === 'YES';
         if(is_all_store()) {
         $stocks = DB::table('inv_current_stock')
             ->join('inv_products', 'inv_current_stock.product_id', '=', 'inv_products.id')
@@ -249,7 +254,9 @@ class CurrentStockController extends Controller
         return view('stock_management.current_stock.current_stock_value')->with([
             'stocks'=>$stocks,
             'detailed'=>$detailed,
-            'outstock'=>$outstock]);
+            'outstock'=>$outstock,
+            'expireEnabled' => $expireEnabled
+        ]);
     }
 
     public function filterStockValue(Request $request)

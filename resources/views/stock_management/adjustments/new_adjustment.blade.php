@@ -11,12 +11,12 @@
 @endsection
 
 @section('content-title')
-    Stock Adjustments
+    Stock Adjustment
 @endsection
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#"> Inventory / Stock Adjustments</a></li>
+    <li class="breadcrumb-item"><a href="#"> Inventory / Stock Adjustment</a></li>
 @endsection
 
 @section("content")
@@ -99,8 +99,7 @@
                                         . (!empty($allstock->brand) ? ' ' . $allstock->brand : '')
                                         . (!empty($allstock->pack_size) ? ' ' . $allstock->pack_size : '')
                                         . (!empty($allstock->sales_uom) ? $allstock->sales_uom : '') }}"
-                                                                data-from-type="summary"
-                                                                data-current-stock="{{ $allstock->quantity }}">
+                                                                data-from-type="summary" data-current-stock="{{ $allstock->quantity }}">
                                                                 Adjust
                                                             </button>
                                                         </td>
@@ -124,7 +123,9 @@
                                 <th>Product Name</th>
                                 <th>Category</th>
                                 <th>Batch Number</th>
-                                <th>Expire Date</th>
+                                @if ($expireEnabled)
+                                    <th>Expire Date</th>
+                                @endif
                                 <th>Quantity</th>
                                 @if(auth()->user()->checkPermission('Create Stock Adjustment'))
                                     <th>Actions</th>
@@ -144,7 +145,9 @@
                                         {{ $allDet->cat_name }}
                                     </td>
                                     <td id="d_batch_{{ $allDet->product_id }}">{{ $allDet->batch_number ?? '' }}</td>
-                                    <td id="d_expiry_{{ $allDet->product_id }}">{{ $allDet->expiry_date ?? '' }}</td>
+                                    @if ($expireEnabled)
+                                        <td id="d_expiry_{{ $allDet->product_id }}">{{ $allDet->expiry_date ?? '' }}</td>
+                                    @endif
                                     <td id="d_quantity_{{ $allDet->product_id }}">
                                         {{ floor($allDet->quantity) == $allDet->quantity ? number_format($allDet->quantity, 0) : number_format($allDet->quantity, 1) }}
                                     </td>
@@ -157,8 +160,7 @@
                                         . (!empty($allDet->brand) ? ' ' . $allDet->brand : '')
                                         . (!empty($allDet->pack_size) ? ' ' . $allDet->pack_size : '')
                                         . (!empty($allDet->sales_uom) ? $allDet->sales_uom : '') }}"
-                                                                data-from-type="detailed"
-                                                                data-current-stock="{{ $allDet->quantity }}">
+                                                                data-from-type="detailed" data-current-stock="{{ $allDet->quantity }}">
                                                                 Adjust
                                                             </button>
                                                         </td>
@@ -208,8 +210,7 @@
                                         . (!empty($stock->brand) ? ' ' . $stock->brand : '')
                                         . (!empty($stock->pack_size) ? ' ' . $stock->pack_size : '')
                                         . (!empty($stock->sales_uom) ? $stock->sales_uom : '') }}"
-                                                                data-from-type="summary"
-                                                                data-current-stock="{{ $stock->quantity }}">
+                                                                data-from-type="summary" data-current-stock="{{ $stock->quantity }}">
                                                                 Adjust
                                                             </button>
                                                         </td>
@@ -233,7 +234,9 @@
                                 <th>Product Name</th>
                                 <th>Category</th>
                                 <th>Batch Number</th>
-                                <th>Expire Date</th>
+                                @if ($expireEnabled)
+                                    <th>Expire Date</th>
+                                @endif
                                 <th>Quantity</th>
                                 @if(auth()->user()->checkPermission('Create Stock Adjustment'))
                                     <th>Actions</th>
@@ -253,7 +256,9 @@
                                         {{ $data->cat_name }}
                                     </td>
                                     <td id="d_batch_{{ $data->product_id }}">{{ $data->batch_number ?? '' }}</td>
-                                    <td id="d_expiry_{{ $data->product_id }}">{{ $data->expiry_date ?? '' }}</td>
+                                    @if ($expireEnabled)
+                                        <td id="d_expiry_{{ $data->product_id }}">{{ $data->expiry_date ?? '' }}</td>
+                                    @endif
                                     <td id="d_quantity_{{ $data->product_id }}">
                                         {{ floor($data->quantity) == $data->quantity ? number_format($data->quantity, 0) : number_format($data->quantity, 1) }}
                                     </td>
@@ -266,8 +271,7 @@
                                         . (!empty($data->brand) ? ' ' . $data->brand : '')
                                         . (!empty($data->pack_size) ? ' ' . $data->pack_size : '')
                                         . (!empty($data->sales_uom) ? $data->sales_uom : '') }}"
-                                                                data-from-type="detailed"
-                                                                data-current-stock="{{ $data->quantity }}">
+                                                                data-from-type="detailed" data-current-stock="{{ $data->quantity }}">
                                                                 Adjust
                                                             </button>
                                                         </td>
@@ -319,8 +323,7 @@
                                                                 data-product-id="{{ $out->product_id }}" data-product-name="{{ $out->name
                                         . (!empty($out->brand) ? ' ' . $out->brand : '')
                                         . (!empty($out->pack_size) ? ' ' . $out->pack_size : '')
-                                        . (!empty($out->sales_uom) ? $out->sales_uom : '') }}"
-                                                                data-from-type="summary"
+                                        . (!empty($out->sales_uom) ? $out->sales_uom : '') }}" data-from-type="summary"
                                                                 data-current-stock="{{ $out->quantity }}">
                                                                 Adjust
                                                             </button>
@@ -343,7 +346,9 @@
                                 <th>Product Name</th>
                                 <th>Category</th>
                                 <th>Batch Number</th>
-                                <th>Expire Date</th>
+                                @if ($expireEnabled)
+                                    <th>Expire Date</th>
+                                @endif
                                 <th>Quantity</th>
                                 @if(auth()->user()->checkPermission('Create Stock Adjustment'))
                                     <th>Actions</th>
@@ -363,7 +368,9 @@
                                         {{ $outDet->cat_name }}
                                     </td>
                                     <td id="o_detal_batch_{{ $outDet->product_id }}">{{ $outDet->batch_number ?? '' }}</td>
-                                    <td id="o_detal_expiry_{{ $outDet->product_id }}">{{ $outDet->expiry_date ?? '' }}</td>
+                                    @if ($expireEnabled)
+                                        <td id="o_detal_expiry_{{ $outDet->product_id }}">{{ $outDet->expiry_date ?? '' }}</td>
+                                    @endif
                                     <td id="o_detal_quantity_{{ $outDet->product_id }}">
                                         {{ floor($outDet->quantity) == $outDet->quantity ? number_format($outDet->quantity, 0) : number_format($outDet->quantity, 1) }}
                                     </td>
@@ -376,8 +383,7 @@
                                         . (!empty($outDet->brand) ? ' ' . $outDet->brand : '')
                                         . (!empty($outDet->pack_size) ? ' ' . $outDet->pack_size : '')
                                         . (!empty($outDet->sales_uom) ? $outDet->sales_uom : '') }}"
-                                                                data-from-type="detailed"
-                                                                data-current-stock="{{ $outDet->quantity }}">
+                                                                data-from-type="detailed" data-current-stock="{{ $outDet->quantity }}">
                                                                 Adjust
                                                             </button>
                                                         </td>
@@ -612,7 +618,24 @@
             }
         }
 
+        $(document).ready(function () {
+            var savedStatus = localStorage.getItem('stock_status_id');
+            var savedCategory = localStorage.getItem('category_id');
+
+            if (savedStatus !== null) {
+                $('#stock_status_id').val(savedStatus);
+            }
+            if (savedCategory !== null) {
+                $('#category_id').val(savedCategory);
+            }
+
+            // Trigger change once to load the table using saved values
+            $('#stock_status_id, #category_id').trigger('change');
+        });
+
         $(document).on('change', '#stock_status_id, #category_id', function () {
+            localStorage.setItem('stock_status_id', $('#stock_status_id').val());
+            localStorage.setItem('category_id', $('#category_id').val());
             showStockView($stockStatus.val(), $category.val());
         });
 

@@ -7,7 +7,7 @@ $('#create').on('show.bs.modal', function () {
 
 //Create customer
 $(document).on('submit', '#create_customer', function(e) {
-    e.preventDefault(); 
+    // e.preventDefault(); 
     
     let form = $(this);
     let actionUrl = form.attr('action');
@@ -66,7 +66,7 @@ $('#delete').on('show.bs.modal', function (event) {
 });
 
 //Change the input into money format with fixed 2 decimal places
-$("#credit_input").on('change', function (evt) {
+$("#credit_limit").on('change', function (evt) {
     if (evt.which != 110) {//not a fullstop
         var n = Math.abs((parseFloat($(this).val().replace(/\,/g, ''), 10) || 0));
         $(this).val(n.toLocaleString("en", {
@@ -74,7 +74,7 @@ $("#credit_input").on('change', function (evt) {
             maximumFractionDigits: 2,
         }));
     }
-    var credit_input = (document.getElementById("credit_input").value);
+    var credit_input = (document.getElementById("credit_limit").value);
     credit_limit_amount = (parseFloat(credit_input.replace(/\,/g, ''), 10) || 0);
     $('#create').find('.modal-body #credit_limit_amount').val(credit_limit_amount);
 });
@@ -215,4 +215,10 @@ function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
     } catch (e) {
         console.log(e)
     }
+}
+
+function numberWithCommas(digit) {
+    return String(parseFloat(digit))
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }

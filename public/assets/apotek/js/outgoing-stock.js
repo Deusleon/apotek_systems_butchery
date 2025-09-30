@@ -2,7 +2,11 @@ var summary_table = $("#fixedHeader").DataTable({
     searching: true,
     bPaginate: true,
     bInfo: true,
-    columns: [{ data: "product_name" }, { data: "out_total" }, { data: "qoh" }],
+    columns: [
+        { data: "product_name" },
+        { data: "out_total" },
+        // { data: "qoh" }
+    ],
     // order: [[1, "desc"]],
 });
 
@@ -14,21 +18,23 @@ var table_daily_stock = $("#fixedHeader2").DataTable({
         { data: "product_name" },
         { data: "out_mode" },
         { data: "out_total" },
-        { data: "batch_number" },
+        // { data: "batch_number" },
         { data: "date" },
-        { data: "qoh" },
+        // { data: "qoh" },
     ],
-    columnDefs: [{ type: "date", targets: 4 }],
-    order: [[4, "desc"]],
+    columnDefs: [{ type: "date", targets: 3 }],
+    order: [[3, "desc"]],
 });
 
 $(function () {
     var start = moment();
     var end = moment();
 
-            function cb(start, end) {
-                $("#outgoing-date span").html(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
-            }
+    function cb(start, end) {
+        $("#outgoing-date span").html(
+            start.format("YYYY/MM/DD") + " - " + end.format("YYYY/MM/DD")
+        );
+    }
     // function cb(start, end) {
     //     $("#outgoing-date span").html(
     //         start.format("MMMM D, YYYY") + " - " + end.format("MMMM D, YYYY")
@@ -41,9 +47,9 @@ $(function () {
             endDate: moment().endOf("month"),
             maxDate: end,
             autoUpdateInput: true,
-                locale: {
-                    format: 'YYYY/MM/DD' 
-                },
+            locale: {
+                format: "YYYY/MM/DD",
+            },
             ranges: {
                 Today: [moment(), moment()],
                 Yesterday: [
@@ -85,17 +91,16 @@ $("#category_id").on("change", function () {
     }
 });
 
-$("#outgoing-date").on("change", function(){
+$("#outgoing-date").on("change", function () {
     var date = $(this).val();
     outgoingFilter(date);
 });
 
 // outgoing stock filter ajax call
 function outgoingFilter(dates) {
-    
     var parts = dates.split(" - ");
     var from = moment(parts[0], "YYYY/MM/DD").format("YYYY-MM-DD");
-    var to   = moment(parts[1], "YYYY/MM/DD").format("YYYY-MM-DD");
+    var to = moment(parts[1], "YYYY/MM/DD").format("YYYY-MM-DD");
 
     var ajaxurl = config.routes.ledgerShow;
     $("#loading").show();
@@ -108,7 +113,7 @@ function outgoingFilter(dates) {
             date_to: to,
         },
         success: function (response) {
-            // console.log("Response is:", response);
+            console.log("Response is:", response);
             bindData(response.summary);
             bindStockCountData(response.detailed);
         },
@@ -122,15 +127,15 @@ function bindData(data) {
     const filteredData = data.filter((item) => Number(item.out_total) > 0);
 
     filteredData.forEach((item) => {
-        item.qoh = Number(item.current_stock).toFixed(0);
-        item.out_total = Number(item.out_total).toFixed(0);
+        // item.qoh = Number(item.current_stock).toFixed(0);
+        item.out_total = numberWithCommas(item.out_total);
         item.product_name =
-            (item.product.name ? item.product.name : '') +
+            (item.product.name ? item.product.name : "") +
             " " +
-            (item.product.brand ? item.product.brand : '') +
+            (item.product.brand ? item.product.brand : "") +
             " " +
-            (item.product.pack_size ? item.product.pack_size : '') +
-            (item.product.sales_uom ? item.product.sales_uom : '');
+            (item.product.pack_size ? item.product.pack_size : "") +
+            (item.product.sales_uom ? item.product.sales_uom : "");
     });
     // console.log("Binding data:", filteredData);
     summary_table.clear();
@@ -148,18 +153,18 @@ function bindStockCountData(data) {
                     product_name:
                         item.product_name +
                         " " +
-                        (item.product.brand ?? '') +
+                        (item.product.brand ?? "") +
                         " " +
-                        (item.product.pack_size ?? '') +
-                        (item.product.sales_uom ?? ''),
+                        (item.product.pack_size ?? "") +
+                        (item.product.sales_uom ?? ""),
                     out_mode: mv.out_mode || "",
                     out_total: mv.qty,
-                    batch_number: item.batch_number || "",
+                    // batch_number: item.batch_number || "",
                     date: mv.date,
-                    qoh:
-                        item.current_stock_batch != null
-                            ? Number(item.current_stock_batch).toFixed(0)
-                            : 0,
+                    // qoh:
+                    //     item.current_stock_batch != null
+                    //         ? Number(item.current_stock_batch).toFixed(0)
+                    //         : 0,
                 });
             });
         }
@@ -167,12 +172,13 @@ function bindStockCountData(data) {
 
     let grouped = {};
     flattened.forEach((item) => {
-        const key = `${item.product_name}|${item.out_mode}|${item.batch_number}|${item.date}`;
+        const key = `${item.product_name}|${item.out_mode}|${item.date}`;
         if (!grouped[key]) {
             grouped[key] = { ...item };
         } else {
-            grouped[key].out_total =
-                Number(grouped[key].out_total) + Number(item.out_total);
+            grouped[key].out_total = numberWithCommas(
+                Number(grouped[key].out_total) + Number(item.out_total)
+            );
         }
     });
 
@@ -185,4 +191,24 @@ function bindStockCountData(data) {
     table_daily_stock.clear();
     table_daily_stock.rows.add(result);
     table_daily_stock.draw();
+}
+
+$(document).ready(function () {
+    var savedCategory = localStorage.getItem("category_id");
+    if (savedCategory !== null) {
+        $("#category_id").val(savedCategory);
+    }
+
+    // Trigger change once to load the table using saved values
+    $("#category_id").trigger("change");
+});
+
+$(document).on("change", "#category_id", function () {
+    localStorage.setItem("category_id", $("#category_id").val());
+});
+
+function numberWithCommas(digit) {
+    return String(parseFloat(digit))
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }

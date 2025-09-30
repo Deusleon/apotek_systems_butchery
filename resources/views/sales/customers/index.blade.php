@@ -32,23 +32,6 @@
             <div class="col-sm-12">
                 @if(auth()->user()->checkPermission('View Customers'))
                     <div class="tab-content" id="myTabContent">
-                        @if(session('alert-success'))
-                            <div class="alert alert-success">{{ session('alert-success') }}</div>
-                        @endif
-                        @if(session('alert-danger'))
-                            <div class="alert alert-danger">{{ session('alert-danger') }}</div>
-                        @endif
-                        @if(
-                                $errors->any()
-                            )
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
                         @if(auth()->user()->checkPermission('Add Customers'))
                             <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-sm btn-secondary"
                                 data-toggle="modal" data-target="#create">

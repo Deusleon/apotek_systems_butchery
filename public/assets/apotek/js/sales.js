@@ -1473,7 +1473,7 @@ $("#credit_payment_table tbody").on("click", "#pay_btn", function () {
 
 /*local storage of sale type*/
 $("#sales_form").on("submit", function (e) {
-    // $("#loading").show();
+    $("#loading").show();
     e.preventDefault();
     var cart = document.getElementById("order_cart").value;
     var is_backdate_enabled = document.getElementById(
@@ -1482,16 +1482,17 @@ $("#sales_form").on("submit", function (e) {
 
     if (cart === "" || cart === "undefined") {
         notify("Sale list empty", "top", "right", "warning");
+        $("#loading").hide();
         return false;
     }
     if (is_backdate_enabled === "YES") {
         var saleDate = document.getElementById("cash_sale_date").value;
         if (saleDate === "" || saleDate == null) {
             notify("Sales date is required", "top", "right", "warning");
+            $("#loading").hide();
             return false;
         }
     }
-    console.log("BackDates", is_backdate_enabled);
 
     $("#save_btn").attr("disabled", true);
 
@@ -1517,8 +1518,8 @@ function saveCashSale() {
             notify("Sale recorded successfully", "top", "right", "success");
             deselect();
             $("#save_btn").attr("disabled", false);
-            $("#loading").hide();
             $("#barcode_input").focus();
+            $("#loading").hide();
         },
         timeout: 20000,
     });

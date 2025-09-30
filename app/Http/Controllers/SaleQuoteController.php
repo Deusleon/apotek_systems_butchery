@@ -303,7 +303,7 @@ class SaleQuoteController extends Controller {
         if ($details->isEmpty()) {
             return response()->json([
                 'status'  => 'error',
-                'message' => 'Quote not found!'
+                'message' => 'Sales order not found!'
             ]);
         }
 
@@ -849,7 +849,7 @@ class SaleQuoteController extends Controller {
             ] );
 
             if ( !$update ) {
-                throw new \Exception( 'Failed to update sales quote details' );
+                throw new \Exception( 'Failed to update order details' );
             }
 
             DB::commit();
