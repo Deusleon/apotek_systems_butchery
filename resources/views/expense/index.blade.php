@@ -79,7 +79,7 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
-                                @if(auth()->user()->checkPermission('Manage Expenses'))
+                                @if(auth()->user()->checkPermission('Add Expense'))
                                     <button style="float: right;margin-bottom: 7%;" type="button"
                                             class="btn btn-secondary btn-sm"
                                             data-toggle="modal"
@@ -115,13 +115,11 @@
 
                             <thead>
                             <tr>
-                                <th>Expense Date</th>
-                                <th>Expense Category</th>
+                                <th>Date</th>
+                                <th>Category</th>
                                 <th>Description</th>
                                 <th>Amount</th>
-                                @if(auth()->user()->checkPermission('Manage Expenses'))
-                                <th>Action</th>
-                                @endif
+                                <th>Action</th>   
                             </tr>
                             </thead>
                             <tbody>
@@ -162,12 +160,19 @@
                 },
                 // {'data': 'payment_method'},
                 // {'data': 'user'},
-                @if(auth()->user()->checkPermission('Manage Expenses'))
-                {
-                    'data': 'action',
-                    defaultContent: "<button class='btn btn-primary btn-rounded btn-sm' type='button' id='edit_btn'>Edit</button><button class='btn btn-danger btn-rounded btn-sm' type='button' id='delete_btn'>Delete</button>"
+               {
+                    data: 'action',
+                    defaultContent: `
+                        @if(auth()->user()->checkPermission('Edit Expense'))
+                            <button class="btn btn-primary btn-rounded btn-sm" type="button" id="edit_btn">Edit</button>
+                        @endif
+
+                        @if(auth()->user()->checkPermission('Delete Expense'))
+                            <button class="btn btn-danger btn-rounded btn-sm" type="button" id="delete_btn">Delete</button>
+                        @endif
+                    `
                 }
-                @endif
+
 
             ], aaSorting: [[0, "desc"]]
 
@@ -192,7 +197,7 @@
             var row_data = table_expense_filter.row($(this).parents('tr')).data();
             var index = table_expense_filter.row($(this).parents('tr')).index();
 
-            var message = "Are you sure you want to delete expense?";
+            var message = "Are you sure you want to delete this expense?";
             $('#delete').find('.modal-body #message').text(message);
 
             $('#delete').find('.modal-body #expense_id').val(row_data.id);

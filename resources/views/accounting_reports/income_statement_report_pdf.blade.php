@@ -172,7 +172,7 @@
                 <div class="col-25"></div>
                 <div class="col-25">
                     <div class="full-row">
-                        <div class="col-50" align="left"><b>Total Sell: </b></div>
+                        <div class="col-50" align="left"><b>Total Sales: </b></div>
                         <div class="col-50"
                              align="right">{{number_format($data->last()->total_sell,2)}}</div>
                     </div>

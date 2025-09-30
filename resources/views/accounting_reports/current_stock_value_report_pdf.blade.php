@@ -45,7 +45,7 @@
         #table-detail-main {
             width: 103%;
             margin-top: -10%;
-            margin-bottom: 1%;
+            margin-bottom: -3%;
             border-collapse: collapse;
         }
 
@@ -130,11 +130,11 @@
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
     <h2 align="center" style="margin-top: -1%">Current Stock Value Report</h2>
-    <div class="row" style="margin-top: 10%;">
+    <div class="row" style="margin-top: 7%;">
         <div class="col-md-12">
             <table id="table-detail-main">
                 <tr>
-                    <td style="background: #1f273b; color: white"><b>Store: </b> {{$data[0]['store']}}
+                    <td><b>Store: </b> {{$data[0]['store']}}
                     </td>
             </table>
             <table id="table-detail" align="center">
@@ -142,15 +142,15 @@
                 <thead>
                 <tr style="background: #1f273b; color: white;">
                     <th align="left">Product Category</th>
-                    <th align="left">SubTotal Buy</th>
-                    <th align="left">SubTotal Sell</th>
+                    <th align="right">Total Buy</th>
+                    <th align="right">Total Sell</th>
                 </tr>
                 </thead>
                 @foreach($data as $item)
                     <tr>
                         <td align="left">{{$item['category_name']}}</td>
-                        <td align="left">{{number_format($item['buy_price'],2)}}</td>
-                        <td align="left">{{number_format($item['sell_price'],2)}}</td>
+                        <td align="right">{{number_format($item['buy_price'],2)}}</td>
+                        <td align="right">{{number_format($item['sell_price'],2)}}</td>
                     </tr>
                 @endforeach
             </table>

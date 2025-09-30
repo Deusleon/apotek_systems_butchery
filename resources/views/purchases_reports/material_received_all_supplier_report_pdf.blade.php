@@ -17,7 +17,6 @@
         }
 
         table, th, td {
-            /*border: 1px solid black;*/
             border-collapse: collapse;
             padding: 10px;
         }
@@ -40,16 +39,14 @@
         }
 
         #table-detail {
-            /*border-spacing: 5px;*/
             width: 100%;
-            /*margin-top: -10%;*/
             margin-bottom: 0%;
         }
 
         #table-detail-main {
             width: 102%;
             margin-top: 1%;
-            margin-bottom: -2%;
+            margin-bottom: -6%;
             border-collapse: collapse;
         }
 
@@ -59,10 +56,6 @@
 
         tr:nth-child(even) {
             background-color: #f2f2f2;
-        }
-
-        #category {
-            text-transform: uppercase;
         }
 
         h3 {
@@ -103,7 +96,7 @@
             width: 15%;
         }
 
-         #container .logo-container {
+        #container .logo-container {
             padding-top: -2%;
             text-align: center;
             vertical-align: middle;
@@ -115,7 +108,6 @@
         }
 
     </style>
-
 </head>
 <body>
 
@@ -128,101 +120,121 @@
         </div>
     </div>
 </div>
+
 <div class="row" style="padding-top: -2%">
     <h1 align="center">{{$pharmacy['name']}}</h1>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
     <h2 align="center" style="margin-top: -1%">Material Received Report</h2>
+
     <div class="row">
         <div class="col-md-12">
+            @php
+                $grand_total_cost = 0;
+                $grand_total_sell = 0;
+                $grand_total_profit = 0;
+            @endphp
+
             @foreach($data[0]['data'] as $key => $items)
                 <table id="table-detail-main">
                     <tr>
-                        <td style="background: #1f273b; color: white"><b>Supplier: </b>{{$key}}</td>
+                        <td><b>Supplier: </b>{{$key}}</td>
                     </tr>
                 </table>
 
                 <table id="table-detail" align="center">
-                    <!-- loop the product names here -->
                     <thead>
                     <tr style="background: #1f273b; color: white; font-size: 0.9em">
                         <th align="left">Product Name</th>
-                        <th align="left">Quantity</th>
-                        <th align="left">Buy Price</th>
-                        <th align="left">Sell Price</th>
-                        <th align="left">Profit</th>
+                        <th align="center">Quantity</th>
+                        <th align="right">Buy Price</th>
+                        <th align="right">Sell Price</th>
+                        <th align="right">Profit</th>
                         <th align="left">Receive Date</th>
                         <th align="left">Received By</th>
                     </tr>
                     </thead>
+
                     @foreach($items as $item)
                         <tr>
                             <td align="left">{{$item['product_name']}}</td>
-                            <td align="left">
-                                {{number_format($item['quantity'],0)}}
-                            </td>
-                            <td align="left">{{number_format($item['unit_cost'],2)}}</td>
-                            <td align="left">{{number_format($item['sell_price'],2)}}</td>
-                            <td align="left">{{number_format($item['profit'],2)}}</td>
-                            <td align="left">{{date('Y-m-d',strtotime($item['date']))}}
-                            </td>
+                            <td align="center">{{number_format($item['quantity'],0)}}</td>
+                            <td align="right">{{number_format($item['unit_cost'],2)}}</td>
+                            <td align="right">{{number_format($item['sell_price'],2)}}</td>
+                            <td align="right">{{number_format($item['profit'],2)}}</td>
+                            <td align="left">{{date('Y-m-d',strtotime($item['date']))}}</td>
                             <td align="left">{{$item['received_by']}}</td>
                         </tr>
                     @endforeach
                 </table>
 
+                @php
+                    $grand_total_cost += $data[0]['cost_by_supplier'][$key][0]['total_cost'];
+                    $grand_total_sell += $data[0]['cost_by_supplier'][$key][0]['total_sell'];
+                    $grand_total_profit += $data[0]['cost_by_supplier'][$key][0]['profit'];
+                @endphp
+
                 <hr>
 
                 <div class="full-row" style="padding-top: 1%">
-                    <div class="col-35">
-                        <div class="full-row">
-                        </div>
-
-                    </div>
+                    <div class="col-35"><div class="full-row"></div></div>
                     <div class="col-15"></div>
                     <div class="col-25"></div>
                     <div class="col-25">
                         <div class="full-row">
-                            <div class="col-50" align="left"><b>Total </b></div>
-                            <div class="col-50"
-                                 align="right">{{number_format($data[0]['cost_by_supplier'][$key][0]['total_cost'],2)}}</div>
+                            <div class="col-50" align="left"><b>Total Buy</b></div>
+                            <div class="col-50" align="right">{{number_format($data[0]['cost_by_supplier'][$key][0]['total_cost'],2)}}</div>
                         </div>
                     </div>
                 </div>
-                <div class="full-row" style="padding-top: 1%">
-                    <div class="col-35">
-                        <div class="full-row">
-                        </div>
 
-                    </div>
+                <div class="full-row" style="padding-top: 1%">
+                    <div class="col-35"><div class="full-row"></div></div>
                     <div class="col-15"></div>
                     <div class="col-25"></div>
                     <div class="col-25">
                         <div class="full-row">
-                            <div class="col-50" align="left"><b>Total Sell: </b></div>
-                            <div class="col-50"
-                                 align="right">{{number_format($data[0]['cost_by_supplier'][$key][0]['total_sell'],2)}}</div>
+                            <div class="col-50" align="left"><b>Total Sales: </b></div>
+                            <div class="col-50" align="right">{{number_format($data[0]['cost_by_supplier'][$key][0]['total_sell'],2)}}</div>
                         </div>
                     </div>
                 </div>
+
                 <div class="full-row" style="padding-top: 1%">
-                    <div class="col-35">
-                        <div class="full-row">
-                        </div>
-                    </div>
+                    <div class="col-35"><div class="full-row"></div></div>
                     <div class="col-15"></div>
                     <div class="col-25"></div>
                     <div class="col-25">
                         <div class="full-row">
                             <div class="col-50" align="left"><b>Total Profit: </b></div>
-                            <div class="col-50"
-                                 align="right">{{number_format($data[0]['cost_by_supplier'][$key][0]['profit'],2)}}</div>
+                            <div class="col-50" align="right">{{number_format($data[0]['cost_by_supplier'][$key][0]['profit'],2)}}</div>
                         </div>
                     </div>
                 </div>
-
             @endforeach
+
+            <!-- GRAND TOTAL SUMMARY - Centered like Cash Sales -->
+            <div style="margin-top: 20px; padding-top: 10px;">
+                <h3 align="center"><b>Total Summary</b></h3>
+                <table style="min-width: 25%; width: auto; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 6px; text-align: right;"><b>Total Buy</b></td>
+                        <td style="padding: 6px; text-align: center;"><b>:</b></td>
+                        <td style="padding: 6px; text-align: right;"><b>{{ number_format($grand_total_cost, 2) }}</b></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px; text-align: right;"><b>Total Sales</b></td>
+                        <td style="padding: 6px; text-align: center;"><b>:</b></td>
+                        <td style="padding: 6px; text-align: right;"><b>{{ number_format($grand_total_sell, 2) }}</b></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 6px; text-align: right;"><b>Total Profit</b></td>
+                        <td style="padding: 6px; text-align: center;"><b>:</b></td>
+                        <td style="padding: 6px; text-align: right;"><b>{{ number_format($grand_total_profit, 2) }}</b></td>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -235,28 +247,12 @@
         $font = null;
         $size = 10;
         $color = array(0,0,0);
-        $word_space = 0.0;  //  default
-        $char_space = 0.0;  //  default
-        $angle = 0.0;   //  default
+        $word_space = 0.0;
+        $char_space = 0.0;
+        $angle = 0.0;
         $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
-
-
-     }
-
-
-
-
-
-
-
-
-
-
-
-
-
+    }
 </script>
 
 </body>
 </html>
-

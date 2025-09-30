@@ -109,7 +109,7 @@
                     <tr style="background: #1f273b; color: white;">
                         <th align="left">Date</th>
                         <th align="right">Total Buy</th>
-                        <th align="right">Total Sell</th>
+                        <th align="right">Total Sales</th>
                         <th align="right">Total Profit</th>
                     </tr>
                 </thead>
@@ -134,7 +134,7 @@
                 {{ number_format($data[0]['grand_total_buy'], 2) }}
             </div>
 
-            <div style="margin-left: 70%;width: 29.6%;background: #f2f2f2;margin-top: 2%; padding: 1%"><b>Total Sell: </b></div>
+            <div style="margin-left: 70%;width: 29.6%;background: #f2f2f2;margin-top: 2%; padding: 1%"><b>Total Sales: </b></div>
             <div align="right" style="margin-top: -10%; padding-top: 1%; padding-left: 1%">
                 {{ number_format($data[0]['grand_total_sell'], 2) }}
             </div>
