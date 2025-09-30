@@ -69,7 +69,7 @@
                                         <option value="">Select Products...</option>
                                         @foreach ($items as $item)
                                             <option value='@json($item)'>
-                                                {{ $item->name }} {{ $item->brand }} {{ $item->pack_size }} {{ $item->sales_uom }}
+                                                {{ $item->name }} {{ $item->brand }} {{ $item->pack_size }}{{ $item->sales_uom }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -220,7 +220,7 @@
                 data: 'itemss',
                 render: function(data) {
                     if (!data) return "";
-                    return data.name + ' ' + data.brand + ' ' + data.pack_size + ' ' + data.sales_uom;
+                    return data.name + ' ' + data.brand + ' ' + data.pack_size + '' + data.sales_uom;
                 }
             },
             {
