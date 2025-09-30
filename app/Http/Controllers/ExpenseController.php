@@ -24,7 +24,7 @@ class ExpenseController extends Controller
     public function store(Request $request)
     {
         $expense = new Expense;
-        $expense->amount = str_replace(',', '', $request->expense_amount);
+        $expense->amount = (float) str_replace(',', '', $request->expense_amount);
         $expense->expense_category_id = $request->expense_category;
         $expense->expense_description = $request->expense_description;
         $expense->payment_method_id = $request->payment_method;
@@ -40,7 +40,7 @@ class ExpenseController extends Controller
     public function update(Request $request)
     {
         $expense = Expense::find($request->expense_id);
-        $expense->amount = str_replace(',', '', $request->expense_amount_edit);
+        $expense->amount = (float) str_replace(',', '', $request->expense_amount_edit);
         $expense->expense_category_id = $request->expense_category_edit;
         $expense->expense_description = $request->expense_description_edit;
         $expense->payment_method_id = $request->payment_method_edit;
