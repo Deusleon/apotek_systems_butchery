@@ -22,7 +22,10 @@ use Maatwebsite\Excel\Row;
 Route::post('/login', 'Auth\LoginController@login')->middleware('web');
 
 
-Route::get('/', 'HomeController@login')->name('login');
+// Route::get('/', 'HomeController@login')->name('login');
+Route::get('/', function () {
+    return redirect('/home');
+});
 
 
 Route::get('/changePassword', 'HomeController@showChangePasswordForm')->name('changePasswordForm');

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use App\Setting;
 use App\Store;
@@ -89,7 +90,7 @@ class LoginController extends Controller {
 
         // If store name is 'ALL' (DB shows id = 1 for ALL), set special value.
         // we'll use id = 1 to represent ALL ( same as DB )
-        if ( (strtoupper( $store->name ) === 'ALL' || $store->id == 1) && $multiStoreEnabled) {
+        if ( ( strtoupper( $store->name ) === 'ALL' || $store->id == 1 ) && $multiStoreEnabled ) {
             session( [
                 'current_store_id' => 1,
                 'store' => 'ALL',
@@ -100,7 +101,23 @@ class LoginController extends Controller {
                 'store' => $defaultStore,
             ] );
         }
+        Log::info( 'Session debugging', [
+            'session_id_before' => session()->getId(),
+            'session_driver' => config( 'session.driver' ),
+            'session_path' => config( 'session.files' ),
+            'session_lifetime' => config( 'session.lifetime' ),
+            'current_store_id' => session( 'current_store_id' ),
+            'store' => session( 'store' ),
+            'all_session_data' => session()->all()
+        ] );
 
+        // Force session save
+        session()->save();
+
+        Log::info( 'After session save', [
+            'session_id_after' => session()->getId(),
+            'current_store_id_after_save' => session( 'current_store_id' )
+        ] );
         return null;
     }
     /**
