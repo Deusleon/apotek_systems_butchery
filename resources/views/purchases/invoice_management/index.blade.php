@@ -37,7 +37,7 @@ Invoice Management
                     @if(auth()->user()->checkPermission('Manage Invoices'))
                     <button type="button" class="btn btn-secondary btn-sm"
                         data-toggle="modal" data-target="#create">
-                        Add New Invoice
+                        Add Invoice
                     </button>
                     @endif
                 </div>
@@ -78,7 +78,7 @@ Invoice Management
                         <tr>
                             <th>Invoice #</th>
                             <th>Supplier</th>
-                            <th>Invoice Date</th>
+                            <th>Date</th>
                             <th>Amount</th>
                             <th>Balance</th>
                             <th>Due Date</th>
