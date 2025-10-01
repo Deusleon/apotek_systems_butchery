@@ -257,7 +257,7 @@ class GoodsReceivingController extends Controller
     public function itemReceive(Request $request)
     {
 
-        $default_store_id = $this->resolveStoreId($request ?? null);
+        $default_store_id = Auth::user()->store->id ?? 1;
 
 
         if ($request->ajax()) {
@@ -341,6 +341,7 @@ class GoodsReceivingController extends Controller
             $incoming_stock->quantity = $cart['quantity'];
             $incoming_stock->unit_cost = str_replace(',', '', $request->unit_cost);
             $incoming_stock->total_cost = $total_buyprice;
+            $incoming_stock->store_id = $default_store_id;
             $incoming_stock->total_sell = $total_sellprice;
             $incoming_stock->item_profit = $profit;
             $incoming_stock->created_by = Auth::user()->id;
@@ -402,7 +403,7 @@ class GoodsReceivingController extends Controller
             return redirect()->back()->with('error', 'This order has already been fully received.');
         }
 
-        $default_store_id = optional(Auth::user()->store->first())->id ?? 1;
+        $default_store_id = Auth::user()->store->id ?? 1;
 
         foreach ($validated['items'] as $itemData) {
             $received_qty = (int)$itemData['quantity'];
@@ -425,13 +426,17 @@ class GoodsReceivingController extends Controller
                                  ? date('Y-m-d', strtotime($itemData['expiry_date']))
                                  : null;
 
+            // Get the correct unit price from order details
+            $unit_price = $order_detail->unit_price ?? 0;
+
             // Save goods receiving
             $goods_receiving = new GoodsReceiving();
             $goods_receiving->product_id   = $itemData['product_id'];
             $goods_receiving->supplier_id  = $validated['supplier_id'];
             $goods_receiving->quantity     = $received_qty;
-            $goods_receiving->unit_cost    = $itemData['cost_price'];
-            $goods_receiving->total_cost   = $received_qty * $itemData['cost_price'];
+            $goods_receiving->unit_cost    = $unit_price;
+            $goods_receiving->total_cost   = $received_qty * $unit_price;
+            $goods_receiving->store_id     = $default_store_id;
             $goods_receiving->batch_number = $batch_number;
             $goods_receiving->expire_date  = $expiry_date_value;
             $goods_receiving->created_by   = Auth::id();
@@ -444,7 +449,7 @@ class GoodsReceivingController extends Controller
                 'store_id'     => $default_store_id,
             ]);
             $stock->quantity   += $received_qty;
-            $stock->unit_cost   = $itemData['cost_price'];
+            $stock->unit_cost   = $unit_price;
             $stock->expiry_date = $expiry_date_value;
             $stock->save();
 
@@ -699,7 +704,7 @@ class GoodsReceivingController extends Controller
             $cart = json_decode($request->cart, true);
             // dd($request);
 
-            $default_store_id = $request->store;
+            $default_store_id = Auth::user()->store->id ?? 1;
 
             foreach($cart as $single_item){
                 // dd($single_item);
@@ -800,6 +805,7 @@ class GoodsReceivingController extends Controller
                 $incoming_stock->quantity = $quantity;
                 $incoming_stock->unit_cost = str_replace(',', '', $single_item['buying_price']);
                 $incoming_stock->total_cost = $total_buyprice;
+                $incoming_stock->store_id = $default_store_id;
                 $incoming_stock->total_sell = $total_sellprice;
                 $incoming_stock->item_profit = $profit;
                 $incoming_stock->created_by = Auth::user()->id;
