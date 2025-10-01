@@ -118,7 +118,7 @@ class ProductController extends Controller
                 'string',
                 'max:255',
                 Rule::unique('inv_products', 'name')
-                    ->ignore($request->id) // iache product unayoedit
+                    ->ignore($request->id) 
                     ->where(function ($query) use ($request) {
                         return $query->where('category_id', $request->category);
                     }),

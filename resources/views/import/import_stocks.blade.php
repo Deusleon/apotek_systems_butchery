@@ -66,12 +66,12 @@
 @endsection
 
 @section('content-title')
-    Import Data
+    Products Import
 @endsection
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#">Import Products</a></li>
+    <li class="breadcrumb-item"><a href="#">Products Import</a></li>
 @endsection
 
 @section("content")
@@ -79,11 +79,11 @@
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
             <li class="nav-item">
                 <a class="nav-link text-uppercase" id="invoice-received" href="{{ route('import-products') }}"
-                    role="tab" aria-controls="quotes_list" aria-selected="false">Import products</a>
+                    role="tab" aria-controls="quotes_list" aria-selected="false">Products Import</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link active text-uppercase" id="invoice-received" href="{{ route('import-data') }}"
-                    role="tab" aria-controls="quotes_list" aria-selected="false">Import Stocks</a>
+                    role="tab" aria-controls="quotes_list" aria-selected="false">Stocks Import</a>
             </li>
             {{-- @if (auth()->user()->checkPermission('Download Import Templates')) --}}
                 <li class="nav-item">

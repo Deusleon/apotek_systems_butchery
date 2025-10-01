@@ -91,22 +91,22 @@ class ImportDataController extends Controller {
     }
 
     public function downloadTemplate() {
-        $file = public_path() . '/fileStore/import_template/import_products_template.xlsx';
+        $file = public_path() . '/fileStore/import_template/products_import_template.xlsx';
         $headers = array(
             'Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         );
-        return response()->download( $file, 'import_products_template.xlsx', $headers );
+        return response()->download( $file, 'products_import_template.xlsx', $headers );
     }
 
     public function previewStockImport( Request $request ) {
-        Log::info( 'Request reaching preview route', [
-            'method' => $request->method(),
-            'headers' => $request->headers->all(),
-            'files' => $request->allFiles(),
-            'post_size' => $request->server( 'CONTENT_LENGTH' ),
-            'max_post_size' => ini_get( 'post_max_size' ),
-            'upload_max_filesize' => ini_get( 'upload_max_filesize' )
-        ] );
+        // Log::info( 'Request reaching preview route', [
+        //     'method' => $request->method(),
+        //     'headers' => $request->headers->all(),
+        //     'files' => $request->allFiles(),
+        //     'post_size' => $request->server( 'CONTENT_LENGTH' ),
+        //     'max_post_size' => ini_get( 'post_max_size' ),
+        //     'upload_max_filesize' => ini_get( 'upload_max_filesize' )
+        // ] );
 
         try {
             // Validate request
@@ -186,6 +186,7 @@ class ImportDataController extends Controller {
                     return back()->withErrors( [ 'file' => 'No valid data rows found in the file' ] )->withInput();
                 }
 
+                Log::info('Imported Data', $preview_data);
                 // Store preview data in session
                 Session::put( 'import_preview', [
                     'data' => $preview_data,
@@ -221,14 +222,14 @@ class ImportDataController extends Controller {
     }
 
     public function previewImport( Request $request ) {
-        Log::info( 'Request reaching preview route', [
-            'method' => $request->method(),
-            'headers' => $request->headers->all(),
-            'files' => $request->allFiles(),
-            'post_size' => $request->server( 'CONTENT_LENGTH' ),
-            'max_post_size' => ini_get( 'post_max_size' ),
-            'upload_max_filesize' => ini_get( 'upload_max_filesize' )
-        ] );
+        // Log::info( 'Request reaching preview route', [
+        //     'method' => $request->method(),
+        //     'headers' => $request->headers->all(),
+        //     'files' => $request->allFiles(),
+        //     'post_size' => $request->server( 'CONTENT_LENGTH' ),
+        //     'max_post_size' => ini_get( 'post_max_size' ),
+        //     'upload_max_filesize' => ini_get( 'upload_max_filesize' )
+        // ] );
 
         try {
             // Validate request
@@ -305,6 +306,7 @@ class ImportDataController extends Controller {
                     return back()->withErrors( [ 'file' => 'No valid data rows found in the file' ] )->withInput();
                 }
 
+                Log::info('Imported Data', $preview_data);
                 // Store preview data in session
                 Session::put( 'import_preview', [
                     'data' => $preview_data,
@@ -355,7 +357,6 @@ class ImportDataController extends Controller {
             return 'Unknown upload error';
         }
     }
-
     public function recordImport( Request $request ) {
         Log::info( 'Starting import process' );
 
@@ -721,7 +722,6 @@ class ImportDataController extends Controller {
             return back()->with( 'error', 'Import failed: ' . $e->getMessage() );
         }
     }
-
     private function validateRow( $row, $row_number ) {
         Log::info( 'Validating row', [ 'row_number' => $row_number ] );
 

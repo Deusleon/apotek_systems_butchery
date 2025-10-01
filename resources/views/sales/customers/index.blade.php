@@ -117,7 +117,7 @@
             </div>
         </div>
 
-        @include('sales.customers.create')
+        @include('sales.customers.create2')
         @include('sales.customers.delete')
         @include('sales.customers.edit')
 

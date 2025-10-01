@@ -23,81 +23,81 @@
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
             <li class="nav-item">
                 <a class="nav-link  text-uppercase" id="current-stock-tablist" data-toggle="pill"
-                   href="{{ url('inventory/current-stocks') }}" role="tab"
-                   aria-controls="current-stock" aria-selected="true">Current Stock</a>
+                    href="{{ url('inventory/current-stocks') }}" role="tab" aria-controls="current-stock"
+                    aria-selected="true">Current Stock</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link active text-uppercase" id="all-stock-tablist" data-toggle="pill"
-                   href="{{ url('inventory/current-stock-value') }}" role="tab"
-                   aria-controls="stock_list" aria-selected="false">Current Stock Value
+                    href="{{ url('inventory/current-stock-value') }}" role="tab" aria-controls="stock_list"
+                    aria-selected="false">Current Stock Value
                 </a>
             </li>
-{{--            <li class="nav-item">--}}
-{{--                <a class="nav-link text-uppercase" id="old-stock-tablist" data-toggle="pill"--}}
-{{--                   href="{{ url('inventory/old-stocks') }}" role="tab"--}}
-{{--                   aria-controls="stock_list" aria-selected="false">Old Value--}}
-{{--                </a>--}}
-{{--            </li>--}}
         </ul>
         <div class="card">
             <div class="card-body">
-{{--                <div class="form-group row" style="display: none;">--}}
-{{--                    <div class="col-md-6">--}}
-
-{{--                    </div>--}}
-{{--                    <div class="col-md-3" style="margin-left: 2.5%">--}}
-{{--                        <label style="margin-left: 80%" for="issued_date"--}}
-{{--                               class="col-form-label text-md-right">Date:</label>--}}
-{{--                    </div>--}}
-{{--                    <div class="col-md-3" style="margin-left: -3.1%">--}}
-{{--                        <input style="width: 103.4%;" type="text" name="adjustment-date"--}}
-{{--                               onchange="loadStockValues()"--}}
-{{--                               class="form-control" id="adjustment-date" value=""/>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
                 {{--Summary--}}
+                <div class="col-md-3 mb-3" style="justify-content: right; float: right;">
+                    <form method="POST" action="{{ route('current_stock_value') }}">
+                        @csrf
+                        {{-- <label for="price_category">Price Type:</label> --}}
+                        <select name="price_category" class="js-example-basic-single form-control"
+                            onchange="this.form.submit()" id="price_category">
+                            @foreach($price_categories as $price_category)
+                                <option value="{{$price_category->id}}" {{ $price_category->id == request('price_category', 1) ? 'selected' : '' }}>
+                                    {{ $price_category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
+                </div>
                 <div class="table-responsive" id="summary">
-
-
                     {{--Summary--}}
-                    <table id="current_stock" class="table table-striped table-hover mb-3" style="background: white;width: 100%">
+                    <table id="current_stock" class="table table-striped table-hover mb-3"
+                        style="background: white;width: 100%">
 
                         <thead>
-                        <tr>
-                            <th>Product Name</th> <!-- Product| npk| brand| pack size -->
-                            <th>Quantity</th>
-                            <th>Buy Price</th>
-                            <th>Sell Price</th>
-                            <th>Total Buy</th>
-                            <th>Total Sell</th>
-                            <th hidden>Total Profit</th>
-                            <th hidden>%Profit</th>
+                            <tr>
+                                <th>Product Name</th> <!-- Product| npk| brand| pack size -->
+                                <th>Quantity</th>
+                                <th>Buy Price</th>
+                                <th>Sell Price</th>
+                                <th>Total Buy</th>
+                                <th>Total Sell</th>
+                                <th hidden>Total Profit</th>
+                                <th hidden>%Profit</th>
 
-                        </tr>
+                            </tr>
                         </thead>
 
                         <tbody>
                             {{-- @dd($stocks) --}}
-                        @foreach ($stocks as $stock)
-                            @if($stock->buying_price>0)
-                            <tr>
-                                <td id="name_{{ $stock->product_id }}">
-                                    {{ trim(($stock->name ?? '') . 
-                                            (!empty($stock->brand) ? ' ' . $stock->brand : '') . 
-                                            (!empty($stock->pack_size) ? ' ' . $stock->pack_size : '') . 
-                                            (!empty($stock->sales_uom) ? '' . $stock->sales_uom : '')
+                            @foreach ($stocks as $stock)
+                                @if($stock->buying_price > 0)
+                                                    <tr>
+                                                        <td id="name_{{ $stock->product_id }}">
+                                                            {{ trim(
+                                        ($stock->name ?? '') .
+                                        (!empty($stock->brand) ? ' ' . $stock->brand : '') .
+                                        (!empty($stock->pack_size) ? ' ' . $stock->pack_size : '') .
+                                        (!empty($stock->sales_uom) ? '' . $stock->sales_uom : '')
                                     ) }}
-                                </td>
-                                <td id="quantity_{{ $stock->product_id }}">{{ floor($stock->quantity) == $stock->quantity ? number_format($stock->quantity,0) : number_format($stock->quantity,1) }}</td>
-                                <td id="unitcost_{{ $stock->product_id }}">{{ number_format($stock->unit_cost,2) ?? '' }}</td>
-                                <td id="price_{{ $stock->product_id }}">{{ number_format($stock->price,2) ?? '' }}</td>
-                                <td id="buy_{{ $stock->product_id }}">{{ number_format($stock->buying_price,2) ?? '' }}</td>
-                                <td id="sell_{{ $stock->product_id }}">{{ number_format($stock->selling_price,2) ?? '' }}</td>
-                                <td id="profit_{{ $stock->product_id }}" hidden>{{ number_format($stock->profit,2) ?? '' }}</td>
-                                <td id="percent_profit{{ $stock->product_id }}" hidden>{{  number_format($stock->profit/$stock->buying_price * 100,0)  ?? '' }}</td>
-                            </tr>
-                            @endif
-                        @endforeach
+                                                        </td>
+                                                        <td id="quantity_{{ $stock->product_id }}">
+                                                            {{ floor($stock->quantity) == $stock->quantity ? number_format($stock->quantity, 0) : number_format($stock->quantity, 1) }}
+                                                        </td>
+                                                        <td id="unitcost_{{ $stock->product_id }}">{{ number_format($stock->unit_cost, 2) ?? '' }}
+                                                        </td>
+                                                        <td id="price_{{ $stock->product_id }}">{{ number_format($stock->price, 2) ?? '' }}</td>
+                                                        <td id="buy_{{ $stock->product_id }}">{{ number_format($stock->buying_price, 2) ?? '' }}</td>
+                                                        <td id="sell_{{ $stock->product_id }}">{{ number_format($stock->selling_price, 2) ?? '' }}
+                                                        </td>
+                                                        <td id="profit_{{ $stock->product_id }}" hidden>{{ number_format($stock->profit, 2) ?? '' }}
+                                                        </td>
+                                                        <td id="percent_profit{{ $stock->product_id }}" hidden>
+                                                            {{  number_format($stock->profit / $stock->buying_price * 100, 0) ?? '' }}</td>
+                                                    </tr>
+                                @endif
+                            @endforeach
                         </tbody>
 
                     </table>
@@ -115,7 +115,6 @@
     <script>
         //Load all current product values
 
-
         //Datatable and Tabs managed here
         $(document).ready(function () {
 
@@ -124,89 +123,27 @@
                 order: [[0, 'asc']]
             });
 
-            $('#current-stock-tablist').on('click', function(e) {
+            $('#current-stock-tablist').on('click', function (e) {
                 e.preventDefault(); // Prevent default tab switching behavior
                 var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
                 window.location.href = redirectUrl; // Redirect to the URL
             });
 
-            $('#old-stock-tablist').on('click', function(e) {
+            $('#old-stock-tablist').on('click', function (e) {
                 e.preventDefault(); // Prevent default tab switching behavior
                 var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
                 window.location.href = redirectUrl; // Redirect to the URL
             });
 
-            $('#all-stock-tablist').on('click', function(e) {
+            $('#all-stock-tablist').on('click', function (e) {
                 e.preventDefault(); // Prevent default tab switching behavior
                 var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
                 window.location.href = redirectUrl; // Redirect to the URL
             });
-
-            //Retrieves all the current stock value
-            {{--function defaultCurrentStockValue()--}}
-            {{--{--}}
-            {{--    var startDate = '01/01/2024'.format('MMMM D, YYYY');--}}
-            {{--    var endDate = '01/01/20100'.format('MMMM D, YYYY');--}}
-
-            {{--    $(document).ready(function () {--}}
-
-            {{--        var table = $('#current_stock').DataTable();--}}
-
-            {{--        $.ajax({--}}
-            {{--            headers: {--}}
-            {{--                "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),--}}
-            {{--                "X-Requested-With": "XMLHttpRequest"--}}
-            {{--            },--}}
-            {{--            url: '{{ route('stock-value-filter') }}',--}}
-            {{--            type: 'POST',--}}
-            {{--            data: {--}}
-            {{--                _token: "{{csrf_token()}}",--}}
-            {{--                date_from: startDate,--}}
-            {{--                date_to: endDate--}}
-            {{--            },--}}
-            {{--            success: function (response) {--}}
-
-            {{--                console.log('Current Stock loading...', response)--}}
-
-            {{--                $('#current_stock tbody tr').hide();--}}
-            {{--                $('#current_stock tbody').empty();--}}
-
-            {{--                table.clear().draw();--}}
-
-            {{--                response.forEach(function (data_returned) {--}}
-            {{--                    var roundedQuantity = Math.round(data_returned.quantity);--}}
-            {{--                    var percent_profit = (Math.round(data_returned.profit) /  Math.round(data_returned.buying_price))* 100;--}}
-
-            {{--                    // Construct the new row as an array for DataTable--}}
-            {{--                    var newRow = [--}}
-            {{--                        data_returned.name || '',--}}
-            {{--                        roundedQuantity.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }),--}}
-            {{--                        data_returned.unit_cost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '',--}}
-            {{--                        data_returned.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '',--}}
-            {{--                        data_returned.buying_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '',--}}
-            {{--                        data_returned.selling_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '',--}}
-            {{--                        data_returned.profit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '',--}}
-            {{--                        percent_profit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || ''--}}
-            {{--                    ];--}}
-
-            {{--                    // Append the new row to the DataTable--}}
-            {{--                    table.row.add(newRow).draw();--}}
-            {{--                });--}}
-
-            {{--            },--}}
-            {{--            error: function (error) {--}}
-            {{--                console.error('Error fetching users:', error)--}}
-            {{--            }--}}
-            {{--        });--}}
-            {{--    });--}}
-            {{--}--}}
-
-            // defaultCurrentStockValue();
         });
 
         //Table Data managed here
-        function loadStockValues()
-        {
+        function loadStockValues() {
             var dates = document.querySelector('input[name=adjustment-date]').value;
             dates = dates.split('-');
 

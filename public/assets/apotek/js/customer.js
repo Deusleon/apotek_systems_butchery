@@ -7,7 +7,7 @@ $('#create').on('show.bs.modal', function () {
 
 //Create customer
 $(document).on('submit', '#create_customer', function(e) {
-    // e.preventDefault(); 
+    e.preventDefault(); 
     
     let form = $(this);
     let actionUrl = form.attr('action');
@@ -25,7 +25,6 @@ $(document).on('submit', '#create_customer', function(e) {
             );
 
             $('#customer').val(customer.id).trigger('change');
-
             $('#create').modal('hide');
 
             form[0].reset();
