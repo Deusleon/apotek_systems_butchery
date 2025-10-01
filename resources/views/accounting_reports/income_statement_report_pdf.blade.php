@@ -52,6 +52,11 @@
             margin-top: 0%;
         }
 
+        #table-detail-3 {
+            width: 100%;
+            margin-top: 3%;
+        }
+
         #table-detail-main {
             width: 103%;
             margin-top: -10%;
@@ -207,6 +212,38 @@
                         <div class="col-50" align="left"><b>Total Buy: </b></div>
                         <div class="col-50"
                              align="right">{{number_format($data->last()->total_buy,2)}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <table id="table-detail-3" align="center">
+                <!-- loop the product names here -->
+                <thead>
+                <tr style="background: #1f273b; color: white;">
+                    <th>Expenses</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tr>
+                    <td align="right">Expense Amount</td>
+                    <td align="right">{{number_format($data->last()->expense_amount,2)}}</td>
+                </tr>
+            </table>
+            <hr>
+
+            <div class="full-row" style="padding-top: 1%">
+                <div class="col-35">
+                    <div class="full-row">
+                    </div>
+
+                </div>
+                <div class="col-15"></div>
+                <div class="col-25"></div>
+                <div class="col-25">
+                    <div class="full-row">
+                        <div class="col-50" align="left"><b>Total Expenses: </b></div>
+                        <div class="col-50"
+                             align="right">{{number_format($data->last()->expense_amount,2)}}</div>
                     </div>
                 </div>
             </div>

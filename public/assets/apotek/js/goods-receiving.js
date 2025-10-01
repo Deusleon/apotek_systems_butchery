@@ -971,11 +971,16 @@ function invoicevaluesCollection() {
             invoice_cart = invoice_cart.map(function (element) {
                 console.log("Element", element);
                 if (element.id == item.id) {
-                    element.quantity = +element.quantity + item.quantity;
-                    invoice_item_received.quantity = element.quantity;
+                    let currentQty = parseFloat(
+                        element.quantity.toString().replace(/,/g, "")
+                    );
+                    element.quantity = numberWithCommas(
+                        currentQty + item.quantity
+                    );
+                    invoice_item_received.quantity = currentQty + item.quantity;
                     console.log(
                         "Updated Element",
-                        invoice_cart_received.quantity
+                        invoice_item_received.quantity
                     );
                 }
                 return element;
