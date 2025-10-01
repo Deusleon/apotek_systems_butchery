@@ -76,7 +76,7 @@
                                     id="good_receiving_supplier_ids" required="true"
                                     onchange="goodReceivingFilterInvoiceBySupplier()">
                                     <option selected="true" value="" disabled="disabled">Select Supplier...</option>
-                                    @foreach($suppliers as $supplier)
+                                    @foreach($suppliers->sortBy(function($supplier) { return strtolower($supplier->name); }) as $supplier)
                                         <option value="{{$supplier->id}}">{{$supplier->name}}</option>
                                         <!-- <option
                                                                 value="{{$supplier->id}}" {{$default_supplier->id === $supplier->id  ? 'selected' : ''}}>{{$supplier->name}}</option> -->

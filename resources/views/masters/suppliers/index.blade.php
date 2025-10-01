@@ -113,6 +113,19 @@
                 modal.find('.modal-body #email_edit').val(button.data('email'));
 
                 initPhoneValidation("#phone_edits", "#save_btns", modal);
+
+                // For edit mode, validate the pre-filled phone number
+                setTimeout(function() {
+                    var phoneInput = document.querySelector("#phone_edits");
+                    if (phoneInput && phoneInput._itiInstance && phoneInput.value.trim()) {
+                        if (phoneInput._itiInstance.isValidNumber()) {
+                            $('#save_btns').prop('disabled', false);
+                        }
+                    } else {
+                        // If no phone validation or empty, enable button
+                        $('#save_btns').prop('disabled', false);
+                    }
+                }, 200);
             });
 
             // DELETE modal

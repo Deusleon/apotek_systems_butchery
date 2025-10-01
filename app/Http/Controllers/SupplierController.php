@@ -35,6 +35,12 @@ class SupplierController extends Controller
 
     public function store(Request $request)
     {
+        // Check if supplier with the same name already exists
+        if (Supplier::where('name', $request->name)->exists()) {
+            session()->flash("alert-danger", "Supplier with this name already exists!");
+            return back();
+        }
+
         $supplier = new Supplier;
         $supplier->name = $request->name;
         $supplier->contact_person = $request->contact_person;
@@ -46,13 +52,19 @@ class SupplierController extends Controller
             session()->flash("alert-success", "Supplier Added Successfully!");
             return back();
         } catch (Exception $exception) {
-            session()->flash("alert-danger", "Supplier exists!");
+            session()->flash("alert-danger", "Error adding supplier!");
             return back();
         }
     }
 
     public function update(Request $request)
     {
+        // Check if another supplier with the same name already exists
+        if (Supplier::where('name', $request->name)->where('id', '!=', $request->id)->exists()) {
+            session()->flash("alert-danger", "Supplier with this name already exists!");
+            return back();
+        }
+
         $supplier = Supplier::find($request->id);
         $supplier->name = $request->name;
         $supplier->contact_person = $request->contact_person;
@@ -65,7 +77,7 @@ class SupplierController extends Controller
             session()->flash("alert-success", "Supplier updated Successfully!");
             return back();
         } catch (Exception $exception) {
-            session()->flash("alert-danger", "Supplier exists!");
+            session()->flash("alert-danger", "Error updating supplier!");
             return back();
         }
     }
@@ -77,12 +89,12 @@ class SupplierController extends Controller
             $order_count = DB::table('orders')->where('supplier_id', $request->id)->count();
             $receiving_count = DB::table('inv_incoming_stock')->where('supplier_id', $request->id)->count();
             $total_count = $order_count + $receiving_count;
-            
+
             if ($total_count > 0) {
                 session()->flash("alert-danger", "Supplier has pending transactions!");
                 return back();
             }
-            
+
             Supplier::destroy($request->id);
             session()->flash("alert-success", "Supplier Deleted Successfully!");
             return back();
