@@ -28,8 +28,8 @@ use PhpOffice\PhpSpreadsheet\Writer\Xls;
 
 class ImportDataController extends Controller {
     public function index() {
-        if (!Auth()->user()->checkPermission('Products Import')) {
-            abort(403, 'Access Denied');
+        if ( !Auth()->user()->checkPermission( 'Products Import' ) ) {
+            abort( 403, 'Access Denied' );
         }
 
         $stores = Store::where( 'name', '<>', 'ALL' )->get();
@@ -84,7 +84,7 @@ class ImportDataController extends Controller {
 
         // Save to php output
         header( 'Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' );
-        header( "Content-Disposition: attachment; filename=\"$fileName\"" );
+        header( 'Content-Disposition: attachment; filename=\'$fileName\'' );
 
         $writer->save( 'php://output' );
         exit;
@@ -186,7 +186,7 @@ class ImportDataController extends Controller {
                     return back()->withErrors( [ 'file' => 'No valid data rows found in the file' ] )->withInput();
                 }
 
-                Log::info('Imported Data', $preview_data);
+                Log::info( 'Imported Data', $preview_data );
                 // Store preview data in session
                 Session::put( 'import_preview', [
                     'data' => $preview_data,
@@ -306,7 +306,7 @@ class ImportDataController extends Controller {
                     return back()->withErrors( [ 'file' => 'No valid data rows found in the file' ] )->withInput();
                 }
 
-                Log::info('Imported Data', $preview_data);
+                Log::info( 'Imported Data', $preview_data );
                 // Store preview data in session
                 Session::put( 'import_preview', [
                     'data' => $preview_data,
@@ -357,6 +357,7 @@ class ImportDataController extends Controller {
             return 'Unknown upload error';
         }
     }
+
     public function recordImport( Request $request ) {
         Log::info( 'Starting import process' );
 
@@ -722,6 +723,7 @@ class ImportDataController extends Controller {
             return back()->with( 'error', 'Import failed: ' . $e->getMessage() );
         }
     }
+
     private function validateRow( $row, $row_number ) {
         Log::info( 'Validating row', [ 'row_number' => $row_number ] );
 
@@ -739,6 +741,18 @@ class ImportDataController extends Controller {
         // Min/Max stock validation
         if ( !empty( $row[ 7 ] ) && !empty( $row[ 8 ] ) && $row[ 7 ] > $row[ 8 ] ) {
             $errors[] = 'Min stock cannot be greater than max stock';
+        }
+
+        // Uniqueness validation ( name+category )
+        if ( !empty( $row[ 1 ] ) && !empty( $row[ 5 ] ) ) {
+            $exists = DB::table( 'inv_products' )
+            ->where( 'name', $row[ 1 ] )
+            ->where( 'category_id', $row[ 5 ] )
+            ->exists();
+
+            if ( $exists ) {
+                $errors[] = "Product '{$row[1]}' already exists in this category";
+            }
         }
 
         if ( !empty( $errors ) ) {
