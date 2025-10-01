@@ -104,7 +104,7 @@
                                     <th>Brand</th>
                                     <th>Pack Size</th>
                                     <th>Category</th>
-                                    <th>Unit of Measure</th>
+                                    <th>Unit</th>
                                     <th>Min Stock</th>
                                     <th>Max Stock</th>
                                     <th>Validation</th>
@@ -119,8 +119,8 @@
                                         <td>{{ $row['data'][4] ?? '' }}</td>
                                         <td>{{ $row['data'][5] ?? '' }}</td>
                                         <td>{{ $row['data'][6] ?? '' }}</td>
-                                        <td>{{ $row['data'][7] ?? '' }}</td>
-                                        <td>{{ $row['data'][8] ?? '' }}</td>
+                                        <td>{{ number_format((float)$row['data'][7], 0) ?? '' }}</td>
+                                        <td>{{ number_format((float)$row['data'][8], 0) ?? '' }}</td>
                                         <td>
                                             @if(!empty($row['errors']))
                                                 <span class="text-danger">
@@ -146,7 +146,7 @@
                             </a>
                             @if($valid_count > 0)
                                 <button type="button" class="btn btn-primary" id="importButton">
-                                    <i class="feather icon-upload"></i> Import {{ $valid_count }} Records
+                                    <i class="feather icon-upload"></i> Import {{ number_format($valid_count, 0) }} Records
                                 </button>
                             @endif
                         </div>

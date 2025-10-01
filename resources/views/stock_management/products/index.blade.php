@@ -355,8 +355,8 @@
                 $('#show #category_edit').html(row_data.category ? row_data.category.name : 'N/A');
                 $('#show #sale_edit').html(row_data.sales_uom || 'N/A');
                 $('#show #pack_size_show').html(row_data.pack_size || 'N/A');
-                $('#show #min_quantinty_show').html(numberWithCommas(row_data.min_quantinty) || 'N/A');
-                $('#show #max_quantinty_show').html(numberWithCommas(row_data.max_quantinty) || 'N/A');
+                $('#show #min_quantinty_show').html(row_data.min_quantinty>0 ? numberWithCommas(row_data.min_quantinty) : 'N/A');
+                $('#show #max_quantinty_show').html(row_data.max_quantinty>0 ? numberWithCommas(row_data.max_quantinty) : 'N/A');
                 $('#show #status').html(row_data.status === 1 ? 'Active' : 'Inactive');
             });
 
@@ -376,8 +376,8 @@
                 $('#edit').find('.modal-body #pack_size_edit').val(row_data.pack_size);
                 $('#edit').find('.modal-body #category_options').val(row_data.category_id);
                 $('#edit').find('.modal-body #sale_edit').val(row_data.sales_uom);
-                $('#edit').find('.modal-body #min_stock_edit').val(numberWithCommas(row_data.min_quantinty));
-                $('#edit').find('.modal-body #max_stock_edit').val(numberWithCommas(row_data.max_quantinty));
+                $('#edit').find('.modal-body #min_stock_edit').val(row_data.min_quantinty>0 ? numberWithCommas(row_data.min_quantinty) : '');
+                $('#edit').find('.modal-body #max_stock_edit').val(row_data.max_quantinty>0 ? numberWithCommas(row_data.max_quantinty) : '');
                 $('#edit').find('.modal-body #product_type').val(row_data.type);
                 $('#edit').find('.modal-body #status_edit').val(row_data.status);
                 $('#edit').find('.modal-body #id').val(row_data.id);

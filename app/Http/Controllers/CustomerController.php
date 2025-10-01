@@ -34,29 +34,19 @@ class CustomerController extends Controller {
 
     public function store( Request $request ) {
 
+        $credit_limit = (float) str_replace(',', '', $request->credit_limit);
         $this->validate( $request, [
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique( 'customers', 'name' )
-                ->ignore( $request->id ),
-            ],
+            'name' => 'required|string|max:255|unique:customers,name',
             'email' => 'nullable|email',
         ], [
             'name.unique' => 'Customer name exist',
         ] );
-        if ( $request->credit_limit>0 ) {
-            $payment_term = '2';
-        }
-
-        if ( $request->credit_limit == 0 ) {
-            $payment_term = '1';
-        }
+        
+       $payment_term = $credit_limit > 0 ? '2' : '1';
 
         $customer = new Customer;
         $customer->name = $request->name;
-        $customer->credit_limit = $request->credit_limit;
+        $customer->credit_limit = $credit_limit;
         $customer->address = $request->address;
         $customer->phone = $request->phone;
         $customer->email = $request->email;
@@ -74,6 +64,7 @@ class CustomerController extends Controller {
     }
 
     public function update( Request $request ) {
+        $credit_limit = (float) str_replace(',', '', $request->credit_limit);
         $this->validate( $request, [
             'name' => [
                 'required',
@@ -92,8 +83,8 @@ class CustomerController extends Controller {
         $customer->phone = $request->phone;
         $customer->email = $request->email;
         $customer->tin = $request->tin;
-        if ( !empty( $request->credit_limit ) ) {
-            $customer->credit_limit = $request->credit_limit;
+        if ( !empty( $credit_limit ) ) {
+            $customer->credit_limit = $credit_limit;
         }
 
         $customer->save();
