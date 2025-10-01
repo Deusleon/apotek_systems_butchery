@@ -140,17 +140,17 @@ class AccountingReportController extends Controller
         $total_sell = 0;
         $total_buy = 0;
 
-        $sale_detail = SalesDetail::select('stock_id', 'amount')
+        $sale_detail = SalesDetail::select('stock_id', 'amount', 'quantity')
             ->whereNotIn('sale_id', DB::table('sales_credits')->pluck('sale_id'))
             ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
             ->whereBetween(DB::raw('date(date)'), [$date[0], $date[1]])
             ->get();
 
-        $expense_amount = Expense::sum('amount');
+        $expense_amount = Expense::whereBetween(DB::raw('date(created_at)'), [$date[0], $date[1]])->sum('amount');
 
         foreach ($sale_detail as $detail) {
             $total_sell = $total_sell + $detail->amount;
-            $total_buy = $total_buy + $detail->currentStock['unit_cost'];
+            $total_buy = $total_buy + ($detail->currentStock['unit_cost'] * $detail->quantity);
 
             $detail->total_sell = $total_sell;
             $detail->total_buy = $total_buy;
