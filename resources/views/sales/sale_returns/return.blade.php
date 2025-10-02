@@ -30,12 +30,14 @@
                         <label for="code" class="col-md-4 col-form-label text-md-right">Quantity<font
                                 color="red">*</font></label>
                         <div class="col-md-8">
-                            <input type="number" class="form-control"
+                            <input type="hidden" class="form-control"
                                    name="quantity" value="" min="1" step="1" id="rtn_qty"
+                                   placeholder="">
+                            <input type="text" class="form-control"
+                                   name="quantity_to_show" value="" min="1" step="1" id="rtn_qty_to_show"
                                    placeholder="Enter quantity" required>
                             <div class="text text-danger" id="qty_error"></div>
                         </div>
-
                     </div>
 
                     <div class="form-group row">
@@ -43,10 +45,9 @@
                         <div class="col-md-8">
                                      <textarea type="text" class="form-control"
                                                name="reason"
-                                               placeholder="Enter Reason To Return" required></textarea>
+                                               placeholder="Enter reason for return" required></textarea>
                         </div>
                     </div>
-
 
                     <input type="hidden" name="item_id" id="id_of_item" value="">
                     <input type="hidden" name="original_qty" id="og_item_qty" value="">
@@ -59,7 +60,6 @@
 
                 </div>
             </form>
-
 
         </div>
     </div>

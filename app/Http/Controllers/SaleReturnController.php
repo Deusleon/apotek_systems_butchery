@@ -12,6 +12,7 @@ use App\Setting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 
 class SaleReturnController extends Controller
@@ -138,7 +139,7 @@ class SaleReturnController extends Controller
             $value->item_returned;
         }
         $data = json_decode($returns, true);
-
+        Log::info($data);
         return $data;
     }
 
@@ -149,16 +150,15 @@ class SaleReturnController extends Controller
         $details = SalesDetail::find($request['item_detail_id']);
         $stock->quantity += $request['rtn_qty'];
         $newqty = $request['bought_qty'] - $request['rtn_qty'];
-
+        $old_vat = $details->vat; 
 
         //IF Partial return the values are re-calculated
         if ($newqty != 0) {
             $original_amount = $details->amount;
             $status = 5;
-            $details->price = ($details->price / $details->quantity) * ($newqty);
-            $details->vat = ($details->vat / $details->quantity) * ($newqty);
-            $details->amount = ($details->amount / $details->quantity) * ($newqty);
-            $details->discount = ($details->discount / $newqty) * ($newqty);
+            $details->vat = ($old_vat / $details->quantity) * ($newqty);
+            $details->amount = ((($details->amount-$old_vat) / $details->quantity) * $newqty)+$details->vat;
+            $details->discount = ($details->discount / $details->quantity) * ($newqty);
             $details->quantity = $newqty;
 
             if ($creditID) {

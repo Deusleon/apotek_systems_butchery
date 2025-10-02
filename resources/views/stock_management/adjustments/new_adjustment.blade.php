@@ -661,18 +661,6 @@
             }
 
         });
-
-        // $('#new_quantity').on('change', function () {
-        //     var newValue = document.getElementById('new_quantity').value;
-        //     if (newValue !== '') {
-        //         document.getElementById('new_quantity').value =
-        //             numberWithCommas(parseFloat(newValue.replace(/\,/g, ''), 10));
-        //     } else {
-        //         document.getElementById('new_quantity').value = '';
-        //     }
-
-        // });
-
         function numberWithCommas(digit) {
             return String(parseFloat(digit)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }

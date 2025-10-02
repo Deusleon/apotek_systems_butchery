@@ -956,7 +956,7 @@ $("#items_table tbody").on("click", "#rtn_btn", function () {
     $("#sale-return").find(".modal-body #og_item_qty").val(data[2]);
     $("#sale-return").find(".modal-body #name_of_item").val(data[1]);
     document.getElementById("save_btn").style.display = "block";
-    $("#sale-return").on("change", "#rtn_qty", function () {
+    $("#sale-return").on("change", "#rtn_qty_to_show", function () {
         var quantity = document.getElementById("rtn_qty").value;
         if (Number(quantity) > Number(data[2]) || Number(quantity) < 0) {
             document.getElementById("save_btn").disabled = "true";

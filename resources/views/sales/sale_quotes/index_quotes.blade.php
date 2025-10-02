@@ -387,7 +387,7 @@
                     {
                         data: 'quote_number',
                         render: function (data) {
-                            return data;
+                            return data ?? '';
                         }
                     },
                     {
@@ -399,7 +399,7 @@
                     {
                         data: 'date',
                         render: function (date) {
-                            return moment(date).format('YYYY-MM-DD');
+                            return date ? moment(date).format('YYYY-MM-DD') : '';
                         }
                     },
                     {
@@ -416,41 +416,41 @@
                             let buttons = ``;
 
                             buttons += `
-                                                                                        <button class="btn btn-sm btn-rounded btn-success" type="button"
-                                                                                                onclick="showQuoteDetails(event)"
-                                                                                                id="quote_details">Show
-                                                                                        </button>`;
+                                                                                                <button class="btn btn-sm btn-rounded btn-success" type="button"
+                                                                                                        onclick="showQuoteDetails(event)"
+                                                                                                        id="quote_details">Show
+                                                                                                </button>`;
                             @if(auth()->user()->checkPermission('Print Sales Orders'))
                                 buttons += `
-                                                                                                            <a href="${receipt_url}" target="_blank">
-                                                                                                                <button class="btn btn-sm btn-rounded btn-secondary" type="button">
-                                                                                                                    <span class="fa fa-print" aria-hidden="true"></span>
-                                                                                                                    Print
-                                                                                                                </button>
-                                                                                                            </a>`;
+                                                                                                                            <a href="${receipt_url}" target="_blank">
+                                                                                                                                <button class="btn btn-sm btn-rounded btn-secondary" type="button">
+                                                                                                                                    <span class="fa fa-print" aria-hidden="true"></span>
+                                                                                                                                    Print
+                                                                                                                                </button>
+                                                                                                                            </a>`;
                             @endif
 
-                                                                    if (row.status === 1) {
+                                                                            if (row.status === 1) {
                                 @if(auth()->user()->checkPermission('Edit Sales Orders'))
                                     buttons += `
-                                                                                                        <a class="btn btn-sm btn-rounded btn-info" href="${update_url}">
-                                                                                                            Edit
-                                                                                                        </a>`;
+                                                                                                                        <a class="btn btn-sm btn-rounded btn-info" href="${update_url}">
+                                                                                                                            Edit
+                                                                                                                        </a>`;
                                 @endif
                                 @if(auth()->user()->checkPermission('Convert Sales Orders'))
                                     buttons += `
-                                                                                                    <button class="btn btn-sm btn-rounded btn-warning"
-                                                                                                            type="button"
-                                                                                                            onclick="convertQuoteToSale(${row.id})">
-                                                                                                        Convert
-                                                                                                    </button>`;
+                                                                                                                    <button class="btn btn-sm btn-rounded btn-warning"
+                                                                                                                            type="button"
+                                                                                                                            onclick="convertQuoteToSale(${row.id})">
+                                                                                                                        Convert
+                                                                                                                    </button>`;
                                 @endif
-                                                                            } else {
+                                                                                    } else {
                                 buttons += `
-                                                                            <button class="btn btn-sm btn-rounded btn-primary opacity-75"
-                                                                                    type="button" disabled>
-                                                                                Sold
-                                                                            </button>`;
+                                                                                    <button class="btn btn-sm btn-rounded btn-primary opacity-75"
+                                                                                            type="button" disabled>
+                                                                                        Sold
+                                                                                    </button>`;
                             }
 
                             return buttons;
@@ -566,9 +566,22 @@
                             <option value="credit">Credit Sale</option>
                         </select>
                     </div>
-                    <div class="form-group" id="gracePeriodDiv">
+                    {{-- <div class="form-group" id="gracePeriodDiv">
                         <label for="gracePeriod">Grace Period<span class="text-danger">*</span></label>
                         <input type="text" class="form-control" name="" id="gracePeriod">
+                    </div> --}}
+                    <div class="form-group" id="gracePeriodDiv">
+                        <label>Grace Period<font color="red">*</font></label>
+                        <select class="form-control" name="" id="gracePeriod">
+                            <option value="">Select grace period</option>
+                            <option value="1">1 Day</option>
+                            <option value="7">7 Days</option>
+                            <option value="14">14 Days</option>
+                            <option value="21">21 Days</option>
+                            <option value="30">30 Days</option>
+                            <option value="60">60 Days</option>
+                            <option value="90">90 Days</option>
+                        </select>
                     </div>
                     <input type="hidden" name="" id="convert_id">
                     <div class="form-group mt-3">
@@ -676,13 +689,13 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p class="mb-3">Are you sure you want to convert this Sales Order to a Sale? This action cannot be
+                    <p class="mb-3">Are you sure you want to convert this Sales Order? <br> This action cannot be
                         undone!.</p>
-                    <p>Stock quantities will be automatically deducted from inventory.</p>
+                    {{-- <p>Stock quantities will be automatically deducted from inventory.</p> --}}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="convertToSale()">Yes, Convert</button>
+                    <button type="button" class="btn btn-primary" onclick="convertToSale()">Yes</button>
                 </div>
             </div>
         </div>
@@ -736,6 +749,10 @@
             document.getElementById('gracePeriodDiv').style.display = "none";
         }
     };
+
+    $('#gracePeriod').select2({
+        dropdownParent: $('#professionalConvertModal')
+    });
 
     function convertionConfirm() {
         $('#professionalConvertModal').off('hidden.bs.modal').one('hidden.bs.modal', function () {

@@ -202,8 +202,8 @@
                                                     <div style="width: 99%">
                                                         <label>Grace Period<font color="red">*</font></label>
                                                         <select class="js-example-basic-single form-control" name="grace_period"
-                                                            id="grace_period">
-                                                            <option value="1" disabled="true" selected>Select grace period</option>
+                                                            id="grace_period" required>
+                                                            <option value="">Select grace period</option>
                                                             <option value="1">1 Day</option>
                                                             <option value="7">7 Days</option>
                                                             <option value="14">14 Days</option>
@@ -227,8 +227,8 @@
                                                     <div style="width: 99%">
                                                         <label>Grace Period<font color="red">*</font></label>
                                                         <select class="js-example-basic-single form-control" name="grace_period"
-                                                            id="grace_period">
-                                                            <option value="" disabled selected style="display:none;">Select grace period
+                                                            id="grace_period" required>
+                                                            <option value="">Select grace period
                                                             </option>
                                                             <option value="1">1 Day</option>
                                                             <option value="7">7 Days</option>
@@ -283,8 +283,8 @@
                                                     <div style="width: 99%">
                                                         <label>Grace Period<font color="red">*</font></label>
                                                         <select class="js-example-basic-single form-control" name="grace_period"
-                                                            id="grace_period">
-                                                            <option value="1" disabled="true" selected>Select grace period</option>
+                                                            id="grace_period" required>
+                                                            <option value="">Select grace period</option>
                                                             <option value="1">1 Day</option>
                                                             <option value="7">7 Days</option>
                                                             <option value="14">14 Days</option>
@@ -315,8 +315,8 @@
                                                     <div style="width: 99%">
                                                         <label>Grace Period<font color="red">*</font></label>
                                                         <select class="js-example-basic-single form-control" name="grace_period"
-                                                            id="grace_period">
-                                                            <option value="1" disabled="true" selected>Select grace period</option>
+                                                            id="grace_period" required>
+                                                            <option value="">Select grace period</option>
                                                             <option value="1">1 Day</option>
                                                             <option value="7">7 Days</option>
                                                             <option value="14">14 Days</option>
@@ -366,7 +366,7 @@
                                             </div>
                                             <div class="row">
                                                 <div class="col-md-6">
-                                                    <b>Total Amount:</b>
+                                                    <b>Total:</b>
                                                 </div>
                                                 <div class="total-amount col-md-6"
                                                     style="display: flex; justify-content: flex-end">0.00

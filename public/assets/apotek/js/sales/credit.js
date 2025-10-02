@@ -367,7 +367,7 @@ $("#sale_paid").on("blur", function () {
     $("#credit_barcode_input").focus();
 });
 
-$("#grace_period").on("blur", function () {
+$("#grace_period").on("change", function () {
     $("#credit_barcode_input").focus();
 });
 
@@ -957,7 +957,9 @@ function deselect1() {
     // document.getElementById("credit_sales_form").reset();
     // $('#price_category').val('').change();
     $("#customer_id").val("").change();
+    $("#grace_period").val("").change();
     try {
+        document.getElementById("credit_sale_date").value = "";
         document.getElementById("sale_paid").value = 0;
         document.getElementById("sale_discount").value = 0;
         document.getElementById("remark").value = "";
@@ -1470,12 +1472,17 @@ function saveCashSale() {
 $("#credit_sales_form").on("submit", function (e) {
     e.preventDefault();
 
+    var grace_period = document.getElementById("grace_period").value;
     var cart = document.getElementById("order_cart").value;
     var is_backdate_enabled = document.getElementById(
         "is_backdate_enabled"
     ).value;
     if (cart === "" || cart === "undefined") {
-        notify("Credit Sales list empty", "top", "right", "warning");
+        notify("Credit sales list empty", "top", "right", "warning");
+        return false;
+    }
+    if (grace_period === "" || grace_period === "undefined") {
+        notify("Grace period is required", "top", "right", "warning");
         return false;
     }
 
@@ -1488,7 +1495,7 @@ $("#credit_sales_form").on("submit", function (e) {
     }
 
     $("#save_btn").attr("disabled", true);
-
+    // console.log(grace_period, is_backdate_enabled);
     saveCreditSale();
 });
 

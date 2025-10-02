@@ -211,7 +211,7 @@
                     }
                 },
                 {
-                    data: 'item_returned.bought_qty',
+                    data: 'item_returned.remained_qty',
                     render: function (data) {
                         return Math.floor(data);
                     }
@@ -228,12 +228,22 @@
                     }
                 },
                 {
-                    data: 'item_returned', render: function (item_returned) {
-                        return formatMoney((item_returned.rtn_qty / item_returned.bought_qty) * (item_returned.amount - item_returned.discount));
+                    data: 'item_returned',
+                    render: function (item, type, row) {
+                        const amount = parseFloat(row.amount) || 0;
+                        const vat = parseFloat(row.vat) || 0;
+                        const discount = parseFloat(row.discount) || 0;
+                        const remained = Math.round(parseFloat(item.remained_qty) * 100) / 100 || 1;
+                        const rtn = parseFloat(item.rtn_qty) || 0;
+
+                        const total = (((amount - vat) + discount) / remained) * rtn
+                            + ((vat / remained) * rtn);
+
+                        return formatMoney(total);
                     }
                 },
                 @if(Auth::user()->checkPermission('Approve Sales Return'))
-                                        {
+                                                        {
                         data: "action",
                         defaultContent: "<button type='button' id='approve' class='btn btn-sm btn-rounded btn-primary'>Approve</button><button type='button' id='reject' class='btn btn-sm btn-rounded btn-danger'>Reject</button>"
                     }
@@ -244,7 +254,7 @@
                         }
                     @endif
 
-                        ], aaSorting: [[1, "desc"]]
+                                ], aaSorting: [[1, "desc"]]
         });
 
         function getRetunedProducts(action, product) {
@@ -266,14 +276,14 @@
                     dataType: 'json',
                     cache: false,
                     success: function (data) {
-                        // console.log('NewData:', data);
+                        console.log('NewData:', data);
                         if (status == 3) {
 
                             return_table.column(6).visible(false);
                             data.forEach(function (data) {
                                 if (data.status == 5) {
-                                    data.item_returned.bought_qty += Number(data.item_returned.rtn_qty);
-                                    data.item_returned.amount = (data.item_returned.amount / data.item_returned.rtn_qty) * data.item_returned.bought_qty;
+                                    data.item_returned.remained_qty += Number(data.item_returned.rtn_qty);
+                                    data.item_returned.amount = (data.item_returned.amount / data.item_returned.rtn_qty) * data.item_returned.remained_qty;
                                 }
 
                             });

@@ -482,6 +482,18 @@
     </script>
 
     <script>
+        $('#rtn_qty_to_show').on('keyup', function () {
+            var newValue = document.getElementById('rtn_qty_to_show').value;
+            if (newValue !== '') {
+                document.getElementById('rtn_qty_to_show').value =
+                    numberWithCommas(parseFloat(newValue.replace(/\,/g, ''), 10));
+                document.getElementById('rtn_qty').value = parseFloat(newValue.replace(/\,/g, ''), 10);
+            } else {
+                document.getElementById('rtn_qty_to_show').value = '';
+                document.getElementById('rtn_qty').value = '';
+            }
+        });
+
         $(document).ready(function () {
             // Listen for the click event on the Transfer History tab
             $('#sales-history-tablist').on('click', function (e) {
