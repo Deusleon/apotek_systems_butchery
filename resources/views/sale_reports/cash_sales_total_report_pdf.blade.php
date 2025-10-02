@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Sales Total Report</title>
+    <title>Cash Sales Total Report</title>
     <style>
         body {
             font-size: 13px;

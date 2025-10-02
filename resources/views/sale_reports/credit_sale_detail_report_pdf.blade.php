@@ -102,11 +102,11 @@
                 <thead>
                     <tr style="background: #1f273b; color: white;">
                         <th align="center" style="width: 1%;">#</th>
-                        <th align="left" style="width: 1%;">Receipt #</th>
+                        <th align="left">Receipt #</th>
                         <th align="left" style="width: 20%">Product Name</th>
                         <th align="left">Batch #</th>
                         <th align="left">Sold By</th>
-                        <th align="center" style="width: 2%">Qty</th>
+                        <th align="center" style="width: 3%">Qty</th>
                         <th align="right">Sales Price</th>
                         <th align="right">Sub Total</th>
                         <th align="right">VAT</th>
@@ -212,7 +212,7 @@
         @endphp
 
         <div style="margin-top: 10px; padding-top: 5px;">
-            <h3 align="center"><b>Total Summary</b></h3>
+            <h3 align="center"><b>Summary</b></h3>
             <table
                 style="width: auto; min-width: 25%; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
                 <tr>

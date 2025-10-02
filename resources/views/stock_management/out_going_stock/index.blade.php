@@ -77,30 +77,14 @@
         <div class="card">
             <div class="card-body">
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-
-                    <div class="form-group row">
-                        <div class="col-md-6">
-
-                        </div>
-                        <div class="col-md-3" style="margin-left: 2.5%">
-                            <label style="margin-left: 80%" for="issued_date"
-                                class="col-form-label text-md-right">Date:</label>
-                        </div>
-                        <div class="col-md-3" style="margin-left: -3.1%">
-                            <input style="width: 103.4%;" type="text" name="outgoing-date"
-                                class="form-control" id="outgoing-date" value="" />
-                        </div>
+                    <div class="d-flex justify-content-end mb-3 align-items-center">
+                        <label class="mr-2" for="">Date:</label>
+                        <input type="text" name="outgoing-date" id="outgoing-date" class="form-control w-auto">
                     </div>
-                    <div class="form-group row">
-                        <div class="col-md-6">
-
-                        </div>
-                        <div class="col-md-3">
-                            <div class="row justify-content-end">
-                                <label for="category" class="col-form-label text-md-right">Type:</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
+                    <div class="d-flex justify-content-end mb-3">
+                        <div class="d-flex align-items-center" style="width: 247px;">
+                            <label for="price_category" class="form-label mb-0"
+                                style="white-space: nowrap; margin-right: 10px;">Type:</label>
                             <select name="category" class="js-example-basic-single form-control" id="category_id">
                                 <option name="store_name" value="1">Summary</option>
                                 <option name="store_name" value="0">Detailed</option>
@@ -119,7 +103,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                
+
                             </tbody>
                         </table>
 
@@ -138,7 +122,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                
+
                             </tbody>
                         </table>
 
@@ -208,7 +192,7 @@
                 });
 
             });
-            
+
             $(document).ready(function () {
                 var baseUrl = $('#count-sheet-tablist').attr('href');
 

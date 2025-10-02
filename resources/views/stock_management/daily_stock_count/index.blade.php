@@ -92,24 +92,16 @@
                     {{-- <form id="daily-stock" action="{{ route('daily-stock-count-pdf-gen') }}" method="post" --}} <form
                         id="daily-stock" action="" method="post" enctype="multipart/form-data">
                         @csrf()
-                        <div class="col mb-3">
-                            <div class="row justify-content-end">
-                                <div class="col-4">
-                                    <div class="row">
-                                        <label for="d_auto_8" class="col text-md-right mt-2">Date:</label>
-                                        <input type="text" name="sale_date" class="col form-control" id="d_auto_8" value=""
-                                            required>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- ajax loading gif -->
                         <div id="loading">
                             <image id="loading-image" src="{{asset('assets/images/spinner.gif')}}"></image>
                         </div>
 
 
+                        <div class="d-flex justify-content-end mb-3 align-items-center">
+                            <label class="mr-2" for="">Date:</label>
+                            <input type="text" name="sale_date" id="d_auto_8" class="form-control w-auto">
+                        </div>
                         <div id="tbody2" class="table-responsive">
                             <table id="fixed-header2" class="display table nowrap table-striped table-hover"
                                 style="width:100%">

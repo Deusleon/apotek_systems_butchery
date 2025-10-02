@@ -35,15 +35,15 @@
         </ul>
         <div class="card">
             <div class="card-body">
-                {{--Summary--}}
-                <div class="col-md-3 mb-3" style="justify-content: right; float: right;">
-                    <form method="POST" action="{{ route('current_stock_value') }}">
+                <div class="d-flex justify-content-end mb-3">
+                    <form method="POST" action="{{ route('current_stock_value') }}" class="d-flex align-items-center"
+                        style="width: 284px;">
                         @csrf
-                        {{-- <label for="price_category">Price Type:</label> --}}
-                        <select name="price_category" class="js-example-basic-single form-control"
-                            onchange="this.form.submit()" id="price_category">
+                        <label for="price_category" class="form-label mb-0" style="white-space: nowrap; margin-right: 10px;">Price Type:</label>
+                        <select name="price_category" id="price_category" class="form-control"
+                            onchange="this.form.submit()">
                             @foreach($price_categories as $price_category)
-                                <option value="{{$price_category->id}}" {{ $price_category->id == request('price_category', 1) ? 'selected' : '' }}>
+                                <option value="{{ $price_category->id }}" {{ $price_category->id == request('price_category', 1) ? 'selected' : '' }}>
                                     {{ $price_category->name }}
                                 </option>
                             @endforeach
@@ -88,13 +88,15 @@
                                                         <td id="unitcost_{{ $stock->product_id }}">{{ number_format($stock->unit_cost, 2) ?? '' }}
                                                         </td>
                                                         <td id="price_{{ $stock->product_id }}">{{ number_format($stock->price, 2) ?? '' }}</td>
-                                                        <td id="buy_{{ $stock->product_id }}">{{ number_format($stock->buying_price, 2) ?? '' }}</td>
+                                                        <td id="buy_{{ $stock->product_id }}">{{ number_format($stock->buying_price, 2) ?? '' }}
+                                                        </td>
                                                         <td id="sell_{{ $stock->product_id }}">{{ number_format($stock->selling_price, 2) ?? '' }}
                                                         </td>
                                                         <td id="profit_{{ $stock->product_id }}" hidden>{{ number_format($stock->profit, 2) ?? '' }}
                                                         </td>
                                                         <td id="percent_profit{{ $stock->product_id }}" hidden>
-                                                            {{  number_format($stock->profit / $stock->buying_price * 100, 0) ?? '' }}</td>
+                                                            {{  number_format($stock->profit / $stock->buying_price * 100, 0) ?? '' }}
+                                                        </td>
                                                     </tr>
                                 @endif
                             @endforeach

@@ -105,7 +105,7 @@
     <h2 align="center" style="margin-top: -1%">Product Details Report</h2>
     <h4 align="center" style="margin-top: -1%">Category: {{$data[0]['category']}}</h4>
 
-    <div class="row" style="margin-top: 8%;">
+    <div class="row" style="margin-top: 7%;">
         <div class="col-md-12">
             <table id="table-detail" align="center">
                 <thead>

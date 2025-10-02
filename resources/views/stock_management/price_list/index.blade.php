@@ -56,7 +56,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                    <div class="form-group row">
+                    {{-- <div class="form-group row">
                         <div class="col-md-6" style="margin-left: 2%">
                         </div>
                         <div class="col-md-3">
@@ -66,16 +66,41 @@
                         <div class="col-md-3" style="margin-left: -2.6%;">
                             <select name="price_category" class="js-example-basic-single form-control" id="price_category">
                                 @foreach($price_categories as $price_category)
+                                <option value="{{$price_category->id}}">
+                                    {{ $price_category->name }}
+                                </option>
+                                @endforeach
+                            </select>
+
+                        </div>
+                    </div> --}}
+                    <div class="d-flex justify-content-end mb-3">
+                        <div class="d-flex align-items-center" style="width: 274px;">
+                            <label for="price_category" class="form-label mb-0"
+                                style="white-space: nowrap; margin-right: 10px;">Category:</label>
+                            <select name="price_category" class="js-example-basic-single form-control" id="price_category">
+                                @foreach($price_categories as $price_category)
                                     <option value="{{$price_category->id}}">
                                         {{ $price_category->name }}
                                     </option>
                                 @endforeach
                             </select>
-
                         </div>
                     </div>
-
-                    <div class="form-group row">
+                    <div class="d-flex justify-content-end mb-3">
+                        <div class="d-flex align-items-center" style="width: 247px;">
+                            <label for="price_category" class="form-label mb-0"
+                                style="white-space: nowrap; margin-right: 10px;">Type:</label>
+                            <select name="type_id" class="js-example-basic-single form-control" id="type_id">
+                                <option readonly value="" id="store_name_edit" disabled>Select Type...
+                                </option>
+                                <option name="store_name" value="1" selected>Current</option>
+                                <option name="store_name" value="pending">Pending</option>
+                                <option name="store_name" value="0">History</option>
+                            </select>
+                        </div>
+                    </div>
+                    {{-- <div class="form-group row">
                         <div class="col-md-6" style="margin-left: 2%">
                         </div>
                         <div class="col-md-3">
@@ -90,8 +115,7 @@
                                 <option name="store_name" value="0">History</option>
                             </select>
                         </div>
-                    </div>
-
+                    </div> --}}
                     <div id="pendingTable" class="table-responsive">
                         <table id="pendingPrices" class="display table nowrap table-striped table-hover" style="width:100%">
                             <thead>
@@ -363,7 +387,7 @@
                 @if($batch_enabled === 'YES')
                     { 'data': 'batch_number' }
                 @endif
-                ]
+                                ]
         });
 
         function bindData(data) {
@@ -464,20 +488,20 @@
                         { data: "price", render: data => formatMoney(data) },
                         { data: "profit", render: data => (data ? `${Math.round(data)}%` : '0%') },
                         @if(auth()->user()->checkPermission('Edit Price List'))
-                                        {
+                                                                        {
                                 data: "id", render: function (data, type, row) {
                                     return `
-                                                        <button id='pricing' class='btn btn-sm btn-rounded btn-primary'
-                                                            type='button' data-toggle="modal" data-target="#edit"
-                                                            data-name='${row.product_name ?? ''}'
-                                                            data-unit-cost='${row.unit_cost ?? ''}'
-                                                            data-price='${row.price ?? ''}'
-                                                            data-id='${row.id ?? ''}'
-                                                            data-brand='${row.brand ?? ''}'
-                                                            data-pack-size='${row.pack_size ?? ''}'
-                                                            data-sales-uom='${row.sales_uom ?? ''}'
-                                                            data-price-category-id='${row.price_category_id ?? ''}'>Edit</button>
-                                                    `;
+                                                                                        <button id='pricing' class='btn btn-sm btn-rounded btn-primary'
+                                                                                            type='button' data-toggle="modal" data-target="#edit"
+                                                                                            data-name='${row.product_name ?? ''}'
+                                                                                            data-unit-cost='${row.unit_cost ?? ''}'
+                                                                                            data-price='${row.price ?? ''}'
+                                                                                            data-id='${row.id ?? ''}'
+                                                                                            data-brand='${row.brand ?? ''}'
+                                                                                            data-pack-size='${row.pack_size ?? ''}'
+                                                                                            data-sales-uom='${row.sales_uom ?? ''}'
+                                                                                            data-price-category-id='${row.price_category_id ?? ''}'>Edit</button>
+                                                                                    `;
                                 }
                             },
                         @endif

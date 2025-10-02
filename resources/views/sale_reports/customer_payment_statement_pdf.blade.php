@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Customer Payment Statement</title>
+    <title>Customer Credit Payment Statement</title>
     <style>
         body {
             font-size: 12px;
@@ -124,10 +124,10 @@
 
                 <div class="full-row" style="width: 100%;">
                     <div class="col-50">
-                        <b>Date of Sale:</b> {{date('j M, Y', strtotime($dat[0]['date']))}}
+                        <b>Date of Sale:</b> {{date('Y-m-d', strtotime($dat[0]['date']))}}
                     </div>
                     <div class="col-50" style="text-align: right;">
-                        <b>Total Amount:</b> {{number_format(($dat[0]['paid_amount'] + $dat[0]['balance']), 2)}}
+                        <b>Total:</b> {{number_format(($dat[0]['paid_amount'] + $dat[0]['balance']), 2)}}
                     </div>
                 </div>
             </div>
@@ -156,23 +156,23 @@
 
         @endforeach
         <div style="margin-top: 10px; padding-top: 5px;">
-            <h3 align="center"><b>Total Summary</b></h3>
+            <h3 align="center"><b>Summary</b></h3>
             <table
                 style="width: auto; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
                 <tr>
-                    <td style="padding: 4px; text-align: right;"><b>Total Amount</b></td>
+                    <td style="padding: 4px; text-align: right;"><b>Total</b></td>
                     <td style="padding: 4px; text-align: center;"><b>:</b></td>
                     <td style="padding: 4px; text-align: right;">
                         <b>{{ number_format($data['total_paid'] + $data['total_balance'], 2) }}</b>
                     </td>
                 </tr>
                 <tr>
-                    <td style="padding: 4px; text-align: right;"><b>Total Paid</b></td>
+                    <td style="padding: 4px; text-align: right;"><b>Paid</b></td>
                     <td style="padding: 4px; text-align: center;"><b>:</b></td>
                     <td style="padding: 4px; text-align: right;"><b>{{ number_format($data['total_paid'], 2) }}</b></td>
                 </tr>
                 <tr>
-                    <td style="padding: 4px; text-align: right;"><b>Total Balance</b></td>
+                    <td style="padding: 4px; text-align: right;"><b>Balance</b></td>
                     <td style="padding: 4px; text-align: center;"><b>:</b></td>
                     <td style="padding: 4px; text-align: right; color: red;">
                         <b>{{ number_format($data['total_balance'], 2) }}</b>
