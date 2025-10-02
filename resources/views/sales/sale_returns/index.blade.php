@@ -421,8 +421,8 @@
                             return_table.column(6).visible(false);
                             data.forEach(function (data) {
                                 if (data.status == 5) {
-                                    data.item_returned.bought_qty += Number(data.item_returned.rtn_qty);//This calculate the original bought qty
-                                    data.item_returned.amount = (data.item_returned.amount / data.item_returned.rtn_qty) * data.item_returned.bought_qty;
+                                    data.item_returned.remained_qty += Number(data.item_returned.rtn_qty);
+                                    data.item_returned.amount = (data.item_returned.amount / data.item_returned.rtn_qty) * data.item_returned.remained_qty;
                                 }
 
                             });
@@ -454,7 +454,7 @@
                         return moment(date).format('YYYY-MM-DD');
                     }
                 },
-                { data: 'item_returned.bought_qty' },
+                { data: 'item_returned.remained_qty' },
                 {
                     data: 'date', render: function (date) {
                         return moment(date).format('YYYY-MM-DD');
@@ -463,7 +463,7 @@
                 { data: 'item_returned.rtn_qty' },
                 {
                     data: 'item_returned', render: function (item_returned) {
-                        return formatMoney((item_returned.rtn_qty / item_returned.bought_qty) * (item_returned.amount - item_returned.discount));
+                        return formatMoney((item_returned.rtn_qty / item_returned.remained_qty) * (item_returned.amount - item_returned.discount));
                     }
                 },
                 {

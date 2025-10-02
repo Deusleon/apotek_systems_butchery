@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Credit Total Report</title>
+    <title>Credit Sales Total Report</title>
     <style>
         body {
             font-size: 13px;

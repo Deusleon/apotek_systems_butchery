@@ -308,7 +308,7 @@
                 const canApprove = false;
             @endif
 
-                                    if ((status === 'Pending') && canApprove && (fromStoreId === currentStore)) {
+                                        if ((status === 'Pending') && canApprove && (fromStoreId === currentStore)) {
                 approveBtn.show().data({
                     'transfer-no': transferNo,
                     'from-store': fromStore,
@@ -367,15 +367,15 @@
                 }
                 items.forEach(item => {
                     let row = `
-                                                                    <tr>
-                                                                        <td>${item.product_name}</td>
-                                                                        <td>${Number(item.quantity ?? 0).toFixed(0)}</td>
-                                                                `;
+                                                                        <tr>
+                                                                            <td>${item.product_name}</td>
+                                                                            <td>${numberWithCommas(Number(item.quantity ?? 0).toFixed(0))}</td>
+                                                                    `;
 
                     if (status === 'Completed' || status === 'Acknowledged') {
                         row += `
-                                                                        <td>${Number(item.accepted_qty ?? 0).toFixed(0)}</td>
-                                                                    `;
+                                                                            <td>${numberWithCommas(Number(item.accepted_qty ?? 0).toFixed(0))}</td>
+                                                                        `;
                     }
 
                     row += `</tr>`;
@@ -383,6 +383,10 @@
                 });
             }
         });
+
+        function numberWithCommas(digit) {
+            return String(parseFloat(digit)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
 
         $(document).on('click', '.btn-approve-transfer', function () {
             const $btn = $(this);
@@ -416,7 +420,7 @@
 
             $('#reject_transfer_no').val(transferNo);
             $('#reject-modal-title').text('Reject Stock Transfer');
-            $('#reject-message').html('Are you sure you want to reject this transfer from ' + fromStore + ' to ' + toStore + '? Please enter rejection reason below: '+'<span class="text-danger">*</span>');
+            $('#reject-message').html('Are you sure you want to reject this transfer from ' + fromStore + ' to ' + toStore + '? Please enter rejection reason below: ' + '<span class="text-danger">*</span>');
 
             $('#rejection_reason').val('');
 
@@ -448,16 +452,16 @@
                 const tbody = table.find('tbody');
                 items.forEach((item, index) => {
                     tbody.append(`
-                                                                                                                                                                                            <tr>
-                                                                                                                                                                                                <td>
-                                                                                                                                                                                                    ${item.product_name}
-                                                                                                                                                                                                    <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
-                                                                                                                                                                                                </td>
-                                                                                                                                                                                                <td>
-                                                                                                                                                                                                    <input type="number" name="transfers[${index}][transfer_qty]" class="form-control" value="${item.quantity}" required>
-                                                                                                                                                                                                </td>
-                                                                                                                                                                                            </tr>
-                                                                                                                                                                                        `);
+                                                                                                                                                                                                <tr>
+                                                                                                                                                                                                    <td>
+                                                                                                                                                                                                        ${item.product_name}
+                                                                                                                                                                                                        <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
+                                                                                                                                                                                                    </td>
+                                                                                                                                                                                                    <td>
+                                                                                                                                                                                                        <input type="number" name="transfers[${index}][transfer_qty]" class="form-control" value="${item.quantity}" required>
+                                                                                                                                                                                                    </td>
+                                                                                                                                                                                                </tr>
+                                                                                                                                                                                            `);
                 });
                 itemsContainer.append(table);
             }
@@ -490,9 +494,9 @@
                             const productLabel =
                                 (item.current_stock && item.current_stock.product)
                                     ? (item.current_stock.product.name + ' ' +
-                                        item.current_stock.product.brand + ' ' +
-                                        item.current_stock.product.pack_size +
-                                        item.current_stock.product.sales_uom)
+                                        (item.current_stock.product.brand ? item.current_stock.product.brand + ' ' : '') +
+                                        (item.current_stock.product.pack_size ? item.current_stock.product.pack_size : '') +
+                                        (item.current_stock.product.sales_uom ? item.current_stock.product.sales_uom : ''))
                                     : 'Unknown Product';
 
                             const transferQty = Number(item.transfer_qty || 0).toFixed(0);
@@ -504,18 +508,18 @@
                             $('#acknowledge_to_store').text(item.to_store.name);
 
                             $('#acknowledge_items_body').append(`
-                                                                                                    <tr data-item-id="${item.id}">
-                                                                                                        <td>
-                                                                                                            ${productLabel}
-                                                                                                            <!-- Hidden inputs for id and original transfer_qty so they are submitted -->
-                                                                                                            <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
-                                                                                                            <input type="hidden" name="transfers[${index}][transfer_qty]" value="${transferQty}">
-                                                                                                        </td>
-                                                                                                        <td class="transferred">${transferQty}</td>
-                                                                                                        <td class="received">${acceptedQty}</td>
-                                                                                                        <td class="receive text-center" data-original="${transferQty}" contenteditable="false">${receiveDefault}</td>
-                                                                                                    </tr>
-                                                                                                `);
+                                                                                                        <tr data-item-id="${item.id}">
+                                                                                                            <td>
+                                                                                                                ${productLabel}
+                                                                                                                <!-- Hidden inputs for id and original transfer_qty so they are submitted -->
+                                                                                                                <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
+                                                                                                                <input type="hidden" name="transfers[${index}][transfer_qty]" value="${transferQty}">
+                                                                                                            </td>
+                                                                                                            <td class="transferred">${transferQty}</td>
+                                                                                                            <td class="received">${acceptedQty}</td>
+                                                                                                            <td class="receive text-center" data-original="${transferQty}" contenteditable="false">${receiveDefault}</td>
+                                                                                                        </tr>
+                                                                                                    `);
                         });
                     } else {
                         notify(

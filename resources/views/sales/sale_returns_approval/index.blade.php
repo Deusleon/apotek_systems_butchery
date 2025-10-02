@@ -184,11 +184,13 @@
 
         $('#return_table tbody').on('click', '#approve', function () {
             var product = return_table.row($(this).parents('tr')).data();
+            // console.log(product.item_returned);
             getRetunedProducts('approve', product.item_returned)
         });
 
         $('#return_table tbody').on('click', '#reject', function () {
             var product = return_table.row($(this).parents('tr')).data();
+            // console.log(product.item_returned);
             getRetunedProducts('reject', product.item_returned)
         });
 

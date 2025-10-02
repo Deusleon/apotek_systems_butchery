@@ -409,64 +409,6 @@
             $(this).val(picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD'));
         });
 
-        // function reportOption() {
-        //     var report_option = document.getElementById("report_option");
-        //     var report_option_index = report_option.options[report_option.selectedIndex].value;
-
-        //     if (Number(report_option_index) !== Number(0)) {
-        //         document.getElementById('border').style.borderColor = 'white';
-        //     }
-
-        //     //if product ledger
-        //     if (Number(report_option_index) === Number(3)) {
-        //         document.getElementById('product_ledger').style.display = 'block';
-        //     } else {
-        //         document.getElementById('product_ledger').style.display = 'none';
-        //         document.getElementById('warning').style.display = 'none';
-
-        //     }
-
-        //     //if current stock
-        //     if (Number(report_option_index) === Number(1)) {
-        //         document.getElementById('current-stock').style.display = 'block';
-        //     } else {
-        //         document.getElementById('current-stock').style.display = 'none';
-        //         document.getElementById('warning-store').style.display = 'none';
-
-        //     }
-
-        //     /*product detail*/
-        //     if (Number(report_option_index) === Number(2)) {
-        //         document.getElementById('product-detail').style.display = 'block';
-        //     } else {
-        //         document.getElementById('product-detail').style.display = 'none';
-        //         document.getElementById('warning-detail').style.display = 'none';
-
-        //     }
-
-        //     /*stock issue*/
-        //     if (Number(report_option_index) === Number(8)) {
-        //         document.getElementById('stock-issue').style.display = 'block';
-        //     } else {
-        //         document.getElementById('stock-issue').style.display = 'none';
-        //     }
-
-        //     /*stock transfer*/
-        //     if (Number(report_option_index) === Number(9)) {
-        //         document.getElementById('stock-transfer').style.display = 'block';
-        //     } else {
-        //         document.getElementById('stock-transfer').style.display = 'none';
-        //     }
-
-        //     /*stock adjustment*/
-        //     if (Number(report_option_index) === Number(7)) {
-        //         document.getElementById('stock-adjustment').style.display = 'block';
-        //     } else {
-        //         document.getElementById('stock-adjustment').style.display = 'none';
-        //     }
-
-        // }
-
         function reportOption() {
             var report_option = document.getElementById("report_option");
             var report_option_index = report_option.options[report_option.selectedIndex].value;

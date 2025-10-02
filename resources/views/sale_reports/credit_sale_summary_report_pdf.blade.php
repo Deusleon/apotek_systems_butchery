@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Credit Sale Summary Report</title>
+    <title>Credit Sales Summary Report</title>
     <style>
         body {
             font-size: 13px;
@@ -142,17 +142,17 @@
             </table>
             <hr>
             <div style="margin-top: 10px; padding-top: 5px;">
-                <h3 align="center"><b>Total Summary</b></h3>
+                <h3 align="center"><b>Summary</b></h3>
                 <table
-                    style="width: auto; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
+                    style="width: auto; min-width: 200px; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
                     <tr>
-                        <td style="padding: 8px; text-align: right;"><b>Total Amount</b></td>
+                        <td style="padding: 8px; text-align: right;"><b>Total</b></td>
                         <td style="padding: 8px; text-align: center;"><b>:</b></td>
                         <td style="padding: 8px; text-align: right;"><b>{{ number_format($data['grand_total'], 2) }}</b>
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding: 8px; text-align: right;"><b>Total Paid</b></td>
+                        <td style="padding: 8px; text-align: right;"><b>Paid</b></td>
                         <td style="padding: 8px; text-align: center;"><b>:</b></td>
                         <td style="padding: 8px; text-align: right;"><b>{{ number_format($data['total_paid'], 2) }}</b>
                         </td>

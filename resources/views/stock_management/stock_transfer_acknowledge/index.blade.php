@@ -76,30 +76,6 @@
 
                                 </div>
                             </div>
-                            {{-- <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="code">From</label>
-                                    <select id="from_id" name="from_id" class="js-example-basic-single form-control drop"
-                                        onchange="storeSelect()">
-                                        <option selected="true" disabled="disabled">Select Store...</option>
-                                        @foreach($stores as $store)
-                                        <option value="{{$store->id}}">{{$store->name}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label for="code">To</label>
-                                    <select id="to_id" name="to_id" class="js-example-basic-single form-control drop"
-                                        onchange="storeSelect()" disabled>
-                                        <option selected="true" disabled="disabled">Select Store..</option>
-                                        @foreach($stores as $store)
-                                        <option value="{{$store->id}}">{{$store->name}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div> --}}
                         </div>
 
                         <!-- ajax loading gif -->

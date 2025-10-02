@@ -145,11 +145,11 @@
                 </table>
                 <hr>
                 <div style="margin-top: 10px; padding-top: 5px;">
-                    <h3 align="center"><b>Overall Summary</b></h3>
+                    <h3 align="center"><b>Summary</b></h3>
                     <table
                         style="width: auto; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
                         <tr>
-                            <td style="padding: 8px; text-align: right;"><b>Total Amount</b></td>
+                            <td style="padding: 8px; text-align: right;"><b>Total</b></td>
                             <td style="padding: 8px; text-align: center;"><b>:</b></td>
                             <td style="padding: 8px; text-align: right;"><b>{{ number_format($total, 2) }}</b></td>
                         </tr>

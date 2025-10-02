@@ -6,7 +6,7 @@
 
     <style>
         body {
-            font-size: 12px;
+            font-size: 13px;
         }
 
         * {
@@ -172,19 +172,19 @@
                     <h3 align="center"><b>Top Sellers</b></h3>
                     <table
                         style="width: auto; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 8px;"><b>#</b></td>
+                            <td style="padding: 8px; text-align: left;"><b>Name:</b></td>
+                            <td style="padding: 8px; text-align: center;"><b>:</b></td>
+                            <td style="padding: 8px; text-align: right;">
+                                <b>Sales</b>
+                            </td>
+                            <td style="padding: 8px; text-align: center;"><b>:</b></td>
+                            <td style="padding: 8px; text-align: right;">
+                                <b>%</b>
+                            </td>
+                        </tr>
                         @foreach($topSellers as $seller)
-                            <tr>
-                                <td style="padding: 8px;"><b>#</b></td>
-                                <td style="padding: 8px; text-align: left;"><b>Name:</b></td>
-                                <td style="padding: 8px; text-align: center;"><b>:</b></td>
-                                <td style="padding: 8px; text-align: right;">
-                                    <b>Sales</b>
-                                </td>
-                                <td style="padding: 8px; text-align: center;"><b>:</b></td>
-                                <td style="padding: 8px; text-align: right;">
-                                    <b>%</b>
-                                </td>
-                            </tr>
                             <tr>
                                 <td style="padding: 8px;"><b>{{ $loop->iteration }}.</b></td>
                                 <td style="padding: 8px; text-align: left;"><b>{{ $seller['user'] }}</b></td>

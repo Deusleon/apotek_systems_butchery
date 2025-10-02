@@ -200,17 +200,17 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div style="width: 99%">
-                                                        <label>Grace Period<font color="red">*</font></label>
+                                                        <label>Grace Period(In Days)<font color="red">*</font></label>
                                                         <select class="js-example-basic-single form-control" name="grace_period"
                                                             id="grace_period" required>
-                                                            <option value="">Select grace period</option>
-                                                            <option value="1">1 Day</option>
-                                                            <option value="7">7 Days</option>
-                                                            <option value="14">14 Days</option>
-                                                            <option value="21">21 Days</option>
-                                                            <option value="30">30 Days</option>
-                                                            <option value="60">60 Days</option>
-                                                            <option value="90">90 Days</option>
+                                                            <option value="">Select period</option>
+                                                            <option value="1">1</option>
+                                                            <option value="7">7</option>
+                                                            <option value="14">14</option>
+                                                            <option value="21">21</option>
+                                                            <option value="30">30</option>
+                                                            <option value="60">60</option>
+                                                            <option value="90">90</option>
                                                         </select>
 
                                                     </div>
@@ -225,18 +225,18 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div style="width: 99%">
-                                                        <label>Grace Period<font color="red">*</font></label>
+                                                        <label>Grace Period(In Days)<font color="red">*</font></label>
                                                         <select class="js-example-basic-single form-control" name="grace_period"
                                                             id="grace_period" required>
-                                                            <option value="">Select grace period
+                                                            <option value="">Select period
                                                             </option>
-                                                            <option value="1">1 Day</option>
-                                                            <option value="7">7 Days</option>
-                                                            <option value="14">14 Days</option>
-                                                            <option value="21">21 Days</option>
-                                                            <option value="30">30 Days</option>
-                                                            <option value="60">60 Days</option>
-                                                            <option value="90">90 Days</option>
+                                                            <option value="1">1</option>
+                                                            <option value="7">7</option>
+                                                            <option value="14">14</option>
+                                                            <option value="21">21</option>
+                                                            <option value="30">30</option>
+                                                            <option value="60">60</option>
+                                                            <option value="90">90</option>
                                                         </select>
 
                                                     </div>
@@ -281,17 +281,17 @@
                                                 </div>
                                                 <div class="col-md-3">
                                                     <div style="width: 99%">
-                                                        <label>Grace Period<font color="red">*</font></label>
+                                                        <label>Grace Period(In Days)<font color="red">*</font></label>
                                                         <select class="js-example-basic-single form-control" name="grace_period"
                                                             id="grace_period" required>
-                                                            <option value="">Select grace period</option>
-                                                            <option value="1">1 Day</option>
-                                                            <option value="7">7 Days</option>
-                                                            <option value="14">14 Days</option>
-                                                            <option value="21">21 Days</option>
-                                                            <option value="30">30 Days</option>
-                                                            <option value="60">60 Days</option>
-                                                            <option value="90">90 Days</option>
+                                                            <option value="">Select period</option>
+                                                            <option value="1">1</option>
+                                                            <option value="7">7</option>
+                                                            <option value="14">14</option>
+                                                            <option value="21">21</option>
+                                                            <option value="30">30</option>
+                                                            <option value="60">60</option>
+                                                            <option value="90">90</option>
                                                         </select>
 
                                                     </div>
@@ -313,17 +313,17 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div style="width: 99%">
-                                                        <label>Grace Period<font color="red">*</font></label>
+                                                        <label>Grace Period(In Days)<font color="red">*</font></label>
                                                         <select class="js-example-basic-single form-control" name="grace_period"
                                                             id="grace_period" required>
-                                                            <option value="">Select grace period</option>
-                                                            <option value="1">1 Day</option>
-                                                            <option value="7">7 Days</option>
-                                                            <option value="14">14 Days</option>
-                                                            <option value="21">21 Days</option>
-                                                            <option value="30">30 Days</option>
-                                                            <option value="60">60 Days</option>
-                                                            <option value="90">90 Days</option>
+                                                            <option value="">Select period</option>
+                                                            <option value="1">1</option>
+                                                            <option value="7">7</option>
+                                                            <option value="14">14</option>
+                                                            <option value="21">21</option>
+                                                            <option value="30">30</option>
+                                                            <option value="60">60</option>
+                                                            <option value="90">90</option>
                                                         </select>
 
                                                     </div>

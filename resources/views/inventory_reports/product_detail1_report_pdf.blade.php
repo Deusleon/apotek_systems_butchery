@@ -116,7 +116,7 @@
                     </thead>
                     @foreach($data as $item)
                         <tr>
-                            <td>{{$item['product_id']}}</td>
+                            <td>{{$loop->iteration}}.</td>
                             <td>{{$item['name']}}</td>
                             <td align="">{{$item['category']}}</td>
                         </tr>
