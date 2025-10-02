@@ -350,15 +350,13 @@ class HomeController extends Controller {
         if ( auth()->user()->checkPermission( 'Manage All Branches' ) && $store_id == 1 ) {
 
             $totalPurchases = GoodsReceiving::sum( 'total_cost' );
-
-            $days = GoodsReceiving::select( DB::raw( 'date(created_at)' ) )
-            ->distinct()
-            ->get();
-
-            if ( $days->count() == 0 ) {
-                $avgDailyPurchases = 0;
+    
+            $minDate = GoodsReceiving::min('created_at');
+            if ($minDate) {
+                $totalDays = DB::select("SELECT DATEDIFF(CURDATE(), ?) as days", [$minDate])[0]->days + 1;
+                $avgDailyPurchases = $totalPurchases / $totalDays;
             } else {
-                $avgDailyPurchases = $totalPurchases / $days->count();
+                $avgDailyPurchases = 0;
             }
 
             $todayPurchases = GoodsReceiving::whereRaw( 'date(created_at) = date(now())' )
@@ -391,15 +389,12 @@ class HomeController extends Controller {
         $totalPurchases = GoodsReceiving::where( 'store_id', $store_id )
         ->sum( 'total_cost' );
 
-        $days = GoodsReceiving::where( 'store_id', $store_id )
-        ->select( DB::raw( 'date(created_at)' ) )
-        ->distinct()
-        ->get();
-
-        if ( $days->count() == 0 ) {
-            $avgDailyPurchases = 0;
+        $minDate = GoodsReceiving::where( 'store_id', $store_id )->min('created_at');
+        if ($minDate) {
+            $totalDays = DB::select("SELECT DATEDIFF(CURDATE(), ?) as days", [$minDate])[0]->days + 1;
+            $avgDailyPurchases = $totalPurchases / $totalDays;
         } else {
-            $avgDailyPurchases = $totalPurchases / $days->count();
+            $avgDailyPurchases = 0;
         }
 
         $todayPurchases = GoodsReceiving::whereRaw( 'date(created_at) = date(now())' )
@@ -443,14 +438,12 @@ class HomeController extends Controller {
         if ( auth()->user()->checkPermission( 'Manage All Branches' ) && $store_id == 1 ) {
             $totalExpenses = Expense::sum( 'amount' );
 
-            $days = Expense::select( DB::raw( 'date(created_at)' ) )
-            ->distinct()
-            ->get();
-
-            if ( $days->count() == 0 ) {
-                $avgDailyExpenses = 0;
+            $minDate = Expense::min('created_at');
+            if ($minDate) {
+                $totalDays = DB::select("SELECT DATEDIFF(CURDATE(), ?) as days", [$minDate])[0]->days + 1;
+                $avgDailyExpenses = $totalExpenses / $totalDays;
             } else {
-                $avgDailyExpenses = $totalExpenses / $days->count();
+                $avgDailyExpenses = 0;
             }
 
             $todayExpenses = Expense::whereRaw( 'date(created_at) = date(now())' )
@@ -481,15 +474,12 @@ class HomeController extends Controller {
 
         $totalExpenses = Expense::where( 'store_id', $store_id )->sum( 'amount' );
 
-        $days = Expense::select( DB::raw( 'date(created_at)' ) )
-        ->where( 'store_id', $store_id )
-        ->distinct()
-        ->get();
-
-        if ( $days->count() == 0 ) {
-            $avgDailyExpenses = 0;
+        $minDate = Expense::where( 'store_id', $store_id )->min('created_at');
+        if ($minDate) {
+            $totalDays = DB::select("SELECT DATEDIFF(CURDATE(), ?) as days", [$minDate])[0]->days + 1;
+            $avgDailyExpenses = $totalExpenses / $totalDays;
         } else {
-            $avgDailyExpenses = $totalExpenses / $days->count();
+            $avgDailyExpenses = 0;
         }
 
         $todayExpenses = Expense::whereRaw( 'date(created_at) = date(now())' )
