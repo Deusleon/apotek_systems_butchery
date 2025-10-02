@@ -116,9 +116,9 @@
                             <thead>
                             <tr>
                                 <th>Date</th>
+                                <th>Amount</th>
                                 <th>Category</th>
                                 <th>Description</th>
-                                <th>Amount</th>
                                 <th>Action</th>   
                             </tr>
                             </thead>
@@ -151,13 +151,14 @@
             bInfo: true,
             'columns': [
                 {'data': 'created_at'},
-                {'data': 'expense_Category'},
-                {'data': 'description'},
                 {
                     'data': 'amount', render: function (amount) {
                         return formatMoney(amount);
                     }
                 },
+                {'data': 'expense_Category'},
+                {'data': 'description'},
+            
                 // {'data': 'payment_method'},
                 // {'data': 'user'},
                {

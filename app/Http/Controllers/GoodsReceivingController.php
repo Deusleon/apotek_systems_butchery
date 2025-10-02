@@ -257,7 +257,7 @@ class GoodsReceivingController extends Controller
     public function itemReceive(Request $request)
     {
 
-        $default_store_id = Auth::user()->store->id ?? 1;
+        $default_store_id = current_store_id();
 
 
         if ($request->ajax()) {
@@ -403,7 +403,7 @@ class GoodsReceivingController extends Controller
             return redirect()->back()->with('error', 'This order has already been fully received.');
         }
 
-        $default_store_id = Auth::user()->store->id ?? 1;
+        $default_store_id = current_store_id();
 
         foreach ($validated['items'] as $itemData) {
             $received_qty = (int)$itemData['quantity'];
@@ -704,7 +704,7 @@ class GoodsReceivingController extends Controller
             $cart = json_decode($request->cart, true);
             // dd($request);
 
-            $default_store_id = Auth::user()->store->id ?? 1;
+            $default_store_id = current_store_id();
 
             foreach($cart as $single_item){
                 // dd($single_item);

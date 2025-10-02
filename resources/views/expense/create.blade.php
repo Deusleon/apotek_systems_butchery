@@ -43,10 +43,10 @@
                                         <select id="payment_method" name="payment_method" class="form-control" required>
                                             <option value="" disabled selected>Select method</option>
                                             <option value="1">CASH</option>
-                                            <option value="2">MOBILE MONEY</option>
+                                            <option value="2">MOBILE</option>
                                             <option value="3">BANK</option>
                                             <option value="4">CHEQUE</option>
-                                            <option value="5">OTHER</option>
+                                            <option value="5">OTHERS</option>
                                         </select>
                                     </div>
                                 </div>
