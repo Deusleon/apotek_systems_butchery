@@ -157,13 +157,19 @@ function populateHistoryTable(data) {
                 (item.brand ? item.brand + " " : "") +
                 (item.pack_size ? item.pack_size : "") +
                 (item.sales_uom ? item.sales_uom : ""),
-            formatMoney(Number(item.quantity).toFixed(0)),
-            formatMoney(Number(item.price)),
+            numberWithCommas(Number(item.quantity).toFixed(0)),
+            numberWithCommas(Number(item.price)),
         ]);
     });
 
     // Redraw the table
     saleHistoryDataTable.draw();
+}
+
+function numberWithCommas(digit) {
+    return String(parseFloat(digit))
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {

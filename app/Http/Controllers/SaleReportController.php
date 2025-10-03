@@ -1261,11 +1261,8 @@ unset($dayData);
                     ->with('priceCategory')
                     ->get();
 
-            // foreach ($prices as $price) {
-            //     $row[$price->priceCategory->name] = $price->price;
-            // }
             foreach ($prices as $price) {
-                if ($price->priceCategory) { // hakikisha haiko null
+                if ($price->priceCategory) { 
                     $row[$price->priceCategory->name] = $price->price;
                 }
             }
@@ -1296,7 +1293,7 @@ unset($dayData);
         }
 
         $returns = $query->get();
-        
+        // dd($returns);
         return $returns;
     }
     private function salesComparison( $from, $to ) {

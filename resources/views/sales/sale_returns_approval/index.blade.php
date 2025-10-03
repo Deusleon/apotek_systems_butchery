@@ -67,15 +67,10 @@
 
         @if(Auth::user()->checkPermission('View Sales Return Approval'))
             <div class="tab-content" id="myTabContent">
-
-                <div class="form-group row">
-                    <div class="col-md-6">
-
-                    </div>
-                    <div class="col-md-3" style="margin-left: 2.5%">
-                        <label style="margin-left: 74%" for="" class="col-form-label text-md-right">Status:</label>
-                    </div>
-                    <div class="col-md-3" style="margin-left: -3.2%;">
+                <div class="d-flex justify-content-end mb-3">
+                    <div class="d-flex align-items-center" style="width: 256px;">
+                        <label for="price_category" class="form-label mb-0"
+                            style="white-space: nowrap; margin-right: 10px;">Status:</label>
                         <select id="retun_status" class="js-example-basic-single form-control" onchange="getRetunedProducts()">
                             <option value="2">Pending</option>
                             <option value="3">Approved</option>
@@ -83,17 +78,9 @@
                         </select>
                     </div>
                 </div>
-                <div class="form-group row">
-                    <div class="col-md-6">
-
-                    </div>
-                    <div class="col-md-3" style="margin-left: 2.5%">
-                        <label style="margin-left: 78%" for="" class="col-form-label text-md-right">Date:</label>
-                    </div>
-                    <div class="col-md-3" style="margin-left: -3.4%;">
-                        <input style="width: 104%;" type="text" class="form-control" id="returned_date"
-                            onchange="getRetunedProducts()">
-                    </div>
+                <div class="d-flex justify-content-end mb-3 align-items-center">
+                    <label class="mr-2" for="">Date:</label>
+                    <input type="text" id="returned_date" onchange="getRetunedProducts()" class="form-control w-auto">
                 </div>
                 <div class="table-responsive">
                     <table id="return_table" class="display table table-striped table-hover" style="width:100%">
@@ -245,7 +232,7 @@
                     }
                 },
                 @if(Auth::user()->checkPermission('Approve Sales Return'))
-                                                        {
+                                                                        {
                         data: "action",
                         defaultContent: "<button type='button' id='approve' class='btn btn-sm btn-rounded btn-primary'>Approve</button><button type='button' id='reject' class='btn btn-sm btn-rounded btn-danger'>Reject</button>"
                     }
@@ -256,7 +243,7 @@
                         }
                     @endif
 
-                                ], aaSorting: [[1, "desc"]]
+                                        ], aaSorting: [[1, "desc"]]
         });
 
         function getRetunedProducts(action, product) {

@@ -72,7 +72,7 @@
                             </div>
                         </div>
                         <div id="sales">
-                            <div class="form-group row">
+                            {{-- <div class="form-group row">
                                 <div class="col-md-6">
 
                                 </div>
@@ -91,6 +91,10 @@
                                     <label for="Seach">Search</label>
                                     <input type="text" class="form-control" id="searching_sales" placeholder="Search" />
                                 </div>
+                            </div> --}}
+                            <div class="d-flex justify-content-end mb-3 align-items-center">
+                                <label class="mr-2" for="">Date:</label>
+                                <input type="text" id="sold_date" onchange="getSales()" class="form-control w-auto">
                             </div>
                             <div class="table-responsive">
                                 <table id="sale_list_return_table" class="display table nowrap table-striped table-hover"

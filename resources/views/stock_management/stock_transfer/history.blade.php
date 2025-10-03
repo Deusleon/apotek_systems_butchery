@@ -504,9 +504,9 @@
                                                                                                                                                                                         <input type="hidden" name="transfers[${index}][id]" value="${item.id}">
                                                                                                                                                                                         <input type="hidden" name="transfers[${index}][transfer_qty]" value="${transferQty}">
                                                                                                                                                                                     </td>
-                                                                                                                                                                                    <td class="transferred">${transferQty}</td>
-                                                                                                                                                                                    <td class="received">${acceptedQty}</td>
-                                                                                                                                                                                    <td class="receive text-center" data-original="${transferQty}" contenteditable="false">${receiveDefault}</td>
+                                                                                                                                                                                    <td class="transferred" data-value="${transferQty}">${numberWithCommas(transferQty)}</td>
+                                                                                                                                                                                    <td class="received">${numberWithCommas(acceptedQty)}</td>
+                                                                                                                                                                                    <td class="receive text-center" data-original="${transferQty}" contenteditable="false">${numberWithCommas(receiveDefault)}</td>
                                                                                                                                                                                 </tr>
                                                                                                                                                                             `);
                         });
@@ -600,7 +600,7 @@
                 caretPos = newCaret;
             }
 
-            const transferred = parseInt($cell.siblings('.transferred').text(), 10) || 0;
+            const transferred = parseInt($cell.siblings('.transferred').data('value'), 10) || 0;
             const parsed = parseInt($cell.text().trim(), 10);
             if (!isNaN(parsed) && parsed > transferred) {
                 $cell.text(transferred);
@@ -611,7 +611,7 @@
 
         $(document).on('blur', '#acknowledge_items_body .receive', function () {
             const $cell = $(this);
-            const transferred = parseInt($cell.siblings('.transferred').text(), 10) || 0;
+            const transferred = parseInt($cell.siblings('.transferred').data('value'), 10) || 0;
             let text = $cell.text().trim();
 
             text = text.replace(/\D+/g, '').replace(/^0+(?=\d)/, '');
@@ -620,7 +620,7 @@
             if (parsed < 0) parsed = 0;
             if (parsed > transferred) parsed = transferred;
 
-            $cell.text(parsed);
+            $cell.text(numberWithCommas(parsed));
         });
 
         $('#transfer').on('submit', function (e) {

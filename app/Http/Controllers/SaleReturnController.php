@@ -29,7 +29,6 @@ class SaleReturnController extends Controller
             ->with(compact('sales'))
             ->with(compact('count'));
     }
-
     public function getSales(Request $request)
     {
 
@@ -142,14 +141,14 @@ class SaleReturnController extends Controller
         Log::info($data);
         return $data;
     }
-
     public function approve($request)
     {
+        Log::info($request);
         $creditID = SalesCredit::where('sale_id', $request['sale_id'])->value('id');
         $stock = CurrentStock::find($request['stock_id']);
         $details = SalesDetail::find($request['item_detail_id']);
         $stock->quantity += $request['rtn_qty'];
-        $newqty = $request['bought_qty'] - $request['rtn_qty'];
+        $newqty = $request['remained_qty']-$request['rtn_qty'];
         $old_vat = $details->vat; 
 
         //IF Partial return the values are re-calculated
@@ -235,6 +234,4 @@ class SaleReturnController extends Controller
         return $data;
 
     }
-
-
 }

@@ -160,7 +160,10 @@
                                                     class="js-example-basic-single form-control" title="Customer" required>
                                                     <option value="">Select Customer</option>
                                                     @foreach($customers as $customer)
-                                                        <option value="{{$customer}}">{{$customer->name}}</option>
+                                                        <option value="{{ $customer->id }}" data-customer='@json($customer)'>
+                                                            {{ $customer->name }}
+                                                        </option>
+                                                        {{-- <option value="{{$customer}}">{{$customer->name}}</option> --}}
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -384,7 +387,7 @@
                                                 <div class="col-md-6">
                                                     <b>Max. Credit:</b>
                                                 </div>
-                                                <div class="credit_max col-md-6"
+                                                <div id="max_credit" class="credit_max col-md-6"
                                                     style="display: flex; justify-content: flex-end">0.00
                                                 </div>
                                             </div>

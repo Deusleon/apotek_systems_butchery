@@ -56,24 +56,6 @@
         <div class="card">
             <div class="card-body">
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                    {{-- <div class="form-group row">
-                        <div class="col-md-6" style="margin-left: 2%">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="price_category" class="col-form-label text-md-right"
-                                style="margin-left: 68%">Category:</label>
-                        </div>
-                        <div class="col-md-3" style="margin-left: -2.6%;">
-                            <select name="price_category" class="js-example-basic-single form-control" id="price_category">
-                                @foreach($price_categories as $price_category)
-                                <option value="{{$price_category->id}}">
-                                    {{ $price_category->name }}
-                                </option>
-                                @endforeach
-                            </select>
-
-                        </div>
-                    </div> --}}
                     <div class="d-flex justify-content-end mb-3">
                         <div class="d-flex align-items-center" style="width: 274px;">
                             <label for="price_category" class="form-label mb-0"

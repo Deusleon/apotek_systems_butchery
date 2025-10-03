@@ -65,15 +65,9 @@
                 <div class="tab-pane fade show active" id="sales-history" role="tabpanel"
                     aria-labelledby="sales_history-tab">
                     <input type="hidden" value="{{$vat}}" id="vat">
-                    <div class="form-group row">
-                        <div class="col-md-6"></div>
-                        <div class="col-md-3" style="margin-left: 2.5%">
-                            <label style="margin-left: 80%" for="filter" class="col-form-label text-md-right">Date:</label>
-                        </div>
-                        <div class="col-md-3" style="margin-left: -3.4%">
-                            <input style="width: 103.4%;" type="text" class="form-control" id="daterange" />
-                        </div>
-
+                    <div class="d-flex justify-content-end mb-3 align-items-center">
+                        <label class="mr-2" for="">Date:</label>
+                        <input type="text" id="daterange" class="form-control w-auto">
                     </div>
                     <form id="sale_receipt_reprint_form" action="{{route('sale-reprint-receipt')}}" method="post"
                         enctype="multipart/form-data" target="_blank">

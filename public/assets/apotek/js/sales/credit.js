@@ -857,17 +857,32 @@ function discount() {
     } catch (e) {}
 
     //Credit Sales
-    var customer;
+    // var customer;
+    var customer = {};
     var max_credit;
     var balance;
     if ($("#credit_sale").length) {
-        var customer_x = document.getElementById("customer_id").value;
-        if (customer_x === "") {
-            customer = JSON.parse("{}");
+        var custId = $("#customer_id").val();
+        if (custId) {
+            // Safest: data attribute kwenye option ndiyo priority
+            var optionData = $("#customer_id option:selected").data("customer");
+            if (optionData) {
+                customer = optionData;
+            } else if (window.customersMap && window.customersMap[custId]) {
+                customer = window.customersMap[custId];
+            } else {
+                customer = {};
+            }
         } else {
-            customer = JSON.parse(document.getElementById("customer_id").value);
+            customer = {};
         }
-        max_credit = customer.credit_limit - customer.total_credit || 0;
+
+        console.log("selected customer object:", customer);
+
+        var credit_limit = customer.credit_limit || 0;
+        var total_credit = customer.total_credit || 0;
+        max_credit = credit_limit - total_credit;
+
         balance = total - sale_paid_amount;
         if (balance > max_credit) {
             document.getElementById("save_btn").disabled = "true";

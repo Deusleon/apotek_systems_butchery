@@ -33,7 +33,7 @@
                             <input type="text" class="form-control uniform-input" id="name" name="name"
                                 value="{{ old('name') }}" required>
                             @if($errors->has('name'))
-                                <span class="text-danger">{{ $errors->first('name') }}</span>
+                                <small class="text-danger">{{ $errors->first('name') }}</small>
                             @endif
                         </div>
                     </div>
