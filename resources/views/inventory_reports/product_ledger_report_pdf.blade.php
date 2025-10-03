@@ -100,23 +100,23 @@
                             <th>#</th>
                             <th style="text-align: left">Date</th>
                             <th style="text-align: left">Transaction Method</th>
-                            <th style="text-align: right">Received</th>
-                            <th style="text-align: right">Outgoing</th>
-                            <th style="text-align: right">Balance</th>
+                            <th style="text-align: center">Received</th>
+                            <th style="text-align: center">Outgoing</th>
+                            <th style="text-align: center">Balance</th>
                         </tr>
                     </thead>
                     @foreach($data as $item)
                         <tr>
                             <td style="text-align: center">{{$loop->iteration}}.</td>
-                            <td style="text-align: left">{{$item['date']}}</td>
+                            <td style="text-align: left">{{($item['date'] ?? '')}}</td>
                             <td style="text-align: left">{{$item['method']}}</td>
-                            <td style="text-align: right;">
-                                {{number_format($item['received'], 2)}}
+                            <td style="text-align: center;">
+                                {{number_format($item['received'],0)}}
                             </td>
-                            <td style="text-align: right;">
-                                {{number_format($item['outgoing'], 2)}}
+                            <td style="text-align: center;">
+                                {{number_format($item['outgoing'], 0)}}
                             </td>
-                            <td style="text-align: right;">{{number_format($item['balance'], 2)}}</td>
+                            <td style="text-align: center;">{{number_format($item['balance'], 0)}}</td>
                         </tr>
                     @endforeach
                     {{-- @endforeach--}}

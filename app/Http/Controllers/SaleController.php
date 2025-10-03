@@ -473,7 +473,11 @@ class SaleController extends Controller
                             $stock_tracking->store_id = $default_store;
                             $stock_tracking->created_by = Auth::user()->id;
                             $stock_tracking->updated_by = Auth::user()->id;
-                            $stock_tracking->out_mode = 'Cash Sales';
+                            if ($request->credit == 'Yes') {
+                                $stock_tracking->out_mode = 'Credit Sales';
+                            }else{
+                                $stock_tracking->out_mode = 'Cash Sales';
+                            }
                             $stock_tracking->updated_at = date('Y/m/d');
                             $stock_tracking->movement = 'OUT';
                             $stock_tracking->save();

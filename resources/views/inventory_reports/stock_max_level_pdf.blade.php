@@ -110,7 +110,7 @@
                     @foreach($data as $item)
                         <tr>
                             <td>{{$loop->iteration}}.</td>
-                            <td>{{$item->name}}</td>
+                            <td>{{$item->name.' '.($item->brand.' ' ?? '').($item->pack_size).($item->sales_uom)}}</td>
                             <td align="center">{{number_format($item->max_quantinty)}}</td>
                             <td align="center">{{number_format($item->qty)}}</td>
                         </tr>

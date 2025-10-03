@@ -39,7 +39,8 @@
                     <form method="POST" action="{{ route('current_stock_value') }}" class="d-flex align-items-center"
                         style="width: 284px;">
                         @csrf
-                        <label for="price_category" class="form-label mb-0" style="white-space: nowrap; margin-right: 10px;">Price Type:</label>
+                        <label for="price_category" class="form-label mb-0"
+                            style="white-space: nowrap; margin-right: 10px;">Price Type:</label>
                         <select name="price_category" id="price_category" class="form-control"
                             onchange="this.form.submit()">
                             @foreach($price_categories as $price_category)
@@ -72,15 +73,15 @@
                         <tbody>
                             {{-- @dd($stocks) --}}
                             @foreach ($stocks as $stock)
-                                @if($stock->buying_price > 0)
+                                                    {{-- @if($stock->buying_price > 0) --}}
                                                     <tr>
                                                         <td id="name_{{ $stock->product_id }}">
                                                             {{ trim(
-                                        ($stock->name ?? '') .
-                                        (!empty($stock->brand) ? ' ' . $stock->brand : '') .
-                                        (!empty($stock->pack_size) ? ' ' . $stock->pack_size : '') .
-                                        (!empty($stock->sales_uom) ? '' . $stock->sales_uom : '')
-                                    ) }}
+                                    ($stock->name ?? '') .
+                                    (!empty($stock->brand) ? ' ' . $stock->brand : '') .
+                                    (!empty($stock->pack_size) ? ' ' . $stock->pack_size : '') .
+                                    (!empty($stock->sales_uom) ? '' . $stock->sales_uom : '')
+                                ) }}
                                                         </td>
                                                         <td id="quantity_{{ $stock->product_id }}">
                                                             {{ floor($stock->quantity) == $stock->quantity ? number_format($stock->quantity, 0) : number_format($stock->quantity, 1) }}
@@ -95,10 +96,14 @@
                                                         <td id="profit_{{ $stock->product_id }}" hidden>{{ number_format($stock->profit, 2) ?? '' }}
                                                         </td>
                                                         <td id="percent_profit{{ $stock->product_id }}" hidden>
-                                                            {{  number_format($stock->profit / $stock->buying_price * 100, 0) ?? '' }}
+                                                            @if($stock->buying_price > 0)
+                                                                {{  number_format($stock->profit / $stock->buying_price * 100, 0) ?? '' }}
+                                                            @else
+                                                                {{  number_format($stock->profit) ?? '' }}
+                                                            @endif
                                                         </td>
                                                     </tr>
-                                @endif
+                                                    {{-- @endif --}}
                             @endforeach
                         </tbody>
 
