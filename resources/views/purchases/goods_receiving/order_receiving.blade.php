@@ -14,6 +14,13 @@
 @endsection
 
 @section("content")
+
+    @php
+        $current_store = session('current_store_id') ?? auth()->user()->store_id;
+        $is_all_branch = $current_store == 1;
+    @endphp
+
+
     <style>
         /* Wrapper to control table height */
         .receive-items-wrapper {
@@ -195,6 +202,18 @@
         const orders = @json($orders);
         const batchSetting = @json($batch_setting);
         const expireDate   = @json($expire_date);
+        const isAllBranch = @json($is_all_branch);
+
+        // Flag to prevent multiple notifications
+        let notificationShown = false;
+
+        function showNotification() {
+            if (!notificationShown) {
+                notificationShown = true;
+                notify('You cannot receive in branch ALL. Please switch to another branch to proceed.', 'top', 'right', 'warning');
+                setTimeout(() => notificationShown = false, 1000); // Reset after 1 second
+            }
+        }
 
 
         // Initialize DataTable
@@ -242,15 +261,27 @@
 
                     }
                     if (row.status == '2') {
-                        return `<button class="btn btn-primary btn-rounded btn-sm receive-btn" data-id="${row.id}">
-                                 Receive
+                        if (isAllBranch) {
+                            return `<button class="btn btn-primary btn-rounded btn-sm" disabled onclick="showNotification()">
+                                     Receive
                                 </button>`;
+                        } else {
+                            return `<button class="btn btn-primary btn-rounded btn-sm receive-btn" data-id="${row.id}">
+                                     Receive
+                                </button>`;
+                        }
 
                     }
                     if (row.status == '3') {
-                        return `<button class="btn btn-primary btn-rounded btn-sm receive-btn" data-id="${row.id}">
-                                 Receive
+                        if (isAllBranch) {
+                            return `<button class="btn btn-primary btn-rounded btn-sm" disabled onclick="showNotification()">
+                                     Receive
                                 </button>`;
+                        } else {
+                            return `<button class="btn btn-primary btn-rounded btn-sm receive-btn" data-id="${row.id}">
+                                     Receive
+                                </button>`;
+                        }
 
                     }
                     return `<button class="btn btn-success btn-rounded btn-sm" disabled>
@@ -383,6 +414,32 @@
         // Call this every time the modal opens
         $('#receiveOrderModal').on('shown.bs.modal', function() {
             initExpiryDatePickers();
+
+            if (isAllBranch) {
+                // Prevent all interactions in the modal
+                $('#receiveOrderForm input').on('focus input', function(e) {
+                    e.preventDefault();
+                    $(this).blur();
+                    showNotification();
+                });
+
+                $('#receiveOrderForm select').on('change', function(e) {
+                    e.preventDefault();
+                    $(this).val('').trigger('change');
+                    showNotification();
+                });
+
+                $('#proceed-receive-btn, #edit-receive-btn').on('click', function(e) {
+                    e.preventDefault();
+                    showNotification();
+                });
+
+                // Prevent form submission
+                $('#receiveOrderForm').on('submit', function(e) {
+                    e.preventDefault();
+                    showNotification();
+                });
+            }
         });
 
         // Edit button click

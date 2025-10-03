@@ -12,6 +12,12 @@
 @endsection
 @section("content")
 
+    @php
+        $current_store = session('current_store_id') ?? auth()->user()->store_id;
+        $is_all_branch = $current_store == 1;
+    @endphp
+
+
     <style>
         .datepicker>.datepicker-days {
             display: block;
@@ -283,6 +289,125 @@
 
         $(document).ready(function () {
             resetForms();
+
+            // Flag to prevent multiple notifications
+            let notificationShown = false;
+
+            // Check if user is in ALL branch
+            if (@json($is_all_branch)) {
+                // Prevent form interactions and show message
+                function showNotification() {
+                    if (!notificationShown) {
+                        notificationShown = true;
+                        notify('You cannot receive in branch ALL. Please switch to another branch to proceed.', 'top', 'right', 'warning');
+                        setTimeout(() => notificationShown = false, 1000); // Reset after 1 second
+                    }
+                }
+
+                $('#good_receiving_supplier_ids').on('change', function(e) {
+                    e.preventDefault();
+                    $(this).val('').trigger('change.select2');
+                    showNotification();
+                });
+
+
+                $('#goodreceving_invoice_id').on('change', function(e) {
+                    e.preventDefault();
+                    $(this).val('').trigger('change.select2');
+                    showNotification();
+                });
+
+                $('#invoicing_batch_n').on('focus input', function(e) {
+                    e.preventDefault();
+                    $(this).blur();
+                    showNotification();
+                });
+
+                $('#invoiceprice_category').on('change', function(e) {
+                    e.preventDefault();
+                    $(this).val('').trigger('change');
+                    showNotification();
+                });
+
+                $('#invoicing_purchase_date').on('focus click', function(e) {
+                    e.preventDefault();
+                    $(this).blur();
+                    showNotification();
+                });
+
+                $('#invoicesave_id').on('click', function(e) {
+                    e.preventDefault();
+                    showNotification();
+                });
+
+                // Prevent form submission
+                $('#invoiceFormId').on('submit', function(e) {
+                    e.preventDefault();
+                    showNotification();
+                });
+
+                // Handle edit selected product modal
+                $('#editselected_product').on('shown.bs.modal', function() {
+                    $('#item_quantity, #invoice_buy_price, #invoice_sell_price_id, #expire_date_21').on('focus input', function(e) {
+                        e.preventDefault();
+                        $(this).blur();
+                        showNotification();
+                    });
+
+                    $('#expire_check').on('change', function(e) {
+                        e.preventDefault();
+                        $(this).prop('checked', false);
+                        showNotification();
+                    });
+
+                    $('#order_receive button[type="submit"]').on('click', function(e) {
+                        e.preventDefault();
+                        showNotification();
+                    });
+
+                    $('#order_receive').on('submit', function(e) {
+                        e.preventDefault();
+                        showNotification();
+                    });
+                });
+
+                // Handle receive modal (for order receiving in invoice tab? but anyway)
+                $('#receive').on('shown.bs.modal', function() {
+                    $('#rec_qty, #pr_id, #sell_price_i, #batch_number').on('focus input', function(e) {
+                        e.preventDefault();
+                        $(this).blur();
+                        showNotification();
+                    });
+
+                    $('#invoice_ids, #price_cat').on('change', function(e) {
+                        e.preventDefault();
+                        $(this).val('').trigger('change');
+                        showNotification();
+                    });
+
+                    $('#expire_date_1').on('focus click', function(e) {
+                        e.preventDefault();
+                        $(this).blur();
+                        showNotification();
+                    });
+
+                    $('#expire_check_id').on('change', function(e) {
+                        e.preventDefault();
+                        $(this).prop('checked', false);
+                        showNotification();
+                    });
+
+                    $('#order_reveice button[type="button"]').on('click', function(e) {
+                        e.preventDefault();
+                        showNotification();
+                    });
+
+                    $('#order_reveice').on('submit', function(e) {
+                        e.preventDefault();
+                        showNotification();
+                    });
+                });
+            }
         });
 
         function resetForms() {
