@@ -23,7 +23,7 @@
                         @csrf()
                         <div class="modal-body">
                             <div class="form-group row">
-                                <label for="expense_date" class="col-md-4 col-form-label text-md-right">{{ __('Expense
+                                <label for="expense_date" class="col-md-4 col-form-label text-md-right">{{ __('
                                             Date') }}<span style="color: red;">*</span></label>
                                 <div class="col-md-8">
                                     <div id="date" style="border: 2px solid white; border-radius: 6px;">
@@ -35,7 +35,7 @@
                             <div class="form-group row">
                                 <label for="payment_method"
                                     class="col-md-4 col-form-label text-md-right">
-                                    {{ __('Payment Method') }}
+                                    {{ __('Pay Method') }}
                                     <span style="color: red;">*</span>
                                 </label>
                                 <div class="col-md-8">
@@ -52,7 +52,7 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="expense_amount" class="col-md-4 col-form-label text-md-right">{{ __('Expense
+                                <label for="expense_amount" class="col-md-4 col-form-label text-md-right">{{ __('
                                     Amount') }}<span style="color: red;">*</span></label>
                                 <div class="col-md-8">
                                     <input type="text" id="expense" class="form-control" onkeypress="return isNumberKey(event,this)" name="expense_amount" required>
@@ -60,7 +60,7 @@
                             </div>
                             <div class="form-group row">
                                 <label for="expense_category"
-                                       class="col-md-4 col-form-label text-md-right">{{ __('Expense Category') }}<span
+                                       class="col-md-4 col-form-label text-md-right">{{ __('Category') }}<span
                                         style="color: red;">*</span></label>
                                 <div class="col-md-8">
                                     <div id="category" style="border: 2px solid white; border-radius: 6px;">
@@ -77,7 +77,7 @@
                             </div>
                             <div class="form-group row">
                                 <label for="expense_description"
-                                       class="col-md-4 col-form-label text-md-right">{{ __('Expense Description') }}</label>
+                                       class="col-md-4 col-form-label text-md-right">{{ __('Description') }}</label>
                                 <div class="col-md-8">
                                     <input type="text" class="form-control" name="expense_description">
                                 </div>

@@ -116,10 +116,11 @@
                             <thead>
                             <tr>
                                 <th>Date</th>
+                                <th>Pay Method</th>
                                 <th>Amount</th>
                                 <th>Category</th>
-                                <th>Description</th>
-                                <th>Action</th>   
+                                <th>Updated by</th>
+                                <th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -135,6 +136,7 @@
     @include("expense.create")
     @include("expense.edit")
     @include("expense.delete")
+    @include("expense.show")
 
 @endsection
 
@@ -150,24 +152,32 @@
             bPaginate: true,
             bInfo: true,
             'columns': [
-                {'data': 'created_at'},
+                {
+                    'data': 'created_at',
+                    render: function (data, type, row) {
+                        if (type === 'sort') {
+                            return data; // Use full datetime for sorting
+                        }
+                        return data.split(' ')[0]; // Display only date part
+                    }
+                },
+                {'data': 'payment_method'},
                 {
                     'data': 'amount', render: function (amount) {
                         return formatMoney(amount);
                     }
                 },
                 {'data': 'expense_Category'},
-                {'data': 'description'},
-            
-                // {'data': 'payment_method'},
-                // {'data': 'user'},
+                {'data': 'user'},
                {
                     data: 'action',
                     defaultContent: `
+                        @if(auth()->user()->checkPermission('Show Expense'))
+                            <button class="btn btn-info btn-rounded btn-sm" type="button" id="show_btn">Show</button>
+                        @endif
                         @if(auth()->user()->checkPermission('Edit Expense'))
                             <button class="btn btn-primary btn-rounded btn-sm" type="button" id="edit_btn">Edit</button>
                         @endif
-
                         @if(auth()->user()->checkPermission('Delete Expense'))
                             <button class="btn btn-danger btn-rounded btn-sm" type="button" id="delete_btn">Delete</button>
                         @endif
@@ -183,7 +193,7 @@
             var row_data = table_expense_filter.row($(this).parents('tr')).data();
             var index = table_expense_filter.row($(this).parents('tr')).index();
 
-            $('#edit').find('.modal-body #d_auto_91_edit').val(row_data.created_at);
+            $('#edit').find('.modal-body #d_auto_91_edit').val(row_data.created_at.split(' ')[0]); // Display date only
             $('#payment_method_edit').val(row_data.payment_method_id).change();
             $('#edit').find('.modal-body #expense_amount_edit').val(formatMoney(row_data.amount));
             $('#expense_category_edit').val(row_data.expense_category_id).change();
@@ -204,6 +214,20 @@
             $('#delete').find('.modal-body #expense_id').val(row_data.id);
 
             $('#delete').modal('show');
+
+        });
+
+        $('#fixed-header-expense tbody').on('click', '#show_btn', function () {
+            var row_data = table_expense_filter.row($(this).parents('tr')).data();
+
+            $('#show').find('#show_date').val(row_data.created_at.split(' ')[0]); // Display date only
+            $('#show').find('#show_payment_method').val(row_data.payment_method);
+            $('#show').find('#show_amount').val(formatMoney(row_data.amount));
+            $('#show').find('#show_category').val(row_data.expense_Category);
+            $('#show').find('#show_updated_by').val(row_data.user);
+            $('#show').find('#show_description').val(row_data.description);
+
+            $('#show').modal('show');
 
         });
 
@@ -381,13 +405,41 @@
         });
 
         $('#expense').on('change', function () {
-            var amount = document.getElementById('expense').value;
+            var amount = document.getElementById('expense').value.replace(/,/g, '');
             document.getElementById('expense').value = formatMoney(amount);
         });
 
         $('#expense_amount_edit').on('change', function () {
-            var amount = document.getElementById('expense_amount_edit').value;
+            var amount = document.getElementById('expense_amount_edit').value.replace(/,/g, '');
             document.getElementById('expense_amount_edit').value = formatMoney(amount);
+        });
+
+        /* AJAX submit for edit form */
+        $('#expense_form_edit').on('submit', function (e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            formData.append('_method', 'PUT');
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    $('#edit').modal('hide');
+                    getExpenseDate(); // Refresh table
+                    // Show success message - assuming toastr or similar is available
+                    if (typeof toastr !== 'undefined') {
+                        toastr.success('Expense updated successfully!');
+                    }
+                },
+                error: function (xhr) {
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error('Error updating expense');
+                    }
+                }
+            });
         });
 
         function isNumberKey(evt, obj) {
