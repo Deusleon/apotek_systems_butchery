@@ -50,7 +50,7 @@ class RequisitionController extends Controller
                     $buttons .= '<input type="hidden" name="req_id" value="'.$row->id .'">';
 
                     // Show button (depends on View Requisitions Details)
-                    if (Auth()->user()->checkPermission('View Requisitions Details')) {
+                    if (Auth()->user()->checkPermission('Show Requisitions')) {
                         $buttons .= '<button type="button" data-toggle="modal" data-target="#requisition-details" 
                                         data-id="'.$row->id.'" 
                                         class="btn btn-rounded btn-success btn-sm">
@@ -215,7 +215,7 @@ class RequisitionController extends Controller
 
     public function show($id)
 {
-    if (!Auth()->user()->checkPermission('View Requisitions Details')) {
+    if (!Auth()->user()->checkPermission('Edit Requisitions')) {
         abort(403, 'Access Denied');
     }
 

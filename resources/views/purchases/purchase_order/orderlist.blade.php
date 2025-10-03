@@ -102,7 +102,9 @@
                 getOrderHistory: '{{route('getOrderHistory')}}',
                 approveOrder: '{{route('orders.approve', ['id' => ':id'])}}'
             },
-            csrfToken: '{{ csrf_token() }}' // ← ADD THIS LINE
+            csrfToken: '{{ csrf_token() }}', // ← ADD THIS LINE
+            showPurchaseOrder: '{{auth()->user()->checkPermission('Show Purchase Order')}}',
+            printPurchaseOrder: '{{auth()->user()->checkPermission('Print Purchase Order')}}'
         };
 
         // IMPORTANT: Allow printing ONLY when approved

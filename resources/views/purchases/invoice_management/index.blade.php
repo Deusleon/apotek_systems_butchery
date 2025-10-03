@@ -34,7 +34,7 @@ Invoice Management
 
                 </div>
                 <div class="col-md-3 text-right">
-                    @if(auth()->user()->checkPermission('Manage Invoices'))
+                    @if(auth()->user()->checkPermission('Add Invoices'))
                     <button type="button" class="btn btn-secondary btn-sm"
                         data-toggle="modal" data-target="#create">
                         Add Invoice
@@ -367,8 +367,14 @@ Invoice Management
 
             {
                 data: "action",
-                defaultContent: "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm' size='2'/>" +
-                    "<input type='button' value='Edit' id='edit_btn' class='btn btn-primary btn-rounded btn-sm' size='2' />" 
+                defaultContent: 
+                    `@if(auth()->user()->checkPermission('Show Invoices'))
+                        <input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm' size='2'/>
+                    @endif
+
+                    @if(auth()->user()->checkPermission('Edit Invoices'))
+                        <input type='button' value='Edit' id='edit_btn' class='btn btn-primary btn-rounded btn-sm' size='2'/>
+                    @endif`
             }
             //
             ,
