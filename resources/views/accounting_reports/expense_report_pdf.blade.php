@@ -140,6 +140,7 @@
                     <th align="left">Date</th>
                     <th align="left">Pay Method</th>
                     <th align="left">Category</th>
+                    <th align="left">Updated by</th>
                     <th align="left">Description</th>
                     <th align="left">Amount</th>
                     {{--                <th>Payment Method</th>--}}
@@ -164,6 +165,7 @@
                             @endif
                         </td>
                         <td align="left">{{$item->accExpenseCategory['name']}}</td>
+                        <td align="left">{{$item->user['name'] ?? 'Unknown'}}</td>
                         <td align="left">{{$item->expense_description}}</td>
                         <td align="left">{{number_format($item->amount,2)}}</td>
 

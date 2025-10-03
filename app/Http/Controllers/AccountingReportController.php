@@ -118,8 +118,9 @@ class AccountingReportController extends Controller
         $date[1] = date('Y-m-d', strtotime($date[1]));
 
         //by default return todays month expenses
-        $expense = Expense::whereBetween(DB::raw('date(created_at)'), [$date[0], $date[1]])
-            ->orderby('id', 'DESC')
+        $expense = Expense::with('user') // Include user relationship
+            ->whereBetween(DB::raw('date(created_at)'), [$date[0], $date[1]])
+            ->orderby('created_at', 'DESC') // Order by timestamp for proper sorting
             ->get();
         foreach ($expense as $item) {
             $total = $total + $item->amount;

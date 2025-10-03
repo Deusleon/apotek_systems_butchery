@@ -28,7 +28,7 @@ class ExpenseController extends Controller
         $expense->expense_category_id = $request->expense_category;
         $expense->expense_description = $request->expense_description;
         $expense->payment_method_id = $request->payment_method;
-        $expense->created_at = date('Y-m-d', strtotime($request->expense_date));
+        $expense->created_at = date('Y-m-d H:i:s', strtotime($request->expense_date . ' ' . now()->format('H:i:s')));
         $expense->updated_by = Auth::user()->id;
         $expense->store_id = Auth::user()->store_id;
         $expense->save();
@@ -44,10 +44,16 @@ class ExpenseController extends Controller
         $expense->expense_category_id = $request->expense_category_edit;
         $expense->expense_description = $request->expense_description_edit;
         $expense->payment_method_id = $request->payment_method_edit;
-        $expense->created_at = date('Y-m-d', strtotime($request->expense_date_edit));
+        // Preserve the original timestamp but update the date part
+        $originalTime = date('H:i:s', strtotime($expense->created_at));
+        $expense->created_at = date('Y-m-d H:i:s', strtotime($request->expense_date_edit . ' ' . $originalTime));
         $expense->updated_by = Auth::user()->id;
         $expense->store_id = Auth::user()->store_id;
         $expense->save();
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Expense updated successfully!']);
+        }
 
         session()->flash("alert-success", "Expense updated successfully!");
         return back();
@@ -70,13 +76,17 @@ class ExpenseController extends Controller
             $to_table = array();
 
             foreach ($results[0] as $result) {
-                if ($result->payment_method_id == 1)
-                    $method = "CASH";
-                else
-                    $method = "BILL";
+                $payment_methods = [
+                    1 => "CASH",
+                    2 => "MOBILE",
+                    3 => "BANK",
+                    4 => "CHEQUE",
+                    5 => "OTHERS"
+                ];
+                $method = $payment_methods[$result->payment_method_id] ?? "UNKNOWN";
                 array_push($results_mod, array(
                     "id" => $result->id,
-                    "created_at" => date('Y-m-d', strtotime($result->created_at)),
+                    "created_at" => $result->created_at, // Send full datetime for sorting
                     "expense_Category" => $result->accExpenseCategory['name'],
                     "expense_category_id" => $result->expense_category_id,
                     "description" => $result->expense_description,
@@ -101,8 +111,10 @@ class ExpenseController extends Controller
     {
         $total = 0;
 
-        //by default return todays month expenses
-        $expense = Expense::whereBetween(DB::raw('date(created_at)'), [$first_date, $last_date])->get();
+        //by default return todays month expenses, ordered by created_at desc
+        $expense = Expense::whereBetween(DB::raw('date(created_at)'), [$first_date, $last_date])
+                         ->orderBy('created_at', 'desc')
+                         ->get();
         foreach ($expense as $item) {
             $total = $total + $item->amount;
         }

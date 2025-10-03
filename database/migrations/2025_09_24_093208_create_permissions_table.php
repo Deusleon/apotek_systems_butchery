@@ -132,6 +132,7 @@ class CreatePermissionsTable extends Migration
             ['name' => 'Add Expense', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'ACCOUNTING'],
             ['name' => 'Edit Expense', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'ACCOUNTING'],
             ['name' => 'Delete Expense', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'ACCOUNTING'],
+            ['name' => 'Show Expense', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'ACCOUNTING'],
             ['name' => 'View Invoices', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:20', 'updated_at' => '2024-11-23 08:25:20', 'category' => 'ACCOUNTING'],
             ['name' => 'Manage Invoices', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:36', 'updated_at' => '2024-11-23 08:25:36', 'category' => 'ACCOUNTING'],
             ['name' => 'View Assets', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:27:22', 'updated_at' => '2024-11-23 08:27:22', 'category' => 'ACCOUNTING'],
