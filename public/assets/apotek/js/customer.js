@@ -1,95 +1,116 @@
 //Create Modal
-$('#create').on('show.bs.modal', function () {
+$("#create").on("show.bs.modal", function () {
     var input = document.querySelector("#phone");
     var validationMsg = document.querySelector("#validation-msg");
     validateMobile(input, validationMsg);
 });
 
 //Create customer
-$(document).on('submit', '#create_customer', function(e) {
-    e.preventDefault(); 
-    
+$(document).on("submit", "#create_customer", function (e) {
+    e.preventDefault();
+
     let form = $(this);
-    let actionUrl = form.attr('action');
-    
+    let actionUrl = form.attr("action");
+
     $.ajax({
         url: actionUrl,
         type: "POST",
         data: form.serialize(),
-        success: function(response) {
-            console.log('Customer', response);
+        success: function (response) {
+            // console.log('Customer', response);
             let customer = response.customer;
+            window.customersMap = window.customersMap || {};
+            window.customersMap[customer.id] = customer;
+            const $opt = $("<option>")
+                .val(customer.id)
+                .text(customer.name)
+                .prop("selected", true)
+                .data("customer", customer);
 
-            $('#customer_id').append(
-                `<option value="${customer.id}" selected>${customer.name}</option>`
-            );
+            $("#customer_id").append($opt);
+            $("#customer_id").val(customer.id).trigger("change");
+            $("#customer").val(customer.id).trigger("change");
 
-            $('#customer').val(customer.id).trigger('change');
-            $('#create').modal('hide');
-
+            $("#create").modal("hide");
             form[0].reset();
+            notify("New customer added successfully", "top", "right", "success");
         },
-        error: function(xhr) {
-            console.log(xhr.responseText);
-        }
+        error: function (xhr) {
+            console.log("Server returned error:", xhr);
+            notify(xhr.responseJSON.errors.name, "top", "right", "warning");
+        },
     });
 });
 
 //Edit Modal
-$('#edit').on('show.bs.modal', function (event) {
+$("#edit").on("show.bs.modal", function (event) {
     var button = $(event.relatedTarget);
     var modal = $(this);
     var no = document.getElementById("phone_edit").value;
     var input = document.querySelector("#phone_edit");
     var errorMsg = document.querySelector("#error-msg-edit");
     var validMsg = document.querySelector("#valid-msg-edit");
-    var action = 'Edit';
-    modal.find('.modal-body #id_edit').val(button.data('id'));
-    modal.find('.modal-body #name_edit').val(button.data('name'));
-    modal.find('.modal-body #address_edit').val(button.data('address'));
-    modal.find('.modal-body #credit_input_edit').val(formatMoney(button.data('credit_limit')));
-    modal.find('.modal-body #phone_edit').val(button.data('phone'));
-    modal.find('.modal-body #email_edit').val(button.data('email'));
-    modal.find('.modal-body #tin_edit').val(button.data('tin'));
+    var action = "Edit";
+    modal.find(".modal-body #id_edit").val(button.data("id"));
+    modal.find(".modal-body #name_edit").val(button.data("name"));
+    modal.find(".modal-body #address_edit").val(button.data("address"));
+    modal
+        .find(".modal-body #credit_input_edit")
+        .val(formatMoney(button.data("credit_limit")));
+    modal.find(".modal-body #phone_edit").val(button.data("phone"));
+    modal.find(".modal-body #email_edit").val(button.data("email"));
+    modal.find(".modal-body #tin_edit").val(button.data("tin"));
 
     validateMobile(input, errorMsg, validMsg, action);
 });
 
-
-$('#delete').on('show.bs.modal', function (event) {
+$("#delete").on("show.bs.modal", function (event) {
     var button = $(event.relatedTarget);
-    var message = "Are you sure you want to delete '".concat(button.data('name'), "'?");
+    var message = "Are you sure you want to delete '".concat(
+        button.data("name"),
+        "'?"
+    );
     var modal = $(this);
-    modal.find('.modal-body #message').text(message);
-    modal.find('.modal-body #id').val(button.data('id'))
+    modal.find(".modal-body #message").text(message);
+    modal.find(".modal-body #id").val(button.data("id"));
 });
 
 //Change the input into money format with fixed 2 decimal places
-$("#credit_limit").on('change', function (evt) {
-    if (evt.which != 110) {//not a fullstop
-        var n = Math.abs((parseFloat($(this).val().replace(/\,/g, ''), 10) || 0));
-        $(this).val(n.toLocaleString("en", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }));
+$("#credit_limit").on("change", function (evt) {
+    if (evt.which != 110) {
+        //not a fullstop
+        var n = Math.abs(parseFloat($(this).val().replace(/\,/g, ""), 10) || 0);
+        $(this).val(
+            n.toLocaleString("en", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            })
+        );
     }
-    var credit_input = (document.getElementById("credit_limit").value);
-    credit_limit_amount = (parseFloat(credit_input.replace(/\,/g, ''), 10) || 0);
-    $('#create').find('.modal-body #credit_limit_amount').val(credit_limit_amount);
+    var credit_input = document.getElementById("credit_limit").value;
+    credit_limit_amount = parseFloat(credit_input.replace(/\,/g, ""), 10) || 0;
+    $("#create")
+        .find(".modal-body #credit_limit_amount")
+        .val(credit_limit_amount);
 });
 
 //Change the input into money format with fixed 2 decimal places
-$("#credit_input_edit").on('change', function (evt) {
-    if (evt.which != 110) {//not a fullstop
-        var n = Math.abs((parseFloat($(this).val().replace(/\,/g, ''), 10) || 0));
-        $(this).val(n.toLocaleString("en", {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        }));
+$("#credit_input_edit").on("change", function (evt) {
+    if (evt.which != 110) {
+        //not a fullstop
+        var n = Math.abs(parseFloat($(this).val().replace(/\,/g, ""), 10) || 0);
+        $(this).val(
+            n.toLocaleString("en", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            })
+        );
     }
-    var credit_input = (document.getElementById("credit_input_edit").value);
-    credit_limit_amount = (parseFloat(credit_input.replace(/\,/g, ''), 10) || 0);
-    $('#edit').find('.modal-body #credit_limit_amount_edit').val(credit_limit_amount);
+    var credit_input = document.getElementById("credit_input_edit").value;
+    credit_limit_amount = parseFloat(credit_input.replace(/\,/g, ""), 10) || 0;
+    $("#edit")
+        .find(".modal-body #credit_limit_amount_edit")
+        .val(credit_limit_amount);
 });
 
 function validateMobile(input, validationMsg, action) {
@@ -98,7 +119,7 @@ function validateMobile(input, validationMsg, action) {
         "Invalid Country Code",
         "Too Short",
         "Too Long",
-        "Invalid Phone Number"
+        "Invalid Phone Number",
     ];
 
     const reset = function () {
@@ -112,7 +133,8 @@ function validateMobile(input, validationMsg, action) {
         onlyCountries: ["tz", "ug", "ke", "rw", "bi", "sd"],
         separateDialCode: false,
         nationalMode: false,
-        utilsScript: "../assets/plugins/intl-tel-input/js/utils.js?1562189064761"
+        utilsScript:
+            "../assets/plugins/intl-tel-input/js/utils.js?1562189064761",
     };
 
     const iti = window.intlTelInput(input, itiOptions);
@@ -174,7 +196,8 @@ function validateMobile(input, validationMsg, action) {
         const cursorPos = input.selectionStart;
 
         if (
-            (cursorPos <= dialCode.length && (e.key === "Backspace" || e.key === "Delete")) ||
+            (cursorPos <= dialCode.length &&
+                (e.key === "Backspace" || e.key === "Delete")) ||
             (cursorPos < dialCode.length && e.key.length === 1)
         ) {
             e.preventDefault();
@@ -183,7 +206,11 @@ function validateMobile(input, validationMsg, action) {
         }
 
         let currentNumber = input.value.replace(dialCode, "").trim();
-        if (currentNumber.length >= 9 && e.key.length === 1 && /\d/.test(e.key)) {
+        if (
+            currentNumber.length >= 9 &&
+            e.key.length === 1 &&
+            /\d/.test(e.key)
+        ) {
             e.preventDefault();
         }
     });
@@ -196,8 +223,8 @@ function validateMobile(input, validationMsg, action) {
         liveValidate();
     });
 
-    ensurePrefix(); 
-    reset(); 
+    ensurePrefix();
+    reset();
 }
 
 function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
@@ -207,12 +234,24 @@ function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
 
         const negativeSign = amount < 0 ? "-" : "";
 
-        let i = parseInt(amount = Math.abs(Number(amount) || 0).toFixed(decimalCount)).toString();
-        let j = (i.length > 3) ? i.length % 3 : 0;
+        let i = parseInt(
+            (amount = Math.abs(Number(amount) || 0).toFixed(decimalCount))
+        ).toString();
+        let j = i.length > 3 ? i.length % 3 : 0;
 
-        return negativeSign + (j ? i.substr(0, j) + thousands : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) + (decimalCount ? decimal + Math.abs(amount - i).toFixed(decimalCount).slice(2) : "");
+        return (
+            negativeSign +
+            (j ? i.substr(0, j) + thousands : "") +
+            i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) +
+            (decimalCount
+                ? decimal +
+                  Math.abs(amount - i)
+                      .toFixed(decimalCount)
+                      .slice(2)
+                : "")
+        );
     } catch (e) {
-        console.log(e)
+        console.log(e);
     }
 }
 

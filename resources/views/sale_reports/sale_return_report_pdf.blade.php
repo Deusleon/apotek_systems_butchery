@@ -6,7 +6,7 @@
 
     <style>
         body {
-            font-size: 12px;
+            font-size: 13px;
         }
 
         * {
@@ -140,23 +140,23 @@
                                                     {{ $datas['item_returned']['pack_size'] ?? '' }}{{ $datas['item_returned']['sales_uom'] ?? '' }}
                                                 </td>
                                                 <td align="left">{{date('Y-m-d', strtotime($datas['item_returned']['b_date']))}}</td>
-                                                @if($datas['status'] == 5)
-                                                    <td align="center">
-                                                        {{number_format(($datas['item_returned']['bought_qty'] + $datas['item_returned']['rtn_qty']), 0)}}
-                                                    </td>
-                                                @else
-                                                    <td align="center">{{number_format($datas['item_returned']['bought_qty'], 0)}}</td>
-                                                @endif
+                                                {{-- @if($datas['status'] == 5) --}}
+                                                <td align="center">
+                                                    {{number_format(($datas['item_returned']['remained_qty'] + $datas['item_returned']['rtn_qty']), 0)}}
+                                                </td>
+                                                {{-- @else
+                                                <td align="center">{{number_format($datas['item_returned']['remained_qty'], 0)}}</td>
+                                                @endif --}}
 
                                                 <td align="left">{{date('Y-m-d', strtotime($datas['date']))}}</td>
                                                 <td align="center">{{number_format($datas['item_returned']['rtn_qty'], 0)}}</td>
                                                 <td align="left">{{$datas['reason']}}</td>
                                                 <td align="right">{{number_format((($datas['item_returned']['rtn_qty']) /
-                            ($datas['item_returned']['bought_qty'])) * ($datas['item_returned']['amount']
+                            ($datas['item_returned']['remained_qty'])) * ($datas['item_returned']['amount']
                             - $datas['item_returned']['discount']), 2)}}</td>
                                             </tr>
                                             @php
-                                                $refund = (($datas['item_returned']['rtn_qty']) / ($datas['item_returned']['bought_qty']))
+                                                $refund = (($datas['item_returned']['rtn_qty']) / ($datas['item_returned']['remained_qty']))
                                                     * ($datas['item_returned']['amount'] - $datas['item_returned']['discount']);
                                                 $totalRefund += $refund;
                                             @endphp
@@ -165,13 +165,14 @@
                 </table>
                 <hr>
                 <div style="margin-top: 10px; padding-top: 5px;">
-                    <h3 align="center"><b>Total Summary</b></h3>
+                    <h3 align="center"><b>Summary</b></h3>
                     <table
                         style="width: auto; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
                         <tr>
-                            <td style="padding: 8px; text-align: right;"><b>Total Refund</b></td>
+                            <td style="padding: 8px; text-align: right;"><b>Total</b></td>
                             <td style="padding: 8px; text-align: center;"><b>:</b></td>
-                            <td style="padding: 8px; text-align: right;"><b>{{ number_format($totalRefund, 2) }}</b></td>
+                            <td style="padding: 8px; text-align: right;"><b>{{ number_format($totalRefund, 2) }}</b>
+                            </td>
                         </tr>
                     </table>
                 </div>

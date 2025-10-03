@@ -23,7 +23,6 @@ use Maatwebsite\Excel\Concerns\ToArray;
 
 class SaleController extends Controller
 {
-
     public function cashSale()
     {
         if (!Auth()->user()->checkPermission('View Cash Sales')) {
@@ -656,53 +655,63 @@ class SaleController extends Controller
         if (!Auth()->user()->checkPermission('View Sales History')) {
             abort(403, 'Access Denied');
         }
-        $from = $request->range[0] ?? null;
-        $to = $request->range[1] ?? null;
+
+        $range = $request->range ?? null;
+        $from = $range[0] ?? null;
+        $to = $range[1] ?? null;
         $storeId = current_store_id();
 
-        // Get aggregated data for sales_details
+        // Parse dates safely using Carbon (if provided)
+        $fromDate = $toDate = null;
+        if ($from && $to) {
+            try {
+                $fromDate = \carbon\Carbon::parse($from)->startOfDay();
+                $toDate   = \carbon\Carbon::parse($to)->endOfDay();
+            } catch (\Exception $e) {
+                // invalid date format -> return empty or handle as you like
+                return response()->json(['data' => []]);
+            }
+        }
+
+        // Build the sales_details aggregation subquery
         $salesDetailsSubquery = DB::table('sales_details')
             ->select([
                 'sale_id',
                 DB::raw('SUM(amount) as total_amount'),
-                DB::raw('SUM(discount) as total_discount'), 
+                DB::raw('SUM(discount) as total_discount'),
                 DB::raw('SUM(vat) as total_vat'),
-                DB::raw('COUNT(*) as items_count')
+                DB::raw('COUNT(*) as items_count'),
             ])
-            ->groupBy(['sale_id']);
+            // Apply store filter inside subquery so joinSub uses it
+            ->when(!is_all_store(), function ($q) use ($storeId) {
+                $q->join('inv_current_stock', 'sales_details.stock_id', '=', 'inv_current_stock.id')
+                ->where('inv_current_stock.store_id', $storeId);
+            })
+            ->groupBy('sale_id');
 
-        // Then join sales table
+        // Main query: join aggregated subquery
         $query = Sale::with(['customer', 'cost'])
             ->joinSub($salesDetailsSubquery, 'sales_summary', function ($join) {
                 $join->on('sales.id', '=', 'sales_summary.sale_id');
             });
 
-        // Store filter
-        if (!is_all_store()) {
-            $salesDetailsSubquery->join('inv_current_stock', 'sales_details.stock_id', '=', 'inv_current_stock.id')
-                ->where('inv_current_stock.store_id', $storeId);
+        // Date filter on sales.date column (use full datetime range)
+        if ($fromDate && $toDate) {
+            $query->whereBetween('sales.date', [$fromDate->toDateTimeString(), $toDate->toDateTimeString()]);
+            // alternatively: ->whereDate('sales.date', '>=', $fromDate)->whereDate('sales.date', '<=', $toDate);
         }
 
-        // Date filter
-        if ($from && $to) {
-            $query->whereBetween(DB::raw('date(sales.date)'), [
-                date('Y/m/d', strtotime($from)),
-                date('Y/m/d', strtotime($to))
-            ]);
-        }
-
-        // Select specific columns
+        // Select columns (ensure sales.* so Eloquent can hydrate model)
         $sales = $query->select([
                 'sales.*',
                 'sales_summary.total_amount',
-                'sales_summary.total_discount', 
+                'sales_summary.total_discount',
                 'sales_summary.total_vat',
                 'sales_summary.items_count'
             ])
             ->orderBy('sales.id', 'desc')
             ->get();
-            Log::info('Data is'.json_encode($sales, JSON_PRETTY_PRINT));
-            
+
         return response()->json([
             "data" => $sales
         ]);
