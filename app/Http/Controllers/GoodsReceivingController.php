@@ -783,6 +783,7 @@ class GoodsReceivingController extends Controller
                 $price->price_category_id = $request->invoice_price_category;
                 $price->status = 1;
                 $price->created_at = date('Y-m-d H:m:s');
+                $price->created_by = Auth::user()->id;
                 $price->save();
 
 
