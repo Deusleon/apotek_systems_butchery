@@ -43,12 +43,15 @@ class InventoryReportController extends Controller
         $store = Store::all();
         $category = Category::orderBy('name', 'asc')->get();
         $adj_reasons = AdjustmentReason::orderBy('reason', 'asc')->get();
+        $expireSettings = Setting::where('id', 123)->value('value');
+        $expireEnabled = $expireSettings === 'YES';
 
         return view('inventory_reports.index')->with([
             'products' => $products,
             'stores' => $store,
             'categories' => $category,
-            'reasons' => $adj_reasons
+            'reasons' => $adj_reasons,
+            'expireEnabled' => $expireEnabled
         ]);
     }
 

@@ -77,7 +77,7 @@
                                         @if (current_store()->id === 1)
                                             <select id="from_id" name="from_id"
                                                 class="js-example-basic-single form-control drop">
-                                                <option selected="true" value="0" disabled="disabled">Select branch...
+                                                <option selected="true" value="0" disabled="disabled">Select branch
                                                 </option>
                                                 @foreach($stores as $store)
                                                     <option value="{{$store->id}}">{{$store->name}}</option>
@@ -100,7 +100,7 @@
                                     <label for="to_id">To</label>
                                     <div id="to_border">
                                         <select id="to_id" name="to_id" class="js-example-basic-single form-control drop">
-                                            <option selected="true" value="0" disabled="disabled">Select branch...
+                                            <option selected="true" value="0" disabled="disabled">Select branch
                                             </option>
                                             @foreach($stores as $store)
                                                 <option value="{{$store->id}}">{{$store->name}}</option>
@@ -116,7 +116,7 @@
                                 <div class="form-group">
                                     <label for="select_id">Products</label>
                                     <select id="select_id" name="select_id" class="form-control" disabled>
-                                        <option selected="true" value="0" disabled>Select product...</option>
+                                        <option selected="true" value="0" disabled>Select product</option>
                                     </select>
                                 </div>
                             </div>

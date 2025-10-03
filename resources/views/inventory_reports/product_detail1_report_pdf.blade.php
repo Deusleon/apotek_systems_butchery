@@ -117,7 +117,7 @@
                     @foreach($data as $item)
                         <tr>
                             <td>{{$loop->iteration}}.</td>
-                            <td>{{$item['name']}}</td>
+                            <td>{{$item['name'].' '.($item['brand'] ? $item['brand'].' ' : '').($item['pack_size'] ?? '').($item['sales_uom'] ?? '')}}</td>
                             <td align="">{{$item['category']}}</td>
                         </tr>
                     @endforeach

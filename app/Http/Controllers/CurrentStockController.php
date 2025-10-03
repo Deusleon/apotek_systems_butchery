@@ -316,12 +316,12 @@ public function getStockValue(Request $request)
                 DB::raw('SUM(ics.quantity * COALESCE(latest_price.price, 0)) - SUM(ics.quantity * latest_stock.unit_cost) as profit')
             )
             ->groupBy(
-                'ics.product_id',
+                ['ics.product_id',
                 'p.name',
                 'p.brand',
                 'p.pack_size',
                 'p.sales_uom',
-                'latest_stock.unit_cost'
+                'latest_stock.unit_cost']
             );
 
         if (!is_all_store()) {
@@ -329,7 +329,7 @@ public function getStockValue(Request $request)
         }
 
         $stocks = $stocks->get();
-
+        
         return view('stock_management.current_stock.current_stock_value')->with([
             'stocks' => $stocks,
             'price_categories' => $price_categories

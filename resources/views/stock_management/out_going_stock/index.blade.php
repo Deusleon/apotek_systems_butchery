@@ -116,8 +116,8 @@
                                     <th>Product Name</th>
                                     <th>Out Mode</th>
                                     <th>Quantity</th>
-                                    {{-- <th>Batch #</th> --}}
                                     <th>Date</th>
+                                    <th>Created By</th>
                                     {{-- <th>QoH</th> --}}
                                 </tr>
                             </thead>

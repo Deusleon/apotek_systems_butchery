@@ -81,8 +81,10 @@
                                             @if(auth()->user()->checkPermission('Product Ledger Report'))
                                                 <option value="3">Product Ledger Report</option>
                                             @endif
-                                            @if(auth()->user()->checkPermission('Expired Products Report'))
-                                                <option value="4">Expired Products Report</option>
+                                            @if ($expireEnabled)
+                                                @if(auth()->user()->checkPermission('Expired Products Report'))
+                                                    <option value="4">Expired Products Report</option>
+                                                @endif
                                             @endif
                                             @if(auth()->user()->checkPermission('Out Of Stock Report'))
                                                 <option value="5">Out Of Stock Report</option>
@@ -579,7 +581,7 @@
                 }
                 location.reload();
 
-            } 
+            }
 
 
         });

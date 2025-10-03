@@ -18,8 +18,8 @@ var table_daily_stock = $("#fixedHeader2").DataTable({
         { data: "product_name" },
         { data: "out_mode" },
         { data: "out_total" },
-        // { data: "batch_number" },
         { data: "date" },
+        { data: "created_by" },
         // { data: "qoh" },
     ],
     columnDefs: [{ type: "date", targets: 3 }],
@@ -35,11 +35,6 @@ $(function () {
             start.format("YYYY/MM/DD") + " - " + end.format("YYYY/MM/DD")
         );
     }
-    // function cb(start, end) {
-    //     $("#outgoing-date span").html(
-    //         start.format("MMMM D, YYYY") + " - " + end.format("MMMM D, YYYY")
-    //     );
-    // }
 
     $("#outgoing-date").daterangepicker(
         {
@@ -113,7 +108,7 @@ function outgoingFilter(dates) {
             date_to: to,
         },
         success: function (response) {
-            console.log("Response is:", response);
+            // console.log("Response is:", response);
             bindData(response.summary);
             bindStockCountData(response.detailed);
         },
@@ -144,11 +139,12 @@ function bindData(data) {
 }
 
 function bindStockCountData(data) {
-    // flatten out_movements
+    // flatten movement
     let flattened = [];
     data.forEach((item) => {
-        if (item.out_movements && item.out_movements.length > 0) {
-            item.out_movements.forEach((mv) => {
+        // console.log('Detailed',item);
+        if (item.movement && item.movement.length > 0) {
+            item.movement.forEach((mv) => {
                 flattened.push({
                     product_name:
                         item.product_name +
@@ -158,9 +154,9 @@ function bindStockCountData(data) {
                         (item.product.pack_size ?? "") +
                         (item.product.sales_uom ?? ""),
                     out_mode: mv.out_mode || "",
-                    out_total: mv.qty,
-                    // batch_number: item.batch_number || "",
+                    out_total: numberWithCommas(mv.qty),
                     date: mv.date,
+                    created_by: mv.created_by || "",
                     // qoh:
                     //     item.current_stock_batch != null
                     //         ? Number(item.current_stock_batch).toFixed(0)
