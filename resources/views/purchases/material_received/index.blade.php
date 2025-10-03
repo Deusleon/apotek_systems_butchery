@@ -330,10 +330,20 @@
                             }
                         },
                         { data: 'user.name' },
-                        {
+                       {
                             data: 'action',
-                            defaultContent: "<div><input type='button' value='Edit' id='edit_btn' class='btn btn-info btn-rounded btn-sm'/><input type='button' value='Delete' id='delete_btn' class='btn btn-danger btn-rounded btn-sm'/></div>"
+                            defaultContent: 
+                                `<div>
+                                    @if(auth()->user()->checkPermission('Edit Material Received'))
+                                        <input type='button' value='Edit' id='edit_btn' class='btn btn-info btn-rounded btn-sm'/>
+                                    @endif
+
+                                    @if(auth()->user()->checkPermission('Delete Material Received'))
+                                        <input type='button' value='Delete' id='delete_btn' class='btn btn-danger btn-rounded btn-sm'/>
+                                    @endif
+                                </div>`
                         }
+
                     ], "columnDefs": [
                         {
                             "targets": [0, 2, 4],

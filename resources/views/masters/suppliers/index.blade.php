@@ -19,7 +19,7 @@
             <div class="col-sm-12">
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                        @if(auth()->user()->checkPermission('Manage Suppliers'))
+                        @if(auth()->user()->checkPermission('Add Suppliers'))
                             <button style="float: right;margin-bottom: 2%;" type="button"
                                     class="btn btn-secondary btn-sm mr-0"
                                     data-toggle="modal"
@@ -36,10 +36,8 @@
                                     <th>Contact Person</th>
                                     <th>Phone</th>
                                     <th>Email</th>
-                                    <th>Address</th>
-                                    @if(auth()->user()->checkPermission('Manage Suppliers'))
-                                        <th>Action</th>
-                                    @endif
+                                    <th>Address</th>     
+                                    <th>Action</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -50,8 +48,9 @@
                                         <td>{{$supplier->mobile}}</td>
                                         <td>{{$supplier->email}}</td>
                                         <td>{{$supplier->address}}</td>
-                                        @if(auth()->user()->checkPermission('Manage Suppliers'))
-                                            <td>
+                                        <td>
+                                            {{-- Edit button --}}
+                                            @if(auth()->user()->checkPermission('Edit Suppliers'))
                                                 <button class="btn btn-sm btn-rounded btn-primary"
                                                         data-id="{{$supplier->id}}"
                                                         data-name="{{$supplier->name}}"
@@ -63,7 +62,10 @@
                                                         data-toggle="modal" data-target="#edit">
                                                     Edit
                                                 </button>
-                                                @if($supplier->active_user != "has transactions")
+                                            @endif
+
+                                            {{-- Delete button (requires permission + no transactions) --}}
+                                            @if(auth()->user()->checkPermission('Delete Suppliers') && $supplier->active_user != "has transactions")
                                                 <button class="btn btn-sm btn-rounded btn-danger"
                                                         data-id="{{$supplier->id}}"
                                                         data-name="{{$supplier->name}}"
@@ -72,9 +74,8 @@
                                                         data-target="#delete">
                                                     Delete
                                                 </button>
-                                                @endif
-                                            </td>
-                                        @endif
+                                            @endif
+                                        </td>
                                     </tr>
                                 @endforeach
                                 </tbody>

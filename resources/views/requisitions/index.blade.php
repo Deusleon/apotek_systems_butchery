@@ -40,9 +40,7 @@
                                         <th>From</th>
                                         <th>To</th>
                                         <th>Date</th>
-                                        @if(auth()->user()->checkPermission('View Requisitions Details'))
-                                            <th>Action</th>
-                                        @endif
+                                        <th>Action</th>                                   
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -205,13 +203,11 @@
                     },
                     orderable: false,
                 },
-                @if(auth()->user()->checkPermission('View Requisitions Details'))
                     {
                         data: 'action',
                         orderable: false,
                         searchable: false
                     }
-                @endif
             ]
         });
 

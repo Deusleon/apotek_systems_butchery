@@ -46,37 +46,38 @@ var order_history_datatable = $("#order_history_datatable").DataTable({
                     status === "Approved";
                 var isApprovedByClient = !!row.clientApproved;
 
+                var showBtn = config2.showPurchaseOrder
+                    ? "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm'/>"
+                    : "";
+                var printBtnEnabled =
+                    "<button id='print_btn' class='btn btn-primary btn-rounded btn-sm'><span class='fa fa-print' aria-hidden='true'></span> Print</button>";
+                var printBtnDisabled =
+                    "<button id='print_btn' class='btn btn-secondary btn-rounded btn-sm' disabled><span class='fa fa-print' aria-hidden='true'></span> Print</button>";
+                var printBtn = config2.printPurchaseOrder
+                    ? isApprovedByBackend || isApprovedByClient
+                        ? printBtnEnabled
+                        : printBtnDisabled
+                    : "";
+
                 // Cancelled: never printable
                 if (status === "Cancelled") {
                     return (
                         "" +
-                        "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm'/> " +
-                        "<button id='print_btn' class='btn btn-secondary btn-rounded btn-sm' disabled>" +
-                        "<span class='fa fa-print' aria-hidden='true'></span> Print" +
-                        "</button> " +
+                        showBtn +
+                        " " +
+                        (config.printPurchaseOrder ? printBtnDisabled : "") +
+                        " " +
                         "<span class='badge badge-warning badge-lg'>Rejected</span>"
                     );
                 }
 
                 // Approved (backend or client) => print enabled; else disabled
                 if (isApprovedByBackend || isApprovedByClient) {
-                    return (
-                        "" +
-                        "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm'/> " +
-                        "<button id='print_btn' class='btn btn-primary btn-rounded btn-sm'>" +
-                        "<span class='fa fa-print' aria-hidden='true'></span> Print" +
-                        "</button>"
-                    );
+                    return "" + showBtn + " " + printBtn;
                 }
 
                 // Not approved yet => print disabled
-                return (
-                    "" +
-                    "<input type='button' value='Show' id='dtl_btn' class='btn btn-success btn-rounded btn-sm'/> " +
-                    "<button id='print_btn' class='btn btn-secondary btn-rounded btn-sm' disabled>" +
-                    "<span class='fa fa-print' aria-hidden='true'></span> Print" +
-                    "</button>"
-                );
+                return "" + showBtn + " " + printBtn;
             },
         },
     ],
