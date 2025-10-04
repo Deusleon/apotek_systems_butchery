@@ -74,7 +74,6 @@
                         @csrf()
 
                         <div class="table-responsive" id="sales">
-
                             <table id="sale_history_dataTable"
                                 class="display table nowrap table-striped table-hover dataTable no-footer"
                                 style="width:100%">

@@ -367,6 +367,7 @@
             <div class="slogan">{{$pharmacy['slogan'] ?? 'Thank you for your business'}}</div>
             @break
         @endforeach
+        <span style="font-size: 10px;">Printed on: {{date('Y-m-d H:i:s')}}</span>
     </div>
 
 </body>

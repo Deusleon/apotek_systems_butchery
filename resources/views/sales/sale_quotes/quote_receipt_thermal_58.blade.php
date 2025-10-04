@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Proforma Invoice</title>
     <style>
@@ -25,7 +26,8 @@
             font-size: 9px;
         }
 
-        th, td {
+        th,
+        td {
             padding: 2px;
             word-wrap: break-word;
         }
@@ -40,103 +42,118 @@
             margin: 3px 0;
         }
 
-        h3, h4, h5, h6 {
+        h3,
+        h4,
+        h5,
+        h6 {
             margin: 2px 0;
             font-weight: bold;
             text-align: center;
         }
 
-        .text-right { text-align: right; }
-        .text-center { text-align: center; }
-        #footer-detail td { padding: 2px 0; }
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        #footer-detail td {
+            padding: 2px 0;
+        }
     </style>
 </head>
+
 <body>
-<div style="width: 100%;">
-    <h3><b>PROFORMA INVOICE</b></h3>
-    <h4>{{$pharmacy['name']}}</h4>
-    <h5>{{$pharmacy['address']}}</h5>
-    <h5>{{$pharmacy['phone']}}</h5>
-    <h5>TIN: {{$pharmacy['tin_number'] ?? 'N/A'}}</h5>
-    <h5>VRN: {{$pharmacy['vrn_number'] ?? 'N/A'}}</h5>
-    @php
-        $subTotal = 0;
-        $vat = 0;
-        $discount = 0;
-        $grandTotal = 0;
-    @endphp
-    {{-- @dd($data) --}}
-    @foreach($data as $datas => $dat)
-        <table>
-            <tr>
-                <td>
-                    <span>Receipt #:</span> {{$datas}}<br>
-                    <span>Customer:</span> {{$dat[0]['customer'] ?? 'CASH'}}<br>
-                    <span>Customer TIN:</span> {{$dat[0]['customer_tin'] ?? 'N/A'}}<br>
-                    <span>Date:</span> {{date('Y-m-d H:i:s')}}
-                </td>
-            </tr>
-        </table>
-
-        <table id="table-detail">
-            <thead>
+    <div style="width: 100%;">
+        <h3><b>PROFORMA INVOICE</b></h3>
+        <h4>{{$pharmacy['name']}}</h4>
+        <h5>{{$pharmacy['address']}}</h5>
+        <h5>{{$pharmacy['phone']}}</h5>
+        <h5>TIN: {{$pharmacy['tin_number'] ?? 'N/A'}}</h5>
+        <h5>VRN: {{$pharmacy['vrn_number'] ?? 'N/A'}}</h5>
+        @php
+            $subTotal = 0;
+            $vat = 0;
+            $discount = 0;
+            $grandTotal = 0;
+        @endphp
+        {{-- @dd($data) --}}
+        @foreach($data as $datas => $dat)
+            <table>
                 <tr>
-                    <th align="left">Description</th>
-                    <th class="text-center">Qty</th>
-                    <th class="text-right">Price</th>
-                    {{-- <th class="text-right">VAT</th> --}}
-                    <th class="text-right">Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($dat as $item)
-                    <tr>
-                        <td>{{$item['name']}} {{$item['brand'] ?? ''}} {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}</td>
-                        <td class="text-center">{{number_format($item['quantity'], 0)}}</td>
-                        <td class="text-right">{{number_format($item['price'], 0)}}</td>
-                        {{-- <td class="text-right">{{number_format($item['vat'], 2)}}</td> --}}
-                        <td class="text-right">{{number_format($item['sub_total'], 0)}}</td>
-                    </tr>
-                    @php
-                    $subTotal += $item['sub_total'];
-                    $vat += $item['vat'];
-                    $discount += $item['discount'];
-                    $grandTotal += ($item['sub_total']-$item['discount'])+$item['vat'];
-                    @endphp
-                @endforeach
-            </tbody>
-        </table>
-
-        <hr>
-        <table id="footer-detail">
-            <tbody>
-                <tr>
-                    <td>Sub Total</td>
-                    <td class="text-right">
-                        {{number_format($subTotal, 0)}}
+                    <td>
+                        <span>Date:</span> {{date('Y-m-d', strtotime($dat[0]['created_at']))}}<br>
+                        <span>Receipt #:</span> {{$datas}}<br>
+                        <span>Customer:</span> {{$dat[0]['customer'] ?? 'CASH'}}<br>
+                        <span>Customer TIN:</span> {{$dat[0]['customer_tin'] ?? 'N/A'}}<br>
+                        <span>Printed On:</span> {{date('Y-m-d H:i:s')}}
                     </td>
                 </tr>
-                <tr>
-                    <td>VAT</td>
-                    <td class="text-right">{{number_format($vat, 0)}}</td>
-                </tr>
-                @if($dat[0]['discount_total'] > 0)
-                <tr>
-                    <td>Discount</td>
-                    <td class="text-right">{{number_format($discount, 0)}}</td>
-                </tr>
-                @endif
-                <tr>
-                    <td><b>Total</b></td>
-                    <td class="text-right"><b>{{number_format($grandTotal, 0)}}</b></td>
-                </tr>
-            </tbody>
-        </table>
+            </table>
 
-        <hr>
-        <h5>Issued By: {{$dat[0]['sold_by']}}</h5>
-        <h5 style="font-style: italic;">{{$pharmacy['slogan'] ?? 'Thank you for your business'}}</h5>
-    @endforeach
-</div>
+            <table id="table-detail">
+                <thead>
+                    <tr>
+                        <th align="left">Description</th>
+                        <th class="text-center">Qty</th>
+                        <th class="text-right">Price</th>
+                        {{-- <th class="text-right">VAT</th> --}}
+                        <th class="text-right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($dat as $item)
+                        <tr>
+                            <td>{{$item['name']}} {{$item['brand'] ?? ''}}
+                                {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}</td>
+                            <td class="text-center">{{number_format($item['quantity'], 0)}}</td>
+                            <td class="text-right">{{number_format($item['price'], 0)}}</td>
+                            {{-- <td class="text-right">{{number_format($item['vat'], 2)}}</td> --}}
+                            <td class="text-right">{{number_format($item['sub_total'], 0)}}</td>
+                        </tr>
+                        @php
+                            $subTotal += $item['sub_total'];
+                            $vat += $item['vat'];
+                            $discount += $item['discount'];
+                            $grandTotal += ($item['sub_total'] - $item['discount']) + $item['vat'];
+                        @endphp
+                    @endforeach
+                </tbody>
+            </table>
+
+            <hr>
+            <table id="footer-detail">
+                <tbody>
+                    <tr>
+                        <td>Sub Total</td>
+                        <td class="text-right">
+                            {{number_format($subTotal, 0)}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>VAT</td>
+                        <td class="text-right">{{number_format($vat, 0)}}</td>
+                    </tr>
+                    @if($dat[0]['discount_total'] > 0)
+                        <tr>
+                            <td>Discount</td>
+                            <td class="text-right">{{number_format($discount, 0)}}</td>
+                        </tr>
+                    @endif
+                    <tr>
+                        <td><b>Total</b></td>
+                        <td class="text-right"><b>{{number_format($grandTotal, 0)}}</b></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <hr>
+            <h5>Issued By: {{$dat[0]['sold_by']}}</h5>
+            <h5 style="font-style: italic;">{{$pharmacy['slogan'] ?? 'Thank you for your business'}}</h5>
+        @endforeach
+    </div>
 </body>
+
 </html>

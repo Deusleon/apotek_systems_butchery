@@ -451,8 +451,8 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-3">
-                                    <div class="form-group">
+                                <div class="col-auto d-flex justify-content-end pe-0" style="width: 230px; margin-left: auto; padding-right: 0px;">
+                                    <div class="w-100">
                                         <label id="cat_label">Status:<font color="red">*</font></label>
                                         <select name="status" id="payment-status" class="js-example-basic-single form-control">
                                             <option value="" selected="true" disabled>Select Status</option>
@@ -463,10 +463,11 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-3 justify-content-end" style="margin-right: 0px;">
-                                    <label id="cat_label">Date<font color="red">*</font></label>
-                                    <input type="text" name="date_of_sale" class="form-control"
-                                        id="sales_date" value="" />
+                                <div class="col-auto d-flex justify-content-end pe-0" style="width: 230px; margin-left: auto; padding-right: 0px;">
+                                    <div class="w-90">
+                                        <label id="cat_label">Date <font color="red">*</font></label>
+                                        <input type="text" name="date_of_sale" class="form-control" id="sales_date" value="" />
+                                    </div>
                                 </div>
                             </div>
                             <input type="hidden" id="track" value="1">

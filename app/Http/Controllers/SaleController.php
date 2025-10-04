@@ -599,23 +599,43 @@ class SaleController extends Controller
             $data = $grouped_sales;
 
 
-            if ($receipt_size == '58mm Thermal Paper') {
+            if ($receipt_size == '58mm Thermal Paper' && $page == 1) {
                 $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
                     compact('data', 'pharmacy', 'page'))
                     ->setPaper([0, 0, 163, 600], '');
                 return $pdf->stream($request->reprint_receipt . '.pdf');
-            } else if ($receipt_size == 'A4 / Letter') {
+            } else if ($receipt_size == '58mm Thermal Paper' && $page == -1) {
+                $pdf = PDF::loadView('sales.cash_sales.credit_receipt_thermal',
+                    compact('data', 'pharmacy', 'page'))
+                    ->setPaper([0, 0, 163, 600], '');
+                return $pdf->stream($request->reprint_receipt . '.pdf');
+            }else if ($receipt_size == 'A4 / Letter' && $page == 1) {
                 $pdf = PDF::loadView('sales.cash_sales.receipt_A4',
                     compact('data', 'pharmacy', 'page'))
                     ->setPaper('a4', '');
                 return $pdf->stream($request->reprint_receipt . '.pdf');
-            } else if ($receipt_size == '80mm Thermal Paper') {
-                $pdf = PDF::loadView('sales.cash_sales.receipt_thermal',
+            }else if ($receipt_size == 'A4 / Letter' && $page == -1) {
+                $pdf = PDF::loadView('sales.cash_sales.credit_receipt_A4',
+                    compact('data', 'pharmacy', 'page'))
+                    ->setPaper('a4', '');
+                return $pdf->stream($request->reprint_receipt . '.pdf');
+            } else if ($receipt_size == '80mm Thermal Paper' && $page == 1) {
+                $pdf = PDF::loadView('sales.cash_sales.receipt_thermal_80',
                     compact('data', 'pharmacy', 'page'))
                     ->setPaper([0, 0, 227, 600], '');
                 return $pdf->stream($request->reprint_receipt . '.pdf');
-            } else if ($receipt_size == 'A5 / Half Letter') {
+            } else if ($receipt_size == '80mm Thermal Paper' && $page == -1) {
+                $pdf = PDF::loadView('sales.cash_sales.credit_receipt_thermal_80',
+                    compact('data', 'pharmacy', 'page'))
+                    ->setPaper([0, 0, 227, 600], '');
+                return $pdf->stream($request->reprint_receipt . '.pdf');
+            } else if ($receipt_size == 'A5 / Half Letter' && $page == 1) {
                 $pdf = PDF::loadView('sales.cash_sales.receipt',
+                    compact('data', 'pharmacy', 'page'))
+                    ->setPaper('a5', '');
+                return $pdf->stream($request->reprint_receipt . '.pdf');
+            } else if ($receipt_size == 'A5 / Half Letter' && $page == -1) {
+                $pdf = PDF::loadView('sales.cash_sales.credit_receipt',
                     compact('data', 'pharmacy', 'page'))
                     ->setPaper('a5', '');
                 return $pdf->stream($request->reprint_receipt . '.pdf');

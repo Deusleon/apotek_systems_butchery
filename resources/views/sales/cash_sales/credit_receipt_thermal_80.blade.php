@@ -85,10 +85,11 @@
             <table>
                 <tr>
                     <td>
+                        <span>Sales Date:</span> {{date('Y-m-d', strtotime($dat[0]['created_at']))}}<br>
                         <span>Receipt #:</span> {{$datas}}<br>
                         <span>Customer:</span> {{$dat[0]['customer'] ?? 'CASH'}}<br>
                         <span>TIN:</span> {{$dat[0]['customer_tin'] ?? 'N/A'}}<br>
-                        <span>Date:</span> {{date('Y-m-d H:i:s')}}
+                        <span>Printed On:</span> {{date('Y-m-d H:i:s')}}
                     </td>
                 </tr>
             </table>
