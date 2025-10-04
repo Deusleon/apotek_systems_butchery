@@ -388,7 +388,7 @@ class SaleQuoteController extends Controller {
 
     //Retrieves update sales details
     public function update( $id ) {
-        Log::info( $id);
+        // Log::info( $id);
         //1. Retrieve Item Details
         $sales_details = DB::table( 'sales_quote_details' )
         ->join( 'inv_products', 'sales_quote_details.product_id', '=', 'inv_products.id' )

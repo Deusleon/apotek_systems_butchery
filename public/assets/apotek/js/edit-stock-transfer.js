@@ -72,8 +72,8 @@ function calculateCart() {
             } else {
                 reduced__obj_cart[c[0]][2] =
                     Number(
-                        reduced__obj_cart[c[0]][2].toString().replace(",", "")
-                    ) + Number(c[2]);
+                        reduced__obj_cart[c[0]][2].toString().replace(/,/g, "")
+                    ) + Number(c[2].toString().replace(/,/g, ""));
 
                 if (reduced__obj_cart[c[0]][2] > Number(c[1])) {
                     reduced__obj_cart[c[0]][2] = Number(c[1]);
@@ -98,16 +98,16 @@ function calculateCart() {
             sale_products.quantityIn = item[1];
             if (
                 !(
-                    Number(item[2].toString().replace(",", "")) >
+                    Number(item[2].toString().replace(/,/g, "")) >
                         Number(item[1]) ||
-                    isNaN(item[2].toString().replace(",", ""))
+                    isNaN(item[2].toString().replace(/,/g, ""))
                 )
             ) {
                 sale_products.quantityTran = item[2]
                     .toString()
-                    .replace(",", "");
+                    .replace(/,/g, "");
             }
-            if (isNaN(item[2].toString().replace(",", ""))) {
+            if (isNaN(item[2].toString().replace(/,/g, ""))) {
                 t = 0;
             }
             order_cart.push(sale_products);
@@ -325,7 +325,7 @@ $("#cart_table tbody").on("click", "#edit_btn", function () {
         /*not set then set it*/
         var row_data = cart_table.row($(this).parents("tr")).data();
         var index = cart_table.row($(this).parents("tr")).index();
-        quantity = row_data[2].toString().replace(",", "");
+        quantity = row_data[2].toString().replace(/,/g, "");
         row_data[2] =
             "<div><input style='width: 50%' type='text' min='1' class='form-control' id='edit_quantity' onkeypress='return isNumberKey(event,this)' required/><span id='span_danger' style='display: none; color: red; font-size: 0.9em;'></span></div>";
         cart[index] = row_data;
@@ -356,7 +356,7 @@ $("#cart_table tbody").on("change", "#edit_quantity", function () {
         document.getElementById("edit_quantity").style.borderColor = "red";
         document.getElementById("span_danger").style.display = "block";
         $("#span_danger").text(
-            "Maximum quantity is " + Math.floor(row_data[1])
+            "Maximum quantity is " + numberWithCommas(Math.floor(row_data[1]))
         );
         row_data[2] = row_data[2];
         $("#transfer_preview").prop("disabled", true);

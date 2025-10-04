@@ -82,22 +82,6 @@
                             </select>
                         </div>
                     </div>
-                    {{-- <div class="form-group row">
-                        <div class="col-md-6" style="margin-left: 2%">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="type_id" class="col-form-label text-md-right" style="margin-left: 68%">Type:</label>
-                        </div>
-                        <div class="col-md-3" style="margin-left: -2.6%;">
-                            <select name="type_id" class="js-example-basic-single form-control" id="type_id">
-                                <option readonly value="" id="store_name_edit" disabled>Select Type...
-                                </option>
-                                <option name="store_name" value="1" selected>Current</option>
-                                <option name="store_name" value="pending">Pending</option>
-                                <option name="store_name" value="0">History</option>
-                            </select>
-                        </div>
-                    </div> --}}
                     <div id="pendingTable" class="table-responsive">
                         <table id="pendingPrices" class="display table nowrap table-striped table-hover" style="width:100%">
                             <thead>

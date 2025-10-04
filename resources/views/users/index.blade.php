@@ -94,7 +94,7 @@
                                                     data-email="{{$user->email}}" data-id="{{$user->id}}"
                                                     data-job="{{$user->position}}" data-mobile="{{$user->mobile}}"
                                                     data-role="{{ implode(", ", $user->getRoleNames()->toArray()) }}"
-                                                    data-store="{{$user->store->id ?? 0}}" type="button" data-toggle="modal"
+                                                    data-store="{{$user->store->name ?? ""}}" type="button" data-toggle="modal"
                                                     data-target="#showUser">Show
                                                 </button>
                                             </a>
@@ -235,13 +235,13 @@
                 var modal = $(this);
 
 
-                modal.find('.modal-body #name1').val(name);
-                modal.find('.modal-body #store').val(store);
-                modal.find('.modal-body #email1').val(email);
-                modal.find('.modal-body #position1').val(job);
-                modal.find('.modal-body #mobile1').val(mobile).change();
+                modal.find('.modal-body #name1').html(name);
+                modal.find('.modal-body #store').html(store);
+                modal.find('.modal-body #email1').html(email);
+                modal.find('.modal-body #position1').html(job);
+                modal.find('.modal-body #mobile1').html(mobile).change();
                 modal.find('.modal-body #UserID').val(id);
-                modal.find('.modal-body #role1').val(role);
+                modal.find('.modal-body #role1').html(role);
 
                 var _token = $('input[name="_token"]').val();
                 $.ajax({

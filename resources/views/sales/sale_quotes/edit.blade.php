@@ -139,7 +139,7 @@
                                     @foreach($sales_details as $saleData)
                                         <tr data-id="{{ $saleData->id }}">
                                             <td>{{ $saleData->name.' '.$saleData->brand.' '.$saleData->pack_size.$saleData->sales_uom }}</td>
-                                            <td class="quantity">{{ $saleData->quantity }}</td>
+                                            <td class="quantity">{{ number_format($saleData->quantity) }}</td>
                                             <td class="price">{{ number_format($saleData->price, 2) }}</td>
                                             <td class="vat">{{ number_format($saleData->vat, 2) }}</td>
                                             <td class="amount">{{ number_format($saleData->amount, 2) }}</td>
@@ -186,8 +186,7 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <label class="col-md-6 col-form-label text-md-right"><b>Total
-                                        Amount:</b></label>
+                                <label class="col-md-6 col-form-label text-md-right"><b>Total:</b></label>
                                 <div class="col-md-6" style="display: flex; justify-content: flex-end">
                                     <input type="text" id="total" class="form-control-plaintext text-md-right" readonly
                                         value="{{ number_format($total, 2) ?? '0.0' }}" />
@@ -226,12 +225,10 @@
                             </div>
                         </div>
                     </div>
-
                 </form>
             </div>
         </div>
     </div>
-    {{-- @include('sales.sale_quotes.modal.update') --}}
     @include('sales.customers.create')
 
 @endsection
@@ -417,7 +414,9 @@
             })
 
             $('#save_buttons').on('click', '.btn-save', function(e) {
-                var discount = document.getElementById('sale_discount').value;
+                e.preventDefault();
+                var discountInput = document.getElementById('sale_discount');
+                var discount = discountInput ? discountInput.value : 0;
                 var quoteId = $(this).data('id');
                 $.ajax({
                     url: '{{ route("save-final-qoute") }}',
@@ -453,6 +452,4 @@
     <script src="{{ asset('assets/apotek/js/notification.js') }}"></script>
     <script src="{{ asset('assets/apotek/js/edit_quote.js') }}"></script>
     <script src="{{ asset('assets/apotek/js/customer.js') }}"></script>
-
-
 @endpush

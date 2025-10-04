@@ -218,10 +218,42 @@ class StockTransferController extends Controller {
         return view('stock_management.stock_transfer.show', compact('transfers'));
     }
  
+    // public function edit($transfer_no)
+    // {
+    //     $transfer_group = StockTransfer::where('transfer_no', $transfer_no)->first();
+    //     $transfers = StockTransfer::with(['currentStock.product', 'fromStore', 'toStore'])->where('transfer_no', $transfer_group->transfer_no)->get();
+
+    //     if ($transfers->isEmpty()) {
+    //         return redirect()->route('stock-transfer-history')->with('error', 'Transfer not found.');
+    //     }
+
+    //     foreach ($transfers as $transfer) {
+    //         $productId = $transfer->currentStock->product_id ?? null;
+    //         if ($productId) {
+    //             $totalStock = DB::table('inv_current_stock')
+    //                 ->where('product_id', $productId)
+    //                 ->sum('quantity');
+
+    //             $transfer->total_stock = $totalStock;
+    //         } else {
+    //             $transfer->total_stock = 0;
+    //         }
+    //     }
+    //     $stores = Store::where('name', '<>', 'ALL')->get();
+
+    //     return view('stock_management.stock_transfer.edit', compact('transfers', 'stores'));
+    // }
     public function edit($transfer_no)
     {
         $transfer_group = StockTransfer::where('transfer_no', $transfer_no)->first();
-        $transfers = StockTransfer::with(['currentStock.product', 'fromStore', 'toStore'])->where('transfer_no', $transfer_group->transfer_no)->get();
+
+        if (!$transfer_group) {
+            return redirect()->route('stock-transfer-history')->with('error', 'Transfer group not found.');
+        }
+
+        $transfers = StockTransfer::with(['currentStock', 'fromStore', 'toStore'])
+            ->where('transfer_no', $transfer_group->transfer_no)
+            ->get();
 
         if ($transfers->isEmpty()) {
             return redirect()->route('stock-transfer-history')->with('error', 'Transfer not found.');
@@ -229,20 +261,24 @@ class StockTransferController extends Controller {
 
         foreach ($transfers as $transfer) {
             $productId = $transfer->currentStock->product_id ?? null;
-            if ($productId) {
-                $totalStock = DB::table('inv_current_stock')
-                    ->where('product_id', $productId)
-                    ->sum('quantity');
 
-                $transfer->total_stock = $totalStock;
+            $storeId = $transfer->from_store_id ?? $transfer->fromStore->id ?? $transfer->currentStock->store_id ?? null;
+
+            if ($productId && $storeId) {
+                $transfer->total_stock = DB::table('inv_current_stock')
+                    ->where('product_id', $productId)
+                    ->where('store_id', $storeId)
+                    ->sum('quantity');
             } else {
                 $transfer->total_stock = 0;
             }
         }
+
         $stores = Store::where('name', '<>', 'ALL')->get();
 
         return view('stock_management.stock_transfer.edit', compact('transfers', 'stores'));
     }
+
 
     public function update(Request $request, $transfer_no)
     {

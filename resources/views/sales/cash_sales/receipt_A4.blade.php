@@ -285,7 +285,8 @@
                 @foreach($dat as $item)
                     <tr>
                         <td class="index-col">{{$loop->iteration}}.</td>
-                        <td class="description-col">{{$item['name']}} {{$item['brand'] ?? ''}} {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}</td>
+                        <td class="description-col">{{$item['name']}} {{$item['brand'] ?? ''}}
+                            {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}</td>
                         <td class="qty-col">{{number_format($item['quantity'], 0)}}</td>
                         <td class="unit-col">{{number_format($item['price'], 2)}}</td>
                         <td class="amount-col">{{number_format($item['price'] * $item['quantity'], 2)}}</td>
@@ -352,6 +353,7 @@
             <div class="slogan">{{$pharmacy['slogan'] ?? 'Thank you for your business'}}</div>
             @break
         @endforeach
+        <span style="font-size: 10px;">Printed on: {{date('Y-m-d H:i:s')}}</span>
     </div>
 
 </body>

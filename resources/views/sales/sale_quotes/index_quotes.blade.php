@@ -381,7 +381,6 @@
 
             });
 
-
             quotes_table = $('#sale_quotes-Table').DataTable({
                 columns: [
                     {
@@ -416,41 +415,41 @@
                             let buttons = ``;
 
                             buttons += `
-                                                                                                <button class="btn btn-sm btn-rounded btn-success" type="button"
-                                                                                                        onclick="showQuoteDetails(event)"
-                                                                                                        id="quote_details">Show
-                                                                                                </button>`;
+                                                                                                    <button class="btn btn-sm btn-rounded btn-success" type="button"
+                                                                                                            onclick="showQuoteDetails(event)"
+                                                                                                            id="quote_details">Show
+                                                                                                    </button>`;
                             @if(auth()->user()->checkPermission('Print Sales Orders'))
                                 buttons += `
-                                                                                                                            <a href="${receipt_url}" target="_blank">
-                                                                                                                                <button class="btn btn-sm btn-rounded btn-secondary" type="button">
-                                                                                                                                    <span class="fa fa-print" aria-hidden="true"></span>
-                                                                                                                                    Print
-                                                                                                                                </button>
-                                                                                                                            </a>`;
+                                                                                                                                    <a href="${receipt_url}" target="_blank">
+                                                                                                                                        <button class="btn btn-sm btn-rounded btn-secondary" type="button">
+                                                                                                                                            <span class="fa fa-print" aria-hidden="true"></span>
+                                                                                                                                            Print
+                                                                                                                                        </button>
+                                                                                                                                    </a>`;
                             @endif
 
-                                                                            if (row.status === 1) {
+                                                                             if (parseInt(row.status, 10) === 1) {
                                 @if(auth()->user()->checkPermission('Edit Sales Orders'))
                                     buttons += `
-                                                                                                                        <a class="btn btn-sm btn-rounded btn-info" href="${update_url}">
-                                                                                                                            Edit
-                                                                                                                        </a>`;
+                                                                                                                                <a class="btn btn-sm btn-rounded btn-info" href="${update_url}">
+                                                                                                                                    Edit
+                                                                                                                                </a>`;
                                 @endif
                                 @if(auth()->user()->checkPermission('Convert Sales Orders'))
                                     buttons += `
-                                                                                                                    <button class="btn btn-sm btn-rounded btn-warning"
-                                                                                                                            type="button"
-                                                                                                                            onclick="convertQuoteToSale(${row.id})">
-                                                                                                                        Convert
-                                                                                                                    </button>`;
+                                                                                                                            <button class="btn btn-sm btn-rounded btn-warning"
+                                                                                                                                    type="button"
+                                                                                                                                    onclick="convertQuoteToSale(${row.id})">
+                                                                                                                                Convert
+                                                                                                                            </button>`;
                                 @endif
-                                                                                    } else {
+                                                                                        } else {
                                 buttons += `
-                                                                                    <button class="btn btn-sm btn-rounded btn-primary opacity-75"
-                                                                                            type="button" disabled>
-                                                                                        Sold
-                                                                                    </button>`;
+                                                                                        <button class="btn btn-sm btn-rounded btn-primary opacity-75"
+                                                                                                type="button" disabled>
+                                                                                            Sold
+                                                                                        </button>`;
                             }
 
                             return buttons;
@@ -498,7 +497,6 @@
                     visible: false
                 }]
             });
-
 
         });
 
@@ -571,16 +569,16 @@
                         <input type="text" class="form-control" name="" id="gracePeriod">
                     </div> --}}
                     <div class="form-group" id="gracePeriodDiv">
-                        <label>Grace Period<font color="red">*</font></label>
+                        <label>Grace Period(In Days)<font color="red">*</font></label>
                         <select class="form-control" name="" id="gracePeriod">
                             <option value="">Select grace period</option>
-                            <option value="1">1 Day</option>
-                            <option value="7">7 Days</option>
-                            <option value="14">14 Days</option>
-                            <option value="21">21 Days</option>
-                            <option value="30">30 Days</option>
-                            <option value="60">60 Days</option>
-                            <option value="90">90 Days</option>
+                            <option value="1">1</option>
+                            <option value="7">7</option>
+                            <option value="14">14</option>
+                            <option value="21">21</option>
+                            <option value="30">30</option>
+                            <option value="60">60</option>
+                            <option value="90">90</option>
                         </select>
                     </div>
                     <input type="hidden" name="" id="convert_id">

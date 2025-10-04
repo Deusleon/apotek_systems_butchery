@@ -439,7 +439,7 @@
                     @if(auth()->user()->checkPermission('View Credit Tracking'))
                         <div class="tab-pane fade" id="credit-tracking" role="tabpanel" aria-labelledby="credit_tracking-tab">
                             <div class="row">
-                                <div class="col-md-5">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label id="cat_label">Customer<font color="red">*</font></label>
                                         <select name="customer_id" id="cust_id" class="js-example-basic-single form-control">
@@ -463,13 +463,10 @@
                                         </select>
                                     </div>
                                 </div>
-
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label id="cat_label">Date<font color="red">*</font></label>
-                                        <input style="width: 110%;" type="text" name="date_of_sale" class="form-control"
-                                            id="sales_date" value="" />
-                                    </div>
+                                <div class="col-md-3 justify-content-end" style="margin-right: 0px;">
+                                    <label id="cat_label">Date<font color="red">*</font></label>
+                                    <input type="text" name="date_of_sale" class="form-control"
+                                        id="sales_date" value="" />
                                 </div>
                             </div>
                             <input type="hidden" id="track" value="1">
@@ -527,15 +524,10 @@
                     {{-- Start Credit Payment--}}
                     @if(auth()->user()->checkPermission('View Credit Payment'))
                         <div class="tab-pane fade" id="credit-payment" role="tabpanel" aria-labelledby="credit_payment-tab">
-                            <div class="form-group row">
-                                <div class="col-md-6">
-
-                                </div>
-                                <div class="col-md-3" style="margin-left: 2.5%">
-                                    <label style="margin-left: 62%" for=""
-                                        class="col-form-label text-md-right">Customer:</label>
-                                </div>
-                                <div class="col-md-3" style="margin-left: -3.2%;">
+                            <div class="d-flex justify-content-end mb-3">
+                                <div class="d-flex align-items-center" style="width: 278px;">
+                                    <label for="price_category" class="form-label mb-0"
+                                        style="white-space: nowrap; margin-right: 8px;">Customer:</label>
                                     <select name="customer_id" id="customer_payment"
                                         class="js-example-basic-single form-control" onchange="filterPaymentHistory()">
                                         <option value="" selected="true" disabled>Select Customer</option>
@@ -545,19 +537,11 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="form-group row">
-                                <div class="col-md-6">
-
-                                </div>
-                                <div class="col-md-3" style="margin-left: 1.4%">
-                                    <label style="margin-left: 80%" for="" class="col-form-label text-md-right">Date:</label>
-                                </div>
-                                <div class="col-md-3" style="margin-left: -3%;">
-                                    <input style="width: 107%;" type="text" name="date_of_sale" class="form-control"
-                                        id="sales_date_payment" value="" autocomplete="off" />
-                                </div>
+                            <div class="d-flex justify-content-end mb-3 align-items-center">
+                                <label class="mr-2" for="">Date:</label>
+                                <input type="text" id="sales_date_payment" name="date_of_sale" autocomplete="off"
+                                    class="form-control w-auto">
                             </div>
-
                             <div class="table-responsive" id="main_table">
                                 <table id="fixed-header-main" class="display table nowrap table-striped table-hover"
                                     style="width:100%">

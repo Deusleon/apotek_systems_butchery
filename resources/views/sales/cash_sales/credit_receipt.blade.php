@@ -252,7 +252,7 @@
 
     <!-- Receipt Header -->
     <div class="receipt-header">
-        <div class="receipt-title">CREDIT RECEIPT</div>
+        <div class="receipt-title">CREDIT INVOICE</div>
         @foreach($data as $datas => $dat)
             <span style="font-size: 10px; font-weight: 400;">NO.</span><span class="receipt-number"> {{$datas}}</span>
             @break
@@ -367,6 +367,7 @@
             <div class="slogan">{{$pharmacy['slogan'] ?? 'Thank you for your business'}}</div>
             @break
         @endforeach
+        <span style="font-size: 8px;">Printed on: {{date('Y-m-d H:i:s')}}</span>
     </div>
 
 </body>

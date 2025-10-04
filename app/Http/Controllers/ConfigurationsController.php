@@ -57,6 +57,29 @@ class ConfigurationsController extends Controller
         }
         $setting->updated_by = Auth::user()->id;
         $setting->save();
+
+        if ( $request->setting_id == 121 && $request->formdata === 'NO' ) {
+            $user = auth()->user();
+
+            if ( !$user || $user->store->name !== 'ALL' ) {
+                return response()->json( [ 'error' => 'Not allowed' ], 403 );
+            }
+
+            $defaultStoreName = Setting::where( 'id', 122 )->value( 'value' );
+            $defaultStore = Store::where( 'name', $defaultStoreName )->first();
+
+            if ( !$defaultStore ) {
+                return response()->json( [ 'error' => 'Default Branch not found' ], 422 );
+            }
+
+            session( [
+                'current_store_id' => $defaultStore->id,
+                'store' => $defaultStore->name
+            ] );
+
+            return redirect()->back()->with( 'success', "Default Branch is {$defaultStore->name}" );
+        }
+
         if ( $request->setting_id == 122 ) {
             $user = auth()->user();
 
@@ -65,18 +88,21 @@ class ConfigurationsController extends Controller
             }
 
             $storeName = $request->formdata;
+            $store = Store::where( 'name', $storeName )->first();
 
-            $store = Store::where( 'name', $storeName )->value( 'id' );
             if ( !$store ) {
                 return response()->json( [ 'error' => 'Branch not found' ], 422 );
             }
 
-            session( [ 'current_store_id' => $store, 'store' => $storeName ] );
+            session( [
+                'current_store_id' => $store->id,
+                'store' => $storeName
+            ] );
 
             return redirect()->back()->with( 'success', "Branch changed to {$storeName}" );
         }
-        session()->flash( 'alert-success', 'Changes saved successfully!' );
-        return back();
+
+        return redirect()->back()->with( 'success', 'Changes saved successfully!' );
     }
 
     public function destroy( $id )

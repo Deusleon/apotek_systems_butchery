@@ -109,7 +109,7 @@
                             </label>
                             <div class="col-md-8">
                                 <select class="form-control select2" id="store" name="store_id" data-placeholder="Select Store" required data-width="100%">
-                                    <option value="">Select Store</option>
+                                    <option value="">Select Branch</option>
                                     @foreach($stores as $store)
                                         <option value="{{ $store->id }}" {{ old('store_id') == $store->id ? 'selected' : '' }}>
                                             {{ $store->name }}
