@@ -248,6 +248,32 @@ function fetchProductByBarcode(barcode) {
     });
 }
 
+$(document).ready(function () {
+    var initialValues = {
+        price_category: $("#price_category").val(),
+        product_id: $("#product_id").val(),
+        customer_id: $("#customer_id").val(),
+    };
+
+    $("#price_category, #product_id, #customer_id").on("change", function () {
+        var check_store = $("#is_all_store").val();
+        var id = $(this).attr("id");
+
+        if (check_store === "ALL") {
+            notify(
+                "You can't sell in ALL branches. Please switch to a specific branch to proceed",
+                "top",
+                "right",
+                "warning"
+            );
+
+            $(this).val(initialValues[id]).trigger("change.select2");
+        } else {
+            initialValues[id] = $(this).val();
+        }
+    });
+});
+
 function addProductToCart(product) {
     // console.log("Item Receive", product);
 
@@ -1485,6 +1511,7 @@ function saveCashSale() {
 }
 
 $("#credit_sales_form").on("submit", function (e) {
+    $("#loading").show();
     e.preventDefault();
 
     var grace_period = document.getElementById("grace_period").value;
@@ -1494,10 +1521,12 @@ $("#credit_sales_form").on("submit", function (e) {
     ).value;
     if (cart === "" || cart === "undefined") {
         notify("Credit sales list empty", "top", "right", "warning");
+        $("#loading").hide();
         return false;
     }
     if (grace_period === "" || grace_period === "undefined") {
         notify("Grace period is required", "top", "right", "warning");
+        $("#loading").hide();
         return false;
     }
 
@@ -1505,12 +1534,12 @@ $("#credit_sales_form").on("submit", function (e) {
         var saleDate = document.getElementById("credit_sale_date").value;
         if (saleDate === "" || saleDate == null) {
             notify("Sales date is required", "top", "right", "warning");
+            $("#loading").hide();
             return false;
         }
     }
 
     $("#save_btn").attr("disabled", true);
-    // console.log(grace_period, is_backdate_enabled);
     saveCreditSale();
 });
 
@@ -1531,8 +1560,11 @@ function saveCreditSale() {
                 "success"
             );
             deselect1();
-            window.open(data.redirect_to);
+            if (data.to === "receipt") {
+                window.open(data.redirect_to);
+            }
             $("#save_btn").attr("disabled", false);
+            $("#loading").hide();
         },
     });
 }

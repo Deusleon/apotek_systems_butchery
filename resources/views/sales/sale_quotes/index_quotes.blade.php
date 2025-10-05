@@ -415,41 +415,41 @@
                             let buttons = ``;
 
                             buttons += `
-                                                                                                    <button class="btn btn-sm btn-rounded btn-success" type="button"
-                                                                                                            onclick="showQuoteDetails(event)"
-                                                                                                            id="quote_details">Show
-                                                                                                    </button>`;
+                                                                                                            <button class="btn btn-sm btn-rounded btn-success" type="button"
+                                                                                                                    onclick="showQuoteDetails(event)"
+                                                                                                                    id="quote_details">Show
+                                                                                                            </button>`;
                             @if(auth()->user()->checkPermission('Print Sales Orders'))
                                 buttons += `
-                                                                                                                                    <a href="${receipt_url}" target="_blank">
-                                                                                                                                        <button class="btn btn-sm btn-rounded btn-secondary" type="button">
-                                                                                                                                            <span class="fa fa-print" aria-hidden="true"></span>
-                                                                                                                                            Print
-                                                                                                                                        </button>
-                                                                                                                                    </a>`;
+                                                                                                                                                    <a href="${receipt_url}" target="_blank">
+                                                                                                                                                        <button class="btn btn-sm btn-rounded btn-secondary" type="button">
+                                                                                                                                                            <span class="fa fa-print" aria-hidden="true"></span>
+                                                                                                                                                            Print
+                                                                                                                                                        </button>
+                                                                                                                                                    </a>`;
                             @endif
 
-                                                                             if (parseInt(row.status, 10) === 1) {
+                                                                                     if (parseInt(row.status, 10) === 1) {
                                 @if(auth()->user()->checkPermission('Edit Sales Orders'))
                                     buttons += `
-                                                                                                                                <a class="btn btn-sm btn-rounded btn-info" href="${update_url}">
-                                                                                                                                    Edit
-                                                                                                                                </a>`;
+                                                                                                                                                <a class="btn btn-sm btn-rounded btn-info" href="${update_url}">
+                                                                                                                                                    Edit
+                                                                                                                                                </a>`;
                                 @endif
                                 @if(auth()->user()->checkPermission('Convert Sales Orders'))
                                     buttons += `
-                                                                                                                            <button class="btn btn-sm btn-rounded btn-warning"
-                                                                                                                                    type="button"
-                                                                                                                                    onclick="convertQuoteToSale(${row.id})">
-                                                                                                                                Convert
-                                                                                                                            </button>`;
+                                                                                                                                            <button class="btn btn-sm btn-rounded btn-warning"
+                                                                                                                                                    type="button"
+                                                                                                                                                    onclick="convertQuoteToSale(${row.id})">
+                                                                                                                                                Convert
+                                                                                                                                            </button>`;
                                 @endif
-                                                                                        } else {
+                                                                                                } else {
                                 buttons += `
-                                                                                        <button class="btn btn-sm btn-rounded btn-primary opacity-75"
-                                                                                                type="button" disabled>
-                                                                                            Sold
-                                                                                        </button>`;
+                                                                                                <button class="btn btn-sm btn-rounded btn-primary opacity-75"
+                                                                                                        type="button" disabled>
+                                                                                                    Sold
+                                                                                                </button>`;
                             }
 
                             return buttons;
@@ -798,7 +798,6 @@
                     }
 
                     // Set document links
-                    // $('#invoiceLink').attr('href', '{{ route('generate-tax-invoice', '') }}/' + response.quote_id);
                     $('#deliveryNoteLink').attr('href', '{{ route('generate-delivery-note', '') }}/' + response.sale_id);
                     $('#receiptLink').attr('href', '{{ route('getCashReceipt', '') }}/' + response.sale_id);
 
@@ -813,8 +812,10 @@
                     }
 
                     // Open receipt in new tab
-                    let receiptUrl = '{{ route('getCashReceipt', '') }}/' + response.sale_id;
-                    window.open(receiptUrl, '_blank');
+                    if (response.redirect_to === 'receipt') {
+                        let receiptUrl = '{{ route('getCashReceipt', '') }}/' + response.sale_id;
+                        window.open(receiptUrl, '_blank');
+                    }
 
                 } else {
                     notify(response.error, "top", "right", "danger");

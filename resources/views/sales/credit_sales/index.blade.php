@@ -127,6 +127,7 @@
                                     </div>
                                 @endif
 
+                                <input type="hidden" name="" id="is_all_store" value="{{ current_store()->name }}">
                                 <div id="sale-panel">
                                     <div class="row">
                                         <div class="col-md-3">
@@ -451,7 +452,8 @@
                                     </div>
                                 </div>
 
-                                <div class="col-auto d-flex justify-content-end pe-0" style="width: 230px; margin-left: auto; padding-right: 0px;">
+                                <div class="col-auto d-flex justify-content-end pe-0"
+                                    style="width: 230px; margin-left: auto; padding-right: 0px;">
                                     <div class="w-100">
                                         <label id="cat_label">Status:<font color="red">*</font></label>
                                         <select name="status" id="payment-status" class="js-example-basic-single form-control">
@@ -463,7 +465,8 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-auto d-flex justify-content-end pe-0" style="width: 230px; margin-left: auto; padding-right: 0px;">
+                                <div class="col-auto d-flex justify-content-end pe-0"
+                                    style="width: 230px; margin-left: auto; padding-right: 0px;">
                                     <div class="w-90">
                                         <label id="cat_label">Date <font color="red">*</font></label>
                                         <input type="text" name="date_of_sale" class="form-control" id="sales_date" value="" />
@@ -597,6 +600,27 @@
     </div>
 
     <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('form[name="payment-form"]');
+            if (!form) return;
+
+            form.addEventListener('submit', function (e) {
+                const btn = form.querySelector('#save_btn');
+                // if already disabled, block double submit
+                if (btn.dataset.saving === '1') {
+                    e.preventDefault();
+                    return;
+                }
+                // mark as saving and disable
+                btn.dataset.saving = '1';
+                btn.setAttribute('disabled', 'disabled');
+                btn.setAttribute('aria-disabled', 'true');
+                btn.originalText = btn.innerHTML;
+                btn.innerHTML = 'Saving...';
+            });
+        });
+
         document.addEventListener("DOMContentLoaded", function () {
             let activeTabView = localStorage.getItem("creditActiveTab");
 

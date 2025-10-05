@@ -376,21 +376,15 @@ class SaleController extends Controller
         if ($request->ajax()) {
             $this->store($request);
             
-            // // Check if auto print enabled (example from settings)
-            // $auto_print = Setting::where('id', 117)->value('value');
-            // Log::info('AutoPrintSetting', ['AutoPrint' => $auto_print]);
-
-            // if ($auto_print === 'AUTO') {
-            //     $pdf_url = route('getCashReceipt', '1'); // Route to generate PDF
-            //     return response()->json([
-            //         'auto_print' => true,
-            //         'pdf_url' => $pdf_url,
-            //     ]);
-            // }
-            
-            return response()->json([
-                'redirect_to' => route('getCashReceipt', '1')
-            ]);
+            $receipt_print = Setting::where('id', 117)->value('value');
+            if($receipt_print === "YES"){
+                return response()->json([
+                    'redirect_to' => route('getCashReceipt', '1')
+                ]);
+            }else{
+                $this->cashSale();
+                return;
+            }
         }
     }
     public function store(Request $request)
@@ -518,7 +512,7 @@ class SaleController extends Controller
             $pharmacy['slogan'] = Setting::where('id', 104)->value('value');
             $pharmacy['vrn_number'] = Setting::where('id', 103)->value('value');
 
-            Log::info('PrintSize', ['Size' => $receipt_size]);
+            // Log::info('PrintSize', ['Size' => $receipt_size]);
 
             $receipt_number = $receipt ?? $request->reprint_receipt;
             $id = Sale::where('receipt_number', $receipt_number)->value('id');
@@ -650,26 +644,64 @@ class SaleController extends Controller
 
 
     }
+    
     public function storeCreditSale(Request $request)
-    {
-        if (!Auth()->user()->checkPermission('View Credit Sales')) {
-            abort(403, 'Access Denied');
+{
+    Log::info($request->all());
+
+    if (!Auth()->user()->checkPermission('View Credit Sales')) {
+        abort(403, 'Access Denied');
+    }
+
+    if ($request->ajax()) {
+        $decoded = null;
+        if (is_array($request->customer_id)) {
+            $decoded = $request->customer_id;
+        } else {
+            $decoded = @json_decode($request->customer_id, true);
         }
-        if ($request->ajax()) {
-            $customer = json_decode($request->customer_id, true);
-            if ($customer) {
-                $request['customer_id'] = $customer['id'];
-                $this->store($request);
+
+        if (is_array($decoded) && isset($decoded['id'])) {
+            $request->merge(['customer_id' => $decoded['id']]);
+            $this->store($request);
+
+            $receipt_print = Setting::where('id', 117)->value('value');
+            if($receipt_print === "YES"){
                 return response()->json([
+                    'to' => 'receipt',
                     'redirect_to' => route('getCashReceipt', '-1')
                 ]);
-            } else {
-                session()->flash("alert-danger", "Customer Name is Required");
-                return back();
+            }else{
+                return response()->json([
+                    'to' => 'sale',
+                    'redirect_to' => route('credit-sales.creditSale') 
+                ]);
             }
         }
 
+        if (is_numeric($request->customer_id) || is_int($decoded)) {
+            $request->merge(['customer_id' => (int) $request->customer_id]);
+            $this->store($request);
+            $receipt_print = Setting::where('id', 117)->value('value');
+            if($receipt_print === "YES"){
+                return response()->json([
+                    'to' => 'receipt',
+                    'redirect_to' => route('getCashReceipt', '-1')
+                ]);
+            }else{
+                return response()->json([
+                    'to' => 'sale',
+                    'redirect_to' => route('credit-sales.creditSale') 
+                ]);
+            }
+        }
+
+        session()->flash("alert-danger", "Customer Name is Required");
+        return back();
     }
+}
+
+
     public function getSalesHistory(Request $request)
     {
         if (!Auth()->user()->checkPermission('View Sales History')) {

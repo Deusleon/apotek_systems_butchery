@@ -25,6 +25,25 @@
             width: 45%;
         }
 
+        #loading {
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            position: fixed;
+            display: none;
+            opacity: 0.7;
+            background-color: #fff;
+            z-index: 99;
+            text-align: center;
+        }
+
+        #loading-image {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            z-index: 100;
+        }
         /* Chrome, Safari, Edge, Opera */
         #edit_sales_order input[type=number]::-webkit-outer-spin-button,
         #edit_sales_order input[type=number]::-webkit-inner-spin-button {
@@ -64,7 +83,7 @@
         </ul>
         <div class="tab-content" id="pills-tabContent">
             <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
-                <form id="quote_sale_form">
+                <form id="quote_sale_form" name="submit_quote_sale_form">
                     @if (auth()->user()->checkPermission('Manage Customers'))
                         <div class="row">
                             <div class="col-md-12">
@@ -77,6 +96,7 @@
                         </div>
                     @endif
                     @csrf()
+                    <input type="hidden" name="" id="is_all_store" value="{{ current_store()->name }}">
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
@@ -154,7 +174,10 @@
 
                             </table>
                         </div>
-
+                        <!-- ajax loading gif -->
+                        <div id="loading">
+                            <img id="loading-image" src="{{asset('assets/images/spinner.gif')}}" />
+                        </div>
                     </div>
                     <hr>
                     <div class="row">
@@ -256,6 +279,26 @@
         priceSelect.disabled = false;
     }
 
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('form[name="submit_quote_sale_form"]');
+            if (!form) return;
+
+            form.addEventListener('submit', function (e) {
+                const btn = form.querySelector('#save_order_changes');
+                // if already disabled, block double submit
+                if (btn.dataset.saving === '1') {
+                    e.preventDefault();
+                    return;
+                }
+                // mark as saving and disable
+                btn.dataset.saving = '1';
+                btn.setAttribute('disabled', 'disabled');
+                btn.setAttribute('aria-disabled', 'true');
+                btn.originalText = btn.innerHTML;
+                btn.innerHTML = 'Saving...';
+            });
+        });
+        
         // helper functions
         function unformatNumber(str) {
             if (str === undefined || str === null) return 0;
@@ -267,7 +310,6 @@
             if (isNaN(num)) num = 0;
             return Number(num).toLocaleString(undefined, { minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits });
         }
-
                 
         $(document).ready(function() {
 

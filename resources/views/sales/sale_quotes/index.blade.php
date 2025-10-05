@@ -24,6 +24,25 @@
             float: left;
             width: 45%;
         }
+        #loading {
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            position: fixed;
+            display: none;
+            opacity: 0.7;
+            background-color: #fff;
+            z-index: 99;
+            text-align: center;
+        }
+
+        #loading-image {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            z-index: 100;
+        }
     </style>
     <div class="col-sm-12">
         @if(auth()->user()->checkPermission('View Sales Orders'))
@@ -57,6 +76,7 @@
                             </div>
                         @endif
                         @csrf()
+                        <input type="hidden" name="" id="is_all_store" value="{{ current_store()->name }}">
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
@@ -210,6 +230,10 @@
                 </div>
             </div>
         @endif
+        <!-- ajax loading gif -->
+        <div id="loading">
+            <img id="loading-image" src="{{asset('assets/images/spinner.gif')}}" />
+        </div>
         @if(!Auth::user()->checkPermission('View Sales Orders'))
             <div class="" style="background-color: #fff; min-height: 80px; ">
                 <div class="tab-pane fade show" id="credit-sale-receiving" role="tabpanel" aria-labelledby="credit_sales-tab">
@@ -240,6 +264,32 @@
             var cart_table;
             var edit_btn_set = 0; // For edit functionality
             var fixed_price = document.getElementById('fixed_price').value || 'NO';
+
+            $(document).ready(function () {
+                var initialValues = {
+                    price_category: $("#price_category").val(),
+                    product_id: $("#product_id").val(),
+                    customer_id: $("#customer_id").val(),
+                };
+
+                $("#price_category, #product_id, #customer_id").on("change", function () {
+                    var check_store = $("#is_all_store").val();
+                    var id = $(this).attr("id");
+
+                    if (check_store === "ALL") {
+                        notify(
+                            "You can't sell in ALL branches. Please switch to a specific branch to proceed",
+                            "top",
+                            "right",
+                            "warning"
+                        );
+
+                        $(this).val(initialValues[id]).trigger("change.select2");
+                    } else {
+                        initialValues[id] = $(this).val();
+                    }
+                });
+            });
 
             // Initialize DataTable for cart
             try {
@@ -874,7 +924,9 @@
             });
 
             // Save button
-            $('#save_btn').on('click', function () {
+            $('#save_btn').on('click', function (e) {
+                e.preventDefault()
+                $("#loading").show();
                 saveQuoteForm();
             });
 
@@ -886,7 +938,8 @@
 
                 if (!customer_id) {
                     if (typeof notify === 'function') {
-                        notify('Please select a customer', 'top', 'right', 'error');
+                        notify('Please select a customer', 'top', 'right', 'warning');
+                        $("#loading").hide();
                     } else {
                         alert('Please select a customer');
                     }
@@ -895,16 +948,18 @@
 
                 if (!price_category) {
                     if (typeof notify === 'function') {
-                        notify('Please select sales type', 'top', 'right', 'error');
+                        notify('Please select sales type', 'top', 'right', 'warning');
+                        $("#loading").hide();
                     } else {
                         alert('Please select sales type');
                     }
                     return;
                 }
 
-                if (cart.length === 0) {
+                if (cart.length == 0) {
                     if (typeof notify === 'function') {
-                        notify('Please add at least one product to the cart', 'top', 'right', 'error');
+                        notify('Please add at least one product to the cart', 'top', 'right', 'warning');
+                        $("#loading").hide();
                     } else {
                         alert('Please add at least one product to the cart');
                     }
@@ -970,6 +1025,7 @@
 
                         // Re-enable save button
                         $('#save_btn').prop('disabled', false).text('Save');
+                        $("#loading").hide();
                     },
                     error: function (xhr, status, error) {
                         // console.error('Error saving quote:', xhr.responseText);
@@ -982,6 +1038,7 @@
 
                         // Re-enable save button
                         $('#save_btn').prop('disabled', false).text('Save');
+                        $("#loading").hide();
                     }
                 });
             }

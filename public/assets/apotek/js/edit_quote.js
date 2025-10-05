@@ -61,6 +61,32 @@ $("#quote_barcode_input").on("keypress", function (e) {
     }
 });
 
+$(document).ready(function () {
+    var initialValues = {
+        price_category: $("#price_category").val(),
+        product_id: $("#product_id").val(),
+        customer_id: $("#customer_id").val(),
+    };
+
+    $("#price_category, #product_id, #customer_id").on("change", function () {
+        var check_store = $("#is_all_store").val();
+        var id = $(this).attr("id"); 
+
+        if (check_store === "ALL") {
+            notify(
+                "You can't sell in ALL branches. Please switch to a specific branch to proceed",
+                "top",
+                "right",
+                "warning"
+            );
+
+            $(this).val(initialValues[id]).trigger("change.select2");
+        } else {
+            initialValues[id] = $(this).val();
+        }
+    });
+});
+
 function fetchProductByBarcode(barcode) {
     var price_category = $("#price_category").val();
     // var customer_id = $("#customer_id").val();

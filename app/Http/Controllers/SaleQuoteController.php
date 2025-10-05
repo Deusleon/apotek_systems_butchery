@@ -710,6 +710,7 @@ class SaleQuoteController extends Controller {
         $saleType = $request->sale_type;
         $gracePeriod = $request->grace_period;
         $remarks = $request->notes;
+        $receipt_print = Setting::where('id', 117)->value('value');
 
         $default_store = current_store_id();
         DB::beginTransaction();
@@ -854,11 +855,21 @@ class SaleQuoteController extends Controller {
 
             DB::commit();
 
+            if($receipt_print === "YES"){
             return [
                 'status' => 'success',
                 'message' => 'Order converted to sales successfully',
-                'sale_id' => $sale
+                'sale_id' => $sale,
+                'redirect_to' => 'receipt'
             ];
+        }else{
+            return [
+                'status' => 'success',
+                'message' => 'Order converted to sales successfully',
+                'sale_id' => $sale,
+                'redirect_to' => 'quote'
+            ];
+        }
         } catch ( \Exception $e ) {
             DB::rollBack();
             Log::error( 'ConvertToSales Error: ' . $e->getMessage(), [ 'trace' => $e->getTraceAsString() ] );

@@ -56,6 +56,7 @@
                             </div>
                         @endif
                         @csrf()
+                        <input type="hidden" name="" id="is_all_store" value="{{ current_store()->name }}">
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">

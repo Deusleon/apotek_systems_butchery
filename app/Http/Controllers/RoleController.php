@@ -16,7 +16,7 @@ class RoleController extends Controller
         $roles = Role::get();
         $permissions = Permission::get();
         foreach ($roles as $role) {
-            $role_count = DB::table('role_has_permissions')->where('role_id', $role->id)->count();
+            $role_count = DB::table('model_has_roles')->where('role_id', $role->id)->count();
 
             if ($role_count > 0) {
                 $role['is_used'] = 'yes';
@@ -42,8 +42,9 @@ class RoleController extends Controller
             'name' => 'unique:roles|required|string|min:2|max:50',
             'description' => 'required|string|min:5|max:50',
             'permissions' => 'required',
-        ]);
-
+        ], [
+            'name.unique' => 'Role with this name exist',
+        ] );
 
         $role = Role::create([
             'name' => $request->name,
