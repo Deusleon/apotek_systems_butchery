@@ -714,7 +714,8 @@ $("#invoicecart_table tbody").on("click", "#edit_btn", function () {
                 .daterangepicker({
                     singleDatePicker: true,
                     showDropdowns: true,
-                    minDate: moment().add(1, "days"),
+                    minDate: moment(),
+                    maxDate: moment().add(5, "years"),
                     autoUpdateInput: false,
                     locale: {
                         format: "YYYY-MM-DD",
@@ -831,19 +832,36 @@ if (expire_date_enabler === "YES") {
             edit_btn_set = 0;
             var row_data = invoicecart_table.row($(this).parents("tr")).data();
             var index = invoicecart_table.row($(this).parents("tr")).index();
-            let check_expire_date = moment().format("YYYY-MM-DD");
+            let expireValue = document.getElementById("edit_expire_date").value;
 
-            if (
-                document.getElementById("edit_expire_date").value ==
-                check_expire_date
-            ) {
-                $("#invoicesave_id").attr("disabled", true);
-            } else {
+            if (expireValue === "") {
+                // blank is allowed
                 $("#invoicesave_id").attr("disabled", false);
+            } else {
+                let selectedDate = moment(expireValue);
+                let today = moment();
+                let maxDate = moment().add(5, "years");
+                if (
+                    selectedDate.isSameOrAfter(today) &&
+                    selectedDate.isSameOrBefore(maxDate)
+                ) {
+                    // valid
+                    $("#invoicesave_id").attr("disabled", false);
+                } else {
+                    // invalid, set blank
+                    document.getElementById("edit_expire_date").value = "";
+                    expireValue = "";
+                    notify(
+                        "Invalid expire date, must be blank or within 5 years from today",
+                        "top",
+                        "right",
+                        "warning"
+                    );
+                    $("#invoicesave_id").attr("disabled", false);
+                }
             }
 
-            row_data.expire_date =
-                document.getElementById("edit_expire_date").value;
+            row_data.expire_date = expireValue;
             console.log(document.getElementById("invoice_edit_quantity").value);
             row_data.quantity = document.getElementById(
                 "invoice_edit_quantity"
@@ -1164,29 +1182,32 @@ $("#invoiceFormId").on("submit", function (e) {
         return false;
     }
 
-    //Check for Expire Date
-    let check_expire_date = moment().format("YYYY-MM-DD");
-
-    for (i = 0; i < invoice_cart.length; i++) {
-        if (invoice_cart[i].expire_date == check_expire_date) {
-            console.log("invalid date");
-            notify(
-                "Please specify a valid expire date of each item",
-                "top",
-                "right",
-                "warning"
-            );
-            $("#invoicesave_id").attr("disabled", true);
-            break;
-        }
-
-        if (i === invoice_cart.length - 1) {
-            console.log("valid date continue");
-            $("#invoicesave_id").attr("disabled", true);
-
-            invoicesaveInvoiceForm();
+    // Validate expire dates: set invalid to blank
+    for (let i = 0; i < invoice_cart.length; i++) {
+        let expDate = invoice_cart[i].expire_date;
+        if (expDate && expDate !== "") {
+            let selectedDate = moment(expDate);
+            let today = moment();
+            let maxDate = moment().add(5, "years");
+            if (
+                !(
+                    selectedDate.isSameOrAfter(today) &&
+                    selectedDate.isSameOrBefore(maxDate)
+                )
+            ) {
+                invoice_cart[i].expire_date = "";
+            }
         }
     }
+
+    // Update the cart with validated dates
+    invoice_cart_receiveds = JSON.stringify(invoice_cart);
+    document.getElementById("invoice_received_cart").value =
+        invoice_cart_receiveds;
+
+    // Proceed to save
+    $("#invoicesave_id").attr("disabled", true);
+    invoicesaveInvoiceForm();
 });
 
 function invoicesaveInvoiceForm() {
