@@ -101,14 +101,22 @@ class GoodsReceivingController extends Controller
         $expire_date = Setting::where('id', 123)->value('value');
 
         // Get orders with their related details, products, and suppliers
-        $orders = Order::with([
+        $ordersQuery = Order::with([
             'details' => function ($query) {
                 // Select the original ordered_qty and alias it to quantity for consistency in the view
                 $query->select('order_details.*', 'order_details.ordered_qty as quantity');
             },
             'details.product',
             'supplier'
-        ])->orderBy('id', 'desc')->get();
+        ]);
+
+        if (!is_all_store()) {
+            $ordersQuery->whereHas('details.product.incomingStock', function($q) {
+                $q->where('store_id', current_store_id());
+            });
+        }
+
+        $orders = $ordersQuery->orderBy('id', 'desc')->get();
 
         // Manually add order_item_id to each detail to ensure it's available in the view
         foreach ($orders as $order) {
@@ -543,12 +551,25 @@ class GoodsReceivingController extends Controller
         $from = $request->range[0];
         $to = $request->range[1];
 
+        $store_id = current_store_id();
+        $useStoreFilter = !is_all_store();
 
-        $totalData = Order::where('status', '<=', '3')
+        $totalDataQuery = Order::where('status', '<=', '3')
             ->whereBetween(DB::raw('date(ordered_at)'),
-                [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
-            ->orderby('id', 'DESC')
-            ->count();
+                [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))]);
+
+        if ($useStoreFilter) {
+            $totalDataQuery->whereExists(function($subQuery) use ($store_id) {
+                $subQuery->select(DB::raw(1))
+                    ->from('order_details')
+                    ->join('inv_products', 'inv_products.id', '=', 'order_details.product_id')
+                    ->join('inv_incoming_stock', 'inv_incoming_stock.product_id', '=', 'inv_products.id')
+                    ->whereRaw('order_details.order_id = orders.id')
+                    ->where('inv_incoming_stock.store_id', $store_id);
+            });
+        }
+
+        $totalData = $totalDataQuery->count();
 
         $totalFiltered = $totalData;
 
@@ -558,45 +579,85 @@ class GoodsReceivingController extends Controller
         $dir = $request->input('order.0.dir');
 
         if (empty($request->input('search.value'))) {
-            $orders = Order::where('status', '<=', '3')
+            $query = Order::where('status', '<=', '3')
                 ->select('orders.id', 'order_number', 'supplier_id', 'ordered_by', 'ordered_at', 'received_by', 'received_at'
                     , 'Comment', 'status', 'total_vat', 'total_amount')
                 ->join('inv_suppliers', 'inv_suppliers.id', '=', 'orders.supplier_id')
                 ->whereBetween(DB::raw('date(ordered_at)'),
-                    [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
-                ->offset($start)
+                    [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))]);
+
+            if ($useStoreFilter) {
+                $query->whereExists(function($subQuery) use ($store_id) {
+                    $subQuery->select(DB::raw(1))
+                        ->from('order_details')
+                        ->join('inv_products', 'inv_products.id', '=', 'order_details.product_id')
+                        ->join('inv_incoming_stock', 'inv_incoming_stock.product_id', '=', 'inv_products.id')
+                        ->whereRaw('order_details.order_id = orders.id')
+                        ->where('inv_incoming_stock.store_id', $store_id);
+                });
+            }
+
+            $orders = $query->offset($start)
                 ->limit($limit)
                 ->orderBy($order, $dir)
                 ->get();
         } else {
             $search = $request->input('search.value');
 
-            $orders = Order::where('status', '<=', '3')
+            $query = Order::where('status', '<=', '3')
                 ->select('orders.id', 'order_number', 'supplier_id', 'ordered_by', 'ordered_at', 'received_by', 'received_at'
                     , 'Comment', 'status', 'total_vat', 'total_amount')
                 ->join('inv_suppliers', 'inv_suppliers.id', '=', 'orders.supplier_id')
                 ->whereBetween(DB::raw('date(ordered_at)'),
                     [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
-                ->where('order_number', 'LIKE', "%{$search}%")
-                ->orwhere('total_amount', 'LIKE', "%{$search}%")
-                ->orWhere(DB::raw('inv_suppliers.name'), 'LIKE', "%{$search}%")
-                ->orWhere(DB::raw('date(ordered_at)'), 'LIKE', "%{$search}%")
-                ->offset($start)
+                ->where(function($q) use ($search) {
+                    $q->where('order_number', 'LIKE', "%{$search}%")
+                      ->orwhere('total_amount', 'LIKE', "%{$search}%")
+                      ->orWhere(DB::raw('inv_suppliers.name'), 'LIKE', "%{$search}%")
+                      ->orWhere(DB::raw('date(ordered_at)'), 'LIKE', "%{$search}%");
+                });
+
+            if ($useStoreFilter) {
+                $query->whereExists(function($subQuery) use ($store_id) {
+                    $subQuery->select(DB::raw(1))
+                        ->from('order_details')
+                        ->join('inv_products', 'inv_products.id', '=', 'order_details.product_id')
+                        ->join('inv_incoming_stock', 'inv_incoming_stock.product_id', '=', 'inv_products.id')
+                        ->whereRaw('order_details.order_id = orders.id')
+                        ->where('inv_incoming_stock.store_id', $store_id);
+                });
+            }
+
+            $orders = $query->offset($start)
                 ->limit($limit)
                 ->orderBy($order, $dir)
                 ->get();
 
-            $totalFiltered = Order::where('status', '<=', '3')
+            $totalFilteredQuery = Order::where('status', '<=', '3')
                 ->select('orders.id', 'order_number', 'supplier_id', 'ordered_by', 'ordered_at', 'received_by', 'received_at'
                     , 'Comment', 'status', 'total_vat', 'total_amount')
                 ->join('inv_suppliers', 'inv_suppliers.id', '=', 'orders.supplier_id')
                 ->whereBetween(DB::raw('date(ordered_at)'),
                     [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))])
-                ->where('order_number', 'LIKE', "%{$search}%")
-                ->orwhere('total_amount', 'LIKE', "%{$search}%")
-                ->orWhere(DB::raw('inv_suppliers.name'), 'LIKE', "%{$search}%")
-                ->orWhere(DB::raw('date(ordered_at)'), 'LIKE', "%{$search}%")
-                ->count();
+                ->where(function($q) use ($search) {
+                    $q->where('order_number', 'LIKE', "%{$search}%")
+                      ->orwhere('total_amount', 'LIKE', "%{$search}%")
+                      ->orWhere(DB::raw('inv_suppliers.name'), 'LIKE', "%{$search}%")
+                      ->orWhere(DB::raw('date(ordered_at)'), 'LIKE', "%{$search}%");
+                });
+
+            if ($useStoreFilter) {
+                $totalFilteredQuery->whereExists(function($subQuery) use ($store_id) {
+                    $subQuery->select(DB::raw(1))
+                        ->from('order_details')
+                        ->join('inv_products', 'inv_products.id', '=', 'order_details.product_id')
+                        ->join('inv_incoming_stock', 'inv_incoming_stock.product_id', '=', 'inv_products.id')
+                        ->whereRaw('order_details.order_id = orders.id')
+                        ->where('inv_incoming_stock.store_id', $store_id);
+                });
+            }
+
+            $totalFiltered = $totalFilteredQuery->count();
         }
 
         $data = array();
