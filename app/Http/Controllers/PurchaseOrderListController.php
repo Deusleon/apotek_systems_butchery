@@ -31,11 +31,22 @@ class PurchaseOrderListController extends Controller
 
     public function getOrderHistory(Request $request)
     {
-
-
         $from = Carbon::parse($request->date[0]);
         $to =  Carbon::parse($request->date[1]);
-        $order_history = Order::whereBetween('ordered_at', [$from, $to])->orderByDesc('ordered_at')->get();
+
+        $store_id = current_store_id();
+        $useStoreFilter = !is_all_store();
+
+        $query = Order::whereBetween('ordered_at', [$from, $to]);
+
+        if ($useStoreFilter) {
+            $query->whereHas('details.product.incomingStock', function($q) use ($store_id) {
+                $q->where('store_id', $store_id);
+            });
+        }
+
+        $order_history = $query->orderByDesc('ordered_at')->get();
+
         foreach ($order_history as $value) {
             $value->supplier;
             $value->details;
