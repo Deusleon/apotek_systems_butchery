@@ -13,7 +13,7 @@
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#"> Inventory / Daily Stock Count </a></li>
+    <li class="breadcrumb-item"><a href="#"> Inventory / Stock Count </a></li>
 @endsection
 
 

@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Current Stock Summary Report</title>
+    <title>Current Stock Detailed Report</title>
 
     <style>
         body {
@@ -12,7 +12,6 @@
         * {
             font-family: Verdana, Arial, sans-serif;
         }
-
 
         table,
         th,
@@ -103,7 +102,7 @@
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}</h3>
-        <h2 align="center" style="margin-top: -1%">Current Stock Summary Report</h2>
+        <h2 align="center" style="margin-top: -1%">Current Stock Detailed Report</h2>
         <h4 align="center" style="margin-top: -1%">Branch: {{$store}}  Category: {{$category}}</h4>
 
         <div class="row" style="margin-top: 8%;">
@@ -114,7 +113,7 @@
                             <th>#</th>
                             {{-- <th>Code</th> --}}
                             <th>Product Name</th>
-                            {{-- <th>Batch No</th> --}}
+                            <th>Batch No</th>
                             {{-- <th style="text-align: center">Expiry Date</th> --}}
                             <th style="text-align: center">Quantity</th>
                         </tr>
@@ -127,7 +126,7 @@
                             <td>{{$item['name']}} {{$item['brand'] ?? ''}}
                                 {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}
                             </td>
-                            {{-- <td>{{$item['batch_number']}}</td> --}}
+                            <td>{{$item['batch_number']}}</td>
                             {{-- @if($item['expiry_date'] === null) --}}
                             {{-- <td align="center"></td>
                             @else
@@ -159,8 +158,6 @@
 
 
      }
-
-
 
 </script>
 

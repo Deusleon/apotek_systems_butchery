@@ -197,7 +197,7 @@ class StockTransferController extends Controller {
                     $this->sendNotifications($transfer, 'created', 'needs_approval');
                 }
 
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('Stock Transfer Error: ' . $e->getMessage());
                 return back()->with('error', 'Failed to create stock transfer. Please try again.');
             }
@@ -347,7 +347,7 @@ class StockTransferController extends Controller {
                 'message' => 'Stock transfer updated successfully'
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
                 'success' => false,
@@ -790,7 +790,7 @@ class StockTransferController extends Controller {
 
                 $remaining = $qtyToMove;
 
-                $batches = \App\CurrentStock::where('product_id', $productId)
+                $batches = CurrentStock::where('product_id', $productId)
                     ->where('store_id', $fromStore)
                     ->where('quantity', '>', 0)
                     ->orderBy('expiry_date', 'asc') 
@@ -822,7 +822,7 @@ class StockTransferController extends Controller {
                     $batch->save();
 
                     // create stock tracking (OUT)
-                    \App\StockTracking::create([
+                    StockTracking::create([
                         'stock_id' => $batch->id, 
                         'product_id' => $productId,
                         'quantity' => $consumed,
@@ -861,7 +861,7 @@ class StockTransferController extends Controller {
 
             // return response()->json(['message' => 'Stock transfer approved successfully']);
             return redirect()->route('stock-transfer-history')->with(['message' => 'Stock transfer approved successfully']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             Log::error('Approve transfer error: ' . $e->getMessage());
             return response()->json(['message' => 'Failed to approve transfer: ' . $e->getMessage()], 500);
@@ -901,7 +901,7 @@ class StockTransferController extends Controller {
             DB::commit();
 
             return redirect()->route('stock-transfer-history')->with(['message' => 'Stock transfer rejected successfully']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             Log::error('Reject transfer error: ' . $e->getMessage());
             return response()->json(['message' => 'Failed to reject transfer: ' . $e->getMessage()], 500);
@@ -924,7 +924,7 @@ class StockTransferController extends Controller {
             ->join('users as u', 'u.id', '=', 't.created_by')
             ->leftJoin('users as up', 'up.id', '=', 't.updated_by')
             ->where('t.transfer_no', $transfer)
-            ->groupBy('t.transfer_no', 't.from_store', 't.to_store', 't.created_at', 't.status', 't.remark', 't.evidence', 'fs.name', 'ts.name', 'u.name', 'up.name')
+            ->groupBy(['t.transfer_no', 't.from_store', 't.to_store', 't.created_at', 't.status', 't.remark', 't.evidence', 'fs.name', 'ts.name', 'u.name', 'up.name'])
             ->first();
 
         if (!$transfer) {

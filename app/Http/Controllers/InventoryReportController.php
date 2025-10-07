@@ -98,6 +98,34 @@ class InventoryReportController extends Controller
                     ->setPaper( 'a4', '' );
                     return $pdf->stream( 'current_stock_report.pdf' );
                 }
+            case 12:
+                $request_store = $request->store_name ?? current_store_id();    
+                $store_name = Store::where('id', $request_store)
+                            ->first();
+                $store = $store_name->name ?? current_store()->name;
+                //current stock
+                if ($request->category_name == null) {
+                    $data = $this->currentStockByStoreReport($request_store);
+                    if ($data == []) {
+                        return response()->view('error_pages.pdf_zero_data');
+                    }
+                    $pdf = PDF::loadView( 'inventory_reports.current_stock_by_store_report_pdf',
+                    compact( 'data', 'store', 'pharmacy' ) )
+                    ->setPaper( 'a4', '' );
+                    return $pdf->stream( 'current_stock_by_store_report.pdf' );
+                } else {
+                    $category_name = Category::where('id', $request->category_name)
+                                ->first();
+                    $category = $category_name->name;
+                    $data = $this->currentStockReport($request_store, $request->category_name);
+                    if ($data == []) {
+                        return response()->view('error_pages.pdf_zero_data');
+                    }
+                    $pdf = PDF::loadView( 'inventory_reports.current_stock_detailed_report_pdf',
+                    compact( 'data', 'store', 'category', 'pharmacy' ) )
+                    ->setPaper( 'a4', '' );
+                    return $pdf->stream( 'current_stock_detailed_report.pdf' );
+                }
             case 2:
                 $data = $this->productDetailReport($request->category_name_detail);
                 if ($data == []) {

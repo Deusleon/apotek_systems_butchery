@@ -89,7 +89,7 @@ class HomeController extends Controller {
             ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
             ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
             ->whereRaw( 'date(sales.date) >= date(now()) - interval 90 day' )
-            ->groupBy( 'receipt_number', 'product_name' )
+            ->groupBy( ['receipt_number', 'product_name'] )
             ->get();
 
             $fast_moving = $this->fastMovingCalculation( $fast_moving );
@@ -137,7 +137,7 @@ class HomeController extends Controller {
         ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
         ->whereRaw( 'date(sales.date) >= date(now()) - interval 90 day' )
         ->where( 'inv_current_stock.store_id', $store_id )
-        ->groupBy( 'receipt_number', 'product_name' )
+        ->groupBy( ['receipt_number', 'product_name'] )
         ->get();
 
         $fast_moving = $this->fastMovingCalculation( $fast_moving );
@@ -256,7 +256,7 @@ class HomeController extends Controller {
             ->join( 'inv_categories', 'inv_categories.id', '=', 'inv_products.category_id' )
             ->wherenull( 'sales_details.status' )
             ->orwhere( 'sales_details.status', '!=', 3 )
-            ->groupBy( 'category' )
+            ->groupBy( ['category'] )
             ->get();
 
             $data[ 'avgDailySales' ] = $avgDailySales;
@@ -328,7 +328,7 @@ class HomeController extends Controller {
         ->wherenull( 'sales_details.status' )
         ->orwhere( 'sales_details.status', '!=', 3 )
         ->where( 'inv_current_stock.store_id', '=', $store_id )
-        ->groupBy( 'category' )
+        ->groupBy( ['category'] )
         ->get();
 
         $data[ 'avgDailySales' ] = $avgDailySales;

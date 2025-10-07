@@ -73,8 +73,11 @@
                                             class="js-example-basic-single form-control drop">
                                             <option selected="true" value="0" disabled="disabled">Select report</option>
                                             @if(auth()->user()->checkPermission('Current Stock Report'))
-                                                <option value="1">Current Stock Report</option>
+                                                <option value="1">Current Stock Summary Report</option>
                                             @endif
+                                            {{-- @if(auth()->user()->checkPermission('Current Stock Report'))
+                                                <option value="12">Current Stock Detailed Report</option>
+                                            @endif --}}
                                             @if(auth()->user()->checkPermission('Product Details Report'))
                                                 <option value="2">Product Details Report</option>
                                             @endif
@@ -432,7 +435,7 @@
             // current stock
             let stockDiv = document.getElementById('current-stock');
             let warningStore = document.getElementById('warning-store');
-            if (Number(report_option_index) === 1) {
+            if (Number(report_option_index) === 1 || Number(report_option_index) === 12) {
                 if (stockDiv) stockDiv.style.display = 'block';
             } else {
                 if (stockDiv) stockDiv.style.display = 'none';

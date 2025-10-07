@@ -316,8 +316,6 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::post('inventory/current-stock-value','CurrentStockController@getStockValue')->name('current_stock_value');
     Route::post('inventory/filtered_values','CurrentStockController@filterStockValue')->name('stock-value-filter');
 
-
-
     Route::post('inventory/current-stock/in-stock',
         'CurrentStockController@allInStock')->name('all-in-stock');
 
