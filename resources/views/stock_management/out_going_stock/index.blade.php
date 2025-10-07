@@ -8,7 +8,7 @@
 @endsection
 
 @section('content-title')
-    Outgoing Stock
+    Stock Count
 @endsection
 
 @section('content-sub-title')

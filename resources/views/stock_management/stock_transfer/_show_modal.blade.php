@@ -13,7 +13,7 @@
                 <div class="col mb-2">
                     <div class="row">
                         <div class="col-4">
-                            <strong class="">Transfer No:</strong>
+                            <strong class="">Transfer #:</strong>
                             <p id="show_transfer_no" class="text-body"></p>
                         </div>
                         <div class="col-4">

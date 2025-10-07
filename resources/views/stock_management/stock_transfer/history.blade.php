@@ -131,11 +131,12 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {{-- @dd($transfers) --}}
                                 @foreach($transfers as $transfer)
                                                             <tr class="p-0">
                                                                 <td>{{$transfer->transfer_no}}</td>
                                                                 <td>{{ $transfer->created_at->format('Y-m-d') }}</td>
-                                                                <td>{{$transfer->total_products}}</td>
+                                                                <td><span class="badge badge-primary p-1">{{$transfer->total_products > 1 ? $transfer->total_products." Products" : $transfer->total_products." Product"}}</span></td>
                                                                 <td align="left">
                                                                     <div style="margin-right: 50%">
                                                                         {{$transfer->fromStore->name}}

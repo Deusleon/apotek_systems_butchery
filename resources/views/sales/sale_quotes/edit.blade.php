@@ -180,6 +180,7 @@
                         </div>
                     </div>
                     <hr>
+                    <input type="hidden" name="" id="is_discount_enabled" value="{{$enable_discount}}">
                     <div class="row">
                         <div class="col-md-4">
                             @if ($enable_discount === 'YES')
@@ -447,7 +448,7 @@
                     success: function(response) {
                         refreshSalesTable(response.data);
                         isCartEmpty(response.data.sales_details.length);
-                        console.log('response', response);
+                        // console.log('response', response);
                     },
                     error: function(xhr) {
                         notify('Failed', 'top', 'right', 'danger');

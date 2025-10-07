@@ -48,7 +48,6 @@ $("#sale_discount").on("blur", function () {
     $("#quote_barcode_input").focus();
 });
 
-
 $("#quote_barcode_input").on("keypress", function (e) {
     if (e.which === 13) {
         e.preventDefault();
@@ -70,7 +69,7 @@ $(document).ready(function () {
 
     $("#price_category, #product_id, #customer_id").on("change", function () {
         var check_store = $("#is_all_store").val();
-        var id = $(this).attr("id"); 
+        var id = $(this).attr("id");
 
         if (check_store === "ALL") {
             notify(
@@ -120,7 +119,7 @@ function fetchProductByBarcode(barcode) {
 }
 // ===== addProductToCartScan =====
 function addProductToCartScan(product) {
-    console.log("Item Receive", product);
+    // console.log("Item Receive", product);
 
     // Normalize numeric fields
     const priceNum = Number(product.price) || 0;
@@ -448,10 +447,15 @@ function refreshSalesTable(data) {
         `;
         tbody.append(row);
     });
-    document.getElementById("sale_discount").value = formatNumber(
-        Number(data.discount),
-        2
-    );
+    var is_discount_enabled = document.getElementById(
+        "is_discount_enabled"
+    ).value;
+    if (is_discount_enabled === "YES") {
+        document.getElementById("sale_discount").value = formatNumber(
+            Number(data.discount),
+            2
+        );
+    }
     document.getElementById("sub_total").value = formatNumber(
         Number(data.sub_total),
         2

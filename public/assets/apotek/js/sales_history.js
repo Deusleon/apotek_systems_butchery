@@ -158,7 +158,7 @@ function populateHistoryTable(data) {
                 (item.pack_size ? item.pack_size : "") +
                 (item.sales_uom ? item.sales_uom : ""),
             numberWithCommas(Number(item.quantity).toFixed(0)),
-            numberWithCommas(Number(item.price)),
+            numberWithCommas(Number(item.price).toFixed(2)),
         ]);
     });
 
