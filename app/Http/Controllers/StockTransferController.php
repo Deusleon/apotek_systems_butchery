@@ -218,31 +218,6 @@ class StockTransferController extends Controller {
         return view('stock_management.stock_transfer.show', compact('transfers'));
     }
  
-    // public function edit($transfer_no)
-    // {
-    //     $transfer_group = StockTransfer::where('transfer_no', $transfer_no)->first();
-    //     $transfers = StockTransfer::with(['currentStock.product', 'fromStore', 'toStore'])->where('transfer_no', $transfer_group->transfer_no)->get();
-
-    //     if ($transfers->isEmpty()) {
-    //         return redirect()->route('stock-transfer-history')->with('error', 'Transfer not found.');
-    //     }
-
-    //     foreach ($transfers as $transfer) {
-    //         $productId = $transfer->currentStock->product_id ?? null;
-    //         if ($productId) {
-    //             $totalStock = DB::table('inv_current_stock')
-    //                 ->where('product_id', $productId)
-    //                 ->sum('quantity');
-
-    //             $transfer->total_stock = $totalStock;
-    //         } else {
-    //             $transfer->total_stock = 0;
-    //         }
-    //     }
-    //     $stores = Store::where('name', '<>', 'ALL')->get();
-
-    //     return view('stock_management.stock_transfer.edit', compact('transfers', 'stores'));
-    // }
     public function edit($transfer_no)
     {
         $transfer_group = StockTransfer::where('transfer_no', $transfer_no)->first();
@@ -278,8 +253,6 @@ class StockTransferController extends Controller {
 
         return view('stock_management.stock_transfer.edit', compact('transfers', 'stores'));
     }
-
-
     public function update(Request $request, $transfer_no)
     {
         $request->validate([
@@ -382,58 +355,57 @@ class StockTransferController extends Controller {
             ]);
         }
     }
-            public function transferNumberAutoGen() {
-                $number_gen = new CommonFunctions();
-                $unique = $number_gen->generateNumber();
-                return $unique;
-            }
+    public function transferNumberAutoGen() {
+        $number_gen = new CommonFunctions();
+        $unique = $number_gen->generateNumber();
+        return $unique;
+    }
+    public function generateStockTransferPDF( $transfer_no ) {
+        $transfer = DB::table( 'inv_stock_transfers as t' )
+        ->select(
+            't.*',
+            'fs.name as from_store_name',
+            'ts.name as to_store_name',
+            'p.name as product_name',
+            'p.brand',
+            'p.pack_size',
+            'u.name as created_by_name',
+            'up.name as updated_by_name'
+        )
+        ->join( 'inv_stores as fs', 'fs.id', '=', 't.from_store' )
+        ->join( 'inv_stores as ts', 'ts.id', '=', 't.to_store' )
+        ->join( 'inv_current_stock as cs', 'cs.id', '=', 't.stock_id' )
+        ->join( 'inv_products as p', 'p.id', '=', 'cs.product_id' )
+        ->join( 'users as u', 'u.id', '=', 't.created_by' )
+        ->leftJoin( 'users as up', 'up.id', '=', 't.updated_by' )
+        ->where( 't.transfer_no', $transfer_no )
+        ->first();
 
-            public function generateStockTransferPDF( $transfer_no ) {
-                $transfer = DB::table( 'inv_stock_transfers as t' )
-                ->select(
-                    't.*',
-                    'fs.name as from_store_name',
-                    'ts.name as to_store_name',
-                    'p.name as product_name',
-                    'p.brand',
-                    'p.pack_size',
-                    'u.name as created_by_name',
-                    'up.name as updated_by_name'
-                )
-                ->join( 'inv_stores as fs', 'fs.id', '=', 't.from_store' )
-                ->join( 'inv_stores as ts', 'ts.id', '=', 't.to_store' )
-                ->join( 'inv_current_stock as cs', 'cs.id', '=', 't.stock_id' )
-                ->join( 'inv_products as p', 'p.id', '=', 'cs.product_id' )
-                ->join( 'users as u', 'u.id', '=', 't.created_by' )
-                ->leftJoin( 'users as up', 'up.id', '=', 't.updated_by' )
-                ->where( 't.transfer_no', $transfer_no )
-                ->first();
+        if ( !$transfer ) {
+            return back()->with( 'error', 'Transfer not found' );
+        }
 
-                if ( !$transfer ) {
-                    return back()->with( 'error', 'Transfer not found' );
-                }
+        // Get status text
+        $statuses = [
+            1 => 'Created',
+            2 => 'Assigned',
+            3 => 'Approved',
+            4 => 'In Transit',
+            5 => 'Acknowledged',
+            6 => 'Completed'
+        ];
+        $transfer->status_text = $statuses[ $transfer->status ] ?? 'Unknown';
 
-                // Get status text
-                $statuses = [
-                    1 => 'Created',
-                    2 => 'Assigned',
-                    3 => 'Approved',
-                    4 => 'In Transit',
-                    5 => 'Acknowledged',
-                    6 => 'Completed'
-                ];
-                $transfer->status_text = $statuses[ $transfer->status ] ?? 'Unknown';
-
-                // Get audit trail - try to find relevant stock adjustments or provide empty collection
-                try {
-                    $audit_trail = DB::table( 'stock_adjustment_logs' )
-                    ->where( 'current_stock_id', $transfer->stock_id )
-                    ->where( 'created_at', '>=', $transfer->created_at )
-                    ->orderBy( 'created_at', 'asc' )
-                    ->get();
-                } catch ( Exception $e ) {
-                    // If audit table doesn't exist or has issues, provide empty collection
-            $audit_trail = collect();
+        // Get audit trail - try to find relevant stock adjustments or provide empty collection
+        try {
+            $audit_trail = DB::table( 'stock_adjustment_logs' )
+            ->where( 'current_stock_id', $transfer->stock_id )
+            ->where( 'created_at', '>=', $transfer->created_at )
+            ->orderBy( 'created_at', 'asc' )
+            ->get();
+        } catch ( Exception $e ) {
+            // If audit table doesn't exist or has issues, provide empty collection
+        $audit_trail = collect();
         }
 
         $pdf = PDF::loadView('stock_management.stock_transfer.pdf', [
@@ -443,7 +415,6 @@ class StockTransferController extends Controller {
 
         return $pdf->stream('stock_transfer_' . $transfer_no . '.pdf');
     }
-
     public function regenerateStockTransferPDF(Request $request)
     {
         $transfer_no = $request->transfer_no;
@@ -454,7 +425,6 @@ class StockTransferController extends Controller {
 
         return redirect()->route('stock-transfer-pdf-gen', strval($transfer_no));
     }
-
     public function stockTransferHistory()
     {
         if (!Auth()->user()->checkPermission('View Stock Transfer')) {
@@ -485,18 +455,24 @@ class StockTransferController extends Controller {
         $flattened = $transfers_groups->flatten(1); // collection of StockTransfer models
         $approverIds = $flattened->pluck('approved_by')->filter()->unique()->values()->all();
         $cancellerIds = $flattened->pluck('cancelled_by')->filter()->unique()->values()->all();
+        $acknowledgersIds = $flattened->pluck('acknowledged_by')->filter()->unique()->values()->all();
 
         // Resolve User model from auth config (works for App\User or App\Models\User setups)
         $userModel = config('auth.providers.users.model');
 
         $approvers = [];
+        $acknowledgers = [];
         if (!empty($approverIds) || !empty($cancellerIds)) {
         $allIds = array_unique(array_merge($approverIds, $cancellerIds));
         $approvers = $userModel::whereIn('id', $allIds)->get()->keyBy('id');
         }
+        if (!empty($acknowledgersIds)) {
+        $ackIds = array_unique(array_merge($acknowledgersIds));
+        $acknowledgers = $userModel::whereIn('id', $ackIds)->get()->keyBy('id');
+        }
 
         // Create a representative model for each group to display in the main table.
-        $transfers = $transfers_groups->map(function ($group) use ($approvers) {
+        $transfers = $transfers_groups->map(function ($group) use ($approvers, $acknowledgers) {
             $first = $group->first();
 
             // create a replica to avoid mutating original relations
@@ -522,8 +498,8 @@ class StockTransferController extends Controller {
 
         // acknowledged by
         $acknowledgerId = $group->pluck('acknowledged_by')->filter()->first();
-        $repres->acknowledged_by_name = $acknowledgerId && isset($approvers[$acknowledgerId])
-            ? $approvers[$acknowledgerId]->name
+        $repres->acknowledged_by_name = $acknowledgerId && isset($acknowledgers[$acknowledgerId])
+            ? $acknowledgers[$acknowledgerId]->name
             : null;
 
             return $repres;

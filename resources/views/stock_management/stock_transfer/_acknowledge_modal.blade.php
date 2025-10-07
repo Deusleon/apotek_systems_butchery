@@ -12,7 +12,7 @@
             <div class="modal-body">
                 <div class="mb-3">
                     <div class="mb-2">
-                        Transfer No: <span id="acknowledge_transfer_no" class="text-body"></span><br>
+                        Transfer #: <span id="acknowledge_transfer_no" class="text-body"></span><br>
                     </div>
                     From: <span id="acknowledge_from_store" class="text-body mr-3"></span>
                     To: <span id="acknowledge_to_store" class="text-body"></span><br>
@@ -52,7 +52,7 @@
 
 <!-- Confirmation Modal -->
 <div class="modal fade" id="confirmAcknowledgeModal" tabindex="-1" role="dialog" aria-labelledby="confirmAcknowledgeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm" role="document">
+  <div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="confirmAcknowledgeModalLabel">Confirm Acknowledge</h5>

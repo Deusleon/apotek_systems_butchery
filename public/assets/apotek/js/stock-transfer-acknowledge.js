@@ -305,9 +305,7 @@ $('#quantity_rcvd').on('change', function () {
 
     }
 
-
 });
-
 
 function showStockTransfer(data, data1, data2) {
     var transfer_no = data;

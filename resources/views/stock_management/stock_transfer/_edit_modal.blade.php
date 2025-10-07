@@ -14,7 +14,7 @@
                 <div class="modal-body">
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <strong>Transfer No:</strong>
+                            <strong>Transfer #:</strong>
                             <p id="edit_transfer_no"></p>
                         </div>
                         <div class="col-md-4">

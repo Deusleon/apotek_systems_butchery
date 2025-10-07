@@ -926,8 +926,8 @@ function quoteDetails(remark, items, data) {
             item.name +
                 " " +
                 (item.brand ? item.brand + " " : "") +
-                item.pack_size +
-                item.sales_uom
+                (item.pack_size ? item.pack_size : "") +
+                (item.sales_uom ? item.sales_uom : "")
         );
         item_data.push(item.quantity);
         item_data.push(item.price);

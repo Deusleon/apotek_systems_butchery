@@ -97,8 +97,8 @@ class LoginController extends Controller {
             ] );
         } else {
             session( [
-                'current_store_id' => $storeId,
-                'store' => $defaultStore,
+                'current_store_id' => $store->id,
+                'store' => $store->name,
             ] );
         }
         Log::info( 'Session debugging', [

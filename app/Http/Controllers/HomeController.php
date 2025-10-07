@@ -855,9 +855,9 @@ class HomeController extends Controller {
         $store_id = current_store_id();
         $query = TransportOrder::query();
 
-        if ( $store_id && !Auth::user()->checkPermission( 'Manage All Branches' ) ) {
-            $query->where( 'store_id', $store_id );
-        }
+        // if ( $store_id && !Auth::user()->checkPermission( 'Manage All Branches' ) ) {
+        //     $query->where( 'store_id', $store_id );
+        // }
 
         $orders = $query->get();
 
