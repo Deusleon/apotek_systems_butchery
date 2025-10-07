@@ -146,11 +146,11 @@
                                 @if($batch_setting === 'YES')
                                     <label for="code">Batch # <font color="red">*</font></label>
                                     <input type="text" name="batch_number" class="form-control" id="invoicing_batch_n" autocomplete="off"
-                                        required="true" value="{{session('batch_number')}}" />
+                                        required="true" value="{{ date('Y-m-d') }}" />
                                 @else
                                     <label for="code">Batch #</label>
                                     <input type="text" name="batch_number" class="form-control" id="invoicing_batch_n" autocomplete="off"
-                                        value="{{session('batch_number')}}" /> 
+                                        value="{{ date('Y-m-d') }}" />
                                 @endif
                             </div>
                         </div>
@@ -335,6 +335,7 @@
                     showNotification();
                 });
 
+                $('#invoicesave_id').prop('disabled', true);
                 $('#invoicesave_id').on('click', function(e) {
                     e.preventDefault();
                     showNotification();
@@ -427,7 +428,7 @@
                 // document.getElementById("selected-product").value = '';
 
                 // Preserve batch number
-                document.getElementById("invoicing_batch_n").value = "{{session('batch_number')}}";
+                document.getElementById("invoicing_batch_n").value = "{{ date('Y-m-d') }}";
 
                 // Clear dates & totals
                 document.getElementById("invoicing_purchase_date").value = '';

@@ -123,6 +123,7 @@ class HomeController extends Controller {
             $default_store_id = 0;
         }
         session()->put( 'store', $default_store_id );
+        session()->put( 'current_store_id', $default_store_id );
 
         $outOfStock = CurrentStock::where( 'quantity', 0 )
         ->where( 'store_id', $store_id )->groupby( 'product_id' )->get();

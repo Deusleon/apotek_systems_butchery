@@ -88,7 +88,8 @@ public function approve(Request $request, $id)
                 'total_vat' => $request->vat_total_amount,
                 'total_amount' => $request->total_amount,
                 'Comment' => $request->note,
-                'status' => '1'
+                'status' => '1',
+                'store_id' => current_store_id()
 
             ));
 
