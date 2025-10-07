@@ -84,7 +84,14 @@
         ajax: { url: "{{ route('requisitions-issue-history-list') }}" },
         columns: [
             { data: 'req_no', name: 'req_no' },
-            { data: 'products', name: 'products', searchable: false },
+            {
+                data: 'products',
+                name: 'products',
+                render: function(data, type, row) {
+                    return data || '';
+                },
+                searchable: false
+            },
             { data: 'fromStore', name: 'fromStore' },
             { data: 'toStore', name: 'toStore' },
             { data: 'issued_by', name: 'issued_by' },

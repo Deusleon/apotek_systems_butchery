@@ -220,7 +220,7 @@
                 data: 'itemss',
                 render: function(data) {
                     if (!data) return "";
-                    return data.name + ' ' + data.brand + ' ' + data.pack_size + '' + data.sales_uom;
+                    return [data.name, data.brand, data.pack_size, data.sales_uom].filter(Boolean).join(' ');
                 }
             },
             {

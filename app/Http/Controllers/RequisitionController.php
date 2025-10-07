@@ -85,20 +85,22 @@ class RequisitionController extends Controller
                     $productNames = [];
                     foreach ($row->reqDetails->take(3) as $detail) {
                         if ($detail->products_) {
-                            $productNames[] = $detail->products_->name . ' ' . 
-                                            $detail->products_->brand . ' ' . 
-                                            $detail->products_->pack_size . ' ' . 
+                            $productNames[] = $detail->products_->name . ' ' .
+                                            $detail->products_->brand . ' ' .
+                                            $detail->products_->pack_size . ' ' .
                                             $detail->products_->sales_uom;
                         }
                     }
-                    
+
                     $displayText = implode(', ', $productNames);
                     if ($row->reqDetails->count() > 3) {
                         $displayText .= ' and ' . ($row->reqDetails->count() - 3) . ' more';
                     }
-                    
-                    $prod = '<span class="badge badge-primary p-1" title="' . htmlspecialchars($displayText) . '">' . 
-                            $row->reqDetails->count() . ' Products</span>';
+
+                    $count = $row->reqDetails->count();
+                    $word = $count == 1 ? ' Product' : ' Products';
+                    $prod = '<span class="badge badge-primary p-1" title="' . htmlspecialchars($displayText) . '">' .
+                            $count . $word . '</span>';
                     return $prod;
                 })
                 ->addColumn('reqDate', function ($row) {
@@ -481,7 +483,9 @@ class RequisitionController extends Controller
 
             return DataTables::of($data)
                 ->addColumn('products', function ($row) {
-                    return '<span class="badge badge-primary p-1">' . $row->reqDetails->count() . ' Products</span>';
+                    $count = $row->reqDetails->count();
+                    $word = $count == 1 ? ' Product' : ' Products';
+                    return '<span class="badge badge-primary p-1">' . $count . $word . '</span>';
                 })
                 ->addColumn('issued_by', function ($row) {
                     return $row->creator ? $row->creator->name : 'N/A';
@@ -563,7 +567,9 @@ class RequisitionController extends Controller
                 return $btn_view;
             })
             ->addColumn('products', function ($row) {
-                return '<span class="badge badge-primary p-1">' . $row->reqDetails->count() . ' Products</span>';
+                $count = $row->reqDetails->count();
+                $word = $count == 1 ? ' Product' : ' Products';
+                return '<span class="badge badge-primary p-1">' . $count . $word . '</span>';
             })
             ->addColumn('reqDate', function ($row) {
                 return $row->created_at;

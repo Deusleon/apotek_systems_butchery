@@ -63,7 +63,14 @@
         ajax: { url: "{{ route('requisitions-issue-list') }}" },
         columns: [
             { data: 'req_no', name: 'req_no' },
-            { data: 'products', name: 'products', searchable: false },
+            {
+                data: 'products',
+                name: 'products',
+                render: function(data, type, row) {
+                    return data || '';
+                },
+                searchable: false
+            },
             { data: 'fromStore', name: 'fromStore', searchable: false },
             { data: 'toStore', name: 'toStore', searchable: false },
             { 
