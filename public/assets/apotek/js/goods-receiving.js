@@ -723,6 +723,7 @@ $("#invoicecart_table tbody").on("click", "#edit_btn", function () {
                 })
                 .on("apply.daterangepicker", function (ev, picker) {
                     $(this).val(picker.startDate.format("YYYY-MM-DD"));
+                    $(this).trigger('change');
                 });
         }, 50);
 
@@ -829,7 +830,6 @@ if (expire_date_enabler === "YES") {
         "change",
         "#edit_expire_date",
         function () {
-            edit_btn_set = 0;
             var row_data = invoicecart_table.row($(this).parents("tr")).data();
             var index = invoicecart_table.row($(this).parents("tr")).index();
             let expireValue = document.getElementById("edit_expire_date").value;
@@ -837,6 +837,9 @@ if (expire_date_enabler === "YES") {
             if (expireValue === "") {
                 // blank is allowed
                 $("#invoicesave_id").attr("disabled", false);
+                edit_btn_set = 0;
+                row_data.expire_date = expireValue;
+                updateRowData();
             } else {
                 let selectedDate = moment(expireValue);
                 let tomorrow = moment().add(1, "days");
@@ -847,44 +850,51 @@ if (expire_date_enabler === "YES") {
                 ) {
                     // valid
                     $("#invoicesave_id").attr("disabled", false);
+                    edit_btn_set = 0;
+                    row_data.expire_date = expireValue;
+                    updateRowData();
                 } else {
-                    // invalid, set blank
+                    // invalid
+                    $("#invoicesave_id").attr("disabled", true);
+                    edit_btn_set = 1; // keep editing this row
                     document.getElementById("edit_expire_date").value = "";
-                    expireValue = "";
                     notify(
                         "Invalid expire date, must be blank or within 5 years from tomorrow",
                         "top",
                         "right",
                         "warning"
                     );
-                    $("#invoicesave_id").attr("disabled", false);
+                    return; // don't update row
                 }
             }
 
-            row_data.expire_date = expireValue;
-            console.log(document.getElementById("invoice_edit_quantity").value);
-            row_data.quantity = document.getElementById(
-                "invoice_edit_quantity"
-            ).value;
-            console.log(row_data.quantity);
-            row_data.buying_price = formatMoney(
-                document.getElementById("edit_buying_price").value
-            );
-            row_data.selling_price = formatMoney(
-                document.getElementById("edit_selling_price").value
-            );
+            function updateRowData() {
+                console.log(
+                    document.getElementById("invoice_edit_quantity").value
+                );
+                row_data.quantity = document.getElementById(
+                    "invoice_edit_quantity"
+                ).value;
+                console.log(row_data.quantity);
+                row_data.buying_price = formatMoney(
+                    document.getElementById("edit_buying_price").value
+                );
+                row_data.selling_price = formatMoney(
+                    document.getElementById("edit_selling_price").value
+                );
 
-            invoice_cart[index] = row_data;
-            invoicecart_table.clear();
-            invoicecart_table.rows.add(invoice_cart);
-            invoicecart_table.draw();
+                invoice_cart[index] = row_data;
+                invoicecart_table.clear();
+                invoicecart_table.rows.add(invoice_cart);
+                invoicecart_table.draw();
 
-            invoice_cart_receiveds = JSON.stringify(invoice_cart);
-            document.getElementById("invoice_received_cart").value =
-                invoice_cart_receiveds;
-            // console.log(invoice_cart_receiveds);
+                invoice_cart_receiveds = JSON.stringify(invoice_cart);
+                document.getElementById("invoice_received_cart").value =
+                    invoice_cart_receiveds;
+                // console.log(invoice_cart_receiveds);
 
-            totalCostCalculated();
+                totalCostCalculated();
+            }
         }
     );
 }
@@ -1230,8 +1240,8 @@ function invoicesaveInvoiceForm() {
                 $("#sub_total").val("0.00");
 
                 try {
-                    document.getElementById("goodreceving_invoice_id").value =
-                        "";
+                    // Keep invoice selected for next selections
+                    // document.getElementById("goodreceving_invoice_id").value = "";
                     document.getElementById("invoiceselected-product").value =
                         "";
                     // $('#invoicing_purchase_date').val('');

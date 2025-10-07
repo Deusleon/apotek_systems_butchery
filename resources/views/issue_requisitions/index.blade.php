@@ -1,12 +1,12 @@
 @extends("layouts.master")
 
 @section('content-title')
-    Requisitions Issue
+    Stock Issue
 @endsection
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#">Purchasing / Requisitions Issue</a></li>
+    <li class="breadcrumb-item"><a href="#">Inventory / Stock Issue / Issue List</a></li>
 @endsection
 
 @section('content')
