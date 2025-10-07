@@ -40,9 +40,7 @@ class PurchaseOrderListController extends Controller
         $query = Order::whereBetween('ordered_at', [$from, $to]);
 
         if ($useStoreFilter) {
-            $query->whereHas('details.product.incomingStock', function($q) use ($store_id) {
-                $q->where('store_id', $store_id);
-            });
+            $query->where('store_id', $store_id);
         }
 
         $order_history = $query->orderByDesc('ordered_at')->get();

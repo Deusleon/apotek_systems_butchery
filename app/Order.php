@@ -9,6 +9,18 @@ class Order extends Model
     protected $table = 'orders';
     public $timestamps = false;
 
+    protected $fillable = [
+        'order_number',
+        'supplier_id',
+        'ordered_by',
+        'ordered_at',
+        'total_vat',
+        'total_amount',
+        'Comment',
+        'status',
+        'store_id'
+    ];
+
     public function supplier()
     {
         return $this->belongsTo(Supplier::class, 'supplier_id');

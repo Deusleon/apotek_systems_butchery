@@ -714,7 +714,7 @@ $("#invoicecart_table tbody").on("click", "#edit_btn", function () {
                 .daterangepicker({
                     singleDatePicker: true,
                     showDropdowns: true,
-                    minDate: moment(),
+                    minDate: moment().add(1, "days"),
                     maxDate: moment().add(5, "years"),
                     autoUpdateInput: false,
                     locale: {
@@ -839,10 +839,10 @@ if (expire_date_enabler === "YES") {
                 $("#invoicesave_id").attr("disabled", false);
             } else {
                 let selectedDate = moment(expireValue);
-                let today = moment();
+                let tomorrow = moment().add(1, "days");
                 let maxDate = moment().add(5, "years");
                 if (
-                    selectedDate.isSameOrAfter(today) &&
+                    selectedDate.isSameOrAfter(tomorrow) &&
                     selectedDate.isSameOrBefore(maxDate)
                 ) {
                     // valid
@@ -852,7 +852,7 @@ if (expire_date_enabler === "YES") {
                     document.getElementById("edit_expire_date").value = "";
                     expireValue = "";
                     notify(
-                        "Invalid expire date, must be blank or within 5 years from today",
+                        "Invalid expire date, must be blank or within 5 years from tomorrow",
                         "top",
                         "right",
                         "warning"
@@ -1091,13 +1091,8 @@ function totalCostCalculated() {
         formatMoney(total_buying_price);
     document.getElementById("sub_total").value = formatMoney(sub_total);
 
-    //Check For Profit
-    if (total_buying_price > total_selling_price) {
-        $("#invoicesave_id").prop("disabled", true);
-        // notify('Cannot be less than or equal to Buy Price', 'top', 'right', 'warning');
-    } else {
-        $("#invoicesave_id").prop("disabled", false);
-    }
+    // Removed profit check to allow saving with negative profit
+    $("#invoicesave_id").prop("disabled", false);
 }
 
 function filterReceivingInvoiceBySupplier() {
@@ -1187,11 +1182,11 @@ $("#invoiceFormId").on("submit", function (e) {
         let expDate = invoice_cart[i].expire_date;
         if (expDate && expDate !== "") {
             let selectedDate = moment(expDate);
-            let today = moment();
+            let tomorrow = moment().add(1, "days");
             let maxDate = moment().add(5, "years");
             if (
                 !(
-                    selectedDate.isSameOrAfter(today) &&
+                    selectedDate.isSameOrAfter(tomorrow) &&
                     selectedDate.isSameOrBefore(maxDate)
                 )
             ) {
@@ -1215,7 +1210,7 @@ function invoicesaveInvoiceForm() {
 
     $.ajax({
         url: config.routes.invoiceFormSave,
-        type: "get",
+        type: "post",
         dataType: "json",
         cache: "false",
         data: form,

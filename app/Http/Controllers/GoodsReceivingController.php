@@ -111,9 +111,7 @@ class GoodsReceivingController extends Controller
         ]);
 
         if (!is_all_store()) {
-            $ordersQuery->whereHas('details.product.incomingStock', function($q) {
-                $q->where('store_id', current_store_id());
-            });
+            $ordersQuery->where('store_id', current_store_id());
         }
 
         $orders = $ordersQuery->orderBy('id', 'desc')->get();
@@ -559,14 +557,7 @@ class GoodsReceivingController extends Controller
                 [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))]);
 
         if ($useStoreFilter) {
-            $totalDataQuery->whereExists(function($subQuery) use ($store_id) {
-                $subQuery->select(DB::raw(1))
-                    ->from('order_details')
-                    ->join('inv_products', 'inv_products.id', '=', 'order_details.product_id')
-                    ->join('inv_incoming_stock', 'inv_incoming_stock.product_id', '=', 'inv_products.id')
-                    ->whereRaw('order_details.order_id = orders.id')
-                    ->where('inv_incoming_stock.store_id', $store_id);
-            });
+            $totalDataQuery->where('store_id', $store_id);
         }
 
         $totalData = $totalDataQuery->count();
@@ -587,14 +578,7 @@ class GoodsReceivingController extends Controller
                     [date('Y-m-d', strtotime($from)), date('Y-m-d', strtotime($to))]);
 
             if ($useStoreFilter) {
-                $query->whereExists(function($subQuery) use ($store_id) {
-                    $subQuery->select(DB::raw(1))
-                        ->from('order_details')
-                        ->join('inv_products', 'inv_products.id', '=', 'order_details.product_id')
-                        ->join('inv_incoming_stock', 'inv_incoming_stock.product_id', '=', 'inv_products.id')
-                        ->whereRaw('order_details.order_id = orders.id')
-                        ->where('inv_incoming_stock.store_id', $store_id);
-                });
+                $query->where('store_id', $store_id);
             }
 
             $orders = $query->offset($start)
@@ -618,13 +602,8 @@ class GoodsReceivingController extends Controller
                 });
 
             if ($useStoreFilter) {
-                $query->whereExists(function($subQuery) use ($store_id) {
-                    $subQuery->select(DB::raw(1))
-                        ->from('order_details')
-                        ->join('inv_products', 'inv_products.id', '=', 'order_details.product_id')
-                        ->join('inv_incoming_stock', 'inv_incoming_stock.product_id', '=', 'inv_products.id')
-                        ->whereRaw('order_details.order_id = orders.id')
-                        ->where('inv_incoming_stock.store_id', $store_id);
+                $query->whereHas('user', function($q) use ($store_id) {
+                    $q->where('store_id', $store_id);
                 });
             }
 
@@ -647,14 +626,7 @@ class GoodsReceivingController extends Controller
                 });
 
             if ($useStoreFilter) {
-                $totalFilteredQuery->whereExists(function($subQuery) use ($store_id) {
-                    $subQuery->select(DB::raw(1))
-                        ->from('order_details')
-                        ->join('inv_products', 'inv_products.id', '=', 'order_details.product_id')
-                        ->join('inv_incoming_stock', 'inv_incoming_stock.product_id', '=', 'inv_products.id')
-                        ->whereRaw('order_details.order_id = orders.id')
-                        ->where('inv_incoming_stock.store_id', $store_id);
-                });
+                $totalFilteredQuery->where('store_id', $store_id);
             }
 
             $totalFiltered = $totalFilteredQuery->count();
