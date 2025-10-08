@@ -39,8 +39,15 @@ class RequisitionController extends Controller
             $data = Requisition::with(['reqDetails'])
                 ->leftJoin(DB::raw('inv_stores as from_store'), 'requisitions.from_store', '=', 'from_store.id')
                 ->leftJoin(DB::raw('inv_stores as to_store'), 'requisitions.to_store', '=', 'to_store.id')
-                ->selectRaw('requisitions.*, to_store.name as toStore, from_store.name as fromStore')
-                ->orderBy('requisitions.id', 'DESC');
+                ->selectRaw('requisitions.*, to_store.name as toStore, from_store.name as fromStore');
+
+            // Filter by current store if not ALL branch
+            $currentStoreId = current_store_id();
+            if ($currentStoreId && $currentStoreId != 1) {
+                $data->where('requisitions.to_store', $currentStoreId);
+            }
+
+            $data = $data->orderBy('requisitions.id', 'DESC');
             return DataTables::of($data)
                 ->addColumn('action', function ($row) {
                     $buttons = '';
@@ -190,7 +197,7 @@ class RequisitionController extends Controller
             $requisition->remarks = $request->remark;
             $requisition->evidence_document = $evidencePath; // FIXED COLUMN NAME
             $requisition->from_store = $from_store;
-            $requisition->to_store = "1";
+            $requisition->to_store = Auth::user()->store_id;
             $requisition->status = 0;
             $requisition->created_by = Auth::user()->id;
 
@@ -373,13 +380,13 @@ class RequisitionController extends Controller
             $from_store = Auth::user()->store_id;
         }
 
-        $to_store = "1";
+        $to_store = Auth::user()->store_id;
 
         // Handle file upload - NEW CODE ADDED
         $evidencePath = null;
         if($request->hasFile('evidence')) {
             $evidencePath = $request->file('evidence')->store('requisition_evidence', 'public');
-            
+
             // Optional: Delete old evidence file if it exists
             $oldRequisition = Requisition::find($req_id);
             if ($oldRequisition->evidence_document && Storage::disk('public')->exists($oldRequisition->evidence_document)) {
@@ -478,8 +485,15 @@ class RequisitionController extends Controller
                 ->leftJoin(DB::raw('inv_stores as from_store'), 'requisitions.from_store', '=', 'from_store.id')
                 ->leftJoin(DB::raw('inv_stores as to_store'), 'requisitions.to_store', '=', 'to_store.id')
                 ->selectRaw('requisitions.*, to_store.name as toStore, from_store.name as fromStore')
-                ->where('requisitions.status', 1) // ✅ Only Approved/Issued
-                ->orderBy('requisitions.id', 'DESC');
+                ->where('requisitions.status', 1); // ✅ Only Approved/Issued
+
+            // Filter by current store if not ALL branch
+            $currentStoreId = current_store_id();
+            if ($currentStoreId && $currentStoreId != 1) {
+                $data->where('requisitions.to_store', $currentStoreId);
+            }
+
+            $data = $data->orderBy('requisitions.id', 'DESC');
 
             return DataTables::of($data)
                 ->addColumn('products', function ($row) {
@@ -543,8 +557,15 @@ class RequisitionController extends Controller
         $data = Requisition::with(['reqDetails'])
             ->leftJoin(DB::raw('inv_stores as from_store'), 'requisitions.from_store', '=', 'from_store.id')
             ->leftJoin(DB::raw('inv_stores as to_store'), 'requisitions.to_store', '=', 'to_store.id')
-            ->selectRaw('requisitions.*, to_store.name as toStore, from_store.name as fromStore')
-            ->orderBy('requisitions.id', 'DESC');
+            ->selectRaw('requisitions.*, to_store.name as toStore, from_store.name as fromStore');
+
+        // Filter by current store if not ALL branch
+        $currentStoreId = current_store_id();
+        if ($currentStoreId && $currentStoreId != 1) {
+            $data->where('requisitions.to_store', $currentStoreId);
+        }
+
+        $data = $data->orderBy('requisitions.id', 'DESC');
 
         return DataTables::of($data)
             ->addColumn('action', function ($row) {

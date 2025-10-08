@@ -11,6 +11,11 @@
 
 @section('content')
 
+    @php
+        $current_store = session('current_store_id') ?? auth()->user()->store_id;
+        $is_all_branch = $current_store == 1;
+    @endphp
+
     <div class="col-sm-12">
 
         <div class="card-block">
@@ -18,21 +23,21 @@
                 <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
                     <li class="nav-item">
                         <a class="nav-link active text-uppercase" id="requisition-create" data-toggle="pill"
-                           href="{{ url('purchases/requisitions-create') }}" role="tab"
-                           aria-controls="current-stock" aria-selected="true">New</a>
+                            href="{{ url('purchases/requisitions-create') }}" role="tab"
+                            aria-controls="current-stock" aria-selected="true">New</a>
                     </li>
                     @if(Auth::user()->checkPermission('View Requisition List'))
                     <li class="nav-item">
                         <a class="nav-link text-uppercase" id="requisitions" data-toggle="pill"
-                           href="{{ url('purchases/requisitions') }}" role="tab"
-                           aria-controls="stock_list" aria-selected="false">Requisition List
+                            href="{{ url('purchases/requisitions') }}" role="tab"
+                            aria-controls="stock_list" aria-selected="false">Requisition List
                         </a>
                     </li>
                     @endif
                 </ul>
-               <div class="tab-content" id="myTabContent">
+                <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                        <form action="{{ route('requisitions.store') }}" method="post" enctype="multipart/form-data">
+                        <form action="{{ route('requisitions.store') }}" method="post" enctype="multipart/form-data" id="requisitionForm">
                             @csrf
                             <!-- Store and Products Selection -->
                             <div class="row mb-3">
@@ -152,6 +157,57 @@
             var redirectUrl = $(this).attr('href');
             window.location.href = redirectUrl;
         });
+
+        // Flag to prevent multiple notifications
+        let notificationShown = false;
+
+        // Check if user is in ALL branch
+        if (@json($is_all_branch)) {
+            // Prevent form interactions and show message
+            function showNotification() {
+                if (!notificationShown) {
+                    notificationShown = true;
+                    notify('You cannot create requisitions in branch ALL. Please switch to another branch to proceed.', 'top', 'right', 'warning');
+                    setTimeout(() => notificationShown = false, 1000); // Reset after 1 second
+                }
+            }
+
+            $('#from_store').on('change', function(e) {
+                e.preventDefault();
+                $(this).val('').trigger('change.select2');
+                showNotification();
+            });
+
+            $('#products').on('change', function(e) {
+                e.preventDefault();
+                $(this).val('').trigger('change.select2');
+                showNotification();
+            });
+
+            $('#remark').on('focus input', function(e) {
+                e.preventDefault();
+                $(this).blur();
+                showNotification();
+            });
+
+            $('#evidence').on('change', function(e) {
+                e.preventDefault();
+                $(this).val('');
+                showNotification();
+            });
+
+            $('#submit_btn').prop('disabled', true);
+            $('#submit_btn').on('click', function(e) {
+                e.preventDefault();
+                showNotification();
+            });
+
+            // Prevent form submission
+            $('#requisitionForm').on('submit', function(e) {
+                e.preventDefault();
+                showNotification();
+            });
+        }
     });
 
     // CSRF Token
