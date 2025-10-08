@@ -1,7 +1,7 @@
 @extends("layouts.master")
 
 @section('content-title')
-Invoice Management
+Invoices
 
 @endsection
 

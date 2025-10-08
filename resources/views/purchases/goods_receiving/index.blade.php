@@ -8,7 +8,7 @@
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#">Purchasing / Goods Receiving</a></li>
+    <li class="breadcrumb-item"><a href="#">Purchasing / Goods Receiving / Invoice Receiving</a></li>
 @endsection
 @section("content")
 

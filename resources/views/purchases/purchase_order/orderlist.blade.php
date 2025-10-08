@@ -1,11 +1,11 @@
 @extends("layouts.master")
 @section('content-title')
-    Purchase Order List
+    Purchase Order 
 @endsection
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#">Purchasing / Purchase Order / List</a></li>
+    <li class="breadcrumb-item"><a href="#">Purchasing / Purchase Order / Order List</a></li>
 @endsection
 
 @section("content")
