@@ -53,35 +53,35 @@
                             </div>
                             <div class="row">
                                 <div class="form-group col-md-3">
-                                    <label for="from_store">Requesting From<font color="red">*</font></label>
-                                    @if(!auth()->user()->checkPermission('Manage All Branches'))
-                                        <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
-                                            <option value="">Select Branch...</option>
-                                            @foreach ($stores as $item)
-                                                @if($item->id != Auth::user()->store_id && strtoupper($item->name) !== 'ALL')
-                                                    <option value="{{ $item->id }}" 
-                                                        {{ $item->id == $requisition->from_store_id ? 'selected' : '' }}>
-                                                        {{ $item->name }}
-                                                    </option>
-                                                @endif
-                                            @endforeach
-                                        </select>
-                                    @endif
+                                     <label for="from_store">Requesting From<font color="red">*</font></label>
+                                     @if(!auth()->user()->checkPermission('Manage All Branches'))
+                                         <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
+                                             <option value="">Select Branch...</option>
+                                             @foreach ($stores as $item)
+                                                 @if(strtoupper($item->name) !== 'ALL')
+                                                     <option value="{{ $item->id }}"
+                                                         {{ $item->id == $requisition->from_store ? 'selected' : '' }}>
+                                                         {{ $item->name }}
+                                                     </option>
+                                                 @endif
+                                             @endforeach
+                                         </select>
+                                     @endif
 
-                                    @if(auth()->user()->checkPermission('Manage All Branches'))
-                                        <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
-                                            <option value="">Select Branch...</option>
-                                            @foreach ($stores as $item)
-                                                @if($item->id != Auth::user()->store_id && strtoupper($item->name) !== 'ALL')
-                                                    <option value="{{ $item->id }}" 
-                                                        {{ $item->id == $requisition->from_store_id ? 'selected' : '' }}>
-                                                        {{ $item->name }}
-                                                    </option>
-                                                @endif
-                                            @endforeach
-                                        </select>
-                                    @endif
-                                </div>
+                                     @if(auth()->user()->checkPermission('Manage All Branches'))
+                                         <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
+                                             <option value="">Select Branch...</option>
+                                             @foreach ($stores as $item)
+                                                 @if(strtoupper($item->name) !== 'ALL')
+                                                     <option value="{{ $item->id }}"
+                                                         {{ $item->id == $requisition->from_store ? 'selected' : '' }}>
+                                                         {{ $item->name }}
+                                                     </option>
+                                                 @endif
+                                             @endforeach
+                                         </select>
+                                     @endif
+                                 </div>
                                 <div class="form-group col-md-6">
                                     <label for="products">Select Products <font color="red">*</font></label>
                                     <select name="products" class="js-example-basic-single form-control products"

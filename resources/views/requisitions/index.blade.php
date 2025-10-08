@@ -1,7 +1,7 @@
 @extends("layouts.master")
 
 @section('content-title')
-    Requisitions
+    Stock Requisition
 @endsection
 
 @section('content-sub-title')
@@ -108,7 +108,7 @@
                 var name = item.full_product_name || [
                     item.name, item.brand, item.pack_size, item.sales_uom
                 ].filter(Boolean).join(' ');
-                var qty = (item.quantity !== undefined ? item.quantity : '') + (item.unit ? ' ' + item.unit : '');
+                var qty = (item.quantity !== undefined ? Number(item.quantity).toLocaleString() : '') + (item.unit ? ' ' + item.unit : '');
                 orderTable.row.add([name, qty]);
             });
 
@@ -226,10 +226,10 @@
                                 (row.pack_size || '') + ' ' + (row.sales_uom || ''));
                         }
                     },
-                    { 
+                    {
                         title: "Quantity",
                         render: function(data, type, row) {
-                            return row.quantity + (row.unit ? ' ' + row.unit : '');
+                            return Number(row.quantity).toLocaleString() + (row.unit ? ' ' + row.unit : '');
                         }
                     }
                 ]

@@ -109,7 +109,7 @@
             Requisition
         </h2>
         <br>
-        <h4 align="center" style="margin-top: -1%">{{ date('j M, Y', strtotime($requisition->created_at)) }}</h4>
+        <h4 align="center" style="margin-top: -1%">{{ date('Y-m-d', strtotime($requisition->created_at)) }}</h4>
     </div>
 
     <!-- Requisition Info -->
@@ -126,7 +126,7 @@
             <thead>
                 <tr>
                     <th style="width: 5%">#</th>
-                    <th style="width: 70%">Product</th>
+                    <th style="width: 70%">Product Name</th>
                     <th style="width: 25%">Quantity</th>
                 </tr>
             </thead>

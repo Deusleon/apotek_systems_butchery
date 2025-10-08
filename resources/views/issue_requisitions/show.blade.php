@@ -1,12 +1,12 @@
 @extends("layouts.master")
 
 @section('content-title')
-    Issue Requisition
+    Stock Issue
 @endsection
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#">Purchasing / Requisitions / Requisition Details</a></li>
+    <li class="breadcrumb-item"><a href="#">Inventory / Stock Issue / Issue Details</a></li>
 @endsection
 
 @section('content')
@@ -97,11 +97,11 @@
                                                 <td class="text-center border-0">{{ number_format($item->qty_oh) }}</td>
                                                 <td class="text-center border-0">
                                                     <input class="form-control text-center" style="display: none" type="text" name="qty_req[]"
-                                                        value="{{ $item->quantity }}">{{ $item->quantity }}
+                                                        value="{{ $item->quantity }}">{{ number_format($item->quantity) }}
                                                 </td>
                                                 <td class="text-center border-0 qty-issued-cell" data-index="{{ $index }}">
                                                     <!-- Display as text initially -->
-                                                    <span class="qty-text">{{ $item->quantity_given ?? $item->quantity }}</span>
+                                                    <span class="qty-text">{{ number_format($item->quantity_given ?? $item->quantity) }}</span>
                                                     <!-- Input field (hidden initially) -->
                                                     <input class="form-control text-center qty-input" type="text" name="qty[]"
                                                         value="{{ $item->quantity_given ?? $item->quantity }}"
