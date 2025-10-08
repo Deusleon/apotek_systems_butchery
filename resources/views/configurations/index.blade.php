@@ -15,7 +15,7 @@
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#"> General / Configurations</a></li>
+    <li class="breadcrumb-item"><a href="#">Settings / General / Configurations</a></li>
 @endsection
 
 @section("content")

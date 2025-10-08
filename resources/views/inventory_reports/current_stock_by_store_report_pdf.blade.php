@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Current Stock Report</title>
+    <title>Current Stock Summary Report</title>
 
     <style>
         body {
@@ -101,7 +101,7 @@
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}</h3>
-        <h2 align="center" style="margin-top: -1%">Current Stock Report</h2>
+        <h2 align="center" style="margin-top: -1%">Current Stock Summary Report</h2>
         <h3 align="center" style="margin-top: -1%">Branch: {{$store}}</h3>
 
         <div class="row" style="margin-top: 8%;">
