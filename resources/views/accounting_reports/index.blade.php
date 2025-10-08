@@ -114,10 +114,10 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="store">Store<font color="red">*</font></label>
+                                    <label for="store">Branch<font color="red">*</font></label>
                                     <select id="store" name="store_id" onchange=""
                                             class="js-example-basic-single form-control drop" required>
-                                        <option value="" selected="true" disabled="disabled">Select Store...</option>
+                                        <option value="" selected="true" disabled="disabled">Select Branch...</option>
                                         @foreach($stores as $store)
                                             <option value="{{$store->id}}">{{$store->name}}</option>
                                         @endforeach
