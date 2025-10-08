@@ -43,13 +43,12 @@
 @endsection
 
 @section('content-title')
-    Preview Import Data
+    Products Import
 @endsection
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="{{ route('import-data') }}">Import</a></li>
-    <li class="breadcrumb-item"><a href="#">Preview</a></li>
+    <li class="breadcrumb-item"><a href="{{ route('import-data') }}">Inventory / Products Import / Preview Products Import</a></li>
 @endsection
 
 @section("content")

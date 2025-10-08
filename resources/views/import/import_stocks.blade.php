@@ -71,7 +71,7 @@
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#">Products Import</a></li>
+    <li class="breadcrumb-item"><a href="#">Inventory / Products Import / Stocks Import</a></li>
 @endsection
 
 @section("content")
@@ -119,14 +119,30 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="store_id">Branch <span class="text-danger">*</span></label>
-                                <select class="form-control" id="store_id" name="store_id" required>
+                                {{-- <select class="form-control" id="store_id" name="store_id" required>
                                     <option value="">Select Branch</option>
                                     @foreach($stores as $store)
                                         <option value="{{ $store->id }}" {{ old('store_id') == $store->id ? 'selected' : '' }}>
                                             {{ $store->name }}
                                         </option>
                                     @endforeach
-                                </select>
+                                </select> --}}
+                                        @if (current_store()->id === 1)
+                                            <select id="store_id" name="store_id"
+                                                class="js-example-basic-single form-control drop">
+                                                <option selected="true" value="0" disabled="disabled">Select branch
+                                                </option>
+                                                @foreach($stores as $store)
+                                                    <option value="{{$store->id}}">{{$store->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        @else
+                                            <select id="store_id" name="store_id"
+                                                class="js-example-basic-single form-control drop">
+                                                <option value="{{ current_store()->id }}">{{ current_store()->name }}
+                                                </option>
+                                            </select>
+                                        @endif
                             </div>
                         </div>
                         <div class="col-md-6">

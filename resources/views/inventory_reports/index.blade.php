@@ -75,9 +75,9 @@
                                             @if(auth()->user()->checkPermission('Current Stock Report'))
                                                 <option value="1">Current Stock Summary Report</option>
                                             @endif
-                                            {{-- @if(auth()->user()->checkPermission('Current Stock Report'))
+                                            @if(auth()->user()->checkPermission('Current Stock Report'))
                                                 <option value="12">Current Stock Detailed Report</option>
-                                            @endif --}}
+                                            @endif
                                             @if(auth()->user()->checkPermission('Product Details Report'))
                                                 <option value="2">Product Details Report</option>
                                             @endif
