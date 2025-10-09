@@ -185,6 +185,10 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::delete('inventory/price-list/{price_list}', [PriceListController::class, 'destroy'])->name('price-list.destroy');
     Route::get('inventory/price-list/all', [PriceListController::class, 'allPriceList'])->name('all-price-list');
 
+    //purchase return routes
+    Route::get('purchases/purchase-returns', 'PurchaseReturnController@index')
+    ->name('purchase-return.returns');
+    Route::get('purchases/purchase-returns/approvals', 'PurchaseReturnController@approvals');
     //Purchase Order routes
     Route::resource('purchases/purchase-order', 'OrderController')->only([
         'index', 'store', 'update', 'destroy'
