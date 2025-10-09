@@ -293,9 +293,6 @@
                 $('.alert').fadeOut('slow');
             }, 3000); // Adjust the time (3000 ms) as needed
 
-
-
-
         });
 
     </script>

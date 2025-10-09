@@ -181,6 +181,8 @@ class CreatePermissionsTable extends Migration
             ['name' => 'Products Expire Date Report', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'REPORTS'],
             ['name' => 'Out Of Stock Report', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'REPORTS'],
             ['name' => 'Outgoing Tracking Report', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'REPORTS'],
+            ['name' => 'Fast Moving Report', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'REPORTS'],
+            ['name' => 'Dead Stock Report', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'REPORTS'],
             ['name' => 'Stock Adjustment Report', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'REPORTS'],
             ['name' => 'Stock Issue Report', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'REPORTS'],
             ['name' => 'Stock Transfer Report', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'REPORTS'],

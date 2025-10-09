@@ -14,6 +14,7 @@ use App\StockTracking;
 use App\StockTransfer;
 use App\StockCountSchedule;
 use App\Store;
+use App\SalesDetail;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -201,6 +202,34 @@ class InventoryReportController extends Controller
                 compact( 'data',  'pharmacy' ) )
                 ->setPaper( 'a4', '' );
                 return $pdf->stream( 'outgoing_stocktracking_summary_report.pdf' );
+            case 15:
+                //outgoing tracking summary report
+                $request_store = $request->store_name ?? current_store_id();    
+                $store_name = Store::where('id', $request_store)
+                            ->first();
+                $store = $store_name->name ?? current_store()->name;
+                $data = $this->fastMovingReport();
+                if ($data->isEmpty()) {
+                    return response()->view('error_pages.pdf_zero_data');
+                }
+                $pdf = PDF::loadView( 'inventory_reports.fast_moving_report_pdf',
+                compact( 'data', 'store', 'pharmacy' ) )
+                ->setPaper( 'a4', '' );
+                return $pdf->stream( 'fast_moving_report.pdf' );
+            case 16:
+                //outgoing tracking summary report
+                $request_store = $request->store_name ?? current_store_id();    
+                $store_name = Store::where('id', $request_store)
+                            ->first();
+                $store = $store_name->name ?? current_store()->name;
+                $data = $this->deadStockReport();
+                if ($data->isEmpty()) {
+                    return response()->view('error_pages.pdf_zero_data');
+                }
+                $pdf = PDF::loadView( 'inventory_reports.dead_stock_report_pdf',
+                compact( 'data', 'store', 'pharmacy' ) )
+                ->setPaper( 'a4', '' );
+                return $pdf->stream( 'dead_stock_report.pdf' );
             case 7:
                 //stock adjustment report
                 $dates = explode(" - ", $request->adjustment_date);
@@ -689,8 +718,7 @@ class InventoryReportController extends Controller
         })->values();
 
         return $merged;
-    }
-        
+    }  
     private function outgoingTrackingSummaryReport() 
     {
         if (!Auth()->user()->checkPermission('Outgoing Tracking Report')) {
@@ -722,7 +750,140 @@ class InventoryReportController extends Controller
 
         return $merged;
     }
+    private function fastMovingReport()
+    {
+        if (!Auth()->user()->checkPermission('Fast Moving Report')) {
+            abort(403, 'Access Denied');
+        }
 
+        $store_id = current_store_id();
+
+        // Automatically get range: from 3 months ago to today
+        $start_date = now()->subMonths(3)->startOfDay();
+        $end_date = now()->endOfDay();
+
+        $query = SalesDetail::join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
+            ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+            ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
+            ->select(
+                'inv_products.id as product_id',
+                'inv_products.name as product_name',
+                'inv_products.brand',
+                'inv_products.pack_size',
+                'inv_products.sales_uom',
+                DB::raw('SUM(sales_details.quantity) as total_sold')
+            )
+            ->whereBetween('sales.date', [$start_date, $end_date])
+            ->groupBy('inv_products.id')
+            ->orderByDesc('total_sold');
+
+        if (!is_all_store()) {
+            $query->where('inv_current_stock.store_id', $store_id);
+        }
+
+        $fast_moving = $query->get();
+
+        // Optional: add rank numbering
+        $ranked = $fast_moving->map(function ($item, $index) {
+            return [
+                'rank'        => $index + 1,
+                'product_id'  => $item->product_id,
+                'name'        => $item->product_name,
+                'brand'       => $item->brand,
+                'pack_size'   => $item->pack_size,
+                'sales_uom'   => $item->sales_uom,
+                'quantity'  => (float) $item->total_sold,
+            ];
+        });
+
+        return $ranked;
+    }
+    // private function deadStockReport()
+    // {
+    //     if (!Auth()->user()->checkPermission('Dead Stock Report')) {
+    //         abort(403, 'Access Denied');
+    //     }
+
+    //     $store_id = current_store_id();
+
+    //     // Date range: 3 months ago up to today
+    //     $three_months_ago = now()->subMonths(3)->startOfDay();
+
+    //     // Build query
+    //     $query = DB::table('inv_current_stock as cs')
+    //         ->join('inv_products as p', 'p.id', '=', 'cs.product_id')
+    //         ->leftJoin('sales_details as sd', 'sd.stock_id', '=', 'cs.id')
+    //         ->leftJoin('sales as s', function ($join) use ($three_months_ago) {
+    //             $join->on('s.id', '=', 'sd.sale_id')
+    //                 ->where('s.date', '>=', $three_months_ago);
+    //         })
+    //         ->select(
+    //             'p.id as product_id',
+    //             'p.name',
+    //             'p.brand',
+    //             'p.pack_size',
+    //             'p.sales_uom',
+    //             'cs.store_id',
+    //             DB::raw('SUM(cs.quantity) as quantity')
+    //         )
+    //         ->whereNull('sd.stock_id') 
+    //         ->where('cs.quantity', '>', 0)
+    //         ->groupBy(['p.id'])
+    //         ->orderBy('p.name', 'asc');
+
+    //     if (!is_all_store()) {
+    //         $query->where('cs.store_id', $store_id);
+    //     }
+
+    //     $dead_stock = $query->get();
+
+    //     return $dead_stock;
+    // }
+    private function deadStockReport()
+    {
+        if (!Auth()->user()->checkPermission('Dead Stock Report')) {
+            abort(403, 'Access Denied');
+        }
+
+        $store_id = current_store_id();
+
+        // Date range: 3 years ago up to today
+        $three_years_ago = now()->subMonth(3)->startOfDay();
+
+        // Build query
+        $query = DB::table('inv_current_stock as cs')
+            ->join('inv_products as p', 'p.id', '=', 'cs.product_id')
+            ->leftJoin('sales_details as sd', function($join) use ($three_years_ago) {
+                $join->on('sd.stock_id', '=', 'cs.id')
+                    ->whereExists(function($query) use ($three_years_ago) {
+                        $query->select(DB::raw(1))
+                            ->from('sales as s')
+                            ->whereColumn('s.id', 'sd.sale_id')
+                            ->where('s.date', '>=', $three_years_ago);
+                    });
+            })
+            ->select(
+                'p.id as product_id',
+                'p.name',
+                'p.brand',
+                'p.pack_size',
+                'p.sales_uom',
+                'cs.store_id',
+                DB::raw('SUM(cs.quantity) as quantity')
+            )
+            ->whereNull('sd.stock_id')
+            ->where('cs.quantity', '>', 0)
+            ->groupBy(['p.id', 'p.name', 'p.brand', 'p.pack_size', 'p.sales_uom', 'cs.store_id'])
+            ->orderBy('p.name', 'asc');
+
+        if (!is_all_store()) {
+            $query->where('cs.store_id', $store_id);
+        }
+
+        $dead_stock = $query->get();
+
+        return $dead_stock;
+    }
     private function stockAdjustmentReport($dates, $type, $reason)
     {  
         if (!Auth()->user()->checkPermission('Stock Adjustment Report')) {

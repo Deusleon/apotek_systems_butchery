@@ -105,10 +105,10 @@
 
                         <div class="form-group row">
                             <label for="store" class="col-md-4 col-form-label text-md-right">
-                                {{ __('User Store') }} <font color="red">*</font>
+                                {{ __('User Branch') }} <font color="red">*</font>
                             </label>
                             <div class="col-md-8">
-                                <select class="form-control select2" id="store" name="store_id" data-placeholder="Select Store" required data-width="100%">
+                                <select class="form-control select2" id="store" name="store_id" data-placeholder="Select Branch" required data-width="100%">
                                     <option value="">Select Branch</option>
                                     @foreach($stores as $store)
                                         <option value="{{ $store->id }}" {{ old('store_id') == $store->id ? 'selected' : '' }}>

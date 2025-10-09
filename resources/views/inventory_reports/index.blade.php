@@ -98,10 +98,16 @@
                                                 <option value="5">Out Of Stock Report</option>
                                             @endif
                                             @if(auth()->user()->checkPermission('Outgoing Tracking Report'))
-                                                <option value="14">Outgoing Tracking Summary Report</option>
+                                                <option value="14">Outgoing Stock Summary Report</option>
                                             @endif
                                             @if(auth()->user()->checkPermission('Outgoing Tracking Report'))
-                                                <option value="6">Outgoing Tracking Detailed Report</option>
+                                                <option value="6">Outgoing Stock Detailed Report</option>
+                                            @endif
+                                            @if(auth()->user()->checkPermission('Fast Moving Report'))
+                                                <option value="15">Fast Moving Products Report</option>
+                                            @endif
+                                            @if(auth()->user()->checkPermission('Dead Stock Report'))
+                                                <option value="16">Dead Stock Report</option>
                                             @endif
                                             @if(auth()->user()->checkPermission('Stock Adjustment Report'))
                                                 <option value="7">Stock Adjustment Report</option>
@@ -155,7 +161,7 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="store">Branch<font color="red">*</font></label>
-                                        <select id="store-name" name="store_name" onchange=""
+                                        <select id="store_name" name="store_name" onchange=""
                                             class="js-example-basic-single form-control drop">
                                             <option value="0" selected="true" disabled="disabled">Select Branch</option>
                                             @foreach($stores as $store)
@@ -487,15 +493,14 @@
         $('#inventory_report_form').on('submit', function () {
             var report_option = document.getElementById("report_option");
             var report_option_index = report_option.options[report_option.selectedIndex].value;
-            console.log(report_option_index);
 
             /*product ledger*/
             var product_option = document.getElementById("product");
             var product_option_index = product_option.options[product_option.selectedIndex].value;
 
-            /*current stock*/
+            /*current stock*/            
             var store_option = document.getElementById("store-name");
-            var store_option_index = store_option.options[store_option.selectedIndex].value;
+            var store_option_index = store_option ? Number(store_option.value || 0) : 0;
 
             /*product detail*/
             var category_option = document.getElementById("category-name-detail");
@@ -521,11 +526,10 @@
             document.getElementById('border').style.borderColor = 'white';
 
             /*if product ledger*/
-            console.log(report_option_index, product_option_index);
             if (Number(report_option_index) === Number(3) && Number(product_option_index) !== Number(0)) {
                 document.getElementById('warning').style.display = 'none';
                 //make request
-                return false;
+                return true;
             } else if (Number(report_option_index) === Number(3) && Number(product_option_index) === Number(0)) {
                 document.getElementById('warning').style.display = 'block';
                 return false;
