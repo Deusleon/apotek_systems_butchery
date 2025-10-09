@@ -1,11 +1,11 @@
 @extends("layouts.master")
 @section('content-title')
-    Goods Receiving
+    Purchase Returns
 @endsection
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#">Purchasing / Goods Receiving / Material Received</a></li>
+    <li class="breadcrumb-item"><a href="#">Purchasing / Purchase Returns / Returns</a></li>
 @endsection
 
 @section("content")
@@ -67,20 +67,16 @@
     </style>
 
     <div class="col-sm-12">
-        <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
+        <ul class="nav nav-pills mb-3" id="myTab">
             @if (auth()->user()->checkPermission('View Purchase Return'))
                 <li class="nav-item">
-                    <a class="nav-link active text-uppercase" id="returns" data-toggle="pill"
-                        href="{{ url('purchases/purchase-returns/returns') }}" role="tab" aria-controls="new_quotes"
-                        aria-selected="false">Returns
+                    <a class="nav-link active text-uppercase" href="{{ url('purchases/purchase-returns') }}">Returns
                     </a>
                 </li>
             @endif
             @if (auth()->user()->checkPermission('View Purchase Returns Approval'))
                 <li class="nav-item">
-                    <a class="nav-link text-uppercase" id="approvals" data-toggle="pill"
-                        href="{{ url('purchases/purchase_returns/approvals') }}" role="tab" aria-controls="new_quotes"
-                        aria-selected="false">Approvals
+                    <a class="nav-link text-uppercase" href="{{ url('purchases/purchase_returns/approvals') }}">Approvals
                     </a>
                 </li>
             @endif
@@ -150,6 +146,8 @@
 
     @include('purchases.material_received.edit')
     @include('purchases.material_received.delete')
+    @include('purchases.purchase_returns.return')
+    @include('purchases.purchase_returns.returns')
 
 @endsection
 @push("page_scripts")
@@ -325,8 +323,12 @@
                         { data: 'user.name' },
                        {
                             data: 'action',
-                            defaultContent: 
+                            defaultContent:
                                 `<div>
+                                    @if(auth()->user()->checkPermission('View Purchase Return'))
+                                        <input type='button' value='Return' id='return_btn' class='btn btn-warning btn-rounded btn-sm'/>
+                                    @endif
+
                                     @if(auth()->user()->checkPermission('Edit Material Received'))
                                         <input type='button' value='Edit' id='edit_btn' class='btn btn-info btn-rounded btn-sm'/>
                                     @endif
@@ -397,6 +399,33 @@
             $('#delete').modal('show');
         });
 
+        $('#received_material_table tbody').on('click', '#return_btn', function () {
+            var row_data = $('#received_material_table').DataTable().row($(this).parents('tr')).data();
+            $("#purchase-return").modal("show");
+            $("#purchase-return").find(".modal-body #product_name").val(
+                (row_data.product.name || '') + ' ' +
+                (row_data.product.brand || '') + ' ' +
+                (row_data.product.pack_size || '') +
+                (row_data.product.sales_uom || '')
+            );
+            $("#purchase-return").find(".modal-body #goods_receiving_id").val(row_data.id);
+            $("#purchase-return").find(".modal-body #original_qty").val(row_data.quantity);
+            document.getElementById("save_btn").style.display = "block";
+            $("#purchase-return").on("change", "#rtn_qty_to_show", function () {
+                var quantity = document.getElementById("rtn_qty").value;
+                if (Number(quantity) > Number(row_data.quantity) || Number(quantity) < 0) {
+                    document.getElementById("save_btn").disabled = "true";
+                    document.getElementById("qty_error").style.display = "block";
+                    $("#purchase-return")
+                        .find(".modal-body #qty_error")
+                        .text("Maximum quantity is " + Math.floor(row_data.quantity));
+                } else {
+                    document.getElementById("qty_error").style.display = "none";
+                    $("#save_btn").prop("disabled", false);
+                }
+            });
+        });
+
         $('#price_edit').on('change', function () {
             var price = document.getElementById('price_edit').value;
             document.getElementById('price_edit').value = formatMoney(price);
@@ -408,6 +437,18 @@
                 document.getElementById('quantity_edit').value = '';
             } else {
                 document.getElementById('quantity_edit').value = numberWithCommas(quantity);
+            }
+        });
+
+        $('#rtn_qty_to_show').on('keyup', function () {
+            var newValue = document.getElementById('rtn_qty_to_show').value;
+            if (newValue !== '') {
+                document.getElementById('rtn_qty_to_show').value =
+                    numberWithCommas(parseFloat(newValue.replace(/\,/g, ''), 10));
+                document.getElementById('rtn_qty').value = parseFloat(newValue.replace(/\,/g, ''), 10);
+            } else {
+                document.getElementById('rtn_qty_to_show').value = '';
+                document.getElementById('rtn_qty').value = '';
             }
         });
 

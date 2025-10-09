@@ -23,6 +23,20 @@ Invoices
 </style>
 
 <div class="col-sm-12">
+    <ul class="nav nav-pills mb-3" id="myTab">
+            @if (auth()->user()->checkPermission('View Purchase Return'))
+                <li class="nav-item">
+                    <a class="nav-link active text-uppercase" href="{{ url('accounting/invoices') }}">Invoices
+                    </a>
+                </li>
+            @endif
+            @if (auth()->user()->checkPermission('View Purchase Returns Approval'))
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" href="{{ url('accounting/invoices/payments') }}">Payments
+                    </a>
+                </li>
+            @endif
+    </ul>
     <div class="card">
         <div class="card-body">
 

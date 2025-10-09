@@ -151,6 +151,7 @@ class CreatePermissionsTable extends Migration
             ['name' => 'View Goods Receiving', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'PURCHASING'],
             ['name' => 'View Purchase Return', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'PURCHASING'],
             ['name' => 'View Purchase Returns Approval', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'PURCHASING'],
+            ['name' => 'Approve Purchase Returns', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'PURCHASING'],
             ['name' => 'View Purchase Order', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'PURCHASING'],
             ['name' => 'Show Purchase Order', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'PURCHASING'],
             ['name' => 'Print Purchase Order', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'PURCHASING'],
