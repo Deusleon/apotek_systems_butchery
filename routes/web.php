@@ -185,6 +185,12 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::delete('inventory/price-list/{price_list}', [PriceListController::class, 'destroy'])->name('price-list.destroy');
     Route::get('inventory/price-list/all', [PriceListController::class, 'allPriceList'])->name('all-price-list');
 
+    //purchase return routes
+        Route::get('purchases/purchase-returns', 'PurchaseReturnController@index')
+        ->name('purchase-return.returns');
+        Route::get('purchases/purchase_returns/approvals', 'PurchaseReturnController@approvals')->name('purchase-returns.approvals');
+        Route::post('purchase-returns', 'PurchaseReturnController@store')->name('purchase-returns.store');
+        Route::get('get-purchase-returns', 'PurchaseReturnController@getPurchaseReturns')->name('getPurchaseReturns');
     //Purchase Order routes
     Route::resource('purchases/purchase-order', 'OrderController')->only([
         'index', 'store', 'update', 'destroy'
@@ -208,6 +214,7 @@ Route::middleware(["auth","main_branch"])->group(function () {
     ]);
 
     Route::get('accounting/invoices','InvoiceController@index')->name('invoice-management.index');
+    Route::get('accounting/invoices/payments','InvoiceController@payments')->name('invoice-management.payments');
 
     Route::get('purchases/invoice-received', 'InvoiceController@getInvoice')->name('getInvoice');
     Route::get('purchases/invoice-received/filter-by-due-date', 'InvoiceController@getInvoiceByDueDate')->name('get-invoice-by-due-date');

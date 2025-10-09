@@ -36,6 +36,9 @@
             @if(auth()->user()->checkPermission('View Goods Receiving'))
                 <li class=""><a href="{{route('goods-receiving.index')}}" class="">Goods Receiving</a></li>
             @endif
+            @if(auth()->user()->checkPermission('View Purchase Return'))
+            <li class=""><a href="{{route('purchase-return.returns')}}" class="">Purchase Returns</a></li>
+            @endif
             @if(auth()->user()->checkPermission('View Purchase Order'))
                 <li class=""><a href="{{route('purchase-order.index')}}" class="">Purchase Order</a></li>
             @endif

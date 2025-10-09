@@ -23,6 +23,18 @@ class InvoiceController extends Controller
             compact('invoices', 'suppliers'));
     }
 
+    public function payments()
+    {
+        $invoices = Invoice::where('remain_balance', '>', 0)
+            ->orderBy('invoice_date', 'DESC')
+            ->get();
+
+        $suppliers = Supplier::orderBy('name', 'ASC')->get();
+
+        return View::make('purchases.invoice_management.payments',
+            compact('invoices', 'suppliers'));
+    }
+
     public function store(Request $request)
     {
         date_default_timezone_set('Africa/Nairobi');
