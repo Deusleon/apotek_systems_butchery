@@ -70,7 +70,6 @@ class InventoryReportController extends Controller
 
         switch ($request->report_option) {
             case 1:
-                
                 $request_store = $request->store_name ?? current_store_id();    
                 $store_name = Store::where('id', $request_store)
                             ->first();
@@ -105,19 +104,19 @@ class InventoryReportController extends Controller
                 $store = $store_name->name ?? current_store()->name;
                 //current stock
                 if ($request->category_name == null) {
-                    $data = $this->currentStockByStoreReport($request_store);
+                    $data = $this->currentStockByStoreDeailedReport($request_store, 0);
                     if ($data == []) {
                         return response()->view('error_pages.pdf_zero_data');
                     }
-                    $pdf = PDF::loadView( 'inventory_reports.current_stock_by_store_report_pdf',
+                    $pdf = PDF::loadView( 'inventory_reports.current_stock_by_store_detailed_report_pdf',
                     compact( 'data', 'store', 'pharmacy' ) )
                     ->setPaper( 'a4', '' );
-                    return $pdf->stream( 'current_stock_by_store_report.pdf' );
+                    return $pdf->stream( 'current_stock_by_store_detailed_report.pdf' );
                 } else {
                     $category_name = Category::where('id', $request->category_name)
                                 ->first();
                     $category = $category_name->name;
-                    $data = $this->currentStockReport($request_store, $request->category_name);
+                    $data = $this->currentStockByStoreDeailedReport($request_store, $request->category_name);
                     if ($data == []) {
                         return response()->view('error_pages.pdf_zero_data');
                     }
@@ -161,7 +160,17 @@ class InventoryReportController extends Controller
                 $pdf = PDF::loadView( 'inventory_reports.expiry_product_report_pdf',
                 compact( 'data',  'pharmacy' ) )
                 ->setPaper( 'a4', '' );
-                return $pdf->stream( 'expiry_product.pdf' );
+                return $pdf->stream( 'expiry_product_report.pdf' );
+            case 13:
+                //products expire date
+                $data = $this->productsExpireDateReport();
+                if ($data->isEmpty()) {
+                    return response()->view('error_pages.pdf_zero_data');
+                }
+                $pdf = PDF::loadView( 'inventory_reports.product_expire_date_report_pdf',
+                compact( 'data',  'pharmacy' ) )
+                ->setPaper( 'a4', '' );
+                return $pdf->stream( 'products_expire_date_report.pdf' );
             case 5:
                 //out of stock
                 $data = $this->outOfStockReport();
@@ -182,6 +191,16 @@ class InventoryReportController extends Controller
                 compact( 'data',  'pharmacy' ) )
                 ->setPaper( 'a4', '' );
                 return $pdf->stream( 'outgoing_stocktracking_report.pdf' );
+            case 14:
+                //outgoing tracking summary report
+                $data = $this->outgoingTrackingSummaryReport();
+                if ($data->isEmpty()) {
+                    return response()->view('error_pages.pdf_zero_data');
+                }
+                $pdf = PDF::loadView( 'inventory_reports.outgoing_stocktracking_summary_report_pdf',
+                compact( 'data',  'pharmacy' ) )
+                ->setPaper( 'a4', '' );
+                return $pdf->stream( 'outgoing_stocktracking_summary_report.pdf' );
             case 7:
                 //stock adjustment report
                 $dates = explode(" - ", $request->adjustment_date);
@@ -332,6 +351,76 @@ class InventoryReportController extends Controller
         return $results_data;
     }
     
+    private function currentStockByStoreDeailedReport($store, $category)
+    {
+        if (!Auth()->user()->checkPermission('Current Stock Report')) {
+            abort(403, 'Access Denied');
+        }
+
+        $query = CurrentStock::with(['product', 'store'])
+            ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+            ->join('inv_categories', 'inv_categories.id', '=', 'inv_products.category_id')
+            ->select(
+                'inv_current_stock.product_id',
+                'inv_current_stock.store_id',
+                'inv_products.name',
+                'inv_products.brand',
+                'inv_products.pack_size',
+                'inv_products.sales_uom',
+                'inv_categories.name as category',
+                'inv_current_stock.batch_number',
+                'inv_current_stock.expiry_date',
+                'inv_current_stock.shelf_number',
+                DB::raw('SUM(inv_current_stock.quantity) as total_quantity')
+            );
+
+        // Filter by store
+        if (!($store == 1 || $store === '1')) {
+            $query->where('inv_current_stock.store_id', $store);
+        }
+
+        // Filter by category
+        if (!($category == 0 || $category === '0')) {
+            $query->where('inv_categories.id', $category);
+        }
+
+        // Group by product, batch, expiry & shelf (to get real detailed view)
+        $current_stocks = $query->groupBy([
+                'inv_current_stock.product_id',
+                'inv_current_stock.batch_number',
+                'inv_current_stock.expiry_date',
+                'inv_current_stock.shelf_number',
+                'inv_current_stock.store_id',
+                'inv_products.name',
+                'inv_products.brand',
+                'inv_products.pack_size',
+                'inv_products.sales_uom',
+                'inv_categories.name'
+            ])
+            ->orderBy('inv_products.name', 'asc')
+            ->get();
+
+        $results_data = [];
+
+        foreach ($current_stocks as $current_stock) {
+            $results_data[] = [
+                'product_id'   => $current_stock->product_id,
+                'store'        => $current_stock->store->name ?? '',
+                'name'         => $current_stock->name ?? '',
+                'brand'        => $current_stock->brand ?? '',
+                'pack_size'    => $current_stock->pack_size ?? '',
+                'sales_uom'    => $current_stock->sales_uom ?? '',
+                'category'     => $current_stock->category ?? '',
+                'expiry_date'  => $current_stock->expiry_date,
+                'quantity'     => $current_stock->total_quantity,
+                'batch_number' => $current_stock->batch_number,
+                'shelf_no'     => $current_stock->shelf_number
+            ];
+        }
+
+        return $results_data;
+    }
+
     private function currentStockReport($store, $category)
     {
         if (!Auth()->user()->checkPermission('Current Stock Report')) {
@@ -432,7 +521,7 @@ class InventoryReportController extends Controller
         $store_id = current_store_id();
         $query = DB::table('stock_details')
             ->select('product_id')
-            ->groupby('product_id');
+            ->groupby(['product_id']);
 
         if (!is_all_store()) {
             $query->where('store_id', $store_id);
@@ -519,7 +608,7 @@ class InventoryReportController extends Controller
             abort(403, 'Access Denied');
         }
         $store_id = current_store_id();
-        $query = CurrentStock::where(DB::raw('date(expiry_date)'), '<', date('Y-m-d'))
+        $query = CurrentStock::where(DB::raw('date(expiry_date)'), '<=', date('Y-m-d'))
             ->orderby('expiry_date', 'DESC');
 
         if (!is_all_store()) {
@@ -529,6 +618,23 @@ class InventoryReportController extends Controller
         $expired_products = $query->get();
         
         return $expired_products;
+    }
+    private function productsExpireDateReport()
+    {
+        if (!Auth()->user()->checkPermission('Products Expire Date Report')) {
+            abort(403, 'Access Denied');
+        }
+        $store_id = current_store_id();
+        $query = CurrentStock::where(DB::raw('date(expiry_date)'), '>', date('Y-m-d'))
+            ->orderby('expiry_date', 'DESC');
+
+        if (!is_all_store()) {
+            $query->where('store_id', $store_id);
+        }
+        
+        $expire_date = $query->get();
+        
+        return $expire_date;
     }
     private function outOfStockReport()
     {
@@ -584,6 +690,39 @@ class InventoryReportController extends Controller
 
         return $merged;
     }
+        
+    private function outgoingTrackingSummaryReport() 
+    {
+        if (!Auth()->user()->checkPermission('Outgoing Tracking Report')) {
+            abort(403, 'Access Denied');
+        }
+        $store_id = current_store_id();
+        $query = StockTracking::where('movement', 'OUT')
+            ->with(['currentStock.product', 'user']);
+
+        if (!is_all_store()) {
+            $query->where('store_id', $store_id);
+        }
+
+        $outgoing = $query->get();
+
+        // group product_id
+        $grouped = $outgoing->groupBy(function ($item) {
+            return $item->currentStock->product->id;
+        });
+
+        // convert grouped data into flat array with summed quantities
+        $merged = $grouped->map(function ($rows) {
+            $first = $rows->first();
+            return (object) [
+                'product' => $first->currentStock->product,
+                'quantity' => $rows->sum('quantity'),
+            ];
+        })->values();
+
+        return $merged;
+    }
+
     private function stockAdjustmentReport($dates, $type, $reason)
     {  
         if (!Auth()->user()->checkPermission('Stock Adjustment Report')) {

@@ -3,7 +3,6 @@
 @section('page_css')
     <style>
 
-
     </style>
 @endsection
 
@@ -82,7 +81,7 @@
                         <input type="text" name="outgoing-date" id="outgoing-date" class="form-control w-auto">
                     </div>
                     <div class="d-flex justify-content-end mb-3">
-                        <div class="d-flex align-items-center" style="width: 247px;">
+                        <div class="d-flex align-items-center" style="width: 256px;">
                             <label for="price_category" class="form-label mb-0"
                                 style="white-space: nowrap; margin-right: 10px;">Type:</label>
                             <select name="category" class="js-example-basic-single form-control" id="category_id">
@@ -103,7 +102,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-
+                                
                             </tbody>
                         </table>
 
@@ -161,15 +160,11 @@
 
 @endsection
 
-
-
-
     @push("page_scripts")
         <script src="{{asset("assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js")}}"></script>
         <script src="{{asset("assets/js/pages/ac-datepicker.js")}}"></script>
 
         @include('partials.notification')
-
 
         <script type="text/javascript">
             var config = {
@@ -188,7 +183,7 @@
                 $('#daily-stock-tablist').on('click', function (e) {
                     e.preventDefault(); // Prevent default tab switching behavior
                     var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
-                    window.location.href = redirectUrl; // Redirect to the URL
+                    window.location.href = redirectUrl;
                 });
 
             });
@@ -212,6 +207,4 @@
                 });
             });
         </script>
-
-
     @endpush

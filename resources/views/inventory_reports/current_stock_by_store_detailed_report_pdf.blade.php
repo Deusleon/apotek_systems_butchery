@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Outgoing Stock Detailed Report</title>
+    <title>Current Stock Detailed Report</title>
 
     <style>
         body {
@@ -13,12 +13,17 @@
             font-family: Verdana, Arial, sans-serif;
         }
 
+
         table,
         th,
         td {
             /*border: 1px solid black;*/
             border-collapse: collapse;
             padding: 10px;
+        }
+
+        th {
+            text-align: left;
         }
 
         table {
@@ -31,7 +36,10 @@
         }
 
         thead {
-            display: table-header-group
+            display: table-header-group;
+            background: #1f273b;
+            color: white;
+            font-size: 12px;
         }
 
         tfoot {
@@ -39,12 +47,12 @@
         }
 
         #table-detail {
-            /*border-spacing: 5px;*/
             width: 100%;
             margin-top: -10%;
+            border-collapse: collapse;
         }
 
-        #table-detail tr> {
+        #table-detail tr {
             line-height: 13px;
         }
 
@@ -63,7 +71,7 @@
         h4 {
             font-weight: normal;
         }
-
+        
         #container .logo-container {
             padding-top: -2%;
             text-align: center;
@@ -93,38 +101,48 @@
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}</h3>
-        <h2 align="center" style="margin-top: -1%">Outgoing Stock Detailed Report</h2>
+        <h2 align="center" style="margin-top: -1%">Current Stock Detailed Report</h2>
+        <h3 align="center" style="margin-top: -1%">Branch: {{$store}}</h3>
 
         <div class="row" style="margin-top: 8%;">
             <div class="col-md-12">
                 <table id="table-detail" align="center">
-                    <!-- loop the product names here -->
                     <thead>
-                        <tr style="background: #1f273b; color: white;">
-                            <th align="center">#</th>
-                            <th align="left">Date</th>
-                            <th align="left">Product Name</th>
-                            <th align="left">Out Mode</th>
-                            <th>Quantity</th>
-                            <th align="left">Made By</th>
+                        <tr>
+                            <th>#</th>
+                            {{-- <th>Code</th> --}}
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Batch #</th>
+                            {{-- <th style="text-align: center">Expiry Date</th> --}}
+                            <th style="text-align: center">Quantity</th>
                         </tr>
                     </thead>
+                    {{-- @dd($data) --}}
                     @foreach($data as $item)
                         <tr>
-                            <td align="center">{{$loop->iteration}}.</td>
-                            <td>{{$item->date}}</td>
-                            <td>{{$item->product->name . ' ' . ($item->product->brand . ' ' ?? '') . ($item->product->pack_size ?? '') . ($item->product->sales_uom ?? '')}}
+                            <td>{{ $loop->iteration }}.</td>
+                            {{-- <td>{{ $item['product_id'] }}</td> --}}
+                            <td>{{$item['name']}} {{$item['brand'] ?? ''}}
+                                {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}
                             </td>
-                            <td>{{$item->out_mode}}</td>
+                            <td align="">{{$item['category']}}</td>
+                            <td align="">{{$item['batch_number']}}</td>
+                            {{-- @if($item['expiry_date'] === null)
+                            <td align="center"></td>
+                            @else
+                            <td align="center">{{date('Y-m-d', strtotime($item['expiry_date']))}}</td>
+                            @endif --}}
                             <td align="center">
-                                <div>{{number_format($item->quantity)}}</div>
+                                {{number_format($item['quantity'], 0)}}
                             </td>
-                            <td>{{$item->user['name']}}</td>
                         </tr>
                     @endforeach
+                    {{-- @endforeach--}}
                 </table>
             </div>
         </div>
+
     </div>
 
     <script type="text/php">
@@ -139,7 +157,6 @@
         $char_space = 0.0;  //  default
         $angle = 0.0;   //  default
         $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
-
 
      }
 

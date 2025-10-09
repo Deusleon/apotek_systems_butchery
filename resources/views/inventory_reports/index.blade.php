@@ -89,11 +89,19 @@
                                                     <option value="4">Expired Products Report</option>
                                                 @endif
                                             @endif
+                                            @if ($expireEnabled)
+                                                @if(auth()->user()->checkPermission('Products Expire Date Report'))
+                                                    <option value="13">Products Expire Date Report</option>
+                                                @endif
+                                            @endif
                                             @if(auth()->user()->checkPermission('Out Of Stock Report'))
                                                 <option value="5">Out Of Stock Report</option>
                                             @endif
                                             @if(auth()->user()->checkPermission('Outgoing Tracking Report'))
-                                                <option value="6">Outgoing Tracking Report</option>
+                                                <option value="14">Outgoing Tracking Summary Report</option>
+                                            @endif
+                                            @if(auth()->user()->checkPermission('Outgoing Tracking Report'))
+                                                <option value="6">Outgoing Tracking Detailed Report</option>
                                             @endif
                                             @if(auth()->user()->checkPermission('Stock Adjustment Report'))
                                                 <option value="7">Stock Adjustment Report</option>
@@ -127,7 +135,7 @@
                                 <div class="form-group">
                                     <label for="product">Products<font color="red">*</font></label>
                                     <select id="product" name="product" onchange=""
-                                        class="js-example-basic-single form-control drop">
+                                        class="js-example-basic-single form-control drop" required>
                                         <option value="0" selected="true" disabled="disabled">Select product</option>
                                         @foreach($products as $product)
                                             <option value="{{$product->product_id}}">
@@ -324,7 +332,6 @@
 
     @include('partials.notification')
 
-
     <script>
 
         $(function () {
@@ -480,6 +487,7 @@
         $('#inventory_report_form').on('submit', function () {
             var report_option = document.getElementById("report_option");
             var report_option_index = report_option.options[report_option.selectedIndex].value;
+            console.log(report_option_index);
 
             /*product ledger*/
             var product_option = document.getElementById("product");
@@ -513,11 +521,11 @@
             document.getElementById('border').style.borderColor = 'white';
 
             /*if product ledger*/
+            console.log(report_option_index, product_option_index);
             if (Number(report_option_index) === Number(3) && Number(product_option_index) !== Number(0)) {
                 document.getElementById('warning').style.display = 'none';
                 //make request
-                location.reload();
-
+                return false;
             } else if (Number(report_option_index) === Number(3) && Number(product_option_index) === Number(0)) {
                 document.getElementById('warning').style.display = 'block';
                 return false;
@@ -527,9 +535,20 @@
             if (Number(report_option_index) === Number(1) && Number(store_option_index) !== Number(0)) {
                 document.getElementById('warning-store').style.display = 'none';
                 //make request
-                location.reload();
+                return true;
 
             } else if (Number(report_option_index) === Number(1) && Number(store_option_index) === Number(0)) {
+                document.getElementById('warning-store').style.display = 'block';
+                return false;
+            }
+            
+            /*if current stock*/
+            if (Number(report_option_index) === Number(12) && Number(store_option_index) !== Number(0)) {
+                document.getElementById('warning-store').style.display = 'none';
+                //make request
+                return true;
+
+            } else if (Number(report_option_index) === Number(12) && Number(store_option_index) === Number(0)) {
                 document.getElementById('warning-store').style.display = 'block';
                 return false;
             }
@@ -538,7 +557,7 @@
             if (Number(report_option_index) === Number(2) && Number(category_option_index) !== Number(0)) {
                 document.getElementById('warning-detail').style.display = 'none';
                 //make request
-                location.reload();
+                return true;
 
             } else if (Number(report_option_index) === Number(2) && Number(category_option_index) === Number(0)) {
                 // document.getElementById('warning-detail').style.display = 'block';
@@ -554,7 +573,7 @@
                     return false;
                 }
                 document.getElementById('issue_date').style.borderColor = 'white';
-                location.reload();
+                return true;
             }
 
             /*if stock transfer*/
@@ -567,7 +586,7 @@
                     return false;
                 }
                 document.getElementById('transfer_date').style.borderColor = 'white';
-                location.reload();
+                return true;
 
             }
 
@@ -582,7 +601,7 @@
                     document.getElementById('date').style.borderColor = 'red';
                     return false;
                 }
-                location.reload();
+                return true;
 
             }
 

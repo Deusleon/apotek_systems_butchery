@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Outgoing Stock Detailed Report</title>
+    <title>Outgoing Stock Summary Report</title>
 
     <style>
         body {
@@ -93,7 +93,7 @@
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}</h3>
-        <h2 align="center" style="margin-top: -1%">Outgoing Stock Detailed Report</h2>
+        <h2 align="center" style="margin-top: -1%">Outgoing Stock Summary Report</h2>
 
         <div class="row" style="margin-top: 8%;">
             <div class="col-md-12">
@@ -102,24 +102,24 @@
                     <thead>
                         <tr style="background: #1f273b; color: white;">
                             <th align="center">#</th>
-                            <th align="left">Date</th>
+                            {{-- <th align="left">Date</th> --}}
                             <th align="left">Product Name</th>
-                            <th align="left">Out Mode</th>
+                            {{-- <th align="left">Out Mode</th> --}}
                             <th>Quantity</th>
-                            <th align="left">Made By</th>
+                            {{-- <th align="left">Made By</th> --}}
                         </tr>
                     </thead>
                     @foreach($data as $item)
                         <tr>
                             <td align="center">{{$loop->iteration}}.</td>
-                            <td>{{$item->date}}</td>
+                            {{-- <td>{{$item->date}}</td> --}}
                             <td>{{$item->product->name . ' ' . ($item->product->brand . ' ' ?? '') . ($item->product->pack_size ?? '') . ($item->product->sales_uom ?? '')}}
                             </td>
-                            <td>{{$item->out_mode}}</td>
+                            {{-- <td>{{$item->out_mode}}</td> --}}
                             <td align="center">
                                 <div>{{number_format($item->quantity)}}</div>
                             </td>
-                            <td>{{$item->user['name']}}</td>
+                            {{-- <td>{{$item->user['name']}}</td> --}}
                         </tr>
                     @endforeach
                 </table>
