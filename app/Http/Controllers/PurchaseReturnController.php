@@ -40,6 +40,19 @@ class PurchaseReturnController extends Controller
         if ($request->action == "reject") {
             $this->reject($request->goods_receiving);
         }
+        if ($request->action == "check_return") {
+            $return = PurchaseReturn::where('goods_receiving_id', $request->goods_receiving_id)->first();
+            if ($return) {
+                return response()->json([
+                    'has_return' => true,
+                    'return_id' => $return->id,
+                    'return_quantity' => $return->quantity,
+                    'reason' => $return->reason
+                ]);
+            } else {
+                return response()->json(['has_return' => false]);
+            }
+        }
 
         // Handle missing date parameters
         $from = isset($request->date[0]) ? date('Y-m-d', strtotime($request->date[0])) : date('Y-m-d', strtotime('-30 days'));
@@ -63,6 +76,7 @@ class PurchaseReturnController extends Controller
         Log::info('Goods receiving with status 2', ['count' => $pendingGoods->count()]);
 
         $query = PurchaseReturn::join('inv_incoming_stock', 'inv_incoming_stock.id', '=', 'purchase_returns.goods_receiving_id')
+            ->select('purchase_returns.*', 'inv_incoming_stock.*', 'purchase_returns.quantity as return_quantity', 'inv_incoming_stock.quantity as received_quantity')
             ->where(DB::Raw("DATE(purchase_returns.date)"), '>=', $from)
             ->where(DB::Raw("DATE(purchase_returns.date)"), '<=', $to);
 
@@ -77,7 +91,7 @@ class PurchaseReturnController extends Controller
             $query->where('inv_incoming_stock.status', '=', 2);
         }
 
-        $returns = $query->orderBy('inv_incoming_stock.id', 'desc')->get();
+        $returns = $query->orderBy('purchase_returns.created_at', 'desc')->get();
 
         Log::info('Query results', [
             'sql' => $query->toSql(),
@@ -93,13 +107,13 @@ class PurchaseReturnController extends Controller
                 $formattedReturns[] = [
                     'id' => $return->id,
                     'goods_receiving_id' => $return->goods_receiving_id,
-                    'quantity' => $return->quantity,
+                    'quantity' => $return->return_quantity,
                     'reason' => $return->reason,
                     'date' => $return->date,
                     'goods_receiving' => [
                         'id' => $goodsReceiving->id,
                         'product_id' => $goodsReceiving->product_id,
-                        'quantity' => $goodsReceiving->quantity,
+                        'quantity' => $return->received_quantity,
                         'unit_cost' => $goodsReceiving->unit_cost,
                         'total_cost' => $goodsReceiving->total_cost,
                         'created_at' => $goodsReceiving->created_at,
@@ -227,6 +241,29 @@ class PurchaseReturnController extends Controller
             session()->flash("alert-danger", "Error creating purchase return!");
         }
 
+        return back();
+    }
+
+    public function update(Request $request, $id)
+    {
+        Log::info('Updating purchase return', [
+            'id' => $id,
+            'quantity' => $request->quantity,
+            'reason' => $request->reason
+        ]);
+
+        $purchaseReturn = PurchaseReturn::find($id);
+        if (!$purchaseReturn) {
+            session()->flash("alert-danger", "Purchase return not found!");
+            return back();
+        }
+
+        $purchaseReturn->quantity = $request->quantity;
+        $purchaseReturn->reason = $request->reason;
+        $purchaseReturn->save();
+
+        Log::info('Purchase return updated successfully', ['id' => $id]);
+        session()->flash("alert-success", "Purchase return updated successfully!");
         return back();
     }
 

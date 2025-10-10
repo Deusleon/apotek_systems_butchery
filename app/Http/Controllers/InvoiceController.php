@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Invoice;
+use App\Payment;
 use App\Supplier;
 use Auth;
 use DB;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use View;
 
 class InvoiceController extends Controller
@@ -104,6 +106,9 @@ class InvoiceController extends Controller
             $value->date     = date('Y-m-d', strtotime($value->invoice_date));
             $value->due_date = date('Y-m-d', strtotime($value->payment_due_date));
 
+            // Calculate balance (remaining amount to be paid)
+            $value->remain_balance = $value->invoice_amount - $value->paid_amount;
+
             // Calculate paid status
             if ($value->paid_amount >= $value->invoice_amount) {
                 $value->paid_status = 'Fully Paid';
@@ -136,6 +141,9 @@ class InvoiceController extends Controller
             $value->supplier;
             $value->date     = date('Y-m-d', strtotime($value->invoice_date));
             $value->due_date = date('Y-m-d', strtotime($value->payment_due_date));
+
+            // Calculate balance (remaining amount to be paid)
+            $value->remain_balance = $value->invoice_amount - $value->paid_amount;
 
             // Calculate paid status
             if ($value->paid_amount >= $value->invoice_amount) {
@@ -175,35 +183,74 @@ class InvoiceController extends Controller
                             ->first();
 
             if (!$invoice) {
-                return response()->json(['error' => 'Invalid invoice for selected supplier'], 422);
+                return response()->json(['success' => false, 'error' => 'Invalid invoice for selected supplier'], 200);
             }
 
+            // Clean and convert amount
+            $amountPaid = floatval(str_replace(',', '', $request->amount_paid));
+
             // Check if payment amount exceeds remaining balance
-            $remainingBalance = $invoice->invoice_amount - $invoice->paid_amount;
-            if ($request->amount_paid > $remainingBalance) {
-                return response()->json(['error' => 'Payment amount cannot exceed remaining balance'], 422);
+            $remainingBalance = floatval($invoice->invoice_amount - $invoice->paid_amount);
+            if ($amountPaid > $remainingBalance) {
+                return response()->json(['success' => false, 'error' => 'Payment amount cannot exceed remaining balance'], 200);
             }
 
             // Update invoice paid amount
-            $invoice->paid_amount += str_replace(',', '', $request->amount_paid);
+            $invoice->paid_amount += $amountPaid;
             $invoice->save();
 
-            // Here you could create a payment record in a separate payments table if needed
-            // For now, we'll just update the invoice
+            // Generate unique receipt number
+            $receiptNumber = 'INV-' . $invoice->id . '-' . time() . '-' . rand(100, 999);
 
-            session()->flash("alert-success", "Payment recorded successfully!");
-            return response()->json(['success' => true, 'message' => 'Payment recorded successfully!']);
+            // Create payment record
+            Payment::create([
+                'invoice_id' => $invoice->id,
+                'user_id' => Auth::id(),
+                'amount' => $amountPaid,
+                'payment_method' => $request->payment_method,
+                'payment_date' => $request->payment_date,
+                'receipt_number' => $receiptNumber,
+                'notes' => $request->remarks,
+                'status' => 'completed'
+            ]);
 
+            return response()->json(['success' => true, 'message' => 'Payment recorded successfully!'], 200);
+
+        } catch (ValidationException $e) {
+            $errors = $e->errors();
+            $errorMessage = 'Validation failed: ';
+            foreach ($errors as $field => $messages) {
+                $errorMessage .= implode(' ', $messages) . ' ';
+            }
+            return response()->json(['success' => false, 'error' => trim($errorMessage)], 200);
         } catch (Exception $exception) {
-            return response()->json(['error' => 'Payment failed: ' . $exception->getMessage()], 500);
+            return response()->json(['success' => false, 'error' => 'Payment failed: ' . $exception->getMessage()], 200);
         }
     }
 
     public function getPaymentHistory()
     {
-        // For now, return empty array since we're not storing payments separately
-        // In a full implementation, you'd query a payments table
-        return response()->json([]);
+        $payments = Payment::whereNotNull('invoice_id')
+            ->with(['invoice.supplier', 'user'])
+            ->orderBy('payment_date', 'desc')
+            ->get()
+            ->map(function ($payment) {
+                return [
+                    'payment_date' => $payment->payment_date ? $payment->payment_date->format('Y-m-d') : null,
+                    'invoice' => [
+                        'invoice_no' => $payment->invoice ? $payment->invoice->invoice_no : null
+                    ],
+                    'supplier' => [
+                        'name' => $payment->invoice && $payment->invoice->supplier ? $payment->invoice->supplier->name : null
+                    ],
+                    'amount_paid' => $payment->amount,
+                    'payment_method' => $payment->payment_method,
+                    'remarks' => $payment->notes,
+                    'user' => $payment->user ? $payment->user->name : null
+                ];
+            });
+
+        return response()->json(['data' => $payments]);
     }
 
     public function getSupplierInvoices(Request $request)

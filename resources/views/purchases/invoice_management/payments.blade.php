@@ -68,13 +68,14 @@ Invoices
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="payment_method">Payment Method *</label>
+                            <label for="payment_method">Pay Method *</label>
                             <select name="payment_method" class="form-control" id="payment_method" required="true">
-                                <option value="" disabled selected>Select Payment Method</option>
-                                <option value="cash">Cash</option>
-                                <option value="bank_transfer">Bank Transfer</option>
-                                <option value="mobile_money">Mobile Money</option>
-                                <option value="cheque">Cheque</option>
+                                <option value="" disabled selected>Select Method</option>
+                                <option value="cash">CASH</option>
+                                <option value="mobile_money">MOBILE</option>
+                                <option value="bank_transfer">BANK</option>
+                                <option value="cheque">CHEQUE</option>
+                                <option value="others">OTHERS</option>
                             </select>
                             <span id="method_warning" style="display: none; color: red; font-size: 0.9em">Payment method required</span>
                         </div>
@@ -180,11 +181,11 @@ Invoices
         return true;
     }
 
-    // Format amount paid on input
-    $('#amount_paid').on('keyup', function () {
+    // Format amount paid on blur (when user leaves the input)
+    $('#amount_paid').on('blur', function () {
         var newValue = $(this).val();
         if (newValue !== '') {
-            $(this).val(formatMoney(parseFloat(newValue.replace(/\,/g, ''), 10)));
+            $(this).val(formatMoney(parseFloat(newValue.replace(/\,/g, ''))));
         }
     });
 
@@ -214,8 +215,10 @@ Invoices
         }
     });
 
-    // Form validation
-    $('#payment_form').on('submit', function() {
+    // Form validation and submission
+    $('#payment_form').on('submit', function(e) {
+        e.preventDefault(); // Prevent default form submission
+
         var isValid = true;
 
         // Check supplier
@@ -265,6 +268,35 @@ Invoices
         // Format amount before submission
         var amount = $('#amount_paid').val().replace(/\,/g, '');
         $('#amount_paid').val(amount);
+
+        // Submit via AJAX
+        var formData = $(this).serialize();
+
+        $.ajax({
+            url: $(this).attr('action'),
+            method: 'POST',
+            data: formData,
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    notify(response.message || 'Payment recorded successfully!', 'top', 'right', 'success');
+
+                    // Reset form
+                    $('#payment_form')[0].reset();
+                    $('#supplier').val('').trigger('change');
+                    $('#invoice').empty().append('<option value="" disabled selected>Select Invoice...</option>').prop('disabled', true);
+                    $('#payment_date').datepicker('setDate', new Date());
+
+                    // Reload payment history table
+                    paymentHistoryTable.ajax.reload();
+                } else {
+                    notify(response.error || 'Payment failed!', 'top', 'right', 'danger');
+                }
+            },
+            error: function(xhr, status, error) {
+                notify('Network error occurred. Please try again.', 'top', 'right', 'danger');
+            }
+        });
     });
 
     // Initialize payment history table
@@ -275,7 +307,8 @@ Invoices
         ordering: true,
         ajax: {
             url: '{{ route("invoice-payments.history") }}',
-            type: 'GET'
+            type: 'GET',
+            dataSrc: 'data'
         },
         columns: [
             {

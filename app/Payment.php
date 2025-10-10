@@ -9,6 +9,7 @@ class Payment extends Model
     
     protected $fillable = [
         'transport_order_id',
+        'invoice_id',
         'user_id',
         'amount',
         'payment_type',
@@ -44,6 +45,11 @@ class Payment extends Model
     public function transportOrder()
     {
         return $this->belongsTo(TransportOrder::class, 'transport_order_id');
+    }
+
+    public function invoice()
+    {
+        return $this->belongsTo(Invoice::class, 'invoice_id');
     }
 
     public function user()
