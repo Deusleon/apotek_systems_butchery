@@ -57,12 +57,12 @@
                     <div class="col-md-3">
                         <input type="text" readonly class="form-control-plaintext" id="received">
                     </div>
-                    <label class="col-md-3 col-form-label text-md-right">
+                    <!-- <label class="col-md-3 col-form-label text-md-right">
                         Balance Remain:
                     </label>
                     <div class="col-md-3">
                         <input type="text" readonly class="form-control-plaintext" id="balance">
-                    </div>
+                    </div> -->
                 </div>
                 <div class="form-group row" style="margin-top: -2%">
                     <label class="col-md-3 col-form-label text-md-right">
