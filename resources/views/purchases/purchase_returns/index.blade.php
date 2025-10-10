@@ -147,6 +147,7 @@
     @include('purchases.material_received.edit')
     @include('purchases.material_received.delete')
     @include('purchases.purchase_returns.return')
+    @include('purchases.purchase_returns.edit')
     @include('purchases.purchase_returns.returns')
 
 @endsection
@@ -364,30 +365,68 @@
         $('#received_material_table tbody').on('click', '#edit_btn', function () {
             var row_data = $('#received_material_table').DataTable().row($(this).parents('tr')).data();
 
-            $('#edit').find('.modal-body #name_edit').val(
-                (row_data.product.name || '') + ' ' +
-                (row_data.product.brand || '') + ' ' +
-                (row_data.product.pack_size || '') +
-                (row_data.product.sales_uom || '')
-            );
-            $('#edit').find('.modal-body #quantity_edit').val(numberWithCommas(row_data.quantity));
-            $('#edit').find('.modal-body #price_edit').val(formatMoney(row_data.unit_cost));
-            if (row_data.expire_date) {
-                $('#edit').find('.modal-body #expire_date_edit').val(moment(row_data.expire_date).format('YYYY-MM-DD'));
-            } else {
-                $('#edit').find('.modal-body #expire_date_edit').val('');
-            }
-            $('#edit').find('.modal-body #receive_date_edit').val(moment(row_data.created_at).format('YYYY-MM-DD'));
-            $('#edit').find('.modal-body #id').val(row_data.id);
+            // Check if there's a purchase return for this goods_receiving_id
+            $.ajax({
+                url: '{{route('getPurchaseReturns')}}',
+                data: {
+                    "_token": '{{ csrf_token() }}',
+                    "action": "check_return",
+                    "goods_receiving_id": row_data.id
+                },
+                type: 'get',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.has_return) {
+                        // Open purchase return edit modal
+                        $('#edit-purchase-return').find('.modal-body #edit_product_name').val(
+                            (row_data.product.name || '') + ' ' +
+                            (row_data.product.brand || '') + ' ' +
+                            (row_data.product.pack_size || '') +
+                            (row_data.product.sales_uom || '')
+                        );
+                        $('#edit-purchase-return').find('.modal-body #edit_rtn_qty_to_show').val(numberWithCommas(response.return_quantity));
+                        $('#edit-purchase-return').find('.modal-body #edit_rtn_qty').val(response.return_quantity);
+                        $('#edit-purchase-return').find('.modal-body #edit_reason').val(response.reason);
+                        $('#edit-purchase-return').find('.modal-body #edit_goods_receiving_id').val(row_data.id);
+                        $('#edit-purchase-return').find('.modal-body #edit_return_id').val(response.return_id);
 
-            // ✅ Preselect supplier
-            if (row_data.supplier && row_data.supplier.id) {
-                $('#supplier_id_edit').val(row_data.supplier.id).trigger('change');
-            } else {
-                $('#supplier_id_edit').val('').trigger('change');
-            }
+                        // Set form action dynamically
+                        var updateUrl = '{{ url("purchase-returns") }}/' + response.return_id;
+                        $('#edit-purchase-return-form').attr('action', updateUrl);
 
-            $('#edit').modal('show');
+                        $('#edit-purchase-return').modal('show');
+                    } else {
+                        // Open material received edit modal
+                        $('#edit').find('.modal-body #name_edit').val(
+                            (row_data.product.name || '') + ' ' +
+                            (row_data.product.brand || '') + ' ' +
+                            (row_data.product.pack_size || '') +
+                            (row_data.product.sales_uom || '')
+                        );
+                        $('#edit').find('.modal-body #quantity_edit').val(numberWithCommas(row_data.quantity));
+                        $('#edit').find('.modal-body #price_edit').val(formatMoney(row_data.unit_cost));
+                        if (row_data.expire_date) {
+                            $('#edit').find('.modal-body #expire_date_edit').val(moment(row_data.expire_date).format('YYYY-MM-DD'));
+                        } else {
+                            $('#edit').find('.modal-body #expire_date_edit').val('');
+                        }
+                        $('#edit').find('.modal-body #receive_date_edit').val(moment(row_data.created_at).format('YYYY-MM-DD'));
+                        $('#edit').find('.modal-body #id').val(row_data.id);
+
+                        // ✅ Preselect supplier
+                        if (row_data.supplier && row_data.supplier.id) {
+                            $('#supplier_id_edit').val(row_data.supplier.id).trigger('change');
+                        } else {
+                            $('#supplier_id_edit').val('').trigger('change');
+                        }
+
+                        $('#edit').modal('show');
+                    }
+                },
+                error: function() {
+                    alert('Error checking return status');
+                }
+            });
 
         });
 
@@ -449,6 +488,18 @@
             } else {
                 document.getElementById('rtn_qty_to_show').value = '';
                 document.getElementById('rtn_qty').value = '';
+            }
+        });
+
+        $('#edit_rtn_qty_to_show').on('keyup', function () {
+            var newValue = document.getElementById('edit_rtn_qty_to_show').value;
+            if (newValue !== '') {
+                document.getElementById('edit_rtn_qty_to_show').value =
+                    numberWithCommas(parseFloat(newValue.replace(/\,/g, ''), 10));
+                document.getElementById('edit_rtn_qty').value = parseFloat(newValue.replace(/\,/g, ''), 10);
+            } else {
+                document.getElementById('edit_rtn_qty_to_show').value = '';
+                document.getElementById('edit_rtn_qty').value = '';
             }
         });
 

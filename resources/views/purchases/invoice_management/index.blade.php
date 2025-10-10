@@ -158,15 +158,20 @@ Invoices
         $('#show').find('.modal-body #inv_date').val(data.date);
         $('#show').find('.modal-body #amount').val(formatMoney(data.invoice_amount));
         $('#show').find('.modal-body #paid').val(formatMoney(data.paid_amount));
+        $('#show').find('.modal-body #received').val(formatMoney(data.received_amount || 0));
         $('#show').find('.modal-body #balance').val(formatMoney(data.remain_balance));
         $('#show').find('.modal-body #period').val(data.grace_period);
         $('#show').find('.modal-body #due').val(data.due_date);
         $('#show').find('.modal-body #status').val(data.received_status);
         $('#show').find('.modal-body #remarks').val(data.remarks);
     });
-    $(document).ready(subtract());
-    $(document).ready(editSubtract());
-    $(document).ready(editdueDate());
+    $(document).ready(function() {
+        subtract();
+        editSubtract();
+        editdueDate();
+        // Load initial data
+        getInvoice();
+    });
 
     $('#d_auto').on('change', function() {
         setdueDate();
@@ -426,7 +431,7 @@ Invoices
             [7, 'asc']
         ],
         columnDefs: [{
-            targets: 7,
+            targets: [7,9],
             visible: false
         }]
     });

@@ -190,6 +190,7 @@ Route::middleware(["auth","main_branch"])->group(function () {
         ->name('purchase-return.returns');
         Route::get('purchases/purchase_returns/approvals', 'PurchaseReturnController@approvals')->name('purchase-returns.approvals');
         Route::post('purchase-returns', 'PurchaseReturnController@store')->name('purchase-returns.store');
+        Route::put('purchase-returns/{id}', 'PurchaseReturnController@update')->name('purchase-returns.update');
         Route::get('get-purchase-returns', 'PurchaseReturnController@getPurchaseReturns')->name('getPurchaseReturns');
     //Purchase Order routes
     Route::resource('purchases/purchase-order', 'OrderController')->only([
@@ -466,7 +467,7 @@ Route::middleware(["auth","main_branch"])->group(function () {
 
     Route::get('inventory/stock-transfer-show', 'StockTransferAcknowledgeController@stockTransferShow')->name('stock-transfer-show');
 
-    Route::post('inventory/stock-transfer/update-details/{id}', 'App\Http\Controllers\StockTransferController@update')->name('stock-transfer.update_details');
+    Route::post('inventory/stock-transfer/update-details/{id}', 'StockTransferController@update')->name('stock-transfer.update_details');
 
     Route::get('inventory/stock-issue-show', 'StockIssueController@stockIssueShow')->name('stock-issue-show');
 

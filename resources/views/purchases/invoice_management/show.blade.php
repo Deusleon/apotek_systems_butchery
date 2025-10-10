@@ -52,10 +52,10 @@
                 </div>
                 <div class="form-group row" style="margin-top: -2%">
                     <label class="col-md-3 col-form-label text-md-right">
-                        Payment Due Date:
+                        Received Amount:
                     </label>
                     <div class="col-md-3">
-                        <input type="text" readonly class="form-control-plaintext" id="due">
+                        <input type="text" readonly class="form-control-plaintext" id="received">
                     </div>
                     <label class="col-md-3 col-form-label text-md-right">
                         Balance Remain:
@@ -66,16 +66,24 @@
                 </div>
                 <div class="form-group row" style="margin-top: -2%">
                     <label class="col-md-3 col-form-label text-md-right">
+                        Payment Due Date:
+                    </label>
+                    <div class="col-md-3">
+                        <input type="text" readonly class="form-control-plaintext" id="due">
+                    </div>
+                    <label class="col-md-3 col-form-label text-md-right">
                         Received Status:
                     </label>
                     <div class="col-md-3">
                         <input type="text" readonly class="form-control-plaintext" id="status">
                     </div>
-                    <label class="col-md-3 col-form-label text-md-right">
-                        Remarks:
+                </div>
+                <div class="form-group row" style="margin-top: 10px;">
+                    <label class="col-md-12 col-form-label text-md-left font-weight-bold">
+                        Remarks/Description:
                     </label>
-                    <div class="col-md-3">
-                        <textarea type="text" readonly class="form-control-plaintext" id="remarks"></textarea>
+                    <div class="col-md-12">
+                        <textarea type="text" readonly class="form-control-plaintext" id="remarks" rows="3" style="border: 1px solid #ddd; padding: 8px; border-radius: 4px; background-color: #f8f9fa;"></textarea>
                     </div>
                 </div>
             </div>
