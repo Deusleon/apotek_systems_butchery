@@ -61,7 +61,7 @@
                                         <input type="text" class="form-control" id="amount_paid_id" name="paid_amount"
                                                aria-describedby="emailHelp"
                                                onchange="subtract()"
-                                               required="true">
+                                               required="true" readonly>
                                         <span class="help-inline" onkeypress="return isNumberKey(event,this)">
                                         </span>
                                         <div class="text text-danger" id="amount_error"></div>
@@ -69,8 +69,8 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="Amount">Remain Balance</label>
-                                        <input type="text" class="form-control" id="balance_id" name="balance"
+                                        <label for="Amount">Received Amount</label>
+                                        <input type="text" class="form-control" id="received_amount_id" name="received_amount"
                                                aria-describedby="emailHelp" readonly value="0">
                                     </div>
                                 </div>
@@ -157,7 +157,7 @@
 
             //not zero then sub
             var remain_amount = invoice_amount - paid_amount;
-            document.getElementById("balance_id").value = formatMoney(remain_amount);
+            document.getElementById("received_amount_id").value = formatMoney(remain_amount);
             document.getElementById('amount_error').style.display = 'none';
 
             if (Number(remain_amount) === 0) {
