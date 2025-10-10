@@ -216,6 +216,11 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::get('accounting/invoices','InvoiceController@index')->name('invoice-management.index');
     Route::get('accounting/invoices/payments','InvoiceController@payments')->name('invoice-management.payments');
 
+    // Invoice Payment Routes
+    Route::post('accounting/invoices/payments', 'InvoiceController@storePayment')->name('invoice-payments.store');
+    Route::get('accounting/invoices/payments/history', 'InvoiceController@getPaymentHistory')->name('invoice-payments.history');
+    Route::get('accounting/invoices/get-supplier-invoices', 'InvoiceController@getSupplierInvoices')->name('get-supplier-invoices');
+
     Route::get('purchases/invoice-received', 'InvoiceController@getInvoice')->name('getInvoice');
     Route::get('purchases/invoice-received/filter-by-due-date', 'InvoiceController@getInvoiceByDueDate')->name('get-invoice-by-due-date');
 
