@@ -329,14 +329,6 @@
                                     @if(auth()->user()->checkPermission('View Purchase Return'))
                                         <input type='button' value='Return' id='return_btn' class='btn btn-warning btn-rounded btn-sm'/>
                                     @endif
-
-                                    @if(auth()->user()->checkPermission('Edit Material Received'))
-                                        <input type='button' value='Edit' id='edit_btn' class='btn btn-info btn-rounded btn-sm'/>
-                                    @endif
-
-                                    @if(auth()->user()->checkPermission('Delete Material Received'))
-                                        <input type='button' value='Delete' id='delete_btn' class='btn btn-danger btn-rounded btn-sm'/>
-                                    @endif
                                 </div>`
                         }
 
