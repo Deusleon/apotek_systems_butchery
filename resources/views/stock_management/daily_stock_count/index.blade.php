@@ -65,14 +65,14 @@
             @if(auth()->user()->checkPermission('View Stock Count'))
                 <li class="nav-item">
                     <a class="nav-link active text-uppercase" id="daily-stock-tablist" data-toggle="pill"
-                        href="{{ url('inventory/daily-stock-count') }}" role="tab" aria-controls="stock_adjustment"
+                        href="{{ url('inventory/daily-stock-count') }}" role="tab"
                         aria-selected="true">Daily Stock Count</a>
                 </li>
             @endif
             @if(auth()->user()->checkPermission('View Outgoing Stock'))
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" id="outgoing-stock-tablist" data-toggle="pill"
-                        href="{{ url('inventory/out-going-stock') }}" role="tab" aria-controls="stock_list"
+                        href="{{ url('inventory/out-going-stock') }}" role="tab"
                         aria-selected="false">Outgoing Stock
                     </a>
                 </li>
@@ -82,6 +82,14 @@
                     <a class="nav-link text-uppercase" id="count-sheet-tablist"
                         href="{{ url('inventory/inventory-count-sheet/Inventory Count Sheet') }}" role="tab"
                         aria-controls="stock_list" aria-selected="false" target="_blank">Inventory Count Sheet
+                    </a>
+                </li>
+            @endif
+            @if(auth()->user()->checkPermission('View Stock Taking'))
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" id="count-sheet-tablist"
+                        href="{{ route('stock-taking') }}" role="tab"
+                        aria-selected="false">Stock Taking
                     </a>
                 </li>
             @endif

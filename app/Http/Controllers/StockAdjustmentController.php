@@ -21,11 +21,6 @@ use Illuminate\Support\Facades\Validator;
 
 class StockAdjustmentController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware('permission:View Stock Adjustment|Stock Adjustment', ['only' => ['index', 'show']]);
-    //     $this->middleware('permission:Stock Adjustment', ['only' => ['create', 'store']]);
-    // }
 
     public function index()
     {

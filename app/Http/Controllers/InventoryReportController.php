@@ -379,9 +379,7 @@ class InventoryReportController extends Controller
 
         return $results_data;
     }
-    
-    private function currentStockByStoreDeailedReport($store, $category)
-    {
+    private function currentStockByStoreDeailedReport($store, $category){
         if (!Auth()->user()->checkPermission('Current Stock Report')) {
             abort(403, 'Access Denied');
         }
@@ -449,7 +447,6 @@ class InventoryReportController extends Controller
 
         return $results_data;
     }
-
     private function currentStockReport($store, $category)
     {
         if (!Auth()->user()->checkPermission('Current Stock Report')) {
@@ -542,8 +539,7 @@ class InventoryReportController extends Controller
 
         return $results_data;
     }
-    private function productLedgerReport($product_id)
-    {
+    private function productLedgerReport($product_id){
         if (!Auth()->user()->checkPermission('Product Ledger Report')) {
             abort(403, 'Access Denied');
         }
@@ -798,47 +794,6 @@ class InventoryReportController extends Controller
 
         return $ranked;
     }
-    // private function deadStockReport()
-    // {
-    //     if (!Auth()->user()->checkPermission('Dead Stock Report')) {
-    //         abort(403, 'Access Denied');
-    //     }
-
-    //     $store_id = current_store_id();
-
-    //     // Date range: 3 months ago up to today
-    //     $three_months_ago = now()->subMonths(3)->startOfDay();
-
-    //     // Build query
-    //     $query = DB::table('inv_current_stock as cs')
-    //         ->join('inv_products as p', 'p.id', '=', 'cs.product_id')
-    //         ->leftJoin('sales_details as sd', 'sd.stock_id', '=', 'cs.id')
-    //         ->leftJoin('sales as s', function ($join) use ($three_months_ago) {
-    //             $join->on('s.id', '=', 'sd.sale_id')
-    //                 ->where('s.date', '>=', $three_months_ago);
-    //         })
-    //         ->select(
-    //             'p.id as product_id',
-    //             'p.name',
-    //             'p.brand',
-    //             'p.pack_size',
-    //             'p.sales_uom',
-    //             'cs.store_id',
-    //             DB::raw('SUM(cs.quantity) as quantity')
-    //         )
-    //         ->whereNull('sd.stock_id') 
-    //         ->where('cs.quantity', '>', 0)
-    //         ->groupBy(['p.id'])
-    //         ->orderBy('p.name', 'asc');
-
-    //     if (!is_all_store()) {
-    //         $query->where('cs.store_id', $store_id);
-    //     }
-
-    //     $dead_stock = $query->get();
-
-    //     return $dead_stock;
-    // }
     private function deadStockReport()
     {
         if (!Auth()->user()->checkPermission('Dead Stock Report')) {
@@ -847,21 +802,24 @@ class InventoryReportController extends Controller
 
         $store_id = current_store_id();
 
-        // Date range: 3 years ago up to today
-        $three_years_ago = now()->subMonth(3)->startOfDay();
+        // Range: 3 months ago -> now
+        $three_months_ago = now()->subMonths(3)->startOfDay();
+        $today = now()->endOfDay();
 
-        // Build query
+        $sold_product_ids = DB::table('sales_details as sd')
+            ->join('inv_current_stock as cs', 'cs.id', '=', 'sd.stock_id')
+            ->join('sales as s', 's.id', '=', 'sd.sale_id')
+            ->when(!is_all_store(), function ($q) use ($store_id) {
+                $q->where('cs.store_id', $store_id);
+            })
+            ->whereBetween('s.date', [$three_months_ago, $today])
+            ->distinct()
+            ->pluck('cs.product_id')
+            ->toArray();
+
+        // 2) Get current stock entries & exclude sold products
         $query = DB::table('inv_current_stock as cs')
             ->join('inv_products as p', 'p.id', '=', 'cs.product_id')
-            ->leftJoin('sales_details as sd', function($join) use ($three_years_ago) {
-                $join->on('sd.stock_id', '=', 'cs.id')
-                    ->whereExists(function($query) use ($three_years_ago) {
-                        $query->select(DB::raw(1))
-                            ->from('sales as s')
-                            ->whereColumn('s.id', 'sd.sale_id')
-                            ->where('s.date', '>=', $three_years_ago);
-                    });
-            })
             ->select(
                 'p.id as product_id',
                 'p.name',
@@ -871,14 +829,18 @@ class InventoryReportController extends Controller
                 'cs.store_id',
                 DB::raw('SUM(cs.quantity) as quantity')
             )
-            ->whereNull('sd.stock_id')
             ->where('cs.quantity', '>', 0)
-            ->groupBy(['p.id', 'p.name', 'p.brand', 'p.pack_size', 'p.sales_uom', 'cs.store_id'])
+            // only exclude sold products if we have any sold ids; otherwise keep all (no sold in period)
+            ->when(!empty($sold_product_ids), function ($q) use ($sold_product_ids) {
+                $q->whereNotIn('cs.product_id', $sold_product_ids);
+            })
+            ->when(!is_all_store(), function ($q) use ($store_id) {
+                $q->where('cs.store_id', $store_id);
+            })
+            ->groupBy(
+                'p.id'
+            )
             ->orderBy('p.name', 'asc');
-
-        if (!is_all_store()) {
-            $query->where('cs.store_id', $store_id);
-        }
 
         $dead_stock = $query->get();
 

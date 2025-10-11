@@ -10,6 +10,7 @@ use App\Store;
 use App\StockTracking;
 use App\StockAdjustmentLog;
 use App\Exports\DailyStockCountExport;
+use App\Http\Controllers\StockAdjustmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -33,102 +34,181 @@ class DailyStockCountController extends Controller
 
     }
 
-    public function fetchSalesWithStock(Request $request)
+  public function stockTaking()
 {
-    if (! $request->ajax()) {
-        abort(400, 'AJAX only');
+    if (!Auth()->user()->checkPermission('View Stock Taking')) {
+        abort(403, 'Access Denied');
     }
 
-    $date = $request->date;
-    $default_store = current_store_id();
+    $store_id = current_store_id();
 
-    // 1) Fetch sale_ids per date
-    $saleIds = DB::table('sales')
-        ->whereDate('date', $date)
-        ->pluck('id');
+    // Fetch all products with current stock (join to stock or inventory table)
+    $query = DB::table('inv_products as p')
+        ->leftJoin('inv_current_stock as s', 'p.id', '=', 's.product_id')
+        ->select(
+            'p.id',
+            'p.name',
+            'p.brand',
+            'p.pack_size',
+            'p.sales_uom',
+            DB::raw('COALESCE(SUM(s.quantity), 0) as current_stock')
+        )
+        ->groupBy('p.id')
+        ->orderBy('p.name');
 
-    if ($saleIds->isEmpty()) {
-        return response()->json(['items' => []]);
-    }
+        if (!is_all_store()) {
+            $query->where('s.store_id', $store_id);
+        }
+        $products = $query->get();
 
-    // 2) Fetch & aggregate sales_details (sum for every stock_id)
-    $salesDetails = DB::table('sales_details')
-        ->select('stock_id', DB::raw('SUM(quantity) as total_sold'))
-        ->whereIn('sale_id', $saleIds)
-        ->groupBy('stock_id')
-        ->get();
-
-    if ($salesDetails->isEmpty()) {
-        return response()->json(['items' => []]);
-    }
-
-    $stockIds = $salesDetails->pluck('stock_id')->unique();
-
-    // 3) Fetch current stock rows
-    $stockRows = DB::table('inv_current_stock')
-        ->select('id as stock_id', 'product_id', 'store_id', 'quantity')
-        ->whereIn('id', $stockIds)
-        ->when(!is_all_store(), function ($q) use ($default_store) {
-            $q->where('store_id', $default_store);
-        })
-        ->get();
-
-    if ($stockRows->isEmpty()) {
-        return response()->json(['items' => []]);
-    }
-
-    // 4) Aggregate sales per product_id
-    $salesPerProduct = $salesDetails->map(function ($row) use ($stockRows) {
-        $stock = $stockRows->firstWhere('stock_id', $row->stock_id);
-        return $stock ? [
-            'product_id' => $stock->product_id,
-            'store_id'   => $stock->store_id,
-            'sold'       => (float) $row->total_sold,
-        ] : null;
-    })->filter()
-    ->groupBy('product_id')
-    ->map(function ($group) {
-        return [
-            'product_id' => $group->first()['product_id'],
-            'store_id'   => $group->first()['store_id'],
-            'total_sold' => collect($group)->sum('sold'),
-        ];
-    });
-
-    // 5) Fetch total stock per product_id (sum for all batches)
-    $currentStock = DB::table('inv_current_stock')
-        ->select('product_id', DB::raw('SUM(quantity) as total_stock'))
-        ->when(!is_all_store(), function ($q) use ($default_store) {
-            $q->where('store_id', $default_store);
-        })
-        ->whereIn('product_id', $salesPerProduct->pluck('product_id'))
-        ->groupBy('product_id')
-        ->get()
-        ->keyBy('product_id');
-
-    // 6) Fetch product details
-    $products = DB::table('inv_products')
-        ->whereIn('id', $salesPerProduct->pluck('product_id'))
-        ->get()
-        ->keyBy('id');
-
-    // 7) Combine final items
-    $items = $salesPerProduct->map(function ($row) use ($currentStock, $products) {
-        $product = $products->get($row['product_id']);
-        $stock   = $currentStock->get($row['product_id']);
-
-        return [
-            'product_id'    => $row['product_id'],
-            'product'       => $product ? (array) $product : null,
-            'total_sold'    => (float) $row['total_sold'],
-            'current_stock' => $stock ? (float) $stock->total_stock : 0,
-            'store_id'      => $row['store_id'],
-        ];
-    })->values();
-
-    return response()->json(['items' => $items]);
+    return view('stock_management.stock_taking.index', compact('products'));
 }
 
+
+public function processStockTaking(Request $request)
+{
+    $data = $request->validate([
+        'items' => 'required|array',
+        'items.*.product_id' => 'required|integer',
+        'items.*.qoh' => 'required|numeric',
+        'items.*.physical' => 'nullable|numeric',
+    ]);
+    $data['date'] = now();
+
+    DB::beginTransaction();
+    try {
+        $adjustmentController = new StockAdjustmentController();
+        $storeId = current_store_id();
+
+        foreach ($data['items'] as $item) {
+            $physical = $item['physical'] ?? $item['qoh'];
+            $diff = $physical - $item['qoh'];
+
+            if ($diff != 0) {
+                // tafuta batch moja ya product hii
+                $stock = CurrentStock::where('product_id', $item['product_id'])
+                    ->where('store_id', $storeId)
+                    ->first();
+
+                if ($stock) {
+                    // prepare fake request for adjustment controller
+                    $adjRequest = new Request([
+                        'stock_id' => $stock->id,
+                        'product_id' => $item['product_id'],
+                        'current_stock' => $item['qoh'],
+                        'new_quantity' => $physical,
+                        'reason' => 'Stock Taking Adjustment',
+                        'from_type' => 'summary',
+                    ]);
+
+                    // call adjustment controller directly
+                    $response = $adjustmentController->store($adjRequest);
+                }
+            }
+        }
+
+        DB::commit();
+        return response()->json(['success' => true, 'message' => 'Stock taking adjustments processed successfully']);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+}
+    public function fetchSalesWithStock(Request $request)
+    {
+        if (! $request->ajax()) {
+            abort(400, 'AJAX only');
+        }
+
+        $date = $request->date;
+        $default_store = current_store_id();
+
+        // 1) Fetch sale_ids per date
+        $saleIds = DB::table('sales')
+            ->whereDate('date', $date)
+            ->pluck('id');
+
+        if ($saleIds->isEmpty()) {
+            return response()->json(['items' => []]);
+        }
+
+        // 2) Fetch & aggregate sales_details (sum for every stock_id)
+        $salesDetails = DB::table('sales_details')
+            ->select('stock_id', DB::raw('SUM(quantity) as total_sold'))
+            ->whereIn('sale_id', $saleIds)
+            ->groupBy('stock_id')
+            ->get();
+
+        if ($salesDetails->isEmpty()) {
+            return response()->json(['items' => []]);
+        }
+
+        $stockIds = $salesDetails->pluck('stock_id')->unique();
+
+        // 3) Fetch current stock rows
+        $stockRows = DB::table('inv_current_stock')
+            ->select('id as stock_id', 'product_id', 'store_id', 'quantity')
+            ->whereIn('id', $stockIds)
+            ->when(!is_all_store(), function ($q) use ($default_store) {
+                $q->where('store_id', $default_store);
+            })
+            ->get();
+
+        if ($stockRows->isEmpty()) {
+            return response()->json(['items' => []]);
+        }
+
+        // 4) Aggregate sales per product_id
+        $salesPerProduct = $salesDetails->map(function ($row) use ($stockRows) {
+            $stock = $stockRows->firstWhere('stock_id', $row->stock_id);
+            return $stock ? [
+                'product_id' => $stock->product_id,
+                'store_id'   => $stock->store_id,
+                'sold'       => (float) $row->total_sold,
+            ] : null;
+        })->filter()
+        ->groupBy('product_id')
+        ->map(function ($group) {
+            return [
+                'product_id' => $group->first()['product_id'],
+                'store_id'   => $group->first()['store_id'],
+                'total_sold' => collect($group)->sum('sold'),
+            ];
+        });
+
+        // 5) Fetch total stock per product_id (sum for all batches)
+        $currentStock = DB::table('inv_current_stock')
+            ->select('product_id', DB::raw('SUM(quantity) as total_stock'))
+            ->when(!is_all_store(), function ($q) use ($default_store) {
+                $q->where('store_id', $default_store);
+            })
+            ->whereIn('product_id', $salesPerProduct->pluck('product_id'))
+            ->groupBy('product_id')
+            ->get()
+            ->keyBy('product_id');
+
+        // 6) Fetch product details
+        $products = DB::table('inv_products')
+            ->whereIn('id', $salesPerProduct->pluck('product_id'))
+            ->get()
+            ->keyBy('id');
+
+        // 7) Combine final items
+        $items = $salesPerProduct->map(function ($row) use ($currentStock, $products) {
+            $product = $products->get($row['product_id']);
+            $stock   = $currentStock->get($row['product_id']);
+
+            return [
+                'product_id'    => $row['product_id'],
+                'product'       => $product ? (array) $product : null,
+                'total_sold'    => (float) $row['total_sold'],
+                'current_stock' => $stock ? (float) $stock->total_stock : 0,
+                'store_id'      => $row['store_id'],
+            ];
+        })->values();
+
+        return response()->json(['items' => $items]);
+    }
     public function showDailyStockFilter(Request $request)
     {
 
@@ -142,7 +222,6 @@ class DailyStockCountController extends Controller
         }
 
     }
-
     public function generateDailyStockCountPDF(Request $request)
     {
 
@@ -155,7 +234,6 @@ class DailyStockCountController extends Controller
         $report_pdf->splitPdf($new_data, $view, $output);
 
     }
-
     public function processStockCountAdjustment(Request $request)
     {
         $request->validate([
@@ -236,7 +314,6 @@ class DailyStockCountController extends Controller
             return response()->json(['success' => false, 'message' => 'Error processing stock adjustments: ' . $e->getMessage()], 500);
         }
     }
-
     public function exportDailyStockCount(Request $request)
     {
         $date = $request->input('date', date('Y-m-d'));
