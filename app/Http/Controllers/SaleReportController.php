@@ -27,12 +27,13 @@ class SaleReportController extends Controller {
             abort(403, 'Access Denied');
         }
         $price_category = PriceCategory::all();
+        $enable_discount = Setting::where( 'id', 111 )->value( 'value' );
         $customers = Customer::join( 'sales', 'sales.customer_id', '=', 'customers.id' )
         ->join( 'sales_credits', 'sales_credits.sale_id', '=', 'sales.id' )
         ->groupby( 'customers.id' )
         ->orderBy('customers.name', 'asc')
         ->get();
-        return view( 'sale_reports.index', compact( 'price_category', 'customers' ) );
+        return view( 'sale_reports.index', compact( 'price_category', 'enable_discount', 'customers' ) );
     }
 
     protected function reportOption( Request $request ) {
@@ -205,6 +206,16 @@ class SaleReportController extends Controller {
             compact( 'data', 'pharmacy', 'enable_discount' ) )
             ->setPaper( 'a4', 'landscape' );
             return $pdf->stream( 'Credit_sales_total_report.pdf' );
+
+            case 15:
+            $data = $this->discountReport( $from, $to );
+            if ( $data->isEmpty() ) {
+                return response()->view( 'error_pages.pdf_zero_data' );
+            }
+            $pdf = PDF::loadView( 'sale_reports.discount_report_pdf',
+            compact( 'data', 'pharmacy') )
+            ->setPaper( 'a4', '' );
+            return $pdf->stream( 'Discount_report.pdf' );
 
             default:
 
@@ -1467,5 +1478,47 @@ unset($dayData);
         return $to_print;
 
     }
+    private function discountReport($from, $to)
+    {
+        if (!Auth()->user()->checkPermission('Discount Report')) {
+            abort(403, 'Access Denied');
+        }
 
+        $store_id = current_store_id();
+
+        $query = DB::table('sales_details as sd')
+            ->join('sales as s', 's.id', '=', 'sd.sale_id')
+            ->join('inv_current_stock as cs', 'cs.id', '=', 'sd.stock_id')
+            ->join('inv_products as p', 'p.id', '=', 'cs.product_id')
+            ->leftJoin('users as u', 'u.id', '=', 's.created_by')
+            ->select(
+                'p.id as product_id',
+                'p.name as product_name',
+                'p.brand',
+                'p.pack_size',
+                'p.sales_uom',
+                'cs.store_id',
+                's.receipt_number',
+                's.date',
+                DB::raw('SUM(sd.quantity) as quantity'),
+                DB::raw('SUM(sd.discount) as discount'),
+                DB::raw('SUM(sd.amount) as amount'),
+                DB::raw('u.name as created_by')
+            )
+            ->whereBetween('s.date', [$from, $to])
+            ->where('sd.discount', '>', 0);
+
+        if (!is_all_store()) {
+            $query->where('cs.store_id', $store_id);
+        }
+
+        $query->groupBy(
+            's.receipt_number'
+        )
+        ->orderBy('s.date', 'desc');
+
+        $discount_report = $query->get();
+
+        return $discount_report;
+    }
 }

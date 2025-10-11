@@ -72,6 +72,14 @@
                     </a>
                 </li>
             @endif
+            @if(auth()->user()->checkPermission('View Stock Taking'))
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" id="count-sheet-tablist"
+                        href="{{ route('stock-taking') }}" role="tab"
+                        aria-selected="false">Stock Taking
+                    </a>
+                </li>
+            @endif
         </ul>
         <div class="card">
             <div class="card-body">

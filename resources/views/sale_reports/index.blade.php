@@ -105,7 +105,7 @@
                                             <option value="6">Customer Payments Statement</option>
                                         @endif
                                         <!-- <option value="6">Bill Sales Details Report</option>
-                                                        <option value="7">Company Billing Report</option> -->
+                                                                <option value="7">Company Billing Report</option> -->
                                         @if(auth()->user()->checkPermission('Price List Report'))
                                             <option value="8">Price List Report</option>
                                         @endif
@@ -115,6 +115,11 @@
                                         @endif
                                         @if(auth()->user()->checkPermission('Sales Comparison Report'))
                                             <option value="12">Sales Comparison Report</option>
+                                        @endif
+                                        @if ($enable_discount === 'YES')
+                                            @if(auth()->user()->checkPermission('Discount Report'))
+                                                <option value="15">Discount Report</option>
+                                            @endif
                                         @endif
                                     </select>
                                 </div>
