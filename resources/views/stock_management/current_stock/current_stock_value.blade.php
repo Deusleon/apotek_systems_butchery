@@ -22,16 +22,26 @@
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
             <li class="nav-item">
-                <a class="nav-link  text-uppercase" id="current-stock-tablist" data-toggle="pill"
+                <a class="nav-link text-uppercase" id="current-stock-tablist" data-toggle="pill"
                     href="{{ url('inventory/current-stocks') }}" role="tab" aria-controls="current-stock"
                     aria-selected="true">Current Stock</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link active text-uppercase" id="all-stock-tablist" data-toggle="pill"
-                    href="{{ url('inventory/current-stock-value') }}" role="tab" aria-controls="stock_list"
-                    aria-selected="false">Current Stock Value
-                </a>
-            </li>
+            @if (auth()->user()->checkPermission('View Current Stock Value'))
+                <li class="nav-item">
+                    <a class="nav-link active text-uppercase" id="all-stock-tablist" data-toggle="pill"
+                        href="{{ url('inventory/current-stock-value') }}" role="tab" aria-controls="stock_list"
+                        aria-selected="false">Current Stock Value
+                    </a>
+                </li>
+            @endif
+            @if (auth()->user()->checkPermission('View OLd Stock Value'))
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" id="old-stock-tablist" data-toggle="pill"
+                        href="{{ url('inventory/old-stocks') }}" role="tab" aria-controls="stock_list" aria-selected="false">Old
+                        Stock Value
+                    </a>
+                </li>
+            @endif
         </ul>
         <div class="card">
             <div class="card-body">
@@ -59,13 +69,13 @@
                         <thead>
                             <tr>
                                 <th>Product Name</th> <!-- Product| npk| brand| pack size -->
-                                <th>Quantity</th>
-                                <th>Buy Price</th>
-                                <th>Sell Price</th>
-                                <th>Total Buy</th>
-                                <th>Total Sell</th>
-                                <th hidden>Total Profit</th>
-                                <th hidden>%Profit</th>
+                                <th style="text-align: center">Quantity</th>
+                                <th style="text-align: right">Buy Price</th>
+                                <th style="text-align: right">Sell Price</th>
+                                <th style="text-align: right">Total Buy</th>
+                                <th style="text-align: right">Total Sell</th>
+                                <th style="text-align: right" hidden>Total Profit</th>
+                                <th style="text-align: right" hidden>%Profit</th>
 
                             </tr>
                         </thead>
@@ -83,19 +93,19 @@
                                     (!empty($stock->sales_uom) ? '' . $stock->sales_uom : '')
                                 ) }}
                                                         </td>
-                                                        <td id="quantity_{{ $stock->product_id }}">
+                                                        <td style="text-align: center;" id="quantity_{{ $stock->product_id }}">
                                                             {{ floor($stock->quantity) == $stock->quantity ? number_format($stock->quantity, 0) : number_format($stock->quantity, 1) }}
                                                         </td>
-                                                        <td id="unitcost_{{ $stock->product_id }}">{{ number_format($stock->unit_cost, 2) ?? '' }}
+                                                        <td style="text-align: right" id="unitcost_{{ $stock->product_id }}">{{ number_format($stock->unit_cost, 2) ?? '' }}
                                                         </td>
-                                                        <td id="price_{{ $stock->product_id }}">{{ number_format($stock->price, 2) ?? '' }}</td>
-                                                        <td id="buy_{{ $stock->product_id }}">{{ number_format($stock->buying_price, 2) ?? '' }}
+                                                        <td style="text-align: right" id="price_{{ $stock->product_id }}">{{ number_format($stock->price, 2) ?? '' }}</td>
+                                                        <td style="text-align: right" id="buy_{{ $stock->product_id }}">{{ number_format($stock->buying_price, 2) ?? '' }}
                                                         </td>
-                                                        <td id="sell_{{ $stock->product_id }}">{{ number_format($stock->selling_price, 2) ?? '' }}
+                                                        <td style="text-align: right" id="sell_{{ $stock->product_id }}">{{ number_format($stock->selling_price, 2) ?? '' }}
                                                         </td>
-                                                        <td id="profit_{{ $stock->product_id }}" hidden>{{ number_format($stock->profit, 2) ?? '' }}
+                                                        <td style="text-align: right" id="profit_{{ $stock->product_id }}" hidden>{{ number_format($stock->profit, 2) ?? '' }}
                                                         </td>
-                                                        <td id="percent_profit{{ $stock->product_id }}" hidden>
+                                                        <td style="text-align: right" id="percent_profit{{ $stock->product_id }}" hidden>
                                                             @if($stock->buying_price > 0)
                                                                 {{  number_format($stock->profit / $stock->buying_price * 100, 0) ?? '' }}
                                                             @else
@@ -120,8 +130,6 @@
 
 @push("page_scripts")
     <script>
-        //Load all current product values
-
         //Datatable and Tabs managed here
         $(document).ready(function () {
 

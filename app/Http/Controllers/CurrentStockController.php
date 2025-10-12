@@ -261,87 +261,142 @@ class CurrentStockController extends Controller
         ]);
     }
     
-public function getStockValue(Request $request)
-{
-    $store_id = current_store_id();
-    $price_category = $request->price_category ?? 1;
-    $price_categories = PriceCategory::all();
+    public function getStockValue(Request $request)
+    {
+        $store_id = current_store_id();
+        $price_category = $request->price_category ?? 1;
+        $price_categories = PriceCategory::all();
 
-    try {
-        // Subquery kupata latest inv_current_stock per product
-        $latestStock = DB::table('inv_current_stock as ics1')
-            ->select('ics1.product_id', 'ics1.id as latest_stock_id', 'ics1.unit_cost')
-            ->whereRaw('ics1.id = (
-                SELECT ics2.id
-                FROM inv_current_stock as ics2
-                WHERE ics2.product_id = ics1.product_id
-                ' . (!is_all_store() ? 'AND ics2.store_id = ' . (int)$store_id : '') . '
-                ORDER BY ics2.created_at DESC, ics2.id DESC
-                LIMIT 1
-            )');
+        try {
+            // Subquery kupata latest inv_current_stock per product
+            $latestStock = DB::table('inv_current_stock as ics1')
+                ->select('ics1.product_id', 'ics1.id as latest_stock_id', 'ics1.unit_cost')
+                ->whereRaw('ics1.id = (
+                    SELECT ics2.id
+                    FROM inv_current_stock as ics2
+                    WHERE ics2.product_id = ics1.product_id
+                    ' . (!is_all_store() ? 'AND ics2.store_id = ' . (int)$store_id : '') . '
+                    ORDER BY ics2.created_at DESC, ics2.id DESC
+                    LIMIT 1
+                )');
 
-        // Subquery kupata latest selling price per stock_id
-        $latestPrice = DB::table('sales_prices as sp1')
-            ->select('sp1.stock_id', 'sp1.price')
-            ->where('sp1.price_category_id', $price_category)
-            ->whereRaw('sp1.id = (
-                SELECT sp2.id
-                FROM sales_prices as sp2
-                WHERE sp2.stock_id = sp1.stock_id
-                  AND sp2.price_category_id = ' . $price_category . '
-                ORDER BY sp2.created_at DESC, sp2.id DESC
-                LIMIT 1
-            )');
+            // Subquery kupata latest selling price per stock_id
+            $latestPrice = DB::table('sales_prices as sp1')
+                ->select('sp1.stock_id', 'sp1.price')
+                ->where('sp1.price_category_id', $price_category)
+                ->whereRaw('sp1.id = (
+                    SELECT sp2.id
+                    FROM sales_prices as sp2
+                    WHERE sp2.stock_id = sp1.stock_id
+                    AND sp2.price_category_id = ' . $price_category . '
+                    ORDER BY sp2.created_at DESC, sp2.id DESC
+                    LIMIT 1
+                )');
 
-        // Main query
-        $stocks = DB::table('inv_current_stock as ics')
-            ->join('inv_products as p', 'ics.product_id', '=', 'p.id')
-            ->joinSub($latestStock, 'latest_stock', function($join) {
-                $join->on('ics.product_id', '=', 'latest_stock.product_id');
-            })
-            ->leftJoinSub($latestPrice, 'latest_price', function($join) {
-                $join->on('latest_stock.latest_stock_id', '=', 'latest_price.stock_id');
-            })
-            ->select(
-                'ics.product_id',
-                'p.name',
-                'p.brand',
-                'p.pack_size',
-                'p.sales_uom',
-                'latest_stock.unit_cost',
-                'latest_price.price',
-                DB::raw('SUM(ics.quantity) as quantity'),
-                DB::raw('SUM(ics.quantity * latest_stock.unit_cost) as buying_price'),
-                DB::raw('SUM(ics.quantity * COALESCE(latest_price.price, 0)) as selling_price'),
-                DB::raw('SUM(ics.quantity * COALESCE(latest_price.price, 0)) - SUM(ics.quantity * latest_stock.unit_cost) as profit')
-            )
-            ->groupBy(
-                ['ics.product_id',
-                'p.name',
-                'p.brand',
-                'p.pack_size',
-                'p.sales_uom',
-                'latest_stock.unit_cost']
-            );
+            // Main query
+            $stocks = DB::table('inv_current_stock as ics')
+                ->join('inv_products as p', 'ics.product_id', '=', 'p.id')
+                ->joinSub($latestStock, 'latest_stock', function($join) {
+                    $join->on('ics.product_id', '=', 'latest_stock.product_id');
+                })
+                ->leftJoinSub($latestPrice, 'latest_price', function($join) {
+                    $join->on('latest_stock.latest_stock_id', '=', 'latest_price.stock_id');
+                })
+                ->select(
+                    'ics.product_id',
+                    'p.name',
+                    'p.brand',
+                    'p.pack_size',
+                    'p.sales_uom',
+                    'latest_stock.unit_cost',
+                    'latest_price.price',
+                    DB::raw('SUM(ics.quantity) as quantity'),
+                    DB::raw('SUM(ics.quantity * latest_stock.unit_cost) as buying_price'),
+                    DB::raw('SUM(ics.quantity * COALESCE(latest_price.price, 0)) as selling_price'),
+                    DB::raw('SUM(ics.quantity * COALESCE(latest_price.price, 0)) - SUM(ics.quantity * latest_stock.unit_cost) as profit')
+                )
+                ->groupBy(
+                    ['ics.product_id',
+                    'p.name',
+                    'p.brand',
+                    'p.pack_size',
+                    'p.sales_uom',
+                    'latest_stock.unit_cost']
+                );
 
-        if (!is_all_store()) {
-            $stocks->where('ics.store_id', $store_id);
+            if (!is_all_store()) {
+                $stocks->where('ics.store_id', $store_id);
+            }
+
+            $stocks = $stocks->get();
+            
+            return view('stock_management.current_stock.current_stock_value')->with([
+                'stocks' => $stocks,
+                'price_categories' => $price_categories
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error in getStockValue: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'An error occurred while fetching stock data'
+            ], 500);
         }
-
-        $stocks = $stocks->get();
-        
-        return view('stock_management.current_stock.current_stock_value')->with([
-            'stocks' => $stocks,
-            'price_categories' => $price_categories
-        ]);
-
-    } catch (\Exception $e) {
-        Log::error('Error in getStockValue: ' . $e->getMessage());
-        return response()->json([
-            'error' => 'An error occurred while fetching stock data'
-        ], 500);
     }
-}
+
+    public function getOldStockValue(Request $request)
+    {
+        // dd($request->all());
+        $store_id = current_store_id();
+        $price_category = $request->price_category ?? 1; 
+        $date = $request->date ?? \Carbon\Carbon::now()->subDay()->toDateString(); // default yesterday
+        $price_categories = PriceCategory::all();
+
+        try {
+            $query = DB::table('inv_old_stock_values as os')
+                ->join('inv_products as p', 'os.product_id', '=', 'p.id')
+                ->select(
+                    'os.product_id',
+                    'p.name',
+                    'p.brand',
+                    'p.pack_size',
+                    'p.sales_uom',
+                    'os.buy_price',
+                    'os.sell_price',
+                    DB::raw('SUM(os.quantity) as quantity'),
+                    DB::raw('SUM(os.quantity * os.buy_price) as buying_price'),
+                    DB::raw('SUM(os.quantity * COALESCE(os.sell_price, 0)) as selling_price'),
+                    DB::raw('SUM(os.quantity * COALESCE(os.sell_price, 0)) - SUM(os.quantity * os.buy_price) as profit')
+                )
+                ->where('os.snapshot_date', $date)
+                ->groupBy(
+                    [
+                        'os.product_id'
+                    ]
+                );
+
+            if ($price_category !== null) {
+                $query->where('os.price_category_id', $price_category);
+            } else {
+                $query->whereNull('os.price_category_id');
+            }
+
+            if (!is_all_store()) {
+                $query->where('os.store_id', $store_id);
+            }
+
+            $stocks = $query->get();
+
+            return view('stock_management.current_stock.old_stock_value')->with([
+                'stocks' => $stocks,
+                'price_categories' => $price_categories,
+                'selected_date' => $date,
+                'selected_price_category' => $price_category
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in getOldStockValue: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while fetching old stock data'], 500);
+        }
+    }
 
     public function filterStockValue(Request $request)
     {

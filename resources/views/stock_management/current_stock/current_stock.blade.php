@@ -35,12 +35,14 @@
                         </a>
                     </li>
                 @endif
-                {{-- <li class="nav-item">--}}
-                    {{-- <a class="nav-link text-uppercase" id="old-stock-tablist" data-toggle="pill" --}} {{--
-                        href="{{ url('inventory/old-stocks') }}" role="tab" --}} {{-- aria-controls="stock_list"
-                        aria-selected="false">Old Value--}}
-                        {{-- </a>--}}
-                    {{-- </li>--}}
+                @if (auth()->user()->checkPermission('View OLd Stock Value'))
+                    <li class="nav-item">
+                        <a class="nav-link text-uppercase" id="old-stock-tablist" data-toggle="pill"
+                            href="{{ url('inventory/old-stocks') }}" role="tab" aria-controls="stock_list" aria-selected="false">Old
+                            Stock Value
+                        </a>
+                    </li>
+                @endif
             </ul>
             <div class="card">
                 <div class="card-body">

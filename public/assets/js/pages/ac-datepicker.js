@@ -74,6 +74,15 @@ $(document).ready(function () {
         endDate: new Date(),
     });
     $("#cash_sale_date").prop("readonly", true);
+    
+    $("#old_stock_date").datepicker({
+        autoclose: true,
+        todayHighlight: true,
+        format: "yyyy-mm-dd",
+        changeYear: true,
+        endDate: new Date(),
+    });
+    // $("#old_stock_date").prop("readonly", true);
 
     $("#rec_d").datepicker({
         autoclose: true,

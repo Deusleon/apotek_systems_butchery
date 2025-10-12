@@ -324,7 +324,7 @@ Route::middleware(["auth","main_branch"])->group(function () {
     /*New Routes for Current Stock*/
     Route::get('inventory/current-stocks','CurrentStockController@currentStock')->name('current-stocks');
     Route::post('inventory/api/current-stocks','CurrentStockController@currentStockApi')->name('current-stocks-filter');
-    Route::get('inventory/old-stocks','CurrentStockController@oldStock')->name('old-stocks');
+    Route::get('inventory/old-stocks','CurrentStockController@getOldStockValue')->name('old-stocks');
     Route::get('inventory/current-stock-value','CurrentStockController@getStockValue')->name('all-stocks');
     Route::post('inventory/current-stock-value','CurrentStockController@getStockValue')->name('current_stock_value');
     Route::post('inventory/filtered_values','CurrentStockController@filterStockValue')->name('stock-value-filter');

@@ -5,6 +5,7 @@ namespace App\Console;
 use App\Console\Commands\CalculateStockValues;
 use App\Console\Commands\CheckLowStock;
 use App\Console\Commands\FixStockPermissions;
+use App\Console\Commands\SnapshotOldStockValue;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -18,7 +19,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         CalculateStockValues::class,
         CheckLowStock::class,
-        FixStockPermissions::class
+        FixStockPermissions::class,
     ];
 
     /**
@@ -31,6 +32,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('stock:calculate-values')->hourly();
         $schedule->command('stock:check-low')->hourly();
+        $schedule->command('snapshot:oldstock')->dailyAt('00:00')->withoutOverlapping();
     }
 
     /**

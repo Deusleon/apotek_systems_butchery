@@ -89,7 +89,7 @@
                         <input type="text" name="outgoing-date" id="outgoing-date" class="form-control w-auto">
                     </div>
                     <div class="d-flex justify-content-end mb-3">
-                        <div class="d-flex align-items-center" style="width: 256px;">
+                        <div class="d-flex align-items-center" style="width: 248px;">
                             <label for="price_category" class="form-label mb-0"
                                 style="white-space: nowrap; margin-right: 10px;">Type:</label>
                             <select name="category" class="js-example-basic-single form-control" id="category_id">

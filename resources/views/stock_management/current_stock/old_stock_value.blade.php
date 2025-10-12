@@ -22,69 +22,86 @@
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
             <li class="nav-item">
-                <a class="nav-link  text-uppercase" id="current-stock-tablist" data-toggle="pill"
-                   href="{{ url('inventory/current-stocks') }}" role="tab"
-                   aria-controls="current-stock" aria-selected="true">Current Stock</a>
+                <a class="nav-link text-uppercase" id="current-stock-tablist" data-toggle="pill"
+                    href="{{ url('inventory/current-stocks') }}" role="tab" aria-controls="current-stock"
+                    aria-selected="true">Current Stock</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link text-uppercase" id="all-stock-tablist" data-toggle="pill"
-                   href="{{ url('inventory/all-stocks') }}" role="tab"
-                   aria-controls="stock_list" aria-selected="false">Current Stock Value
-                </a>
-            </li>
-{{--            <li class="nav-item">--}}
-{{--                <a class="nav-link active text-uppercase" id="old-stock-tablist" data-toggle="pill"--}}
-{{--                   href="{{ url('inventory/old-stocks') }}" role="tab"--}}
-{{--                   aria-controls="stock_list" aria-selected="false">Old Value--}}
-{{--                </a>--}}
-{{--            </li>--}}
+            @if (auth()->user()->checkPermission('View Current Stock Value'))
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" id="all-stock-tablist" data-toggle="pill"
+                        href="{{ url('inventory/current-stock-value') }}" role="tab" aria-controls="stock_list"
+                        aria-selected="false">Current Stock Value
+                    </a>
+                </li>
+            @endif
+            @if (auth()->user()->checkPermission('View OLd Stock Value'))
+                <li class="nav-item">
+                    <a class="nav-link active text-uppercase" id="old-stock-tablist" data-toggle="pill"
+                        href="{{ url('inventory/old-stocks') }}" role="tab" aria-controls="stock_list" aria-selected="false">Old
+                        Stock Value
+                    </a>
+                </li>
+            @endif
         </ul>
         <div class="card">
             <div class="card-body">
-                <div class="form-group row">
-                    <div class="col-md-6">
+                <form method="GET" action="{{ route('old-stocks') }}">
+                    @csrf
 
+                    <div class="d-flex justify-content-end mb-3 align-items-center">
+                        <label class="mr-2" for="">Date:</label>
+                        <input type="text" name="old_stock_date" id="old_stock_date" class="form-control w-auto">
                     </div>
-                    <div class="col-md-3" style="margin-left: 2.5%">
-                        <label style="margin-left: 80%" for="issued_date"
-                               class="col-form-label text-md-right">Date:</label>
+                    <div class="d-flex justify-content-end mb-3">
+                        <div class="d-flex align-items-center" style="width: 284px;">
+                            <label for="price_category" class="form-label mb-0"
+                                style="white-space: nowrap; margin-right: 10px;">Price Type:</label>
+                            <select name="price_category" id="price_category" class="form-control"
+                                onchange="this.form.submit()">
+                                @foreach($price_categories as $price_category)
+                                    <option value="{{ $price_category->id }}" {{ $price_category->id == request('price_category', 1) ? 'selected' : '' }}>
+                                        {{ $price_category->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
-                    <div class="col-md-3" style="margin-left: -3.1%">
-                        <input style="width: 103.4%;" type="text" name="adjustment-date"
-                               onchange="loadStockValues()"
-                               class="form-control" id="adjustment-date" value=""/>
-                    </div>
-                </div>
-
+                </form>
                 {{--Stock Value Div Begins here--}}
                 <div class="table-responsive" id="summary">
 
-                <table id="current_stock" class="table table-striped table-hover mb-3" style="background: white;width: 100%">
+                    <table id="old_stock" class="table table-striped table-hover mb-3"
+                        style="background: white;width: 100%">
 
                         <thead>
-                        <tr>
-                            <th>Product Name</th>
-                            <th>Quantity</th>
-                            <th>Cost</th>
-                            <th>Price</th>
-                            <th>Total Cost</th>
-                            <th>Total Sell</th>
-                            <th>Total Profit</th>
-                        </tr>
-                        </thead>
-
-                        <tbody>
-                        @foreach ($stocks as $stock)
                             <tr>
-                                <td id="name_{{ $stock->product_id }}">{{ $stock->name ?? '' }}</td>
-                                <td id="quantity_{{ $stock->product_id }}">{{ number_format($stock->quantity,0) ?? '' }}</td>
-                                <td id="quantity_{{ $stock->product_id }}">{{ number_format($stock->unit_cost,0) ?? '' }}</td>
-                                <td id="quantity_{{ $stock->product_id }}">{{ number_format($stock->price,0) ?? '' }}</td>
-                                <td id="batch_{{ $stock->product_id }}">{{ number_format($stock->buying_price,0) ?? '' }}</td>
-                                <td id="expiry_{{ $stock->product_id }}">{{ number_format($stock->selling_price,0) ?? '' }}</td>
-                                <td id="expiry_{{ $stock->product_id }}">{{ number_format($stock->profit,0) ?? '' }}</td>
+                                <th>Product Name</th>
+                                <th style="text-align: center;">Quantity</th>
+                                <th style="text-align: right;">Buy Price</th>
+                                <th style="text-align: right;">Sell Price</th>
+                                <th style="text-align: right;">Total Buy</th>
+                                <th style="text-align: right;">Total Sell</th>
                             </tr>
-                        @endforeach
+                        </thead>
+                        {{-- @dd($stocks) --}}
+                        <tbody>
+                            @foreach ($stocks as $stock)
+                                <tr>
+                                    <td>{{ $stock->name . ' ' . ($stock->brand ? $stock->brand . ' ' : $stock->brand) . ($stock->pack_size ?? '') . ($stock->sales_uom ?? '') }}
+                                    </td>
+                                    <td style="text-align: center;">{{ number_format($stock->quantity, 0) ?? 0 }}
+                                    </td>
+                                    <td style="text-align: right;">{{ number_format($stock->buy_price, 2) ?? 0 }}
+                                    </td>
+                                    <td style="text-align: right;">{{ number_format($stock->sell_price, 2) ?? 0 }}</td>
+                                    <td style="text-align: right;">
+                                        {{ number_format($stock->quantity * $stock->buy_price, 2) ?? 0 }}
+                                    </td>
+                                    <td style="text-align: right;">
+                                        {{ number_format($stock->quantity * $stock->sell_price, 2) ?? 0 }}
+                                    </td>
+                                </tr>
+                            @endforeach
                         </tbody>
 
                     </table>
@@ -101,126 +118,34 @@
 @endsection
 
 @push("page_scripts")
+    <script src="{{asset('assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js')}}"></script>
+    <script src="{{asset('assets/js/pages/ac-datepicker.js')}}"></script>
     <script>
         //Datatable and Tabs managed here
         $(document).ready(function () {
 
-            $('#current_stock').DataTable({
+            $('#old_stock').DataTable({
                 responsive: true,
                 order: [[0, 'asc']]
             });
 
-            $('#current-stock-tablist').on('click', function(e) {
+            $('#current-stock-tablist').on('click', function (e) {
                 e.preventDefault(); // Prevent default tab switching behavior
                 var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
                 window.location.href = redirectUrl; // Redirect to the URL
             });
 
-            $('#old-stock-tablist').on('click', function(e) {
+            $('#old-stock-tablist').on('click', function (e) {
                 e.preventDefault(); // Prevent default tab switching behavior
                 var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
                 window.location.href = redirectUrl; // Redirect to the URL
             });
 
-            $('#all-stock-tablist').on('click', function(e) {
+            $('#all-stock-tablist').on('click', function (e) {
                 e.preventDefault(); // Prevent default tab switching behavior
                 var redirectUrl = $(this).attr('href'); // Get the URL from the href attribute
                 window.location.href = redirectUrl; // Redirect to the URL
             });
         });
-
-        //Table Data managed here
-        function loadStockValues()
-        {
-            var dates = document.querySelector('input[name=adjustment-date]').value;
-            dates = dates.split('-');
-
-            $(document).ready(function () {
-
-                var table = $('#current_stock').DataTable();
-
-                $.ajax({
-                    headers: {
-                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-                        "X-Requested-With": "XMLHttpRequest"
-                    },
-                    url: 'https://bensagrostar.net/inventory/filtered_values',
-                    type: 'POST',
-                    data: {
-                        _token: "{{csrf_token()}}",
-                        date_from: dates[0],
-                        date_to: dates[1]
-                    },
-                    success: function (response) {
-
-                        console.log('Current Stock loading...', response)
-
-                        $('#current_stock tbody tr').hide();
-                        $('#current_stock tbody').empty();
-
-                        table.clear().draw();
-
-                        response.forEach(function (data_returned) {
-                            var roundedQuantity = Math.round(data_returned.quantity);
-
-                            // Construct the new row as an array for DataTable
-                            var newRow = [
-                                data_returned.name || '',
-                                roundedQuantity.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }),
-                                data_returned.unit_cost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '',
-                                data_returned.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '',
-                                data_returned.buying_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '',
-                                data_returned.selling_price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '',
-                                data_returned.profit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || ''
-                            ];
-
-                            // Append the new row to the DataTable
-                            table.row.add(newRow).draw();
-                        });
-
-                    },
-                    error: function (error) {
-                        console.error('Error fetching users:', error)
-                    }
-                });
-            });
-        }
-
-        //Calender managed here
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-
-        $(function () {
-
-            var start = moment();
-            var end = moment();
-
-            function cb(start, end) {
-                $('#adjustment-date span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-            }
-
-            $('#adjustment-date').daterangepicker({
-                startDate: moment().startOf('month'),
-                endDate: moment().endOf('month'),
-                maxDate: end,
-                autoUpdateInput: true,
-                ranges: {
-                    'Today': [moment(), moment()],
-                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                    'This Month': [moment().startOf('month'), moment().endOf('month')],
-                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-                    'This Year': [moment().startOf('year'), moment()]
-                }
-            }, cb);
-
-            cb(start, end);
-
-        });
-
     </script>
 @endpush

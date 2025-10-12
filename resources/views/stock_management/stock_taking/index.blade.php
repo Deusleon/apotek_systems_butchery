@@ -64,13 +64,13 @@
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
             @if(auth()->user()->checkPermission('View Stock Count'))
                 <li class="nav-item">
-                    <a class="nav-link text-uppercase" id="daily-stock-tablist" data-toggle="pill"
+                    <a class="nav-link text-uppercase" id="daily-stock-tablist"
                         href="{{ url('inventory/daily-stock-count') }}" role="tab" aria-selected="true">Daily Stock Count</a>
                 </li>
             @endif
             @if(auth()->user()->checkPermission('View Outgoing Stock'))
                 <li class="nav-item">
-                    <a class="nav-link text-uppercase" id="outgoing-stock-tablist" data-toggle="pill"
+                    <a class="nav-link text-uppercase" id="outgoing-stock-tablist" 
                         href="{{ url('inventory/out-going-stock') }}" role="tab" aria-selected="false">Outgoing Stock
                     </a>
                 </li>
@@ -482,6 +482,25 @@
                     });
                 });
 
+            });
+        
+            $(document).ready(function () {
+                var baseUrl = $('#count-sheet-tablist').attr('href');
+
+                $('#count-sheet-tablist').on('click', function (e) {
+                    e.preventDefault();
+                    $('#confirmModal').modal('show');
+                });
+
+                $('#confirmYes').on('click', function () {
+                    $('#confirmModal').modal('hide');
+                    window.open(baseUrl + '?showQoH=1', '_blank');
+                });
+
+                $('#confirmNo').on('click', function () {
+                    $('#confirmModal').modal('hide');
+                    window.open(baseUrl + '?showQoH=0', '_blank');
+                });
             });
         </script>
 

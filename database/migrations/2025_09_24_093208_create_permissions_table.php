@@ -62,6 +62,7 @@ class CreatePermissionsTable extends Migration
             // Inventory Sub Modules
             ['name' => 'View Current Stock', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
             ['name' => 'View Current Stock Value', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
+            ['name' => 'View OLd Stock Value', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
             ['name' => 'View Products List', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
             ['name' => 'Add Products', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
             ['name' => 'Edit Products', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],

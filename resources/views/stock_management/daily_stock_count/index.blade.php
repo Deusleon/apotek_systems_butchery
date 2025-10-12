@@ -105,7 +105,6 @@
                             <image id="loading-image" src="{{asset('assets/images/spinner.gif')}}"></image>
                         </div>
 
-
                         <div class="d-flex justify-content-end mb-3 align-items-center">
                             <label class="mr-2" for="">Date:</label>
                             <input type="text" name="sale_date" id="d_auto_8" class="form-control w-auto">
