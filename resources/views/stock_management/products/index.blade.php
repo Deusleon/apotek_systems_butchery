@@ -154,7 +154,7 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label>Product Name<span class="text-danger">*</span></label>
+                                    <label>Name<span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="name_edit" disabled>
                                 </div>
                             </div>

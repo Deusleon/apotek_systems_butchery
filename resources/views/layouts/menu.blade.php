@@ -55,10 +55,7 @@
             <span class="pcoded-mtext">Inventory</span>
         </a>
         <ul class="pcoded-submenu">
-            @if(auth()->user()->checkPermission('View Current Stock'))
-                <li class=""><a href="{{ route('current-stocks') }}" class="">Current Stock</a></li>
-            @endif
-            @if(auth()->user()->checkPermission('View Products List'))
+             @if(auth()->user()->checkPermission('View Products List'))
                 <li class=""><a href="{{route('products.index')}}" class="">Product List</a></li>
             @endif
             @if(auth()->user()->checkPermission('Products Import'))
@@ -66,8 +63,15 @@
                             Import</span></a>
                 </li>
             @endif
+            @if(auth()->user()->checkPermission('View Current Stock'))
+                <li class=""><a href="{{ route('current-stocks') }}" class="">Current Stock</a></li>
+            @endif
+                <li class=""><a href="" class="">Stock Details</a></li>
             @if(auth()->user()->checkPermission('View Price List'))
                 <li class=""><a href="{{ route('price-list.index') }}" class="">Price List</a></li>
+            @endif
+             @if(auth()->user()->checkPermission('View Stock Adjustment'))
+                <li class=""><a href="{{ route('new-stock-adjustment') }}" class="">Stock Adjustment</a></li>
             @endif
             @if(auth()->user()->checkPermission('View Requisition'))
                 <li class=""><a href="{{ route('requisitions.create')}}" class="">Stock Requisition</a></li>
@@ -75,12 +79,8 @@
             @if(auth()->user()->checkPermission('View Stock Issue'))
                 <li class=""><a href="{{ route('issue.index') }}" class="">Stock Issue</a></li>
             @endif
-
             @if(auth()->user()->checkPermission('View Stock Transfer'))
                 <li class=""><a href="{{ route('stock-transfer.index') }}" class="">Stock Transfer</a></li>
-            @endif
-            @if(auth()->user()->checkPermission('View Stock Adjustment'))
-                <li class=""><a href="{{ route('new-stock-adjustment') }}" class="">Stock Adjustment</a></li>
             @endif
             @if(auth()->user()->checkPermission('View Stock Count'))
                 <li class=""><a href="{{ route('daily-stock-count.index') }}" class="">Stock Count</a></li>
