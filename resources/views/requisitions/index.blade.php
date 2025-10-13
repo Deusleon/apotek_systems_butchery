@@ -36,10 +36,10 @@
                                 <thead>
                                     <tr>
                                         <th>Req #</th>
-                                        <th>Products</th>
+                                        <th>Date</th>
                                         <th>From</th>
                                         <th>To</th>
-                                        <th>Date</th>
+                                        <th>Products</th>
                                         <th>Action</th>                                   
                                     </tr>
                                 </thead>
@@ -182,11 +182,11 @@
                     name: 'req_no'
                 },
                 {
-                    data: 'products',
-                    name: 'products',
-                    render: function(data, type, row) {
-                        return data || '';
-                    }
+                    data: 'reqDate', 
+                    render: function (date) {
+                        return moment(date).format('YYYY-MM-DD');
+                    },
+                    orderable: false,
                 },
                 {
                     data: 'fromStore',
@@ -197,17 +197,17 @@
                     name: 'toStore'
                 },
                 {
-                    data: 'reqDate', 
-                    render: function (date) {
-                        return moment(date).format('YYYY-MM-DD');
-                    },
-                    orderable: false,
-                },
-                    {
-                        data: 'action',
-                        orderable: false,
-                        searchable: false
+                    data: 'products',
+                    name: 'products',
+                    render: function(data, type, row) {
+                        return data || '';
                     }
+                },
+                {
+                    data: 'action',
+                    orderable: false,
+                    searchable: false
+                }
             ]
         });
 

@@ -197,7 +197,7 @@ class RequisitionController extends Controller
             $requisition->remarks = $request->remark;
             $requisition->evidence_document = $evidencePath; // FIXED COLUMN NAME
             $requisition->from_store = $from_store;
-            $requisition->to_store = Auth::user()->store_id;
+            $requisition->to_store = current_store_id();
             $requisition->status = 0;
             $requisition->created_by = Auth::user()->id;
 

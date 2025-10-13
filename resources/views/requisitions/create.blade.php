@@ -12,7 +12,7 @@
 @section('content')
 
     @php
-        $current_store = session('current_store_id') ?? auth()->user()->store_id;
+        $current_store = current_store_id();
         $is_all_branch = $current_store == 1;
     @endphp
 
@@ -59,7 +59,7 @@
                                     <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
                                         <option value="">Select Branch...</option>
                                         @foreach ($stores as $item)
-                                            @if($item->id != Auth::user()->store_id)
+                                            @if($item->id != $current_store)
                                                 <option value="{{ $item->id }}">{{ $item->name }}</option>
                                             @endif
                                         @endforeach
@@ -69,7 +69,7 @@
 
                                 <!--Concurtination of product name, brand, pack_size and sales_uom-->
                                 <div class="form-group col-md-6">
-                                    <label for="products">Select Products <font color="red">*</font></label>
+                                    <label for="products">Products <font color="red">*</font></label>
                                     <select name="products" class="js-example-basic-single form-control products" id="products">
                                         <option value="">Select Products...</option>
                                         @foreach ($items as $item)
