@@ -124,7 +124,7 @@
                                 <th>Category</th>
                                 <th>Batch Number</th>
                                 @if ($expireEnabled)
-                                    <th>Expire Date</th>
+                                    <th>Expiry Date</th>
                                 @endif
                                 <th>Quantity</th>
                                 @if(auth()->user()->checkPermission('Create Stock Adjustment'))
@@ -235,7 +235,7 @@
                                 <th>Category</th>
                                 <th>Batch Number</th>
                                 @if ($expireEnabled)
-                                    <th>Expire Date</th>
+                                    <th>Expiry Date</th>
                                 @endif
                                 <th>Quantity</th>
                                 @if(auth()->user()->checkPermission('Create Stock Adjustment'))
@@ -347,7 +347,7 @@
                                 <th>Category</th>
                                 <th>Batch Number</th>
                                 @if ($expireEnabled)
-                                    <th>Expire Date</th>
+                                    <th>Expiry Date</th>
                                 @endif
                                 <th>Quantity</th>
                                 @if(auth()->user()->checkPermission('Create Stock Adjustment'))

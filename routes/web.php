@@ -552,9 +552,9 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::post('/budget/budgets-approve',[BudgetController::class,'index'])->name('budget.approve');
 
     /* Requisition */
-    Route::get('purchases/requisitions', 'RequisitionController@index')->name('requisitions.index');
+    Route::get('Inventory/StockRequisitions/Requisition-list', 'RequisitionController@index')->name('requisitions.index');
     Route::get('requisitions/issue-history/print/{id}', 'RequisitionController@printIssueHistory')->name('requisitions.issue-history.print');
-    Route::get('purchases/requisitions-create', 'RequisitionController@create')->name('requisitions.create');
+    Route::get('Inventory/StockRequisitions/new', 'RequisitionController@create')->name('requisitions.create');
     Route::get('search_items', 'RequisitionController@search_items')->name('search_items');
     Route::post('requisitions-store', 'RequisitionController@store')->name('requisitions.store');
     Route::post('requisitions-update', 'RequisitionController@update')->name('requisitions.update');

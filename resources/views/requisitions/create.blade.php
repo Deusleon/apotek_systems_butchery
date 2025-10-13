@@ -23,13 +23,13 @@
                 <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
                     <li class="nav-item">
                         <a class="nav-link active text-uppercase" id="requisition-create" data-toggle="pill"
-                            href="{{ url('purchases/requisitions-create') }}" role="tab"
+                            href="{{ url('Inventory/StockRequisitions/new') }}" role="tab"
                             aria-controls="current-stock" aria-selected="true">New</a>
                     </li>
                     @if(Auth::user()->checkPermission('View Requisition List'))
                     <li class="nav-item">
                         <a class="nav-link text-uppercase" id="requisitions" data-toggle="pill"
-                            href="{{ url('purchases/requisitions') }}" role="tab"
+                            href="{{ url('Inventory/StockRequisitions/Requisition-list') }}" role="tab"
                             aria-controls="stock_list" aria-selected="false">Requisition List
                         </a>
                     </li>
@@ -42,7 +42,7 @@
                             <!-- Store and Products Selection -->
                             <div class="row mb-3">
                                 <div class="form-group col-md-3">
-                                    <label for="from_store">Requesting From <font color="red">*</font></label>
+                                    <label for="from_store">Supplying Branch <font color="red">*</font></label>
                                     
                                     @if(!auth()->user()->checkPermission('Manage All Branches'))
                                     <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
