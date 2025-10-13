@@ -120,7 +120,7 @@
                                     <th>Category</th>
                                     <th>Batch Number</th>
                                     @if ($expireEnabled)
-                                        <th>Expire Date</th>
+                                        <th>Expiry Date</th>
                                     @endif
                                     <th>Quantity</th>
                                 </tr>
@@ -206,7 +206,7 @@
                                     <th>Category</th>
                                     <th>Batch Number</th>
                                     @if ($expireEnabled)
-                                        <th>Expire Date</th>
+                                        <th>Expiry Date</th>
                                     @endif
                                     <th>Quantity</th>
                                 </tr>
@@ -284,7 +284,7 @@
                                     <th>Category</th>
                                     <th>Batch Number</th>
                                     @if ($expireEnabled)
-                                        <th>Expire Date</th>
+                                        <th>Expiry Date</th>
                                     @endif
                                     <th>Quantity</th>
                                 </tr>

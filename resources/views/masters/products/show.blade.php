@@ -14,7 +14,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="row mb-3 gap-3 width-100">
-                            <label class="col text-right">Product Name:</label>
+                            <label class="col text-right">Name:</label>
                             <div class="col text-dark" id="name_edit"></div>
                         </div>
                         <div class="row mb-3 gap-3">

@@ -17,7 +17,7 @@
                             {{-- Product Name --}}
                             <div class="form-group row">
                                 <label for="name" class="col-md-4 col-form-label text-md-right">
-                                    Product Name<span class="text-danger">*</span>
+                                    Name<span class="text-danger">*</span>
                                 </label>
                                 <div class="col-md-8">
                                     <input type="text" class="form-control" id="name_edit" name="name" maxlength="50"

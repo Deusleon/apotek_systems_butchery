@@ -143,10 +143,11 @@ class PriceListController extends Controller {
                     'cs.id as id',
                     'sp.price_category_id as price_category_id',
                     'cs.created_at as purchased_at',
-                    'sp.created_at as price_date' 
+                    'sp.created_at as price_date'
                 )
                 ->where('sp.price_category_id', $categoryId)
                 ->where('cs.unit_cost', '>', 0)
+                ->where('cs.quantity', '>', 0)
                 ->orderBy('cs.batch_number', 'desc')
                 ->orderBy('sp.created_at', 'desc');
                 if (!is_all_store()) {

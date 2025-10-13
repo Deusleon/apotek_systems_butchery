@@ -140,8 +140,8 @@
                                     @endif
                                     <th>Buy Price</th>
                                     <th>Sell Price</th>
+                                    <th>Profit%</th>
                                     {{-- <th>Purchase Date</th> --}}
-                                    <th hidden>Profit%</th>
                                     <th hidden>Real Time</th>
                                 </tr>
                             </thead>
@@ -492,8 +492,9 @@
                         @endif
                         { data: "unit_cost", render: data => formatMoney(data) },
                         { data: "price", render: data => formatMoney(data) },
+                        { data: "profit", render: data => (data ? `${Math.round(data)}%` : '0%') },
                         // { data: "purchased_at", render: data => data ? data.split(' ')[0] : '' },
-                        // { data: "updated_at", render: data => data ? data.split(' ')[0] : '' }, 
+                        // { data: "updated_at", render: data => data ? data.split(' ')[0] : '' },
                         { data: "price_category_id", visible: false }
                     ]
                 });
