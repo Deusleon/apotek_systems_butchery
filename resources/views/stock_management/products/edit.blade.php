@@ -14,7 +14,7 @@
                 <div class="modal-body">
 
                     <div class="form-group row">
-                        <label for="product_name" class="col-md-4 col-form-label text-md-right">Product Name<font
+                        <label for="product_name" class="col-md-4 col-form-label text-md-right">Name<font
                                 color="red">*</font></label>
                         <div class="col-md-8">
                             <input type="text" class="form-control" id="name_edit" name="name"
