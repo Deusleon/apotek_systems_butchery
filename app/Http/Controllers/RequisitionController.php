@@ -371,7 +371,7 @@ class RequisitionController extends Controller
 
         $req_id = $request->requisition_id;
         $remarks = $request->remark;
-        
+
         if(auth()->user()->checkPermission('Manage All Branches')) {
             $from_store = $request->from_store;
         }
@@ -380,7 +380,7 @@ class RequisitionController extends Controller
             $from_store = Auth::user()->store_id;
         }
 
-        $to_store = Auth::user()->store_id;
+        $to_store = current_store_id();
 
         // Handle file upload - NEW CODE ADDED
         $evidencePath = null;
