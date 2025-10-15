@@ -263,14 +263,14 @@ class RequisitionController extends Controller
     {
         $id = $request->req_id;
 
-        $requisition = Requisition::with(['creator', 'reqDetails.products_'])->findOrFail($id);
+        $requisition = Requisition::with(['creator', 'updater', 'reqDetails.products_'])->findOrFail($id);
         $fromStore = Store::find($requisition->from_store);
         $toStore = Store::find($requisition->to_store);
 
         $products = $requisition->reqDetails->map(function($detail) {
             $product = $detail->products_;
-            $full_name = $product ? 
-                ($product->name.' '.($product->brand ?? '').' '.($product->pack_size ?? '').' '.($product->sales_uom ?? '')) 
+            $full_name = $product ?
+                ($product->name.' '.($product->brand ?? '').' '.($product->pack_size ?? '').' '.($product->sales_uom ?? ''))
                 : '';
 
             return [
@@ -287,7 +287,7 @@ class RequisitionController extends Controller
             'req_no' => $requisition->req_no,
             'from_store' => $fromStore->name ?? 'N/A',
             'to_store' => $toStore->name ?? 'N/A',
-            'issued_by' => $requisition->creator->name ?? 'N/A',
+            'issued_by' => $requisition->updater ? $requisition->updater->name : ($requisition->creator ? $requisition->creator->name : 'N/A'),
             'created_by' => $requisition->creator->name ?? 'N/A',
             'created_at' => $requisition->created_at,
             'remarks' => $requisition->remarks,
@@ -481,16 +481,21 @@ class RequisitionController extends Controller
     public function getRequisitionsHistory(Request $request)
     {
         if ($request->ajax()) {
-            $data = Requisition::with(['reqDetails', 'creator'])
+            $data = Requisition::with(['reqDetails', 'creator', 'updater'])
                 ->leftJoin(DB::raw('inv_stores as from_store'), 'requisitions.from_store', '=', 'from_store.id')
                 ->leftJoin(DB::raw('inv_stores as to_store'), 'requisitions.to_store', '=', 'to_store.id')
                 ->selectRaw('requisitions.*, to_store.name as toStore, from_store.name as fromStore')
                 ->where('requisitions.status', 1); // ✅ Only Approved/Issued
 
-            // Filter by current store if not ALL branch
-            $currentStoreId = current_store_id();
-            if ($currentStoreId && $currentStoreId != 1) {
-                $data->where('requisitions.to_store', $currentStoreId);
+            // Filter by from_store if provided (from view filter)
+            if ($request->has('from_store_filter') && $request->from_store_filter) {
+                $data->where('requisitions.from_store', $request->from_store_filter);
+            } else {
+                // Fallback: Filter by current store if not ALL branch
+                $currentStoreId = current_store_id();
+                if ($currentStoreId && $currentStoreId != 1) {
+                    $data->where('requisitions.to_store', $currentStoreId);
+                }
             }
 
             $data = $data->orderBy('requisitions.id', 'DESC');
@@ -502,7 +507,7 @@ class RequisitionController extends Controller
                     return '<span class="badge badge-primary p-1">' . $count . $word . '</span>';
                 })
                 ->addColumn('issued_by', function ($row) {
-                    return $row->creator ? $row->creator->name : 'N/A';
+                    return $row->updater ? $row->updater->name : ($row->creator ? $row->creator->name : 'N/A');
                 })
                 ->addColumn('reqDate', function ($row) {
                     return $row->updated_at ?? $row->created_at;
@@ -559,10 +564,15 @@ class RequisitionController extends Controller
             ->leftJoin(DB::raw('inv_stores as to_store'), 'requisitions.to_store', '=', 'to_store.id')
             ->selectRaw('requisitions.*, to_store.name as toStore, from_store.name as fromStore');
 
-        // Filter by current store if not ALL branch
-        $currentStoreId = current_store_id();
-        if ($currentStoreId && $currentStoreId != 1) {
-            $data->where('requisitions.to_store', $currentStoreId);
+        // Filter by from_store if provided (from view filter)
+        if ($request->has('from_store_filter') && $request->from_store_filter) {
+            $data->where('requisitions.from_store', $request->from_store_filter);
+        } else {
+            // Fallback: Filter by current store if not ALL branch
+            $currentStoreId = current_store_id();
+            if ($currentStoreId && $currentStoreId != 1) {
+                $data->where('requisitions.to_store', $currentStoreId);
+            }
         }
 
         $data = $data->orderBy('requisitions.id', 'DESC');
@@ -572,9 +582,14 @@ class RequisitionController extends Controller
                 $btn_view = '';
 
                 if (Auth()->user()->checkPermission('View Requisitions Issue')) {
-                    if ($row->status == 0) {
+                    $currentStoreId = current_store_id();
+
+                    if ($currentStoreId == 1) {
+                        // Branch ALL - show disabled button with warning
+                        $btn_view = '<button class="btn btn-warning btn-sm btn-rounded" disabled title="Cannot issue in branch ALL. Please switch to a specific branch.">Issue</button>';
+                    } elseif ($row->status == 0) {
                         // Pending → show active Issue button
-                        $btn_view = '<a href="' . route('requisitions.issue', $row->id) . '" 
+                        $btn_view = '<a href="' . route('requisitions.issue', $row->id) . '"
                                         class="btn btn-warning btn-sm btn-rounded" title="ISSUE">Issue</a>';
                     } elseif ($row->status == 1) {
                         // Approved → disable Issue button
@@ -606,6 +621,13 @@ class RequisitionController extends Controller
     //        if (!Auth()->user()->checkPermission('View Requisitions Issue')) {
     //            abort(403, 'Access Denied');
     //        }
+
+        // Check if user is in branch ALL and prevent issuing
+        $currentStoreId = current_store_id();
+        if ($currentStoreId == 1) {
+            session()->flash("alert-danger", "Cannot issue requisitions in branch ALL. Please switch to a specific branch to proceed.");
+            return redirect()->route('issue.index');
+        }
 
         $items = Product::where('status', 1)->get();
         $stores = Store::get();

@@ -81,7 +81,15 @@
         iDisplayLength: 10,
         processing: true,
         serverSide: true,
-        ajax: { url: "{{ route('requisitions-issue-history-list') }}" },
+        ajax: {
+            url: "{{ route('requisitions-issue-history-list') }}",
+            data: function(d) {
+                @php $currentStoreId = current_store_id(); @endphp
+                @if($currentStoreId != 1)
+                    d.from_store_filter = "{{ $currentStoreId }}";
+                @endif
+            }
+        },
         columns: [
             { data: 'req_no', name: 'req_no' },
             {
