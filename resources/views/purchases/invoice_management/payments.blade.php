@@ -25,6 +25,12 @@ Invoices
                     </a>
                 </li>
             @endif
+             
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" href="{{ url('accounting/invoices/payments-history') }}">Payment History
+                    </a>
+                </li>
+            
     </ul>
     <div class="card">
         <div class="card-header">
@@ -72,8 +78,8 @@ Invoices
                             <select name="payment_method" class="form-control" id="payment_method" required="true">
                                 <option value="" disabled selected>Select Method</option>
                                 <option value="cash">CASH</option>
-                                <option value="mobile_money">MOBILE</option>
-                                <option value="bank_transfer">BANK</option>
+                                <option value="mobile">MOBILE</option>
+                                <option value="bank">BANK</option>
                                 <option value="cheque">CHEQUE</option>
                                 <option value="others">OTHERS</option>
                             </select>
@@ -105,32 +111,6 @@ Invoices
             </form>
         </div>
     </div>
-
-    <!-- Payment History Table -->
-    <div class="card mt-4">
-        <div class="card-header">
-            <h5>Payment History</h5>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table id="payment_history_table" class="display table nowrap table-striped table-hover" style="width:100%">
-                    <thead>
-                        <tr>
-                            <th>Payment Date</th>
-                            <th>Invoice #</th>
-                            <th>Supplier</th>
-                            <th>Amount Paid</th>
-                            <th>Payment Method</th>
-                            <th>Remarks</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
 
 @endsection
 
@@ -297,42 +277,6 @@ Invoices
                 notify('Network error occurred. Please try again.', 'top', 'right', 'danger');
             }
         });
-    });
-
-    // Initialize payment history table
-    var paymentHistoryTable = $('#payment_history_table').DataTable({
-        searching: true,
-        bPaginate: true,
-        bInfo: true,
-        ordering: true,
-        ajax: {
-            url: '{{ route("invoice-payments.history") }}',
-            type: 'GET',
-            dataSrc: 'data'
-        },
-        columns: [
-            {
-                data: 'payment_date',
-                render: function(date) {
-                    return moment(date).format('YYYY-MM-DD');
-                }
-            },
-            { data: 'invoice.invoice_no' },
-            { data: 'supplier.name' },
-            {
-                data: 'amount_paid',
-                render: function(amount) {
-                    return formatMoney(amount);
-                }
-            },
-            {
-                data: 'payment_method',
-                render: function(method) {
-                    return method.charAt(0).toUpperCase() + method.slice(1).replace('_', ' ');
-                }
-            },
-            { data: 'remarks' }
-        ]
     });
 
     // Initialize select2

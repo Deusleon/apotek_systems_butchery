@@ -219,6 +219,7 @@ Route::middleware(["auth","main_branch"])->group(function () {
 
     // Invoice Payment Routes
     Route::post('accounting/invoices/payments', 'InvoiceController@storePayment')->name('invoice-payments.store');
+    Route::get('accounting/invoices/payments-history', 'InvoiceController@PaymentHistory')->name('invoice-payments-history');
     Route::get('accounting/invoices/payments/history', 'InvoiceController@getPaymentHistory')->name('invoice-payments.history');
     Route::get('accounting/invoices/get-supplier-invoices', 'InvoiceController@getSupplierInvoices')->name('get-supplier-invoices');
 

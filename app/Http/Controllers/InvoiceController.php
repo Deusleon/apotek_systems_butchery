@@ -37,6 +37,11 @@ class InvoiceController extends Controller
             compact('invoices', 'suppliers'));
     }
 
+    public function paymentHistory()
+    {
+        return View::make('purchases.invoice_management.history');
+    }
+
     public function store(Request $request)
     {
         date_default_timezone_set('Africa/Nairobi');

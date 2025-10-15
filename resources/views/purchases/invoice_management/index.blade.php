@@ -36,6 +36,10 @@ Invoices
                     </a>
                 </li>
             @endif
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" href="{{ url('accounting/invoices/payments-history') }}">Payment History
+                    </a>
+                </li>
     </ul>
     <div class="card">
         <div class="card-body">
