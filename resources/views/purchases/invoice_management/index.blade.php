@@ -24,22 +24,24 @@ Invoices
 
 <div class="col-sm-12">
     <ul class="nav nav-pills mb-3" id="myTab">
-            @if (auth()->user()->checkPermission('View Purchase Return'))
+            @if (auth()->user()->checkPermission('Show Invoices'))
                 <li class="nav-item">
                     <a class="nav-link active text-uppercase" href="{{ url('accounting/invoices') }}">Invoices
                     </a>
                 </li>
             @endif
-            @if (auth()->user()->checkPermission('View Purchase Returns Approval'))
+            @if (auth()->user()->checkPermission('Show payments'))
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" href="{{ url('accounting/invoices/payments') }}">Payments
                     </a>
                 </li>
             @endif
+            @if (auth()->user()->checkPermission('Show payments history'))
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" href="{{ url('accounting/invoices/payments-history') }}">Payment History
                     </a>
                 </li>
+            @endif
     </ul>
     <div class="card">
         <div class="card-body">

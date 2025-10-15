@@ -138,6 +138,8 @@ class CreatePermissionsTable extends Migration
             ['name' => 'View Invoices', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:20', 'updated_at' => '2024-11-23 08:25:20', 'category' => 'ACCOUNTING'],
             ['name' => 'Add Invoices', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:36', 'updated_at' => '2024-11-23 08:25:36', 'category' => 'ACCOUNTING'],
             ['name' => 'Show Invoices', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:36', 'updated_at' => '2024-11-23 08:25:36', 'category' => 'ACCOUNTING'],
+            ['name' => 'Show payments', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:36', 'updated_at' => '2024-11-23 08:25:36', 'category' => 'ACCOUNTING'],
+            ['name' => 'Show payments history', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:36', 'updated_at' => '2024-11-23 08:25:36', 'category' => 'ACCOUNTING'],
             ['name' => 'Edit Invoices', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:36', 'updated_at' => '2024-11-23 08:25:36', 'category' => 'ACCOUNTING'],
             ['name' => 'View Assets', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:27:22', 'updated_at' => '2024-11-23 08:27:22', 'category' => 'ACCOUNTING'],
             ['name' => 'Manage Assets', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:27:38', 'updated_at' => '2024-11-23 08:27:38', 'category' => 'ACCOUNTING'],
