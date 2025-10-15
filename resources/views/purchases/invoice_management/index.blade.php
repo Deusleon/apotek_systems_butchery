@@ -7,7 +7,7 @@ Invoices
 
 @section('content-sub-title')
 <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-<li class="breadcrumb-item"><a href="#">Accounting / Invoices </a></li>
+<li class="breadcrumb-item"><a href="#">Accounting / Invoices / Invoices </a></li>
 @endsection
 
 @section("content")
