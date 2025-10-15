@@ -455,6 +455,8 @@ Route::middleware(["auth","main_branch"])->group(function () {
 
     Route::get('current-stock/stock-price-category', 'PriceListController@priceCategory')->name('sale-price-category');
 
+    Route::get('inventory/stock-details', 'StockDetailsController@stockDetails')->name('stock-details');
+
     Route::post('inventory/stock-transfer-save', 'StockTransferController@store')->name('stock-transfer-save');
 
     Route::get('inventory/stock-transfer-filter', 'StockTransferAcknowledgeController@transferFilter')->name('stock-transfer-filter');

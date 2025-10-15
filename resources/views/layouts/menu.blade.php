@@ -66,7 +66,7 @@
             @if(auth()->user()->checkPermission('View Current Stock'))
                 <li class=""><a href="{{ route('current-stocks') }}" class="">Current Stock</a></li>
             @endif
-                <li class=""><a href="" class="">Stock Details</a></li>
+                <li class=""><a href="{{ route('stock-details') }}" class="">Stock Details</a></li>
             @if(auth()->user()->checkPermission('View Price List'))
                 <li class=""><a href="{{ route('price-list.index') }}" class="">Price List</a></li>
             @endif
