@@ -10,12 +10,12 @@ class CreateInvOldStockValueTable extends Migration
     {
         Schema::create('inv_old_stock_values', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('product_id');
+            $table->integer('product_id');
             $table->unsignedBigInteger('store_id')->nullable();
             $table->decimal('quantity', 20, 4)->default(0);
             $table->decimal('buy_price', 20, 4)->default(0);   // unit_cost snapshot (latest)
             $table->decimal('sell_price', 20, 4)->default(0);  // price from sales_prices (latest per stock_id & price_category)
-            $table->unsignedBigInteger('price_category_id')->nullable();
+            $table->integer('price_category_id')->nullable();
             $table->date('snapshot_date'); // date snapshot (YYYY-MM-DD)
             $table->timestamps();
 

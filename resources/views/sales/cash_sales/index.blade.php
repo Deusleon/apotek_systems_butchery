@@ -58,7 +58,7 @@
                         @csrf()
                         <input type="hidden" name="" id="is_all_store" value="{{ current_store()->name }}">
                         <div class="row">
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
                                     <label id="cat_label">Sales Type<font color="red">*</font></label>
                                     <select id="price_category" class="js-example-basic-single form-control" required>
@@ -78,9 +78,21 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <div class="form-group">
-                                    <label for="code">Customer Name </label>
+                                    <label for="code">Payment Type<font color="red">*</font></label>
+                                    <select name="payment_type" id="payment_type"
+                                        class="js-example-basic-single form-control">
+                                        {{-- <option value="" disabled>Select Payment</option> --}}
+                                            <option value="CASH">CASH</option> 
+                                            <option value="MOBILE">MOBILE</option>
+                                            <option value="BANK">BANK</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label for="code">Customer Name<font color="red">*</font></label>
                                     <select name="customer_id" id="customer_id"
                                         class="js-example-basic-single form-control">
                                         <option value="" disabled>Select Customer</option>

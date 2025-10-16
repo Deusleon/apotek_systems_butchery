@@ -194,6 +194,18 @@ function val() {
 }
 
 $("#customer_id").on("change", function () {
+    var check_store = $("#is_all_store").val();
+    if (check_store === "ALL") {
+        notify(
+            "You can't sell in ALL branches. Please switch to a specific branch to proceed",
+            "top",
+            "right",
+            "warning"
+        );
+
+        $("#products").val("").trigger("change.select2");
+        $("#customer_id").val("").trigger("change.select2");
+    }
     discount();
     setTimeout(function () {
         $("#barcode_input").focus();
@@ -1179,6 +1191,18 @@ function addProductToCart(product) {
 }
 
 $("#price_category").change(function () {
+    var check_store = $("#is_all_store").val();
+    if (check_store === "ALL") {
+        notify(
+            "You can't sell in ALL branches. Please switch to a specific branch to proceed",
+            "top",
+            "right",
+            "warning"
+        );
+
+        $("#price_category").val("").trigger("change.select2");
+        return;
+    }
     var id = $(this).val();
     if (id) {
         $.ajax({
@@ -1200,27 +1224,22 @@ $("#price_category").change(function () {
 $(document).ready(function () {
     var initialValues = {
         price_category: $("#price_category").val(),
-        product_id: $("#product_id").val(),
+        product_id: $("#products").val(),
         customer_id: $("#customer_id").val(),
     };
 
-    $("#price_category, #product_id, #customer_id").on("change", function () {
-        var check_store = $("#is_all_store").val();
-        var id = $(this).attr("id"); 
+    var check_store = $("#is_all_store").val();
+    if (check_store === "ALL") {
+        notify(
+            "You can't sell in ALL branches. Please switch to a specific branch to proceed",
+            "top",
+            "right",
+            "warning"
+        );
 
-        if (check_store === "ALL") {
-            notify(
-                "You can't sell in ALL branches. Please switch to a specific branch to proceed",
-                "top",
-                "right",
-                "warning"
-            );
-
-            $(this).val(initialValues[id]).trigger("change.select2");
-        } else {
-            initialValues[id] = $(this).val();
-        }
-    });
+        $("#products").val("").trigger("change.select2");
+        $("#customer_id").val("").trigger("change.select2");
+    }
 });
 
 function valueCollection() {
