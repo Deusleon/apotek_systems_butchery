@@ -78,6 +78,7 @@
                                     <option value="">All</option>
                                     <option value="1">Active</option>
                                     <option value="0">Inactive</option>
+                                    <option value="unused">Unused</option>
                                 </select>
                             </div>
                         </div>

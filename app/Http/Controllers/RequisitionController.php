@@ -159,7 +159,7 @@ class RequisitionController extends Controller
             abort(403, 'Access Denied');
         }
 
-        // Validate file upload
+        // Validate file upload (evidence is now optional)
         $request->validate([
             'evidence' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048', // max 2MB
         ]);
@@ -364,7 +364,7 @@ class RequisitionController extends Controller
             abort(403, 'Access Denied');
         }
 
-        // Validate file upload (same as store method)
+        // Validate file upload (evidence is now optional)
         $request->validate([
             'evidence' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048', // max 2MB
         ]);

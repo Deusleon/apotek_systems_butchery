@@ -68,7 +68,7 @@
                                 </div>
 
                                 <!--Concurtination of product name, brand, pack_size and sales_uom-->
-                                <div class="form-group col-md-6">
+                                <div class="form-group col-md-7">
                                     <label for="products">Products <font color="red">*</font></label>
                                     <select name="products" class="js-example-basic-single form-control products" id="products">
                                         <option value="">Select Products...</option>
@@ -116,8 +116,8 @@
                                 <!-- File Upload (Right side) -->
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label><b>Evidence <font color="red">*</font></b></label>
-                                        <input type="file" id="evidence" name="evidence" class="form-control" accept=".pdf,.doc,.docx,.jpg,.png" required>
+                                        <label><b>Evidence</b></label>
+                                        <input type="file" id="evidence" name="evidence" class="form-control" accept=".pdf,.doc,.docx,.jpg,.png">
                                     </div>
                                 </div>
                             </div>

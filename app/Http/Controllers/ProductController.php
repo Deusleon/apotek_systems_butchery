@@ -217,7 +217,14 @@ class ProductController extends Controller
             }
 
             if ($request->filled('status')) {
-                $query->where('status', $request->status);
+                if ($request->status === 'unused') {
+                    // Products that have no stock records and no sales transactions
+                    $query->whereDoesntHave('currentStock', function($q) {
+                        $q->where('quantity', '>', 0);
+                    })->whereDoesntHave('incomingStock');
+                } else {
+                    $query->where('status', $request->status);
+                }
             }
 
             $totalData = $query->count();
