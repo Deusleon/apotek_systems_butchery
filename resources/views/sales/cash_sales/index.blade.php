@@ -83,10 +83,10 @@
                                     <label for="code">Payment Type<font color="red">*</font></label>
                                     <select name="payment_type" id="payment_type"
                                         class="js-example-basic-single form-control">
+                                        @foreach($payment_type as $payment)
                                         {{-- <option value="" disabled>Select Payment</option> --}}
-                                            <option value="CASH">CASH</option> 
-                                            <option value="MOBILE">MOBILE</option>
-                                            <option value="BANK">BANK</option>
+                                            <option value="{{$payment->id}}">{{$payment->name}}</option> 
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>

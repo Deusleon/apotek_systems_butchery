@@ -11,6 +11,7 @@ use App\SalesCredit;
 use App\SalesDetail;
 use App\Setting;
 use App\StockTracking;
+use App\PaymentType;
 use App\Store;
 use Dompdf\Exception;
 use Illuminate\Http\Request;
@@ -38,6 +39,7 @@ class SaleController extends Controller
         /*get default Price Category*/
         $default_sale_type = Setting::where('id', 125)->value('value');
         $sale_type = PriceCategory::where('name', $default_sale_type)->first();
+        $payment_type = PaymentType::all();
 
         if ($sale_type != null) {
             $default_sale_type = $sale_type->id;
@@ -55,6 +57,7 @@ class SaleController extends Controller
             ->with(compact('price_category'))
             ->with(compact('current_stock'))->with(compact('enable_discount'))
             ->with(compact('back_date'))->with(compact('enable_paid'))
+            ->with(compact('payment_type'))
             ->with(compact('default_sale_type'))
             ->with(compact('default_customer'))
             ->with(compact('vat'))->with(compact('fixed_price'));
@@ -75,6 +78,7 @@ class SaleController extends Controller
         /*get default Price Category*/
         $default_sale_type = Setting::where('id', 125)->value('value');
         $sale_type = PriceCategory::where('name', $default_sale_type)->first();
+        $payment_type = PaymentType::all();
 
         if ($sale_type != null) {
             $default_sale_type = $sale_type->id;
@@ -92,6 +96,7 @@ class SaleController extends Controller
         return View::make('sales.credit_sales.index')
             ->with(compact('customers'))
             ->with(compact('price_category'))
+            ->with(compact('payment_type'))
             ->with(compact('back_date'))
             ->with(compact('current_stock'))->with(compact('enable_discount'))
             ->with(compact('default_sale_type'))
@@ -416,6 +421,7 @@ class SaleController extends Controller
                 'receipt_number' => $receipt_number,
                 'customer_id' => $request->customer_id,
                 'price_category_id' => $request->price_category_id,
+                'payment_type_id' => $request->payment_type,
                 'date' => $date,
                 'created_by' => Auth::User()->id
             ));

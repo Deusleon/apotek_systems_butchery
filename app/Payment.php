@@ -22,20 +22,6 @@ class Payment extends Model
         'status'
     ];
 
-    // protected $fillable = [
-    //     'transport_order_id',
-    //     'user_id',
-    //     'amount',
-    //     'payment_type', // 'advance' or 'balance'
-    //     'payment_method', // 'cash', 'bank_transfer', etc.
-    //     'transaction_reference',
-    //     'status', // 'pending', 'completed', etc.
-    //     'notes',
-    //     'payment_date',
-    //     'receipt_number',
-    //     'payment_proof',
-    // ];
-
     protected $casts = [
         'payment_date' => 'date',
         'amount' => 'decimal:2',

@@ -815,18 +815,18 @@ function discount() {
 
 function deselect() {
     if (discount_enable === "YES") {
-        document.getElementById("sale_discount").value = 0.0;
+        document.getElementById("sale_discount").value = "0.00";
     }
     var backDate = document.getElementById("cash_sale_date");
     if (backDate) {
         backDate.value = "";
     }
-    document.getElementById("sub_total").value = 0.0;
-    document.getElementById("total_vat").value = 0.0;
-    document.getElementById("total").value = 0.0;
+    document.getElementById("sub_total").value = 0.00;
+    document.getElementById("total_vat").value = 0.00;
+    document.getElementById("total").value = 0.00;
     try {
-        document.getElementById("sale_paid").value = 0.0;
-        document.getElementById("change_amount").value = 0.0;
+        document.getElementById("sale_paid").value = 0.00;
+        document.getElementById("change_amount").value = 0.00;
     } catch (e) {}
 
     sub_total = 0;

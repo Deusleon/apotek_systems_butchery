@@ -47,6 +47,9 @@ class Sale extends Model
        return $this->belongsTo(Customer::class, 'customer_id');
     }
 
-
+    public function paymentType()
+    {
+        return $this->belongsTo(PaymentType::class);
+    }
 
 }
