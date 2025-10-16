@@ -122,9 +122,9 @@
                                 <tr>
                                     <th>Transfer #</th>
                                     <th>Date</th>
-                                    <th>Products</th>
                                     <th>From</th>
                                     <th>To</th>
+                                    <th>Products</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                     <th hidden>Date</th>
@@ -136,7 +136,6 @@
                                                             <tr class="p-0">
                                                                 <td>{{$transfer->transfer_no}}</td>
                                                                 <td>{{ $transfer->created_at->format('Y-m-d') }}</td>
-                                                                <td><span class="badge badge-primary p-1">{{$transfer->total_products > 1 ? $transfer->total_products." Products" : $transfer->total_products." Product"}}</span></td>
                                                                 <td align="left">
                                                                     <div style="margin-right: 50%">
                                                                         {{$transfer->fromStore->name}}
@@ -147,7 +146,7 @@
                                                                         {{$transfer->toStore->name}}
                                                                     </div>
                                                                 </td>
-
+                                                                <td><span class="badge badge-primary p-1">{{$transfer->total_products > 1 ? $transfer->total_products." Products" : $transfer->total_products." Product"}}</span></td>
                                                                 <td class="justify-content-center">
                                                                     @php
                                                                         $statuses = [
