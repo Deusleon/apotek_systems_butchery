@@ -67,20 +67,21 @@ function calculateCart() {
             incremental_cart;
 
         for (var i = 0, c; (c = cart[i]); ++i) {
-            if (undefined === reduced__obj_cart[c[0]]) {
-                reduced__obj_cart[c[0]] = c;
+            if (undefined === reduced__obj_cart[c[4]]) {
+                // use stock_id as key to prevent merging
+                reduced__obj_cart[c[4]] = c;
             } else {
-                reduced__obj_cart[c[0]][2] =
+                reduced__obj_cart[c[4]][2] =
                     Number(
-                        reduced__obj_cart[c[0]][2].toString().replace(/,/g, "")
+                        reduced__obj_cart[c[4]][2].toString().replace(/,/g, "")
                     ) + Number(c[2].toString().replace(/,/g, ""));
 
-                if (reduced__obj_cart[c[0]][2] > Number(c[1])) {
-                    reduced__obj_cart[c[0]][2] = Number(c[1]);
+                if (reduced__obj_cart[c[4]][2] > Number(c[1])) {
+                    reduced__obj_cart[c[4]][2] = Number(c[1]);
                 }
 
-                reduced__obj_cart[c[0]][2] = numberWithCommas(
-                    reduced__obj_cart[c[0]][2]
+                reduced__obj_cart[c[4]][2] = numberWithCommas(
+                    reduced__obj_cart[c[4]][2]
                 );
             }
         }
@@ -144,10 +145,10 @@ function rePopulateSelect2() {
                 text:
                     detail.product.name +
                     " " +
-                    (detail.brand ?? '') +
+                    (detail.brand ?? "") +
                     " " +
-                    (detail.pack_size ?? '') +
-                    (detail.sales_uom ?? ''),
+                    (detail.pack_size ?? "") +
+                    (detail.sales_uom ?? ""),
             })
         );
     });
@@ -254,10 +255,10 @@ function val() {
     const item_name =
         selected_fields[0] +
         " " +
-        (selected_fields[1] ?? '') +
+        (selected_fields[1] ?? "") +
         " " +
-        (selected_fields[2] ?? '') +
-        (selected_fields[3] ?? '');
+        (selected_fields[2] ?? "") +
+        (selected_fields[3] ?? "");
     const QoH =
         parseFloat(String(selected_fields[4] || 0).replace(/,/g, "")) || 0;
     const product_id = Number(selected_fields[5]);
@@ -324,7 +325,8 @@ $("#cart_table tbody").on("click", "#edit_btn", function () {
     if (t === 0) {
         /*not set then set it*/
         var row_data = cart_table.row($(this).parents("tr")).data();
-        var index = cart_table.row($(this).parents("tr")).index();
+        var stock_id = row_data[4];
+        var index = cart.findIndex((item) => item[4] === stock_id);
         quantity = row_data[2].toString().replace(/,/g, "");
         row_data[2] =
             "<div><input style='width: 50%' type='text' min='1' class='form-control' id='edit_quantity' onkeypress='return isNumberKey(event,this)' required/><span id='span_danger' style='display: none; color: red; font-size: 0.9em;'></span></div>";
@@ -652,10 +654,10 @@ function filterTransferByStore(from_id) {
                         text:
                             detail.name +
                             " " +
-                            (detail.brand ?? '') +
+                            (detail.brand ?? "") +
                             " " +
-                            (detail.pack_size ?? '') +
-                            (detail.sales_uom ?? ''),
+                            (detail.pack_size ?? "") +
+                            (detail.sales_uom ?? ""),
                     })
                 );
             });
