@@ -30,10 +30,10 @@
                 <thead>
                     <tr>
                         <th>Req #</th>
-                        <th>Products</th>
+                        <th>Date</th>
                         <th>From</th>
                         <th>To</th>
-                        <th>Date</th>
+                        <th>Products</th>
                         <th>Status</th>
                         @if(Auth()->user()->checkPermission('View Requisitions Issue'))
                             <th>Action</th>
@@ -71,20 +71,20 @@
         },
         columns: [
             { data: 'req_no', name: 'req_no' },
+            { 
+                data: 'reqDate',
+                render: function(date) { return moment(date).format('YYYY-MM-DD'); },
+                orderable: false,
+                searchable: false
+            },
+            { data: 'fromStore', name: 'fromStore', searchable: false },
+            { data: 'toStore', name: 'toStore', searchable: false },
             {
                 data: 'products',
                 name: 'products',
                 render: function(data, type, row) {
                     return data || '';
                 },
-                searchable: false
-            },
-            { data: 'fromStore', name: 'fromStore', searchable: false },
-            { data: 'toStore', name: 'toStore', searchable: false },
-            { 
-                data: 'reqDate',
-                render: function(date) { return moment(date).format('YYYY-MM-DD'); },
-                orderable: false,
                 searchable: false
             },
             { 

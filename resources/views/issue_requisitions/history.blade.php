@@ -30,11 +30,11 @@
                 <thead>
                     <tr>
                         <th>Req #</th>
-                        <th>Products</th>
+                        <th>Date Issued</th>
                         <th>From</th>
                         <th>To</th>
+                        <th>Products</th>
                         <th>Issued By</th>
-                        <th>Date Issued</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -92,6 +92,14 @@
         },
         columns: [
             { data: 'req_no', name: 'req_no' },
+            {  
+                data: 'reqDate',
+                render: function(date) { return moment(date).format('YYYY-MM-DD'); },
+                orderable: false,
+                searchable: false
+            },
+            { data: 'fromStore', name: 'fromStore' },
+            { data: 'toStore', name: 'toStore' },
             {
                 data: 'products',
                 name: 'products',
@@ -100,15 +108,7 @@
                 },
                 searchable: false
             },
-            { data: 'fromStore', name: 'fromStore' },
-            { data: 'toStore', name: 'toStore' },
             { data: 'issued_by', name: 'issued_by' },
-            {  
-                data: 'reqDate',
-                render: function(date) { return moment(date).format('YYYY-MM-DD'); },
-                orderable: false,
-                searchable: false
-            },
             { data: 'action', orderable: false, searchable: false }
         ]
     });
