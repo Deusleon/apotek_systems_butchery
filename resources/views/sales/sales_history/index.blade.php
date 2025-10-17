@@ -54,7 +54,7 @@
                     <li class="nav-item">
                         <a class="nav-link text-uppercase" id="sales-approval-tablist" data-toggle="pill"
                             href="{{ route('sale-returns-approval.getSalesReturn') }}" role="tab" aria-controls="sales_returns"
-                            aria-selected="false">Approval
+                            aria-selected="false">Approvals
                         </a>
                     </li>
                 @endif
