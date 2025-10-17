@@ -69,8 +69,8 @@
 
 
         /**
-                          Component
-                        **/
+                                                              Component
+                                                            **/
 
         label {
             width: 100%;
@@ -116,21 +116,20 @@
                 @if(auth()->user()->checkPermission('View Sales Summary'))
                     <li class="nav-item">
                         <a class="nav-link active" data-toggle="pill" href="#pills-home" role="tab" aria-selected="true">Sales
-                            Summary</a>
+                        </a>
                     </li>
                 @endif
 
                 @if(auth()->user()->checkPermission('View Purchasing Summary'))
                     <li class="nav-item">
-                        @if(!auth()->user()->checkPermission('View Sales Summary'))
-                            <a class="nav-link active" data-toggle="pill" href="#pills-purchase" role="tab"
-                                aria-selected="false">Purchasing
-                                Summary</a>
-                        @endif
+                        {{-- @if(!auth()->user()->checkPermission('View Purchase Summary'))
+                        <a class="nav-link active" data-toggle="pill" href="#pills-purchase" role="tab"
+                            aria-selected="false">Purchasing</a>
+                        @endif --}}
 
-                        @if(auth()->user()->checkPermission('View Sales Summary'))
-                            <a class="nav-link" data-toggle="pill" href="#pills-purchase" role="tab" aria-selected="false">Purchasing
-                                Summary</a>
+                        @if(auth()->user()->checkPermission('View Purchasing Summary'))
+                            <a class="nav-link" data-toggle="pill" href="#pills-purchase" role="tab"
+                                aria-selected="false">Purchasing</a>
                         @endif
 
                     </li>
@@ -138,14 +137,14 @@
 
                 @if(auth()->user()->checkPermission('View Inventory Summary'))
                     <li class="nav-item">
-                        @if(!auth()->user()->checkPermission('View Sales Summary') && !auth()->user()->checkPermission('View Purchasing Summary'))
-                            <a class="nav-link active" data-toggle="pill" href="#pills-stock" role="tab" aria-selected="false">Inventory
-                                Summary</a>
-                        @endif
+                        {{-- @if(!auth()->user()->checkPermission('View Inventory Summary'))
+                        <a class="nav-link active" data-toggle="pill" href="#pills-stock" role="tab" aria-selected="false">Inventory
+                        </a>
+                        @endif --}}
 
-                        @if(auth()->user()->checkPermission('View Sales Summary') || auth()->user()->checkPermission('View Purchasing Summary'))
+                        @if(auth()->user()->checkPermission('View Inventory Summary'))
                             <a class="nav-link" data-toggle="pill" href="#pills-stock" role="tab" aria-selected="false">Inventory
-                                Summary</a>
+                            </a>
                         @endif
                     </li>
                 @endif
@@ -153,21 +152,22 @@
                 @if(auth()->user()->checkPermission('View Transport Summary'))
                     <li class="nav-item">
                         <a class="nav-link" data-toggle="pill" href="#pills-transport" role="tab" aria-selected="false">Transport
-                            Summary</a>
+                        </a>
                     </li>
                 @endif
 
                 @if(auth()->user()->checkPermission('View Accounting Summary'))
                     <li class="nav-item">
-                        @if(!auth()->user()->checkPermission('View Sales Summary') && !auth()->user()->checkPermission('View Purchasing Summary') && !auth()->user()->checkPermission('View Inventory Summary'))
-                            <a class="nav-link active" data-toggle="pill" href="#pills-expense" role="tab"
-                                aria-selected="false">Accounting
-                                Summary</a>
-                        @endif
+                        {{-- @if(!auth()->user()->checkPermission('View Sales Summary') && !auth()->user()->checkPermission('View
+                        Purchasing Summary') && !auth()->user()->checkPermission('View Inventory Summary'))
+                        <a class="nav-link active" data-toggle="pill" href="#pills-expense" role="tab"
+                            aria-selected="false">Accounting
+                            Summary</a>
+                        @endif --}}
 
-                        @if(auth()->user()->checkPermission('View Sales Summary') || auth()->user()->checkPermission('View Purchasing Summary') || auth()->user()->checkPermission('View Inventory Summary'))
+                        @if(auth()->user()->checkPermission('View Accounting Summary') || auth()->user()->checkPermission('View Purchasing Summary') || auth()->user()->checkPermission('View Inventory Summary'))
                             <a class="nav-link" data-toggle="pill" href="#pills-expense" role="tab" aria-selected="false">Accounting
-                                Summary</a>
+                            </a>
                         @endif
 
                     </li>
@@ -273,72 +273,186 @@
 
                 {{-- Tab 2 --}}
                 @if(auth()->user()->checkPermission('View Inventory Summary'))
-                    @if(!auth()->user()->checkPermission('View Sales Summary') && !auth()->user()->checkPermission('View Purchasing Summary'))
-                        <div class="tab-pane fade show active" id="pills-stock" role="tabpanel" aria-labelledby="pills-stock-tab">
+                    @if(auth()->user()->checkPermission('View Inventory Summary') || auth()->user()->checkPermission('View Inventory Summary'))
+                        <div class="tab-pane fade" id="pills-stock" role="tabpanel" aria-labelledby="pills-stock-tab">
                             {{-- row starts --}}
-                            <div class="row">
-                                <div class="col-md-4 col-lg-4 col-sm-4">
-
-                                    <label>
-                                        <input type="radio" name="stock" id="out_of_stock" class="card-input-element" />
-
-                                        <div class="panel panel-default card-input">
-                                            <div class="card">
-                                                <div class="card-block">
-                                                    <div class="panel-heading">
-                                                        <h5>Out of Stock</h5>
-                                                    </div>
-                                                    <div class="panel-body">
-                                                        <h3 class="text-c-red">{{$outOfStock}}</h3>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </label>
-                                </div>
-                                <div class="col-md-4 col-lg-4 col-sm-4">
-
-                                    <label>
-                                        <input type="radio" name="stock" id="below" class="card-input-element" />
-
-                                        <div class="panel panel-default card-input">
-                                            <div class="card">
-                                                <div class="card-block">
-                                                    <div class="panel-heading">
-                                                        <h5>Fast Moving</h5>
-                                                    </div>
-                                                    <div class="panel-body text-c-green">
-                                                        <h3 class="text-c-green">{{$fast_moving}}</h3>
+                            @if ($expireEnabled)
+                                <div class="row">
+                                    <div class="col-md-4 col-lg-4 col-sm-4">
+                                        <label>
+                                            <input type="radio" name="stock" id="out_of_stock" class="card-input-element" />
+                                            <div class="panel panel-default card-input">
+                                                <div class="card">
+                                                    <div class="card-block">
+                                                        <div class="panel-heading">
+                                                            <h5>Out of Stock</h5>
+                                                        </div>
+                                                        <div class="panel-body">
+                                                            <h3 class="text-c-red">{{$outOfStock}}</h3>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-
-                                    </label>
-                                </div>
-                                <div class="col-md-4 col-lg-4 col-sm-4">
-
-                                    <label>
-                                        <input type="radio" name="stock" id="expired" class="card-input-element" />
-
-                                        <div class="panel panel-default card-input">
-                                            <div class="card">
-                                                <div class="card-block">
-                                                    <div class="panel-heading">
-                                                        <h5>Expired</h5>
-                                                    </div>
-                                                    <div class="panel-body text-c-red">
-                                                        <h3 class="text-c-red">{{$expired}}</h3>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-4 col-lg-4 col-sm-4">
+                                        <label>
+                                            <input type="radio" name="stock" id="below" class="card-input-element" />
+                                            <div class="panel panel-default card-input">
+                                                <div class="card">
+                                                    <div class="card-block">
+                                                        <div class="panel-heading">
+                                                            <h5>Below min level</h5>
+                                                        </div>
+                                                        <div class="panel-body text-c-yellow">
+                                                            <h3 class="text-c-yellow">{{$belowMinLevel->count()}}</h3>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-
-                                    </label>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-4 col-lg-4 col-sm-4">
+                                        <label>
+                                            <input type="radio" name="stock" id="deadStock" class="card-input-element" />
+                                            <div class="panel panel-default card-input">
+                                                <div class="card">
+                                                    <div class="card-block">
+                                                        <div class="panel-heading">
+                                                            <h5>Dead Stock</h5>
+                                                        </div>
+                                                        <div class="panel-body text-c-red">
+                                                            <h3 class="text-c-red">{{$deadStock->count()}}</h3>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-4 col-lg-4 col-sm-4">
+                                        <label>
+                                            <input type="radio" name="stock" id="fastMoving" class="card-input-element" />
+                                            <div class="panel panel-default card-input">
+                                                <div class="card">
+                                                    <div class="card-block">
+                                                        <div class="panel-heading">
+                                                            <h5>Fast Moving</h5>
+                                                        </div>
+                                                        <div class="panel-body text-c-green">
+                                                            <h3 class="text-c-green">{{$fast_moving}}</h3>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-4 col-lg-4 col-sm-4">
+                                        <label>
+                                            <input type="radio" name="stock" id="expired" class="card-input-element" />
+                                            <div class="panel panel-default card-input">
+                                                <div class="card">
+                                                    <div class="card-block">
+                                                        <div class="panel-heading">
+                                                            <h5>Expired</h5>
+                                                        </div>
+                                                        <div class="panel-body text-c-red">
+                                                            <h3 class="text-c-red">{{$expired}}</h3>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-4 col-lg-4 col-sm-4">
+                                        <label>
+                                            <input type="radio" name="stock" id="expireSoon" class="card-input-element" />
+                                            <div class="panel panel-default card-input">
+                                                <div class="card">
+                                                    <div class="card-block">
+                                                        <div class="panel-heading">
+                                                            <h5>Expire in 3 Month</h5>
+                                                        </div>
+                                                        <div class="panel-body">
+                                                            <h3 class="text-c-red">{{$expireSoon->count()}}</h3>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
                                 </div>
-                            </div>
-
+                            @else
+                                <div class="row">
+                                    <div class="col-md-3 col-lg-3 col-sm-3">
+                                        <label>
+                                            <input type="radio" name="stock" id="out_of_stock" class="card-input-element" />
+                                            <div class="panel panel-default card-input">
+                                                <div class="card">
+                                                    <div class="card-block">
+                                                        <div class="panel-heading">
+                                                            <h5>Out of Stock</h5>
+                                                        </div>
+                                                        <div class="panel-body">
+                                                            <h3 class="text-c-red">{{$outOfStock}}</h3>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-3 col-lg-3 col-sm-3">
+                                        <label>
+                                            <input type="radio" name="stock" id="below" class="card-input-element" />
+                                            <div class="panel panel-default card-input">
+                                                <div class="card">
+                                                    <div class="card-block">
+                                                        <div class="panel-heading">
+                                                            <h5>Below min level</h5>
+                                                        </div>
+                                                        <div class="panel-body text-c-yellow">
+                                                            <h3 class="text-c-yellow">{{$belowMinLevel->count()}}</h3>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-3 col-lg-3 col-sm-3">
+                                        <label>
+                                            <input type="radio" name="stock" id="deadStock" class="card-input-element" />
+                                            <div class="panel panel-default card-input">
+                                                <div class="card">
+                                                    <div class="card-block">
+                                                        <div class="panel-heading">
+                                                            <h5>Dead Stock</h5>
+                                                        </div>
+                                                        <div class="panel-body text-c-red">
+                                                            <h3 class="text-c-red">{{$deadStock->count()}}</h3>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="col-md-3 col-lg-3 col-sm-3">
+                                        <label>
+                                            <input type="radio" name="stock" id="fastMoving" class="card-input-element" />
+                                            <div class="panel panel-default card-input">
+                                                <div class="card">
+                                                    <div class="card-block">
+                                                        <div class="panel-heading">
+                                                            <h5>Fast Moving</h5>
+                                                        </div>
+                                                        <div class="panel-body text-c-green">
+                                                            <h3 class="text-c-green">{{$fast_moving}}</h3>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            @endif
                             <div class="row">
                                 <!-- [ Out of stock start -->
                                 <div class="col-xl-12 col-md-12">
@@ -358,14 +472,15 @@
                                         </table>
                                     </div>
 
-                                    <div class="table-responsive" style="display: none" id="stock_items_fast_table">
-                                        <table id="stock_items_fast" class="display table nowrap table-striped table-hover"
+                                    <div class="table-responsive" style="display: none" id="below_items_table">
+                                        <table id="below_stock_items" class="display table nowrap table-striped table-hover"
                                             style="width:100%">
                                             <thead>
                                                 <tr>
                                                     <th style="width: 1%;">#</th>
                                                     <th>Product Name</th>
-                                                    <th>Sold Times</th>
+                                                    <th>Min Quantity</th>
+                                                    <th>Available </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -374,106 +489,14 @@
                                         </table>
                                     </div>
 
-                                    <div class="table-responsive" style="display: none" id="stock_items_expired_table">
-                                        <table id="stock_items_expired" class="display table nowrap table-striped table-hover"
+                                    <div class="table-responsive" style="display: none" id="dead_stock_table">
+                                        <table id="dead_stock_items" class="display table nowrap table-striped table-hover"
                                             style="width:100%">
                                             <thead>
                                                 <tr>
                                                     <th style="width: 1%;">#</th>
                                                     <th>Product Name</th>
                                                     <th>Quantity</th>
-                                                    <th>Expiry Date</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-
-                                            </tbody>
-                                        </table>
-                                    </div>
-
-                                </div>
-
-                            </div>
-                        </div>
-                    @endif
-
-                    @if(auth()->user()->checkPermission('View Sales Summary') || auth()->user()->checkPermission('View Purchasing Summary'))
-                        <div class="tab-pane fade" id="pills-stock" role="tabpanel" aria-labelledby="pills-stock-tab">
-                            {{-- row starts --}}
-                            <div class="row">
-                                <div class="col-md-4 col-lg-4 col-sm-4">
-
-                                    <label>
-                                        <input type="radio" name="stock" id="out_of_stock" class="card-input-element" />
-
-                                        <div class="panel panel-default card-input">
-                                            <div class="card">
-                                                <div class="card-block">
-                                                    <div class="panel-heading">
-                                                        <h5>Out of Stock</h5>
-                                                    </div>
-                                                    <div class="panel-body">
-                                                        <h3 class="text-c-red">{{$outOfStock}}</h3>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </label>
-                                </div>
-                                <div class="col-md-4 col-lg-4 col-sm-4">
-
-                                    <label>
-                                        <input type="radio" name="stock" id="below" class="card-input-element" />
-
-                                        <div class="panel panel-default card-input">
-                                            <div class="card">
-                                                <div class="card-block">
-                                                    <div class="panel-heading">
-                                                        <h5>Fast Moving</h5>
-                                                    </div>
-                                                    <div class="panel-body text-c-green">
-                                                        <h3 class="text-c-green">{{$fast_moving}}</h3>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </label>
-                                </div>
-                                <div class="col-md-4 col-lg-4 col-sm-4">
-
-                                    <label>
-                                        <input type="radio" name="stock" id="expired" class="card-input-element" />
-
-                                        <div class="panel panel-default card-input">
-                                            <div class="card">
-                                                <div class="card-block">
-                                                    <div class="panel-heading">
-                                                        <h5>Expired</h5>
-                                                    </div>
-                                                    <div class="panel-body text-c-red">
-                                                        <h3 class="text-c-red">{{$expired}}</h3>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <!-- [ Out of stock start -->
-                                <div class="col-xl-12 col-md-12">
-                                    <div class="table-responsive" style="display: none" id="stock_items_table">
-                                        <table id="stock_items" class="display table nowrap table-striped table-hover"
-                                            style="width:100%">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: 1%;">#</th>
-                                                    <th>Product Name</th>
-                                                    <th>Category</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -489,7 +512,9 @@
                                                 <tr>
                                                     <th style="width: 1%;">#</th>
                                                     <th>Product Name</th>
-                                                    <th>Sold Times</th>
+                                                    <th>Sold Qty</th>
+                                                    <th>No of Sales</th>
+                                                    <th>Available Qty</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -1003,6 +1028,8 @@
                 document.getElementById('stock_items_table').style.display = 'block';
                 document.getElementById('stock_items_expired_table').style.display = 'none';
                 document.getElementById('stock_items_fast_table').style.display = 'none';
+                document.getElementById('below_items_table').style.display = 'none';
+                document.getElementById('dead_stock_table').style.display = 'none';
 
                 $('#stock_items').DataTable().clear().destroy();
                 $('#stock_items').DataTable({
@@ -1040,16 +1067,18 @@
 
             });
 
-            $('#below').on('click', function () {
+            $('#fastMoving').on('click', function () {
 
                 document.getElementById('stock_items_table').style.display = 'none';
                 document.getElementById('stock_items_expired_table').style.display = 'none';
+                document.getElementById('below_items_table').style.display = 'none';
+                document.getElementById('dead_stock_table').style.display = 'none';
                 document.getElementById('stock_items_fast_table').style.display = 'block';
 
                 $('#stock_items_fast').DataTable().clear().destroy();
                 $('#stock_items_fast').DataTable({
                     "processing": true,
-                    "serverSide": true,
+                    "serverSide": false,
                     "ajax": {
                         "url": "{{ route('stock-summary') }}",
                         "dataType": "json",
@@ -1058,6 +1087,133 @@
                         "data": {
                             _token: "{{csrf_token()}}",
                             summary_no: 2
+                        },
+                        dataSrc: function (json) {
+                            // console.log('Fetched data:', json); 
+
+                            if (Array.isArray(json)) {
+                                // filter only where no_of_sales > 0
+                                return json.filter(item => item.no_of_sales > 0);
+                            }
+
+                            console.error('Unexpected data format:', json);
+                            return [];
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('AJAX Error:', status, error);
+                        }
+                    },
+                    columns: [
+                        {
+                            data: null,
+                            render: function (data, type, row, meta) {
+                                return meta.row + 1 + '.';
+                            }
+                        },
+                        { data: 'name' },
+                        { data: 'quantity', title: 'Sold Qty' },
+                        { data: 'no_of_sales', title: 'No of Sales' },
+                        { data: 'available_qty', title: 'Available Qty' }
+                    ],
+                    'searching': false,
+                    "columnDefs": [
+                        {
+                            "targets": 0,
+                            "orderable": false,
+                        }
+                    ]
+
+                });
+            });
+
+            $('#below').on('click', function () {
+
+                document.getElementById('stock_items_table').style.display = 'none';
+                document.getElementById('stock_items_expired_table').style.display = 'none';
+                document.getElementById('stock_items_fast_table').style.display = 'none';
+                document.getElementById('dead_stock_table').style.display = 'none';
+                document.getElementById('below_items_table').style.display = 'block';
+
+                $('#below_stock_items').DataTable().clear().destroy();
+                $('#below_stock_items').DataTable({
+                    "processing": true,
+                    "serverSide": false,
+                    "ajax": {
+                        "url": "{{ route('stock-summary') }}",
+                        "dataType": "json",
+                        "type": "post",
+                        "cache": false,
+                        "data": {
+                            _token: "{{csrf_token()}}",
+                            summary_no: 3
+                        },
+                        dataSrc: function (json) {
+                            // console.log('Fetched data:', json);
+                            return json.data;
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('AJAX Error:', status, error);
+                        }
+                    },
+                    columns: [
+                        {
+                            data: null,
+                            render: function (data, type, row, meta) {
+                                return meta.row + 1 + '.';
+                            }
+                        },
+                        { data: 'product_name' },
+                        {
+                            data: 'min_quantinty',
+                            render: function (data, type, row) {
+                                return numberWithCommas(data);
+                            }
+                        },
+                        {
+                            data: 'available_qty',
+                            render: function (data, type, row) {
+                                return numberWithCommas(data);
+                            }
+                        }
+                    ],
+                    'searching': false,
+                    "columnDefs": [
+                        {
+                            "targets": 0,
+                            "orderable": false,
+                        }
+                    ]
+
+                });
+
+            });
+
+            $('#deadStock').on('click', function () {
+                document.getElementById('stock_items_table').style.display = 'none';
+                document.getElementById('stock_items_expired_table').style.display = 'none';
+                document.getElementById('stock_items_fast_table').style.display = 'none';
+                document.getElementById('below_items_table').style.display = 'none';
+                document.getElementById('dead_stock_table').style.display = 'block';
+
+                $('#dead_stock_items').DataTable().clear().destroy();
+                $('#dead_stock_items').DataTable({
+                    "processing": true,
+                    "serverSide": false,
+                    "ajax": {
+                        "url": "{{ route('stock-summary') }}",
+                        "dataType": "json",
+                        "type": "post",
+                        "cache": false,
+                        "data": {
+                            _token: "{{csrf_token()}}",
+                            summary_no: 4
+                        },
+                        dataSrc: function (json) {
+                            console.log('Fetched data:', json);
+                            return json.data;
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('AJAX Error:', status, error);
                         }
                     },
                     'columns': [
@@ -1067,8 +1223,13 @@
                                 return meta.row + 1 + ('.');
                             }
                         },
-                        { 'data': 'product_name' },
-                        { 'data': 'occurrence' }
+                        { 'data': 'name' },
+                        {
+                            data: 'quantity',
+                            render: function (data, type, row) {
+                                return numberWithCommas(data);
+                            }
+                        },
                     ],
                     'searching': false,
                     "columnDefs": [
@@ -1085,11 +1246,13 @@
                 document.getElementById('stock_items_table').style.display = 'none';
                 document.getElementById('stock_items_expired_table').style.display = 'block';
                 document.getElementById('stock_items_fast_table').style.display = 'none';
+                document.getElementById('below_items_table').style.display = 'none';
+                document.getElementById('dead_stock_table').style.display = 'none';
 
                 $('#stock_items_expired').DataTable().clear().destroy();
                 $('#stock_items_expired').DataTable({
                     "processing": true,
-                    "serverSide": true,
+                    "serverSide": false,
                     "ajax": {
                         "url": "{{ route('stock-summary') }}",
                         "dataType": "json",
@@ -1097,7 +1260,14 @@
                         "cache": false,
                         "data": {
                             _token: "{{csrf_token()}}",
-                            summary_no: 3
+                            summary_no: 5
+                        },
+                        dataSrc: function (json) {
+                            console.log('Fetched data:', json);
+                            return json.data;
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('AJAX Error:', status, error);
                         }
                     },
                     'columns': [
@@ -1108,7 +1278,60 @@
                             }
                         },
                         { 'data': 'name' },
-                        { 'data': 'quantity' },
+                        {
+                            data: 'quantity',
+                            render: function (data, type, row) {
+                                return numberWithCommas(data);
+                            }
+                        },
+                        { 'data': 'expiry_date' }
+                    ],
+                    'searching': false,
+                    "columnDefs": [
+                        {
+                            "targets": 0,
+                            "orderable": false,
+                        }
+                    ]
+
+                });
+            });
+
+            $('#expireSoon').on('click', function () {
+                document.getElementById('stock_items_table').style.display = 'none';
+                document.getElementById('stock_items_expired_table').style.display = 'block';
+                document.getElementById('stock_items_fast_table').style.display = 'none';
+                document.getElementById('below_items_table').style.display = 'none';
+                document.getElementById('dead_stock_table').style.display = 'none';
+
+                $('#stock_items_expired').DataTable().clear().destroy();
+                $('#stock_items_expired').DataTable({
+                    "processing": true,
+                    "serverSide": false,
+                    "ajax": {
+                        "url": "{{ route('stock-summary') }}",
+                        "dataType": "json",
+                        "type": "post",
+                        "cache": false,
+                        "data": {
+                            _token: "{{csrf_token()}}",
+                            summary_no: 6
+                        }
+                    },
+                    'columns': [
+                        {
+                            'data': null,
+                            'render': function (data, type, row, meta) {
+                                return meta.row + 1 + ('.');
+                            }
+                        },
+                        { 'data': 'name' },
+                        {
+                            data: 'quantity',
+                            render: function (data, type, row) {
+                                return numberWithCommas(data);
+                            }
+                        },
                         { 'data': 'expiry_date' }
                     ],
                     'searching': false,
@@ -1123,9 +1346,10 @@
             });
 
             function numberWithCommas(digit) {
-                return String(parseFloat(digit)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                return String(parseFloat(digit))
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             }
-
         </script>
 
         <script>

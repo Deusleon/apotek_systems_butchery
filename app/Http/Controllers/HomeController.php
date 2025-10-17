@@ -73,15 +73,19 @@ class HomeController extends Controller {
 
         $store_id = current_store_id();
         $all_stores = Store::all();
+        $expireSettings = Setting::where('id', 123)->value('value');
+        $expireEnabled = $expireSettings === 'YES';
 
         //Admin Users
         if ( auth()->user()->checkPermission( 'Manage All Branches' ) && $store_id == 1 ) {
-            session()->put( 'store', 'ALL' );
+            if(is_all_store()){
             $outOfStock = CurrentStock::where( 'quantity', 0 )
             ->groupby( 'product_id' )->get();
             $outOfStock = $outOfStock->count();
             $outOfStockList = CurrentStock::where( 'quantity', 0 )
             ->groupby( 'product_id' )->get();
+                        
+            $belowMinLevel = $this->lowStock(false);
 
             $fast_moving = DB::table( 'sales_details' )->select( 'sales.receipt_number as receipt_number', 'inv_products.name as product_name', 'inv_products.brand as brand', 'inv_products.pack_size as pack_size', 'inv_products.sales_uom as sales_uom',
             DB::raw( 'count(inv_products.name) as occurrence' ), 'inv_products.id as product_id' )
@@ -93,7 +97,8 @@ class HomeController extends Controller {
             ->get();
 
             $fast_moving = $this->fastMovingCalculation( $fast_moving );
-
+            $deadStock = $this->deadStock(false);
+            $expireSoon = $this->expireInThreeMonths(false);
             if ( $fast_moving != [] ) {
                 $fast_moving = sizeof( $fast_moving );
             } else {
@@ -101,7 +106,7 @@ class HomeController extends Controller {
             }
 
             $expired = CurrentStock::where( 'quantity', '>', 0 )
-            ->whereRaw( 'expiry_date <  date(now())' )
+            ->whereRaw( 'expiry_date <=  date(now())' )
             ->count();
 
             $pharmacy_data = $this->pharmacyDashboard();
@@ -109,25 +114,20 @@ class HomeController extends Controller {
             $expense_data = $this->expenseDashboard();
             $transport_data = $this->transportDashboard();
 
-            return view( 'home', compact( [ 'outOfStock', 'outOfStockList', 'expired', 'fast_moving', 'pharmacy_data'
+            return view( 'home', compact( [ 'outOfStock', 'outOfStockList', 'belowMinLevel', 'deadStock', 'expireSoon', 'expireEnabled', 'expired', 'fast_moving', 'pharmacy_data'
             , 'purchase_data', 'expense_data', 'all_stores', 'store_id', 'transport_data' ] ) );
         }
-
-        //Others Users
-        $default_store = Auth::user()->store->name ?? 'Default Store';
-        $stores = Store::where( 'name', $default_store )->first();
-
-        if ( $stores != null ) {
-            $default_store_id = $stores->id;
-        } else {
-            $default_store_id = 0;
-        }
-        session()->put( 'store', $default_store_id );
-        session()->put( 'current_store_id', $default_store_id );
+    }
 
         $outOfStock = CurrentStock::where( 'quantity', 0 )
         ->where( 'store_id', $store_id )->groupby( 'product_id' )->get();
         $outOfStock = $outOfStock->count();
+        $outOfStockList = CurrentStock::where( 'quantity', 0 )
+        ->where( 'store_id', $store_id )->groupby( 'product_id' )->get();
+        
+        $belowMinLevel = $this->lowStock(false);
+
+
         $outOfStockList = CurrentStock::where( 'quantity', 0 )
         ->where( 'store_id', $store_id )->groupby( 'product_id' )->get();
 
@@ -142,6 +142,8 @@ class HomeController extends Controller {
         ->get();
 
         $fast_moving = $this->fastMovingCalculation( $fast_moving );
+        $deadStock = $this->deadStock(false);
+        $expireSoon = $this->expireInThreeMonths(false);
 
         if ( $fast_moving != [] ) {
             $fast_moving = sizeof( $fast_moving );
@@ -151,7 +153,7 @@ class HomeController extends Controller {
 
         $expired = CurrentStock::where( 'quantity', '>', 0 )
         ->where( 'store_id', $store_id )
-        ->whereRaw( 'expiry_date <  date(now())' )
+        ->whereRaw( 'expiry_date <=  date(now())' )
         ->count();
 
         $pharmacy_data = $this->pharmacyDashboard();
@@ -159,7 +161,7 @@ class HomeController extends Controller {
         $expense_data = $this->expenseDashboard();
         $transport_data = $this->transportDashboard();
 
-        return view( 'home', compact( [ 'outOfStock', 'outOfStockList', 'expired', 'fast_moving', 'pharmacy_data'
+        return view( 'home', compact( [ 'outOfStock', 'outOfStockList', 'belowMinLevel', 'deadStock', 'expireSoon', 'expired', 'expireEnabled', 'fast_moving', 'pharmacy_data'
         , 'purchase_data', 'expense_data', 'all_stores', 'store_id', 'transport_data' ] ) );
 
     }
@@ -341,7 +343,6 @@ class HomeController extends Controller {
         return $data;
 
     }
-
     private function purchaseDashboard() {
         $data = array();
 
@@ -513,7 +514,6 @@ class HomeController extends Controller {
         return $data;
 
     }
-
     public function showChangePasswordForm() {
         return view( 'auth.changepassword' );
     }
@@ -538,7 +538,6 @@ class HomeController extends Controller {
         Session::flash( 'alert-success', 'Password changed successfully!' );
         return redirect()->route( 'home' );
     }
-
     public function stockSummary( Request $request ) {
         $request[ 'store_id' ] = current_store_id();
         if ( $request->ajax() ) {
@@ -547,9 +546,15 @@ class HomeController extends Controller {
                 case 1:
                 return $this->outOfStock( $request );
                 case 2:
-                return $this->fastMoving( $request );
+                return $this->fastMoving();
                 case 3:
+                return $this->lowStock(true);
+                case 4:
+                return $this->deadStock(true);
+                case 5:
                 return $this->expired( $request );
+                case 6:
+                return $this->expireInThreeMonths(true);
                 default:
             }
         }
@@ -636,126 +641,235 @@ class HomeController extends Controller {
 
         echo json_encode( $json_data );
     }
-
-    public function fastMoving( $request ) {
+    
+    public function lowStock($isAjax) {
         $store_id = current_store_id();
-         //Admin User
-        try {
-            $columns = array(
-                0 => 'product_id',
-                1 => 'product_name',
-                2 => 'occurrence'
-            );
-
-            //Troubleshooting error on query
-            $query = DB::table( 'sales_details' )->select( 'sales.receipt_number as receipt_number', 'inv_products.name as product_name', 'inv_products.brand as brand', 'inv_products.pack_size as pack_size', 'inv_products.sales_uom as sales_uom',
-            DB::raw( 'count(inv_products.name) as occurrence' ), 'inv_products.id as product_id' )
-            ->join( 'sales', 'sales.id', '=', 'sales_details.sale_id' )
-            ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
-            ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
-            ->whereRaw( 'date(sales.date) >= date(now()) - interval 90 day' )
-            // ->where( 'inv_current_stock.store_id', $request->input( 'store_id' ) )
-            ->groupBy( [ 'sales.receipt_number', 'inv_products.name' ] );
-            // ->get();
-            if(!is_all_store()){
-                $query->where('inv_current_stock.store_id', $store_id);
-            }
-
-            $totalData = $query->get();
-
-            $sum_by_product_name = $this->fastMovingCalculation( $totalData );
-
-            $totalFiltered = sizeof( $sum_by_product_name );
-
-            $limit = $request->input( 'length' );
-            $start = $request->input( 'start' );
-            $order = $columns[ $request->input( 'order.0.column' ) ];
-            $dir = $request->input( 'order.0.dir' );
-
-            if ( empty( $request->input( 'search.value' ) ) ) {
-                //Troubleshooting error on query
-                $query = DB::table( 'sales_details' )->select( 'sales.receipt_number as receipt_number', 'inv_products.name as product_name', 'inv_products.brand as brand', 'inv_products.pack_size as pack_size', 'inv_products.sales_uom as sales_uom',
-                DB::raw( 'count(inv_products.name) as occurrence' ), 'inv_products.id as product_id' )
-                ->join( 'sales', 'sales.id', '=', 'sales_details.sale_id' )
-                ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
-                ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
-                ->whereRaw( 'date(sales.date) >= date(now()) - interval 90 day' )
-                // ->where( 'inv_current_stock.store_id', $request->input( 'store_id' ) )
-                ->groupBy( [ 'sales.receipt_number', 'inv_products.name' ] )
-                ->orderBy( $order, $dir );
-                // ->get();
-                if(!is_all_store()){
-                    $query->where('inv_current_stock.store_id', $store_id);
-                }
-                $fast_moving = $query->get();
-                
-            } else {
-                $search = $request->input( 'search.value' );
-
-                //Troubleshooting error on query
-                $query = DB::table( 'sales_details' )->select( 'sales.receipt_number as receipt_number', 'inv_products.name as product_name', 'inv_products.brand as brand', 'inv_products.pack_size as pack_size', 'inv_products.sales_uom as sales_uom',
-                DB::raw( 'count(inv_products.name) as occurrence' ), 'inv_products.id as product_id' )
-                ->join( 'sales', 'sales.id', '=', 'sales_details.sale_id' )
-                ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id' )
-                ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
-                ->whereRaw( 'date(sales.date) >= date(now()) - interval 90 day' )
-                ->orWhere( 'product_name', 'LIKE', "%{$search}%" )
-                // ->orWhere( 'inv_current_stock.store_id', $request->input( 'store_id' ) )
-                ->groupBy( [ 'sales.receipt_number', 'inv_products.name' ] )
-                ->orderBy( $order, $dir );
-                // ->get();
-                if(!is_all_store()){
-                    $query->where('inv_current_stock.store_id', $store_id);
-                }
-                $fast_moving = $query->get();
-
-                $totalFiltered = DB::table( 'sales_details' )->select( 'receipt_number', 'product_name',
-                DB::raw( 'count(product_name) as occurrence' ), 'product_id' )
-                ->join( 'sales', 'sales.id', '=', 'sales_details.sale_id' )
-                ->whereRaw( 'date(sales.date) >= date(now()) - interval 90 day' )
-                ->orWhere( 'product_name', 'LIKE', "%{$search}%" )
-                ->groupBy( [ 'sales.receipt_number', 'inv_products.name' ] )
-                ->get();
-
-                $sum_by_product_name = $this->fastMovingCalculation( $totalFiltered );
-                $totalFiltered = sizeof( $sum_by_product_name );
-            }
-
-            $data = array();
-            if ( !empty( $fast_moving ) ) {
-                $sum_by_product_name = $this->fastMovingCalculation( $fast_moving );
-                $data = $sum_by_product_name;
-            }
-
-            $sort_column = array_column( $data, 'occurrence' );
-            array_multisort( $sort_column, SORT_DESC, $data );
-
-            $json_data = array(
-                'draw' => intval( $request->input( 'draw' ) ),
-                'recordsTotal' => intval( sizeof( $sum_by_product_name ) ),
-                'recordsFiltered' => intval( $totalFiltered ),
-                'data' => $data
-            );
-            Log::info('Fast moving', $json_data);
-            echo json_encode( $json_data );
-        } catch ( Exception $e ) {
-            Log::info( 'FastMovingError', [ 'ErrorMessage'=>$e ] );
+    
+        $query = DB::table('inv_current_stock as cs')
+        ->select(
+            'p.id as product_id',
+            'p.name as product_name',
+            'p.brand',
+            'p.pack_size',
+            'p.sales_uom',
+            'p.min_quantinty',
+            DB::raw('SUM(cs.quantity) as available_qty')
+        )
+        ->join('inv_products as p', 'p.id', '=', 'cs.product_id')
+        ->havingRaw('SUM(cs.quantity) < p.min_quantinty AND SUM(cs.quantity) > 0');
+        if (!is_all_store()) {
+            $query->where('cs.store_id', $store_id);
         }
-    }
 
+        $belowMinLevel = $query->groupBy( 'p.id')
+                               ->get();
+        Log::info('Data', $belowMinLevel->toArray());
+        
+        if ($isAjax) {
+            return response()->json([
+                'status' => 'success',
+                'data' => $belowMinLevel
+            ]);
+        }
+
+        return $belowMinLevel;
+    }
+    
+    public function fastMoving()
+    {
+        $store_id = current_store_id();
+
+        $start_date = now()->subMonths(3)->startOfDay();
+        $end_date   = now()->endOfDay();
+
+        // Subquery: total sold & number of sales per product (based on sales_details -> inv_current_stock.product_id)
+        $salesSub = DB::table('sales_details')
+            ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
+            ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
+            ->whereBetween('sales.date', [$start_date, $end_date])
+             ->when(!is_all_store(), function ($q) use ($store_id) {
+                    $q->where('inv_current_stock.store_id', $store_id);
+                })
+            ->select(
+                'inv_current_stock.product_id',
+                DB::raw('SUM(sales_details.quantity) as total_sold'),
+                DB::raw('COUNT(DISTINCT sales_details.sale_id) as no_of_sales')
+            )
+            ->groupBy('inv_current_stock.product_id');
+
+        // Subquery: available quantity per product (from inv_current_stock)
+        $stockSub = DB::table('inv_current_stock')
+            ->select(
+                'product_id',
+                DB::raw('SUM(quantity) as available_qty')
+            )
+            ->groupBy('product_id');
+
+        if (!is_all_store()) {
+            $stockSub->where('store_id', $store_id);
+        }
+
+        // Main query: products LEFT JOIN the aggregates
+        $query = DB::table('inv_products as p')
+            ->JoinSub($salesSub, 's', 's.product_id', '=', 'p.id')
+            ->leftJoinSub($stockSub, 'cs', 'cs.product_id', '=', 'p.id')
+            ->select(
+                'p.id as product_id',
+                'p.name as product_name',
+                'p.brand',
+                'p.pack_size',
+                'p.sales_uom',
+                DB::raw('COALESCE(s.total_sold, 0) as total_sold'),
+                DB::raw('COALESCE(cs.available_qty, 0) as available_qty'),
+                DB::raw('COALESCE(s.no_of_sales, 0) as no_of_sales')
+            )
+            ->orderByDesc('total_sold');
+
+        $fast_moving = $query->get();
+
+        $ranked = $fast_moving->map(function ($item, $index) {
+            return [
+                'rank'         => $index + 1,
+                'product_id'   => $item->product_id,
+                'name'         => $item->product_name,
+                'brand'        => $item->brand,
+                'pack_size'    => $item->pack_size,
+                'sales_uom'    => $item->sales_uom,
+                'quantity'     => (float) $item->total_sold,
+                'available_qty'=> (float) $item->available_qty,
+                'no_of_sales'  => (int) $item->no_of_sales,
+            ];
+        });
+
+        Log::info('Fast moving', $ranked->toArray());
+
+        return $ranked;
+    }
+    public function deadStock($isAjax)
+    {
+        if (!Auth()->user()->checkPermission('View Inventory Summary')) {
+            abort(403, 'Access Denied');
+        }
+
+        $store_id = current_store_id();
+
+        // Range: 3 months ago -> now
+        $three_months_ago = now()->subMonths(3)->startOfDay();
+        $today = now()->endOfDay();
+
+        $sold_product_ids = DB::table('sales_details as sd')
+            ->join('inv_current_stock as cs', 'cs.id', '=', 'sd.stock_id')
+            ->join('sales as s', 's.id', '=', 'sd.sale_id')
+            ->when(!is_all_store(), function ($q) use ($store_id) {
+                $q->where('cs.store_id', $store_id);
+            })
+            ->whereBetween('s.date', [$three_months_ago, $today])
+            ->distinct()
+            ->pluck('cs.product_id')
+            ->toArray();
+
+        // 2) Get current stock entries & exclude sold products
+        $query = DB::table('inv_current_stock as cs')
+            ->join('inv_products as p', 'p.id', '=', 'cs.product_id')
+            ->select(
+                'p.id as product_id',
+                'p.name',
+                'p.brand',
+                'p.pack_size',
+                'p.sales_uom',
+                'cs.store_id',
+                DB::raw('SUM(cs.quantity) as quantity')
+            )
+            ->where('cs.quantity', '>', 0)
+            // only exclude sold products if we have any sold ids; otherwise keep all (no sold in period)
+            ->when(!empty($sold_product_ids), function ($q) use ($sold_product_ids) {
+                $q->whereNotIn('cs.product_id', $sold_product_ids);
+            })
+            ->when(!is_all_store(), function ($q) use ($store_id) {
+                $q->where('cs.store_id', $store_id);
+            })
+            ->groupBy(
+                'p.id'
+            )
+            ->orderBy('p.name', 'asc');
+
+        $dead_stock = $query->get();
+
+        if ($isAjax) {
+            return response()->json([
+                'status' => 'success',
+                'data' => $dead_stock
+            ]);
+        }
+
+        return $dead_stock;
+    }
+    public function expireInThreeMonths($isAjax)
+    {
+        if (!Auth()->user()->checkPermission('View Inventory Summary')) {
+            abort(403, 'Access Denied');
+        }
+
+        $store_id = current_store_id();
+
+        // Range: from today -> 3 months ahead
+        $today = now()->startOfDay();
+        $three_months_later = now()->addMonths(3)->endOfDay();
+
+        $query = DB::table('inv_current_stock as cs')
+            ->join('inv_products as p', 'p.id', '=', 'cs.product_id')
+            ->select(
+                'p.id as product_id',
+                'p.name',
+                'p.brand',
+                'p.pack_size',
+                'p.sales_uom',
+                'cs.batch_number',
+                'cs.expiry_date',
+                'cs.store_id',
+                DB::raw('SUM(cs.quantity) as quantity')
+            )
+            ->where('cs.quantity', '>', 0)
+            ->whereBetween('cs.expiry_date', [$today, $three_months_later])
+            ->when(!is_all_store(), function ($q) use ($store_id) {
+                $q->where('cs.store_id', $store_id);
+            })
+            ->groupBy(
+                'p.id',
+                'p.name',
+                'p.brand',
+                'p.pack_size',
+                'p.sales_uom',
+                'cs.batch_number',
+                'cs.expiry_date',
+                'cs.store_id'
+            )
+            ->orderBy('cs.expiry_date', 'asc');
+
+        $expiring_soon = $query->get();
+                
+        if ($isAjax) {
+            return response()->json([
+                'status' => 'success',
+                'data' => $expiring_soon
+            ]);
+        }
+
+        return $expiring_soon;
+    }
     public function expired( $request ) {
         $store_id = current_store_id();
         
         $columns = array(
             0 => 'product_id',
-            1 => 'product_id',
+            1 => 'product_name',
             2 => 'quantity',
             3 => 'expiry_date'
 
         );
 
         $query = CurrentStock::where( 'quantity', '>', 0 )
-        ->whereRaw( 'expiry_date <  date(now())' );
+        ->whereRaw( 'expiry_date <=  date(now())' );
         // ->get();
         if(!is_all_store()){
             $query->where('store_id', $store_id);
@@ -765,22 +879,12 @@ class HomeController extends Controller {
 
         $totalFiltered = $totalData->count();
 
-        $limit = $request->input( 'length' );
-        $start = $request->input( 'start' );
-        $order = $columns[ $request->input( 'order.0.column' ) ];
-        $dir = $request->input( 'order.0.dir' );
-
         if ( empty( $request->input( 'search.value' ) ) ) {
             $query = CurrentStock::select( 'name', 'brand', 'pack_size', 'sales_uom', 'quantity', 'inv_current_stock.id', 'product_id', 'expiry_date' )
             ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
-            ->whereRaw( 'expiry_date <  date(now())' )
+            ->whereRaw( 'expiry_date <=  date(now())' )
             ->where( 'quantity', '>', 0 )
-            // ->where( 'inv_current_stock.store_id', $request->input( 'store_id' ) )
-            ->offset( $start )
-            ->limit( $limit )
-            ->orderby( 'expiry_date', 'desc' )
-            ->orderBy( $order, $dir );
-            // ->get();
+            ->orderby( 'expiry_date', 'desc' );
 
             if(!is_all_store()){
                 $query->where('inv_current_stock.store_id', $store_id);
@@ -793,14 +897,9 @@ class HomeController extends Controller {
             $query = CurrentStock::select( 'name', 'brand', 'pack_size', 'sales_uom', 'quantity', 'inv_current_stock.id', 'product_id', 'expiry_date' )
             ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
             ->orWhere( 'name', 'LIKE', "%{$search}%" )
-            ->orwhereRaw( 'expiry_date <  date(now())' )
+            ->orwhereRaw( 'expiry_date <=  date(now())' )
             ->where( 'quantity', '>', 0 )
-            // ->where( 'inv_current_stock.store_id', $request->input( 'store_id' ) )
-            ->offset( $start )
-            ->limit( $limit )
-            ->orderby( 'expiry_date', 'desc' )
-            ->orderBy( $order, $dir );
-            // ->get();
+            ->orderby( 'expiry_date', 'desc' );
 
             if(!is_all_store()){
                 $query->where('inv_current_stock.store_id', $store_id);
@@ -810,7 +909,7 @@ class HomeController extends Controller {
             $query = CurrentStock::select( 'name', 'brand', 'pack_size', 'sales_uom', 'quantity', 'inv_current_stock.id', 'product_id', 'expiry_date' )
             ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
             ->orWhere( 'name', 'LIKE', "%{$search}%" )
-            ->orwhereRaw( 'expiry_date <  date(now())' )
+            ->orwhereRaw( 'expiry_date <=  date(now())' )
             ->where( 'quantity', '>', 0 );
             // ->where( 'inv_current_stock.store_id', $request->input( 'store_id' ) )
             // ->get();
@@ -844,7 +943,6 @@ class HomeController extends Controller {
 
         echo json_encode( $json_data );
     }
-
     public function taskSchedule( Request $request ) {
         if ( $request->ajax() ) {
             $commonFunction = new CommonFunctions();

@@ -59,8 +59,6 @@ class ProductController extends Controller
             'sub_categories' => $sub_category
         ]);
     }
-
-
     public function store(Request $request)
     {   
         $min_quantinty = str_replace(',', '', $request->input('min_quantinty'));
@@ -107,8 +105,6 @@ class ProductController extends Controller
             return back()->withInput();
         }
     }
-
-
     public function update(Request $request)
     {
         
@@ -166,7 +162,6 @@ class ProductController extends Controller
             return back()->withInput();
         }
     }
-
     public function destroy(Request $request)
     {
         $stock_count = DB::table('inv_current_stock')->where('product_id',$request->product_id)->count();
@@ -194,7 +189,6 @@ class ProductController extends Controller
             return back();
         }
     }
-
     public function allProducts(Request $request)
     {
         try {
@@ -297,7 +291,6 @@ class ProductController extends Controller
             ], 500);
         }
     }
-
     public function productCategoryFilter(Request $request)
     {
         if ($request->ajax()) {
@@ -307,7 +300,6 @@ class ProductController extends Controller
             return json_decode($sub_categories, true);
         }
     }
-
     public function storeProduct(Request $request)
     {
         if ($request->ajax()) {
@@ -360,7 +352,6 @@ class ProductController extends Controller
 
         }
     }
-
     public function statusFilter(Request $request)
     {
         if ($request->ajax()) {
@@ -389,7 +380,6 @@ class ProductController extends Controller
             return $formatted_product;
         }
     }
-
     public function statusActivate(Request $request)
     {
         if ($request->ajax()) {
@@ -405,7 +395,6 @@ class ProductController extends Controller
             }
         }
     }
-
     public function export(Request $request)
     {
         // Increase memory limit

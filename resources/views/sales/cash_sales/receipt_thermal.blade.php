@@ -17,7 +17,7 @@
         }
 
         * {
-            font-family: 'Courier New', monospace;
+            font-family: Arial, Helvetica, sans-serif
         }
 
         table {
@@ -77,9 +77,9 @@
             <table id="table-detail">
                 <thead>
                     <tr>
-                        <th align="left">Description</th>
-                        <th align="center">Qty</th>
-                        <th align="right">Amount</th>
+                        <th align="left" style="width: 50%;">Description</th>
+                        <th align="center" style="width: 15%;">Qty</th>
+                        <th align="right" style="width: 35%;">Amount</th>
                     </tr>
                 </thead>
                 <tbody>

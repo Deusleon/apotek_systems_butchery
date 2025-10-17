@@ -17,7 +17,7 @@
         }
 
         * {
-            font-family: 'Courier New', monospace;
+            font-family: Arial, Helvetica, sans-serif
         }
 
         table {
@@ -99,7 +99,6 @@
                         <th align="left">Description</th>
                         <th class="text-center">Qty</th>
                         <th class="text-right">Price</th>
-                        {{-- <th class="text-right">VAT</th> --}}
                         <th class="text-right">Amount</th>
                     </tr>
                 </thead>

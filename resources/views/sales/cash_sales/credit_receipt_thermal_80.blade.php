@@ -17,7 +17,7 @@
         }
 
         * {
-            font-family: 'Courier New', monospace;
+            font-family: Arial, Helvetica, sans-serif
         }
 
         table {

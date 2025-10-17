@@ -17,7 +17,7 @@
         }
 
         * {
-            font-family: 'Courier New', monospace;
+            font-family: Arial, Helvetica, sans-serif
         }
 
         table {
@@ -95,11 +95,11 @@
             <table id="table-detail">
                 <thead>
                     <tr>
-                        <th align="left">Description</th>
-                        <th class="text-center">Qty</th>
-                        <th class="text-right">Price</th>
+                        <th align="left" style="width: 35%;">Description</th>
+                        <th class="text-center" style="width: 15%;">Qty</th>
+                        <th class="text-right" style="width: 20%;">Price</th>
                         {{-- <th class="text-right">VAT</th> --}}
-                        <th class="text-right">Amount</th>
+                        <th class="text-right" style="width: 30%;">Amount</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -108,9 +108,9 @@
                             <td>{{$item['name']}} {{$item['brand'] ?? ''}}
                                 {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}</td>
                             <td class="text-center">{{number_format($item['quantity'], 0)}}</td>
-                            <td class="text-right">{{number_format($item['price'], 2)}}</td>
+                            <td class="text-right">{{number_format($item['price'], 0)}}</td>
                             {{-- <td class="text-right">{{number_format($item['vat'], 2)}}</td> --}}
-                            <td class="text-right">{{number_format($item['quantity'] * $item['price'], 2)}}</td>
+                            <td class="text-right">{{number_format($item['quantity'] * $item['price'], 0)}}</td>
                         </tr>
                         @php
                             $subTotal += $item['sub_total'];
@@ -128,22 +128,22 @@
                     <tr>
                         <td>Sub Total</td>
                         <td class="text-right">
-                            {{number_format($subTotal, 2)}}
+                            {{number_format($subTotal, 0)}}
                         </td>
                     </tr>
                     <tr>
                         <td>VAT</td>
-                        <td class="text-right">{{number_format($vat, 2)}}</td>
+                        <td class="text-right">{{number_format($vat, 0)}}</td>
                     </tr>
                     @if($dat[0]['discount_total'] > 0)
                         <tr>
                             <td>Discount</td>
-                            <td class="text-right">{{number_format($discount, 2)}}</td>
+                            <td class="text-right">{{number_format($discount, 0)}}</td>
                         </tr>
                     @endif
                     <tr>
                         <td><b>Total</b></td>
-                        <td class="text-right"><b>{{number_format($grandTotal, 2)}}</b></td>
+                        <td class="text-right"><b>{{number_format($grandTotal, 0)}}</b></td>
                     </tr>
                 </tbody>
             </table>
