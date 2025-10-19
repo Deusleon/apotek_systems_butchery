@@ -184,7 +184,6 @@
                                     <label>Purchase Date <font color="red">*</font></label>
                                     <input type="text" name="purchase_date" class="form-control" id="invoicing_purchase_date"
                                         autocomplete="off" required="true">
-
                                 </div>
                             @endif
                         </div>

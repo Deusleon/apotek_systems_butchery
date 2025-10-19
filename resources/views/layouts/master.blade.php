@@ -321,13 +321,43 @@ $store_id = Auth::user()->store_id;
                                 </div>
                             </div>
                             <ul class="noti-body" id="notification">
-                                @foreach(auth()->user()->unreadNotifications as $notification)
-                                    <li><b>OutofStock</b> - <span
-                                            class="text-c-red">{{$notification->data['data'][0]}}</span>;
-                                        <b>Expired</b> - <span class="text-c-red">{{$notification->data['data'][1]}}</span>
-                                    </li>
-                                @endforeach
+                                @forelse(auth()->user()->unreadNotifications as $notification)
+                                    @php
+                                        $data = $notification->data;
+                                    @endphp
+                                        {{-- 1. Out of Stock --}}
+                                        @if(isset($data['out_of_stock_count']))
+                                            <div class="p-1 pl-3">
+                                                <span>Out of Stock:</span>
+                                                <span class="text-c-red">{{ number_format($data['out_of_stock_count']) }}</span>
+                                            </div>
+                                        @endif
+                                        {{-- 2. Below Min Level --}}
+                                        @if(isset($data['below_min_level_count']))
+                                            <div class="p-1 pl-3">
+                                                <span>Below Min Level:</span>
+                                                <span class="text-c-yellow">{{ number_format($data['below_min_level_count']) }}</span>
+                                            </div>
+                                        @endif
+                                        {{-- 3. Expired --}}
+                                        @if(isset($data['expired_count']))
+                                            <div class="p-1 pl-3">
+                                                <span>Expired:</span>
+                                                <span class="text-c-red">{{ number_format($data['expired_count']) }}</span>
+                                            </div>
+                                        @endif
+                                        {{-- 3. Expired --}}
+                                        @if(isset($data['expiring_soon_count']))
+                                            <div class="p-1 pl-3">
+                                                <span>Expire in 3 months:</span>
+                                                <span class="text-c-yellow">{{ number_format($data['expiring_soon_count']) }}</span>
+                                            </div>
+                                        @endif
+                                @empty
+                                    <div class="text-muted">No new notifications</div>
+                                @endforelse
                             </ul>
+
 
                         </div>
                     </div>
@@ -558,7 +588,7 @@ $store_id = Auth::user()->store_id;
         };
 
         $(document).ready(function () {
-            setInterval(checkStock, 120000)
+            setInterval(checkStock, 60000)
 
             // Auto-hide alerts after 5 seconds
             setTimeout(function () {

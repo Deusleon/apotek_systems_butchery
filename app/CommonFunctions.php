@@ -5,7 +5,9 @@ namespace App;
 
 
 use App\Notifications\StockNotification;
+use App\Notifications\ExpiringSoonNotification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CommonFunctions
 {
@@ -47,39 +49,93 @@ class CommonFunctions
 
     public function stockNotificationSchedule($id)
     {
-        $key = 'data'; //for expired and out of stock
+        $user = User::find($id);
+        if (!$user) {
+            return [];
+        }
 
-        /*all notification query*/
-        $notifications = DB::table('notifications')
+        // Get current store for the user - check session first, then user store
+        $store_id = session('current_store_id', $user->store_id);
+        // Log::info("[CommonFunctions.php] Stock notification for user {$id}, store_id: {$store_id}");
+
+        // Update or create stock notification for current store (now includes all alerts)
+        $this->updateOrCreateNotification($user, $store_id, 'App\\Notifications\\StockNotification', 'stock');
+
+        /*retrieve sent notification*/
+        $all_notification = DB::table('notifications')
+            ->where('notifiable_id', $id)
             ->where('read_at', null)
+            // ->orderBy('created_at', 'desc')
             ->get();
-        $save_flag = 0;
-        foreach ($notifications as $notification) {
-            $decode_data = json_decode($notification->data);
-            foreach ($decode_data as $index => $item) {
-                if ($key === $index) {
-                    /*donot save*/
-                    $save_flag = 1;
-                } else {
-                    /*save*/
-                    $save_flag = 0;
-                }
-            }
+
+        return json_decode($all_notification);
+    }
+
+    /**
+     * Clean up old notifications, keeping only the most recent 2 of each type
+     */
+    private function cleanupOldNotifications($user_id, $notification_type)
+    {
+        $old_notifications = DB::table('notifications')
+            ->where('notifiable_id', $user_id)
+            ->where('type', $notification_type)
+            ->where('read_at', null)
+            // ->orderBy('created_at', 'desc')
+            ->offset(2) // Skip the first 2 (keep them)
+            ->limit(1000) // Limit to prevent too many deletions at once
+            ->pluck('id');
+
+        if ($old_notifications->isNotEmpty()) {
+            DB::table('notifications')
+                ->whereIn('id', $old_notifications)
+                ->delete();
+
+            // Log::info("[CommonFunctions.php] Cleaned up " . $old_notifications->count() . " old {$notification_type} notifications for user {$user_id}");
+        }
+    }
+
+    /**
+     * Update existing notification or create new one for the current store
+     */
+    private function updateOrCreateNotification($user, $store_id, $notification_type, $type_key)
+    {
+        // Find existing unread notification of this type for this user
+        $existing_notification = DB::table('notifications')
+            ->where('notifiable_id', $user->id)
+            ->where('type', $notification_type)
+            ->where('read_at', null)
+            ->first();
+
+        if ($existing_notification) {
+            // Update existing notification with new store data
+            $notification_data = json_decode($existing_notification->data, true);
+
+            // Create new notification instance to get fresh data
+            $notification_class = str_replace('App\\Notifications\\', '', $notification_type);
+            $notification_instance = new $notification_type($store_id);
+            $new_data = $notification_instance->toArray($user);
+
+            // Merge with existing data, keeping created_at
+            $updated_data = array_merge($notification_data, $new_data);
+            $updated_data['store_id'] = $store_id; // Ensure store_id is current
+
+            DB::table('notifications')
+                ->where('id', $existing_notification->id)
+                ->update([
+                    'data' => json_encode($updated_data),
+                    'updated_at' => now()
+                ]);
+
+            // Log::info("[CommonFunctions.php] Updated existing {$notification_class} for user {$user->id} with store_id {$store_id}");
+        } else {
+            // Create new notification
+            $notification_class = str_replace('App\\Notifications\\', '', $notification_type);
+            // Log::info("[CommonFunctions.php] Creating new {$notification_class} for user {$user->id} with store_id {$store_id}");
+            $user->notify(new $notification_type($store_id));
         }
 
-        if ($save_flag === 0 || $save_flag !== 0) {
-            /*truncate*/
-            DB::table('notifications')->delete();
-            /*send notification*/
-            User::find($id)->notify(new StockNotification);
-            /*retrieve sent notification*/
-            $all_notification = DB::table('notifications')
-                ->where('read_at', null)
-                ->get();
-            return json_decode($all_notification);
-
-        }
-
+        // Clean up old notifications (keep only 2 of each type per user)
+        $this->cleanupOldNotifications($user->id, $notification_type);
     }
 
 }

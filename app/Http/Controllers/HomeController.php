@@ -52,6 +52,10 @@ class HomeController extends Controller {
 
         session( [ 'current_store_id' => $store->id, 'store' => $store->name ] );
 
+        // Update notifications immediately when store changes
+        $commonFunction = new CommonFunctions();
+        $commonFunction->stockNotificationSchedule($user->id);
+
         return redirect()->back()->with( 'success', "Branch changed to {$store->name}" );
     }
 
@@ -644,7 +648,7 @@ class HomeController extends Controller {
     
     public function lowStock($isAjax) {
         $store_id = current_store_id();
-    
+
         $query = DB::table('inv_current_stock as cs')
         ->select(
             'p.id as product_id',
@@ -657,14 +661,16 @@ class HomeController extends Controller {
         )
         ->join('inv_products as p', 'p.id', '=', 'cs.product_id')
         ->havingRaw('SUM(cs.quantity) < p.min_quantinty AND SUM(cs.quantity) > 0');
+
         if (!is_all_store()) {
             $query->where('cs.store_id', $store_id);
         }
 
-        $belowMinLevel = $query->groupBy( 'p.id')
+        $belowMinLevel = $query->groupBy('p.id')
                                ->get();
-        Log::info('Data', $belowMinLevel->toArray());
-        
+
+        // Log::info('Low stock data', $belowMinLevel->toArray());
+
         if ($isAjax) {
             return response()->json([
                 'status' => 'success',

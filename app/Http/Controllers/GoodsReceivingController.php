@@ -31,7 +31,7 @@ class GoodsReceivingController extends Controller
 
         $default_store_name = Store::where('id', $default_store_id)->value('name');
 
-        $back_date = Setting::where('id', 114)->value('value');
+        $back_date = Setting::where('id', 126)->value('value');
         $expire_date = Setting::where('id', 123)->value('value');
 
         $orders = Order::with(['details', 'details.product', 'supplier'])

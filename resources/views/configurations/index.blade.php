@@ -309,6 +309,9 @@
                 case 125:
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="saletype">   @foreach($sale_types as $sale_type)<option value="{{$sale_type->name}}">{{$sale_type->name}}</option>@endforeach</select>';
                     break;
+                case 126:
+                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="back_date"><option value="YES">YES</option><option value="NO">NO</option></select>';
+                    break;
                 default:
                 // code block
             }
