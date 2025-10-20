@@ -201,9 +201,9 @@ class ComposerStaticInit7512b619ff658d5273426c72a6eca1d4
     public static $prefixDirsPsr4 = array (
         'phpDocumentor\\Reflection\\' => 
         array (
-            0 => __DIR__ . '/..' . '/phpdocumentor/reflection-common/src',
-            1 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
-            2 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
+            0 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
+            1 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
+            2 => __DIR__ . '/..' . '/phpdocumentor/reflection-common/src',
         ),
         'ZipStream\\' => 
         array (
@@ -703,12 +703,14 @@ class ComposerStaticInit7512b619ff658d5273426c72a6eca1d4
         'App\\Invoice' => __DIR__ . '/../..' . '/app/Invoice.php',
         'App\\IssueReturn' => __DIR__ . '/../..' . '/app/IssueReturn.php',
         'App\\Location' => __DIR__ . '/../..' . '/app/Location.php',
+        'App\\Notifications\\ExpiringSoonNotification' => __DIR__ . '/../..' . '/app/Notifications/ExpiringSoonNotification.php',
         'App\\Notifications\\LowStockAlert' => __DIR__ . '/../..' . '/app/Notifications/LowStockAlert.php',
         'App\\Notifications\\StockNotification' => __DIR__ . '/../..' . '/app/Notifications/StockNotification.php',
         'App\\Notifications\\StockTransferNotification' => __DIR__ . '/../..' . '/app/Notifications/StockTransferNotification.php',
         'App\\Order' => __DIR__ . '/../..' . '/app/Order.php',
         'App\\OrderDetail' => __DIR__ . '/../..' . '/app/OrderDetail.php',
         'App\\Payment' => __DIR__ . '/../..' . '/app/Payment.php',
+        'App\\PaymentType' => __DIR__ . '/../..' . '/app/PaymentType.php',
         'App\\PriceCategory' => __DIR__ . '/../..' . '/app/PriceCategory.php',
         'App\\PriceList' => __DIR__ . '/../..' . '/app/PriceList.php',
         'App\\Product' => __DIR__ . '/../..' . '/app/Product.php',
