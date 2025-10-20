@@ -83,6 +83,8 @@ class CreatePermissionsTable extends Migration
             ['name' => 'View Stock Issue', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
             ['name' => 'Issue Return', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
             ['name' => 'Manage Stock Issue', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
+            ['name' => 'View Detailed Stock', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
+            ['name' => 'Edit Detailed Stock', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
             ['name' => 'View Stock Transfer', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'INVENTORY'],
             ['name' => 'Create Stock Transfer', 'guard_name' => 'web', 'created_at' => '2025-07-06 19:12:58', 'updated_at' => '2025-07-06 19:12:58', 'category' => 'INVENTORY'],
             ['name' => 'Edit Stock Transfer', 'guard_name' => 'web', 'created_at' => '2025-07-06 19:12:58', 'updated_at' => '2025-07-06 19:12:58', 'category' => 'INVENTORY'],
