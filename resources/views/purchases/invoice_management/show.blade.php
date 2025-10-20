@@ -7,85 +7,75 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body" style="font-size: 15px">
-                <div class="form-group row">
-                    <label class="col-md-3 col-form-label text-md-right">
-                        Invoice Number:
-                    </label>
+
+            <div class="modal-body" style="font-size: 15px;">
+                
+                <!-- Row 1 -->
+                <div class="form-group row mb-2">
+                    <label class="col-md-3 col-form-label text-md-right">Invoice Number:</label>
                     <div class="col-md-3">
                         <input type="text" readonly class="form-control-plaintext" id="inv_no">
                     </div>
-                    <label class="col-md-3 col-form-label text-md-right">
-                        Supplier's Name:
-                    </label>
+                    <label class="col-md-3 col-form-label text-md-right">Supplier's Name:</label>
                     <div class="col-md-3">
                         <input type="text" readonly class="form-control-plaintext" id="supplier">
                     </div>
                 </div>
-                <div class="form-group row" style="margin-top: -2%">
-                    <label class="col-md-3 col-form-label text-md-right">
-                        Invoice Date:
-                    </label>
+
+                <!-- Row 2 -->
+                <div class="form-group row mb-2" style="margin-top: -2%;">
+                    <label class="col-md-3 col-form-label text-md-right">Invoice Date:</label>
                     <div class="col-md-3">
                         <input type="text" readonly class="form-control-plaintext" id="inv_date">
                     </div>
-                    <label class="col-md-3 col-form-label text-md-right">
-                        Invoice Amount:
-                    </label>
+                    <label class="col-md-3 col-form-label text-md-right">Invoice Amount:</label>
                     <div class="col-md-3">
                         <input type="text" readonly class="form-control-plaintext" id="amount">
                     </div>
                 </div>
-                <div class="form-group row" style="margin-top: -2%">
-                    <label class="col-md-3 col-form-label text-md-right">
-                        Grace Period (In Days):
-                    </label>
+
+                <!-- Row 3 -->
+                <div class="form-group row mb-2" style="margin-top: -2%;">
+                    <label class="col-md-3 col-form-label text-md-right">Grace Period (In Days):</label>
                     <div class="col-md-3">
                         <input type="text" readonly class="form-control-plaintext" id="period">
                     </div>
-                    <label class="col-md-3 col-form-label text-md-right">
-                        Paid Amount:
-                    </label>
+                    <label class="col-md-3 col-form-label text-md-right">Paid Amount:</label>
                     <div class="col-md-3">
                         <input type="text" readonly class="form-control-plaintext" id="paid">
                     </div>
                 </div>
-                <div class="form-group row" style="margin-top: -2%">
-                    <label class="col-md-3 col-form-label text-md-right">
-                        Received Amount:
-                    </label>
+
+                <!-- Row 4 (Received Amount + Received Status) -->
+                <div class="form-group row mb-2" style="margin-top: -2%;">
+                    <label class="col-md-3 col-form-label text-md-right">Received Amount:</label>
                     <div class="col-md-3">
                         <input type="text" readonly class="form-control-plaintext" id="received">
                     </div>
-                    <!-- <label class="col-md-3 col-form-label text-md-right">
-                        Balance Remain:
-                    </label>
-                    <div class="col-md-3">
-                        <input type="text" readonly class="form-control-plaintext" id="balance">
-                    </div> -->
-                </div>
-                <div class="form-group row" style="margin-top: -2%">
-                    <label class="col-md-3 col-form-label text-md-right">
-                        Payment Due Date:
-                    </label>
-                    <div class="col-md-3">
-                        <input type="text" readonly class="form-control-plaintext" id="due">
-                    </div>
-                    <label class="col-md-3 col-form-label text-md-right">
-                        Received Status:
-                    </label>
+                    <label class="col-md-3 col-form-label text-md-right">Received Status:</label>
                     <div class="col-md-3">
                         <input type="text" readonly class="form-control-plaintext" id="status">
                     </div>
                 </div>
-                <div class="form-group row" style="margin-top: 10px;">
-                    <label class="col-md-12 col-form-label text-md-left font-weight-bold">
-                        Remarks/Description:
-                    </label>
-                    <div class="col-md-12">
-                        <textarea type="text" readonly class="form-control-plaintext" id="remarks" rows="3" style="border: 1px solid #ddd; padding: 8px; border-radius: 4px; background-color: #f8f9fa;"></textarea>
+
+                <!-- Row 5 -->
+                <div class="form-group row mb-2" style="margin-top: -2%;">
+                    <label class="col-md-3 col-form-label text-md-right">Payment Due Date:</label>
+                    <div class="col-md-3">
+                        <input type="text" readonly class="form-control-plaintext" id="due">
                     </div>
                 </div>
+
+                <!-- Remarks Styled Like Edit Modal -->
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="remarks" >Remarks / Description</label>
+                            <textarea readonly id="remarks" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <div class="modal-footer">
