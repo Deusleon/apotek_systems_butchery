@@ -321,6 +321,8 @@ class PurchaseReportController extends Controller
 
         foreach ($datas as $d) {
             $d->dates = $dates;
+            // Calculate remain_balance as invoice_amount - paid_amount
+            $d->remain_balance = $d->invoice_amount - $d->paid_amount;
         }
 
         return $datas;

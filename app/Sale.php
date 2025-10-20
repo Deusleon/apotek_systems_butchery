@@ -13,10 +13,10 @@ class Sale extends Model
     public function details()
     {
         return $this->hasMany(SalesDetail::class, 'sale_id', 'id')
-            ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
-            ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
-            ->select('sales_details.id as id', 'name', 'brand', 'pack_size', 'sales_uom', 'sales_details.quantity as quantity', 'price', 'vat', 'discount', 'amount', 'sales_details.status')
-            ->groupBy('sales_details.id');
+            ->leftJoin('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
+            ->leftJoin('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+            ->select('sales_details.id as id', 'inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom', 'sales_details.quantity as quantity', 'sales_details.price', 'sales_details.vat', 'sales_details.discount', 'sales_details.amount', 'sales_details.status')
+            ->groupBy('sales_details.id', 'inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom', 'sales_details.quantity', 'sales_details.price', 'sales_details.vat', 'sales_details.discount', 'sales_details.amount', 'sales_details.status');
     }
 
     public function cost()
