@@ -714,8 +714,9 @@
             }
 
             $('#sales_date').daterangepicker({
-                startDate: moment().startOf('month'),
-                endDate: end,
+                startDate: moment().startOf("month"),
+                endDate: moment().endOf("month"),
+                maxDate: end,
                 autoUpdateInput: true,
                 locale: {
                     format: 'YYYY/MM/DD'

@@ -60,19 +60,20 @@
 
         @if(Auth::user()->checkPermission('View Purchase Returns Approval'))
             <div class="tab-content" id="myTabContent">
-                <div class="d-flex justify-content-end mb-3 align-items-center">
-                    <label class="mr-2" for="">Status:</label>
-                    <select id="return_status" class="js-example-basic-single form-control" onchange="getPurchaseReturns()">
-                        <option value="2">Pending</option>
-                        <option value="3">Approved</option>
-                        <option value="4">Rejected</option>
-                    </select>
+                <div class="row d-flex justify-content-end mr-0 mb-3">
+                    <div class="d-flex justify-content-end mr-3 align-items-center">
+                        <label class="mr-2" for="">Status:</label>
+                        <select id="return_status" class="js-example-basic-single form-control" onchange="getPurchaseReturns()">
+                            <option value="2">Pending</option>
+                            <option value="3">Approved</option>
+                            <option value="4">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="d-flex justify-content-end align-items-center">
+                        <label class="mr-2" for="">Date:</label>
+                        <input type="text" id="return_date" onchange="getPurchaseReturns()" class="form-control w-auto">
+                    </div>
                 </div>
-                <div class="d-flex justify-content-end mb-3 align-items-center">
-                    <label class="mr-2" for="">Date:</label>
-                    <input type="text" id="return_date" onchange="getPurchaseReturns()" class="form-control w-auto">
-                </div>
-
                 <div class="table-responsive">
                     <table id="purchase_returns_table" class="display table table-striped table-hover" style="width:100%">
                         <thead>
@@ -217,17 +218,17 @@
                     }
                 },
                 @if(Auth::user()->checkPermission('Approve Purchase Returns'))
-                    {
+                            {
                         data: "action",
                         defaultContent: "<button type='button' id='approve' class='btn btn-sm btn-rounded btn-primary'>Approve</button> <button type='button' id='reject' class='btn btn-sm btn-rounded btn-danger'>Reject</button>"
                     }
                 @else
-                    {
-                        data: "",
-                        defaultContent: "", visible: false
-                    }
-                @endif
-            ],
+                        {
+                            data: "",
+                            defaultContent: "", visible: false
+                        }
+                    @endif
+                ],
             aaSorting: [[1, "desc"]]
         });
 

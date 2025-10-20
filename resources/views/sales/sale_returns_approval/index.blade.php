@@ -67,20 +67,22 @@
 
         @if(Auth::user()->checkPermission('View Sales Return Approval'))
             <div class="tab-content" id="myTabContent">
-                <div class="d-flex justify-content-end mb-3">
-                    <div class="d-flex align-items-center" style="width: 256px;">
-                        <label for="price_category" class="form-label mb-0"
-                            style="white-space: nowrap; margin-right: 10px;">Status:</label>
-                        <select id="retun_status" class="js-example-basic-single form-control" onchange="getRetunedProducts()">
-                            <option value="2">Pending</option>
-                            <option value="3">Approved</option>
-                            <option value="4">Rejected</option>
-                        </select>
+                <div class="row d-flex justify-content-end mr-0 mb-3">
+                    <div class="d-flex justify-content-end mr-3">
+                        <div class="d-flex align-items-center" style="width: 256px;">
+                            <label for="price_category" class="form-label mb-0"
+                                style="white-space: nowrap; margin-right: 10px;">Status:</label>
+                            <select id="retun_status" class="js-example-basic-single form-control" onchange="getRetunedProducts()">
+                                <option value="2">Pending</option>
+                                <option value="3">Approved</option>
+                                <option value="4">Rejected</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
-                <div class="d-flex justify-content-end mb-3 align-items-center">
-                    <label class="mr-2" for="">Date:</label>
-                    <input type="text" id="returned_date" onchange="getRetunedProducts()" class="form-control w-auto">
+                    <div class="d-flex justify-content-end align-items-center">
+                        <label class="mr-2" for="">Date:</label>
+                        <input type="text" id="returned_date" onchange="getRetunedProducts()" class="form-control w-auto">
+                    </div>
                 </div>
                 <div class="table-responsive">
                     <table id="return_table" class="display table table-striped table-hover" style="width:100%">
@@ -146,9 +148,11 @@
             }
 
             $('#returned_date').daterangepicker({
-                startDate: moment().startOf('month'),
+                // startDate: moment().startOf('month'),
+                startDate: moment(),
                 endDate: end,
                 autoUpdateInput: true,
+                alwaysShowCalendars: false,
                 locale: {
                     format: 'YYYY/MM/DD'
                 },
