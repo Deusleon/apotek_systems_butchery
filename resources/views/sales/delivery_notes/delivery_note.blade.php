@@ -197,6 +197,15 @@
     <p>4. Please check all items before signing for delivery.</p>
 </div>
 
+@if($generalSettings && $generalSettings->delivery_note_terms)
+    <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 3px;">
+        <h4 style="color: #28a745; margin-bottom: 10px;">TERMS & CONDITIONS:</h4>
+        <div style="font-size: 11px; line-height: 1.5; text-align: justify; color: #333;">
+            {!! nl2br(e($generalSettings->delivery_note_terms)) !!}
+        </div>
+    </div>
+@endif
+
 <div class="signature-section">
     <div style="display: flex; justify-content: space-between;">
         <div style="width: 48%;">

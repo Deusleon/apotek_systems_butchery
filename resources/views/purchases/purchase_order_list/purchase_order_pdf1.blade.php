@@ -161,6 +161,19 @@
     </div>
 </div>
 
+@if($generalSettings && $generalSettings->purchase_order_terms)
+    <div style="margin-top: 30px; padding: 15px; background-color: #f8f9fa; border: 1px solid #dee2e6;">
+        <h4 style="margin-bottom: 10px; color: #1f273b;">TERMS & CONDITIONS:</h4>
+        <div style="font-size: 12px; line-height: 1.5; text-align: justify; color: #333;">
+            {!! nl2br(e($generalSettings->purchase_order_terms)) !!}
+        </div>
+    </div>
+@endif
+
+<div style="margin-top: 20px; text-align: center; font-size: 11px; color: #999;">
+    <p>Generated on {{date('j M, Y H:i:s')}} | This is a computer generated document</p>
+</div>
+
 <script type="text/php">
     if ( isset($pdf) ) {
         $x = 280;

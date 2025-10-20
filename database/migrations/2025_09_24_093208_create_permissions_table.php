@@ -118,6 +118,7 @@ class CreatePermissionsTable extends Migration
             ['name' => 'Add Branches', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'SETTINGS'],
             ['name' => 'Edit Branches', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'SETTINGS'],
             ['name' => 'Delete Branches', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'SETTINGS'],
+            ['name' => 'View Terms and Conditions', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'SETTINGS'],
             ['name' => 'View Security', 'guard_name' => 'web', 'created_at' => '2024-11-11 20:00:28', 'updated_at' => '2024-11-11 20:00:28', 'category' => 'SETTINGS'],
             ['name' => 'View Roles', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'SETTINGS'],
             ['name' => 'Add Roles', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'SETTINGS'],

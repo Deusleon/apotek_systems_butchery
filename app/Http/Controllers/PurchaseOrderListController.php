@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\GeneralSetting;
 use App\Order;
 use App\OrderDetail;
 use App\Setting;
@@ -64,6 +65,9 @@ class PurchaseOrderListController extends Controller
     $pharmacy['logo'] = Setting::where('id', 105)->value('value');
     $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
 
+    // Get general settings for terms & conditions
+    $generalSettings = GeneralSetting::first();
+
         $order_details = OrderDetail::where('order_id', $order_no)->get();
         $sub_total = 0;
         $vat = 0;
@@ -80,7 +84,7 @@ class PurchaseOrderListController extends Controller
         }
         $data = $order_details;
                 $pdf = PDF::loadView( 'purchases.purchase_order_list.purchase_order_pdf1',
-                compact( 'data', 'pharmacy') )
+                compact( 'data', 'pharmacy', 'generalSettings') )
                 ->setPaper( 'a4', '' );
                 return $pdf->stream( 'purchase_order.pdf' );
     }

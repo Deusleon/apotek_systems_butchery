@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\CurrentStock;
 use App\Customer;
+use App\GeneralSetting;
 use App\PriceCategory;
 use App\Sale;
 use App\SalesCredit;
@@ -557,6 +558,9 @@ class SaleQuoteController extends Controller {
         $pharmacy[ 'slogan' ] = Setting::where( 'id', 104 )->value( 'value' );
         $pharmacy[ 'vrn_number' ] = Setting::where( 'id', 103 )->value( 'value' );
 
+        // Get general settings for terms & conditions
+        $generalSettings = GeneralSetting::first();
+
         $id = SalesQuoteDetail::orderBy( 'id', 'desc' )->value( 'quote_id' );
 
         $sale_quote = SalesQuoteDetail::where( 'quote_id', $id )->get();
@@ -606,16 +610,16 @@ class SaleQuoteController extends Controller {
 
         if ( $receipt_size === '58mm Thermal Paper' ) {
             $pdf = PDF::loadView( 'sales.cash_sales.order_receipt_thermal',
-            compact( 'data', 'pharmacy', 'page' ) );
+            compact( 'data', 'pharmacy', 'page', 'generalSettings' ) );
         } else if ( $receipt_size === 'A4 / Letter' ) {
-            $pdf = PDF::loadView( 'sales.sale_quotes.quote_receipt',
-            compact( 'data', 'pharmacy', 'page' ) );
+            $pdf = PDF::loadView( 'sales.sale_quotes.quote_receipt_A4',
+            compact( 'data', 'pharmacy', 'page', 'generalSettings' ) );
         } else if ( $receipt_size === '80mm Thermal Paper' ) {
             $pdf = PDF::loadView( 'sales.cash_sales.order_receipt_thermal',
-            compact( 'data', 'pharmacy', 'page' ) );
+            compact( 'data', 'pharmacy', 'page', 'generalSettings' ) );
         } else if ( $receipt_size === 'A5 / Half Letter' ) {
-            $pdf = PDF::loadView( 'sales.sale_quotes.quote_receipt',
-            compact( 'data', 'pharmacy', 'page' ) );
+            $pdf = PDF::loadView( 'sales.sale_quotes.quote_receipt_A5',
+            compact( 'data', 'pharmacy', 'page', 'generalSettings' ) );
         }
 
         return $pdf->stream( $id . '.pdf' );
@@ -632,6 +636,9 @@ class SaleQuoteController extends Controller {
             $pharmacy[ 'phone' ] = Setting::where( 'id', 107 )->value( 'value' );
             $pharmacy[ 'slogan' ] = Setting::where( 'id', 104 )->value( 'value' );
             $pharmacy[ 'vrn_number' ] = Setting::where( 'id', 103 )->value( 'value' );
+
+            // Get general settings for terms & conditions
+            $generalSettings = GeneralSetting::first();
 
             $sale_quote = SalesQuoteDetail::where( 'quote_id', $id )->get();
 
@@ -682,19 +689,19 @@ class SaleQuoteController extends Controller {
 
             if ( $receipt_size === '58mm Thermal Paper' ) {
                 $pdf = PDF::loadView( 'sales.sale_quotes.quote_receipt_thermal_58',
-                compact( 'data', 'pharmacy', 'page' ) )
+                compact( 'data', 'pharmacy', 'page', 'generalSettings' ) )
                     ->setPaper([0, 0, 163, 600], '');
             } else if ( $receipt_size === '80mm Thermal Paper' ) {
                 $pdf = PDF::loadView( 'sales.sale_quotes.quote_receipt_thermal_80',
-                compact( 'data', 'pharmacy', 'page' ) )
+                compact( 'data', 'pharmacy', 'page', 'generalSettings' ) )
                     ->setPaper([0, 0, 227, 600], '');
             } else if ( $receipt_size === 'A4 / Letter' ) {
                 $pdf = PDF::loadView( 'sales.sale_quotes.quote_receipt_A4',
-                compact( 'data', 'pharmacy', 'page' ) )
+                compact( 'data', 'pharmacy', 'page', 'generalSettings' ) )
                     ->setPaper('a4', '');
             } else if ( $receipt_size === 'A5 / Half Letter' )  {
                 $pdf = PDF::loadView( 'sales.sale_quotes.quote_receipt_A5',
-                compact( 'data', 'pharmacy', 'page' ) )
+                compact( 'data', 'pharmacy', 'page', 'generalSettings' ) )
                     ->setPaper('a5', '');
             }
             return $pdf->stream( $id . '.pdf' );
@@ -955,6 +962,9 @@ class SaleQuoteController extends Controller {
             $pharmacy[ 'slogan' ] = Setting::where( 'id', 104 )->value( 'value' );
             $pharmacy[ 'vrn_number' ] = Setting::where( 'id', 103 )->value( 'value' );
 
+            // Get general settings for terms & conditions
+            $generalSettings = GeneralSetting::first();
+
             $sale_quote = SalesQuoteDetail::where( 'quote_id', $id )->get();
 
             $sales = array();
@@ -999,8 +1009,8 @@ class SaleQuoteController extends Controller {
 
             $data = $grouped_sales;
 
-            $pdf = PDF::loadView( 'sales.sale_quotes.delivery_note',
-            compact( 'data', 'pharmacy', 'page' ) );
+            $pdf = PDF::loadView( 'sales.delivery_notes.delivery_note',
+            compact( 'data', 'pharmacy', 'page', 'generalSettings' ) );
 
             return $pdf->stream( 'DELIVERY-NOTE-' . $id . '.pdf' );
 

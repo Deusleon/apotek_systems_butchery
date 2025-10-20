@@ -362,6 +362,15 @@
     <div class="footer-section">
         <div class="footer-note"><b>Remark:</b> {{$dat[0]['remark']}}</div>
 
+        @if($generalSettings && $generalSettings->credit_sale_terms)
+            <div style="margin-top: 20px; padding: 10px; border-top: 1px solid #ccc;">
+                <div style="font-weight: bold; font-size: 12px; margin-bottom: 5px;">Terms & Conditions:</div>
+                <div style="font-size: 10px; line-height: 1.4; text-align: justify;">
+                    {!! nl2br(e($generalSettings->credit_sale_terms)) !!}
+                </div>
+            </div>
+        @endif
+
         @foreach($data as $datas => $dat)
             <div class="sold-by">Issued By: {{$dat[0]['sold_by']}}</div>
             <div class="slogan">{{$pharmacy['slogan'] ?? 'Thank you for your business'}}</div>
