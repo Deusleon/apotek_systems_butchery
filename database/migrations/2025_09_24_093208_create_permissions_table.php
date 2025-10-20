@@ -144,9 +144,6 @@ class CreatePermissionsTable extends Migration
             ['name' => 'Show payments history', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:36', 'updated_at' => '2024-11-23 08:25:36', 'category' => 'ACCOUNTING'],
             ['name' => 'Edit Invoices', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:36', 'updated_at' => '2024-11-23 08:25:36', 'category' => 'ACCOUNTING'],
             ['name' => 'View Assets', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:27:22', 'updated_at' => '2024-11-23 08:27:22', 'category' => 'ACCOUNTING'],
-            ['name' => 'Manage Assets', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:27:38', 'updated_at' => '2024-11-23 08:27:38', 'category' => 'ACCOUNTING'],
-            ['name' => 'View Cash Flow', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:27:54', 'updated_at' => '2024-11-23 08:27:54', 'category' => 'ACCOUNTING'],
-            ['name' => 'Manage Cash Flow', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:29:21', 'updated_at' => '2024-11-23 08:29:21', 'category' => 'ACCOUNTING'],
             ['name' => 'Manage Expense Categories', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:29:43', 'updated_at' => '2024-11-23 08:29:43', 'category' => 'ACCOUNTING'],
             // Purchasing Sub Modules
             ['name' => 'View Order Receiving', 'guard_name' => 'web', 'created_at' => '2024-11-15 19:11:38', 'updated_at' => '2024-11-15 19:11:38', 'category' => 'PURCHASING'],
