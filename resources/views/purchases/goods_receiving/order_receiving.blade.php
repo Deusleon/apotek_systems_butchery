@@ -323,35 +323,35 @@
                 detailsBody.append(`
                 <tr>
                     <td>
-                    ${item.product 
+                    ${item.product
                         ? `${item.product.name} ${item.product.pack_size || ''} ${item.product.brand || ''} ${item.product.sales_uom || ''}`
                         : 'N/A'}
                     </td>
 
-                    <td class="text-right ordered-qty">${orderedQty}</td>
-                    <td class="text-right received-qty-cell" data-initial-received="${receivedQty}">${receivedQty}</td>
-                    <td class="text-right remaining-qty-cell d-none">${remaining}</td>
+                    <td class="text-right ordered-qty">${orderedQty.toLocaleString('en-US')}</td>
+                    <td class="text-right received-qty-cell" data-initial-received="${receivedQty}">${receivedQty.toLocaleString('en-US')}</td>
+                    <td class="text-right remaining-qty-cell d-none">${remaining.toLocaleString('en-US')}</td>
                     <td class="text-right d-none">${unitPrice.toLocaleString('en-US',{ minimumFractionDigits:2 })}</td>
                     <td class="text-right d-none">${totalPrice.toLocaleString('en-US',{ minimumFractionDigits:2 })}</td>
                     <td class="receive-cell text-center">
-                        <span class="plain-receive">${remaining}</span>
-                        <input type="text" name="items[${index}][quantity]" 
+                        <span class="plain-receive">${remaining.toLocaleString('en-US')}</span>
+                        <input type="text" name="items[${index}][quantity]"
                             class="form-control form-control-sm text-center receive-qty-input edit-mode-hidden"
                             min="0" max="${remaining}" value="${remaining}" ${isFullyReceived?'readonly':''}>
                     </td>
 
                     ${batchSetting === 'YES' ? `
                     <td>
-                        <input type="text" name="items[${index}][batch_number]" 
+                        <input type="text" name="items[${index}][batch_number]"
                             class="form-control form-control-sm edit-mode-hidden" ${isFullyReceived?'disabled':''}>
                     </td>` : ''}
 
                     ${expireDate === 'YES' ? `
                     <td>
-                        <input type="text" placeholder="YYYY-MM-DD" name="items[${index}][expiry_date]" 
+                        <input type="text" placeholder="YYYY-MM-DD" name="items[${index}][expiry_date]"
                             class="form-control form-control-sm edit-mode-hidden" ${isFullyReceived?'disabled':''}>
                     </td>` : ''}
-                    
+
                     <input type="hidden" name="items[${index}][product_id]" value="${item.product_id}">
                     <input type="hidden" name="items[${index}][purchase_order_detail_id]" value="${item.id}">
                     <input type="hidden" name="items[${index}][cost_price]" value="${unitPrice}">
@@ -368,16 +368,17 @@
         // Qty Updates
         $('#order_items_body').on('input', '.receive-qty-input', function() {
             const $row = $(this).closest('tr');
-            const receiveQtyInput = parseFloat($(this).val()) || 0;
-            const orderedQty = parseFloat($row.find('.ordered-qty').text()) || 0;
+            let val = $(this).val().replace(/,/g, '');
+            let receiveQtyInput = parseFloat(val) || 0;
+            const orderedQty = parseFloat($row.find('.ordered-qty').text().replace(/,/g, '')) || 0;
             const initialReceivedQty = parseFloat($row.find('.received-qty-cell').data('initial-received')) || 0;
             const remainingBeforeInput = orderedQty - initialReceivedQty;
 
             const currentReceiveQty = receiveQtyInput > remainingBeforeInput ? remainingBeforeInput : receiveQtyInput;
-            if (receiveQtyInput > remainingBeforeInput) $(this).val(remainingBeforeInput);
+            $(this).val(currentReceiveQty);
 
-            $row.find('.received-qty-cell').text(initialReceivedQty + currentReceiveQty);
-            $row.find('.remaining-qty-cell').text(orderedQty - (initialReceivedQty + currentReceiveQty));
+            $row.find('.received-qty-cell').text((initialReceivedQty + currentReceiveQty).toLocaleString('en-US'));
+            $row.find('.remaining-qty-cell').text((orderedQty - (initialReceivedQty + currentReceiveQty)).toLocaleString('en-US'));
         });
 
         // Submit
@@ -453,7 +454,7 @@
                 $row.find('.plain-receive').hide();
 
                 // Extract values
-                const orderedQty = parseFloat($row.find('.ordered-qty').text()) || 0;
+                const orderedQty = parseFloat($row.find('.ordered-qty').text().replace(/,/g, '')) || 0;
                 const initialReceivedQty = parseFloat($row.find('.received-qty-cell').data('initial-received')) || 0;
                 const remaining = orderedQty - initialReceivedQty;
 
@@ -461,10 +462,10 @@
                 $row.find('.receive-qty-input').val(remaining > 0 ? remaining : 0);
 
                 // Update received cell = initial already received + remaining
-                $row.find('.received-qty-cell').text(initialReceivedQty + (remaining > 0 ? remaining : 0));
+                $row.find('.received-qty-cell').text((initialReceivedQty + (remaining > 0 ? remaining : 0)).toLocaleString('en-US'));
 
                 // Update remaining cell (so it goes to 0 if all filled)
-                $row.find('.remaining-qty-cell').text(orderedQty - (initialReceivedQty + remaining));
+                $row.find('.remaining-qty-cell').text((orderedQty - (initialReceivedQty + remaining)).toLocaleString('en-US'));
             });
 
             // Focus first receive input

@@ -402,7 +402,11 @@ $("#order_form").on("submit", function () {
     for (var key in check_cart_to_array) {
         if (check_cart_to_array[key].hasOwnProperty(price)) {
             //present
-            if (parseFloat(check_cart_to_array[key][price]) === Number(0)) {
+            if (
+                parseFloat(
+                    check_cart_to_array[key][price].replace(/,/g, "")
+                ) === 0
+            ) {
                 notify(
                     check_cart_to_array[key].item_name + " price cannot be 0 ",
                     "top",
@@ -416,7 +420,11 @@ $("#order_form").on("submit", function () {
 
         if (check_cart_to_array[key].hasOwnProperty(quantity)) {
             //present
-            if (parseFloat(check_cart_to_array[key][quantity]) === Number(0)) {
+            if (
+                parseFloat(
+                    check_cart_to_array[key][quantity].replace(/,/g, "")
+                ) === 0
+            ) {
                 notify(
                     check_cart_to_array[key].item_name +
                         " quantity cannot be 0 ",
