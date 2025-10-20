@@ -648,17 +648,10 @@ class CurrentStockController extends Controller
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'product_id' => 'required|exists:inv_products,id',
-            'brand' => 'required|string|max:255',
-            'pack_size' => 'required|string|max:255',
             'items' => 'required|array',
             'items.*.id' => 'required|exists:inv_current_stock,id',
             'items.*.batch_number' => 'nullable|string',
             'items.*.expiry_date' => 'nullable|date',
-            'items.*.quantity' => 'required|numeric',
-            'items.*.unit_cost' => 'required|numeric',
-            'items.*.sell_price' => 'nullable|numeric',
-            'items.*.sales_id' => 'nullable|exists:sales_prices,id',
         ]);
 
         if ($validator->fails()) {
@@ -668,36 +661,28 @@ class CurrentStockController extends Controller
         try {
             DB::beginTransaction();
 
-            // Update Product details
-            $product = Product::find($request->product_id);
-            $product->brand = $request->brand;
-            $product->pack_size = $request->pack_size;
-            $product->save();
-
             foreach ($request->items as $itemData) {
                 $stock = CurrentStock::find($itemData['id']);
-                $stock->batch_number = $itemData['batch_number'];
-                $stock->expiry_date = $itemData['expiry_date'];
-                $stock->quantity = $itemData['quantity'];
-                $stock->unit_cost = $itemData['unit_cost'];
-                $stock->save();
 
-                if (isset($itemData['sell_price'])) {
-                    PriceList::updateOrCreate(
-                        ['id' => $itemData['sales_id'] ?? null, 'stock_id' => $stock->id],
-                        ['price' => $itemData['sell_price'], 'status' => 1]
-                    );
+                // Only update batch_number and expiry_date fields
+                if (isset($itemData['batch_number'])) {
+                    $stock->batch_number = $itemData['batch_number'];
                 }
+                if (isset($itemData['expiry_date'])) {
+                    $stock->expiry_date = $itemData['expiry_date'];
+                }
+
+                $stock->save();
             }
 
             DB::commit();
 
-            return response()->json(['message' => 'Stock updated successfully!']);
+            return response()->json(['message' => 'Stock details updated successfully!']);
 
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Stock Update Error: ' . $e->getMessage());
-            return response()->json(['message' => 'An error occurred while updating the stock.'], 500);
+            return response()->json(['message' => 'An error occurred while updating the stock details.'], 500);
         }
     }
 
