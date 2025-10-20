@@ -10,6 +10,7 @@ use App\Supplier;
 use App\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use View;
 
@@ -37,7 +38,7 @@ class OrderController extends Controller
 public function approve(Request $request, $id)
 {
     try {
-        \Log::info('Approving order ID: ' . $id); // Add logging
+        Log::info('Approving order ID: ' . $id); // Add logging
         
         $order = Order::findOrFail($id);
         
@@ -47,14 +48,14 @@ public function approve(Request $request, $id)
 
         session()->flash("alert-success", "Order approved Successfully!");
 
-        \Log::info('Order approved successfully: ' . $id); // Add logging
+        Log::info('Order approved successfully: ' . $id); // Add logging
 
         return response()->json([
             'success' => true,
             'message' => 'Order approved successfully!'
         ]);
     } catch (\Exception $e) {
-        \Log::error('Error approving order: ' . $e->getMessage()); // Add logging
+        Log::error('Error approving order: ' . $e->getMessage()); // Add logging
         
         return response()->json([
             'success' => false,
@@ -114,48 +115,62 @@ public function approve(Request $request, $id)
 
     public function filterSupplierProduct(Request $request)
     {
-
         if ($request->ajax()) {
-            $max_prices = array();
-            $current_stock = Product::where('status', 1)
-                ->limit(500)
-                ->get();
 
-            foreach ($current_stock as $stock) {
+            $store_id = current_store_id();
+            $max_prices = [];
 
-                $data = GoodsReceiving::select('unit_cost', 'product_id')
+            $query = Product::where('status', 1);
+
+            if ($request->status == 'out_stock') {
+                $query->whereHas('currentStock', function($q) use ($store_id) {
+                    if (!is_all_store()) {
+                        $q->where('store_id', $store_id);
+                    }
+                    $q->select('product_id', DB::raw('SUM(quantity) as total_qty'))
+                    ->groupBy('product_id')
+                    ->havingRaw('SUM(quantity) <= 0');
+                });
+
+            } elseif ($request->status == 'below_min') {
+                $query->whereHas('currentStock', function($q) use ($store_id) {
+                    if (!is_all_store()) {
+                        $q->where('store_id', $store_id);
+                    }
+                    $q->select('product_id', DB::raw('SUM(quantity) as total_qty'))
+                    ->groupBy('product_id')
+                    ->havingRaw('SUM(quantity) < MAX(min_quantinty)')
+                    ->havingRaw('SUM(quantity) > 0');
+                });
+            }
+
+            $products = $query->get();
+
+            foreach ($products as $product) {
+
+                $data = GoodsReceiving::select('inv_incoming_stock.id', 'inv_incoming_stock.unit_cost', 'inv_incoming_stock.product_id')
                     ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
                     ->where('inv_products.status', 1)
-                    ->where('supplier_id', $request->supplier_id)
-                    ->where('product_id', $stock->id)
+                    ->where('inv_incoming_stock.product_id', $product->id)
+                    ->when($request->supplier_id, function($q) use ($request) {
+                        $q->where('inv_incoming_stock.supplier_id', $request->supplier_id);
+                    })
                     ->orderBy('inv_incoming_stock.id', 'desc')
-                    ->first('unit_cost');
+                    ->first();
 
-                if ($data === null) {
-                    $data = GoodsReceiving::select('unit_cost', 'product_id')
-                        ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
-                        ->where('inv_products.status', 1)
-                        ->where('product_id', $stock->id)
-                        ->orderBy('inv_incoming_stock.id', 'desc')
-                        ->first('unit_cost');
-                }
-
-                array_push($max_prices, array(
-                    'name' => $stock->name . ' ' . ($stock->brand ?? '') . ' ' . ($stock->pack_size ?? '') . ($stock->sales_uom ?? ''),
-                    'unit_cost' => $data['unit_cost'],
-                    'product_id' => $stock->id,
-                    'incoming_id' => $data['id']
-                ));
-
+                $max_prices[] = [
+                    'name' => $product->name . ' ' . ($product->brand ?? '') . ' ' . ($product->pack_size ?? '') . ($product->sales_uom ?? ''),
+                    'unit_cost' => $data->unit_cost ?? 0,
+                    'product_id' => $product->id,
+                    'incoming_id' => $data->id ?? null
+                ];
             }
 
             $sort_column = array_column($max_prices, 'name');
             array_multisort($sort_column, SORT_ASC, $max_prices);
 
             return $max_prices;
-
         }
-
     }
 
     public function filterSupplierProductInput(Request $request)
@@ -163,10 +178,22 @@ public function approve(Request $request, $id)
 
         if ($request->ajax()) {
             $max_prices = array();
-            $current_stock = Product::where('status', 1)
-                ->where('name', 'LIKE', "%{$request->word}%")
-                ->limit(10)
-                ->get();
+            $query = Product::where('status', 1)
+                ->where('name', 'LIKE', "%{$request->word}%");
+
+            // Filter based on status
+            if ($request->status == 'out_stock') {
+                $query->whereDoesntHave('currentStock', function($q) {
+                    $q->where('quantity', '>', 0);
+                });
+            } elseif ($request->status == 'below_min') {
+                $query->whereHas('currentStock', function($q) {
+                    $q->whereColumn('quantity', '<=', 'min_quantinty');
+                });
+            }
+            // For 'all', no additional filtering
+
+            $current_stock = $query->limit(10)->get();
 
             foreach ($current_stock as $stock) {
 

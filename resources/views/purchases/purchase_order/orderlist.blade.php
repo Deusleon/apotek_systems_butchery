@@ -1,6 +1,6 @@
 @extends("layouts.master")
 @section('content-title')
-    Purchase Order 
+    Purchase Order
 @endsection
 
 @section('content-sub-title')
@@ -15,7 +15,8 @@
             width: 100%;
         }
 
-        .ms-selectable, .ms-selection {
+        .ms-selectable,
+        .ms-selection {
             background: #fff;
             color: #555555;
             float: left;
@@ -28,48 +29,49 @@
             <div class="col-sm-12">
                 <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link text-uppercase" id="purchase-order-tablist" 
-                           href="{{ route('purchase-order.index') }}" 
-                           aria-controls="purchase_order" aria-selected="false">New</a>
+                        <a class="nav-link text-uppercase" id="purchase-order-tablist"
+                            href="{{ route('purchase-order.index') }}" aria-controls="purchase_order"
+                            aria-selected="false">New</a>
                     </li>
                     @if(Auth::user()->checkPermission('View Order List'))
-                    <li class="nav-item">
-                        <a class="nav-link active text-uppercase" id="order-list-tablist"
-                           href="#order-list" role="tab"
-                           aria-controls="order_list" aria-selected="true">Order List
-                        </a>
-                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link active text-uppercase" id="order-list-tablist" href="#order-list" role="tab"
+                                aria-controls="order_list" aria-selected="true">Order List
+                            </a>
+                        </li>
                     @endif
                 </ul>
-                
+
                 <div class="tab-content" id="myTabContent">
                     {{-- Order List Start--}}
                     <div class="tab-pane fade show active" id="order-list" role="tabpanel" aria-labelledby="order_list-tab">
-                        <div class="form-group row">
+                        {{-- <div class="form-group row">
                             <div class="col-md-6">
                             </div>
                             <div class="col-md-3" style="margin-left: 2.5%">
-                                <label for="" class="col-form-label text-md-right"
-                                       style="margin-left: 74.5%">Date:</label>
+                                <label for="" class="col-form-label text-md-right" style="margin-left: 74.5%">Date:</label>
                             </div>
                             <div class="col-md-3" style="margin-left: -3.4%;">
                                 <input style="width: 104%;" type="text" name="order_filter" class="form-control"
-                                       onchange="getOrderHistory()"
-                                       id="date_filter">
+                                    onchange="getOrderHistory()" id="date_filter">
                             </div>
+                        </div> --}}
+                        <div class="d-flex justify-content-end mb-3 align-items-center">
+                            <label class="mr-2" for="date_filter">Date:</label>
+                            <input type="text" name="order_filter" id="date_filter" onchange="getOrderHistory()" class="form-control w-auto">
                         </div>
                         <div id="purchases">
                             <table id="order_history_datatable" class="display table nowrap table-striped table-hover"
-                                   style="width:100%">
+                                style="width:100%">
                                 <thead>
-                                <tr>
-                                    <th hidden>ID</th>
-                                    <th>Order #</th>
-                                    <th>Supplier</th>
-                                    <th>Date</th>
-                                    <th>Amount</th>
-                                    <th>Action</th>
-                                </tr>
+                                    <tr>
+                                        <th hidden>ID</th>
+                                        <th>Order #</th>
+                                        <th>Supplier</th>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Action</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                 </tbody>
@@ -121,9 +123,9 @@
             var isApprovedByClient = !!data.clientApproved; // set by our Approve in modal
             var isApprovedByBackend = (data.status === '2' || data.status === '3' || data.status === 'Approved');
 
-            
+
             // ORIGINAL LOGIC (unchanged)
-            let url = '{{route('printOrder','id','Purchase Order')}}';
+            let url = '{{route('printOrder', 'id', 'Purchase Order')}}';
             url = url.replace('id', data.details[0].order_id);
             let a = document.getElementById('order_no');
             a.href = url;

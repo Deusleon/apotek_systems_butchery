@@ -283,7 +283,7 @@ function orderDetails(items) {
         item_data.push(fullProductName);
 
         // Quantity
-        item_data.push(item.ordered_qty);
+        item_data.push(formatMoney(item.ordered_qty));
 
         // Price, VAT, Amount
         item_data.push(formatMoney(item.price));

@@ -240,7 +240,12 @@
                     </div>
                     <hr>
                     <div class="row" id="save_buttons">
-                        <div class="col-md-6"></div>
+                        <div class="col-md-6 d-flex">
+                            <div>
+                                <b>Total Items:</b>
+                                <span id="total_items">{{ $sales_details->count() }}</span>
+                            </div>
+                        </div>
                         <div class="col-md-6">
                             <div class="btn-group" style="float: right;">
                                 <a href="{{ url('sales/sales-order-list') }}" class="btn btn-danger">Back</a>
@@ -334,6 +339,10 @@
 
                     tr.removeClass('editing');
                     $(this).text('Edit').removeClass('btn-close').addClass('btn-edit');
+                    // Update total items count after editing
+                    var totalItems = document.querySelectorAll('#edit_sales_order tbody tr').length;
+                    // console.log('Total items', totalItems);
+                    document.getElementById('total_items').innerHTML = formatNumber(totalItems, 0);
                     $("#quote_barcode_input").focus();
                     return;
                 }
@@ -365,7 +374,7 @@
                 var tr = $(this).closest('tr');
                 // if row is not in editing mode, ignore
                 if (!tr.hasClass('editing')) return;
-
+                
                 // get raw numeric values
                 var qVal = unformatNumber(tr.find('td.quantity input').val());
                 var pVal = unformatNumber(tr.find('td.price input').val());
@@ -396,6 +405,7 @@
                             document.getElementById('sub_total').value = formatNumber(Number(response.data.sub_total), 2);
                             document.getElementById('total_vat').value = formatNumber(Number(response.data.vat), 2);
                             document.getElementById('total').value = formatNumber(Number(response.data.total), 2);
+                            document.getElementById('total_items').innerHTML = formatNumber(response.data.sales_details.length, 0);
     $("#quote_barcode_input").focus();
                         }
                     },
@@ -427,6 +437,9 @@
 
                         tr.removeClass('editing');
                         tr.find('.btn-close').text('Edit').removeClass('btn-close').addClass('btn-edit');
+                        // Update total items count after editing
+                        var totalItems = document.querySelectorAll('#edit_sales_order tbody tr').length;
+                        document.getElementById('total_items').innerHTML = totalItems;
     $("#quote_barcode_input").focus();
                     }
                 });
@@ -448,6 +461,7 @@
                     success: function(response) {
                         refreshSalesTable(response.data);
                         isCartEmpty(response.data.sales_details.length);
+                        document.getElementById('total_items').innerHTML = response.data.sales_details.length;
                         // console.log('response', response);
                     },
                     error: function(xhr) {

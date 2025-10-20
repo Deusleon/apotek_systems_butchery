@@ -645,7 +645,6 @@ class HomeController extends Controller {
 
         echo json_encode( $json_data );
     }
-    
     public function lowStock($isAjax) {
         $store_id = current_store_id();
 

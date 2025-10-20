@@ -224,7 +224,13 @@
                     <input type="hidden" name="invoice_setting" id="invoice_setting" value="{{$invoice_setting}}">
                     <hr>
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6 d-flex">
+                            <div>
+                                <b>Total Items:</b>
+                                <span id="total_items">0</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
                             <div class="btn-group" style="float: right;">
                                 <button type="button" class="btn btn-danger" id="cancel-all" onclick="resetForms()">
                                     Clear

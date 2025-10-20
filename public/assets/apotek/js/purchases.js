@@ -277,6 +277,7 @@ function discount() {
     document.getElementById("sub_total_price").value = formatMoney(sub_total);
     document.getElementById("total").value = formatMoney(total);
     document.getElementById("sub_total").value = formatMoney(sub_total);
+    document.getElementById("total_items").innerHTML = cart.length;
 
     $("div.sub-total").text(formatMoney(sub_total)).css("font-weight", "Bold");
     $("div.tax-amount").text(formatMoney(total_vat)).css("font-weight", "Bold");
@@ -364,6 +365,7 @@ function deselect() {
     document.getElementById("vat").value = formatMoney(total_vat);
     document.getElementById("total").value = formatMoney(total);
     document.getElementById("sub_total").value = formatMoney(sub_total);
+    document.getElementById("total_items").innerHTML = 0;
     document.getElementById("order_cart").value = cart;
     cart_table.clear();
     cart_table.rows.add(cart);
@@ -434,9 +436,10 @@ $("#order_form").on("submit", function () {
 $("#select_id").prop("disabled", true);
 
 function filterSupplierProduct() {
-    /*ajax filter products by supplier*/
+    /*ajax filter products by supplier and status*/
     var supplier = document.getElementById("supplier");
     var supplier_id = supplier.options[supplier.selectedIndex].value;
+    var status = document.getElementById("product_status").value;
     document.getElementById("supplier_ids").value = supplier_id;
 
     $.ajax({
@@ -445,6 +448,7 @@ function filterSupplierProduct() {
         dataType: "json",
         data: {
             supplier_id: supplier_id,
+            status: status,
         },
         success: function (data) {
             $("#select_id").prop("disabled", false);
@@ -487,6 +491,7 @@ $("#select_id").select2({
             var supplier_id = supplier.options[supplier.selectedIndex].value;
 
             /*make ajax call for more*/
+            var status = document.getElementById("product_status").value;
             $.ajax({
                 url: config.routes.filterSupplierProductInput,
                 type: "get",
@@ -494,6 +499,7 @@ $("#select_id").select2({
                 data: {
                     word: search_input,
                     supplier_id: supplier_id,
+                    status: status,
                 },
                 success: function (data) {
                     $("#select_id").prop("disabled", false);

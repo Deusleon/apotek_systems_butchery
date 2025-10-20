@@ -234,6 +234,7 @@ function handleProductChange(id, price, qty, quoteId) {
                 );
                 $("#total_vat").val(formatNumber(Number(response.data.vat), 2));
                 $("#total").val(formatNumber(Number(response.data.total), 2));
+                document.getElementById('total_items').innerHTML = response.data.sales_details.length;
 
                 // optional notify
                 // notify(response.message, "top", "right", "success");
@@ -284,6 +285,7 @@ $("#products").on("change", function () {
                     Number(response.data.total),
                     2
                 );
+                document.getElementById('total_items').innerHTML = response.data.sales_details.length;
             },
             error: function (xhr) {
                 notify("Failed", "top", "right", "danger");
@@ -430,8 +432,8 @@ function refreshSalesTable(data) {
         var row = `
         <tr data-id="${item.id}">
             <td>${item.name} ${item.brand ? item.brand + " " : ""} ${
-            item.pack_size
-        } ${item.sales_uom}</td>
+            item.pack_size ?? ''
+        } ${item.sales_uom ?? ''}</td>
             <td class="quantity">${formatNumber(item.quantity, 0)}</td>
             <td class="price">${formatNumber(item.price, 0)}</td>
             <td>${formatNumber(item.vat, 0)}</td>
@@ -468,6 +470,7 @@ function refreshSalesTable(data) {
         Number(data.total),
         2
     );
+    document.getElementById('total_items').innerHTML = data.sales_details.length;
 
     $("#quote_barcode_input").focus();
 }
