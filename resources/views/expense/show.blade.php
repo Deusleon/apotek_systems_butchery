@@ -41,7 +41,7 @@
                 <div class="form-group row">
                     <label class="col-md-4 col-form-label text-md-right">Description:</label>
                     <div class="col-md-8">
-                        <textarea class="form-control" id="show_description" readonly rows="3"></textarea>
+                        <input class="form-control" id="show_description" readonly rows="3"></input>
                     </div>
                 </div>
             </div>
