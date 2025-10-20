@@ -60,6 +60,9 @@ Invoices
                                 <option selected="true" value="" disabled="disabled">Select Invoice...</option>
                             </select>
                             <span id="invoice_warning" style="display: none; color: red; font-size: 0.9em">Invoice required</span>
+                            <div id="balance_badge" style="display: none; margin-top: 5px;">
+                                <small class="text-muted">Remaining Balance: <span id="balance_amount" class="badge badge-light" style="font-size: 0.85em; padding: 4px 8px;"></span></small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -183,7 +186,7 @@ Invoices
                 success: function(data) {
                     $('#invoice').empty().append('<option value="" disabled selected>Select Invoice...</option>');
                     $.each(data, function(key, invoice) {
-                        $('#invoice').append('<option value="' + invoice.id + '">' + invoice.invoice_no + ' - ' + formatMoney(invoice.invoice_amount) + '</option>');
+                        $('#invoice').append('<option value="' + invoice.id + '" data-balance="' + (invoice.invoice_amount - invoice.paid_amount) + '">' + invoice.invoice_no + ' - ' + formatMoney(invoice.invoice_amount) + '</option>');
                     });
                     $('#invoice').prop('disabled', false);
                 },
@@ -193,6 +196,7 @@ Invoices
             });
         } else {
             $('#invoice').empty().append('<option value="" disabled selected>Select Invoice...</option>').prop('disabled', true);
+            $('#balance_badge').hide();
         }
     });
 
@@ -291,6 +295,20 @@ Invoices
 
     $('#payment_method').select2({
         dropdownParent: $('#payment_form')
+    });
+
+    // Show balance badge when invoice is selected
+    $('#invoice').on('change', function() {
+        var selectedOption = $(this).find('option:selected');
+        var balance = selectedOption.data('balance');
+
+        if (balance !== undefined) {
+            $('#balance_amount').text(formatMoney(balance));
+            $('#balance_badge').show();
+        } else {
+            $('#balance_badge').hide();
+        }
+        $('#invoice_warning').hide();
     });
 </script>
 @endpush

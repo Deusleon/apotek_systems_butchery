@@ -26,6 +26,36 @@ Invoices
         display: inline-block;
         text-align: center;
     }
+
+    .filter-controls {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .filter-control {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .filter-control label {
+        margin-bottom: 0;
+        white-space: nowrap;
+    }
+
+    @media (max-width: 768px) {
+        .filter-controls {
+            justify-content: flex-start;
+        }
+
+        .filter-control {
+            flex: 1 0 100%;
+        }
+    }
 </style>
 
 <div class="col-sm-12">
@@ -70,31 +100,18 @@ Invoices
 
             </div>
 
-            <div class="form-group row">
-                <div class="col-md-6">
+            <div class="filter-controls">
+                <div class="filter-control">
+                    <label for="due_date_filter" class="col-form-label text-md-right">Due Date:</label>
+                    <input type="text" name="invoice_filter_due_date"
+                        class="form-control" id="due_date_filter" style="min-width: 200px;" />
+                </div>
 
-                </div>
-                <div class="col-md-3" style="margin-left: 2.5%">
-                    <label style="margin-left: 64%" for=""
-                        class="col-form-label text-md-right">Due Date:</label>
-                </div>
-                <div class="col-md-3" style="margin-left: -3.4%;">
-                    <input style="width: 104%;" type="text" name="invoice_filter_due_date"
-                        class="form-control" id="due_date_filter" />
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-6">
-
-                </div>
-                <div class="col-md-3" style="margin-left: 2.5%">
-                    <label style="margin-left: 54%" for=""
-                        class="col-form-label text-md-right">Invoice Date:</label>
-                </div>
-                <div class="col-md-3" style="margin-left: -3.4%;">
-                    <input style="width: 104%;" type="text" name="invoice_filter"
+                <div class="filter-control">
+                    <label for="date_filter" class="col-form-label text-md-right">Invoice Date:</label>
+                    <input type="text" name="invoice_filter"
                         onchange="getInvoice()"
-                        class="form-control" id="date_filter" />
+                        class="form-control" id="date_filter" style="min-width: 200px;" />
                 </div>
             </div>
             <div class="table-responsive">
