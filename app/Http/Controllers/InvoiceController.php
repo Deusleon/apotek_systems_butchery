@@ -271,7 +271,16 @@ class InvoiceController extends Controller
                          ->orderBy('invoice_date', 'DESC')
                          ->get(['id', 'invoice_no', 'invoice_amount', 'paid_amount']);
 
-        return response()->json($invoices);
+        // Calculate total supplier balance (sum of all unpaid amounts)
+        $totalBalance = Invoice::where('supplier_id', $supplierId)
+                             ->selectRaw('SUM(invoice_amount - paid_amount) as total_balance')
+                             ->first()
+                             ->total_balance ?? 0;
+
+        return response()->json([
+            'invoices' => $invoices,
+            'total_balance' => $totalBalance
+        ]);
     }
 
 }

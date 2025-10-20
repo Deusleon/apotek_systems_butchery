@@ -51,6 +51,9 @@ Invoices
                                 @endforeach
                             </select>
                             <span id="supplier_warning" style="display: none; color: red; font-size: 0.9em">Supplier required</span>
+                            <div id="supplier_balance_badge" style="display: none; margin-top: 5px;">
+                                <small class="text-info"><strong>Total Supplier Balance: <span id="supplier_total_balance" class="badge badge-info" style="font-size: 0.9em; padding: 5px 10px;"></span></strong></small>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -184,19 +187,35 @@ Invoices
                 method: 'GET',
                 data: { supplier_id: supplierId },
                 success: function(data) {
+                    // Display total supplier balance
+                    if (data.total_balance && data.total_balance > 0) {
+                        $('#supplier_total_balance').text(formatMoney(data.total_balance));
+                        $('#supplier_balance_badge').show();
+                    } else {
+                        $('#supplier_balance_badge').hide();
+                    }
+
+                    // Load individual invoices
                     $('#invoice').empty().append('<option value="" disabled selected>Select Invoice...</option>');
-                    $.each(data, function(key, invoice) {
-                        $('#invoice').append('<option value="' + invoice.id + '" data-balance="' + (invoice.invoice_amount - invoice.paid_amount) + '">' + invoice.invoice_no + ' - ' + formatMoney(invoice.invoice_amount) + '</option>');
-                    });
-                    $('#invoice').prop('disabled', false);
+                    if (data.invoices && data.invoices.length > 0) {
+                        $.each(data.invoices, function(key, invoice) {
+                            $('#invoice').append('<option value="' + invoice.id + '" data-balance="' + (invoice.invoice_amount - invoice.paid_amount) + '">' + invoice.invoice_no + ' - ' + formatMoney(invoice.invoice_amount) + '</option>');
+                        });
+                        $('#invoice').prop('disabled', false);
+                    } else {
+                        $('#invoice').append('<option value="" disabled>No unpaid invoices found</option>');
+                        $('#invoice').prop('disabled', true);
+                    }
                 },
                 error: function() {
-                    notify('Error loading invoices', 'top', 'right', 'danger');
+                    notify('Error loading supplier data', 'top', 'right', 'danger');
+                    $('#supplier_balance_badge').hide();
                 }
             });
         } else {
             $('#invoice').empty().append('<option value="" disabled selected>Select Invoice...</option>').prop('disabled', true);
             $('#balance_badge').hide();
+            $('#supplier_balance_badge').hide();
         }
     });
 
