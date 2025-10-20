@@ -646,7 +646,7 @@ class InventoryReportController extends Controller
     }
     private function productsExpireDateReport()
     {
-        if (!Auth()->user()->checkPermission('Products Expire Date Report')) {
+        if (!Auth()->user()->checkPermission('Products Expiry Date Report')) {
             abort(403, 'Access Denied');
         }
         $store_id = current_store_id();

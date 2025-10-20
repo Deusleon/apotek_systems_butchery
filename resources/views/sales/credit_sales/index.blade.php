@@ -275,7 +275,7 @@
                                                     <div style="width: 99%">
                                                         <label>Sales Date<font color="red">*</font></label>
                                                         <input type="text" name="sale_date" class="form-control" id="credit_sale_date"
-                                                            autocomplete="off" required="true">
+                                                            autocomplete="off" required="true" value="{{ date('Y-m-d') }}">
                                                     </div>
                                                 </div>
                                                 <div class="col-md-3">
@@ -318,7 +318,7 @@
                                                     <div style="width: 99%">
                                                         <label>Sales Date<font color="red">*</font></label>
                                                         <input type="text" name="sale_date" class="form-control" id="credit_sale_date"
-                                                            autocomplete="off" required="true">
+                                                            autocomplete="off" value="{{ date('Y-m-d') }}" required="true">
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">

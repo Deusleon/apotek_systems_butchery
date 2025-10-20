@@ -53,20 +53,20 @@
                     aria-selected="true">Invoice Receiving</a>
             </li>
             @if (auth()->user()->checkPermission('View Order Receiving'))
-            <li class="nav-item">
-                <a class="nav-link text-uppercase" id="order-received" data-toggle="pill"
-                    href="{{ route('orders-receiving.index') }}" role="tab" aria-controls="new_quotes"
-                    aria-selected="false">Order Receiving
-                </a>
-            </li>
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" id="order-received" data-toggle="pill"
+                        href="{{ route('orders-receiving.index') }}" role="tab" aria-controls="new_quotes"
+                        aria-selected="false">Order Receiving
+                    </a>
+                </li>
             @endif
             @if (auth()->user()->checkPermission('View Material Received'))
-            <li class="nav-item">
-                <a class="nav-link text-uppercase" id="material-received" data-toggle="pill"
-                    href="{{ url('purchases/material-received') }}" role="tab" aria-controls="new_quotes"
-                    aria-selected="false">Material Received
-                </a>
-            </li>
+                <li class="nav-item">
+                    <a class="nav-link text-uppercase" id="material-received" data-toggle="pill"
+                        href="{{ url('purchasing/material-received') }}" role="tab" aria-controls="new_quotes"
+                        aria-selected="false">Material Received
+                    </a>
+                </li>
             @endif
         </ul>
         <div class="tab-content" id="myTabContent">
@@ -82,10 +82,11 @@
                                     id="good_receiving_supplier_ids" required="true"
                                     onchange="goodReceivingFilterInvoiceBySupplier()">
                                     <option selected="true" value="" disabled="disabled">Select Supplier...</option>
-                                    @foreach($suppliers->sortBy(function($supplier) { return strtolower($supplier->name); }) as $supplier)
+                                    @foreach($suppliers->sortBy(function ($supplier) {
+                                        return strtolower($supplier->name); }) as $supplier)
                                         <option value="{{$supplier->id}}">{{$supplier->name}}</option>
                                         <!-- <option
-                                                                value="{{$supplier->id}}" {{$default_supplier->id === $supplier->id  ? 'selected' : ''}}>{{$supplier->name}}</option> -->
+                                                                        value="{{$supplier->id}}" {{$default_supplier->id === $supplier->id  ? 'selected' : ''}}>{{$supplier->name}}</option> -->
                                     @endforeach
                                 </select>
 
@@ -94,63 +95,62 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="code">Products <font color="red">*</font></label>
-                                <select id="invoiceselected-product" class="js-example-basic-single form-control" style="width: 100%">
+                                <select id="invoiceselected-product" class="js-example-basic-single form-control"
+                                    style="width: 100%">
                                     <option selected="true" value="" disabled="disabled">Select Product...</option>
                                     @foreach($current_stock as $stock)
-                                        <option
-                                            value="{{ 
-                                                $stock['product_name'] . '#@' . 
-                                                $stock['product_id'] . '#@' . 
-                                                $stock['brand'] . '#@' . 
-                                                $stock['pack_size'] . '#@' . 
-                                                $stock['unit_cost'] . '#@' . 
-                                                $stock['sales_uom']
-                                            }}"
-                                            data-brand="{{ $stock['brand'] ?? '' }}"
-                                            data-pack="{{ $stock['pack_size'] ?? '' }}"
-                                        >
-                                            {{ $stock['product_name'] . ' ' . $stock['brand'] . ' ' . $stock['pack_size'] . $stock['sales_uom'] }}
-                                        </option>
+                                                                <option value="{{ 
+                                                                                $stock['product_name'] . '#@' .
+                                        $stock['product_id'] . '#@' .
+                                        $stock['brand'] . '#@' .
+                                        $stock['pack_size'] . '#@' .
+                                        $stock['unit_cost'] . '#@' .
+                                        $stock['sales_uom']
+                                                                            }}" data-brand="{{ $stock['brand'] ?? '' }}"
+                                                                    data-pack="{{ $stock['pack_size'] ?? '' }}">
+                                                                    {{ $stock['product_name'] . ' ' . $stock['brand'] . ' ' . $stock['pack_size'] . $stock['sales_uom'] }}
+                                                                </option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-2">
-                        <div class="form-group">
-                            @if($invoice_setting === 'YES')
-                                <label for="code">Invoice # <font color="red">*</font></label>
-                                <select name="invoice_no" class="form-control js-example-basic-single"
-                                    id="goodreceving_invoice_id" required>
-                                    <option selected="true" value="" disabled="disabled">Select Invoice..</option>
-                                    @foreach($invoices as $invoice)
-                                        <option value="{{ $invoice->id }}">{{ $invoice->invoice_no }} - {{ optional($invoice->supplier)->name }}</option>
-                                    @endforeach
-                                </select>
-                            @else
-                                <label for="code">Invoice #</label>
-                                <select name="invoice_no" class="form-control js-example-basic-single"
-                                    id="goodreceving_invoice_id">
-                                    <option selected="true" value="" disabled="disabled">Select Invoice..</option>
-                                    @foreach($invoices->sortByDesc('id') as $invoice)
-                                        <option value="{{ $invoice->id }}">
-                                            {{ $invoice->invoice_no }} - {{ optional($invoice->supplier)->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            @endif
+                            <div class="form-group">
+                                @if($invoice_setting === 'YES')
+                                    <label for="code">Invoice # <font color="red">*</font></label>
+                                    <select name="invoice_no" class="form-control js-example-basic-single"
+                                        id="goodreceving_invoice_id" required>
+                                        <option selected="true" value="" disabled="disabled">Select Invoice..</option>
+                                        @foreach($invoices as $invoice)
+                                            <option value="{{ $invoice->id }}">{{ $invoice->invoice_no }} -
+                                                {{ optional($invoice->supplier)->name }}</option>
+                                        @endforeach
+                                    </select>
+                                @else
+                                    <label for="code">Invoice #</label>
+                                    <select name="invoice_no" class="form-control js-example-basic-single"
+                                        id="goodreceving_invoice_id">
+                                        <option selected="true" value="" disabled="disabled">Select Invoice..</option>
+                                        @foreach($invoices->sortByDesc('id') as $invoice)
+                                            <option value="{{ $invoice->id }}">
+                                                {{ $invoice->invoice_no }} - {{ optional($invoice->supplier)->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @endif
+                            </div>
                         </div>
-                    </div>
 
                         <div class="col-md-2">
                             <div class="form-group">
                                 @if($batch_setting === 'YES')
                                     <label for="code">Batch # <font color="red">*</font></label>
-                                    <input type="text" name="batch_number" class="form-control" id="invoicing_batch_n" autocomplete="off"
-                                        required="true" value="{{ date('Y-m-d') }}" />
+                                    <input type="text" name="batch_number" class="form-control" id="invoicing_batch_n"
+                                        autocomplete="off" required="true" value="{{ date('Y-m-d') }}" />
                                 @else
                                     <label for="code">Batch #</label>
-                                    <input type="text" name="batch_number" class="form-control" id="invoicing_batch_n" autocomplete="off"
-                                        value="{{ date('Y-m-d') }}" />
+                                    <input type="text" name="batch_number" class="form-control" id="invoicing_batch_n"
+                                        autocomplete="off" value="{{ date('Y-m-d') }}" />
                                 @endif
                             </div>
                         </div>
@@ -183,7 +183,7 @@
                                 <div class="form-group" style="padding-top: 10px">
                                     <label>Purchase Date <font color="red">*</font></label>
                                     <input type="text" name="purchase_date" class="form-control" id="invoicing_purchase_date"
-                                        autocomplete="off" required="true">
+                                        autocomplete="off" required="true" value="{{ date('Y-m-d') }}">
                                 </div>
                             @endif
                         </div>
@@ -303,106 +303,106 @@
                     }
                 }
 
-                $('#good_receiving_supplier_ids').on('change', function(e) {
+                $('#good_receiving_supplier_ids').on('change', function (e) {
                     e.preventDefault();
                     $(this).val('').trigger('change.select2');
                     showNotification();
                 });
 
 
-                $('#goodreceving_invoice_id').on('change', function(e) {
+                $('#goodreceving_invoice_id').on('change', function (e) {
                     e.preventDefault();
                     $(this).val('').trigger('change.select2');
                     showNotification();
                 });
 
-                $('#invoicing_batch_n').on('focus input', function(e) {
+                $('#invoicing_batch_n').on('focus input', function (e) {
                     e.preventDefault();
                     $(this).blur();
                     showNotification();
                 });
 
-                $('#invoiceprice_category').on('change', function(e) {
+                $('#invoiceprice_category').on('change', function (e) {
                     e.preventDefault();
                     $(this).val('').trigger('change');
                     showNotification();
                 });
 
-                $('#invoicing_purchase_date').on('focus click', function(e) {
+                $('#invoicing_purchase_date').on('focus click', function (e) {
                     e.preventDefault();
                     $(this).blur();
                     showNotification();
                 });
 
                 $('#invoicesave_id').prop('disabled', true);
-                $('#invoicesave_id').on('click', function(e) {
+                $('#invoicesave_id').on('click', function (e) {
                     e.preventDefault();
                     showNotification();
                 });
 
                 // Prevent form submission
-                $('#invoiceFormId').on('submit', function(e) {
+                $('#invoiceFormId').on('submit', function (e) {
                     e.preventDefault();
                     showNotification();
                 });
 
                 // Handle edit selected product modal
-                $('#editselected_product').on('shown.bs.modal', function() {
-                    $('#item_quantity, #invoice_buy_price, #invoice_sell_price_id, #expire_date_21').on('focus input', function(e) {
+                $('#editselected_product').on('shown.bs.modal', function () {
+                    $('#item_quantity, #invoice_buy_price, #invoice_sell_price_id, #expire_date_21').on('focus input', function (e) {
                         e.preventDefault();
                         $(this).blur();
                         showNotification();
                     });
 
-                    $('#expire_check').on('change', function(e) {
+                    $('#expire_check').on('change', function (e) {
                         e.preventDefault();
                         $(this).prop('checked', false);
                         showNotification();
                     });
 
-                    $('#order_receive button[type="submit"]').on('click', function(e) {
+                    $('#order_receive button[type="submit"]').on('click', function (e) {
                         e.preventDefault();
                         showNotification();
                     });
 
-                    $('#order_receive').on('submit', function(e) {
+                    $('#order_receive').on('submit', function (e) {
                         e.preventDefault();
                         showNotification();
                     });
                 });
 
                 // Handle receive modal (for order receiving in invoice tab? but anyway)
-                $('#receive').on('shown.bs.modal', function() {
-                    $('#rec_qty, #pr_id, #sell_price_i, #batch_number').on('focus input', function(e) {
+                $('#receive').on('shown.bs.modal', function () {
+                    $('#rec_qty, #pr_id, #sell_price_i, #batch_number').on('focus input', function (e) {
                         e.preventDefault();
                         $(this).blur();
                         showNotification();
                     });
 
-                    $('#invoice_ids, #price_cat').on('change', function(e) {
+                    $('#invoice_ids, #price_cat').on('change', function (e) {
                         e.preventDefault();
                         $(this).val('').trigger('change');
                         showNotification();
                     });
 
-                    $('#expire_date_1').on('focus click', function(e) {
+                    $('#expire_date_1').on('focus click', function (e) {
                         e.preventDefault();
                         $(this).blur();
                         showNotification();
                     });
 
-                    $('#expire_check_id').on('change', function(e) {
+                    $('#expire_check_id').on('change', function (e) {
                         e.preventDefault();
                         $(this).prop('checked', false);
                         showNotification();
                     });
 
-                    $('#order_reveice button[type="button"]').on('click', function(e) {
+                    $('#order_reveice button[type="button"]').on('click', function (e) {
                         e.preventDefault();
                         showNotification();
                     });
 
-                    $('#order_reveice').on('submit', function(e) {
+                    $('#order_reveice').on('submit', function (e) {
                         e.preventDefault();
                         showNotification();
                     });
@@ -421,7 +421,7 @@
 
             try {
                 // Reset form fields except product & batch #
-                document.getElementById('myFormId').reset();
+                // document.getElementById('myFormId').reset();
 
                 // Keep selected product untouched
                 // document.getElementById("selected-product").value = '';
@@ -430,7 +430,7 @@
                 document.getElementById("invoicing_batch_n").value = "{{ date('Y-m-d') }}";
 
                 // Clear dates & totals
-                document.getElementById("invoicing_purchase_date").value = '';
+                // document.getElementById("invoicing_purchase_date").value = '';
                 document.getElementById("total_selling_price").value = '0.00';
                 document.getElementById("total_buying_price").value = '0.00';
                 document.getElementById("sub_total").value = '0.00';
@@ -441,7 +441,7 @@
             // Reset select elements properly
             $('#good_receiving_supplier_ids').val('').trigger('change');
             $('#goodreceving_invoice_id').val('').trigger('change');
-            
+
         }
 
         var a = 1;
@@ -584,7 +584,7 @@
                 locale: {
                     format: 'YYYY-MM-DD'
                 },
-                drops: "up"
+                drops: "up",
             });
         });
 
@@ -606,7 +606,7 @@
 
         // $("datetimepicker2").datepicker({ changeYear: true, dateFormat: 'dd/mm/yy', showOn: 'none', showButtonPanel: true,  minDate:'0d' });
 
-        //Expire Date
+        //Expiry Date
         $('input[name="expire_date"]').on('apply.daterangepicker', function (ev, picker) {
             $(this).val(picker.startDate.format('YYYY/MM/DD'));
         });
@@ -626,11 +626,23 @@
 
 
         //invoicing_purchase_date
-        $('input[name="invoicing_purchase_date"]').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('YYYY/MM/DD'));
+        $('input[name="purchase_date"]').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('YYYY-MM-DD'));
         });
 
-        $('input[name="invoicing_purchase_date"]').on('cancel.daterangepicker', function (ev, picker) {
+        // Update batch number when purchase date changes
+        $(document).on('apply.daterangepicker', '#invoicing_purchase_date', function (ev, picker) {
+            // format chosen date
+            var selectedDate = picker.startDate.format('YYYY-MM-DD');
+
+            // set the input value and the batch field
+            $(this).val(selectedDate);
+            $('#invoicing_batch_n').val(selectedDate);
+
+            console.log('apply.daterangepicker -> New Date is:', selectedDate);
+        });
+
+        $('input[name="purchase_date"]').on('cancel.daterangepicker', function (ev, picker) {
             $(this).val('');
         });
 
@@ -654,56 +666,56 @@
     <script src="{{asset("assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js")}}"></script>
     <script src="{{asset("assets/js/pages/ac-datepicker.js")}}"></script>
 
-   <script>
-    // Step 1: Store all invoices in a JS array
-    const allInvoices = @json($invoices->map(function($inv) {
-        return [
-            'id' => $inv->id,
-            'invoice_no' => $inv->invoice_no,
-            'supplier_id' => $inv->supplier_id
-        ];
-    }));
+    <script>
+        // Step 1: Store all invoices in a JS array
+        const allInvoices = @json($invoices->map(function ($inv) {
+            return [
+                'id' => $inv->id,
+                'invoice_no' => $inv->invoice_no,
+                'supplier_id' => $inv->supplier_id
+            ];
+        }));
 
-    // Step 2: Function to filter invoices when supplier changes
-    function goodReceivingFilterInvoiceBySupplier() {
-        const supplierSelect = document.getElementById('good_receiving_supplier_ids');
-        const invoiceSelect = document.getElementById('goodreceving_invoice_id');
-        const supplierId = supplierSelect.value;
+        // Step 2: Function to filter invoices when supplier changes
+        function goodReceivingFilterInvoiceBySupplier() {
+            const supplierSelect = document.getElementById('good_receiving_supplier_ids');
+            const invoiceSelect = document.getElementById('goodreceving_invoice_id');
+            const supplierId = supplierSelect.value;
 
-        // Clear current invoice options
-        invoiceSelect.innerHTML = '<option selected disabled>Select Invoice...</option>';
+            // Clear current invoice options
+            invoiceSelect.innerHTML = '<option selected disabled>Select Invoice...</option>';
 
-        // Filter invoices based on selected supplier
-        const filteredInvoices = allInvoices.filter(inv => inv.supplier_id == supplierId);
+            // Filter invoices based on selected supplier
+            const filteredInvoices = allInvoices.filter(inv => inv.supplier_id == supplierId);
 
-         // Sort descending by ID (latest first)
-        filteredInvoices.sort((a, b) => b.id - a.id);
-        
-        // Populate invoice dropdown (only invoice_no now)
-        filteredInvoices.forEach(inv => {
-            const option = document.createElement('option');
-            option.value = inv.id;
-            option.text = inv.invoice_no; // <-- removed the supplier name
-            invoiceSelect.appendChild(option);
+            // Sort descending by ID (latest first)
+            filteredInvoices.sort((a, b) => b.id - a.id);
+
+            // Populate invoice dropdown (only invoice_no now)
+            filteredInvoices.forEach(inv => {
+                const option = document.createElement('option');
+                option.value = inv.id;
+                option.text = inv.invoice_no; // <-- removed the supplier name
+                invoiceSelect.appendChild(option);
+            });
+
+            // Reset Select2 display
+            $(invoiceSelect).val('').trigger('change');
+        }
+
+        // Step 3: Initialize Select2 for invoice dropdown
+        $(document).ready(function () {
+            $('#goodreceving_invoice_id').select2({
+                width: '100%',
+                placeholder: 'Select Invoice...'
+            });
+
+            $('#good_receiving_supplier_ids').select2({
+                width: '100%',
+                placeholder: 'Select Supplier...'
+            });
         });
-
-        // Reset Select2 display
-        $(invoiceSelect).val('').trigger('change');
-    }
-
-    // Step 3: Initialize Select2 for invoice dropdown
-    $(document).ready(function () {
-        $('#goodreceving_invoice_id').select2({
-            width: '100%',
-            placeholder: 'Select Invoice...'
-        });
-
-        $('#good_receiving_supplier_ids').select2({
-            width: '100%',
-            placeholder: 'Select Supplier...'
-        });
-    });
-</script>
+    </script>
 
 
 

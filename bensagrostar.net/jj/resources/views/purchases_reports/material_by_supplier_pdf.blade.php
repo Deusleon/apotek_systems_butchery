@@ -80,7 +80,7 @@
                 <th style="text-align: center">Quantity</th>
                 <th style="text-align: center">Buy Price</th>
                 <th style="text-align: center">Sell Price</th>
-                <th style="text-align: center">Expire Date</th>
+                <th style="text-align: center">Expiry Date</th>
                 <th style="text-align: center">Receive Date</th>
 
             </tr>

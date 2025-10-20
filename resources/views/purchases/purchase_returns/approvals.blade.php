@@ -49,12 +49,12 @@
     <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
         @if(Auth::user()->checkPermission('View Purchase Return'))
             <li class="nav-item">
-                <a class="nav-link text-uppercase" id="purchase-return-tablist" href="{{ url('purchases/purchase-returns') }}">Returns</a>
+                <a class="nav-link text-uppercase" id="purchase-return-tablist" href="{{ url('purchasing/purchase-returns') }}">Returns</a>
             </li>
         @endif
         @if(Auth::user()->checkPermission('View Purchase Returns Approval'))
             <li class="nav-item">
-                <a class="nav-link active text-uppercase" id="purchase-approval-tablist" href="{{ url('purchases/purchase_returns/approvals') }}">Approvals</a>
+                <a class="nav-link active text-uppercase" id="purchase-approval-tablist" href="{{ url('purchasing/purchase_returns/approvals') }}">Approvals</a>
             </li>
         @endif
     </ul>

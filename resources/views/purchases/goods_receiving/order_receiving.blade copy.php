@@ -24,12 +24,12 @@
 
     <style type="text/css">
         .iti__flag {
-            background-image: url("{{asset("assets/plugins/intl-tel-input/img/flags.png")}}");
+            background-image: url("{{ asset('assets/plugins/intl-tel-input/img/flags.png') }}");
         }
 
         @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
             .iti__flag {
-                background-image: url("{{asset("assets/plugins/intl-tel-input/img/flags@2x.png")}}");
+                background-image: url("{{ asset('assets/plugins/intl-tel-input/img/flags@2x.png') }}");
             }
         }
 
@@ -53,7 +53,7 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link text-uppercase" id="material-received" data-toggle="pill"
-                   href="{{ url('purchases/material-received') }}"
+                   href="{{ url('purchasing/material-received') }}"
                    role="tab" aria-controls="new_quotes" aria-selected="false">Material Received
                 </a>
             </li>
@@ -162,7 +162,7 @@
             var ordersTable = $('#fixed-header-2').DataTable({
                 "processing": true,
                 "serverSide": false,
-                "data": @json($orders),
+                "data": JSON.parse('@json($orders)'),
                 "columns": [
                     { "data": "order_number", "title": "Order #" },
                     { "data": "supplier.name", "title": "Supplier" },

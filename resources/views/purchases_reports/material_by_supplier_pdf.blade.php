@@ -98,7 +98,7 @@
                 <th align="center">Quantity</th>
                 <th align="right">Buy Price</th>
                 <th align="right">Sell Price</th>
-                <th align="left">Expire Date</th>
+                <th align="left">Expiry Date</th>
                 <th align="left">Receive Date</th>
             </tr>
             </thead>

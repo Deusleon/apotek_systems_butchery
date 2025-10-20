@@ -132,7 +132,7 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::get('settings/general/product-subcategories','SubCategoryController@index')->name('sub-categories.index');
 
     //Supplier routes
-    Route::resource('purchases/suppliers', 'SupplierController')->only([
+    Route::resource('purchasing/suppliers', 'SupplierController')->only([
         'index', 'store', 'destroy', 'update'
     ]);
 
@@ -186,31 +186,31 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::get('inventory/price-list/all', [PriceListController::class, 'allPriceList'])->name('all-price-list');
 
     //purchase return routes
-        Route::get('purchases/purchase-returns', 'PurchaseReturnController@index')
+        Route::get('purchasing/purchase-returns', 'PurchaseReturnController@index')
         ->name('purchase-return.returns');
-        Route::get('purchases/purchase_returns/approvals', 'PurchaseReturnController@approvals')->name('purchase-returns.approvals');
+        Route::get('purchasing/purchase_returns/approvals', 'PurchaseReturnController@approvals')->name('purchase-returns.approvals');
         Route::post('purchase-returns', 'PurchaseReturnController@store')->name('purchase-returns.store');
         Route::put('purchase-returns/{id}', 'PurchaseReturnController@update')->name('purchase-returns.update');
         Route::get('get-purchase-returns', 'PurchaseReturnController@getPurchaseReturns')->name('getPurchaseReturns');
     //Purchase Order routes
-    Route::resource('purchases/purchase-order', 'OrderController')->only([
+    Route::resource('purchasing/purchase-order', 'OrderController')->only([
         'index', 'store', 'update', 'destroy'
     ]);
-    Route::get('purchases/purchase-order/select/filter-product', 'OrderController@filterSupplierProduct')->name('filter-product');
-    Route::get('purchases/purchase-order/select/filter-product-input', 'OrderController@filterSupplierProductInput')->name('filter-product-input');
+    Route::get('purchasing/purchase-order/select/filter-product', 'OrderController@filterSupplierProduct')->name('filter-product');
+    Route::get('purchasing/purchase-order/select/filter-product-input', 'OrderController@filterSupplierProductInput')->name('filter-product-input');
 
     //new route for the order list page
-    Route::get('purchases/purchase-order-list', 'OrderController@orderList')->name('purchases.purchase-order.list');
+    Route::get('purchasing/purchase-order-list', 'OrderController@orderList')->name('purchases.purchase-order.list');
 
     //Purchase OrderList routes
-    Route::get('purchases/order-history', 'PurchaseOrderListController@index')->name('order-history.index');
-    Route::post('purchases/cancel-order', 'PurchaseOrderListController@destroy')->name('cancel-order.destroy');
-    Route::get('purchases/order-date', 'PurchaseOrderListController@getOrderHistory')->name('getOrderHistory');
-    Route::get('purchases/print-order/{id}/Purchase Order', 'PurchaseOrderListController@printOrder')->name('printOrder');
-    Route::get('ipurchases/print-order/pdfgen/{order_no}', 'PurchaseOrderListController@reprintPurchaseOrder')->name('purchase-order-pdf-gen');
+    Route::get('purchasing/order-history', 'PurchaseOrderListController@index')->name('order-history.index');
+    Route::post('purchasing/cancel-order', 'PurchaseOrderListController@destroy')->name('cancel-order.destroy');
+    Route::get('purchasing/order-date', 'PurchaseOrderListController@getOrderHistory')->name('getOrderHistory');
+    Route::get('purchasing/print-order/{id}/Purchase Order', 'PurchaseOrderListController@printOrder')->name('printOrder');
+    Route::get('ipurchasing/print-order/pdfgen/{order_no}', 'PurchaseOrderListController@reprintPurchaseOrder')->name('purchase-order-pdf-gen');
 
     //Invoice management routes
-    Route::resource('purchases/invoice-management', 'InvoiceController')->only([
+    Route::resource('purchasing/invoice-management', 'InvoiceController')->only([
         'index', 'store', 'update'
     ]);
 
@@ -223,29 +223,29 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::get('accounting/invoices/payments/history', 'InvoiceController@getPaymentHistory')->name('invoice-payments.history');
     Route::get('accounting/invoices/get-supplier-invoices', 'InvoiceController@getSupplierInvoices')->name('get-supplier-invoices');
 
-    Route::get('purchases/invoice-received', 'InvoiceController@getInvoice')->name('getInvoice');
-    Route::get('purchases/invoice-received/filter-by-due-date', 'InvoiceController@getInvoiceByDueDate')->name('get-invoice-by-due-date');
+    Route::get('purchasing/invoice-received', 'InvoiceController@getInvoice')->name('getInvoice');
+    Route::get('purchasing/invoice-received/filter-by-due-date', 'InvoiceController@getInvoiceByDueDate')->name('get-invoice-by-due-date');
 
     //Material received routes
-    Route::get('purchases/material-received', 'MaterialReceivedController@index')->name('material-received.index');
-    Route::post('purchases/materials', 'MaterialReceivedController@getMaterialsReceived')->name('getMaterialsReceived');
-    Route::post('purchases/material/edit', 'MaterialReceivedController@update')->name('material.edit');
-    Route::post('purchases/material/delete', 'MaterialReceivedController@destroy')->name('material.delete');
+    Route::get('purchasing/material-received', 'MaterialReceivedController@index')->name('material-received.index');
+    Route::post('purchasing/materials', 'MaterialReceivedController@getMaterialsReceived')->name('getMaterialsReceived');
+    Route::post('purchasing/material/edit', 'MaterialReceivedController@update')->name('material.edit');
+    Route::post('purchasing/material/delete', 'MaterialReceivedController@destroy')->name('material.delete');
 
     //GoodsReceiving Routes
-    Route::get('purchases/goods-receiving', 'GoodsReceivingController@index')->name('goods-receiving.index');
-    Route::get('purchases/orders-receiving', 'GoodsReceivingController@orderReceiving')->name('orders-receiving.index');
-    Route::post('purchases/orders/{id}/approve', 'OrderController@approve')->name('orders.approve');
-    Route::post('purchases/goods-receiving/order-receive', 'GoodsReceivingController@orderReceive')->name('goods-receiving.orderReceive');
-    Route::get('purchases/loading-item-price', 'GoodsReceivingController@getItemPrice')->name('receiving-price-category');
-    Route::get('purchases/loading-product-price', 'GoodsReceivingController@getItemPrice2')->name('product-price-category');
-    Route::get('purchases/goods-receiving.item-receive', 'GoodsReceivingController@itemReceive')->name('goods-receiving.itemReceive');
-    Route::get('purchases/supplier/select/filter-invoice', 'GoodsReceivingController@filterInvoice')->name('filter-invoice');
+    Route::get('purchasing/goods-receiving', 'GoodsReceivingController@index')->name('goods-receiving.index');
+    Route::get('purchasing/orders-receiving', 'GoodsReceivingController@orderReceiving')->name('orders-receiving.index');
+    Route::post('purchasing/orders/{id}/approve', 'OrderController@approve')->name('orders.approve');
+    Route::post('purchasing/goods-receiving/order-receive', 'GoodsReceivingController@orderReceive')->name('goods-receiving.orderReceive');
+    Route::get('purchasing/loading-item-price', 'GoodsReceivingController@getItemPrice')->name('receiving-price-category');
+    Route::get('purchasing/loading-product-price', 'GoodsReceivingController@getItemPrice2')->name('product-price-category');
+    Route::get('purchasing/goods-receiving.item-receive', 'GoodsReceivingController@itemReceive')->name('goods-receiving.itemReceive');
+    Route::get('purchasing/supplier/select/filter-invoice', 'GoodsReceivingController@filterInvoice')->name('filter-invoice');
 
-    Route::get('purchases/supplier/select/filter-price', 'GoodsReceivingController@filterPrice')->name('filter-price');
-    Route::post('purchases/purchase-order/list', 'GoodsReceivingController@purchaseOrderList')->name('purchase-order-list');
-    Route::get('pharmacy/purchases/loading-invoice-item-price', 'GoodsReceivingController@getInvoiceItemPrice')->name('receiving-item-prices');//receiving-item-prices
-    Route::post('pharmacy/purchases/goods-receiving.invoice-item-receive', 'GoodsReceivingController@invoiceitemReceive')->name('goods-receiving.invoiceitemReceive');
+    Route::get('purchasing/supplier/select/filter-price', 'GoodsReceivingController@filterPrice')->name('filter-price');
+    Route::post('purchasing/purchase-order/list', 'GoodsReceivingController@purchaseOrderList')->name('purchase-order-list');
+    Route::get('pharmacy/purchasing/loading-invoice-item-price', 'GoodsReceivingController@getInvoiceItemPrice')->name('receiving-item-prices');//receiving-item-prices
+    Route::post('pharmacy/purchasing/goods-receiving.invoice-item-receive', 'GoodsReceivingController@invoiceitemReceive')->name('goods-receiving.invoiceitemReceive');
 
     //Configurations Routes
     Route::get('/settings/general/configurations', 'ConfigurationsController@index')->name('configurations.index');

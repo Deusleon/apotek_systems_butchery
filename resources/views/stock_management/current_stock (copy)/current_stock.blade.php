@@ -137,7 +137,7 @@ Current Stock
                         <tr>
                             <th>Product Name</th>
                             <th>Quantity</th>
-                            <th>Expire Date</th>
+                            <th>Expiry Date</th>
                             <th>Batch Number</th>
                         </tr>
                     </thead>

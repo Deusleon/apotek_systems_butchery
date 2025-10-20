@@ -90,8 +90,8 @@
                                                 @endif
                                             @endif
                                             @if ($expireEnabled)
-                                                @if(auth()->user()->checkPermission('Products Expire Date Report'))
-                                                    <option value="13">Products Expire Date Report</option>
+                                                @if(auth()->user()->checkPermission('Products Expiry Date Report'))
+                                                    <option value="13">Products Expiry Date Report</option>
                                                 @endif
                                             @endif
                                             @if(auth()->user()->checkPermission('Out Of Stock Report'))

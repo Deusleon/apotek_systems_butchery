@@ -86,7 +86,7 @@
             @if (auth()->user()->checkPermission('View Material Received'))
                 <li class="nav-item">
                     <a class="nav-link active text-uppercase" id="material-received" data-toggle="pill"
-                        href="{{ url('purchases/material-received') }}" role="tab" aria-controls="new_quotes"
+                        href="{{ url('purchasing/material-received') }}" role="tab" aria-controls="new_quotes"
                         aria-selected="false">Material Received
                     </a>
                 </li>

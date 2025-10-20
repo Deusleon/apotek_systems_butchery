@@ -70,13 +70,13 @@
         <ul class="nav nav-pills mb-3" id="myTab">
             @if (auth()->user()->checkPermission('View Purchase Return'))
                 <li class="nav-item">
-                    <a class="nav-link active text-uppercase" href="{{ url('purchases/purchase-returns') }}">Returns
+                    <a class="nav-link active text-uppercase" href="{{ url('purchasing/purchase-returns') }}">Returns
                     </a>
                 </li>
             @endif
             @if (auth()->user()->checkPermission('View Purchase Returns Approval'))
                 <li class="nav-item">
-                    <a class="nav-link text-uppercase" href="{{ url('purchases/purchase_returns/approvals') }}">Approvals
+                    <a class="nav-link text-uppercase" href="{{ url('purchasing/purchase_returns/approvals') }}">Approvals
                     </a>
                 </li>
             @endif

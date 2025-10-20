@@ -974,10 +974,10 @@ function deselect() {
         document.getElementById("sale_discount").value = 0.0;
     }
     document.getElementById("grace_period").value = "";
-    var backDate = document.getElementById("cash_sale_date");
-    if (backDate) {
-        backDate.value = "";
-    }
+    // var backDate = document.getElementById("cash_sale_date");
+    // if (backDate) {
+    //     backDate.value = "";
+    // }
     document.getElementById("sub_total").value = 0.0;
     document.getElementById("total_vat").value = 0.0;
     document.getElementById("total").value = 0.0;

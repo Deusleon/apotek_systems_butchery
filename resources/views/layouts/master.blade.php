@@ -354,7 +354,7 @@ $store_id = Auth::user()->store_id;
                                             </div>
                                         @endif
                                 @empty
-                                    <div class="text-muted">No new notifications</div>
+                                    <div class="text-muted p-3 text-sm">No new notifications</div>
                                 @endforelse
                             </ul>
 

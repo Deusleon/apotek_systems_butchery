@@ -100,7 +100,7 @@
             @if (auth()->user()->checkPermission('View Material Received'))
             <li class="nav-item">
                 <a class="nav-link text-uppercase" id="material-received"
-                   href="{{ url('purchases/material-received') }}">Material Received</a>
+                   href="{{ url('purchasing/material-received') }}">Material Received</a>
             </li>
             @endif
         </ul>

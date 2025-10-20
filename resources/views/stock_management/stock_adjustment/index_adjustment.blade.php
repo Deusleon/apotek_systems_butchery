@@ -165,7 +165,7 @@
                         <tr>
                             <th>Product Name</th>
                             <th>Quantity</th>
-                            <th>Expire Date</th>
+                            <th>Expiry Date</th>
                             <th>Batch No</th>
                             @if(auth()->user()->checkPermission('Stock Adjustment'))
                                 <th>Actions</th>

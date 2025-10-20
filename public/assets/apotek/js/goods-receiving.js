@@ -563,7 +563,7 @@ $("#order_reveice").on("submit", function (e) {
         let date_check = document.getElementById("expire_date_1").value;
 
         if (date_check === "") {
-            notify("Expire date is required", "top", "right", "warning");
+            notify("Expiry date is required", "top", "right", "warning");
             $("#save_btn").attr("disabled", false);
             return false;
         }
@@ -661,7 +661,7 @@ var invoicecart_table = $("#invoicecart_table").DataTable({
         { title: "Buy Price", data: "buying_price" },
         { title: "Sell Price", data: "selling_price" },
         {
-            title: "Expire Date",
+            title: "Expiry Date",
             data: "expire_date",
             visible: expiry_setting.trim() === "YES", // trim to remove any whitespace
         },
@@ -723,7 +723,7 @@ $("#invoicecart_table tbody").on("click", "#edit_btn", function () {
                 })
                 .on("apply.daterangepicker", function (ev, picker) {
                     $(this).val(picker.startDate.format("YYYY-MM-DD"));
-                    $(this).trigger('change');
+                    $(this).trigger("change");
                 });
         }, 50);
 
@@ -736,7 +736,7 @@ $("#invoicecart_table tbody").on("change", "input.inventedAction", function () {
     var row_data = invoicecart_table.row($(this).parents("tr")).data();
     var index = invoicecart_table.row($(this).parents("tr")).index();
     console.log(row_data);
-    row_data.quantity = document.getElementById("invoice_edit_quantity").value;
+    row_data.quantity = numberWithCommas(document.getElementById("invoice_edit_quantity").value);
     row_data.buying_price = document.getElementById("edit_buying_price").value;
     row_data.selling_price =
         document.getElementById("edit_selling_price").value;
@@ -859,7 +859,7 @@ if (expire_date_enabler === "YES") {
                     edit_btn_set = 1; // keep editing this row
                     document.getElementById("edit_expire_date").value = "";
                     notify(
-                        "Invalid expire date, must be blank or within 5 years from tomorrow",
+                        "Invalid expiry date, must be blank or within 5 years from tomorrow",
                         "top",
                         "right",
                         "warning"
@@ -872,9 +872,9 @@ if (expire_date_enabler === "YES") {
                 console.log(
                     document.getElementById("invoice_edit_quantity").value
                 );
-                row_data.quantity = document.getElementById(
-                    "invoice_edit_quantity"
-                ).value;
+                row_data.quantity = numberWithCommas(
+                    document.getElementById("invoice_edit_quantity").value
+                );
                 console.log(row_data.quantity);
                 row_data.buying_price = formatMoney(
                     document.getElementById("edit_buying_price").value
@@ -1005,7 +1005,7 @@ function invoicevaluesCollection() {
                     element.quantity = numberWithCommas(
                         currentQty + item.quantity
                     );
-                    invoice_item_received.quantity = currentQty + item.quantity;
+                    invoice_item_received.quantity = numberWithCommas(currentQty + item.quantity);
                     console.log(
                         "Updated Element",
                         invoice_item_received.quantity

@@ -49,7 +49,7 @@
                                 {{--                                       data-mask="9999 999 999"--}}
                                 {{--                                       pattern="^0\d{3}[\-]\d{3}[\-]\d{3}$" title="Eg:0777-777-777" required>--}}
                                 <input type="text" class="form-control"
-                                       id="phone_edit" name="phone" required style="width: 100%;">
+                                       id="phone_edit" name="phone" required style="width: 100%;" placeholder="">
                                 <span id="valid-msg" class="hide"></span>
                                 <span id="error-msg" class="text text-danger"></span>
                                 <span class="text-danger">

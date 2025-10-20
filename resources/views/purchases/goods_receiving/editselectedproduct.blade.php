@@ -82,14 +82,14 @@
                     </div>
                     <div class="col-md-12">
                         <div class="form-group" style="padding-top: 10px">
-                            <label>Expire Date <font color="red">*</font></label>
+                            <label>Expiry Date <font color="red">*</font></label>
                                 <input type="text" name="expire_date" class="form-control" id="expire_date_21"
                                        autocomplete="off" required="true">
 
                                 <div class="form-group form-check">
                                     <input type="checkbox" class="form-check-input" id="expire_check"
                                            style="padding:10px" value="true" onchange="findselected()">
-                                    <label class="form-check-label" for="expire_check">No Expire Date</label>
+                                    <label class="form-check-label" for="expire_check">No Expiry Date</label>
                                 </div>
                         </div>
                     </div>

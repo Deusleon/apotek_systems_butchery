@@ -71,10 +71,10 @@ class StockNotification extends Notification
         $below_min_level_count = $this->getBelowMinLevelCount();
         $expiring_soon_count = $this->getExpiringSoonCount();
 
-        Log::info('[StockNotification.php] Out of stock count: ' . $out_of_stock_count);
-        Log::info('[StockNotification.php] Expired count: ' . $expired_count);
-        Log::info('[StockNotification.php] Below min level count: ' . $below_min_level_count);
-        Log::info('[StockNotification.php] Expiring soon count: ' . $expiring_soon_count);
+        // Log::info('[StockNotification.php] Out of stock count: ' . $out_of_stock_count);
+        // Log::info('[StockNotification.php] Expired count: ' . $expired_count);
+        // Log::info('[StockNotification.php] Below min level count: ' . $below_min_level_count);
+        // Log::info('[StockNotification.php] Expiring soon count: ' . $expiring_soon_count);
 
         return [
             'out_of_stock_count' => $out_of_stock_count,
@@ -102,7 +102,7 @@ class StockNotification extends Notification
         }
 
         $count = $query->get()->count();
-        Log::info("[StockNotification.php] Out of stock count for store {$this->store_id}: {$count}");
+        // Log::info("[StockNotification.php] Out of stock count for store {$this->store_id}: {$count}");
         return $count;
     }
 
@@ -179,7 +179,7 @@ class StockNotification extends Notification
         }
 
         $count = $query->count();
-        Log::info("[StockNotification.php] Expiring soon count for store {$this->store_id}: {$count}");
+        // Log::info("[StockNotification.php] Expiring soon count for store {$this->store_id}: {$count}");
         return $count;
     }
 }

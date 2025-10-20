@@ -145,7 +145,7 @@
                             <th>Pack Size</th>
                             <th>Quantity</th>
                             <th>Stock Value</th>
-                            <th>Expire Date</th>
+                            <th>Expiry Date</th>
                             <th>Batch Number</th>
                             <th>Stock Status</th>
                             <th>Category</th>

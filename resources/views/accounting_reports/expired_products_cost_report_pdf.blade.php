@@ -141,7 +141,7 @@
                     <th align="left">QOH</th>
                     <th align="right">Cost Buy</th>
                     <th align="right">Cost Sell</th>
-                    <th>Expire Date</th>
+                    <th>Expiry Date</th>
                 </tr>
                 </thead>
                 @foreach($data as $item)

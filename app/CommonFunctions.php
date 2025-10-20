@@ -107,30 +107,35 @@ class CommonFunctions
             ->first();
 
         if ($existing_notification) {
-            // Update existing notification with new store data
+            // Check if the store_id in the notification data matches current store_id
             $notification_data = json_decode($existing_notification->data, true);
+            $current_notification_store_id = $notification_data['store_id'] ?? null;
 
-            // Create new notification instance to get fresh data
-            $notification_class = str_replace('App\\Notifications\\', '', $notification_type);
-            $notification_instance = new $notification_type($store_id);
-            $new_data = $notification_instance->toArray($user);
+            // Only update if the store has changed or if it's been more than 30 minutes
+            $needs_update = ($current_notification_store_id != $store_id) ||
+                           ($existing_notification->updated_at < now()->subMinutes(30));
 
-            // Merge with existing data, keeping created_at
-            $updated_data = array_merge($notification_data, $new_data);
-            $updated_data['store_id'] = $store_id; // Ensure store_id is current
+            if ($needs_update) {
+                // Update existing notification with new store data
+                $notification_class = str_replace('App\\Notifications\\', '', $notification_type);
+                $notification_instance = new $notification_type($store_id);
+                $new_data = $notification_instance->toArray($user);
 
-            DB::table('notifications')
-                ->where('id', $existing_notification->id)
-                ->update([
-                    'data' => json_encode($updated_data),
-                    'updated_at' => now()
-                ]);
+                DB::table('notifications')
+                    ->where('id', $existing_notification->id)
+                    ->update([
+                        'data' => json_encode($new_data), // Replace with fresh data
+                        'updated_at' => now()
+                    ]);
 
-            // Log::info("[CommonFunctions.php] Updated existing {$notification_class} for user {$user->id} with store_id {$store_id}");
+                // Log::info("[CommonFunctions.php] Updated existing {$notification_class} for user {$user->id} with store_id {$store_id}");
+            } else {
+                // Log::info("[CommonFunctions.php] Notification for user {$user->id} is still fresh, skipping update");
+            }
         } else {
             // Create new notification
             $notification_class = str_replace('App\\Notifications\\', '', $notification_type);
-            // Log::info("[CommonFunctions.php] Creating new {$notification_class} for user {$user->id} with store_id {$store_id}");
+            Log::info("[CommonFunctions.php] Creating new {$notification_class} for user {$user->id} with store_id {$store_id}");
             $user->notify(new $notification_type($store_id));
         }
 
