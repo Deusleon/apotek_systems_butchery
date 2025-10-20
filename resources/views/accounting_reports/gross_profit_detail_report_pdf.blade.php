@@ -160,7 +160,7 @@
                         <th align="center">Qty</th>
                         <th align="right">Buy Price</th>
                         <th align="right">Sell Price</th>
-                        <th align="right">Amount</th>
+                        <th align="right">Sold Amount</th>
                         <th align="right">Profit</th>
                     </tr>
                     </thead>
@@ -172,7 +172,7 @@
                             </td>
                             <td align="right">{{number_format($item['buy_price'],2)}}</td>
                             <td align="right">{{number_format($item['sell_price'],2)}}</td>
-                            <td align="right">{{number_format($item['amount'],2)}}</td>
+                            <td align="right">{{number_format($item['sold_amount'],2)}}</td>
                             <td align="right">{{number_format($item['profit'],2)}}</td>
                         </tr>
                     @endforeach

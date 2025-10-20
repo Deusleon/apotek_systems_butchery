@@ -366,19 +366,20 @@ private function grossProfitSummary(array $dates)
 
     $raw_prices_data = [];
     foreach ($sold_items as $detail) {
-        $product = PriceList::where('price_category_id', $detail->price_category_id)
+        $product = PriceList::with('currentStock')
+            ->where('price_category_id', $detail->price_category_id)
             ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
             ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
             ->where('stock_id', $detail->stock_id)
             ->where('inv_products.status', '1')
             ->orderBy('stock_id', 'desc')
             ->select('inv_products.id as id', 'name', 'price', 'stock_id')
-            ->first('price');
+            ->first();
 
-        if ($product) {
+        if ($product && $product->currentStock) {
             $raw_prices_data[] = [
                 'sale_date' => $detail->sale_date,
-                'total_buy' => $product->currentStock['unit_cost'] * $detail->quantity
+                'total_buy' => $product->currentStock->unit_cost * $detail->quantity
             ];
         }
     }
@@ -478,8 +479,7 @@ private function grossProfitSummary(array $dates)
                     'sell_price' => $product->price ?? 0.00,
                     'sold_amount' => $sub_total,
                     'amount' => $detail->quantity * ($product->price ?? 0.00),
-                    'profit' => ($detail->quantity * ($product->price ?? 0.00)) -
-                        (($product->currentStock['unit_cost'] ?? 0.00) * $detail->quantity),
+                    'profit' => $sub_total - (($product->currentStock['unit_cost'] ?? 0.00) * $detail->quantity),
                     'capital_invested' => ($product->currentStock['unit_cost'] ?? 0.00) * $detail->quantity,
                     'date' => $detail->dates
                 ));

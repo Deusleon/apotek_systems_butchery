@@ -1,12 +1,12 @@
 @extends("layouts.master")
 
 @section('content-title')
-    Requisitions
+    Requisition
 @endsection
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{ route('home') }}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#">Purchasing / Requisitions / Requisition Details</a></li>
+    <li class="breadcrumb-item"><a href="#">Purchasing / Requisition / Requisition Details</a></li>
 @endsection
 
 @section('content')
@@ -280,7 +280,7 @@
                 {
                     data: 'quantity',
                     render: function(data) {
-                        return data.toLocaleString();
+                        return Number(data).toLocaleString();
                     }
                 },
                 {
@@ -295,7 +295,7 @@
         function enableEdit(event) {
             const row = event.target.closest('tr');
             const td = row.querySelector('td:nth-child(2)'); // Quantity column
-            const currentQty = td.innerText;
+            const currentQty = td.innerText; // Keep formatted value with commas
 
             // Replace text with input using Bootstrap form-control
             td.innerHTML = `<input type="text" name="qty" class="form-control" value="${currentQty}" onblur="quantityChange(event)">`;
@@ -310,7 +310,7 @@
         }
 
         function quantityChange(event) {
-            let quantity = $(event.target).val();
+            let quantity = $(event.target).val().replace(/,/g, ''); // Remove commas for processing
             let item = $('#order_table').DataTable().row($(event.target).parents('tr')).data();
             cart.editQuantity(item, quantity);
         }
