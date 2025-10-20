@@ -45,17 +45,6 @@
                 <div class="tab-content" id="myTabContent">
                     {{-- Order List Start--}}
                     <div class="tab-pane fade show active" id="order-list" role="tabpanel" aria-labelledby="order_list-tab">
-                        {{-- <div class="form-group row">
-                            <div class="col-md-6">
-                            </div>
-                            <div class="col-md-3" style="margin-left: 2.5%">
-                                <label for="" class="col-form-label text-md-right" style="margin-left: 74.5%">Date:</label>
-                            </div>
-                            <div class="col-md-3" style="margin-left: -3.4%;">
-                                <input style="width: 104%;" type="text" name="order_filter" class="form-control"
-                                    onchange="getOrderHistory()" id="date_filter">
-                            </div>
-                        </div> --}}
                         <div class="d-flex justify-content-end mb-3 align-items-center">
                             <label class="mr-2" for="date_filter">Date:</label>
                             <input type="text" name="order_filter" id="date_filter" onchange="getOrderHistory()" class="form-control w-auto">

@@ -215,7 +215,7 @@ class SaleReturnController extends Controller
         $details->updated_by = Auth::User()->id;
         $details->save();
         $sales_return->save();
-        session()->flash("alert-success", "Item Returned, transaction will be effected after approval!");
+        session()->flash("alert-success", "Item returned, transaction will be effected after approval!");
         return back();
     }
 

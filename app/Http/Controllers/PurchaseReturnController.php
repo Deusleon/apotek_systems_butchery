@@ -72,7 +72,7 @@ class PurchaseReturnController extends Controller
         Log::info('Total purchase returns in database', ['count' => $allReturns->count()]);
 
         // Check goods receiving with status 2
-        $pendingGoods = \DB::table('inv_incoming_stock')->where('status', 2)->get();
+        $pendingGoods = DB::table('inv_incoming_stock')->where('status', 2)->get();
         Log::info('Goods receiving with status 2', ['count' => $pendingGoods->count()]);
 
         $query = PurchaseReturn::join('inv_incoming_stock', 'inv_incoming_stock.id', '=', 'purchase_returns.goods_receiving_id')
@@ -235,7 +235,7 @@ class PurchaseReturnController extends Controller
                 'goods_receiving_status' => $goodsReceiving->status
             ]);
 
-            session()->flash("alert-success", "Material Returned, transaction will be effected after approval!");
+            session()->flash("alert-success", "Purchase returned, transaction will be effected after approval!");
         } catch (\Exception $e) {
             Log::error('Error creating purchase return', ['error' => $e->getMessage()]);
             session()->flash("alert-danger", "Error creating purchase return!");

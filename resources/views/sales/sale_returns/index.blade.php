@@ -72,26 +72,6 @@
                             </div>
                         </div>
                         <div id="sales">
-                            {{-- <div class="form-group row">
-                                <div class="col-md-6">
-
-                                </div>
-                                <div class="col-md-3" style="margin-left: 2.5%">
-                                    <label style="margin-left: 80%" for="issued_date"
-                                        class="col-form-label text-md-right">Date:</label>
-                                </div>
-                                <div class="col-md-3" style="margin-left: -3.1%">
-                                    <input style="width: 103.4%;" type="text" name="expire_date" class="form-control"
-                                        id="sold_date" onchange="getSales()">
-                                </div>
-                                <div class="col-md-6" hidden>
-
-                                </div>
-                                <div class="form-group col-md-6" hidden>
-                                    <label for="Seach">Search</label>
-                                    <input type="text" class="form-control" id="searching_sales" placeholder="Search" />
-                                </div>
-                            </div> --}}
                             <div class="d-flex justify-content-end mb-3 align-items-center">
                                 <label class="mr-2" for="">Date:</label>
                                 <input type="text" id="sold_date" onchange="getSales()" class="form-control w-auto">

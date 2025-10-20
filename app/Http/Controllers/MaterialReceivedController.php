@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\GoodsReceiving;
 use App\Product;
+use App\PurchaseReturn;
 use App\Setting;
 use App\Supplier;
 use Illuminate\Http\Request;
@@ -286,6 +287,9 @@ class MaterialReceivedController extends Controller
             $value->product;
             $value->supplier;
             $value->user;
+
+            // Check if there's already a purchase return for this goods_receiving_id
+            $value->has_return = PurchaseReturn::where('goods_receiving_id', $value->id)->exists();
 
             // --- Calculate remaining quantity (existing logic preserved)
             $orderDetailQuery = DB::table('order_details')

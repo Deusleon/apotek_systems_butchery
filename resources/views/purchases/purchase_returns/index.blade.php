@@ -84,22 +84,26 @@
         <div class="card">
             <div class="card-body">
                 <div class="filter-controls">
-                    <div class="filter-control">
+                    <div class="filter-control" style="min-width: 260px;" hidden>
                         <label for="supplier" class="col-form-label text-md-right">Supplier:</label>
-                        <select class="js-example-basic-single form-control" id="supplier" onchange="getMaterialsReceived()"
-                            style="min-width: 200px;">
+                        <select class="js-example-basic-single form-control" id="supplier" onchange="getMaterialsReceived()">
                             <option value="">Select Supplier</option>
                             @foreach($suppliers as $supplier)
                                 <option value="{{$supplier->id}}">{{$supplier->name}}</option>
                             @endforeach
                         </select>
                     </div>
+                    <div class="d-flex justify-content-end align-items-center">
+                        <label class="mr-2" for="receive_date">Date:</label>
+                        <input type="text" name="expire_date" id="receive_date"
+                            class="form-control w-auto">
+                    </div>
 
-                    <div class="filter-control">
+                    {{-- <div class="filter-control">
                         <label for="receive_date" class="col-form-label text-md-right">Date:</label>
                         <input type="text" name="expire_date" class="form-control" id="receive_date"
                             style="min-width: 250px;">
-                    </div>
+                    </div> --}}
                 </div>
 
                 <div class="col-md-4" hidden>
@@ -121,6 +125,7 @@
                             <tr>
                                 <th>id</th>
                                 <th>Product Name</th>
+                                <th>Supplier</th>
                                 <th class="d-none">Ordered</th>
                                 <th>Quantity</th>
                                 <th class="d-none">Remaining</th>
@@ -249,7 +254,7 @@
     <script type="text/javascript">
 
         $(document).ready(function () {
-           getMaterialsReceived();
+            getMaterialsReceived();
         });
 
         function getMaterialsReceived() {
@@ -292,6 +297,12 @@
                             }
                         },
                         {
+                            data: 'supplier',
+                            render: function (data) {
+                                return data ? data.name : 'N/A';
+                            }
+                        },
+                        {
                             data: 'ordered_qty', render: function (data) {
                                 return numberWithCommas(parseFloat(data));
                             }
@@ -322,19 +333,35 @@
                             }
                         },
                         { data: 'user.name' },
-                       {
+                        {
                             data: 'action',
-                            defaultContent:
-                                `<div>
-                                    @if(auth()->user()->checkPermission('View Purchase Return'))
-                                        <input type='button' value='Return' id='return_btn' class='btn btn-warning btn-rounded btn-sm'/>
-                                    @endif
-                                </div>`
+                            render: function (data, type, row) {
+                                // Check if there's already a purchase return for this goods_receiving_id
+                                var hasReturn = false;
+                                // This will be set by the server-side data or we need to check it
+                                if (row.has_return) {
+                                    hasReturn = true;
+                                }
+
+                                if (hasReturn) {
+                                    return `<div>
+                                                @if(auth()->user()->checkPermission('View Purchase Return'))
+                                                    <input type='button' value='Return' id='return_btn' class='btn btn-success btn-rounded btn-sm' disabled/>
+                                                @endif
+                                            </div>`;
+                                } else {
+                                    return `<div>
+                                                @if(auth()->user()->checkPermission('View Purchase Return'))
+                                                    <input type='button' value='Return' id='return_btn' class='btn btn-primary btn-rounded btn-sm'/>
+                                                @endif
+                                            </div>`;
+                                }
+                            }
                         }
 
                     ], "columnDefs": [
                         {
-                            "targets": [0, 2, 4],
+                            "targets": [0, 3, 5],
                             "visible": false
                         }
                     ],
@@ -345,7 +372,7 @@
                 var expire_date_enabler = document.getElementById("expire_date_enabler").value;
                 console.log(expire_date_enabler);
                 if (expire_date_enabler === "NO") {
-                    received_material_table.column(4).visible(false);
+                    received_material_table.column(5).visible(false);
                 }
             }
         }
@@ -415,7 +442,7 @@
                         $('#edit').modal('show');
                     }
                 },
-                error: function() {
+                error: function () {
                     alert('Error checking return status');
                 }
             });
