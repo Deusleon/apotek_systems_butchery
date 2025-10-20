@@ -177,7 +177,7 @@ class InvoiceController extends Controller
                 'supplier_id' => 'required|exists:inv_suppliers,id',
                 'invoice_id' => 'required|exists:inv_invoices,id',
                 'amount_paid' => 'required|numeric|min:0.01',
-                'payment_method' => 'required|in:cash,bank_transfer,mobile_money,cheque',
+                'payment_method' => 'required|in:cash,mobile,bank,cheque,others',
                 'payment_date' => 'required|date|before_or_equal:today',
                 'remarks' => 'nullable|string|max:255'
             ]);
@@ -237,11 +237,11 @@ class InvoiceController extends Controller
     {
         $payments = Payment::whereNotNull('invoice_id')
             ->with(['invoice.supplier', 'user'])
-            ->orderBy('payment_date', 'desc')
+            ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($payment) {
                 return [
-                    'payment_date' => $payment->payment_date ? $payment->payment_date->format('Y-m-d') : null,
+                    'payment_date' => $payment->created_at ? $payment->created_at->format('Y-m-d H:i:s') : null,
                     'invoice' => [
                         'invoice_no' => $payment->invoice ? $payment->invoice->invoice_no : null
                     ],

@@ -99,6 +99,7 @@ Invoices
         bPaginate: true,
         bInfo: true,
         ordering: true,
+        order: [[0, 'desc']], // Sort by payment date descending (latest first)
         ajax: {
             url: '{{ route("invoice-payments.history") }}',
             type: 'GET',
@@ -108,7 +109,7 @@ Invoices
             {
                 data: 'payment_date',
                 render: function(date) {
-                    return moment(date).format('YYYY-MM-DD');
+                    return moment(date).format('YYYY-MM-DD HH:mm:ss');
                 }
             },
             { data: 'invoice.invoice_no' },

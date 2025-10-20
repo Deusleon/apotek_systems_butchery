@@ -20,6 +20,12 @@ Invoices
     ol.linenums {
         margin: 0 0 0 -10px;
     }
+
+    .badge-fixed-width {
+        width: 100px;
+        display: inline-block;
+        text-align: center;
+    }
 </style>
 
 <div class="col-sm-12">
@@ -380,11 +386,11 @@ Invoices
                 data: 'paid_status',
                 render: function(paid_status) {
                     if (paid_status === 'Fully Paid') {
-                        return '<span class="badge badge-success">Fully Paid</span>';
+                        return '<span class="badge badge-success badge-fixed-width">Fully Paid</span>';
                     } else if (paid_status === 'Partially Paid') {
-                        return '<span class="badge badge-warning">Partially Paid</span>';
+                        return '<span class="badge badge-warning badge-fixed-width">Partially Paid</span>';
                     } else {
-                        return '<span class="badge badge-danger">Unpaid</span>';
+                        return '<span class="badge badge-danger badge-fixed-width">Unpaid</span>';
                     }
                 }
             },
@@ -392,11 +398,11 @@ Invoices
                 data: 'received_status',
                 render: function(received_status) {
                     if (received_status === 'All Received') {
-                        return '<span class="badge badge-success">All Received</span>';
+                        return '<span class="badge badge-success badge-fixed-width">All Received</span>';
                     } else if (received_status === 'Partial Received') {
-                        return '<span class="badge badge-warning">Partial Received</span>';
+                        return '<span class="badge badge-warning badge-fixed-width">Partial Received</span>';
                     } else {
-                        return '<span class="badge badge-secondary">Not Received</span>';
+                        return '<span class="badge badge-secondary badge-fixed-width">Not Received</span>';
                     }
                 }
             },
