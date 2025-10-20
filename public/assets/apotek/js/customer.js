@@ -130,7 +130,7 @@ function validateMobile(input, validationMsg, action) {
 
     const itiOptions = {
         initialCountry: "tz",
-        onlyCountries: ["tz", "ug", "ke", "rw", "bi", "sd"],
+        onlyCountries: ["tz", "ug", "ke", "rw", "bi", "sd", "zm", "zw", "mw", "mz", "bw", "za", "na", "ao", "cd", "cg", "ga", "gq", "cm", "td", "cf", "ss", "et", "dj", "er", "so", "mg", "sc", "mu", "km", "yt", "re", "bf", "bj", "ci", "cv", "gh", "gm", "gn", "gw", "lr", "ml", "mr", "ne", "ng", "sh", "sl", "sn", "st", "tg", "eh", "eg", "ly", "ma", "tn", "dz", "jo", "lb", "sy", "iq", "kw", "sa", "ye", "om", "ae", "qa", "bh", "cy", "il", "ps", "tr", "az", "am", "ge", "ru", "by", "ua", "md", "ro", "bg", "mk", "al", "me", "rs", "ba", "hr", "si", "sk", "cz", "pl", "hu", "at", "ch", "li", "de", "be", "nl", "lu", "fr", "mc", "ad", "es", "pt", "gi", "it", "sm", "va", "mt", "gr", "cy", "gb", "ie", "dk", "no", "se", "fi", "is", "sj", "fo", "ax", "ee", "lv", "lt"],
         separateDialCode: false,
         nationalMode: false,
         utilsScript:

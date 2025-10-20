@@ -457,7 +457,7 @@
                     {{-- Credit Tracking--}}
                     @if(auth()->user()->checkPermission('View Credit Tracking'))
                         <div class="tab-pane fade" id="credit-tracking" role="tabpanel" aria-labelledby="credit_tracking-tab">
-                            <div class="row">
+                            <div class="row ">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label id="cat_label">Customer<font color="red">*</font></label>
@@ -501,7 +501,7 @@
                                 @if(auth()->user()->checkPermission('View Credit Payment'))
                                     <div id="can_pay"></div>
                                 @endif
-                                <div class="table teble responsive" style="width: 100%;">
+                                <div class="table teble responsive p-3" style="width: 100%;">
                                     <table id="credit_payment_table" class="display table nowrap table-striped table-hover"
                                         style="width:100%">
 
@@ -544,23 +544,25 @@
                     {{-- Start Credit Payment--}}
                     @if(auth()->user()->checkPermission('View Credit Payment'))
                         <div class="tab-pane fade" id="credit-payment" role="tabpanel" aria-labelledby="credit_payment-tab">
-                            <div class="d-flex justify-content-end mb-3">
-                                <div class="d-flex align-items-center" style="width: 278px;">
-                                    <label for="price_category" class="form-label mb-0"
-                                        style="white-space: nowrap; margin-right: 8px;">Customer:</label>
-                                    <select name="customer_id" id="customer_payment"
-                                        class="js-example-basic-single form-control" onchange="filterPaymentHistory()">
-                                        <option value="" selected="true" disabled>Select Customer</option>
-                                        @foreach($customers as $customer)
-                                            <option value="{{$customer->id}}">{{$customer->name}}</option>
-                                        @endforeach
-                                    </select>
+                            <div class="row d-flex justify-content-end mr-0">
+                                <div class="d-flex justify-content-end mb-3">
+                                    <div class="d-flex align-items-center mr-4" style="width: 278px;">
+                                        <label for="price_category" class="form-label mb-0"
+                                            style="white-space: nowrap; margin-right: 8px;">Customer:</label>
+                                        <select name="customer_id" id="customer_payment"
+                                            class="js-example-basic-single form-control" onchange="filterPaymentHistory()">
+                                            <option value="" selected="true" disabled>Select Customer</option>
+                                            @foreach($customers as $customer)
+                                                <option value="{{$customer->id}}">{{$customer->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="d-flex justify-content-end mb-3 align-items-center">
-                                <label class="mr-2" for="">Date:</label>
-                                <input type="text" id="sales_date_payment" name="date_of_sale" autocomplete="off"
-                                    class="form-control w-auto">
+                                <div class="d-flex justify-content-end mb-3 align-items-center">
+                                    <label class="mr-2" for="">Date:</label>
+                                    <input type="text" id="sales_date_payment" name="date_of_sale" autocomplete="off"
+                                        class="form-control w-auto">
+                                </div>
                             </div>
                             <div class="table-responsive" id="main_table">
                                 <table id="fixed-header-main" class="display table nowrap table-striped table-hover"

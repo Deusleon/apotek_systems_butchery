@@ -347,11 +347,24 @@ class CurrentStockController extends Controller
     {
         // dd($request->all());
         $store_id = current_store_id();
-        $price_category = $request->price_category ?? 1; 
-        $date = $request->date ?? \Carbon\Carbon::now()->subDay()->toDateString(); // default yesterday
+        $price_category = $request->price_category ?? 1;
+        $date = $request->old_stock_date ?? \Carbon\Carbon::now()->subDay()->toDateString(); // default yesterday
         $price_categories = PriceCategory::all();
 
         try {
+            // First check if table exists and has data
+            $tableExists = DB::select("SHOW TABLES LIKE 'inv_old_stock_values'");
+            if (empty($tableExists)) {
+                Log::error('inv_old_stock_values table does not exist');
+                return view('stock_management.current_stock.old_stock_value')->with([
+                    'stocks' => collect(),
+                    'price_categories' => $price_categories,
+                    'selected_date' => $date,
+                    'selected_price_category' => $price_category,
+                    'error' => 'Old stock values table does not exist. Please run migrations.'
+                ]);
+            }
+
             $query = DB::table('inv_old_stock_values as os')
                 ->join('inv_products as p', 'os.product_id', '=', 'p.id')
                 ->select(
@@ -370,7 +383,13 @@ class CurrentStockController extends Controller
                 ->where('os.snapshot_date', $date)
                 ->groupBy(
                     [
-                        'os.product_id'
+                        'os.product_id',
+                        'p.name',
+                        'p.brand',
+                        'p.pack_size',
+                        'p.sales_uom',
+                        'os.buy_price',
+                        'os.sell_price'
                     ]
                 );
 
@@ -394,7 +413,15 @@ class CurrentStockController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Error in getOldStockValue: ' . $e->getMessage());
-            return response()->json(['error' => 'An error occurred while fetching old stock data'], 500);
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+
+            return view('stock_management.current_stock.old_stock_value')->with([
+                'stocks' => collect(),
+                'price_categories' => $price_categories,
+                'selected_date' => $date,
+                'selected_price_category' => $price_category,
+                'error' => 'An error occurred while fetching old stock data: ' . $e->getMessage()
+            ]);
         }
     }
 

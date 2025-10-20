@@ -46,9 +46,9 @@
             </ul>
             <div class="card">
                 <div class="card-body">
-                    <div class="form-group row d-flex">
-                        <div class="col-md-6">
-                            <label for="stock_status" class="col-form-label text-md-right">Status:</label>
+                    <div class="form-group pr-3 row d-flex justify-content-end">
+                        <div class="d-flex mr-3" style="width: 245px;">
+                            <label for="stock_status" class="col-form-label text-md-right mr-2">Status:</label>
                             <select name="stock_status" class="js-example-basic-single form-control" id="stock_status_id">
                                 <option name="store_name" value="all">All</option>
                                 <option name="store_name" value="1">In Stock</option>
@@ -56,8 +56,8 @@
                             </select>
                         </div>
 
-                        <div class="col-md-6">
-                            <label for="category" class="col-form-label text-md-left">Type:</label>
+                        <div class="d-flex" style="width: 245px;">
+                            <label for="category" class="col-form-label text-md-left mr-2">Type:</label>
                             <select name="category" class="js-example-basic-single form-control" id="category_id">
                                 <option name="store_name" value="1">Summary</option>
                                 <option name="store_name" value="0">Detailed</option>
