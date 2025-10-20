@@ -130,6 +130,8 @@
             $('#edit_stock_id').val(stockId);
             $('#edit_batch_number').val(batchNumber || '');
             $('#edit_expiry_date').val(expiryDate || '');
+            // Reset button state when opening modal
+            $('#editStockForm button[type="submit"]').prop('disabled', false).text('Save');
             $('#editStockModal').modal('show');
         }
 
