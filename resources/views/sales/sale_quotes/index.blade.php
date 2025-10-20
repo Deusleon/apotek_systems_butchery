@@ -24,6 +24,7 @@
             float: left;
             width: 45%;
         }
+
         #loading {
             width: 100%;
             height: 100%;
@@ -192,7 +193,12 @@
                         <hr>
 
                         <div class="row">
-                            <div class="col-md-6"></div>
+                            <div class="col-md-6 d-flex">
+                                <div>
+                                    <b>Total Items:</b>
+                                    <span id="total_items">0</span>
+                                </div>
+                            </div>
                             <div class="col-md-6">
                                 <div class="btn-group" style="float: right;">
                                     <button type="button" class="btn btn-danger" id="deselect-all-quote">Cancel</button>
@@ -355,6 +361,7 @@
                 document.getElementById('sub_total').value = formatMoney(sub_total);
                 document.getElementById('total_vat').value = formatMoney(total_vat);
                 document.getElementById('total').value = formatMoney(total);
+                document.getElementById('total_items').innerHTML = cart.length;
 
                 // Update cart table
                 if (cart_table) {
@@ -865,6 +872,7 @@
                     cart_table.clear().draw();
                 }
                 discount(); // Update totals
+                document.getElementById('total_items').innerHTML = 0;
                 // console.log('Cart cleared');
             }
 

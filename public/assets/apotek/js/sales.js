@@ -585,6 +585,7 @@ function discount() {
     var sub_total,
         total_vat,
         total = 0;
+    var total_items = cart.length;
     if (cart[0]) {
         var result = [];
         var order_cart = []; //for data sent into database.
@@ -714,6 +715,8 @@ function discount() {
             total_vat += parseFloat(item[3].replace(/\,/g, ""), 10);
             total += bought_product.amount;
             order_cart.push(bought_product);
+
+            // No need to sum quantities, total_items is already set to cart.length
         });
         //SUBTOTAL WITH DISCOUNT
         total -= sale_discount;
@@ -800,6 +803,7 @@ function discount() {
 
     document.getElementById("total").value = formatMoney(total);
     document.getElementById("sub_total").value = formatMoney(sub_total);
+    document.getElementById("total_items").innerHTML = numberWithCommas(total_items);
     var t = document.getElementById("total").value;
     var st = document.getElementById("sub_total").value;
 
@@ -807,6 +811,7 @@ function discount() {
         parseFloat(t.replace(/\,/g, ""), 10) -
             parseFloat(st.replace(/\,/g, ""), 10)
     );
+    console.log("Total items (number of cart entries):", total_items);
     $("#barcode_input").focus();
     cart_table.clear();
     cart_table.rows.add(cart);
@@ -824,6 +829,7 @@ function deselect() {
     document.getElementById("sub_total").value = 0.00;
     document.getElementById("total_vat").value = 0.00;
     document.getElementById("total").value = 0.00;
+    document.getElementById("total_items").innerHTML = 0;
     try {
         document.getElementById("sale_paid").value = 0.00;
         document.getElementById("change_amount").value = 0.00;
@@ -844,6 +850,7 @@ function deselect1() {
         document.getElementById("sale_paid").value = 0;
         document.getElementById("sale_discount").value = 0;
         document.getElementById("remark").value = "";
+        document.getElementById("total_items").innerHTML = 0;
     } catch (e) {
         console.log("cancel_error");
     }
@@ -861,6 +868,7 @@ function deselectQuote() {
     document.getElementById("#sale_discount").value = "";
     $("#customer_id").val("").change();
     $("#customer_id").val("").change();
+    document.getElementById("total_items").innerHTML = 0;
     sub_total = 0;
     total = 0;
     cart = [];

@@ -952,6 +952,7 @@ function discount() {
 
     document.getElementById("total").value = formatMoney(total);
     document.getElementById("sub_total").value = formatMoney(sub_total);
+    document.getElementById("total_items").innerHTML = numberWithCommas(cart.length);
     var t = document.getElementById("total").value;
     var st = document.getElementById("sub_total").value;
 
@@ -981,6 +982,7 @@ function deselect() {
     document.getElementById("sub_total").value = 0.0;
     document.getElementById("total_vat").value = 0.0;
     document.getElementById("total").value = 0.0;
+    document.getElementById("total_items").innerHTML = 0;
     try {
         document.getElementById("sale_paid").value = 0.0;
         document.getElementById("change_amount").value = 0.0;
@@ -1004,6 +1006,7 @@ function deselect1() {
         document.getElementById("sale_paid").value = 0;
         document.getElementById("sale_discount").value = 0;
         document.getElementById("remark").value = "";
+        document.getElementById("total_items").innerHTML = 0;
     } catch (e) {
         console.log("cancel_error");
     }

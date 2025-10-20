@@ -15,7 +15,8 @@
             width: 100%;
         }
 
-        .ms-selectable, .ms-selection {
+        .ms-selectable,
+        .ms-selection {
             background: #fff;
             color: #555555;
             float: left;
@@ -28,38 +29,48 @@
             <div class="col-sm-12">
                 <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active text-uppercase" id="purchase-order-tablist" 
-                           href="#purchase-order" role="tab"
-                           aria-controls="purchase_order" aria-selected="true">New</a>
+                        <a class="nav-link active text-uppercase" id="purchase-order-tablist" href="#purchase-order"
+                            role="tab" aria-controls="purchase_order" aria-selected="true">New</a>
                     </li>
                     @if(Auth::user()->checkPermission('View Order List'))
-                    <li class="nav-item">
-                        <a class="nav-link text-uppercase" id="order-list-tablist" 
-                           href="{{ route('purchases.purchase-order.list') }}" 
-                           aria-controls="order_list" aria-selected="false">Order List
-                        </a>
-                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-uppercase" id="order-list-tablist"
+                                href="{{ route('purchases.purchase-order.list') }}" aria-controls="order_list"
+                                aria-selected="false">Order List
+                            </a>
+                        </li>
                     @endif
                 </ul>
-                
+
                 <div class="tab-content" id="myTabContent">
                     {{-- Purchase Order Start--}}
-                    <div class="tab-pane fade show active" id="purchase-order" role="tabpanel" aria-labelledby="purchase_order-tab">
+                    <div class="tab-pane fade show active" id="purchase-order" role="tabpanel"
+                        aria-labelledby="purchase_order-tab">
                         <form action="{{ route('purchase-order.store') }}" method="post" enctype="multipart/form-data"
-                              id="order_form">
+                            id="order_form">
                             @csrf()
                             <div class="row">
                                 <div class="col-md-2" hidden>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <div class="form-group">
                                         <label for="code">Supplier Name <font color="red">*</font></label>
                                         <select name="supplier" class="js-example-basic-single form-control" id="supplier"
-                                                required="true" onchange="filterSupplierProduct()">
+                                            required="true" onchange="filterSupplierProduct()">
                                             <option selected="true" disabled="disabled" value="">Select Supplier...</option>
                                             @foreach($suppliers as $supplier)
                                                 <option value="{{$supplier->id}}">{{$supplier->name}}</option>
                                             @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="status">Status</label>
+                                        <select id="product_status" class="form-control" onchange="filterSupplierProduct()">
+                                            <option value="all">All</option>
+                                            <option value="out_stock">Out Stock</option>
+                                            <option value="below_min">Below Min Level</option>
                                         </select>
                                     </div>
                                 </div>
@@ -76,8 +87,8 @@
                             <div class="row" id="detail">
                                 <hr>
                                 <div class="table responsive" style="width: 100%;">
-                                    <table id="cart_table" class="table nowrap table-striped table-hover"
-                                           width="100%"></table>
+                                    <table id="cart_table" class="table nowrap table-striped table-hover" width="100%">
+                                    </table>
                                 </div>
                             </div>
 
@@ -87,27 +98,26 @@
                                         <div style="width: 99%">
                                             <label> <b> Remarks</b></label>
                                             <textarea class="form-control" id="note" name="note" rows="2"
-                                                      placeholder="Enter Remarks Here.."></textarea>
+                                                placeholder="Enter Remarks Here.."></textarea>
                                         </div>
                                     </div>
                                 </div>
                                 <input type="hidden" id="purchase_discount" name="discount_amount" class="form-control"
-                                       value="0"/>
+                                    value="0" />
                                 <div class="col-md-4">
                                     <div class="row">
                                         <label class="col-md-6 col-form-label text-md-right"><b>Sub Total:</b></label>
                                         <div class="col-md-6" style="display: flex; justify-content: flex-end">
                                             <input type="text" id="sub_total" name="sub_total_amount"
-                                                   class="form-control-plaintext text-md-right" readonly value="0.00"/>
+                                                class="form-control-plaintext text-md-right" readonly value="0.00" />
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <label
-                                            class="col-md-6 col-form-label text-md-right"><b>VAT:</b></label>
+                                        <label class="col-md-6 col-form-label text-md-right"><b>VAT:</b></label>
                                         <div class="col-md-6"
-                                             style="float: right; display: flex; justify-content: flex-end">
+                                            style="float: right; display: flex; justify-content: flex-end">
                                             <input type="text" id="vat" name="vat_total_amount"
-                                                   class="form-control-plaintext text-md-right" readonly value="0.00"/>
+                                                class="form-control-plaintext text-md-right" readonly value="0.00" />
                                         </div>
                                     </div>
 
@@ -116,8 +126,7 @@
                                                 Amount:</b></label>
                                         <div class="col-md-6" style="display: flex; justify-content: flex-end">
                                             <input type="text" id="total" name="total_amount"
-                                                   class="form-control-plaintext text-md-right"
-                                                   readonly value="0.00"/>
+                                                class="form-control-plaintext text-md-right" readonly value="0.00" />
                                         </div>
                                     </div>
                                 </div>
@@ -126,15 +135,21 @@
                             <input type="hidden" id="order_cart" name="cart">
                             <input type="hidden" id="id_vat" name="vat">
                             <input type="hidden" id="total_price" name="total_amount">
-                            <input type="hidden" id="sub_total_price" name="sub_total_amount"/>
+                            <input type="hidden" id="sub_total_price" name="sub_total_amount" />
                             <input type="hidden" value="{{$vat}}" id="vats">
                             <input type="hidden" id="supplier_ids" name="supplier_ids">
 
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-6 d-flex">
+                                    <div>
+                                        <b>Total Items:</b>
+                                        <span id="total_items">0</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
                                     <div class="btn-group" style="float: right;">
                                         <button type="button" class="btn btn-danger" id="deselect-all"
-                                                onclick="return false">Cancel
+                                            onclick="return false">Cancel
                                         </button>
                                         <button class="btn btn-primary">Save</button>
                                     </div>

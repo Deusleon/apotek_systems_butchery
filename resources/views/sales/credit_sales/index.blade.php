@@ -413,7 +413,12 @@
                                     <hr>
 
                                     <div class="row">
-                                        <div class="col-md-6"></div>
+                                        <div class="col-md-6 d-flex">
+                                            <div>
+                                                <b>Total Items:</b>
+                                                <span id="total_items">0</span>
+                                            </div>
+                                        </div>
                                         <div class="col-md-6">
                                             <div class="btn-group" style="float: right;">
                                                 <button type="button" class="btn btn-danger" id="deselect-all-credit-sale">

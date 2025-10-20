@@ -18,7 +18,7 @@
         ol.linenums {
             margin: 0 0 0 -8px;
         }
-        
+
         #loading {
             width: 100%;
             height: 100%;
@@ -84,8 +84,8 @@
                                     <select name="payment_type" id="payment_type"
                                         class="js-example-basic-single form-control">
                                         @foreach($payment_type as $payment)
-                                        {{-- <option value="" disabled>Select Payment</option> --}}
-                                            <option value="{{$payment->id}}">{{$payment->name}}</option> 
+                                            {{-- <option value="" disabled>Select Payment</option> --}}
+                                            <option value="{{$payment->id}}">{{$payment->name}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -249,7 +249,12 @@
                         @endif
 
                         <div class="row">
-                            <div class="col-md-6"></div>
+                            <div class="col-md-6 d-flex">
+                                <div>
+                                    <b>Total Items:</b>
+                                    <span id="total_items">0</span>
+                                </div>
+                            </div>
                             <div class="col-md-6">
                                 <div class="btn-group" style="float: right;">
                                     <button class="btn btn-danger" id="deselect-all" onclick="return false">Cancel

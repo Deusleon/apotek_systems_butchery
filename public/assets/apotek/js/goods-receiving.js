@@ -924,12 +924,29 @@ $("#invoicecart_table tbody").on("click", "#delete_btn", function () {
 $("#invoiceselected-product").on("change", function () {
     let supplier = document.getElementById("good_receiving_supplier_ids");
     let supplier_id = supplier.options[supplier.selectedIndex].value;
+    let invoice_setting = document.getElementById("invoice_setting").value;
 
     if (supplier_id === "") {
         notify("Please Select Supplier", "top", "right", "danger");
         $("#invoiceselected-product option").prop("selected", function () {
             return this.defaultSelected;
         });
+    } else if (invoice_setting === "YES") {
+        let invoice = document.getElementById("goodreceving_invoice_id");
+        let invoice_id = invoice.value;
+        if (invoice_id === "") {
+            notify("Please Select Invoice", "top", "right", "danger");
+            $("#invoiceselected-product option").prop("selected", function () {
+                return this.defaultSelected;
+            });
+        } else {
+            var disabled = $("#invoiceprice_category").attr("disabled");
+            if (disabled === undefined) {
+                $("#invoiceprice_category").attr("disabled", "disabled");
+            }
+
+            invoicevaluesCollection();
+        }
     } else {
         var disabled = $("#invoiceprice_category").attr("disabled");
         if (disabled === undefined) {
@@ -1101,6 +1118,9 @@ function totalCostCalculated() {
         formatMoney(total_buying_price);
     document.getElementById("sub_total").value = formatMoney(sub_total);
 
+    // Update total items count
+    document.getElementById("total_items").innerHTML = invoice_cart.length;
+
     // Removed profit check to allow saving with negative profit
     $("#invoicesave_id").prop("disabled", false);
 }
@@ -1238,6 +1258,7 @@ function invoicesaveInvoiceForm() {
                 $("#total_buying_price").val("0.00");
                 $("#total_selling_price").val("0.00");
                 $("#sub_total").val("0.00");
+                $("#total_items").html("0");
 
                 try {
                     // Keep invoice selected for next selections
@@ -1265,6 +1286,7 @@ function invoicesaveInvoiceForm() {
                 $("#total_buying_price").val("0.00");
                 $("#total_selling_price").val("0.00");
                 $("#sub_total").val("0.00");
+                $("#total_items").html("0");
 
                 deselect();
                 $("#invoicesave_id").attr("disabled", false);
