@@ -637,15 +637,10 @@
         });
 
         // Update batch number when purchase date changes
-        $(document).on('apply.daterangepicker', '#invoicing_purchase_date', function (ev, picker) {
-            // format chosen date
-            var selectedDate = picker.startDate.format('YYYY-MM-DD');
-
-            // set the input value and the batch field
-            $(this).val(selectedDate);
-            $('#invoicing_batch_n').val(selectedDate);
-
-            console.log('apply.daterangepicker -> New Date is:', selectedDate);
+        $('#invoicing_purchase_date').on('apply.daterangepicker', function(ev, picker) {
+            var newDate = picker.startDate.format('YYYY-MM-DD');
+            $('#invoicing_batch_n').val(newDate);
+            // console.log('Purchase date changed to:', newDate);
         });
 
         $('input[name="purchase_date"]').on('cancel.daterangepicker', function (ev, picker) {

@@ -45,12 +45,12 @@
         </ul>
         <div class="card">
             <div class="card-body">
-                <form method="GET" action="{{ route('old-stocks') }}">
+                <form method="GET" class="d-flex justify-content-end" action="{{ route('old-stocks') }}">
                     @csrf
 
-                    <div class="d-flex justify-content-end mb-3 align-items-center">
+                    <div class="d-flex justify-content-end mb-3 mr-3 align-items-center">
                         <label class="mr-2" for="">Date:</label>
-                        <input type="text" name="old_stock_date" id="old_stock_date" class="form-control w-auto">
+                        <input type="text" name="old_stock_date" id="old_stock_date" class="form-control w-auto" value="{{ request('old_stock_date', \Carbon\Carbon::now()->subDay()->format('Y-m-d')) }}">
                     </div>
                     <div class="d-flex justify-content-end mb-3">
                         <div class="d-flex align-items-center" style="width: 284px;">
@@ -68,6 +68,12 @@
                     </div>
                 </form>
                 {{--Stock Value Div Begins here--}}
+                @if(isset($error))
+                    <div class="alert alert-danger">
+                        <strong>Error:</strong> {{ $error }}
+                    </div>
+                @endif
+
                 <div class="table-responsive" id="summary">
 
                     <table id="old_stock" class="table table-striped table-hover mb-3"
@@ -127,6 +133,27 @@
             $('#old_stock').DataTable({
                 responsive: true,
                 order: [[0, 'asc']]
+            });
+
+            // Initialize date picker for old stock date
+            $('#old_stock_date').daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                autoUpdateInput: false,
+                locale: {
+                    format: 'YYYY-MM-DD'
+                }
+            });
+
+            // Handle date selection
+            $('#old_stock_date').on('apply.daterangepicker', function(ev, picker) {
+                $(this).val(picker.startDate.format('YYYY-MM-DD'));
+                // Auto-submit the form when date is selected
+                $(this).closest('form').submit();
+            });
+
+            $('#old_stock_date').on('cancel.daterangepicker', function(ev, picker) {
+                $(this).val('');
             });
 
             $('#current-stock-tablist').on('click', function (e) {
