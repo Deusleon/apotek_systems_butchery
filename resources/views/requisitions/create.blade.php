@@ -127,7 +127,7 @@
                             <!-- Buttons Row -->
                             <div class="row">
                                 <div class="col-md-12 d-flex justify-content-end">
-                                    <a href="{{ route('requisitions.create') }}" class="btn btn-danger me-2">Cancel</a>
+                                    <a href="{{ route('requisitions.create') }}" class="btn btn-danger me-2">Clear</a>
                                     <button type="submit" class="btn btn-primary" id="submit_btn">Save</button>
                                 </div>
                             </div>
