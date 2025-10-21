@@ -11,9 +11,8 @@
 
 @section('content')
 
-    <div class="col-sm-12">
-        <div class="card-block">
-            <div class="col-sm-12">
+    <div class="col-sm-12">   
+                <div class="col-sm-12">
                 <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
                     <li class="nav-item">
                         <a class="nav-link text-uppercase" id="requisition-create" 
@@ -163,9 +162,6 @@
                         </form>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
     </div>
 
 @endsection

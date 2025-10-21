@@ -153,6 +153,31 @@ class RequisitionController extends Controller
         ]);
     }
 
+    public function getProductsByStore(Request $request, $store_id)
+    {
+        if (!Auth()->user()->checkPermission('Create Requisitions')) {
+            abort(403, 'Access Denied');
+        }
+
+        // Get products that have current stock in the specified store
+        $products = DB::table('inv_current_stock')
+            ->join('inv_products', 'inv_current_stock.product_id', '=', 'inv_products.id')
+            ->select(
+                'inv_products.id',
+                'inv_products.name',
+                'inv_products.brand',
+                'inv_products.pack_size',
+                'inv_products.sales_uom'
+            )
+            ->where('inv_current_stock.store_id', $store_id)
+            ->where('inv_current_stock.quantity', '>', 0)
+            ->where('inv_products.status', 1)
+            ->groupBy('inv_current_stock.product_id')
+            ->get();
+
+        return response()->json($products);
+    }
+
         public function store(Request $request)
     {
         if (!Auth()->user()->checkPermission('Create Requisitions')) {
@@ -403,13 +428,31 @@ class RequisitionController extends Controller
             $requisition->to_store = $to_store;
             $requisition->remarks = $remarks;
             $requisition->updated_by = Auth::user()->id;
-            
+
             // Update evidence document if a new file was uploaded - NEW CODE
             if ($evidencePath) {
                 $requisition->evidence_document = $evidencePath;
             }
-            
+
             $requisition->save();
+
+            // Get existing product IDs in the requisition
+            $existingProductIds = RequisitionDetail::where('req_id', $req_id)
+                ->pluck('product')
+                ->toArray();
+
+            // Get product IDs from the updated orders
+            $updatedProductIds = array_column(array_map(function($order) {
+                return $order->products_->id;
+            }, $orders), null);
+
+            // Delete items that are no longer in the updated orders
+            $productsToDelete = array_diff($existingProductIds, $updatedProductIds);
+            if (!empty($productsToDelete)) {
+                RequisitionDetail::where('req_id', $req_id)
+                    ->whereIn('product', $productsToDelete)
+                    ->delete();
+            }
 
             foreach ($orders as $order_details) {
                 $check_req = RequisitionDetail::query()
@@ -436,11 +479,11 @@ class RequisitionController extends Controller
                     $order_detail->save();
                 }
             }
-            
+
             session()->flash("alert-success", "Requisition Updated Successfully!");
             DB::commit();
 
-            return back();
+            return redirect()->route('requisitions.index');
         }
 
         session()->flash("alert-success", "Requisition Accepted Successfully!");
