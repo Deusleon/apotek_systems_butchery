@@ -106,10 +106,10 @@
         @endif
         <br>
         <h2 align="center" style="margin-top: -1%; font-size: 20px; font-weight: bold;">
-            Requisition
+            Stock Requisition
         </h2>
         <br>
-        <h4 align="center" style="margin-top: -1%">{{ date('Y-m-d', strtotime($requisition->created_at)) }}</h4>
+        <h4 align="center" style="margin-top: -1%">Date: {{ date('Y-m-d', strtotime($requisition->created_at)) }}</h4>
     </div>
 
     <!-- Requisition Info -->
