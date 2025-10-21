@@ -781,6 +781,7 @@ class HomeController extends Controller {
                 'p.pack_size',
                 'p.sales_uom',
                 'cs.store_id',
+                'cs.expiry_date',
                 DB::raw('SUM(cs.quantity) as quantity')
             )
             ->where('cs.quantity', '>', 0)
@@ -792,7 +793,8 @@ class HomeController extends Controller {
                 $q->where('cs.store_id', $store_id);
             })
             ->groupBy(
-                'p.id'
+                'p.id',
+                'cs.expiry_date'
             )
             ->orderBy('p.name', 'asc');
 

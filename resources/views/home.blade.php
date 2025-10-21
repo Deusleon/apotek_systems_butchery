@@ -302,7 +302,7 @@
                                                 <div class="card">
                                                     <div class="card-block">
                                                         <div class="panel-heading">
-                                                            <h5>Below min level</h5>
+                                                            <h5>Below Min Level</h5>
                                                         </div>
                                                         <div class="panel-body text-c-yellow">
                                                             <h3 class="text-c-yellow">{{$belowMinLevel->count()}}</h3>
@@ -370,7 +370,7 @@
                                                 <div class="card">
                                                     <div class="card-block">
                                                         <div class="panel-heading">
-                                                            <h5>Expire in 3 Month</h5>
+                                                            <h5>Expire in 3 Months</h5>
                                                         </div>
                                                         <div class="panel-body">
                                                             <h3 class="text-c-red">{{$expireSoon->count()}}</h3>
@@ -407,7 +407,7 @@
                                                 <div class="card">
                                                     <div class="card-block">
                                                         <div class="panel-heading">
-                                                            <h5>Below min level</h5>
+                                                            <h5>Below Min Level</h5>
                                                         </div>
                                                         <div class="panel-body text-c-yellow">
                                                             <h3 class="text-c-yellow">{{$belowMinLevel->count()}}</h3>
@@ -464,6 +464,9 @@
                                                     <th style="width: 1%;">#</th>
                                                     <th>Product Name</th>
                                                     <th>Category</th>
+                                                    {{-- @if ($expireEnabled)
+                                                    <th>Expiry Date</th>
+                                                    @endif --}}
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -479,8 +482,11 @@
                                                 <tr>
                                                     <th style="width: 1%;">#</th>
                                                     <th>Product Name</th>
-                                                    <th>Min Quantity</th>
+                                                    <th>Min Level</th>
                                                     <th>Available </th>
+                                                    {{-- @if ($expireEnabled)
+                                                    <th>Expiry Date</th>
+                                                    @endif --}}
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -497,6 +503,9 @@
                                                     <th style="width: 1%;">#</th>
                                                     <th>Product Name</th>
                                                     <th>Quantity</th>
+                                                    @if ($expireEnabled)
+                                                    <th>Expiry Date</th>
+                                                    @endif
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -515,6 +524,9 @@
                                                     <th>Sold Qty</th>
                                                     <th>No of Sales</th>
                                                     <th>Available Qty</th>
+                                                    {{-- @if ($expireEnabled)
+                                                    <th>Expiry Date</th>
+                                                    @endif --}}
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -523,6 +535,7 @@
                                         </table>
                                     </div>
 
+                                    @if ($expireEnabled)
                                     <div class="table-responsive" style="display: none" id="stock_items_expired_table">
                                         <table id="stock_items_expired" class="display table nowrap table-striped table-hover"
                                             style="width:100%">
@@ -539,6 +552,7 @@
                                             </tbody>
                                         </table>
                                     </div>
+                                    @endif
 
                                 </div>
 
@@ -1089,11 +1103,13 @@
                             summary_no: 2
                         },
                         dataSrc: function (json) {
-                            // console.log('Fetched data:', json); 
+                            // console.log('Fetched data:', json);
 
                             if (Array.isArray(json)) {
-                                // filter only where no_of_sales > 0
-                                return json.filter(item => item.no_of_sales > 0);
+                                // filter only where no_of_sales > 0 and take only 20% of the results
+                                let filtered = json.filter(item => item.no_of_sales > 0);
+                                let takeCount = Math.ceil(filtered.length * 0.2); // Take 20% of fast moving items
+                                return filtered.slice(0, takeCount);
                             }
 
                             console.error('Unexpected data format:', json);
@@ -1111,9 +1127,24 @@
                             }
                         },
                         { data: 'name' },
-                        { data: 'quantity', title: 'Sold Qty' },
-                        { data: 'no_of_sales', title: 'No of Sales' },
-                        { data: 'available_qty', title: 'Available Qty' }
+                        {
+                            data: 'quantity',
+                            render: function (data, type, row) {
+                                return numberWithCommas(data);
+                            }
+                        },
+                        {
+                            data: 'no_of_sales',
+                            render: function (data, type, row) {
+                                return numberWithCommas(data);
+                            }
+                        },
+                        {
+                            data: 'available_qty',
+                            render: function (data, type, row) {
+                                return numberWithCommas(data);
+                            }
+                        },
                     ],
                     'searching': false,
                     "columnDefs": [
@@ -1230,6 +1261,7 @@
                                 return numberWithCommas(data);
                             }
                         },
+                        { 'data': 'expiry_date' }
                     ],
                     'searching': false,
                     "columnDefs": [

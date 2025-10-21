@@ -349,7 +349,7 @@ $store_id = Auth::user()->store_id;
                                         {{-- 3. Expired --}}
                                         @if(isset($data['expiring_soon_count']))
                                             <div class="p-1 pl-3">
-                                                <span>Expire in 3 months:</span>
+                                                <span>Expire in 3 Months:</span>
                                                 <span class="text-c-yellow">{{ number_format($data['expiring_soon_count']) }}</span>
                                             </div>
                                         @endif

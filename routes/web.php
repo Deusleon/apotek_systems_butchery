@@ -594,6 +594,12 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::post('sale_detail',[SaleController::class,'salesDetailsData'])->name('sale_detail');
 
 
+    /* TOOLS */
+    Route::get('settings/tools/database-backup', 'DatabaseBackupController@index')->name('database-backup.index');
+    Route::post('settings/tools/database-backup', 'DatabaseBackupController@create')->name('database-backup.create');
+    Route::get('settings/tools/database-backup/{filename}/download', 'DatabaseBackupController@download')->name('database-backup.download');
+    Route::delete('settings/tools/database-backup/{filename}', 'DatabaseBackupController@delete')->name('database-backup.delete');
+
     /* HELP */
 
     Route::view('/help/support', 'help.support');

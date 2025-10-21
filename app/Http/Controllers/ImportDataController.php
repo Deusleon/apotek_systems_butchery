@@ -66,36 +66,88 @@ class ImportDataController extends Controller {
         $sheet->setCellValue( 'E1', 'Quantity' );
         $sheet->setCellValue( 'F1', 'Expiry' );
 
-        // Data kutoka DB
-        $products = Product::all();
+        // Sample data rows
+        $sampleData = [
+            [100001, 'Sample Product 1', 10.50, 15.00, 100, '2025-12-31'],
+            [100002, 'Sample Product 2', 25.75, 35.00, 50, '2026-06-30'],
+            [100003, 'Sample Product 3', 5.25, 8.50, 200, '2025-08-15']
+        ];
+
         $row = 2;
-        foreach ( $products as $product ) {
-            $sheet->setCellValue( 'A'.$row, $product->id );
-            $sheet->setCellValue( 'B'.$row, $product->name.' '.$product->brand.' '.$product->pack_size.$product->sales_uom );
-            $sheet->setCellValue( 'C'.$row, '' );
-            $sheet->setCellValue( 'D'.$row, '' );
-            $sheet->setCellValue( 'E'.$row, '' );
-            $sheet->setCellValue( 'F'.$row, '' );
+        foreach ( $sampleData as $data ) {
+            $sheet->setCellValue( 'A'.$row, $data[0] );
+            $sheet->setCellValue( 'B'.$row, $data[1] );
+            $sheet->setCellValue( 'C'.$row, $data[2] );
+            $sheet->setCellValue( 'D'.$row, $data[3] );
+            $sheet->setCellValue( 'E'.$row, $data[4] );
+            $sheet->setCellValue( 'F'.$row, $data[5] );
             $row++;
         }
 
         $writer = new Xlsx( $spreadsheet );
         $fileName = 'stock_import_template.xlsx';
 
-        // Save to php output
-        header( 'Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' );
-        header( 'Content-Disposition: attachment; filename=\'$fileName\'' );
+        // Use Laravel's response()->download() for proper headers
+        $tempFile = tempnam(sys_get_temp_dir(), 'stock_template');
+        $writer->save($tempFile);
 
-        $writer->save( 'php://output' );
-        exit;
+        return response()->download($tempFile, $fileName, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"'
+        ])->deleteFileAfterSend(true);
     }
 
     public function downloadTemplate() {
-        $file = public_path() . '/fileStore/import_template/products_import_template.xlsx';
-        $headers = array(
-            'Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        );
-        return response()->download( $file, 'products_import_template.xlsx', $headers );
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Headers with proper column names
+        $headers = [
+            'A1' => 'Product Name',
+            'B1' => 'Barcode',
+            'C1' => 'Brand',
+            'D1' => 'Pack Size',
+            'E1' => 'Sales UOM',
+            'F1' => 'Category',
+            'G1' => 'Min Stock',
+            'H1' => 'Max Stock'
+        ];
+
+        foreach ($headers as $cell => $value) {
+            $sheet->setCellValue($cell, $value);
+        }
+
+        // Sample data rows
+        $sampleData = [
+            ['Sample Product 1', '123456789', 'Brand A', 10, 'PCS', 'Category 1', 5, 100],
+            ['Sample Product 2', '987654321', 'Brand B', 25, 'BOX', 'Category 2', 10, 200],
+            ['Sample Product 3', '456789123', 'Brand C', 5, 'KG', 'Category 1', 2, 50]
+        ];
+
+        $row = 2;
+        foreach ($sampleData as $data) {
+            $sheet->setCellValue('A'.$row, $data[0]);
+            $sheet->setCellValue('B'.$row, $data[1]);
+            $sheet->setCellValue('C'.$row, $data[2]);
+            $sheet->setCellValue('D'.$row, $data[3]);
+            $sheet->setCellValue('E'.$row, $data[4]);
+            $sheet->setCellValue('F'.$row, $data[5]);
+            $sheet->setCellValue('G'.$row, $data[6]);
+            $sheet->setCellValue('H'.$row, $data[7]);
+            $row++;
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'products_import_template.xlsx';
+
+        // Use Laravel's response()->download() for proper headers
+        $tempFile = tempnam(sys_get_temp_dir(), 'products_template');
+        $writer->save($tempFile);
+
+        return response()->download($tempFile, $fileName, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"'
+        ])->deleteFileAfterSend(true);
     }
 
     public function previewStockImport( Request $request ) {
@@ -359,7 +411,8 @@ class ImportDataController extends Controller {
     }
 
     public function recordImport( Request $request ) {
-        Log::info( 'Starting import process' );
+        $start_time = microtime(true);
+        Log::info( 'Starting products import process', ['start_time' => $start_time] );
 
         // Get the import preview data from session
         $preview = Session::get( 'import_preview' );
@@ -377,135 +430,42 @@ class ImportDataController extends Controller {
         }
 
         try {
-            Log::info( 'Reading Excel file for import', [ 'file_path' => $file_path ] );
-            $excel_raw_data = Excel::toArray( null, $file_path );
+            Log::info( 'Reading Excel file for products import', [ 'file_path' => $file_path ] );
 
-            if ( empty( $excel_raw_data ) || !isset( $excel_raw_data[ 0 ] ) ) {
-                Log::error( 'Excel file is empty or invalid' );
-                return back()->with( 'error', 'The file appears to be empty or invalid.' );
-            }
+            // Use the improved ProductsImport class
+            $import = new \App\Imports\ProductsImport();
+            Excel::import($import, $file_path);
 
-            Log::info( 'Creating import history record' );
+            $results = $import->getResults();
+            $successful_records = $results['success_count'];
+            $failed_records = $results['fail_count'];
+            $errors = $results['errors'];
+
             // Create import history record
             $import_history = ImportHistory::create( [
                 'file_name' => $preview[ 'file_name' ],
                 'store_id' => 1,
                 'price_category_id' => 1,
                 'supplier_id' => 1,
-                'total_records' => count( $excel_raw_data[ 0 ] ) - 1, // Minus header
-                'status' => 'processing',
+                'total_records' => $successful_records + $failed_records,
+                'status' => 'completed',
                 'created_by' => Auth::id(),
                 'started_at' => now(),
-                'successful_records' => 0,
-                'failed_records' => 0,
-                'progress' => 0,
-                'error_log' => '',
-                'processed_rows' => json_encode( [] )
-            ] );
-
-            $successful_records = 0;
-            $failed_records = 0;
-            $error_log = [];
-            $processed_rows = [];
-
-            DB::statement( 'ALTER TABLE inv_products AUTO_INCREMENT = 100000;' );
-
-            Log::info( 'Starting to process rows', [ 'total_rows' => count( $excel_raw_data[ 0 ] ) - 1 ] );
-
-            foreach ( $excel_raw_data[ 0 ] as $index => $row ) {
-                if ( $index === 0 ) continue;
-                // Skip header
-
-                Log::info( 'Processing row', [ 'row_number' => $index + 1, 'data' => $row ] );
-
-                try {
-                    DB::beginTransaction();
-
-                    // Validate row
-                    $validation_errors = $this->validateRow( $row, $index + 1 );
-                    if ( !empty( $validation_errors ) ) {
-                        throw new Exception( implode( ', ', $validation_errors ) );
-                    }
-
-                    // Check if product exists by barcode
-                    $product = Product::where( 'id', $row[ 0 ] )->first();
-
-                    if ( $product ) {
-                        Log::info( 'Product exists, updating', [ 'product_id' => $product->id ] );
-                    } else {
-                        Log::info( 'Creating new product' );
-                    }
-
-                    // Get or create category
-                    $category = Category::firstOrCreate(
-                        [ 'name' => $row[ 5 ] ],
-                        [ 'created_by' => Auth::id() ]
-                    );
-
-                    Log::info( 'Category processed', [ 'category_id' => $category->id, 'category_name' => $category->name ] );
-
-                    // Create or update product
-                    $product_data = [
-                        'barcode' => $row[ 2 ],
-                        'name' => $row[ 1 ],
-                        'brand' => $row[ 3 ],
-                        'pack_size' => $row[ 4 ],
-                        'sales_uom' => $row[ 6 ],
-                        'min_stock' => $row[ 7 ],
-                        'max_stock' => $row[ 8 ],
-                        'category_id' => $category->id,
-                        'type' => 'stockable',
-                        'status' => 1,
-                        // 'updated_by' => Auth::id()
-                    ];
-
-                    if ( !$product ) {
-                        // $product_data[ 'created_by' ] = Auth::id();
-                        $product = Product::create( $product_data );
-                        Log::info( 'New product created', [ 'product_id' => $product->id ] );
-                    } else {
-                        // $product->update( $product_data );
-                        Log::info( 'Skipped as product is already existing', [ 'product_id' => $product->id ] );
-                    }
-
-                    DB::commit();
-                    $successful_records++;
-                    $processed_rows[] = $index + 1;
-                    Log::info( 'Row processed successfully' );
-
-                } catch ( \Exception $e ) {
-                    DB::rollBack();
-                    $failed_records++;
-                    $error_log[] = 'Row ' . ( $index + 1 ) . ': ' . $e->getMessage();
-                    Log::error( 'Row processing failed', [
-                        'row_number' => $index + 1,
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString()
-                    ] );
-                }
-
-                // Update import history progress
-                $progress = round( ( $index / ( count( $excel_raw_data[ 0 ] ) - 1 ) ) * 100 );
-                $import_history->update( [
-                    'progress' => $progress,
-                    'successful_records' => $successful_records,
-                    'failed_records' => $failed_records,
-                    'error_log' => json_encode( $error_log ),
-                    'processed_rows' => json_encode( $processed_rows )
-                ] );
-            }
-
-            // Update final status
-            $import_history->update( [
-                'status' => 'completed',
-                'completed_at' => now(),
-                'progress' => 100
-            ] );
-
-            Log::info( 'Import completed', [
                 'successful_records' => $successful_records,
                 'failed_records' => $failed_records,
-                'total_records' => count( $excel_raw_data[ 0 ] ) - 1
+                'progress' => 100,
+                'error_log' => json_encode($errors),
+                'processed_rows' => json_encode(range(1, $successful_records + $failed_records)),
+                'completed_at' => now()
+            ] );
+
+            $end_time = microtime(true);
+            Log::info( 'Products import completed', [
+                'successful_records' => $successful_records,
+                'failed_records' => $failed_records,
+                'total_records' => $successful_records + $failed_records,
+                'total_time' => $end_time - $start_time,
+                'errors' => $errors
             ] );
 
             // Clean up temporary file
@@ -526,7 +486,7 @@ class ImportDataController extends Controller {
             }
 
         } catch ( \Exception $e ) {
-            Log::error( 'Import process failed', [
+            Log::error( 'Products import process failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ] );
@@ -535,7 +495,8 @@ class ImportDataController extends Controller {
     }
 
     public function recordStockImport( Request $request ) {
-        Log::info( 'Starting import process' );
+        $start_time = microtime(true);
+        Log::info( 'Starting stock import process', ['start_time' => $start_time] );
 
         // Get the import preview data from session
         $preview = Session::get( 'import_preview' );
@@ -553,7 +514,7 @@ class ImportDataController extends Controller {
         }
 
         try {
-            Log::info( 'Reading Excel file for import', [ 'file_path' => $file_path ] );
+            Log::info( 'Reading Excel file for stock import', [ 'file_path' => $file_path ] );
             $excel_raw_data = Excel::toArray( null, $file_path );
 
             if ( empty( $excel_raw_data ) || !isset( $excel_raw_data[ 0 ] ) ) {
@@ -561,14 +522,16 @@ class ImportDataController extends Controller {
                 return back()->with( 'error', 'The file appears to be empty or invalid.' );
             }
 
-            Log::info( 'Creating import history record' );
+            $total_rows = count( $excel_raw_data[ 0 ] ) - 1; // Minus header
+            Log::info( 'Creating import history record', ['total_rows' => $total_rows] );
+
             // Create import history record
             $import_history = ImportHistory::create( [
                 'file_name' => $preview[ 'file_name' ],
                 'store_id' => $preview[ 'store_id' ],
                 'price_category_id' => $preview[ 'price_category_id' ],
                 'supplier_id' => $preview[ 'supplier_id' ],
-                'total_records' => count( $excel_raw_data[ 0 ] ) - 1, // Minus header
+                'total_records' => $total_rows,
                 'status' => 'processing',
                 'created_by' => Auth::id(),
                 'started_at' => now(),
@@ -584,104 +547,106 @@ class ImportDataController extends Controller {
             $error_log = [];
             $processed_rows = [];
 
-            // DB::statement( 'ALTER TABLE inv_products AUTO_INCREMENT = 100000;' );
+            Log::info( 'Starting to process stock rows in batches', [ 'total_rows' => $total_rows ] );
 
-            Log::info( 'Starting to process rows', [ 'total_rows' => count( $excel_raw_data[ 0 ] ) - 1 ] );
+            // Process in batches of 50 rows for stock import (smaller batches due to more operations)
+            $batch_size = 50;
+            $batches = array_chunk(array_slice($excel_raw_data[0], 1), $batch_size); // Skip header
 
-            foreach ( $excel_raw_data[ 0 ] as $index => $row ) {
-                if ( $index === 0 ) continue;
-                // Skip header
+            foreach ( $batches as $batch_index => $batch ) {
+                $batch_start_time = microtime(true);
+                Log::info( 'Processing stock batch', [
+                    'batch_index' => $batch_index + 1,
+                    'batch_size' => count($batch),
+                    'start_time' => $batch_start_time
+                ] );
 
-                Log::info( 'Processing row', [ 'row_number' => $index + 1, 'data' => $row ] );
+                foreach ( $batch as $row_index => $row ) {
+                    $global_index = ($batch_index * $batch_size) + $row_index + 1; // +1 for header offset
 
-                try {
-                    DB::beginTransaction();
+                    try {
+                        DB::beginTransaction();
 
-                    // Validate row
-                    $validation_errors = $this->validateStockRow( $row, $index + 1 );
-                    if ( !empty( $validation_errors ) ) {
-                        throw new Exception( implode( ', ', $validation_errors ) );
+                        // Validate row
+                        $validation_errors = $this->validateStockRow( $row, $global_index );
+                        if ( !empty( $validation_errors ) ) {
+                            throw new Exception( implode( ', ', $validation_errors ) );
+                        }
+
+                        // Clean and prepare data
+                        $buy_price = preg_replace( '/[^\d.]/', '', $row[ 2 ] );
+                        $sell_price = preg_replace( '/[^\d.]/', '', $row[ 3 ] );
+                        $quantity = preg_replace( '/[^\d.]/', '', $row[ 4 ] );
+
+                        // Create stock record
+                        $stock_data = [
+                            'product_id' => $row[ 0 ],
+                            'unit_cost' => $row[ 2 ],
+                            'quantity' => $row[ 4 ],
+                            'expiry_date' => $row[ 5 ],
+                            'store_id' => $preview[ 'store_id' ],
+                            'created_by' => Auth::id()
+                        ];
+
+                        $stock = CurrentStock::create( $stock_data );
+
+                        // Create stock tracking record
+                        $stockTrack = StockTracking::create( [
+                            'stock_id'=> $stock->id,
+                            'product_id' => $stock->product_id,
+                            'out_mode'=> 'Stock Import',
+                            'quantity' => $stock->quantity,
+                            'store_id' => $preview[ 'store_id' ],
+                            'created_by' => Auth::id(),
+                            'updated_at' => date( 'Y-m-d' ),
+                            'movement' => 'IN',
+                        ] );
+
+                        // Create or update price list
+                        $price_list = PriceList::updateOrCreate(
+                            [
+                                'stock_id' => $stock->id,
+                                'price_category_id' => $preview[ 'price_category_id' ]
+                            ],
+                            [
+                                'price' => $sell_price,
+                                'status' => 1,
+                                'updated_by' => Auth::id()
+                            ]
+                        );
+
+                        DB::commit();
+                        $successful_records++;
+                        $processed_rows[] = $global_index;
+
+                    } catch ( \Exception $e ) {
+                        DB::rollBack();
+                        $failed_records++;
+                        $error_log[] = 'Row ' . $global_index . ': ' . $e->getMessage();
+                        Log::error( 'Stock row processing failed', [
+                            'row_number' => $global_index,
+                            'error' => $e->getMessage()
+                        ] );
                     }
-
-                    // Clean and prepare data
-                    $buy_price = preg_replace( '/[^\d.]/', '', $row[ 2 ] );
-                    $sell_price = preg_replace( '/[^\d.]/', '', $row[ 3 ] );
-                    $quantity = preg_replace( '/[^\d.]/', '', $row[ 4 ] );
-
-                    Log::info( 'Cleaned data', [
-                        'buy_price' => $buy_price,
-                        'sell_price' => $sell_price,
-                        'quantity' => $quantity
-                    ] );
-
-                    // Create or update product
-                    $stock_data = [
-                        'product_id' => $row[ 0 ],
-                        'unit_cost' => $row[ 2 ],
-                        'quantity' => $row[ 4 ],
-                        'expiry_date' => $row[ 5 ],
-                        // 'batch_number' => $row[ 6 ],
-                        'store_id' => $preview[ 'store_id' ],
-                        'created_by' => Auth::id()
-                    ];
-
-                    $stock = CurrentStock::create( $stock_data );
-                    Log::info( 'New Stock imported', [ 'stock_id' => $stock->id ] );
-
-                    // Create stock tracking record
-                    $stockTrack = StockTracking::create( [
-                        'stock_id'=> $stock->id,
-                        'product_id' => $stock->product_id,
-                        'out_mode'=> 'Stock Import',
-                        'quantity' => $stock->quantity,
-                        'store_id' => $preview[ 'store_id' ],
-                        'created_by' => Auth::id(),
-                        'updated_at' => date( 'Y-m-d' ),
-                        'movement' => 'IN',
-                        // 'reference_id' => $import_history->id,
-                    ] );
-
-                    Log::info( 'Stock tracking record created', $stockTrack->toArray() );
-
-                    // Create or update price list
-                    $price_list = PriceList::updateOrCreate(
-                        [
-                            'stock_id' => $stock->id,
-                            'price_category_id' => $preview[ 'price_category_id' ]
-                        ],
-                        [
-                            'price' => $sell_price,
-                            'status' => 1,
-                            'updated_by' => Auth::id()
-                        ]
-                    );
-
-                    Log::info( 'Price list processed', [ 'price_list_id' => $price_list->id ] );
-
-                    DB::commit();
-                    $successful_records++;
-                    $processed_rows[] = $index + 1;
-                    Log::info( 'Row processed successfully' );
-
-                } catch ( \Exception $e ) {
-                    DB::rollBack();
-                    $failed_records++;
-                    $error_log[] = 'Row ' . ( $index + 1 ) . ': ' . $e->getMessage();
-                    Log::error( 'Row processing failed', [
-                        'row_number' => $index + 1,
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString()
-                    ] );
                 }
 
-                // Update import history progress
-                $progress = round( ( $index / ( count( $excel_raw_data[ 0 ] ) - 1 ) ) * 100 );
+                // Update progress after each batch (less frequent updates)
+                $progress = round( (($batch_index + 1) * $batch_size / $total_rows) * 100 );
+                if ($progress > 100) $progress = 100;
+
                 $import_history->update( [
                     'progress' => $progress,
                     'successful_records' => $successful_records,
                     'failed_records' => $failed_records,
                     'error_log' => json_encode( $error_log ),
                     'processed_rows' => json_encode( $processed_rows )
+                ] );
+
+                $batch_end_time = microtime(true);
+                Log::info( 'Stock batch processed', [
+                    'batch_index' => $batch_index + 1,
+                    'batch_time' => $batch_end_time - $batch_start_time,
+                    'progress' => $progress
                 ] );
             }
 
@@ -692,10 +657,12 @@ class ImportDataController extends Controller {
                 'progress' => 100
             ] );
 
-            Log::info( 'Import completed', [
+            $end_time = microtime(true);
+            Log::info( 'Stock import completed', [
                 'successful_records' => $successful_records,
                 'failed_records' => $failed_records,
-                'total_records' => count( $excel_raw_data[ 0 ] ) - 1
+                'total_records' => $total_rows,
+                'total_time' => $end_time - $start_time
             ] );
 
             // Clean up temporary file
@@ -706,17 +673,16 @@ class ImportDataController extends Controller {
 
             Session::forget( 'import_preview' );
 
-            // $message = 'Import completed. ';
-            $message = "Successfully imported {$successful_records} products. ";
+            $message = "Successfully imported {$successful_records} stock records. ";
             if ( $failed_records > 0 ) {
-                $message = "Failed to import {$failed_records} products. Check import history for details.";
+                $message .= "Failed to import {$failed_records} records. Check import history for details.";
                 return redirect()->route( 'import-data' )->with( 'warning', $message );
             } else {
                 return redirect()->route( 'import-data' )->with( 'success', $message );
             }
 
         } catch ( \Exception $e ) {
-            Log::error( 'Import process failed', [
+            Log::error( 'Stock import process failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ] );
