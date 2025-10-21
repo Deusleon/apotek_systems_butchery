@@ -428,13 +428,31 @@ class RequisitionController extends Controller
             $requisition->to_store = $to_store;
             $requisition->remarks = $remarks;
             $requisition->updated_by = Auth::user()->id;
-            
+
             // Update evidence document if a new file was uploaded - NEW CODE
             if ($evidencePath) {
                 $requisition->evidence_document = $evidencePath;
             }
-            
+
             $requisition->save();
+
+            // Get existing product IDs in the requisition
+            $existingProductIds = RequisitionDetail::where('req_id', $req_id)
+                ->pluck('product')
+                ->toArray();
+
+            // Get product IDs from the updated orders
+            $updatedProductIds = array_column(array_map(function($order) {
+                return $order->products_->id;
+            }, $orders), null);
+
+            // Delete items that are no longer in the updated orders
+            $productsToDelete = array_diff($existingProductIds, $updatedProductIds);
+            if (!empty($productsToDelete)) {
+                RequisitionDetail::where('req_id', $req_id)
+                    ->whereIn('product', $productsToDelete)
+                    ->delete();
+            }
 
             foreach ($orders as $order_details) {
                 $check_req = RequisitionDetail::query()
@@ -461,11 +479,11 @@ class RequisitionController extends Controller
                     $order_detail->save();
                 }
             }
-            
+
             session()->flash("alert-success", "Requisition Updated Successfully!");
             DB::commit();
 
-            return back();
+            return redirect()->route('requisitions.index');
         }
 
         session()->flash("alert-success", "Requisition Accepted Successfully!");
