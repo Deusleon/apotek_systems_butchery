@@ -20,7 +20,7 @@ class ProductController extends Controller
 
     public function index()
     {
-        if (!Auth()->user()->checkPermission('View Products List')) {
+        if (!Auth()->user()->checkPermission('View Product List')) {
             abort(403, 'Access Denied');
         }
         $products = Product::all();

@@ -236,10 +236,10 @@
         </div>
     </div>
     @php
-    $subTotal = 0;
-    $vat = 0;
-    $discount = 0;
-    $grandTotal = 0;
+        $subTotal = 0;
+        $vat = 0;
+        $discount = 0;
+        $grandTotal = 0;
     @endphp
     <!-- Receipt Header -->
     <div class="receipt-header">
@@ -288,19 +288,20 @@
             </thead>
             <tbody>
                 @foreach($dat as $item)
-                {{-- @dd($item) --}}
+                    {{-- @dd($item) --}}
                     <tr>
                         <td class="index-col">{{$loop->iteration}}.</td>
-                        <td class="description-col">{{$item['name']}} {{$item['brand'] ?? ''}} {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}</td>
+                        <td class="description-col">{{$item['name']}} {{$item['brand'] ?? ''}}
+                            {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}</td>
                         <td class="qty-col">{{number_format($item['quantity'], 0)}}</td>
                         <td class="unit-col">{{number_format($item['price'], 2)}}</td>
                         <td class="amount-col">{{number_format($item['price'] * $item['quantity'], 2)}}</td>
                     </tr>
                     @php
-                    $subTotal += $item['sub_total'];
-                    $vat += $item['vat'];
-                    $discount += $item['discount'];
-                    $grandTotal += ($item['sub_total']-$item['discount'])+$item['vat'];
+                        $subTotal += $item['sub_total'];
+                        $vat += $item['vat'];
+                        $discount += $item['discount'];
+                        $grandTotal += ($item['sub_total'] - $item['discount']) + $item['vat'];
                     @endphp
                 @endforeach
 
@@ -358,23 +359,23 @@
     @endforeach
 
     <!-- Footer Section -->
-    <div class="footer-section">
-        @if($generalSettings && $generalSettings->proforma_invoice_terms)
-            <div style="margin-top: 20px; padding: 10px; border-top: 1px solid #ccc;">
-                <div style="font-weight: bold; font-size: 12px; margin-bottom: 5px;">Terms & Conditions:</div>
-                <div style="font-size: 10px; line-height: 1.4; text-align: justify;">
-                    {!! nl2br(e($generalSettings->proforma_invoice_terms)) !!}
-                </div>
-            </div>
-        @endif
-        
+    <div class="footer-section" style="margin-top: -20px;">
         @foreach($data as $datas => $dat)
             <div class="sold-by">Issued By: {{$dat[0]['sold_by']}}</div>
             <div class="slogan">{{$pharmacy['slogan'] ?? 'Thank you for your business'}}</div>
             @break
         @endforeach
-        <span style="font-size: 8px;">Printed on: {{date('Y-m-d H:i:s')}}</span>
+        <span style="font-size: 8px; border-bottom: 1px solid #ccc;">Printed on: {{date('Y-m-d H:i:s')}}</span>
     </div>
+
+    @if($generalSettings && $generalSettings->proforma_invoice_terms)
+        <div style="padding-top: 10px;">
+            <div style="font-weight: bold; font-size: 12px; margin-bottom: 5px;">Terms & Conditions:</div>
+            <div style="font-size: 10px; line-height: 1.4; text-align: justify;">
+                {!! nl2br(e($generalSettings->proforma_invoice_terms)) !!}
+            </div>
+        </div>
+    @endif
 
 </body>
 

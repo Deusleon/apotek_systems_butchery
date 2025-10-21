@@ -498,7 +498,7 @@
 
                             <div class="row" id="detail">
                                 <hr>
-                                @if(auth()->user()->checkPermission('View Credit Payment'))
+                                @if(auth()->user()->checkPermission('View Credit Payments'))
                                     <div id="can_pay"></div>
                                 @endif
                                 <div class="table teble responsive p-3" style="width: 100%;">

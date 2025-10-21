@@ -28,11 +28,13 @@
         <div class="card-block">
             <div class="col-sm-12">
                 <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link active text-uppercase" id="purchase-order-tablist" href="#purchase-order"
-                            role="tab" aria-controls="purchase_order" aria-selected="true">New</a>
-                    </li>
-                    @if(Auth::user()->checkPermission('View Order List'))
+                    @if(Auth::user()->checkPermission('Create Purchase Order'))
+                        <li class="nav-item">
+                            <a class="nav-link active text-uppercase" id="purchase-order-tablist" href="#purchase-order"
+                                role="tab" aria-controls="purchase_order" aria-selected="true">New</a>
+                        </li>
+                    @endif
+                    @if(Auth::user()->checkPermission('View Purchase Order'))
                         <li class="nav-item">
                             <a class="nav-link text-uppercase" id="order-list-tablist"
                                 href="{{ route('purchases.purchase-order.list') }}" aria-controls="order_list"

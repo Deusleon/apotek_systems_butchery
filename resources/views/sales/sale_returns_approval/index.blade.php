@@ -47,7 +47,7 @@
                         aria-selected="true">Sales History</a>
                 </li>
             @endif
-            @if(Auth::user()->checkPermission('View Sales Return'))
+            @if(Auth::user()->checkPermission('View Sales Returns'))
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" id="sales-return-tablist" data-toggle="pill"
                         href="{{ route('sale-returns.index') }}" role="tab" aria-controls="sales_returns"
@@ -55,17 +55,17 @@
                     </a>
                 </li>
             @endif
-            @if(Auth::user()->checkPermission('View Sales Return Approval'))
+            @if(Auth::user()->checkPermission('View Sales Returns Approvals'))
                 <li class="nav-item">
                     <a class="nav-link active text-uppercase" id="sales-approval-tablist" data-toggle="pill"
                         href="{{ route('sale-returns-approval.getSalesReturn') }}" role="tab" aria-controls="sales_returns"
-                        aria-selected="false">Approval
+                        aria-selected="false">Approvals
                     </a>
                 </li>
             @endif
         </ul>
 
-        @if(Auth::user()->checkPermission('View Sales Return Approval'))
+        @if(Auth::user()->checkPermission('View Sales Returns Approvals'))
             <div class="tab-content" id="myTabContent">
                 <div class="row d-flex justify-content-end mr-0 mb-3">
                     <div class="d-flex justify-content-end mr-3">
@@ -94,7 +94,7 @@
                                 <th>Return Date</th>
                                 <th>Qty Returned</th>
                                 <th>Refund</th>
-                                @if(Auth::user()->checkPermission('Approve Sales Return'))
+                                @if(Auth::user()->checkPermission('Approve Sales Returns'))
                                     <th>Action</th>
                                 @else
                                     <th style="display: none"></th>
@@ -121,7 +121,7 @@
             </div>
         @endif
 
-        @if(!Auth::user()->checkPermission('View Sales Return Approval'))
+        @if(!Auth::user()->checkPermission('View Sales Returns Approvals'))
             <div class="card">
                 <div class="card-body">
                     <div class="form-group row">
@@ -235,7 +235,7 @@
                         return formatMoney(total);
                     }
                 },
-                @if(Auth::user()->checkPermission('Approve Sales Return'))
+                @if(Auth::user()->checkPermission('Approve Sales Returns'))
                                                                         {
                         data: "action",
                         defaultContent: "<button type='button' id='approve' class='btn btn-sm btn-rounded btn-primary'>Approve</button><button type='button' id='reject' class='btn btn-sm btn-rounded btn-danger'>Reject</button>"

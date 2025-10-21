@@ -72,10 +72,10 @@
                                         <select id="report_option" name="report_option" onchange="reportOption()"
                                             class="js-example-basic-single form-control drop">
                                             <option selected="true" value="0" disabled="disabled">Select report</option>
-                                            @if(auth()->user()->checkPermission('Current Stock Report'))
+                                            @if(auth()->user()->checkPermission('Current Stock Summary Report'))
                                                 <option value="1">Current Stock Summary Report</option>
                                             @endif
-                                            @if(auth()->user()->checkPermission('Current Stock Report'))
+                                            @if(auth()->user()->checkPermission('Current Stock Detailed Report'))
                                                 <option value="12">Current Stock Detailed Report</option>
                                             @endif
                                             @if(auth()->user()->checkPermission('Product Details Report'))
@@ -97,13 +97,13 @@
                                             @if(auth()->user()->checkPermission('Out Of Stock Report'))
                                                 <option value="5">Out Of Stock Report</option>
                                             @endif
-                                            @if(auth()->user()->checkPermission('Outgoing Tracking Report'))
+                                            @if(auth()->user()->checkPermission('Outgoing Stock Summary Report'))
                                                 <option value="14">Outgoing Stock Summary Report</option>
                                             @endif
-                                            @if(auth()->user()->checkPermission('Outgoing Tracking Report'))
+                                            @if(auth()->user()->checkPermission('Outgoing Stock Detailed Report'))
                                                 <option value="6">Outgoing Stock Detailed Report</option>
                                             @endif
-                                            @if(auth()->user()->checkPermission('Fast Moving Report'))
+                                            @if(auth()->user()->checkPermission('Fast Moving Products Report'))
                                                 <option value="15">Fast Moving Products Report</option>
                                             @endif
                                             @if(auth()->user()->checkPermission('Dead Stock Report'))

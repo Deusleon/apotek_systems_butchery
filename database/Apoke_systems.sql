@@ -2937,7 +2937,6 @@ INSERT INTO `permissions` (`id`, `name`, `guard_name`, `created_at`, `updated_at
 (900, 'View Accounting', 'web', NULL, NULL, 'MODULES'),
 (901, 'Manage Current Stock', 'web', NULL, NULL, 'INVENTORY'),
 (904, 'Manage Suppliers', 'web', NULL, NULL, 'PURCHASING'),
-(905, 'Manage All Branches', 'web', NULL, NULL, 'DASHBOARD'),
 (906, 'View Requisitions Details', 'web', NULL, NULL, 'PURCHASING'),
 (907, 'Create Requisitions', 'web', NULL, NULL, 'PURCHASING'),
 (908, 'Delete Requisitions', 'web', NULL, NULL, 'PURCHASING'),
@@ -2969,7 +2968,6 @@ INSERT INTO `permissions` (`id`, `name`, `guard_name`, `created_at`, `updated_at
 (1022, 'Manage Cash Flow', 'web', '2024-11-23 08:29:21', '2024-11-23 08:29:21', 'ACCOUNTING'),
 (1023, 'View Expense Categories', 'web', '2024-11-23 08:29:29', '2024-11-23 08:29:29', 'SETTINGS'),
 (1024, 'Manage Expense Categories', 'web', '2024-11-23 08:29:43', '2024-11-23 08:29:43', 'ACCOUNTING'),
-(1030, 'Manage All Branches', 'web', '2024-12-02 16:15:52', '2024-12-02 16:15:52', 'SETTINGS'),
 (1031, 'View Settings', 'web', NULL, NULL, 'MODULES'),
 (1032, 'ADMIN', 'web', '2025-06-23 08:49:35', '2025-06-23 08:49:35', 'ACCOUNTING');
 

@@ -54,7 +54,7 @@
                             <div class="row">
                                 <div class="form-group col-md-3">
                                      <label for="from_store">Requesting From<font color="red">*</font></label>
-                                     @if(!auth()->user()->checkPermission('Manage All Branches'))
+                                     @if(current_store()->id != 1)
                                          <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
                                              <option value="">Select Branch...</option>
                                              @foreach ($stores as $item)
@@ -68,7 +68,7 @@
                                          </select>
                                      @endif
 
-                                     @if(auth()->user()->checkPermission('Manage All Branches'))
+                                     @if(current_store()->id === 1)
                                          <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
                                              <option value="">Select Branch...</option>
                                              @foreach ($stores as $item)

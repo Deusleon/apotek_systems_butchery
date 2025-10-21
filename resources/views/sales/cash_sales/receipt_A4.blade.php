@@ -347,24 +347,23 @@
     @endforeach
 
     <!-- Footer Section -->
-    <div class="footer-section">
-        @if($generalSettings && $generalSettings->cash_sale_terms)
-            <div style="margin-top: 20px; padding: 10px; border-top: 1px solid #ccc;">
-                <div style="font-weight: bold; font-size: 12px; margin-bottom: 5px;">Terms & Conditions:</div>
-                <div style="font-size: 10px; line-height: 1.4; text-align: justify;">
-                    {!! nl2br(e($generalSettings->cash_sale_terms)) !!}
-                </div>
-            </div>
-        @endif
-        
+    <div class="footer-section" style="margin-top: -20px;">        
         @foreach($data as $datas => $dat)
             <div class="sold-by">Issued By: {{$dat[0]['sold_by']}}</div>
             <div class="slogan">{{$pharmacy['slogan'] ?? 'Thank you for your business'}}</div>
             @break
         @endforeach
-        <span style="font-size: 10px;">Printed on: {{date('Y-m-d H:i:s')}}</span>
+        <span style="font-size: 10px; border-bottom: 1px solid #ccc;">Printed on: {{date('Y-m-d H:i:s')}}</span>
     </div>
 
+    @if($generalSettings && $generalSettings->cash_sale_terms)
+        <div style="padding-top: 10px;">
+            <div style="font-weight: bold; font-size: 12px; margin-bottom: 5px;">Terms & Conditions:</div>
+            <div style="font-size: 10px; line-height: 1.4; text-align: justify;">
+                {!! nl2br(e($generalSettings->cash_sale_terms)) !!}
+            </div>
+        </div>
+    @endif
 </body>
 
 </html>

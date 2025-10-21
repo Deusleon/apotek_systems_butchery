@@ -33,7 +33,7 @@
     </style>
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-            @if(auth()->user()->checkPermission('View Sales Orders'))
+            @if(auth()->user()->checkPermission('View Sales Order'))
                 <li class="nav-item">
                     <a class="nav-link" id="new-order" data-toggle="pill" href="{{ route('sale-quotes.index') }}" role="tab"
                         aria-controls="pills-home" aria-selected="true">New Order</a>

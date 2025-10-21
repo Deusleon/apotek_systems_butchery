@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\View;
 class SaleQuoteController extends Controller {
 
     public function index() {
-        if (!Auth()->user()->checkPermission('View Sales Orders')) {
+        if (!Auth()->user()->checkPermission('View Sales Order')) {
             if (!Auth()->user()->checkPermission('View Order List')) {
                 abort(403, 'Access Denied');
             }

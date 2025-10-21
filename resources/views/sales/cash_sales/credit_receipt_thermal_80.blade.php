@@ -153,8 +153,8 @@
                 </table>
                 <hr>
                 <div class="summary-row">
-                    <span>Remark:</span>
-                    <span>{{$dat[0]['remark'] ?? ''}}</span>
+                    {{-- <span>Remark:</span>
+                    <span>{{$dat[0]['remark'] ?? ''}}</span> --}}
                 </div>
             @endif
 

@@ -102,7 +102,7 @@
                                             <option value="5">Credit Payments Report</option>
                                         @endif
                                         @if(auth()->user()->checkPermission('Customer Payment Statement'))
-                                            <option value="6">Customer Payments Statement</option>
+                                            <option value="6">Customer Payment Statement</option>
                                         @endif
                                         <!-- <option value="6">Bill Sales Details Report</option>
                                                                 <option value="7">Company Billing Report</option> -->
@@ -110,8 +110,8 @@
                                             <option value="8">Price List Report</option>
                                         @endif
                                         <!--   <option value="10">Sales Trend Chart</option> -->
-                                        @if(auth()->user()->checkPermission('Sales Return Report'))
-                                            <option value="11">Sales Return Report</option>
+                                        @if(auth()->user()->checkPermission('Sales Returns Report'))
+                                            <option value="11">Sales Returns Report</option>
                                         @endif
                                         @if(auth()->user()->checkPermission('Sales Comparison Report'))
                                             <option value="12">Sales Comparison Report</option>

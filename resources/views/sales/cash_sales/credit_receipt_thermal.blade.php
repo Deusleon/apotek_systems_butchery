@@ -131,7 +131,10 @@
                 </tbody>
             </table>
             <hr>
-                <div class="summary-row" style="font-size: 9px;"><span>Remark</span><span>{{$dat[0]['remark']}}</span></div>
+                <div class="summary-row" style="font-size: 9px;">
+                    {{-- <span>Remark</span>
+                    <span>{{$dat[0]['remark']}}</span> --}}
+                </div>
             @endif
 
             <h5>Issued By: {{$dat[0]['sold_by']}}</h5>

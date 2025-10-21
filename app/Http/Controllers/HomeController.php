@@ -81,8 +81,7 @@ class HomeController extends Controller {
         $expireEnabled = $expireSettings === 'YES';
 
         //Admin Users
-        if ( auth()->user()->checkPermission( 'Manage All Branches' ) && $store_id == 1 ) {
-            if(is_all_store()){
+        if ( is_all_store() ) {
             $outOfStock = CurrentStock::where( 'quantity', 0 )
             ->groupby( 'product_id' )->get();
             $outOfStock = $outOfStock->count();
@@ -121,7 +120,6 @@ class HomeController extends Controller {
             return view( 'home', compact( [ 'outOfStock', 'outOfStockList', 'belowMinLevel', 'deadStock', 'expireSoon', 'expireEnabled', 'expired', 'fast_moving', 'pharmacy_data'
             , 'purchase_data', 'expense_data', 'all_stores', 'store_id', 'transport_data' ] ) );
         }
-    }
 
         $outOfStock = CurrentStock::where( 'quantity', 0 )
         ->where( 'store_id', $store_id )->groupby( 'product_id' )->get();
@@ -213,7 +211,7 @@ class HomeController extends Controller {
         $store_id = current_store_id();
 
         //Admin User
-        if ( auth()->user()->checkPermission( 'Manage All Branches' ) && $store_id == 1 ) {
+        if ( is_all_store() ) {
             $totalSales = DB::table( 'sales_details' )
             ->sum( 'amount' );
 
@@ -353,7 +351,7 @@ class HomeController extends Controller {
         $store_id = current_store_id();
 
         //Admin User
-        if ( auth()->user()->checkPermission( 'Manage All Branches' ) && $store_id == 1 ) {
+        if ( is_all_store() ) {
 
             $totalPurchases = GoodsReceiving::sum( 'total_cost' );
     
@@ -441,7 +439,7 @@ class HomeController extends Controller {
         $store_id = current_store_id();
 
         //Admin User
-        if ( auth()->user()->checkPermission( 'Manage All Branches' ) && $store_id == 1 ) {
+        if ( is_all_store() ) {
             $totalExpenses = Expense::sum( 'amount' );
 
             $minDate = Expense::min('created_at');
@@ -959,7 +957,7 @@ class HomeController extends Controller {
         $store_id = current_store_id();
         $query = TransportOrder::query();
 
-        // if ( $store_id && !Auth::user()->checkPermission( 'Manage All Branches' ) ) {
+        // if ( $store_id && !is_all_store() ) {
         //     $query->where( 'store_id', $store_id );
         // }
 

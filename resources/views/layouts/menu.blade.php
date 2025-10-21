@@ -11,10 +11,10 @@
             @if(auth()->user()->checkPermission('View Cash Sales'))
                 <li class=""><a href="{{route('cash-sales.cashSale')}}" class="">Cash Sales</a></li>
             @endif
-            @if(auth()->user()->checkPermission('View Credit Sales') || auth()->user()->checkPermission('View Credit Tracking') || auth()->user()->checkPermission('View Credit Payment'))
+            @if(auth()->user()->checkPermission('View Credit Sales') || auth()->user()->checkPermission('View Credit Tracking') || auth()->user()->checkPermission('View Credit Payments'))
                 <li class=""><a href="{{route('credit-sales.creditSale')}}" class="">Credit Sales</a></li>
             @endif
-            @if(auth()->user()->checkPermission('View Sales Orders') || auth()->user()->checkPermission('View Order List'))
+            @if(auth()->user()->checkPermission('View Sales Order') || auth()->user()->checkPermission('View Order List'))
                 <li class=""><a href="{{route('sale-quotes.index')}}" class="">Sales Order</a></li>
             @endif
             @if(auth()->user()->checkPermission('View Sales History'))
@@ -36,7 +36,7 @@
             @if(auth()->user()->checkPermission('View Goods Receiving'))
                 <li class=""><a href="{{route('goods-receiving.index')}}" class="">Goods Receiving</a></li>
             @endif
-            @if(auth()->user()->checkPermission('View Purchase Return'))
+            @if(auth()->user()->checkPermission('View Purchase Returns'))
             <li class=""><a href="{{route('purchase-return.returns')}}" class="">Purchase Returns</a></li>
             @endif
             @if(auth()->user()->checkPermission('View Purchase Order'))
@@ -55,7 +55,7 @@
             <span class="pcoded-mtext">Inventory</span>
         </a>
         <ul class="pcoded-submenu">
-             @if(auth()->user()->checkPermission('View Products List'))
+             @if(auth()->user()->checkPermission('View Product List'))
                 <li class=""><a href="{{route('products.index')}}" class="">Product List</a></li>
             @endif
             @if(auth()->user()->checkPermission('Products Import'))
@@ -66,7 +66,7 @@
             @if(auth()->user()->checkPermission('View Current Stock'))
                 <li class=""><a href="{{ route('current-stocks') }}" class="">Current Stock</a></li>
             @endif
-            @if(auth()->user()->checkPermission('View Detailed Stock'))
+            @if(auth()->user()->checkPermission('View Stock Details'))
                 <li class=""><a href="{{ route('stock-details') }}" class="">Stock Details</a></li>
             @endif
             @if(auth()->user()->checkPermission('View Price List'))
@@ -75,7 +75,7 @@
              @if(auth()->user()->checkPermission('View Stock Adjustment'))
                 <li class=""><a href="{{ route('new-stock-adjustment') }}" class="">Stock Adjustment</a></li>
             @endif
-            @if(auth()->user()->checkPermission('View Requisition'))
+            @if(auth()->user()->checkPermission('View Stock Requisition'))
                 <li class=""><a href="{{ route('requisitions.create')}}" class="">Stock Requisition</a></li>
             @endif
             @if(auth()->user()->checkPermission('View Stock Issue'))
@@ -239,7 +239,7 @@
                     </ul>
                 </li>
             @endif
-            @if(auth()->user()->checkPermission('View Alerts'))
+            {{-- @if(auth()->user()->checkPermission('View Alerts'))
                 <li>
                     <a href="#">Alerts</a>
                     <ul class="pcoded-submenu">
@@ -248,7 +248,7 @@
                         <li class=""><a href="#" class="">Min/Max Levels</a></li>
                     </ul>
                 </li>
-            @endif
+            @endif --}}
             @if(auth()->user()->checkPermission('View Tools'))
                 <li>
                     <a href="#">Tools</a>

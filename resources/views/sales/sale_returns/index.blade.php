@@ -40,7 +40,7 @@
                         aria-selected="true">Sales History</a>
                 </li>
             @endif
-            @if(Auth::user()->checkPermission('View Sales Return'))
+            @if(Auth::user()->checkPermission('View Sales Returns'))
                 <li class="nav-item">
                     <a class="nav-link active text-uppercase" id="sales-return-tablist" data-toggle="pill"
                         href="{{ route('sale-returns.index') }}" role="tab" aria-controls="sales_returns"
@@ -48,17 +48,17 @@
                     </a>
                 </li>
             @endif
-            @if(Auth::user()->checkPermission('View Sales Return Approval'))
+            @if(Auth::user()->checkPermission('View Sales Returns Approvals'))
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" id="sales-approval-tablist" data-toggle="pill"
                         href="{{ route('sale-returns-approval.getSalesReturn') }}" role="tab" aria-controls="sales_returns"
-                        aria-selected="false">Approval
+                        aria-selected="false">Approvals
                     </a>
                 </li>
             @endif
         </ul>
         <div class="card-block">
-            @if(Auth::user()->checkPermission('View Sales Return'))
+            @if(Auth::user()->checkPermission('View Sales Returns'))
                 <div class="tab-content" id="myTabContent">
                     {{-- Sales Return Start--}}
                     <div class="tab-pane fade show active" id="sales-return" role="tabpanel" aria-labelledby="sales_return-tab">
@@ -179,7 +179,7 @@
                 </div>
             @endif
 
-            @if(!Auth::user()->checkPermission('View Sales Return'))
+            @if(!Auth::user()->checkPermission('View Sales Returns'))
                 <div class="card">
                     <div class="card-body">
                         <div class="form-group row">

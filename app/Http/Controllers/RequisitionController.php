@@ -22,7 +22,7 @@ class RequisitionController extends Controller
 {
     public function index()
     {
-        if (!Auth()->user()->checkPermission('View Requisition')) {
+        if (!Auth()->user()->checkPermission('View Stock Requisition')) {
             abort(403, 'Access Denied');
         }
 
@@ -31,7 +31,7 @@ class RequisitionController extends Controller
 
     public function getRequisitions(Request $request)
     {
-        if (!Auth()->user()->checkPermission('View Requisition')) {
+        if (!Auth()->user()->checkPermission('View Stock Requisition')) {
             abort(403, 'Access Denied');
         }
 
@@ -57,7 +57,7 @@ class RequisitionController extends Controller
                     $buttons .= '<input type="hidden" name="req_id" value="'.$row->id .'">';
 
                     // Show button (depends on View Requisitions Details)
-                    if (Auth()->user()->checkPermission('Show Requisitions')) {
+                    if (Auth()->user()->checkPermission('View Stock Requisition')) {
                         $buttons .= '<button type="button" data-toggle="modal" data-target="#requisition-details" 
                                         data-id="'.$row->id.'" 
                                         class="btn btn-rounded btn-success btn-sm">
@@ -65,8 +65,8 @@ class RequisitionController extends Controller
                                     </button> ';
                     }
 
-                    // Edit button (depends on Edit Requisitions)
-                    if (Auth()->user()->checkPermission('Edit Requisitions')) {
+                    // Edit button (depends on Edit Requisition)
+                    if (Auth()->user()->checkPermission('Edit Stock Requisition')) {
                         $buttons .= '<a href="' . route('requisitions.view', $row->id) . '" 
                                         class="btn btn-rounded btn-primary btn-sm" 
                                         title="EDIT">
@@ -74,8 +74,8 @@ class RequisitionController extends Controller
                                     </a> ';
                     }
 
-                    // Print button (depends on Print Requisitions)
-                    if (Auth()->user()->checkPermission('Print Requisitions')) {
+                    // Print button (depends on Print Stock Requisition)
+                    if (Auth()->user()->checkPermission('Print Stock Requisition')) {
                         $buttons .= '<button type="submit" name="save" 
                                         class="btn btn-rounded btn-secondary btn-sm">
                                         Print <span class="fa fa-print"></span>
@@ -120,7 +120,7 @@ class RequisitionController extends Controller
 
     public function create()
     {
-        if (!Auth()->user()->checkPermission('Create Requisitions')) {
+        if (!Auth()->user()->checkPermission('Create Stock Requisition')) {
             abort(403, 'Access Denied');
         }
 
@@ -182,11 +182,11 @@ class RequisitionController extends Controller
 
         $req_no = date('m') . date('d') . str_pad($Id, 5, '0', STR_PAD_LEFT);
 
-        if(auth()->user()->checkPermission('Manage All Branches')) {
+        if(current_store()->id === 1) {
             $from_store = $request->from_store;
         }
 
-        if(!auth()->user()->checkPermission('Manage All Branches')) {
+        if(current_store()->id != 1) {
             $from_store = Auth::user()->store_id;
         }
 
@@ -372,11 +372,11 @@ class RequisitionController extends Controller
         $req_id = $request->requisition_id;
         $remarks = $request->remark;
 
-        if(auth()->user()->checkPermission('Manage All Branches')) {
+        if(current_store()->id === 1) {
             $from_store = $request->from_store;
         }
 
-        if(!auth()->user()->checkPermission('Manage All Branches')) {
+        if(current_store()->id != 1) {
             $from_store = Auth::user()->store_id;
         }
 
@@ -471,7 +471,7 @@ class RequisitionController extends Controller
 
    public function issueHistory()
     {
-        if (!Auth()->user()->checkPermission('View Requisitions Issue')) {
+        if (!Auth()->user()->checkPermission('View Issue History')) {
             abort(403, 'Access Denied');
         }
 

@@ -44,13 +44,13 @@
 
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
-            @if(Auth::user()->checkPermission('View Purchase Return'))
+            @if(Auth::user()->checkPermission('View Purchase Returns'))
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" id="purchase-return-tablist"
                         href="{{ url('purchasing/purchase-returns') }}">Returns</a>
                 </li>
             @endif
-            @if(Auth::user()->checkPermission('View Purchase Returns Approval'))
+            @if(Auth::user()->checkPermission('View Purchase Returns Approvals'))
                 <li class="nav-item">
                     <a class="nav-link active text-uppercase" id="purchase-approval-tablist"
                         href="{{ url('purchasing/purchase_returns/approvals') }}">Approvals</a>
@@ -58,7 +58,7 @@
             @endif
         </ul>
 
-        @if(Auth::user()->checkPermission('View Purchase Returns Approval'))
+        @if(Auth::user()->checkPermission('View Purchase Returns Approvals'))
             <div class="tab-content" id="myTabContent">
                 <div class="row d-flex justify-content-end mr-0 mb-3">
                     <div class="d-flex justify-content-end mr-3 align-items-center">
@@ -104,16 +104,6 @@
                     <input type="hidden" value="" id="customers">
                     <input type="hidden" value="" id="print">
                     <input type="hidden" value="" id="fixed_price">
-                </div>
-            </div>
-        @endif
-
-        @if(!Auth::user()->checkPermission('View Purchase Returns Approval'))
-            <div class="card">
-                <div class="card-body">
-                    <div class="form-group row">
-                        <p>You do not have permission to View Purchase Returns Approval</p>
-                    </div>
                 </div>
             </div>
         @endif

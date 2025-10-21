@@ -108,7 +108,7 @@
                             <tr>
                                 <th>Product Name</th>
                                 <th>Quantity</th>
-                                {{-- <th>QoH</th> --}}
+                                <th>QoH</th>
                             </tr>
                         </thead>
                         <tbody>

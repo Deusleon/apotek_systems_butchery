@@ -42,7 +42,7 @@
                             aria-selected="true">Sales History</a>
                     </li>
                 @endif
-                @if(Auth::user()->checkPermission('View Sales Return'))
+                @if(Auth::user()->checkPermission('View Sales Returns'))
                     <li class="nav-item">
                         <a class="nav-link text-uppercase" id="sales-return-tablist" data-toggle="pill"
                             href="{{ route('sale-returns.index') }}" role="tab" aria-controls="sales_returns"
@@ -50,7 +50,7 @@
                         </a>
                     </li>
                 @endif
-                @if(Auth::user()->checkPermission('View Sales Return Approval'))
+                @if(Auth::user()->checkPermission('View Sales Returns Approvals'))
                     <li class="nav-item">
                         <a class="nav-link text-uppercase" id="sales-approval-tablist" data-toggle="pill"
                             href="{{ route('sale-returns-approval.getSalesReturn') }}" role="tab" aria-controls="sales_returns"
@@ -191,10 +191,11 @@
             }
 
             $('#daterange').daterangepicker({
-                startDate: moment().startOf("month"),
+                // startDate: moment().startOf("month"),
                 endDate: moment().endOf("month"),
                 maxDate: end,
                 autoUpdateInput: true,
+                alwaysShowCalendars: false,
                 locale: {
                     format: 'YYYY/MM/DD'
                 },

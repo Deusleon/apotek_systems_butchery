@@ -14,7 +14,8 @@
             </div>
             <!-- Modal Footer (ADD THIS) -->
             <div class="modal-footer">
-                <!-- Cancel in modal (opens your existing cancel confirmation modal) -->
+                @if (Auth::user()->checkPermission('Approve Purchase Order'))
+                                <!-- Cancel in modal (opens your existing cancel confirmation modal) -->
                 <button type="button" id="cancel_btn_modal" class="btn btn-danger">
                     Reject
                 </button>
@@ -23,6 +24,8 @@
                 <button type="button" id="approve_btn" class="btn btn-primary">
                     Approve
                 </button>
+
+                @endif
 
                 <!-- Status message for non-actionable orders -->
                 <div id="status_message" class="alert alert-info d-none">

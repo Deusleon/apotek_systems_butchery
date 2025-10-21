@@ -28,12 +28,14 @@
         <div class="card-block">
             <div class="col-sm-12">
                 <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link text-uppercase" id="purchase-order-tablist"
-                            href="{{ route('purchase-order.index') }}" aria-controls="purchase_order"
-                            aria-selected="false">New</a>
-                    </li>
-                    @if(Auth::user()->checkPermission('View Order List'))
+                    @if(Auth::user()->checkPermission('Create Purchase Order'))
+                        <li class="nav-item">
+                            <a class="nav-link text-uppercase" id="purchase-order-tablist"
+                                href="{{ route('purchase-order.index') }}" aria-controls="purchase_order"
+                                aria-selected="false">New</a>
+                        </li>
+                    @endif
+                    @if(Auth::user()->checkPermission('View Purchase Order'))
                         <li class="nav-item">
                             <a class="nav-link active text-uppercase" id="order-list-tablist" href="#order-list" role="tab"
                                 aria-controls="order_list" aria-selected="true">Order List
@@ -47,7 +49,8 @@
                     <div class="tab-pane fade show active" id="order-list" role="tabpanel" aria-labelledby="order_list-tab">
                         <div class="d-flex justify-content-end mb-3 align-items-center">
                             <label class="mr-2" for="date_filter">Date:</label>
-                            <input type="text" name="order_filter" id="date_filter" onchange="getOrderHistory()" class="form-control w-auto">
+                            <input type="text" name="order_filter" id="date_filter" onchange="getOrderHistory()"
+                                class="form-control w-auto">
                         </div>
                         <div id="purchases">
                             <table id="order_history_datatable" class="display table nowrap table-striped table-hover"
@@ -94,7 +97,7 @@
                 approveOrder: '{{route('orders.approve', ['id' => ':id'])}}'
             },
             csrfToken: '{{ csrf_token() }}', // ← ADD THIS LINE
-            showPurchaseOrder: '{{auth()->user()->checkPermission('Show Purchase Order')}}',
+            showPurchaseOrder: '{{auth()->user()->checkPermission('View Purchase Order')}}',
             printPurchaseOrder: '{{auth()->user()->checkPermission('Print Purchase Order')}}'
         };
 

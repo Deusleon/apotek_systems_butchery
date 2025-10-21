@@ -20,7 +20,7 @@
                            href="{{ url('Inventory/StockRequisitions/new') }}" role="tab"
                            aria-controls="current-stock" aria-selected="true">New</a>
                     </li>
-                    @if(Auth::user()->checkPermission('View Requisition List'))
+                    @if(Auth::user()->checkPermission('View Stock Requisition'))
                     <li class="nav-item">
                         <a class="nav-link active text-uppercase" id="requisitions"
                            href="{{ url('Inventory/StockRequisitions/Requisition-list') }}" role="tab"

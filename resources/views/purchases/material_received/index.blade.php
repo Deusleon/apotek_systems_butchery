@@ -68,14 +68,14 @@
 
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
-            @if (auth()->user()->checkPermission('View Invoice Receiving'))
+            @if (auth()->user()->checkPermission('Invoice Receiving'))
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" id="invoice-received" data-toggle="pill"
                         href="{{ route('goods-receiving.index') }}" role="tab" aria-controls="quotes_list"
                         aria-selected="true">Invoice Receiving</a>
                 </li>
             @endif
-            @if (auth()->user()->checkPermission('View Order Receiving'))
+            @if (auth()->user()->checkPermission('Order Receiving'))
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" id="order-received" data-toggle="pill"
                         href="{{ route('orders-receiving.index') }}" role="tab" aria-controls="new_quotes"

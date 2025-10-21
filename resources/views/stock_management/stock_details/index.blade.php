@@ -58,8 +58,8 @@
                                         @endif
                                         <td>{{ floor($data->quantity) == $data->quantity ? number_format($data->quantity, 0) : number_format($data->quantity, 1) }}</td>
                                         <td>
-                                            @if(auth()->user()->checkPermission('Edit Detailed Stock'))
-                                                <button type="button" class="btn btn-primary btn-rounded btn-lg btn-edit"
+                                            @if(auth()->user()->checkPermission('Edit Stock Details'))
+                                                <button type="button" class="btn btn-primary btn-rounded btn-sm btn-edit"
                                                     onclick="editStockDetails({{ $data->id }}, '{{ $data->batch_number ?? '' }}', '{{ $data->expiry_date ?? '' }}')">
                                                     Edit
                                                 </button>

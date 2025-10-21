@@ -46,9 +46,9 @@
         }
     </style>
     <div class="col-sm-12">
-        @if(auth()->user()->checkPermission('View Sales Orders'))
+        @if(auth()->user()->checkPermission('View Sales Order'))
             <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-                @if(auth()->user()->checkPermission('View Sales Orders'))
+                @if(auth()->user()->checkPermission('View Sales Order'))
                     <li class="nav-item">
                         <a class="nav-link active" id="new-order" data-toggle="pill" href="{{ route('sale-quotes.index') }}"
                             role="tab" aria-controls="pills-home" aria-selected="true">New Order</a>
@@ -240,7 +240,7 @@
         <div id="loading">
             <img id="loading-image" src="{{asset('assets/images/spinner.gif')}}" />
         </div>
-        @if(!Auth::user()->checkPermission('View Sales Orders'))
+        @if(!Auth::user()->checkPermission('View Sales Order'))
             <div class="" style="background-color: #fff; min-height: 80px; ">
                 <div class="tab-pane fade show" id="credit-sale-receiving" role="tabpanel" aria-labelledby="credit_sales-tab">
                     <div class="row" style="padding: 10px 0px 0px 30px;">

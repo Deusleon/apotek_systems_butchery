@@ -85,13 +85,13 @@
 
         <!-- Navigation Tabs -->
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
-            @if (auth()->user()->checkPermission('View Invoice Receiving'))
+            @if (auth()->user()->checkPermission('Invoice Receiving'))
             <li class="nav-item">
                 <a class="nav-link text-uppercase" id="invoice-received"
                    href="{{ route('goods-receiving.index') }}">Invoice Receiving</a>
             </li>
             @endif
-            @if (auth()->user()->checkPermission('View Order Receiving'))
+            @if (auth()->user()->checkPermission('Order Receiving'))
             <li class="nav-item">
                 <a class="nav-link active text-uppercase" id="order-received"
                    href="{{ route('orders-receiving.index') }}">Order Receiving</a>

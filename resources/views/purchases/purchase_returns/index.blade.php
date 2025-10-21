@@ -68,13 +68,13 @@
 
     <div class="col-sm-12">
         <ul class="nav nav-pills mb-3" id="myTab">
-            @if (auth()->user()->checkPermission('View Purchase Return'))
+            @if (auth()->user()->checkPermission('View Purchase Returns'))
                 <li class="nav-item">
                     <a class="nav-link active text-uppercase" href="{{ url('purchasing/purchase-returns') }}">Returns
                     </a>
                 </li>
             @endif
-            @if (auth()->user()->checkPermission('View Purchase Returns Approval'))
+            @if (auth()->user()->checkPermission('View Purchase Returns Approvals'))
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" href="{{ url('purchasing/purchase_returns/approvals') }}">Approvals
                     </a>
@@ -345,13 +345,13 @@
 
                                 if (hasReturn) {
                                     return `<div>
-                                                @if(auth()->user()->checkPermission('View Purchase Return'))
+                                                @if(auth()->user()->checkPermission('View Purchase Returns'))
                                                     <input type='button' value='Return' id='return_btn' class='btn btn-success btn-rounded btn-sm' disabled/>
                                                 @endif
                                             </div>`;
                                 } else {
                                     return `<div>
-                                                @if(auth()->user()->checkPermission('View Purchase Return'))
+                                                @if(auth()->user()->checkPermission('View Purchase Returns'))
                                                     <input type='button' value='Return' id='return_btn' class='btn btn-primary btn-rounded btn-sm'/>
                                                 @endif
                                             </div>`;

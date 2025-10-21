@@ -5,7 +5,7 @@ var summary_table = $("#fixedHeader").DataTable({
     columns: [
         { data: "product_name" },
         { data: "out_total" },
-        // { data: "qoh" }
+        { data: "qoh" }
     ],
     // order: [[1, "desc"]],
 });
@@ -122,7 +122,7 @@ function bindData(data) {
     const filteredData = data.filter((item) => Number(item.out_total) > 0);
 
     filteredData.forEach((item) => {
-        // item.qoh = Number(item.current_stock).toFixed(0);
+        item.qoh = numberWithCommas(Number(item.current_stock).toFixed(0));
         item.out_total = numberWithCommas(item.out_total);
         item.product_name =
             (item.product.name ? item.product.name : "") +

@@ -13,19 +13,19 @@ Invoices
 @section("content")
 <div class="col-sm-12">
     <ul class="nav nav-pills mb-3" id="myTab">
-            @if (auth()->user()->checkPermission('Show Invoices'))
+            @if (auth()->user()->checkPermission('View Invoices'))
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" href="{{ url('accounting/invoices') }}">Invoices
                     </a>
                 </li>
             @endif
-            @if (auth()->user()->checkPermission('Show payments'))
+            @if (auth()->user()->checkPermission('View payments'))
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" href="{{ url('accounting/invoices/payments') }}">Payments
                     </a>
                 </li>
             @endif
-            @if (auth()->user()->checkPermission('Show payments history'))
+            @if (auth()->user()->checkPermission('View payment history'))
                 <li class="nav-item">
                     <a class="nav-link active text-uppercase" href="{{ url('accounting/invoices/payments-history') }}">Payment History
                     </a>

@@ -24,7 +24,8 @@
             width: 100%;
         }
 
-        .ms-selectable, .ms-selection {
+        .ms-selectable,
+        .ms-selection {
             background: #fff;
             color: #555555;
             float: left;
@@ -50,7 +51,6 @@
             left: 50%;
             z-index: 100;
         }
-
     </style>
     <div class="col-sm-12">
         <div class="card">
@@ -65,13 +65,14 @@
                                     <label for="code">From</label>
                                     <div id="border" style="border: 2px solid white; border-radius: 6px;">
                                         <select id="from_id" name="from_id"
-                                                class="js-example-basic-single form-control drop"
-                                                onchange="filterTransferByStore()">
+                                            class="js-example-basic-single form-control drop"
+                                            onchange="filterTransferByStore()">
                                             <option selected="true" value="0" disabled="disabled">Select store...
                                             </option>
 
                                             @foreach($stores as $store)
-                                                <option value="{{$store->id}}"{{ $store->id == 1 ? 'selected' : '' }}>{{$store->name}}</option>
+                                                <option value="{{$store->id}}" {{ $store->id == 1 ? 'selected' : '' }}>
+                                                    {{$store->name}}</option>
                                             @endforeach
 
 
@@ -86,21 +87,15 @@
                                 <div class="form-group">
                                     <label for="code">To</label>
                                     <div id="to_border" style="border: 2px solid white; border-radius: 6px;">
-                                        <select id="to_id" name="to_id"
-                                                class="js-example-basic-single form-control drop">
-                                            <option selected="true" value="0" >Select store..
+                                        <select id="to_id" name="to_id" class="js-example-basic-single form-control drop">
+                                            <option selected="true" value="0">Select store..
                                             </option>
-                                            @if(Auth::user()->checkPermission('Manage All Branches'))
-                                                @foreach($stores as $store)
-                                                    <option value="{{$store->id}}">{{$store->name}}</option>
-                                                @endforeach
-                                            @endif
-
-                                            @if(!Auth::user()->checkPermission('Manage All Branches'))
-                                                @foreach($stores as $store)
-                                                    <option value="{{$store->id}}" {{ $store->id == Auth::user()->store_id ? 'selected' : '' }}>{{$store->name}}</option>
-                                                @endforeach
-                                            @endif
+                                            @foreach($stores as $store)
+                                                <option value="{{$store->id}}">{{$store->name}}</option>
+                                            @endforeach
+                                            @foreach($stores as $store)
+                                                <option value="{{$store->id}}" {{ $store->id == Auth::user()->store_id ? 'selected' : '' }}>{{$store->name}}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                     <span id="to_danger" style="display: none; color: red">Please choose store</span>
@@ -113,7 +108,8 @@
                                         <option selected="true" disabled="disabled" value="">Select Product</option>
                                         @foreach($products as $stock)
                                             <option
-                                                value="{{$stock->product['name'].','.$stock->quantity.','.$stock->product_id.','.$stock->stock_id}}">{{$stock->product['name']}}</option>
+                                                value="{{$stock->product['name'] . ',' . $stock->quantity . ',' . $stock->product_id . ',' . $stock->stock_id}}">
+                                                {{$stock->product['name']}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -128,8 +124,7 @@
                         <div class="row" id="detail">
                             <hr>
                             <div class="table teble responsive" style="width: 100%;">
-                                <table id="cart_table" class="table nowrap table-striped table-hover"
-                                       width="100%"></table>
+                                <table id="cart_table" class="table nowrap table-striped table-hover" width="100%"></table>
                             </div>
                         </div>
                         <hr>
@@ -137,13 +132,14 @@
                             <div class="col-md-6">
                                 <label for="remarks">Remarks</label>
                                 <textarea type="text" class="form-control" id="remarks" name="remark"
-                                          maxlength="100"></textarea>
+                                    maxlength="100"></textarea>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="form-group">
-                                <label for="evidence" class="form-label"><span style="color: red;">* </span>Evidence</label>
-                                <input type="file"  class="form-control" id="evidence" name="evidence">
+                                    <label for="evidence" class="form-label"><span style="color: red;">*
+                                        </span>Evidence</label>
+                                    <input type="file" class="form-control" id="evidence" name="evidence">
                                 </div>
                             </div>
                         </div>
@@ -160,7 +156,7 @@
                                     </a>
                                     <button class="btn btn-warning" id="deselect-all">Clear</button>
                                     <button id="transfer_preview" class="btn btn-secondary">
-                                         Transfer
+                                        Transfer
                                     </button>
                                 </div>
                             </div>
@@ -218,7 +214,7 @@
     </script>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
 
             filterTransferByStoreMain();
 
@@ -229,7 +225,7 @@
 
 
         function filterTransferByStoreMain() {
-            var from_id=1;
+            var from_id = 1;
 
             /*ajax filter by store*/
             $('#loading').show();
@@ -254,7 +250,7 @@
 
                         var datas = JSON.stringify([detail.product.name, detail.quantity, detail.product_id, detail.stock_id]);
 
-                        $('#select_id').append($('<option>', {value: datas, text: detail.product.name}));
+                        $('#select_id').append($('<option>', { value: datas, text: detail.product.name }));
                     });
                 },
                 complete: function () {

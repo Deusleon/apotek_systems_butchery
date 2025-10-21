@@ -26,7 +26,7 @@
                             href="{{ url('Inventory/StockRequisitions/new') }}" role="tab"
                             aria-controls="current-stock" aria-selected="true">New</a>
                     </li>
-                    @if(Auth::user()->checkPermission('View Requisition List'))
+                    @if(Auth::user()->checkPermission('View Stock Requisition'))
                     <li class="nav-item">
                         <a class="nav-link text-uppercase" id="requisitions" data-toggle="pill"
                             href="{{ url('Inventory/StockRequisitions/Requisition-list') }}" role="tab"
@@ -44,7 +44,7 @@
                                 <div class="form-group col-md-3">
                                     <label for="from_store">Supplying Branch <font color="red">*</font></label>
                                     
-                                    @if(!auth()->user()->checkPermission('Manage All Branches'))
+                                    @if(current_store()->id === 1)
                                     <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
                                         <option value="">Select Branch...</option>
                                         @foreach ($stores as $item)
@@ -55,7 +55,7 @@
                                     </select>
                                     @endif
                                     
-                                    @if(auth()->user()->checkPermission('Manage All Branches'))
+                                    @if(current_store()->id != 1)
                                     <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
                                         <option value="">Select Branch...</option>
                                         @foreach ($stores as $item)
