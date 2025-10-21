@@ -121,6 +121,18 @@
                             </div>
                         </div>
                     </div>
+                    {{--Purchase Order & Return Reports--}}
+                    <div id="order_return_options" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Date Range</label>
+                                    <input type="text" name="date_range" class="form-control" id="order_return_date"
+                                           readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     {{--Invoice--}}
                     <div id="invoice_options" style="display: none">
                         <div class="row">
@@ -262,6 +274,36 @@
             cb(start, end);
 
         });
+
+        $(function () {
+            var start = moment().startOf('month');
+            var end = moment();
+
+            function cb(start, end) {
+                $('#order_return_date').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
+            }
+
+            $('#order_return_date').daterangepicker({
+                startDate: start,
+                endDate: end,
+                autoUpdateInput: true,
+                locale: {
+                    format: 'YYYY/MM/DD'
+                },
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                    'This Year': [moment().startOf('year'), moment()]
+                }
+            }, cb);
+
+            cb(start, end);
+
+        });
         $(function () {
             var start = moment().startOf('month');
             var end = moment();
@@ -297,43 +339,38 @@
             var report_option = document.getElementById("report_option");
             var report_option_index = report_option.options[report_option.selectedIndex].value;
 
+            // Hide all option sections first
+            document.getElementById('invoice_options').style.display = 'none';
+            document.getElementById('material_options').style.display = 'none';
+            document.getElementById('order_return_options').style.display = 'none';
+
+            // Reset required fields
+            $("#suppliers").prop("required", false);
+            $("#supplier_ids").prop("required", false);
+
             //if invoice
             if (Number(report_option_index) === Number(2)) {
                 document.getElementById('invoice_options').style.display = 'block';
                 $("#suppliers").prop("required", true);
                 $("#supplier_ids").val("");
                 $("#supplier_ids").change();
-                $("#supplier_ids").prop("required", false);
-            } else {
-                document.getElementById('invoice_options').style.display = 'none';
-
             }
 
             //if Material Received
             if (Number(report_option_index) === Number(1)) {
                 document.getElementById('material_options').style.display = 'block';
-                $("#suppliers").prop("required", false);
                 $("#suppliers").val("");
                 $("#suppliers").change();
-                $("#supplier_ids").prop("required", false);
-            } else {
-                document.getElementById('material_options').style.display = 'none';
-
             }
 
-            if (Number(report_option_index) === Number(3)) {
-                $("#suppliers").prop("required", false);
-                $("#supplier_ids").prop("required", false);
+            //if Purchase Order Details or Purchase Return Report
+            if (Number(report_option_index) === Number(6) || Number(report_option_index) === Number(7)) {
+                document.getElementById('order_return_options').style.display = 'block';
             }
 
-            if (Number(report_option_index) === Number(4)) {
-                $("#suppliers").prop("required", false);
-                $("#supplier_ids").prop("required", false);
-            }
-
-            if (Number(report_option_index) === Number(5)) {
-                $("#suppliers").prop("required", false);
-                $("#supplier_ids").prop("required", false);
+            // Other reports don't need special handling
+            if (Number(report_option_index) === Number(3) || Number(report_option_index) === Number(4) || Number(report_option_index) === Number(5)) {
+                // No special requirements
             }
 
         }

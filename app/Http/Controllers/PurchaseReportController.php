@@ -10,6 +10,7 @@ use App\Invoice;
 use App\Order;
 use App\OrderDetail;
 use App\PriceCategory;
+use App\PurchaseReturn;
 use App\Setting;
 use App\Supplier;
 use Illuminate\Http\Request;
@@ -101,6 +102,24 @@ class PurchaseReportController extends Controller
                 compact( 'data', 'pharmacy') )
                 ->setPaper( 'a4', '' );
                 return $pdf->stream( 'supplier_price_comparison_report.pdf' );
+            case 6:
+                $data = $this->purchaseOrderDetailsReport($request->date_range);
+                if ($data->isEmpty()) {
+                    return response()->view('error_pages.pdf_zero_data');
+                }
+                $pdf = PDF::loadView( 'purchases_reports.purchase_Order_Details_Report_pdf',
+                compact( 'data', 'pharmacy') )
+                ->setPaper( 'a4', 'landscape' );
+                return $pdf->stream( 'purchase_order_details_report.pdf' );
+            case 7:
+                $data = $this->purchaseReturnReport($request->date_range);
+                if ($data->isEmpty()) {
+                    return response()->view('error_pages.pdf_zero_data');
+                }
+                $pdf = PDF::loadView( 'purchases_reports.purchase_return_report_pdf',
+                compact( 'data', 'pharmacy') )
+                ->setPaper( 'a4', 'landscape' );
+                return $pdf->stream( 'purchase_return_report.pdf' );
             default;
         }
     }
@@ -353,6 +372,68 @@ class PurchaseReportController extends Controller
 //        }
 //        dd($prices);
         return $supplier_prices;
+    }
+
+    public function purchaseOrderDetailsReport($date_range)
+    {
+        if (!$date_range) {
+            return collect(); // Return empty collection if no date range
+        }
+
+        $dates = explode(" - ", $date_range);
+
+        if (count($dates) < 2) {
+            return collect(); // Return empty collection if date range is invalid
+        }
+
+        $orders = Order::with(['supplier', 'details.product'])
+            ->whereBetween(DB::raw('date(ordered_at)'), [
+                date('Y-m-d', strtotime($dates[0])),
+                date('Y-m-d', strtotime($dates[1]))
+            ])
+            ->where('status', '!=', 'cancelled')
+            ->orderBy('ordered_at', 'DESC')
+            ->get();
+
+        // Add date range to each order for PDF display
+        foreach ($orders as $order) {
+            $order->date_range = $dates;
+        }
+
+        return $orders;
+    }
+
+    public function purchaseReturnReport($date_range)
+    {
+        if (!$date_range) {
+            return collect(); // Return empty collection if no date range
+        }
+
+        $dates = explode(" - ", $date_range);
+
+        if (count($dates) < 2) {
+            return collect(); // Return empty collection if date range is invalid
+        }
+
+        // Based on the PurchaseReturnController logic, approved returns have goods_receiving status of 3 or 5
+        $returns = PurchaseReturn::join('inv_incoming_stock', 'inv_incoming_stock.id', '=', 'purchase_returns.goods_receiving_id')
+            ->select('purchase_returns.*', 'inv_incoming_stock.*', 'purchase_returns.quantity as return_quantity', 'inv_incoming_stock.quantity as received_quantity')
+            ->where(DB::Raw("DATE(purchase_returns.date)"), '>=', date('Y-m-d', strtotime($dates[0])))
+            ->where(DB::Raw("DATE(purchase_returns.date)"), '<=', date('Y-m-d', strtotime($dates[1])))
+            ->where(function($q) {
+                $q->where('inv_incoming_stock.status', '=', 3)
+                  ->orWhere('inv_incoming_stock.status', '=', 5);
+            })
+            ->with(['goodsReceiving.product', 'goodsReceiving.supplier'])
+            ->orderBy('purchase_returns.date', 'desc')
+            ->get();
+
+        // Add date range to each return for PDF display
+        foreach ($returns as $return) {
+            $return->date_range = $dates;
+        }
+
+        return $returns;
     }
 
 
