@@ -52,7 +52,7 @@
                             </div>
                             <div class="row">
                                 <div class="form-group col-md-3">
-                                     <label for="from_store">Requesting From<font color="red">*</font></label>
+                                     <label for="from_store">Supplying Branch<font color="red">*</font></label>
                                      @if(!auth()->user()->checkPermission('Manage All Branches'))
                                          <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
                                              <option value="">Select Branch...</option>
