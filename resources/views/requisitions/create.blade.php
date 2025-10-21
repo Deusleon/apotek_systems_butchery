@@ -368,12 +368,61 @@
         cart.editUnit(item, unit);
     }
 
+    // Handle branch selection change
+    $('#from_store').on('change', function() {
+        const selectedStore = $(this).val();
+
+        if (selectedStore) {
+            // Fetch filtered products for the selected branch
+            $.ajax({
+                url: "{{ route('requisitions.get-products-by-store', ':store_id') }}".replace(':store_id', selectedStore),
+                type: 'GET',
+                dataType: 'json',
+                success: function(products) {
+                    // Clear existing options except the first one
+                    $('#products').find('option:not(:first)').remove();
+
+                    // Add filtered products
+                    products.forEach(function(product) {
+                        const option = new Option(
+                            product.name + ' ' + (product.brand || '') + ' ' + (product.pack_size || '') + (product.sales_uom || ''),
+                            JSON.stringify(product)
+                        );
+                        $('#products').append(option);
+                    });
+
+                    // Reinitialize select2 if needed
+                    $('#products').trigger('change.select2');
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching products:', error);
+                    notify('Error loading products for selected branch', 'top', 'right', 'danger');
+                }
+            });
+        } else {
+            // Clear products when no branch is selected
+            $('#products').find('option:not(:first)').remove();
+            $('#products').trigger('change.select2');
+        }
+    });
+
     $('.products').on('change', function(event) {
-        if (!$(this).val()) return;
-        
-        let itemss = JSON.parse($(this).val());
+        const selectedValue = $(this).val();
+
+        if (!selectedValue) return;
+
+        // Check if branch is selected
+        const selectedStore = $('#from_store').val();
+        if (!selectedStore) {
+            // Show danger message if no branch is selected
+            notify('Please Select Branch', 'top', 'right', 'danger');
+            $(this).val('').trigger('change');
+            return;
+        }
+
+        let itemss = JSON.parse(selectedValue);
         $(this).val('').trigger('change');
-        
+
         $.ajax({
             url: "{{ route('search_items') }}",
             type: 'get',

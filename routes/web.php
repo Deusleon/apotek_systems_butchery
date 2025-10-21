@@ -559,6 +559,7 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::get('requisitions/issue-history/print/{id}', 'RequisitionController@printIssueHistory')->name('requisitions.issue-history.print');
     Route::get('Inventory/StockRequisitions/new', 'RequisitionController@create')->name('requisitions.create');
     Route::get('search_items', 'RequisitionController@search_items')->name('search_items');
+    Route::get('requisitions/get-products-by-store/{store_id}', 'RequisitionController@getProductsByStore')->name('requisitions.get-products-by-store');
     Route::post('requisitions-store', 'RequisitionController@store')->name('requisitions.store');
     Route::post('requisitions-update', 'RequisitionController@update')->name('requisitions.update');
     Route::get('/requisitions-list', ['uses' => 'RequisitionController@getRequisitions', 'as' => 'requisitions-list']);

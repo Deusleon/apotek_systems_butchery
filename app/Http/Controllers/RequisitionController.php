@@ -153,6 +153,31 @@ class RequisitionController extends Controller
         ]);
     }
 
+    public function getProductsByStore(Request $request, $store_id)
+    {
+        if (!Auth()->user()->checkPermission('Create Requisitions')) {
+            abort(403, 'Access Denied');
+        }
+
+        // Get products that have current stock in the specified store
+        $products = DB::table('inv_current_stock')
+            ->join('inv_products', 'inv_current_stock.product_id', '=', 'inv_products.id')
+            ->select(
+                'inv_products.id',
+                'inv_products.name',
+                'inv_products.brand',
+                'inv_products.pack_size',
+                'inv_products.sales_uom'
+            )
+            ->where('inv_current_stock.store_id', $store_id)
+            ->where('inv_current_stock.quantity', '>', 0)
+            ->where('inv_products.status', 1)
+            ->groupBy('inv_current_stock.product_id')
+            ->get();
+
+        return response()->json($products);
+    }
+
         public function store(Request $request)
     {
         if (!Auth()->user()->checkPermission('Create Requisitions')) {
