@@ -75,11 +75,11 @@
                                         <option selected="true" value="0" disabled="disabled">Select report</option>
                                         <option value="1">Material Received Report</option>
                                         <option value="2">Invoice Summary Report</option>
-                                        <option value="3">Purchase Order Details Report</option>
                                         {{--                                        <option value="3">Invoice Details Report</option>--}}
                                         <option value="4">List of Supplier</option>
                                         {{--                                        <option value="5">Supplier Price Comparison</option>--}}
-                                        <option value="6">Purchase Return Report</option>
+                                        <option value="6">Purchase Order Details Report</option>
+                                        <option value="7">Purchase Return Report</option>
                                     </select>
                                 </div>
                             </div>
