@@ -255,7 +255,9 @@
                     <ul class="pcoded-submenu">
                         <li class=""><a href="#" class="">Database Backup</a></li>
                         <li class=""><a href="#" class="">Export to Excel</a></li>
-                        <li class=""><a href="#" class="">Send Report</a></li>
+                        <li class=""><a href="#" class="">Upload Price</a></li>
+                        <li class=""><a href="#" class="">Clear Database</a></li>
+                        <li class=""><a href="#" class="">Upload Stock</a></li>
                         <li class=""><a href="#" class="">Reset Stock</a></li>
                     </ul>
                 </li>
