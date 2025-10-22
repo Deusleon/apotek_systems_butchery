@@ -488,8 +488,8 @@ class RequisitionController extends Controller
             return redirect()->route('requisitions.index');
         }
 
-        session()->flash("alert-success", "Requisition Accepted Successfully!");
-        return back();
+        session()->flash("alert-success", "Requisition Issued Successfully!");
+        return redirect()->route('issue.index');
     }
 
     public function destroy(Request $request)
@@ -810,7 +810,7 @@ class RequisitionController extends Controller
         $req->save();
 
 
-        session()->flash("alert-success", "Requisition Accepted Successfully!");
-        return back();
+        session()->flash("alert-success", "Requisition Issued Successfully!");
+        return redirect()->route('issue.index');
     }
 }
