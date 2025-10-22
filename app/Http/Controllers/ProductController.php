@@ -6,6 +6,7 @@ use App\Category;
 use App\Http\Requests\ProductStoreRequest;
 use App\Product;
 use App\SubCategory;
+use App\PriceCategory;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -399,85 +400,47 @@ class ProductController extends Controller
     {
         // Increase memory limit
         ini_set('memory_limit', '512M');
-        
+
         try {
             Log::info('Starting export process');
             Log::info('Export format: ' . $request->input('format'));
 
+            // Validate store and price category selection
+            if (!$request->filled('store')) {
+                return back()->with('error', 'Please select a store for export');
+            }
+
+            if (!$request->filled('price_category')) {
+                return back()->with('error', 'Please select a price category for export');
+            }
+
             // Only select the columns we need
-            $query = Product::select('name', 'brand', 'pack_size', 'category_id', 'type', 'status', 'min_quantinty', 'max_quantinty')
-                ->with(['category' => function($q) {
-                    $q->select('id', 'name');
-                }])
+            $query = Product::select('id', 'name', 'barcode')
                 ->when($request->filled('category'), function($q) use ($request) {
                     return $q->where('category_id', $request->category);
                 })
-                ->when($request->filled('type'), function($q) use ($request) {
-                    return $q->where('type', $request->type);
-                })
                 ->when($request->filled('status'), function($q) use ($request) {
                     return $q->where('status', $request->status);
+                })
+                ->whereHas('currentStock', function($q) use ($request) {
+                    $q->where('store_id', $request->store);
                 });
 
             $totalCount = $query->count();
             Log::info('Total products count: ' . $totalCount);
 
             if ($totalCount === 0) {
-                return back()->with('error', 'No products found to export');
+                return back()->with('error', 'No Stock found to export');
             }
 
             switch ($request->input('format')) {
-                case 'pdf':
-                    Log::info('Generating PDF');
-                    try {
-                        // Get all products at once since we'll build a single HTML document
-                        $products = $query->get();
-                        
-                        // Calculate number of pages
-                        $productsPerPage = 100;
-                        $totalPages = ceil($products->count() / $productsPerPage);
-                        
-                        // Build HTML for all pages
-                        $html = '';
-                        for ($page = 1; $page <= $totalPages; $page++) {
-                            $pageProducts = $products->forPage($page, $productsPerPage);
-                            
-                            $html .= view('exports.products_pdf', [
-                                'products' => $pageProducts,
-                                'date' => date('Y-m-d H:i:s'),
-                                'page' => $page,
-                                'total_pages' => $totalPages
-                            ])->render();
-                            
-                            // Add page break between pages, except for the last page
-                            if ($page < $totalPages) {
-                                $html .= '<div style="page-break-after: always;"></div>';
-                            }
-                        }
-
-                        // Create PDF from the complete HTML
-                        $pdf = PDF::loadHTML($html);
-                        $pdf->setPaper('a4', 'landscape');
-                        
-                        // Disable SSL verification for local development
-                        if (app()->environment('local')) {
-                            config(['dompdf.options.ssl_verifier' => false]);
-                        }
-
-                        return $pdf->stream('products_'.date('Y-m-d').'.pdf');
-                    } catch (\Exception $e) {
-                        Log::error('Error generating PDF: ' . $e->getMessage());
-                        Log::error('Stack trace: ' . $e->getTraceAsString());
-                        throw $e;
-                    }
-
                 case 'excel':
-                    Log::info('Generating Excel');
-                    return Excel::download(new ProductsExport($query), 'products_'.date('Y-m-d').'.xlsx');
+                    Log::info('Generating Excel with price category: ' . $request->input('price_category') . ' and store: ' . $request->input('store'));
+                    return Excel::download(new ProductsExport($query->get(), $request->input('price_category'), $request->input('store')), 'stock_export_'.date('Y-m-d').'.xlsx');
 
                 case 'csv':
-                    Log::info('Generating CSV');
-                    return Excel::download(new ProductsExport($query), 'products_'.date('Y-m-d').'.csv');
+                    Log::info('Generating CSV with price category: ' . $request->input('price_category') . ' and store: ' . $request->input('store'));
+                    return Excel::download(new ProductsExport($query->get(), $request->input('price_category'), $request->input('store')), 'stock_export_'.date('Y-m-d').'.csv');
 
                 default:
                     return back()->with('error', 'Invalid export format');
@@ -486,6 +449,18 @@ class ProductController extends Controller
             Log::error('Export error: ' . $e->getMessage());
             return back()->with('error', 'An error occurred while exporting products: ' . $e->getMessage());
         }
+    }
+
+    public function exportForm()
+    {
+        if (!Auth()->user()->checkPermission('View Product List')) {
+            abort(403, 'Access Denied');
+        }
+
+        $priceCategories = PriceCategory::all();
+        $categories = Category::orderBy('name', 'asc')->get();
+
+        return view('tools.export_products', compact('priceCategories', 'categories'));
     }
 
 }
