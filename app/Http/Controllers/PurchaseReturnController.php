@@ -110,6 +110,7 @@ class PurchaseReturnController extends Controller
                     'quantity' => $return->return_quantity,
                     'reason' => $return->reason,
                     'date' => $return->date,
+                    'created_at' => $return->created_at,
                     'goods_receiving' => [
                         'id' => $goodsReceiving->id,
                         'product_id' => $goodsReceiving->product_id,
