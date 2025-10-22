@@ -18,6 +18,14 @@ class DatabaseBackupController extends Controller
         return view('tools.database_backup', compact('backups'));
     }
 
+    public function clearIndex()
+    {
+        // Get list of existing backups for reference
+        $backups = $this->getBackupFiles();
+
+        return view('tools.database_clear', compact('backups'));
+    }
+
     public function create(Request $request)
     {
         try {
@@ -142,6 +150,63 @@ class DatabaseBackupController extends Controller
         });
 
         return $backups;
+    }
+
+    public function clearDatabase(Request $request)
+    {
+        // Validate password
+        $request->validate([
+            'password' => 'required|string',
+        ]);
+
+        $providedPassword = $request->input('password');
+        Log::info('User pass:'.$providedPassword);
+        $correctPassword = config('app.db_clear_password');
+        Log::info('Correct pass:'.$correctPassword);
+
+        if ($providedPassword !== $correctPassword) {
+            return redirect()->back()->with('error', 'Incorrect password. Database clearing aborted.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Get all tables except settings and users
+            $tables = DB::select('SHOW TABLES');
+            $databaseName = env('DB_DATABASE');
+            $tableKey = 'Tables_in_' . $databaseName;
+
+            $tablesToClear = [];
+            foreach ($tables as $table) {
+                $tableName = $table->$tableKey;
+                // Skip settings table and users table (we'll handle users separately)
+                if ($tableName !== 'settings' && $tableName !== 'users') {
+                    $tablesToClear[] = $tableName;
+                }
+            }
+
+            // Clear all tables except settings
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+            foreach ($tablesToClear as $table) {
+                DB::statement('TRUNCATE TABLE `' . $table . '`');
+                Log::info('Cleared table: ' . $table);
+            }
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+            // Clear users table but keep user with id 1
+            DB::statement('DELETE FROM users WHERE id != 1');
+            Log::info('Cleared users table, kept user with id 1');
+
+            DB::commit();
+
+            Log::info('Database cleared successfully by user: ' . auth()->user()->name ?? 'Unknown');
+            return redirect()->back()->with('success', 'Database cleared successfully! Settings and user ID 1 have been preserved.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Database clearing error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'An error occurred while clearing the database: ' . $e->getMessage());
+        }
     }
 
     private function formatBytes($bytes)

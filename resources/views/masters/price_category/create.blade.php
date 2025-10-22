@@ -21,7 +21,7 @@
                                    placeholder="" required maxlength="45">
                         </div>
                     </div>
-                    <div class="form-group row">
+                    <div class="form-group row" hidden>
                         <label for="code" class="col-md-4 col-form-label text-md-right">{{ __('Price Type') }} <font
                                 color="red">*</font></label>
                         <div class="col-md-8">

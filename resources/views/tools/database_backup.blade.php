@@ -15,8 +15,8 @@
         <div class="card">
             <div class="card-body">
                 <div class="row justify-content-end align-items-end mb-3">
-                    <div class="col-md-3 text-right pr-1">
-                        <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#createBackupModal">
+                    <div class="col-md-6 text-right pr-1">
+                        <button type="button" class="btn btn-secondary btn-sm mr-2" data-toggle="modal" data-target="#createBackupModal">
                             Create New Backup
                         </button>
                     </div>
@@ -89,6 +89,7 @@
             </div>
         </div>
     </div>
+
 
     <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
