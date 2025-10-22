@@ -94,7 +94,7 @@
                                                 <td style="display: none"><input type="text" name="product_id[]"
                                                         value="{{ $item->products_->id }}"></td>
                                                 <td class="border-0">{{ $item->products_->full_product_name ?? $item->products_->name }}</td>
-                                                <td class="text-center border-0">{{ number_format($item->qty_oh) }}</td>
+                                                <td class="text-center border-0 qoh-cell" data-qoh="{{ $item->qty_oh }}">{{ number_format($item->qty_oh) }}</td>
                                                 <td class="text-center border-0">
                                                     <input class="form-control text-center" style="display: none" type="text" name="qty_req[]"
                                                         value="{{ $item->quantity }}">{{ number_format($item->quantity) }}
@@ -116,11 +116,7 @@
                             <div class="row mt-3">
                                 <div class="form-group col-md-12">
                                     <label for="products">Remarks:</label>
-                                    @if (!$disable)
-                                        <textarea class="form-control" name="remarks" id="remarksTextarea" rows="2" readonly></textarea>
-                                    @else
-                                        <h6>{{ $requisition->remarks ?? '--' }}</h6>
-                                    @endif
+                                    <textarea class="form-control" name="remarks" id="remarksTextarea" rows="2">{{ $requisition->remarks }}</textarea>
                                 </div>
                             </div>
 
@@ -164,6 +160,22 @@
             window.location.href = this.getAttribute('href');
         });
 
+        // Function to check QOH vs Qty Issued and show alert
+        function checkQOHValidation() {
+            let hasAlert = false;
+            document.querySelectorAll('.qty-issued-cell').forEach(function(cell, index) {
+                const qohCell = document.querySelectorAll('.qoh-cell')[index];
+                const qoh = parseFloat(qohCell ? qohCell.getAttribute('data-qoh') : 0);
+                const qtyIssued = parseFloat(cell.querySelector('.qty-input').value || cell.querySelector('.qty-text').textContent.replace(/,/g, ''));
+                if (qtyIssued > qoh) {
+                    const productName = cell.closest('tr').querySelector('td.border-0').textContent.trim();
+                    alert('Qty Issued cannot exceed QOH for product: ' + productName);
+                    hasAlert = true;
+                }
+            });
+            return hasAlert;
+        }
+
         // Edit button functionality
         document.getElementById('editBtn').addEventListener('click', function() {
             if (!isEditing) {
@@ -171,39 +183,40 @@
                 this.textContent = 'Cancel';
                 this.classList.remove('btn-warning');
                 this.classList.add('btn-secondary');
-                
+
                 // Switch quantity display to input fields
                 document.querySelectorAll('.qty-text').forEach(function(el) {
                     el.style.display = 'none';
                 });
-                
+
                 document.querySelectorAll('.qty-input').forEach(function(el) {
                     el.style.display = 'block';
                 });
-                
-                // Enable remarks textarea
-                document.getElementById('remarksTextarea').readOnly = false;
-                
+
                 isEditing = true;
             } else {
                 // Cancel edit mode
                 this.textContent = 'Edit';
                 this.classList.remove('btn-secondary');
                 this.classList.add('btn-warning');
-                
+
                 // Switch input fields back to text display
                 document.querySelectorAll('.qty-text').forEach(function(el) {
                     el.style.display = 'inline';
                 });
-                
+
                 document.querySelectorAll('.qty-input').forEach(function(el) {
                     el.style.display = 'none';
                 });
-                
-                // Disable remarks textarea
-                document.getElementById('remarksTextarea').readOnly = true;
-                
+
                 isEditing = false;
+            }
+        });
+
+        // Add validation on form submit
+        document.getElementById('issueForm').addEventListener('submit', function(e) {
+            if (checkQOHValidation()) {
+                e.preventDefault();
             }
         });
     </script>
