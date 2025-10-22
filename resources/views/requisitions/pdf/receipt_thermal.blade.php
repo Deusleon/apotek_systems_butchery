@@ -116,18 +116,17 @@
     <table class="req-info" align="center">
         <tr>
             <td><b>Requisition #:</b> {{ $requisition->req_no ?? '' }}</td>
-            <td><b>Created By:</b> {{ $requisition->creator->name }}</td>
         </tr>
     </table>
 
     <!-- Requisition Items -->
     <div>
-        <table id="items" align="center">
+        <table id="items" align="center" style="margin-top: -20px;">
             <thead>
                 <tr>
                     <th style="width: 5%">#</th>
-                    <th style="width: 70%">Product Name</th>
-                    <th style="width: 25%">Quantity</th>
+                    <th style="width: 60%">Product Name</th>
+                    <th style="width: 35%">Quantity</th>
                 </tr>
             </thead>
             <tbody>
