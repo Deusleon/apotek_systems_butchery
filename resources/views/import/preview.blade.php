@@ -72,7 +72,7 @@
                             <div class="card bg-body">
                                 <div class="card-body">
                                     <h6 class="card-title">Total Records</h6>
-                                    <h3 class="mb-0">{{ $total_records }}</h3>
+                                    <h3 class="mb-0">{{ number_format($total_records, 0) }}</h3>
                                 </div>
                             </div>
                         </div>
@@ -80,7 +80,7 @@
                             <div class="card text-white" style="background-color:#BBF7D0; color:#48bb78;">
                                 <div class="card-body">
                                     <h6 class="card-title" style="color: #48bb78">Valid Records</h6>
-                                    <h3 class="mb-0" style="color: #48bb78">{{ $valid_count }}</h3>
+                                    <h3 class="mb-0" style="color: #48bb78">{{ number_format($valid_count, 0) }}</h3>
                                 </div>
                             </div>
                         </div>
@@ -88,7 +88,7 @@
                             <div class="card text-white" style="background-color:#FECACA; text-color:#f56565;">
                                 <div class="card-body">
                                     <h6 class="card-title" style="color: #f56565">Records with Errors</h6>
-                                    <h3 class="mb-0" style="color: #f56565">{{ $error_count }}</h3>
+                                    <h3 class="mb-0" style="color: #f56565">{{ number_format($error_count, 0) }}</h3>
                                 </div>
                             </div>
                         </div>

@@ -12,59 +12,61 @@ use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 
 class ProductsImport implements ToModel, WithHeadingRow, WithValidation, WithBatchInserts, WithChunkReading
-{
+ {
     private $errors = [];
     private $successCount = 0;
     private $failCount = 0;
 
     /**
-     * @param array $row
-     *
-     * @return \Illuminate\Database\Eloquent\Model|null
-     */
-    public function model(array $row)
-    {
+    * @param array $row
+    *
+    * @return \Illuminate\Database\Eloquent\Model|null
+    */
+
+    public function model( array $row )
+ {
         // Skip empty rows
-        if (empty(array_filter($row))) {
+        if ( empty( array_filter( $row ) ) ) {
             return null;
         }
 
         try {
             // Get or create category
             $category = Category::firstOrCreate(
-                ['name' => trim($row['category'])],
-                ['created_by' => Auth::id()]
+                [ 'name' => trim( $row[ 'category' ] ) ],
+                [ 'created_by' => Auth::id() ]
             );
 
-            // Check if product already exists
-            $existingProduct = Product::where('name', trim($row['product_name']))
-                ->where('category_id', $category->id)
-                ->first();
+            // Check if product already exists by name + category
+            $existingProduct = Product::where( 'name', trim( $row[ 'name' ] ) )
+            ->where( 'category_id', $category->id )
+            ->first();
 
-            if ($existingProduct) {
+            if ( $existingProduct ) {
                 // Update existing product
-                $existingProduct->update([
-                    'barcode' => $row['barcode'] ?? null,
-                    'brand' => $row['brand'] ?? null,
-                    'pack_size' => $row['pack_size'] ?? null,
-                    'sales_uom' => $row['sales_uom'] ?? null,
-                    'min_stock' => $row['min_stock'] ?? null,
-                    'max_stock' => $row['max_stock'] ?? null,
+                $existingProduct->update( [
+                    'barcode' => $row[ 'barcode' ] ?? null,
+                    'brand' => $row[ 'brand' ] ?? null,
+                    'pack_size' => $row[ 'pack_size' ] ?? null,
+                    'sales_uom' => $row[ 'unit' ] ?? null,
+                    'min_quantinty' => $row[ 'min_stock' ] !== null ? ( int )$row[ 'min_stock' ] : null,
+                    'max_quantinty' => $row[ 'max_stock' ] !== null ? ( int )$row[ 'max_stock' ] : null,
                     'updated_by' => Auth::id(),
-                ]);
+                ] );
                 $this->successCount++;
-                return null; // Don't create new model
+                return null;
+                // Don't create new model
             }
 
             // Create new product
             $product = new Product([
                 'barcode' => $row['barcode'] ?? null,
-                'name' => trim($row['product_name']),
+                'name' => trim($row['name']),
                 'brand' => $row['brand'] ?? null,
                 'pack_size' => $row['pack_size'] ?? null,
-                'sales_uom' => $row['sales_uom'] ?? null,
-                'min_stock' => $row['min_stock'] ?? null,
-                'max_stock' => $row['max_stock'] ?? null,
+                'sales_uom' => $row['unit'] ?? null,
+                'min_quantinty' => $row[ 'min_stock' ] !== null ? ( int )$row[ 'min_stock' ] : null,
+                'max_quantinty' => $row[ 'max_stock' ] !== null ? ( int )$row[ 'max_stock' ] : null,
                 'category_id' => $category->id,
                 'type' => 'stockable',
                 'status' => 1,
@@ -87,14 +89,14 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, WithBat
     public function rules(): array
     {
         return [
-            'product_name' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'pack_size' => 'nullable|numeric|min:0',
             'min_stock' => 'nullable|numeric|min:0',
             'max_stock' => 'nullable|numeric|min:0',
             'barcode' => 'nullable|string|max:255',
             'brand' => 'nullable|string|max:255',
-            'sales_uom' => 'nullable|string|max:50',
+            'unit' => 'nullable|string|max:50',
         ];
     }
 
@@ -137,6 +139,6 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, WithBat
             'success_count' => $this->successCount,
             'fail_count' => $this->failCount,
             'errors' => $this->errors,
-        ];
+            ];
+        }
     }
-}

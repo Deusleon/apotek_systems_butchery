@@ -131,8 +131,8 @@ class CreatePermissionsTable extends Migration
             ['name' => 'Edit Expenses', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'ACCOUNTING'],
             ['name' => 'Delete Expenses', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'ACCOUNTING'],
             ['name' => 'View Invoices', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:20', 'updated_at' => '2024-11-23 08:25:20', 'category' => 'ACCOUNTING'],
-            ['name' => 'Add Invoice', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:36', 'updated_at' => '2024-11-23 08:25:36', 'category' => 'ACCOUNTING'],
-            ['name' => 'Edit Invoice', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'ACCOUNTING'],
+            ['name' => 'Add Invoices', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:36', 'updated_at' => '2024-11-23 08:25:36', 'category' => 'ACCOUNTING'],
+            ['name' => 'Edit Invoices', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'ACCOUNTING'],
             ['name' => 'View payments', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:36', 'updated_at' => '2024-11-23 08:25:36', 'category' => 'ACCOUNTING'],
             ['name' => 'View payment history', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:36', 'updated_at' => '2024-11-23 08:25:36', 'category' => 'ACCOUNTING'],
             // Purchasing Sub Modules

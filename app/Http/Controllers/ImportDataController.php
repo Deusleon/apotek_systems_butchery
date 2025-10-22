@@ -66,22 +66,28 @@ class ImportDataController extends Controller {
         $sheet->setCellValue( 'E1', 'Quantity' );
         $sheet->setCellValue( 'F1', 'Expiry' );
 
-        // Sample data rows
-        $sampleData = [
-            [100001, 'Sample Product 1', 10.50, 15.00, 100, '2025-12-31'],
-            [100002, 'Sample Product 2', 25.75, 35.00, 50, '2026-06-30'],
-            [100003, 'Sample Product 3', 5.25, 8.50, 200, '2025-08-15']
-        ];
+        // Fetch all products from database
+        $products = Product::orderBy('name')->get();
 
         $row = 2;
-        foreach ( $sampleData as $data ) {
-            $sheet->setCellValue( 'A'.$row, $data[0] );
-            $sheet->setCellValue( 'B'.$row, $data[1] );
-            $sheet->setCellValue( 'C'.$row, $data[2] );
-            $sheet->setCellValue( 'D'.$row, $data[3] );
-            $sheet->setCellValue( 'E'.$row, $data[4] );
-            $sheet->setCellValue( 'F'.$row, $data[5] );
+        foreach ( $products as $product ) {
+            $sheet->setCellValue( 'A'.$row, $product->id ); // Product Code (ID)
+            $sheet->setCellValue( 'B'.$row, $product->name ); // Product Name
+            $sheet->setCellValue( 'C'.$row, '' ); // Buy Price (empty for user input)
+            $sheet->setCellValue( 'D'.$row, '' ); // Sell Price (empty for user input)
+            $sheet->setCellValue( 'E'.$row, '' ); // Quantity (empty for user input)
+            $sheet->setCellValue( 'F'.$row, '' ); // Expiry (empty for user input)
             $row++;
+        }
+
+        // If no products exist, add a sample row
+        if ($products->isEmpty()) {
+            $sheet->setCellValue( 'A2', '1' );
+            $sheet->setCellValue( 'B2', 'Sample Product - Please add products first' );
+            $sheet->setCellValue( 'C2', '' );
+            $sheet->setCellValue( 'D2', '' );
+            $sheet->setCellValue( 'E2', '' );
+            $sheet->setCellValue( 'F2', '' );
         }
 
         $writer = new Xlsx( $spreadsheet );
@@ -101,41 +107,33 @@ class ImportDataController extends Controller {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Headers with proper column names
+        // Headers with proper column names matching Excel structure
         $headers = [
-            'A1' => 'Product Name',
-            'B1' => 'Barcode',
-            'C1' => 'Brand',
-            'D1' => 'Pack Size',
-            'E1' => 'Sales UOM',
-            'F1' => 'Category',
-            'G1' => 'Min Stock',
-            'H1' => 'Max Stock'
+            'A1' => 'Code',
+            'B1' => 'Name',
+            'C1' => 'Barcode',
+            'D1' => 'Brand',
+            'E1' => 'Pack Size',
+            'F1' => 'Unit',
+            'G1' => 'Category',
+            'H1' => 'Min Stock',
+            'I1' => 'Max Stock'
         ];
 
         foreach ($headers as $cell => $value) {
             $sheet->setCellValue($cell, $value);
         }
 
-        // Sample data rows
-        $sampleData = [
-            ['Sample Product 1', '123456789', 'Brand A', 10, 'PCS', 'Category 1', 5, 100],
-            ['Sample Product 2', '987654321', 'Brand B', 25, 'BOX', 'Category 2', 10, 200],
-            ['Sample Product 3', '456789123', 'Brand C', 5, 'KG', 'Category 1', 2, 50]
-        ];
-
-        $row = 2;
-        foreach ($sampleData as $data) {
-            $sheet->setCellValue('A'.$row, $data[0]);
-            $sheet->setCellValue('B'.$row, $data[1]);
-            $sheet->setCellValue('C'.$row, $data[2]);
-            $sheet->setCellValue('D'.$row, $data[3]);
-            $sheet->setCellValue('E'.$row, $data[4]);
-            $sheet->setCellValue('F'.$row, $data[5]);
-            $sheet->setCellValue('G'.$row, $data[6]);
-            $sheet->setCellValue('H'.$row, $data[7]);
-            $row++;
-        }
+        // Single sample data row matching the column structure
+        $sheet->setCellValue('A2', '100001'); // Code
+        $sheet->setCellValue('B2', 'Sample Product'); // Name
+        $sheet->setCellValue('C2', '123456789'); // Barcode
+        $sheet->setCellValue('D2', 'Brand A'); // Brand
+        $sheet->setCellValue('E2', 10); // Pack Size
+        $sheet->setCellValue('F2', 'PCS'); // Unit
+        $sheet->setCellValue('G2', 'Category 1'); // Category
+        $sheet->setCellValue('H2', 5); // Min Stock
+        $sheet->setCellValue('I2', 100); // Max Stock
 
         $writer = new Xlsx($spreadsheet);
         $fileName = 'products_import_template.xlsx';
