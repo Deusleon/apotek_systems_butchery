@@ -132,38 +132,32 @@
             REQUISITION ISSUE HISTORY
         </h2>
         <br>
-        <h4 align="center" style="margin-top: -1%">{{ date('j M, Y', strtotime($requisition->updated_at)) }}</h4>
+        <h4 align="center" style="margin-top: -1%">Date: {{ date('Y-m-d', strtotime($requisition->updated_at)) }}</h4>
+        <br>
+        <h4 align="center" style="margin-top: -1%">From: {{ $fromStore->name ?? '' }} To:  {{ $toStore->name ?? '' }}</h4>
     </div>
 
     <!-- Requisition Info -->
-    <table class="req-info">
+    <table class="req-info" style="margin-top: -1%;">
         <tr>
             <td><b>Requisition #:</b> {{ $requisition->req_no ?? '' }}</td>
-            <td><b>Issued By:</b> {{ $requisition->creator->name ?? '' }}</td>
-        </tr>
-        <tr>
-            <td><b>From Store:</b> {{ $fromStore->name ?? '' }}</td>
-            <td><b>To Store:</b> {{ $toStore->name ?? '' }}</td>
         </tr>
         @if(!empty($requisition->remarks))
         <tr>
             <td colspan="2"><b>Remarks:</b> {{ $requisition->remarks }}</td>
         </tr>
         @endif
-        <tr>
-            <td colspan="2"><b>Date Issued:</b> {{ date('j M, Y H:i', strtotime($requisition->updated_at)) }}</td>
-        </tr>
     </table>
 
     <!-- Requisition Items -->
-    <div style="margin-top: 2%;">
+    <div style="margin-top: -5%;">
         <table id="items">
             <thead>
                 <tr>
                     <th style="width: 5%">#</th>
-                    <th style="width: 55%">Product</th>
+                    <th style="width: 55%">Product Name</th>
                     <th style="width: 15%" class="text-center">Requested</th>
-                    <th style="width: 15%" class="text-center">Given</th>
+                    <th style="width: 15%" class="text-center">Issued</th>
                 </tr>
             </thead>
             <tbody>
@@ -200,7 +194,7 @@
     <!-- Footer -->
     <div class="footer">
         <p>Issued By: <b>{{ $requisition->creator->name ?? 'N/A' }}</b></p>
-        <p>Printed on: <b>{{ date('j M, Y H:i') }}</b></p>
+        <p>Printed on: <b>{{ date('Y-m-d') }}</b></p>
         @if(!empty($pharmacy['slogan']))
             <p class="slogan">{{ $pharmacy['slogan'] }}</p>
         @endif
