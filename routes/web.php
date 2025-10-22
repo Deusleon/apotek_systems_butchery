@@ -85,6 +85,10 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::get('products/export', [ProductController::class, 'export'])->name('products.export');
     Route::get('tools/upload-price', [ProductController::class, 'uploadPriceForm'])->name('tools.upload-price-form');
     Route::post('tools/upload-price', [ProductController::class, 'uploadPrice'])->name('tools.upload-price');
+    Route::get('tools/upload-stock', [ProductController::class, 'uploadStockForm'])->name('tools.upload-stock-form');
+    Route::post('tools/upload-stock', [ProductController::class, 'uploadStock'])->name('tools.upload-stock');
+    Route::get('tools/reset-stock', [ProductController::class, 'resetStockForm'])->name('tools.reset-stock-form');
+    Route::post('tools/reset-stock', [ProductController::class, 'resetStock'])->name('tools.reset-stock');
     Route::get('tools/export-products', [ProductController::class, 'exportForm'])->name('tools.export-products');
 
     // Product Import Routes
@@ -602,6 +606,9 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::post('settings/tools/database-backup', 'DatabaseBackupController@create')->name('database-backup.create');
     Route::get('settings/tools/database-backup/{filename}/download', 'DatabaseBackupController@download')->name('database-backup.download');
     Route::delete('settings/tools/database-backup/{filename}', 'DatabaseBackupController@delete')->name('database-backup.delete');
+
+    Route::get('settings/tools/database-clear', 'DatabaseBackupController@clearIndex')->name('database-clear.index');
+    Route::post('settings/tools/database-clear', 'DatabaseBackupController@clearDatabase')->name('database-clear.clear');
 
     /* HELP */
 

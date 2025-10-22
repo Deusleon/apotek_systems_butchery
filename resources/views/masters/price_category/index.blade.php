@@ -33,7 +33,7 @@
                             <thead>
                                 <tr>
                                     <th>Category Name</th>
-                                    <th>Price Type</th>
+                                    {{-- <th>Price Type</th> --}}
                                     @if(auth()->user()->checkPermission('Edit Price Categories') || auth()->user()->checkPermission('Delete Price Categories'))
                                         <th>Actions</th>
                                     @endif
@@ -43,7 +43,7 @@
                                 @foreach($price_category as $price)
                                     <tr>
                                         <td>{{$price->name}}</td>
-                                        <td>{{$price->type}}</td>
+                                        {{-- <td>{{$price->type}}</td> --}}
                                         @if(auth()->user()->checkPermission('Edit Price Categories') || auth()->user()->checkPermission('Delete Price Categories'))
                                             <td>
                                                 @if(auth()->user()->checkPermission('Edit Price Categories'))
