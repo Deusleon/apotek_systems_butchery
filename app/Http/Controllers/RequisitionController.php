@@ -331,6 +331,8 @@ class RequisitionController extends Controller
         $requisition = Requisition::with(['reqDetails', 'reqTo', 'creator'])->find($req_id);
         $requisitionDet = RequisitionDetail::with('products_')->where('req_id', $req_id)->get();
         $pharmacy = $this->companyInfo();
+        $fromStore = Store::find($requisition->from_store);
+        $toStore = Store::find($requisition->to_store);
 
         // ADD CONCATENATION LOGIC HERE:
         $requisitionDet->each(function($detail) {
@@ -346,22 +348,22 @@ class RequisitionController extends Controller
         if ($receipt_size == '58mm Thermal Paper') {
             $view = 'requisitions.pdf.receipt_thermal';
             $output = 'request.pdf';
-            $pdf = PDF::loadView($view, compact('requisition', 'requisitionDet', 'pharmacy'));
+            $pdf = PDF::loadView($view, compact('requisition', 'requisitionDet', 'pharmacy', 'fromStore', 'toStore'));
             return $pdf->stream($output);
         } else if ($receipt_size == 'A4 / Letter') {
             $view = 'requisitions.pdf.receipt';
             $output = 'request.pdf';
-            $pdf = PDF::loadView($view, compact('requisition', 'requisitionDet', 'pharmacy'));
+            $pdf = PDF::loadView($view, compact('requisition', 'requisitionDet', 'pharmacy', 'fromStore', 'toStore'));
             return $pdf->stream($output);
         } else if ($receipt_size == '80mm Thermal Paper') {
             $view = 'requisitions.pdf.receipt_thermal';
             $output = 'request.pdf';
-            $pdf = PDF::loadView($view, compact('requisition', 'requisitionDet', 'pharmacy'));
+            $pdf = PDF::loadView($view, compact('requisition', 'requisitionDet', 'pharmacy', 'fromStore', 'toStore'));
             return $pdf->stream($output);
         } else if ($receipt_size == 'A5 / Half Letter') {
             $view = 'requisitions.pdf.receipt';
             $output = 'request.pdf';
-            $pdf = PDF::loadView($view, compact('requisition', 'requisitionDet', 'pharmacy'));
+            $pdf = PDF::loadView($view, compact('requisition', 'requisitionDet', 'pharmacy', 'fromStore', 'toStore'));
             return $pdf->stream($output);
         } else {
             echo "<script>window.close();</script>";

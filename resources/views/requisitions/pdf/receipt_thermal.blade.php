@@ -110,6 +110,8 @@
         </h2>
         <br>
         <h4 align="center" style="margin-top: -1%">Date: {{ date('Y-m-d', strtotime($requisition->created_at)) }}</h4>
+        <br>
+        <h4 align="center" style="margin-top: -1%">From: {{ $fromStore->name ?? '' }} To: {{ $toStore->name ?? '' }}</h4>
     </div>
 
     <!-- Requisition Info -->
@@ -121,12 +123,12 @@
 
     <!-- Requisition Items -->
     <div>
-        <table id="items" align="center" style="margin-top: -20px;">
+        <table id="items" align="center" style="margin-top: -43px;">
             <thead>
                 <tr>
                     <th style="width: 5%">#</th>
                     <th style="width: 60%">Product Name</th>
-                    <th style="width: 35%">Quantity</th>
+                    <th style="width: 35%; text-align: center;">Quantity</th>
                 </tr>
             </thead>
             <tbody>
@@ -140,7 +142,7 @@
                                 {{ $item->products_->pack_size }}{{ $item->products_->sales_uom }}
                             @endif
                         </td>
-                        <td>{{ number_format($item->quantity, 0) ?? '' }}</td>
+                        <td style="text-align: center;">{{ number_format($item->quantity, 0) ?? '' }}</td>
                     </tr>
                 @endforeach
             </tbody>
