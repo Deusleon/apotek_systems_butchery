@@ -78,6 +78,7 @@
                     <table id="purchase_returns_table" class="display table table-striped table-hover" style="width:100%">
                         <thead>
                             <tr>
+                                <th hidden>Timestamp</th>
                                 <th>Product Name</th>
                                 <th>Receive Date</th>
                                 <th>Qty Received</th>
@@ -185,6 +186,11 @@
             bInfo: true,
             columns: [
                 {
+                    data: 'created_at',
+                    visible: false,
+                    render: function (date) { return moment(date).format('YYYY-MM-DD HH:mm:ss'); }
+                },
+                {
                     data: 'goods_receiving',
                     render: function (item) {
                         if (!item || !item.product) return '';
@@ -229,7 +235,7 @@
                         }
                     @endif
                 ],
-            aaSorting: [[1, "desc"]]
+            aaSorting: [[0, "desc"]]
         });
 
         function getPurchaseReturns(action, goods_receiving) {

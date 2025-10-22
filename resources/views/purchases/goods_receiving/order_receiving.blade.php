@@ -301,6 +301,7 @@
             const orderData = orders.find(order => order.id === orderId);
             const detailsBody = $('#order_items_body');
             detailsBody.empty();
+            const today = new Date().toISOString().split('T')[0];
 
             if (!orderData) return;
 
@@ -343,7 +344,7 @@
                     ${batchSetting === 'YES' ? `
                     <td>
                         <input type="text" name="items[${index}][batch_number]"
-                            class="form-control form-control-sm edit-mode-hidden" ${isFullyReceived?'disabled':''}>
+                            class="form-control form-control-sm edit-mode-hidden" value="${today}" ${isFullyReceived?'disabled':''}>
                     </td>` : ''}
 
                     ${expireDate === 'YES' ? `

@@ -166,10 +166,14 @@ function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
             (j ? i.substr(0, j) + thousands : "") +
             i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands);
 
-        return negativeSign + formattedInt + decimal + decimalPart;
+        if (decimalCount === 0) {
+            return negativeSign + formattedInt;
+        } else {
+            return negativeSign + formattedInt + decimal + decimalPart;
+        }
     } catch (e) {
         console.log(e);
-        return "0.00";
+        return "0";
     }
 }
 
@@ -283,7 +287,7 @@ function orderDetails(items) {
         item_data.push(fullProductName);
 
         // Quantity
-        item_data.push(formatMoney(item.ordered_qty));
+        item_data.push(formatMoney(item.ordered_qty, 0));
 
         // Price, VAT, Amount
         item_data.push(formatMoney(item.price));
