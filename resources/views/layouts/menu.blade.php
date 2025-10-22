@@ -255,7 +255,7 @@
                     <ul class="pcoded-submenu">
                         <li class=""><a href="{{ route('database-backup.index') }}" class="">Database Backup</a></li>
                         <li class=""><a href="{{ route('tools.export-products') }}" class="">Export Stock to Excel</a></li>
-                        <li class=""><a href="#" class="">Upload Price</a></li>
+                        <li class=""><a href="{{ route('tools.upload-price-form') }}" class="">Upload Price</a></li>
                         <li class=""><a href="#" class="">Clear Database</a></li>
                         <li class=""><a href="#" class="">Upload Stock</a></li>
                         <li class=""><a href="#" class="">Reset Stock</a></li>

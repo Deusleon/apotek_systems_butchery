@@ -609,6 +609,7 @@ class ImportDataController extends Controller {
                             [
                                 'price' => $sell_price,
                                 'status' => 1,
+                                'created_by' => Auth::id(),
                                 'updated_by' => Auth::id()
                             ]
                         );
