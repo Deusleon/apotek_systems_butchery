@@ -1,229 +1,198 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Stock Transfer #{{ $transfer->transfer_no }}</title>
+
     <style>
         body {
-            font-family: Arial, sans-serif;
             font-size: 12px;
-            line-height: 1.4;
         }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
+
+        * {
+            font-family: Verdana, Arial, sans-serif;
         }
-        .logo {
-            max-width: 150px;
-            margin-bottom: 10px;
-        }
-        .title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .subtitle {
-            font-size: 14px;
-            color: #666;
-        }
-        .info-section {
-            margin-bottom: 20px;
-        }
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        .info-box {
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-        .info-box h3 {
-            margin: 0 0 5px 0;
-            font-size: 14px;
-            color: #333;
-        }
-        table {
-            width: 100%;
+
+        table,
+        th,
+        td {
+            /*border: 1px solid black;*/
             border-collapse: collapse;
-            margin-bottom: 20px;
+            padding: 10px;
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
+
+        table {
+            page-break-inside: auto
         }
-        th {
-            background-color: #f5f5f5;
+
+        tr {
+            page-break-inside: avoid;
+            page-break-after: auto
         }
-        .status {
-            font-weight: bold;
-            color: #2196F3;
+
+        thead {
+            display: table-header-group
         }
-        .footer {
-            margin-top: 30px;
+
+        tfoot {
+            display: table-footer-group
+        }
+
+        #table-detail {
+            /*border-spacing: 5px;*/
+            width: 100%;
+        }
+
+        #table-detail-main {
+            width: 102%;
+            margin-top: -10%;
+            margin-bottom: 1%;
+            border-collapse: collapse;
+        }
+
+        #table-detail tr> {
+            line-height: 13px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        #category {
+            text-transform: uppercase;
+        }
+
+        h3 {
+            font-weight: normal;
+        }
+
+        h4 {
+            font-weight: normal;
+        }
+
+        #container .logo-container {
+            padding-top: -2%;
             text-align: center;
-            font-size: 10px;
-            color: #666;
+            vertical-align: middle;
         }
-        .signature-section {
-            margin-top: 50px;
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 20px;
-        }
-        .signature-box {
-            text-align: center;
-        }
-        .signature-line {
-            border-top: 1px solid #000;
-            margin-top: 40px;
-            padding-top: 5px;
+
+        #container .logo-container img {
+            max-width: 160px;
+            max-height: 160px;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <img src="{{ public_path('fileStore/logo/logo.png') }}" alt="Company Logo" class="logo">
-        <div class="title">Stock Transfer Receipt</div>
-        <div class="subtitle">Transfer No: {{ $transfer->transfer_no }}</div>
-    </div>
-
-    <div class="info-section">
-        <div class="info-grid">
-            <div class="info-box">
-                <h3>From Store</h3>
-                <p>{{ $transfer->from_store_name }}</p>
-            </div>
-            <div class="info-box">
-                <h3>To Store</h3>
-                <p>{{ $transfer->to_store_name }}</p>
+    <div class="row">
+        <div id="container">
+            <div class="logo-container">
+                @if($pharmacy['logo'] ?? null)
+                    <img src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
+                @endif
             </div>
         </div>
     </div>
+    <div class="row" style="padding-top: -2%">
+        <h1 align="center">{{$pharmacy['name'] ?? 'Company Name'}}</h1>
+        <h3 align="center" style="margin-top: -1%">{{$pharmacy['address'] ?? ''}}</h3>
+        <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone'] ?? ''}}</h3>
+        <h3 align="center" style="margin-top: -1%">{{($pharmacy['email'] ?? '') . ' | ' . ($pharmacy['website'] ?? '')}}</h3>
+        <h2 align="center" style="margin-top: -1%">Stock Transfer Receipt</h2>
+        <h3 align="center" style="margin-top: -1%">Transfer No: <b>{{ $transfer->transfer_no }}</b></h3>
+        <div class="row">
+            <div class="col-md-12">
+                <table id="table-detail" align="center">
+                    <thead>
+                        <tr style="background: #1f273b; color: white;">
+                            <th align="center">#</th>
+                            <th align="left">Product Name</th>
+                            <th align="center">Quantity</th>
+                            <th align="left">From Store</th>
+                            <th align="left">To Store</th>
+                            <th align="left">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($transfer->all_items ?? [$transfer] as $index => $item)
+                        <tr>
+                            <td align="center">{{ $index + 1 }}.</td>
+                            <td align="left">
+                                {{ ($item->currentStock->product->name ?? '') . ' ' .
+                                   ($item->currentStock->product->brand ?? '') . ' ' .
+                                   ($item->currentStock->product->pack_size ?? '') . ' ' .
+                                   ($item->currentStock->product->sales_uom ?? '') }}
+                            </td>
+                            <td align="center">{{ number_format($item->transfer_qty ?? 0) }}</td>
+                            <td align="left">{{ $transfer->fromStore->name ?? '' }}</td>
+                            <td align="left">{{ $transfer->toStore->name ?? '' }}</td>
+                            <td align="left">
+                                @php
+                                    $statuses = [
+                                        'created' => ['name' => 'Pending', 'class' => 'color: blue;'],
+                                        'assigned' => ['name' => 'Assigned', 'class' => 'color: orange;'],
+                                        'approved' => ['name' => 'Approved', 'class' => 'color: yellow;'],
+                                        'in_transit' => ['name' => 'In Transit', 'class' => 'color: teal;'],
+                                        'acknowledged' => ['name' => 'Acknowledged', 'class' => 'color: green;'],
+                                        'completed' => ['name' => 'Completed', 'class' => 'color: green;'],
+                                        'cancelled' => ['name' => 'Cancelled', 'class' => 'color: red;']
+                                    ];
+                                    $currentStatus = $transfer->status ?? 'created';
+                                    $statusInfo = $statuses[$currentStatus] ?? ['name' => 'Unknown', 'class' => 'color: black;'];
+                                @endphp
+                                <span style="font-weight: bold; {{ $statusInfo['class'] }}">{{ $statusInfo['name'] }}</span>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
 
-    <div class="info-section">
-        <div class="info-box">
-            <h3>Transfer Details</h3>
-            <table>
-                <tr>
-                    <th>Status</th>
-                    <td class="status">{{ $transfer->status_text }}</td>
-                </tr>
-                <tr>
-                    <th>Created By</th>
-                    <td>{{ $transfer->created_by_name }}</td>
-                </tr>
-                <tr>
-                    <th>Created Date</th>
-                    <td>{{ date('d/m/Y H:i', strtotime($transfer->created_at)) }}</td>
-                </tr>
-                <tr>
-                    <th>Last Updated By</th>
-                    <td>{{ $transfer->updated_by_name }}</td>
-                </tr>
-                <tr>
-                    <th>Last Updated Date</th>
-                    <td>{{ date('d/m/Y H:i', strtotime($transfer->updated_at)) }}</td>
-                </tr>
-            </table>
+                @if($transfer->remarks)
+                <div style="margin-top: 20px;">
+                    <strong>Remarks:</strong> {{ $transfer->remarks }}
+                </div>
+                @endif
+
+                <div style="margin-top: 20px;">
+                    <table id="table-detail" align="center" style="width: 50%;">
+                        <tr>
+                            <td style="border: none; padding: 5px;"><strong>Created By:</strong></td>
+                            <td style="border: none; padding: 5px;">{{ $transfer->created_by_name ?? 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <td style="border: none; padding: 5px;"><strong>Created Date:</strong></td>
+                            <td style="border: none; padding: 5px;">{{ date('d-m-Y H:i:s', strtotime($transfer->created_at)) }}</td>
+                        </tr>
+                        {{-- @if($transfer->approved_by_name) --}}
+                        <tr>
+                            <td style="border: none; padding: 5px;"><strong>Approved By:</strong></td>
+                            <td style="border: none; padding: 5px;">{{ $transfer->approved_by_name ?? 'N/A' }}</td>
+                        </tr>
+                        {{-- @endif --}}
+                        {{-- @if($transfer->acknowledged_by_name) --}}
+                        <tr>
+                            <td style="border: none; padding: 5px;"><strong>Acknowledged By:</strong></td>
+                            <td style="border: none; padding: 5px;">{{ $transfer->acknowledged_by_name ?? 'N/A' }}</td>
+                        </tr>
+                        {{-- @endif --}}
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="info-section">
-        <h3>Product Details</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Product Name</th>
-                    <th>Brand</th>
-                    <th>Pack Size</th>
-                    <th>Transfer Quantity</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ $transfer->product_name }}</td>
-                    <td>{{ $transfer->brand }}</td>
-                    <td>{{ $transfer->pack_size }}</td>
-                    <td>{{ $transfer->transfer_qty }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    @if($transfer->remarks)
-    <div class="info-section">
-        <div class="info-box">
-            <h3>Remarks</h3>
-            <p>{{ $transfer->remarks }}</p>
-        </div>
-    </div>
-    @endif
-
-    @if(count($audit_trail) > 0 && isset($audit_trail[0]->action))
-    <div class="info-section">
-        <h3>Audit Trail</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Action</th>
-                    <th>User</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($audit_trail as $log)
-                <tr>
-                    <td>{{ date('d/m/Y H:i', strtotime($log->created_at)) }}</td>
-                    <td>{{ $log->action ?? 'N/A' }}</td>
-                    <td>{{ $log->user_name ?? 'N/A' }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-    @elseif(count($audit_trail) > 0)
-    <div class="info-section">
-        <h3>Stock Adjustment History</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Reason</th>
-                    <th>Adjustment</th>
-                    <th>Notes</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($audit_trail as $log)
-                <tr>
-                    <td>{{ date('d/m/Y H:i', strtotime($log->created_at)) }}</td>
-                    <td>{{ $log->reason ?? 'N/A' }}</td>
-                    <td>{{ $log->adjustment_quantity ?? 'N/A' }} ({{ $log->adjustment_type ?? 'N/A' }})</td>
-                    <td>{{ $log->notes ?? 'N/A' }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-    @endif
-
-    <div class="signature-section">
-        <div class="signature-box">
-            <div class="signature-line">Created By</div>
-        </div>
-        <div class="signature-box">
-            <div class="signature-line">Approved By</div>
-        </div>
-        <div class="signature-box">
-            <div class="signature-line">Received By</div>
-        </div>
-    </div>
-
-    <div class="footer">
-        <p>This is a computer generated document. No signature is required.</p>
-        <p>Generated on {{ date('d/m/Y H:i:s') }}</p>
-    </div>
+    <script type="text/php">
+    if ( isset($pdf) ) {
+        $x = 280;
+        $y = 820;
+        $text = "{PAGE_NUM} of {PAGE_COUNT} pages";
+        $font = null;
+        $size = 10;
+        $color = array(0,0,0);
+        $word_space = 0.0;  //  default
+        $char_space = 0.0;  //  default
+        $angle = 0.0;   //  default
+        $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
+    }
+    </script>
 </body>
 </html> 

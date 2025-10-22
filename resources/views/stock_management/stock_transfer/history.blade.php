@@ -166,6 +166,14 @@
                                                                         style="width: 120px; {{ $statusInfo["class"] }}">{{ $statusInfo["name"] }}</button>
                                                                 </td>
                                                                 <td class="">
+                                                                    @if (Auth()->user()->checkPermission('Edit Stock Transfer'))
+                                                                    <!-- Print Button -->
+                                                                    <a href="{{ route('stock-transfer-pdf-gen', $transfer->transfer_no) }}"
+                                                                        class="mt-2 btn btn-sm btn-rounded btn-secondary"
+                                                                        target="_blank" title="Print Transfer">
+                                                                        <i class="fas fa-print"></i>Print
+                                                                    </a>
+                                                                    @endif
                                                                     <!-- Show Button -->
                                                                     <button type="button"
                                                                         class="mt-2 btn btn-sm btn-rounded btn-success btn-show-transfer"

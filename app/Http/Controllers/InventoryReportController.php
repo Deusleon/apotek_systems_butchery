@@ -871,7 +871,7 @@ class InventoryReportController extends Controller
             $query->where('reason', $reason);
         }
 
-        $adjustments = $query->get();
+        $adjustments = $query->orderBy('created_at', 'desc')->get();
         
         $to_pdf = array();
         $total = 0;

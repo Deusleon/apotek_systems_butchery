@@ -121,6 +121,7 @@
                             @endif
                             <th align="center">Quantity</th>
                             <th align="left">Reason</th>
+                            <th align="left">Adjustment Date</th>
                             <th align="left">Adjusted By</th>
                         </tr>
                     </thead>
@@ -136,6 +137,7 @@
                             @endif
                             <td align="center">{{number_format($item['quantity'])}}</td>
                             <td align="left">{{$item['reason']}}</td>
+                            <td align="left">{{date('Y-m-d', strtotime($item['date']))}}</td>
                             <td align="left">{{$item['adjusted_by']}}</td>
                         </tr>
                     @endforeach
