@@ -7,10 +7,13 @@ use App\Http\Requests\ProductStoreRequest;
 use App\Product;
 use App\SubCategory;
 use App\PriceCategory;
+use App\CurrentStock;
+use App\PriceList;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade as PDF;
 use App\Exports\ProductsExport;
@@ -450,7 +453,6 @@ class ProductController extends Controller
             return back()->with('error', 'An error occurred while exporting products: ' . $e->getMessage());
         }
     }
-
     public function exportForm()
     {
         if (!Auth()->user()->checkPermission('View Product List')) {
@@ -461,6 +463,348 @@ class ProductController extends Controller
         $categories = Category::orderBy('name', 'asc')->get();
 
         return view('tools.export_products', compact('priceCategories', 'categories'));
+    }
+
+    public function uploadPriceForm()
+    {
+        if (!Auth()->user()->checkPermission('View Product List')) {
+            abort(403, 'Access Denied');
+        }
+
+        $priceCategories = PriceCategory::all();
+
+        return view('tools.upload_price', compact('priceCategories'));
+    }
+
+    public function uploadPrice(Request $request)
+    {
+        $request->validate([
+            'price_category' => 'required|exists:price_categories,id',
+            'file' => 'required|file|mimes:csv,xlsx,xls|max:10240', // 10MB max
+        ]);
+
+        // Prevent submission when in ALL branch
+        if (is_all_store()) {
+            return back()->with('error', 'Price upload is not allowed when in ALL branches. Please select a specific branch.');
+        }
+
+        $storeId = current_store_id();
+        Log::info('Price upload initiated for store ID: ' . $storeId);
+
+        // Check if the branch has any stock
+        $totalStockCount = CurrentStock::where('store_id', $storeId)->where('quantity', '>', 0)->count();
+        Log::info('Total stock count for store ID ' . $storeId . ': ' . $totalStockCount);
+
+        if ($totalStockCount === 0) {
+            Log::warning('Price upload terminated: No stock found in branch (store ID: ' . $storeId . ')');
+            return back()->with('error', 'The selected branch has no stock. Price upload cannot proceed.');
+        }
+
+        try {
+            $priceCategoryId = $request->price_category;
+            $file = $request->file('file');
+
+            // Parse the file
+            $data = $this->parseFile($file);
+
+            if (empty($data)) {
+                return back()->with('error', 'The uploaded file is empty or contains no valid data.');
+            }
+
+            // Validate headers
+            $headers = array_keys($data[0]);
+            $expectedHeaders = ['code', 'product name', 'selling price'];
+
+            if (count($headers) !== 3 || !empty(array_diff($expectedHeaders, array_map('strtolower', $headers)))) {
+                return back()->with('error', 'Invalid file format. Expected columns: code, product name, selling price');
+            }
+
+            // Validate data structure and content
+            $validationErrors = [];
+            foreach ($data as $index => $row) {
+                $rowNumber = $index + 2; // +2 because index starts at 0 and we skip header
+
+                // Check if all required columns have values
+                if (empty(trim($row['code'] ?? '')) && empty(trim($row['product name'] ?? ''))) {
+                    $validationErrors[] = "Row {$rowNumber}: Both code and product name cannot be empty";
+                    continue;
+                }
+
+                // Validate selling price format
+                $price = trim($row['selling price'] ?? '');
+                if (empty($price)) {
+                    $validationErrors[] = "Row {$rowNumber}: Selling price cannot be empty";
+                    continue;
+                }
+
+                // Check if price is numeric
+                if (!is_numeric(str_replace([',', ' '], '', $price))) {
+                    $validationErrors[] = "Row {$rowNumber}: Invalid selling price format '{$price}'";
+                    continue;
+                }
+
+                // Check if price is positive
+                $numericPrice = floatval(str_replace([',', ' '], '', $price));
+                if ($numericPrice < 0) {
+                    $validationErrors[] = "Row {$rowNumber}: Selling price cannot be negative '{$price}'";
+                }
+            }
+
+            // If there are validation errors, return them
+            if (!empty($validationErrors)) {
+                $errorMessage = "File validation failed:\n\n";
+                $errorMessage .= implode("\n", array_slice($validationErrors, 0, 10)); // Show first 10 errors
+                if (count($validationErrors) > 10) {
+                    $errorMessage .= "\n... and " . (count($validationErrors) - 10) . " more errors";
+                }
+                return back()->with('error', $errorMessage);
+            }
+
+            // Process the data
+            $results = $this->processPriceUpload($data, $priceCategoryId);
+
+            $message = "Upload completed successfully.";
+
+            return back()->with('success', $message);
+
+        } catch (\Exception $e) {
+            Log::error('Price upload error: ' . $e->getMessage());
+            return back()->with('error', 'An error occurred while processing the file. Please try again.');
+        }
+    }
+
+    private function parseFile($file)
+    {
+        $extension = $file->getClientOriginalExtension();
+
+        if ($extension === 'csv') {
+            return $this->parseCsv($file);
+        } else {
+            return $this->parseExcel($file);
+        }
+    }
+
+    private function parseCsv($file)
+    {
+        $data = [];
+        $handle = fopen($file->getPathname(), 'r');
+
+        // Skip header row
+        fgetcsv($handle);
+
+        while (($row = fgetcsv($handle)) !== false) {
+            if (count($row) >= 3) {
+                $data[] = [
+                    'code' => trim($row[0]),
+                    'product name' => trim($row[1]),
+                    'selling price' => trim($row[2]),
+                ];
+            }
+        }
+
+        fclose($handle);
+        return $data;
+    }
+
+    private function parseExcel($file)
+    {
+        $data = [];
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getPathname());
+        $worksheet = $spreadsheet->getActiveSheet();
+        $rows = $worksheet->toArray();
+
+        // Skip header row
+        array_shift($rows);
+
+        foreach ($rows as $row) {
+            if (count($row) >= 3 && !empty($row[0])) {
+                $data[] = [
+                    'code' => trim($row[0]),
+                    'product name' => trim($row[1]),
+                    'selling price' => trim($row[2]),
+                ];
+            }
+        }
+
+        return $data;
+    }
+
+    private function processPriceUpload($data, $priceCategoryId)
+    {
+        $results = [
+            'processed' => 0,
+            'updated' => 0,
+            'created' => 0,
+            'errors' => 0,
+            'error_messages' => [],
+        ];
+
+        $storeId = current_store_id();
+        $userId = Auth::id();
+
+        DB::beginTransaction();
+
+        try {
+            foreach ($data as $row) {
+                $results['processed']++;
+
+                // Validate selling price
+                $sellingPrice = $this->validateAndParsePrice($row['selling price']);
+                if ($sellingPrice === false) {
+                    $errorMsg = "Invalid selling price for product: {$row['code']} - {$row['product name']}";
+                    Log::warning($errorMsg);
+                    $results['error_messages'][] = $errorMsg;
+                    $results['errors']++;
+                    continue;
+                }
+
+                // Find product by code or name
+                $product = $this->findProduct($row['code'], $row['product name']);
+                if (!$product) {
+                    $errorMsg = "Product not found: {$row['code']} - {$row['product name']}";
+                    Log::warning($errorMsg);
+                    $results['error_messages'][] = $errorMsg;
+                    $results['errors']++;
+                    continue;
+                }
+
+                // Get current stock for this product in the store
+                $currentStocks = CurrentStock::where('product_id', $product->id)
+                    ->where('quantity', '>', 0);
+
+                if (!is_all_store()) {
+                    $currentStocks->where('store_id', $storeId);
+                }
+
+                $currentStocks = $currentStocks->get();
+
+                if ($currentStocks->isEmpty()) {
+                    $errorMsg = "No stock found for product: {$product->name}";
+                    Log::warning($errorMsg);
+                    $results['error_messages'][] = $errorMsg;
+                    $results['errors']++;
+                    continue;
+                }
+
+                // Update prices for all stock batches of this product
+                foreach ($currentStocks as $stock) {
+                    $existingPrice = PriceList::where('stock_id', $stock->id)
+                        ->where('price_category_id', $priceCategoryId)
+                        ->first();
+
+                    if ($existingPrice) {
+                        $existingPrice->update([
+                            'price' => $sellingPrice,
+                            'updated_by' => $userId,
+                        ]);
+                        $results['updated']++;
+                    } else {
+                        PriceList::create([
+                            'stock_id' => $stock->id,
+                            'price_category_id' => $priceCategoryId,
+                            'price' => $sellingPrice,
+                            'created_by' => $userId,
+                            'updated_by' => $userId,
+                        ]);
+                        $results['created']++;
+                    }
+                }
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+
+        return $results;
+    }
+
+    private function validateAndParsePrice($price)
+    {
+        // Remove commas and spaces
+        $price = str_replace([',', ' '], '', $price);
+
+        // Check if it's a valid number
+        if (!is_numeric($price)) {
+            return false;
+        }
+
+        $price = floatval($price);
+
+        // Check if positive
+        if ($price < 0) {
+            return false;
+        }
+
+        return $price;
+    }
+
+    private function validateUploadData($data)
+    {
+        $errors = [];
+        $storeId = current_store_id();
+
+        foreach ($data as $index => $row) {
+            $rowNumber = $index + 2; // +2 because index starts at 0 and we skip header
+
+            // Validate selling price
+            $sellingPrice = $this->validateAndParsePrice($row['selling price']);
+            if ($sellingPrice === false) {
+                $errors[] = "Row {$rowNumber}: Invalid selling price '{$row['selling price']}' for product '{$row['code']}' - '{$row['product name']}'";
+                continue;
+            }
+
+            // Validate product exists
+            $product = $this->findProduct($row['code'], $row['product name']);
+            if (!$product) {
+                $errors[] = "Row {$rowNumber}: Product not found - Code: '{$row['code']}', Name: '{$row['product name']}'";
+                continue;
+            }
+
+            // Validate product has stock in current store
+            $currentStocks = CurrentStock::where('product_id', $product->id)
+                ->where('quantity', '>', 0);
+
+            if (!is_all_store()) {
+                $currentStocks->where('store_id', $storeId);
+            }
+
+            if ($currentStocks->count() === 0) {
+                $errors[] = "Row {$rowNumber}: No stock found for product '{$product->name}' in current branch";
+            }
+        }
+
+        return ['errors' => $errors];
+    }
+
+    private function findProduct($code, $name)
+    {
+        // First try to find by code (assuming code is the product ID)
+        if (!empty($code) && is_numeric($code)) {
+            $product = Product::find($code);
+            if ($product) {
+                return $product;
+            }
+        }
+
+        // Then try to find by barcode
+        if (!empty($code)) {
+            $product = Product::where('barcode', $code)->first();
+            if ($product) {
+                return $product;
+            }
+        }
+
+        // Finally try to find by name
+        if (!empty($name)) {
+            $product = Product::where('name', 'LIKE', "%{$name}%")->first();
+            if ($product) {
+                return $product;
+            }
+        }
+
+        return null;
     }
 
 }

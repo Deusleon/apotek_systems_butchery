@@ -83,6 +83,8 @@ Route::middleware(["auth","main_branch"])->group(function () {
 
     Route::get('inventory/product-list','ProductController@index')->name('products.index');
     Route::get('products/export', [ProductController::class, 'export'])->name('products.export');
+    Route::get('tools/upload-price', [ProductController::class, 'uploadPriceForm'])->name('tools.upload-price-form');
+    Route::post('tools/upload-price', [ProductController::class, 'uploadPrice'])->name('tools.upload-price');
     Route::get('tools/export-products', [ProductController::class, 'exportForm'])->name('tools.export-products');
 
     // Product Import Routes
