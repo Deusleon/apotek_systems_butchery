@@ -50,7 +50,7 @@
     <div class="modal-content">
       
       <div class="modal-header bg-light">
-        <h5 class="modal-title" id="requisitionModalLabel">Requisition Details</h5>
+        <h5 class="modal-title" id="requisitionModalLabel">Issue Details</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -136,13 +136,13 @@
                             <p>${requisition.req_no}</p>
                         </div>
                         <div class="detail-item">
-                            <label class="font-weight-bold">From Store:</label>
+                            <label class="font-weight-bold">From Branch:</label>
                             <p>${requisition.from_store}</p>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="detail-item">
-                            <label class="font-weight-bold">To Store:</label>
+                            <label class="font-weight-bold">To Branch:</label>
                             <p>${requisition.to_store}</p>
                         </div>
                         <div class="detail-item">
@@ -174,8 +174,8 @@
                         <thead>
                             <tr>
                                 <th class="font-weight-bold">Product Name</th>
-                                <th class="text-center font-weight-bold">Qty Requested</th>
-                                <th class="text-center font-weight-bold">Qty Given</th>
+                                <th class="text-center font-weight-bold">Requested</th>
+                                <th class="text-center font-weight-bold">Issued</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -243,5 +243,15 @@
 .font-weight-medium {
     font-weight: 500;
 }
+
+/* Remove extra space between details and remarks */
+#requisitionDetails .row.mb-4 {
+    margin-bottom: 0 !important;
+}
+
+#requisitionDetails .detail-item.mb-3 {
+    margin-top: 0 !important;
+}
+
 </style>
 @endpush
