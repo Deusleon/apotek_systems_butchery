@@ -127,9 +127,9 @@
                                         <td>{{ $row['data'][9] ?? 'stockable' }}</td>
                                         <td>{{ isset($row['data'][10]) ? ($row['data'][10] ? 'Active' : 'Inactive') : 'Active' }}
                                         </td> --}}
-                                        <td>{{ $row['data'][2] ?? '' }}</td>
-                                        <td>{{ $row['data'][3] ?? '' }}</td>
-                                        <td>{{ $row['data'][4] ?? '' }}</td>
+                                        <td>{{ number_format($row['data'][2], 0) ?? '' }}</td>
+                                        <td>{{ number_format($row['data'][3], 0) ?? '' }}</td>
+                                        <td>{{ number_format($row['data'][4], 0) ?? '' }}</td>
                                         <td>{{ $row['data'][5] ?? '' }}</td>
                                         <td>
                                             @if(!empty($row['errors']))
@@ -156,7 +156,7 @@
                             </a>
                             @if($valid_count > 0)
                                 <button type="button" class="btn btn-primary" id="importButton">
-                                    <i class="feather icon-upload"></i> Import {{ $valid_count }} Records
+                                    <i class="feather icon-upload"></i> Import {{ number_format($valid_count, 0) }} Records
                                 </button>
                             @endif
                         </div>
