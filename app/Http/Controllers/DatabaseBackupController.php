@@ -160,9 +160,7 @@ class DatabaseBackupController extends Controller
         ]);
 
         $providedPassword = $request->input('password');
-        Log::info('User pass:'.$providedPassword);
         $correctPassword = config('app.db_clear_password');
-        Log::info('Correct pass:'.$correctPassword);
 
         if ($providedPassword !== $correctPassword) {
             return redirect()->back()->with('error', 'Incorrect password. Database clearing aborted.');
@@ -171,16 +169,19 @@ class DatabaseBackupController extends Controller
         try {
             DB::beginTransaction();
 
-            // Get all tables except settings and users
-            $tables = DB::select('SHOW TABLES');
+            // Get all tables (exclude views and other non-table objects)
+            $tables = DB::select("SHOW FULL TABLES WHERE Table_type = 'BASE TABLE'");
             $databaseName = env('DB_DATABASE');
             $tableKey = 'Tables_in_' . $databaseName;
 
             $tablesToClear = [];
             foreach ($tables as $table) {
                 $tableName = $table->$tableKey;
-                // Skip settings table and users table (we'll handle users separately)
-                if ($tableName !== 'settings' && $tableName !== 'users') {
+                // Skip these tables  (we'll handle them separately)
+                if ($tableName !== 'settings' && $tableName !== 'users' &&
+                    $tableName !== 'inv_stores' && $tableName !== 'roles' &&
+                    $tableName !== 'permissions' && $tableName !== 'role_has_permissions' &&
+                    $tableName !== 'model_has_roles') {
                     $tablesToClear[] = $tableName;
                 }
             }
@@ -188,14 +189,26 @@ class DatabaseBackupController extends Controller
             // Clear all tables except settings
             DB::statement('SET FOREIGN_KEY_CHECKS=0;');
             foreach ($tablesToClear as $table) {
-                DB::statement('TRUNCATE TABLE `' . $table . '`');
-                Log::info('Cleared table: ' . $table);
+                try {
+                    DB::statement('TRUNCATE TABLE `' . $table . '`');
+                    Log::info('Cleared table: ' . $table);
+                } catch (\Exception $e) {
+                    // Skip tables that don't exist or can't be truncated (like views)
+                    Log::warning('Could not clear table: ' . $table . ' - ' . $e->getMessage());
+                    continue;
+                }
             }
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
             // Clear users table but keep user with id 1
             DB::statement('DELETE FROM users WHERE id != 1');
             Log::info('Cleared users table, kept user with id 1');
+            DB::statement('DELETE FROM roles WHERE id != 1');
+            Log::info('Cleared roles table, kept role with id 1');
+            DB::statement('DELETE FROM inv_stores WHERE id != 1 && id != 2');
+            Log::info('Cleared inv_stores table, kept store with id 1 & 2');
+            DB::statement('DELETE FROM model_has_roles WHERE role_id != 1');
+            Log::info('Cleared model_has_roles table, kept role with role 1');
 
             DB::commit();
 

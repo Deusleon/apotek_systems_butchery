@@ -36,11 +36,14 @@
                                 </select>
                             </div>
                         </div>
+                    </div>
 
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="file">Upload File <span class="text-danger">*</span></label>
-                                <input type="file" name="file" id="file" class="form-control" accept=".csv,.xlsx,.xls" required onchange="validateFile(this)">
+                                <input type="file" name="file" id="file" class="form-control" accept=".csv,.xlsx,.xls"
+                                    required onchange="validateFile(this)">
                                 <small class="form-text text-muted">Supported formats: CSV, Excel (.xlsx, .xls)</small>
                                 <div id="file-error" class="text-danger mt-1" style="display: none;"></div>
                             </div>
@@ -52,7 +55,8 @@
                             <div class="alert alert-info">
                                 <strong>File Format Requirements:</strong>
                                 <ul class="mb-0">
-                                    <li>The file must contain exactly 3 columns: <strong>code</strong>, <strong>product name</strong>, and <strong>selling price</strong></li>
+                                    <li>The file must contain exactly 3 columns: <strong>code</strong>, <strong>product
+                                            name</strong>, and <strong>selling price</strong></li>
                                     <li>Code should match the product code/ID</li>
                                     <li>Product name should match the product name</li>
                                     <li>Selling price should be a numeric value</li>
@@ -63,7 +67,7 @@
                     </div> --}}
 
                     <div class="row">
-                        <div class="col-md-12 justify-content-end d-flex">
+                        <div class="col-md-6 pl-2 d-flex">
                             <a href="{{ route('home') }}" class="btn btn-danger ml-2">
                                 Cancel
                             </a>
@@ -97,7 +101,7 @@
                 $('#file').prop('disabled', true);
                 $('button[type="submit"]').prop('disabled', true);
             @endif
-        });
+            });
 
         // File validation function
         function validateFile(input) {
@@ -139,7 +143,7 @@
         }
 
         // Form validation before submission
-        $('form').on('submit', function(e) {
+        $('form').on('submit', function (e) {
             const fileInput = document.getElementById('file');
             const priceCategory = document.getElementById('price_category');
 

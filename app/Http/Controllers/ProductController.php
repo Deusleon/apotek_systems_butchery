@@ -532,7 +532,7 @@ class ProductController extends Controller
             $file = $request->file('file');
 
             // Parse the file
-            $data = $this->parseFile($file);
+            $data = $this->parseFile($file, true);
 
             if (empty($data)) {
                 return back()->with('error', 'The uploaded file is empty or contains no valid data.');
@@ -540,10 +540,11 @@ class ProductController extends Controller
 
             // Validate headers
             $headers = array_keys($data[0]);
-            $expectedHeaders = ['code', 'product name', 'selling price'];
+            $expectedHeaders = ['code', 'product name', 'price'];
+            Log::info('Validating file headers: ' . implode(', ', $headers));
 
             if (count($headers) !== 3 || !empty(array_diff($expectedHeaders, array_map('strtolower', $headers)))) {
-                return back()->with('error', 'Invalid file format. Expected columns: code, product name, selling price');
+                return back()->with('error', 'Invalid file format. Expected columns: code, product name,  price');
             }
 
             // Validate data structure and content
@@ -557,32 +558,32 @@ class ProductController extends Controller
                     continue;
                 }
 
-                // Validate selling price format
-                $price = trim($row['selling price'] ?? '');
+                // Validate price format
+                $price = trim($row['price'] ?? '');
                 if (empty($price)) {
-                    $validationErrors[] = "Row {$rowNumber}: Selling price cannot be empty";
+                    $validationErrors[] = "Row {$rowNumber}: Price cannot be empty";
                     continue;
                 }
 
                 // Check if price is numeric
                 if (!is_numeric(str_replace([',', ' '], '', $price))) {
-                    $validationErrors[] = "Row {$rowNumber}: Invalid selling price format '{$price}'";
+                    $validationErrors[] = "Row {$rowNumber}: Invalid Price format '{$price}'";
                     continue;
                 }
 
                 // Check if price is positive
                 $numericPrice = floatval(str_replace([',', ' '], '', $price));
                 if ($numericPrice < 0) {
-                    $validationErrors[] = "Row {$rowNumber}: Selling price cannot be negative '{$price}'";
+                    $validationErrors[] = "Row {$rowNumber}: Price cannot be negative '{$price}'";
                 }
             }
 
             // If there are validation errors, return them
             if (!empty($validationErrors)) {
                 $errorMessage = "File validation failed:\n\n";
-                $errorMessage .= implode("\n", array_slice($validationErrors, 0, 10)); // Show first 10 errors
-                if (count($validationErrors) > 10) {
-                    $errorMessage .= "\n... and " . (count($validationErrors) - 10) . " more errors";
+                $errorMessage .= implode("\n", array_slice($validationErrors, 0, 1)); 
+                if (count($validationErrors) > 1) {
+                    $errorMessage .= "\n... and " . (count($validationErrors) - 1) . " more errors";
                 }
                 return back()->with('error', $errorMessage);
             }
@@ -600,14 +601,14 @@ class ProductController extends Controller
         }
     }
 
-    private function parseFile($file)
+    private function parseFile($file, $isPriceFile = false)
     {
         $extension = $file->getClientOriginalExtension();
 
         if ($extension === 'csv') {
-            return $this->parseCsv($file);
+            return $isPriceFile ? $this->parsePriceCsv($file) : $this->parseCsv($file);
         } else {
-            return $this->parseExcel($file);
+            return $isPriceFile ? $this->parsePriceExcel($file) : $this->parseExcel($file);
         }
     }
 
@@ -655,6 +656,51 @@ class ProductController extends Controller
 
         return $data;
     }
+    
+    private function parsePriceCsv($file)
+    {
+        $data = [];
+        $handle = fopen($file->getPathname(), 'r');
+
+        // Skip header row
+        fgetcsv($handle);
+
+        while (($row = fgetcsv($handle)) !== false) {
+            if (count($row) >= 3) {
+                $data[] = [
+                    'code' => trim($row[0]),
+                    'product name' => trim($row[1]),
+                    'price' => trim($row[2]),
+                ];
+            }
+        }
+
+        fclose($handle);
+        return $data;
+    }
+
+    private function parsePriceExcel($file)
+    {
+        $data = [];
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file->getPathname());
+        $worksheet = $spreadsheet->getActiveSheet();
+        $rows = $worksheet->toArray();
+
+        // Skip header row
+        array_shift($rows);
+
+        foreach ($rows as $row) {
+            if (count($row) >= 3 && !empty($row[0])) {
+                $data[] = [
+                    'code' => trim($row[0]),
+                    'product name' => trim($row[1]),
+                    'price' => trim($row[2]),
+                ];
+            }
+        }
+
+        return $data;
+    }
 
     private function processPriceUpload($data, $priceCategoryId)
     {
@@ -675,20 +721,20 @@ class ProductController extends Controller
             foreach ($data as $row) {
                 $results['processed']++;
 
-                // Validate selling price
-                $sellingPrice = $this->validateAndParsePrice($row['selling price']);
+                // Validate price
+                $sellingPrice = $this->validateAndParsePrice($row['price']);
                 if ($sellingPrice === false) {
-                    $errorMsg = "Invalid selling price for product: {$row['code']} - {$row['product name']}";
+                    $errorMsg = "Invalid price for product: {$row['code']} - {$row['product name']}";
                     Log::warning($errorMsg);
                     $results['error_messages'][] = $errorMsg;
                     $results['errors']++;
                     continue;
                 }
 
-                // Find product by code or name
-                $product = $this->findProduct($row['code'], $row['product name']);
+                // Find product by name
+                $product = $this->findProduct($row['product name']);
                 if (!$product) {
-                    $errorMsg = "Product not found: {$row['code']} - {$row['product name']}";
+                    $errorMsg = "Product not found: {$row['product name']}";
                     Log::warning($errorMsg);
                     $results['error_messages'][] = $errorMsg;
                     $results['errors']++;
@@ -746,7 +792,6 @@ class ProductController extends Controller
 
         return $results;
     }
-
     private function validateAndParsePrice($price)
     {
         // Remove commas and spaces
@@ -767,56 +812,9 @@ class ProductController extends Controller
         return $price;
     }
 
-    private function validateUploadData($data)
-    {
-        $errors = [];
-        $storeId = current_store_id();
-
-        foreach ($data as $index => $row) {
-            $rowNumber = $index + 2; // +2 because index starts at 0 and we skip header
-
-            // Validate selling price
-            $sellingPrice = $this->validateAndParsePrice($row['selling price']);
-            if ($sellingPrice === false) {
-                $errors[] = "Row {$rowNumber}: Invalid selling price '{$row['selling price']}' for product '{$row['code']}' - '{$row['product name']}'";
-                continue;
-            }
-
-            // Validate product exists
-            $product = $this->findProduct($row['code'], $row['product name']);
-            if (!$product) {
-                $errors[] = "Row {$rowNumber}: Product not found - Code: '{$row['code']}', Name: '{$row['product name']}'";
-                continue;
-            }
-
-            // Validate product has stock in current store
-            $currentStocks = CurrentStock::where('product_id', $product->id)
-                ->where('quantity', '>', 0);
-
-            if (!is_all_store()) {
-                $currentStocks->where('store_id', $storeId);
-            }
-
-            if ($currentStocks->count() === 0) {
-                $errors[] = "Row {$rowNumber}: No stock found for product '{$product->name}' in current branch";
-            }
-        }
-
-        return ['errors' => $errors];
-    }
-
-    private function findProduct($code, $name)
+    private function findProduct($name)
     {
         // Log::info("Looking for product with code: '{$code}' and name: '{$name}'");
-
-        // First try to find by code (assuming code is the product ID)
-        // if (!empty($code) && is_numeric($code)) {
-        //     $product = Product::find($code);
-        //     if ($product) {
-        //         Log::info("Found product by ID: {$product->name} (ID: {$product->id})");
-        //         return $product;
-        //     }
-        // }
 
         // Finally try to find by name
         if (!empty($name)) {
@@ -936,7 +934,6 @@ class ProductController extends Controller
             return back()->with('error', 'An error occurred while processing the file. Please try again.');
         }
     }
-
     private function processStockUpload($data, $adjustmentReasonId, $storeId)
     {
         $results = [
@@ -1148,7 +1145,6 @@ class ProductController extends Controller
 
         return $results;
     }
-
     private function validateAndParseQuantity($quantity)
     {
         // Remove commas and spaces
@@ -1168,7 +1164,6 @@ class ProductController extends Controller
 
         return $quantity;
     }
-
     public function resetStock(Request $request)
     {
         $request->validate([
