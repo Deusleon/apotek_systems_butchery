@@ -50,7 +50,7 @@
 
                     <div class="d-flex justify-content-end mb-3 mr-3 align-items-center">
                         <label class="mr-2" for="">Date:</label>
-                        <input type="text" name="old_stock_date" id="old_stock_date" class="form-control w-auto" value="{{ request('old_stock_date', \Carbon\Carbon::now()->subDay()->format('Y-m-d')) }}">
+                        <input type="text" name="old_stock_date" id="old_stock_date" class="form-control w-auto" value="{{ request('old_stock_date', \Carbon\Carbon::now()->format('Y-m-d')) }}">
                     </div>
                     <div class="d-flex justify-content-end mb-3">
                         <div class="d-flex align-items-center" style="width: 284px;">
@@ -124,8 +124,8 @@
 @endsection
 
 @push("page_scripts")
-    <script src="{{asset('assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js')}}"></script>
-    <script src="{{asset('assets/js/pages/ac-datepicker.js')}}"></script>
+    <script src="{{asset("assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js")}}"></script>
+    <script src="{{asset("assets/js/pages/ac-datepicker.js")}}"></script>
     <script>
         //Datatable and Tabs managed here
         $(document).ready(function () {

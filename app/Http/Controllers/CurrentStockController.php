@@ -348,7 +348,7 @@ class CurrentStockController extends Controller
         // dd($request->all());
         $store_id = current_store_id();
         $price_category = $request->price_category ?? 1;
-        $date = $request->old_stock_date ?? \Carbon\Carbon::now()->subDay()->toDateString(); // default yesterday
+        $date = $request->old_stock_date ?? \Carbon\Carbon::now()->toDateString(); // default today
         $price_categories = PriceCategory::all();
 
         try {

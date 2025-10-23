@@ -20,8 +20,8 @@ class SnapshotOldStockValue extends Command
         DB::beginTransaction();
 
         try {
-            // snapshot_date is yesterday (so running at 00:00 yields "yesterday" snapshot)
-            $snapshotDate = Carbon::now()->subDay()->toDateString();
+            // snapshot_date is today (so running at 00:00 yields "today" snapshot)
+            $snapshotDate = Carbon::now()->toDateString();
             $storeId = function_exists('current_store_id') ? current_store_id() : null;
             $isAllStore = function_exists('is_all_store') ? is_all_store() : false;
 
