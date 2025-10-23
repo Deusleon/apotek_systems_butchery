@@ -126,7 +126,7 @@
 
                                 <!-- New Evidence -->
                                 <div class="mr-2" style="flex: 4;">
-                                    <label for="evidence"><b>New Evidence <font color="red">*</font></b></label>
+                                    <label for="evidence"><b>New Evidence</b></label>
                                     <input type="file" id="evidence" name="evidence" class="form-control" accept=".pdf,.doc,.docx,.jpg,.png">
                                 </div>
 
