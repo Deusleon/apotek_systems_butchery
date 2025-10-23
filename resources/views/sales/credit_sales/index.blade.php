@@ -89,23 +89,12 @@
                         </li>
                     @endif
 
-                    @if(auth()->user()->checkPermission('View Credit Payment'))
-                        {{-- @if(!auth()->user()->checkPermission('View Credit Sales') && !auth()->user()->checkPermission('View
-                        Credit Tracking')) --}}
+                    @if(auth()->user()->checkPermission('View Credit Payments'))
                         <li class="nav-item">
                             <a class="nav-link text-uppercase" id="credit-payment-tablist" data-toggle="pill"
                                 href="#credit-payment" role="tab" aria-controls="credit_payment" aria-selected="false">Payments
                             </a>
                         </li>
-                        {{-- @endif --}}
-
-                        {{-- @if(auth()->user()->checkPermission('View Credit Tracking'))
-                        <li class="nav-item">
-                            <a class="nav-link text-uppercase" id="credit-payment-tablist" data-toggle="pill"
-                                href="#credit-payment" role="tab" aria-controls="credit_payment" aria-selected="false">Payments
-                            </a>
-                        </li>
-                        @endif --}}
                     @endif
                 </ul>
                 <div class="tab-content" id="myTabContent">
@@ -442,7 +431,7 @@
                         <img id="loading-image" src="{{asset('assets/images/spinner.gif')}}" />
                     </div>
 
-                    @if(!auth()->user()->checkPermission('View Credit Sales') && !auth()->user()->checkPermission('View Credit Payment') && !auth()->user()->checkPermission('View Credit Tracking'))
+                    @if(!auth()->user()->checkPermission('View Credit Sales') && !auth()->user()->checkPermission('View Credit Payments') && !auth()->user()->checkPermission('View Credit Tracking'))
                         <div class="tab-pane fade show" id="credit-sale-receiving" role="tabpanel"
                             aria-labelledby="credit_sales-tab">
                             <div class="row">
@@ -498,7 +487,7 @@
 
                             <div class="row" id="detail">
                                 <hr>
-                                @if(auth()->user()->checkPermission('View Credit Payments'))
+                                @if(auth()->user()->checkPermission('View Credit Paymentss'))
                                     <div id="can_pay"></div>
                                 @endif
                                 <div class="table teble responsive p-3" style="width: 100%;">
@@ -542,7 +531,7 @@
                     {{-- End Credit Tracking--}}
 
                     {{-- Start Credit Payment--}}
-                    @if(auth()->user()->checkPermission('View Credit Payment'))
+                    @if(auth()->user()->checkPermission('View Credit Payments'))
                         <div class="tab-pane fade" id="credit-payment" role="tabpanel" aria-labelledby="credit_payment-tab">
                             <div class="row d-flex justify-content-end mr-0">
                                 <div class="d-flex justify-content-end mb-3">
@@ -602,11 +591,11 @@
                         </div>
                     @endif
 
-                    @if(!auth()->user()->checkPermission('View Credit Payment'))
+                    @if(!auth()->user()->checkPermission('View Credit Payments'))
                         <div class="tab-pane fade" id="credit-payment" role="tabpanel" aria-labelledby="credit_payment-tab">
                             <div class="row">
 
-                                {{-- <p>You do not have permission to View Credit Payment</p> --}}
+                                {{-- <p>You do not have permission to View Credit Payments</p> --}}
 
                             </div>
                         </div>

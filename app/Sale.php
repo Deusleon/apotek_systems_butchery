@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class Sale extends Model
 {
@@ -12,11 +13,16 @@ class Sale extends Model
 
     public function details()
     {
-        return $this->hasMany(SalesDetail::class, 'sale_id', 'id')
-            ->leftJoin('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
-            ->leftJoin('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
-            ->select('sales_details.id as id', 'inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom', 'sales_details.quantity as quantity', 'sales_details.price', 'sales_details.vat', 'sales_details.discount', 'sales_details.amount', 'sales_details.status')
-            ->groupBy('sales_details.id', 'inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom', 'sales_details.quantity', 'sales_details.price', 'sales_details.vat', 'sales_details.discount', 'sales_details.amount', 'sales_details.status');
+        try {
+            return $this->hasMany(SalesDetail::class, 'sale_id', 'id')
+                ->leftJoin('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
+                ->leftJoin('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                ->select('sales_details.id as id', 'inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom', 'sales_details.quantity as quantity', 'sales_details.price', 'sales_details.vat', 'sales_details.discount', 'sales_details.amount', 'sales_details.status')
+                ->groupBy('sales_details.id', 'inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom', 'sales_details.quantity', 'sales_details.price', 'sales_details.vat', 'sales_details.discount', 'sales_details.amount', 'sales_details.status');
+        } catch (\Exception $e) {
+            Log::error('Error in Sale details relationship: ' . $e->getMessage());
+            return collect(); // Return empty collection on error
+        }
     }
 
     public function cost()

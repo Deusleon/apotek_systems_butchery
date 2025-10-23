@@ -57,12 +57,17 @@ class PriceListController extends Controller {
 
         $current_stocks = $query->get();
 
-        // This query is for the 'History' view
-        $stocks = DB::table( 'stock_details' )
-        ->join( 'inv_products', 'inv_products.id', '=', 'stock_details.product_id' )
-        ->select( 'product_name as name', 'inv_products.brand as brand', 'inv_products.pack_size as pack_size', 'inv_products.sales_uom as sales_uom', 'unit_cost', 'selling_price as price', 'stock_details.updated_at', 'price_category_id' )
-        ->where( 'store_id', $store_id )
-        ->get();
+        // This query is for the 'History' view - with error handling for missing table
+        try {
+            $stocks = DB::table( 'stock_details' )
+            ->join( 'inv_products', 'inv_products.id', '=', 'stock_details.product_id' )
+            ->select( 'product_name as name', 'inv_products.brand as brand', 'inv_products.pack_size as pack_size', 'inv_products.sales_uom as sales_uom', 'unit_cost', 'selling_price as price', 'stock_details.updated_at', 'price_category_id' )
+            ->where( 'store_id', $store_id )
+            ->get();
+        } catch (\Exception $e) {
+            Log::warning('stock_details table query failed, using empty collection: ' . $e->getMessage());
+            $stocks = collect(); // Return empty collection if table doesn't exist
+        }
 
         return view( 'stock_management.price_list.index' )->with( [
             'price_categories' => $price_categories,
@@ -357,15 +362,20 @@ class PriceListController extends Controller {
 
     public function priceHistory( Request $request ) {
         if ( $request->ajax() ) {
-            $prices = DB::table( 'stock_details' )
-            ->select( '*' )
-            ->where( 'product_id', ' = ', $request->product_id )
-            ->where( 'price_category_id', $request->price_category_id )
-            ->orderBy( 'id', 'desc' )
-            ->take( 5 )
-            ->get();
+            try {
+                $prices = DB::table( 'stock_details' )
+                ->select( '*' )
+                ->where( 'product_id', ' = ', $request->product_id )
+                ->where( 'price_category_id', $request->price_category_id )
+                ->orderBy( 'id', 'desc' )
+                ->take( 5 )
+                ->get();
 
-            return json_decode( $prices, true );
+                return json_decode( $prices, true );
+            } catch (\Exception $e) {
+                Log::warning('priceHistory query failed: ' . $e->getMessage());
+                return response()->json(['error' => 'Price history not available'], 500);
+            }
 
         }
 
@@ -499,11 +509,16 @@ class PriceListController extends Controller {
             }
         }
 
-        $store_id = Auth::user()->store_id;
-        $products = DB::table( 'stock_details' )
-        ->select( 'id', 'product_name as name', 'unit_cost', 'selling_price as price', 'created_at' )
-        ->where( 'store_id', $store_id )
-        ->get();
+        try {
+            $store_id = Auth::user()->store_id;
+            $products = DB::table( 'stock_details' )
+            ->select( 'id', 'product_name as name', 'unit_cost', 'selling_price as price', 'created_at' )
+            ->where( 'store_id', $store_id )
+            ->get();
+        } catch (\Exception $e) {
+            Log::warning('allPriceList stock_details query failed: ' . $e->getMessage());
+            $products = collect(); // Return empty collection if table doesn't exist
+        }
 
         $json_data = array(
             'draw' => intval( $request->input( 'draw' ) ),

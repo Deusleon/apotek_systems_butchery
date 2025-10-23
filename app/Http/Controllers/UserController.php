@@ -85,33 +85,43 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:50',
-            'position' => 'nullable|string|max:50',
-            'role' => 'required|exists:roles,id',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-            'store_id' => 'required|exists:inv_stores,id',
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required|string|max:50',
+                'position' => 'nullable|string|max:50',
+                'role' => 'required|exists:roles,id',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:6|confirmed',
+                'store_id' => 'required|exists:inv_stores,id',
+            ]);
 
-        $user = new User;
-        $user->name = $request->name;
-        $user->position = $request->position;
-        $user->email = $request->email;
-        $user->mobile = $request->mobile;
-        $user->status = '1';
-        $user->password = Hash::make($request->password);
-        $user->store_id = $request->store_id;
-        $user->save();
+            $user = new User;
+            $user->name = $request->name;
+            $user->position = $request->position;
+            $user->email = $request->email;
+            $user->mobile = $request->mobile;
+            $user->status = '1';
+            $user->password = Hash::make($request->password);
+            $user->store_id = $request->store_id;
+            $user->save();
 
-        // ✅ resolve role id to role name before syncing
-        $role = Role::find($request->role);
-        if ($role) {
-            $user->syncRoles($role->name);
+            // ✅ resolve role id to role name before syncing
+            $role = Role::find($request->role);
+            if ($role) {
+                $user->syncRoles($role->name);
+            }
+
+            Log::info('User created successfully', ['user_id' => $user->id, 'email' => $user->email, 'created_by' => Auth::id()]);
+            session()->flash("alert-success", "User created successfully!");
+            return back();
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->validator)->withInput();
+        } catch (\Exception $e) {
+            Log::error('Error creating user: ' . $e->getMessage() . ' at line ' . $e->getLine() . ' in ' . $e->getFile());
+            session()->flash("alert-danger", "Failed to create user. Please try again.");
+            return back();
         }
-
-        session()->flash("alert-success", "User created successfully!");
-        return back();
     }
 
     public function update(Request $request)

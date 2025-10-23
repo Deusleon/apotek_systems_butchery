@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProductLedgerController extends Controller
 {
@@ -24,11 +25,16 @@ class ProductLedgerController extends Controller
             $default_store_id = 1;
         }
 
-        $products = DB::table('stock_details')
-            ->select('product_id', 'product_name')
-            ->where('store_id', $default_store_id)
-            ->groupby('product_id', 'product_name')
-            ->get();
+        try {
+            $products = DB::table('stock_details')
+                ->select('product_id', 'product_name')
+                ->where('store_id', $default_store_id)
+                ->groupby('product_id', 'product_name')
+                ->get();
+        } catch (\Exception $e) {
+            Log::warning('ProductLedger index stock_details query failed: ' . $e->getMessage());
+            $products = collect(); // Return empty collection if table doesn't exist
+        }
 
         return view('stock_management.product_ledger.index')->with([
             'products' => $products
@@ -48,22 +54,32 @@ class ProductLedgerController extends Controller
                 $default_store_id = 1;
             }
 
-            $current_stock = DB::table('stock_details')
-                ->select('product_id')
-                ->where('store_id', $default_store_id)
-                ->groupby('product_id')
-                ->get();
+            try {
+                $current_stock = DB::table('stock_details')
+                    ->select('product_id')
+                    ->where('store_id', $default_store_id)
+                    ->groupby('product_id')
+                    ->get();
+            } catch (\Exception $e) {
+                Log::warning('ProductLedger showProductLedger stock_details query failed: ' . $e->getMessage());
+                $current_stock = collect(); // Return empty collection if table doesn't exist
+            }
 
             if ($request->date == null) {
 
                 //return products only
-                $ledger = DB::table('product_ledger')
-                    ->select(DB::raw('*'), DB::raw('(received + outgoing) as quantity'))
-                    ->join('users', 'users.id', '=', 'product_ledger.user')
-                    ->where('store_id', $default_store_id)
-                    ->where('product_id', $request->product_id)
-                    ->orderBy('product_ledger.id', 'ASC')
-                    ->get();
+                try {
+                    $ledger = DB::table('product_ledger')
+                        ->select(DB::raw('*'), DB::raw('(received + outgoing) as quantity'))
+                        ->join('users', 'users.id', '=', 'product_ledger.user')
+                        ->where('store_id', $default_store_id)
+                        ->where('product_id', $request->product_id)
+                        ->orderBy('product_ledger.id', 'ASC')
+                        ->get();
+                } catch (\Exception $e) {
+                    Log::warning('ProductLedger showProductLedger product_ledger query failed: ' . $e->getMessage());
+                    $ledger = collect(); // Return empty collection if table doesn't exist
+                }
 
                 $results = $this->sumProductFilterTotals($ledger, $current_stock);
                 return $results;
@@ -72,22 +88,32 @@ class ProductLedgerController extends Controller
 
                 //return both
                 //previous row
-                $previous_ledger = DB::table('product_ledger')
-                    ->select(DB::raw('*'), DB::raw('(received + outgoing) as quantity'))
-                    ->join('users', 'users.id', '=', 'product_ledger.user')
-                    ->where('product_id', $request->product_id)
-                    ->where('date', '<', $request->date)
-                    ->orderby('product_ledger.id', 'desc')
-                    ->limit('1');
+                try {
+                    $previous_ledger = DB::table('product_ledger')
+                        ->select(DB::raw('*'), DB::raw('(received + outgoing) as quantity'))
+                        ->join('users', 'users.id', '=', 'product_ledger.user')
+                        ->where('product_id', $request->product_id)
+                        ->where('date', '<', $request->date)
+                        ->orderby('product_ledger.id', 'desc')
+                        ->limit('1');
+                } catch (\Exception $e) {
+                    Log::warning('ProductLedger showProductLedger previous_ledger query failed: ' . $e->getMessage());
+                    $previous_ledger = collect(); // Return empty collection if table doesn't exist
+                }
 
                 // $previous_ledger[0]['quantity'] = 80;
 
-                $current_ledger = DB::table('product_ledger')
-                    ->select(DB::raw('*'), DB::raw('(received + outgoing) as quantity'))
-                    ->join('users', 'users.id', '=', 'product_ledger.user')
-                    ->where('product_id', $request->product_id)
-                    ->orderBy('product_ledger.id', 'ASC')
-                    ->whereBetween('date', [$request->date, date('Y-m-d')]);
+                try {
+                    $current_ledger = DB::table('product_ledger')
+                        ->select(DB::raw('*'), DB::raw('(received + outgoing) as quantity'))
+                        ->join('users', 'users.id', '=', 'product_ledger.user')
+                        ->where('product_id', $request->product_id)
+                        ->orderBy('product_ledger.id', 'ASC')
+                        ->whereBetween('date', [$request->date, date('Y-m-d')]);
+                } catch (\Exception $e) {
+                    Log::warning('ProductLedger showProductLedger current_ledger query failed: ' . $e->getMessage());
+                    $current_ledger = collect(); // Return empty collection if table doesn't exist
+                }
 
                 $ledger = $previous_ledger->union($current_ledger)->get();
 
@@ -172,13 +198,18 @@ class ProductLedgerController extends Controller
         //check if the ledger has data
         try {
             if (isset($ledger[0])) {
-                $final_ledger = DB::table('product_ledger')
-                    ->select(DB::raw('product_id'), DB::raw('sum(received + outgoing) as balance'))
-                    ->where('product_id', $ledger[0]->product_id)
-                    ->where('store_id', $default_store_id)
-                    ->where('id', '<', $ledger[0]->id)
-                    ->groupBy('product_id')
-                    ->get();
+                try {
+                    $final_ledger = DB::table('product_ledger')
+                        ->select(DB::raw('product_id'), DB::raw('sum(received + outgoing) as balance'))
+                        ->where('product_id', $ledger[0]->product_id)
+                        ->where('store_id', $default_store_id)
+                        ->where('id', '<', $ledger[0]->id)
+                        ->groupBy('product_id')
+                        ->get();
+                } catch (\Exception $e) {
+                    Log::warning('ProductLedger sumProductFilterTotal final_ledger query failed: ' . $e->getMessage());
+                    $final_ledger = collect(); // Return empty collection if table doesn't exist
+                }
 
                 //set balance for the previous product as balance brought fowardS
                 if ($final_ledger[0]->product_id == null) {

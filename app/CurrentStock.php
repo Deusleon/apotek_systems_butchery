@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use App\Events\StockUpdated;
 use App\StockAdjustmentLog;
 
@@ -90,10 +91,15 @@ class CurrentStock extends Model
 
     public function calculateStockValue()
     {
-        $price = $this->getActivePrice() ? $this->getActivePrice()->price : $this->unit_cost;
-        $this->stock_value = $this->quantity * $price;
-        $this->last_calculated_at = now();
-        return $this->save();
+        try {
+            $price = $this->getActivePrice() ? $this->getActivePrice()->price : $this->unit_cost;
+            $this->stock_value = $this->quantity * $price;
+            $this->last_calculated_at = now();
+            return $this->save();
+        } catch (\Exception $e) {
+            Log::error('Error calculating stock value for stock ID ' . $this->id . ': ' . $e->getMessage());
+            return false;
+        }
     }
 
     public function isLowStock()

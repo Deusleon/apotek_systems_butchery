@@ -72,7 +72,7 @@ class StockTransferController extends Controller {
                     // 'history_url' => route( 'stock-transfer-history' )
                 ] );
             } catch ( Exception $e ) {
-                Log::error( 'Stock Transfer Creation Error: ' . $e->getMessage() );
+                Log::error( 'Stock Transfer Creation Error: ' . $e->getMessage() . ' at line ' . $e->getLine() . ' in ' . $e->getFile() );
                 return response()->json( [
                     'success' => false,
                     'message' => 'Failed to create stock transfer. Please try again.',
@@ -82,8 +82,13 @@ class StockTransferController extends Controller {
         }
 
         // Non-AJAX request - redirect to history page
-        $transfer_no = $this->store( $request );
-        return redirect()->route( 'stock-transfer-history' )->with( 'success', 'Stock transfer created successfully!' );
+        try {
+            $transfer_no = $this->store( $request );
+            return redirect()->route( 'stock-transfer-history' )->with( 'success', 'Stock transfer created successfully!' );
+        } catch ( Exception $e ) {
+            Log::error( 'Stock Transfer Creation Error (non-AJAX): ' . $e->getMessage() . ' at line ' . $e->getLine() . ' in ' . $e->getFile() );
+            return redirect()->back()->with( 'error', 'Failed to create stock transfer. Please try again.' );
+        }
     }
 
     protected function sendNotifications( $transfer, $status, $action ) {
@@ -138,72 +143,87 @@ class StockTransferController extends Controller {
 
     public function store(Request $request)
     {
-        // Handle file upload (kama ulivyokuwa)
-        $pictureName = null;
-        if ($request->hasFile('evidence')) {
-            $picture = $request->file('evidence');
-            $pictureExtension = $picture->getClientOriginalExtension();
-            $pictureName = $picture->getFilename() . '.' . $pictureExtension;
-            $picture->move(public_path('fileStore'), $pictureName);
-        }
+        try {
+            // Handle file upload (kama ulivyokuwa)
+            $pictureName = null;
+            if ($request->hasFile('evidence')) {
+                $picture = $request->file('evidence');
+                $pictureExtension = $picture->getClientOriginalExtension();
+                $pictureName = $picture->getFilename() . '.' . $pictureExtension;
+                $picture->move(public_path('fileStore'), $pictureName);
+            }
 
-        $transfer_no = $this->transferNumberAutoGen();
-        $to_save_data = [];
-        $user_id = Auth::id();
+            $transfer_no = $this->transferNumberAutoGen();
+            $to_save_data = [];
+            $user_id = Auth::id();
 
-        foreach (json_decode($request->cart, true) as $value) {
-            if (!array_key_exists('quantityIn', $value)) {
-                session()->flash("alert-danger", "Please quantity transfered exceeds quantity available!");
+            $cart = json_decode($request->cart, true);
+            if (!$cart || !is_array($cart)) {
+                Log::error('Invalid cart data in stock transfer store');
+                session()->flash("alert-danger", "Invalid cart data!");
                 return back();
             }
 
-            $transferData = [
-                'stock_id' => $value['stock_id'],
-                'product_id' => $value['product_id'],
-                'transfer_no' => $transfer_no,
-                'transfer_qty' => str_replace(', ', '', $value['quantityTran']),
-                'from_store' => $request->from_id,
-                'to_store' => $request->to_id,
-                'status' => 'created',
-                'remarks' => $request->remark, 
-                'created_by' => $user_id,
-                'created_at' => now(),
-                'evidence' => $pictureName
-            ];
-
-            $to_save_data[] = $transferData;
-        }
-
-        // Insert transfers
-        foreach ($to_save_data as $save_data) {
-            try {
-                $id = DB::table('inv_stock_transfers')->insertGetId([
-                    'stock_id' => $save_data['stock_id'],
-                    'transfer_qty' => $save_data['transfer_qty'],
-                    'from_store' => $save_data['from_store'],
-                    'to_store' => $save_data['to_store'],
-                    'status' => $save_data['status'],
-                    'remarks' => $save_data['remarks'],
-                    'created_by' => $save_data['created_by'],
-                    'created_at' => $save_data['created_at'],
-                    'transfer_no' => $save_data['transfer_no'],
-                    'evidence' => $save_data['evidence']
-                ]);
-
-                $transfer = DB::table('inv_stock_transfers')->where('id', $id)->first();
-                $this->sendNotifications($transfer, 'created', 'created');
-
-                if (config('stock.require_transfer_approval', true)) {
-                    $this->sendNotifications($transfer, 'created', 'needs_approval');
+            foreach ($cart as $value) {
+                if (!array_key_exists('quantityIn', $value)) {
+                    session()->flash("alert-danger", "Please quantity transfered exceeds quantity available!");
+                    return back();
                 }
 
-            } catch (Exception $e) {
-                Log::error('Stock Transfer Error: ' . $e->getMessage());
-                return back()->with('error', 'Failed to create stock transfer. Please try again.');
-            }
-        }
+                $transferData = [
+                    'stock_id' => $value['stock_id'],
+                    'product_id' => $value['product_id'],
+                    'transfer_no' => $transfer_no,
+                    'transfer_qty' => str_replace(', ', '', $value['quantityTran']),
+                    'from_store' => $request->from_id,
+                    'to_store' => $request->to_id,
+                    'status' => 'created',
+                    'remarks' => $request->remark,
+                    'created_by' => $user_id,
+                    'created_at' => now(),
+                    'evidence' => $pictureName
+                ];
 
-        return strval($transfer_no);
+                $to_save_data[] = $transferData;
+            }
+
+            // Insert transfers
+            foreach ($to_save_data as $save_data) {
+                try {
+                    $id = DB::table('inv_stock_transfers')->insertGetId([
+                        'stock_id' => $save_data['stock_id'],
+                        'transfer_qty' => $save_data['transfer_qty'],
+                        'from_store' => $save_data['from_store'],
+                        'to_store' => $save_data['to_store'],
+                        'status' => $save_data['status'],
+                        'remarks' => $save_data['remarks'],
+                        'created_by' => $save_data['created_by'],
+                        'created_at' => $save_data['created_at'],
+                        'transfer_no' => $save_data['transfer_no'],
+                        'evidence' => $save_data['evidence']
+                    ]);
+
+                    $transfer = DB::table('inv_stock_transfers')->where('id', $id)->first();
+                    $this->sendNotifications($transfer, 'created', 'created');
+
+                    if (config('stock.require_transfer_approval', true)) {
+                        $this->sendNotifications($transfer, 'created', 'needs_approval');
+                    }
+
+                } catch (Exception $e) {
+                    Log::error('Stock Transfer Error: ' . $e->getMessage() . ' at line ' . $e->getLine() . ' in ' . $e->getFile());
+                    return back()->with('error', 'Failed to create stock transfer. Please try again.');
+                }
+            }
+
+            Log::info('Stock transfer created successfully', ['transfer_no' => $transfer_no, 'user_id' => $user_id]);
+            return strval($transfer_no);
+
+        } catch (Exception $e) {
+            Log::error('Unexpected error in stock transfer store: ' . $e->getMessage() . ' at line ' . $e->getLine() . ' in ' . $e->getFile());
+            session()->flash("alert-danger", "An unexpected error occurred. Please try again.");
+            return back();
+        }
     }
 
         public function show($id)

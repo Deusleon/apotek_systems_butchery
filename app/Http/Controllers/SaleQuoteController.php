@@ -43,7 +43,7 @@ class SaleQuoteController extends Controller {
         if ( $sale_type != null ) {
             $default_sale_type = $sale_type->id;
         } else {
-            $default_sale_type = PriceCategory::first()->value( 'id' );
+            $default_sale_type = optional(PriceCategory::first())->id ?? '';
         }
 
         $price_category = PriceCategory::all();
@@ -78,7 +78,7 @@ class SaleQuoteController extends Controller {
         if ( $sale_type != null ) {
             $default_sale_type = $sale_type->id;
         } else {
-            $default_sale_type = PriceCategory::first()->value( 'id' );
+            $default_sale_type = optional(PriceCategory::first())->id ?? '';
         }
 
         $price_category = PriceCategory::all();
@@ -435,7 +435,7 @@ class SaleQuoteController extends Controller {
         if ( $sale_type != null ) {
             $default_sale_type = $sale_type->id;
         } else {
-            $default_sale_type = PriceCategory::first()->value( 'id' );
+            $default_sale_type = optional(PriceCategory::first())->id ?? '';
         }
 
         $total = $sub_amount - $discount;
@@ -509,7 +509,7 @@ class SaleQuoteController extends Controller {
         if ( $sale_type != null ) {
             $default_sale_type = $sale_type->id;
         } else {
-            $default_sale_type = PriceCategory::first()->value( 'id' );
+            $default_sale_type = optional(PriceCategory::first())->id ?? '';
         }
 
         $total = ($sub_total + $total_vat)-$discount;

@@ -34,12 +34,17 @@ class InventoryReportController extends Controller
         if (!Auth()->user()->checkPermission('View Inventory Reports')) {
             abort(403, 'Access Denied');
         }
-        $products = DB::table('product_ledger')
-            ->join('inv_products', 'inv_products.id', '=', 'product_ledger.product_id')
-            ->select('product_id', 'product_name', 'brand', 'pack_size', 'sales_uom')
-            ->groupby(['product_id', 'product_name'])
-            ->orderBy('product_name', 'asc')
-            ->get();
+        try {
+            $products = DB::table('product_ledger')
+                ->join('inv_products', 'inv_products.id', '=', 'product_ledger.product_id')
+                ->select('product_id', 'product_name', 'brand', 'pack_size', 'sales_uom')
+                ->groupby(['product_id', 'product_name'])
+                ->orderBy('product_name', 'asc')
+                ->get();
+        } catch (\Exception $e) {
+            Log::warning('InventoryReport index product_ledger query failed: ' . $e->getMessage());
+            $products = collect(); // Return empty collection if table doesn't exist
+        }
 
         $store = Store::all();
         $category = Category::orderBy('name', 'asc')->get();
@@ -544,26 +549,36 @@ class InventoryReportController extends Controller
             abort(403, 'Access Denied');
         }
         $store_id = current_store_id();
-        $query = DB::table('stock_details')
-            ->select('product_id')
-            ->groupby(['product_id']);
+        try {
+            $query = DB::table('stock_details')
+                ->select('product_id')
+                ->groupby(['product_id']);
 
-        if (!is_all_store()) {
-            $query->where('store_id', $store_id);
+            if (!is_all_store()) {
+                $query->where('store_id', $store_id);
+            }
+
+            $current_stock = $query->get();
+        } catch (\Exception $e) {
+            Log::warning('InventoryReport productLedgerReport stock_details query failed: ' . $e->getMessage());
+            $current_stock = collect(); // Return empty collection if table doesn't exist
         }
 
-        $current_stock = $query->get();
+        try {
+            $query2 = DB::table('product_ledger')
+                ->join('inv_products', 'inv_products.id', '=', 'product_ledger.product_id')
+                ->select('product_id', 'inv_products.name as product_name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom', 'received', 'outgoing', 'method', 'date')
+                ->where('product_id', '=', $product_id);
 
-        $query2 = DB::table('product_ledger')
-            ->join('inv_products', 'inv_products.id', '=', 'product_ledger.product_id')
-            ->select('product_id', 'inv_products.name as product_name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom', 'received', 'outgoing', 'method', 'date')
-            ->where('product_id', '=', $product_id);
-        
-         if (!is_all_store()) {
-            $query2->where('store_id', $store_id);
+              if (!is_all_store()) {
+                $query2->where('store_id', $store_id);
+            }
+
+            $product_ledger = $query2->get();
+        } catch (\Exception $e) {
+            Log::warning('InventoryReport productLedgerReport product_ledger query failed: ' . $e->getMessage());
+            $product_ledger = collect(); // Return empty collection if table doesn't exist
         }
-
-        $product_ledger = $query2->get();
 
         $result = $this->sumProductFilterTotal($product_ledger, $current_stock);
 

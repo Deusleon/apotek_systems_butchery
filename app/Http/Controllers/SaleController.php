@@ -27,41 +27,62 @@ class SaleController extends Controller
 {
     public function cashSale()
     {
-        if (!Auth()->user()->checkPermission('View Cash Sales')) {
-            abort(403, 'Access Denied');
+        try {
+            if (!Auth()->user()->checkPermission('View Cash Sales')) {
+                abort(403, 'Access Denied');
+            }
+
+            $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
+            $back_date = Setting::where('id', 114)->value('value');
+            $fixed_price = Setting::where('id', 124)->value('value');
+            $enable_discount = Setting::where('id', 111)->value('value');
+            $enable_paid = Setting::where('id', 112)->value('value');
+
+            /*get default Price Category*/
+            $default_sale_type = Setting::where('id', 125)->value('value');
+            $sale_type = PriceCategory::where('name', $default_sale_type)->first();
+            $payment_type = PaymentType::all();
+
+            if ($sale_type != null) {
+                $default_sale_type = $sale_type->id;
+            } else {
+                $default_sale_type = optional(PriceCategory::first())->id ?? '';
+            }
+
+            $price_category = PriceCategory::all();
+            $customers = Customer::orderBy('name', 'ASC')->get();
+            $default_customer = Customer::where('name', 'CASH')->value('id');
+            $current_stock = CurrentStock::all();
+
+            // Check for empty data and provide user-friendly warnings
+            $warnings = [];
+            if ($customers->isEmpty()) {
+                $warnings[] = 'No customers found. Please add customers before proceeding with sales.';
+            }
+            if ($price_category->isEmpty()) {
+                $warnings[] = 'No price categories found. Please configure price categories.';
+            }
+            if ($current_stock->isEmpty()) {
+                $warnings[] = 'No stock available. Please add products and stock.';
+            }
+            if (!$default_customer) {
+                $warnings[] = 'Default CASH customer not found. Please create a customer named "CASH".';
+            }
+
+            return View::make('sales.cash_sales.index')
+                ->with(compact('customers'))
+                ->with(compact('price_category'))
+                ->with(compact('current_stock'))->with(compact('enable_discount'))
+                ->with(compact('back_date'))->with(compact('enable_paid'))
+                ->with(compact('payment_type'))
+                ->with(compact('default_sale_type'))
+                ->with(compact('default_customer'))
+                ->with(compact('vat'))->with(compact('fixed_price'))
+                ->with('warnings', $warnings);
+        } catch (\Exception $e) {
+            Log::error('Error in cashSale method: ' . $e->getMessage());
+            return back()->with('error', 'An error occurred while loading the cash sales page.');
         }
-
-        $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
-        $back_date = Setting::where('id', 114)->value('value');
-        $fixed_price = Setting::where('id', 124)->value('value');
-        $enable_discount = Setting::where('id', 111)->value('value');
-        $enable_paid = Setting::where('id', 112)->value('value');
-
-        /*get default Price Category*/
-        $default_sale_type = Setting::where('id', 125)->value('value');
-        $sale_type = PriceCategory::where('name', $default_sale_type)->first();
-        $payment_type = PaymentType::all();
-
-        if ($sale_type != null) {
-            $default_sale_type = $sale_type->id;
-        } else {
-            $default_sale_type = PriceCategory::first()->value('id');
-        }
-
-
-        $price_category = PriceCategory::all();
-        $customers = Customer::orderBy('name', 'ASC')->get();
-        $default_customer = Customer::where('name', 'CASH')->value('id');
-        $current_stock = CurrentStock::all();
-        return View::make('sales.cash_sales.index')
-            ->with(compact('customers'))
-            ->with(compact('price_category'))
-            ->with(compact('current_stock'))->with(compact('enable_discount'))
-            ->with(compact('back_date'))->with(compact('enable_paid'))
-            ->with(compact('payment_type'))
-            ->with(compact('default_sale_type'))
-            ->with(compact('default_customer'))
-            ->with(compact('vat'))->with(compact('fixed_price'));
     }
     public function creditSale()
     {
@@ -84,7 +105,7 @@ class SaleController extends Controller
         if ($sale_type != null) {
             $default_sale_type = $sale_type->id;
         } else {
-            $default_sale_type = PriceCategory::first()->value('id');
+            $default_sale_type = optional(PriceCategory::first())->id ?? '';
         }
 
 
@@ -395,115 +416,185 @@ class SaleController extends Controller
     }
     public function store(Request $request)
     {
-        $default_store = current_store_id();
+        try {
+            $default_store = current_store_id();
 
-        //some attributes declaration
-        $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
-        $receipt_number = strtoupper(substr(md5(microtime()), rand(0, 26), 8));
-        $cart = json_decode($request->cart, true);
-        $discount = $request->discount_amount;
-        $total = 0;
-        if ($request->sale_date) {
-            $date = $request->sale_date;
-        } else {
-            $date = date('Y/m/d');
-        }
-        //Avoid submission of a null Cart
-        if (!$cart) {
-            session()->flash("alert-danger", "You can not save an empty Cart!");
-        } else {
+            //some attributes declaration
+            $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
+            $receipt_number = strtoupper(substr(md5(microtime()), rand(0, 26), 8));
+            $cart = json_decode($request->cart, true);
+            $discount = $request->discount_amount;
+            $total = 0;
+            if ($request->sale_date) {
+                $date = $request->sale_date;
+            } else {
+                $date = date('Y/m/d');
+            }
+            //Avoid submission of a null Cart
+            if (!$cart) {
+                Log::warning('Empty cart submitted in sale store', ['user_id' => Auth::id()]);
+                session()->flash("alert-danger", "You can not save an empty Cart!");
+                return back();
+            }
+
+            // Validate cart structure
+            if (!is_array($cart) || empty($cart)) {
+                Log::warning('Invalid cart structure in sale store', ['user_id' => Auth::id(), 'cart' => $cart]);
+                session()->flash("alert-danger", "Invalid cart data. Please refresh the page and try again.");
+                return back();
+            }
+
             //calculating the Total Amount
             foreach ($cart as $bought) {
+                // Validate cart item structure
+                if (!isset($bought['amount']) || !isset($bought['quantity']) || !isset($bought['product_id'])) {
+                    Log::error('Invalid cart item structure', ['item' => $bought]);
+                    session()->flash("alert-danger", "Invalid cart item data. Please refresh the page and try again.");
+                    return back();
+                }
                 $total += $bought['amount'];
             }
 
-            //Saving Sale Summary and Get its ID
-            $sale = DB::table('sales')->insertGetId(array(
-                'receipt_number' => $receipt_number,
-                'customer_id' => $request->customer_id,
-                'price_category_id' => $request->price_category_id,
-                'payment_type_id' => $request->payment_type,
-                'date' => $date,
-                'created_by' => Auth::User()->id
-            ));
+            DB::beginTransaction();
 
-            //Saving Sale Details
-            foreach ($cart as $bought) {
-                $bought['quantity'] = str_replace(',', '', $bought['quantity']);
-                if ($bought['quantity'] > 0) {
-                    $unit_discount = (($bought['amount'] / ($total ?: 1)) * $discount) / $bought['quantity'];
-                    $unit_price = $bought['price'];
-                    $stocks = CurrentStock::with('product')->where('product_id', $bought['product_id'])
-                        ->where('store_id', $default_store)
-                        ->where('quantity', '>', 0)
-                        ->get();
+            try {
+                //Saving Sale Summary and Get its ID
+                $sale = DB::table('sales')->insertGetId(array(
+                    'receipt_number' => $receipt_number,
+                    'customer_id' => $request->customer_id,
+                    'price_category_id' => $request->price_category_id,
+                    'payment_type_id' => $request->payment_type,
+                    'date' => $date,
+                    'created_by' => Auth::User()->id
+                ));
 
-                    foreach ($stocks as $stock) {
-                        if ($bought['quantity'] <= $stock->quantity) {
-                            $qty = $bought['quantity'];
-                            $price = $unit_price;
-                            $sale_discount = $unit_discount * $qty;
-                            $stock->quantity -= $qty;
-                            $stock->created_by = Auth::User()->id;
-                            $bought['quantity'] -= $qty;
-                        } else {
-                            $qty = $stock->quantity;
-                            $sale_discount = $unit_discount * $qty;
-                            $price = $unit_price;
-                            $stock->quantity = 0;
-                            $stock->created_by = Auth::User()->id;
-                            $bought['quantity'] -= $qty;
+                //Saving Sale Details
+                foreach ($cart as $bought) {
+                    $bought['quantity'] = str_replace(',', '', $bought['quantity']);
+                    if ($bought['quantity'] > 0) {
+                        $unit_discount = (($bought['amount'] / ($total ?: 1)) * $discount) / $bought['quantity'];
+                        $unit_price = $bought['price'];
+                        $stocks = CurrentStock::with('product')->where('product_id', $bought['product_id'])
+                            ->where('store_id', $default_store)
+                            ->where('quantity', '>', 0)
+                            ->get();
+
+                        if ($stocks->isEmpty()) {
+                            Log::warning('No stock available for product', [
+                                'product_id' => $bought['product_id'],
+                                'store_id' => $default_store,
+                                'requested_quantity' => $bought['quantity']
+                            ]);
+                            session()->flash("alert-danger", "Insufficient stock for product ID: {$bought['product_id']}");
+                            DB::rollBack();
+                            return back();
                         }
-                        if ($qty > 0) {
-                            $details = new SalesDetail;
-                            $details->sale_id = $sale;
-                            $details->stock_id = $stock->id;
-                            $details->quantity = $qty;
-                            $details->price = $price;
-                            $details->vat = ($details->price * $vat) * $details->quantity;
-                            $details->amount = ($details->price*$details->quantity) + $details->vat;
-                            $details->discount = $sale_discount;
-                            $details->save();
-                            $stock->save();
 
-                            $stock_tracking = new StockTracking;
-                            $stock_tracking->stock_id = $stock->id;
-                            $stock_tracking->product_id = $bought['product_id'];
-                            $stock_tracking->quantity = $qty;
-                            $stock_tracking->store_id = $default_store;
-                            $stock_tracking->created_by = Auth::user()->id;
-                            $stock_tracking->updated_by = Auth::user()->id;
-                            if ($request->credit == 'Yes') {
-                                $stock_tracking->out_mode = 'Credit Sales';
-                            }else{
-                                $stock_tracking->out_mode = 'Cash Sales';
+                        foreach ($stocks as $stock) {
+                            if ($bought['quantity'] <= $stock->quantity) {
+                                $qty = $bought['quantity'];
+                                $price = $unit_price;
+                                $sale_discount = $unit_discount * $qty;
+                                $stock->quantity -= $qty;
+                                $stock->created_by = Auth::User()->id;
+                                $bought['quantity'] -= $qty;
+                            } else {
+                                $qty = $stock->quantity;
+                                $sale_discount = $unit_discount * $qty;
+                                $price = $unit_price;
+                                $stock->quantity = 0;
+                                $stock->created_by = Auth::User()->id;
+                                $bought['quantity'] -= $qty;
                             }
-                            $stock_tracking->updated_at = date('Y/m/d');
-                            $stock_tracking->movement = 'OUT';
-                            $stock_tracking->save();
+                            if ($qty > 0) {
+                                try {
+                                    $details = new SalesDetail;
+                                    $details->sale_id = $sale;
+                                    $details->stock_id = $stock->id;
+                                    $details->quantity = $qty;
+                                    $details->price = $price;
+                                    $details->vat = ($details->price * $vat) * $details->quantity;
+                                    $details->amount = ($details->price*$details->quantity) + $details->vat;
+                                    $details->discount = $sale_discount;
+                                    $details->save();
+                                    $stock->save();
+                                } catch (\Exception $e) {
+                                    Log::error('Failed to save sale detail', [
+                                        'sale_id' => $sale,
+                                        'stock_id' => $stock->id,
+                                        'error' => $e->getMessage()
+                                    ]);
+                                    throw $e; // Re-throw to trigger rollback
+                                }
 
+                                $stock_tracking = new StockTracking;
+                                $stock_tracking->stock_id = $stock->id;
+                                $stock_tracking->product_id = $bought['product_id'];
+                                $stock_tracking->quantity = $qty;
+                                $stock_tracking->store_id = $default_store;
+                                $stock_tracking->created_by = Auth::user()->id;
+                                $stock_tracking->updated_by = Auth::user()->id;
+                                if ($request->credit == 'Yes') {
+                                    $stock_tracking->out_mode = 'Credit Sales';
+                                }else{
+                                    $stock_tracking->out_mode = 'Cash Sales';
+                                }
+                                $stock_tracking->updated_at = date('Y/m/d');
+                                $stock_tracking->movement = 'OUT';
+                                $stock_tracking->save();
+
+                            }
                         }
                     }
                 }
-            }
-            //credit Sale
-            if ($request->credit == 'Yes') {
+                //credit Sale
+                if ($request->credit == 'Yes') {
+                    try {
+                        $customer = Customer::find($request->customer_id);
+                        if (!$customer) {
+                            Log::error('Customer not found for credit sale', ['customer_id' => $request->customer_id]);
+                            session()->flash("alert-danger", "Customer not found.");
+                            DB::rollBack();
+                            return back();
+                        }
 
-                $credit = new SalesCredit;
-                $customer = Customer::find($request->customer_id);
-                $credit->sale_id = $sale;
-                $credit->paid_amount = $request->paid_amount;
-                $credit->balance = ($total - $discount) - $request->paid_amount;
-                $credit->grace_period = $request->grace_period;
-                $credit->remark = $request->remark;
-                $credit->created_by = Auth::User()->id;
-                $credit->updated_by = Auth::User()->id;
-                $customer->total_credit += $credit->balance;
-                $credit->save();
-                $customer->save();
-              // session()->flash("alert-success", "Sale recorded successfully!");
+                        $credit = new SalesCredit;
+                        $credit->sale_id = $sale;
+                        $credit->paid_amount = $request->paid_amount ?? 0;
+                        $credit->balance = ($total - $discount) - $credit->paid_amount;
+                        $credit->grace_period = $request->grace_period;
+                        $credit->remark = $request->remark;
+                        $credit->created_by = Auth::User()->id;
+                        $credit->updated_by = Auth::User()->id;
+                        $customer->total_credit += $credit->balance;
+                        $credit->save();
+                        $customer->save();
+                    } catch (\Exception $e) {
+                        Log::error('Failed to process credit sale', [
+                            'sale_id' => $sale,
+                            'customer_id' => $request->customer_id,
+                            'error' => $e->getMessage()
+                        ]);
+                        throw $e; // Re-throw to trigger rollback
+                    }
+                  // session()->flash("alert-success", "Sale recorded successfully!");
+                }
+
+                DB::commit();
+                Log::info('Sale recorded successfully', ['receipt_number' => $receipt_number, 'user_id' => Auth::id()]);
+                session()->flash("alert-success", "Sale recorded successfully!");
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Database error in sale store: ' . $e->getMessage());
+                session()->flash("alert-danger", "Failed to save sale. Please try again.");
+                return back();
             }
 
+        } catch (\Exception $e) {
+            Log::error('Error in sale store method: ' . $e->getMessage());
+            session()->flash("alert-danger", "An unexpected error occurred. Please try again.");
+            return back();
         }
 
     }
