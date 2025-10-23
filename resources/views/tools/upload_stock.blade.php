@@ -25,19 +25,26 @@
                     @csrf
 
                     <div class="row">
-                        {{-- <div class="col-md-6">
+                        <div class="col-md-6">
                             <div class="form-group">
-                                <label for="adjustment_reason">Adjustment Reason <span class="text-danger">*</span></label>
-                                <select name="adjustment_reason" id="adjustment_reason" class="form-control" required>
-                                    <option value="">Select Adjustment Reason</option>
-                                    @foreach($adjustmentReasons as $reason)
-                                        <option value="{{ $reason->id }}">{{ $reason->reason }}</option>
-                                    @endforeach
+                                <label for="store_id">Select Branch <span class="text-danger">*</span></label>
+                                <select name="store_id" id="store_id" class="form-control" required>
+                                    <option value="">Select Branch</option>
+                                    @if(is_all_store())
+                                        @foreach($stores as $store)
+                                            @if($store->id > 1)
+                                                <option value="{{ $store->id }}">{{ $store->name }}</option>
+                                            @endif
+                                        @endforeach
+                                    @else
+                                        <option value="{{ current_store()->id }}" selected>{{ current_store()->name }}</option>
+                                    @endif
                                 </select>
                             </div>
-                        </div> --}}
-                        <input type="hidden" name="adjustment_reason" id="adjustment_reason" value="Stock Upload">
-
+                        </div>
+                    </div>
+                    
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="file">Upload File <span class="text-danger">*</span></label>
@@ -91,12 +98,23 @@
             // Check if in ALL branch mode and show notification
             @if(is_all_store())
                 // Show warning notification
-                toastr.warning('Stock upload is not allowed when viewing ALL branches. Please select a specific branch.');
+                toastr.warning('Please select a branch to upload stock for.');
 
                 // Disable form elements
-                $('#adjustment_reason').prop('disabled', true);
+                $('#store_id').prop('disabled', false);
                 $('#file').prop('disabled', true);
                 $('button[type="submit"]').prop('disabled', true);
+
+                // Enable file input when store is selected
+                $('#store_id').on('change', function() {
+                    if ($(this).val()) {
+                        $('#file').prop('disabled', false);
+                        $('button[type="submit"]').prop('disabled', false);
+                    } else {
+                        $('#file').prop('disabled', true);
+                        $('button[type="submit"]').prop('disabled', true);
+                    }
+                });
             @endif
         });
 
@@ -142,17 +160,19 @@
         // Form validation before submission
         $('form').on('submit', function(e) {
             const fileInput = document.getElementById('file');
-            const adjustmentReason = document.getElementById('adjustment_reason');
+            @if(is_all_store())
+            const storeId = $('#store_id').val();
+
+            if (!storeId) {
+                e.preventDefault();
+                toastr.error('Please select a branch.');
+                return false;
+            }
+            @endif
 
             if (!fileInput.files[0]) {
                 e.preventDefault();
                 toastr.error('Please select a file to upload.');
-                return false;
-            }
-
-            if (!adjustmentReason.value) {
-                e.preventDefault();
-                toastr.error('Please select an adjustment reason.');
                 return false;
             }
 

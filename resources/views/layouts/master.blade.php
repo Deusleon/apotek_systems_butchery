@@ -258,7 +258,7 @@ $store_id = Auth::user()->store_id;
             <ul class="navbar-nav ml-auto">
                 @php
                     $userStore = Auth::user()->store;
-                    $canAccessAll = current_store_id() === 1;
+                    $canAccessAll = Auth::user()->store->name === "ALL";
                     $multiStore = Setting::where('id', 121)->value('value');
                     $multiStoreEnabled = $multiStore === 'YES';
                     $defaultStore = Setting::where('id', 122)->value('value');
