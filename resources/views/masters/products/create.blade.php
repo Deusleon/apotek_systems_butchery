@@ -23,8 +23,9 @@
                     <form id="form_product">
                         @csrf()
                         <div class="modal-body">
-                            <div class="row">
-                                <div class="col-md-6">
+                            <div class="row" id="form-layout-container">
+                                <!-- Left Column - Will be converted to full width in Normal mode -->
+                                <div class="col-md-6" id="left-column">
                                     {{-- Product Name --}}
                                     <div class="form-group row">
                                         <label for="name" class="col-md-4 col-form-label text-md-right">
@@ -67,7 +68,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                
+                                <!-- Right Column - Will be hidden in Normal mode -->
+                                <div class="col-md-6" id="right-column">
                                     {{-- Category --}}
                                     <div class="form-group row">
                                         <label for="category" class="col-md-4 col-form-label text-md-right">Category
@@ -118,6 +121,7 @@
                                     </div>
                                 </div>
                             </div>
+                            
                             {{-- Product Type --}}
                             <!--<div class="form-group row">
                                 <label for="product_type" class="col-md-4 col-form-label text-md-right">Type <font color="red">*</font></label>
@@ -157,6 +161,67 @@
                             $(document).ready(function() {
                                 console.log('Modal document ready');
 
+                                // Function to adjust label width for better centering in Normal mode
+                                function adjustLabelWidthForNormalMode() {
+                                    console.log('Adjusting label width for Normal mode');
+                                    // Change label columns from 4 to 3 and input columns from 8 to 9 for better balance
+                                    $('#left-column .form-group.row .col-form-label').removeClass('col-md-4').addClass('col-md-3');
+                                    $('#left-column .form-group.row .col-md-8').removeClass('col-md-8').addClass('col-md-9');
+                                }
+
+                                // Function to restore original label width for Detailed mode
+                                function restoreLabelWidthForDetailedMode() {
+                                    console.log('Restoring original label width for Detailed mode');
+                                    $('#left-column .form-group.row .col-form-label').removeClass('col-md-3').addClass('col-md-4');
+                                    $('#left-column .form-group.row .col-md-9').removeClass('col-md-9').addClass('col-md-8');
+                                    $('#right-column .form-group.row .col-form-label').removeClass('col-md-3').addClass('col-md-4');
+                                    $('#right-column .form-group.row .col-md-9').removeClass('col-md-9').addClass('col-md-8');
+                                }
+
+                                // Function to rearrange fields for Normal mode
+                                function rearrangeFieldsForNormalMode() {
+                                    console.log('Rearranging fields for Normal mode');
+                                    
+                                    // Move Category, Unit, and Min Stock from right column to left column
+                                    const categoryField = $('#right-column .form-group.row').eq(0); // Category
+                                    const unitField = $('#right-column .form-group.row').eq(1); // Unit
+                                    const minStockField = $('#right-column .form-group.row').eq(2); // Min Stock
+                                    
+                                    // Append them to left column after Barcode
+                                    const barcodeField = $('#left-column .form-group.row').eq(1); // Barcode
+                                    
+                                    if (categoryField.length && unitField.length && minStockField.length) {
+                                        categoryField.insertAfter(barcodeField);
+                                        unitField.insertAfter(categoryField);
+                                        minStockField.insertAfter(unitField);
+                                        console.log('Fields rearranged successfully');
+                                    } else {
+                                        console.log('Could not find all fields for rearrangement');
+                                    }
+                                }
+
+                                // Function to rearrange fields for Detailed mode
+                                function rearrangeFieldsForDetailedMode() {
+                                    console.log('Rearranging fields for Detailed mode');
+                                    
+                                    // Move Category, Unit, and Min Stock back to right column
+                                    const categoryField = $('#left-column .form-group.row').eq(2); // Category (after Name, Barcode)
+                                    const unitField = $('#left-column .form-group.row').eq(3); // Unit
+                                    const minStockField = $('#left-column .form-group.row').eq(4); // Min Stock
+                                    
+                                    // Move them back to right column
+                                    const rightColumn = $('#right-column');
+                                    
+                                    if (categoryField.length && unitField.length && minStockField.length) {
+                                        rightColumn.prepend(minStockField);
+                                        rightColumn.prepend(unitField);
+                                        rightColumn.prepend(categoryField);
+                                        console.log('Fields moved back to right column');
+                                    } else {
+                                        console.log('Could not find all fields for detailed mode rearrangement');
+                                    }
+                                }
+
                                 // Function to apply field visibility based on setting
                                 function applyFieldVisibility(setting) {
                                     try {
@@ -164,15 +229,33 @@
                                         if (setting === 'Normal') {
                                             // Hide fields not needed for Normal mode
                                             $('.product-detail-field').hide();
-                                            console.log('Hiding product-detail-field elements');
-                                            console.log('Hidden elements count:', $('.product-detail-field:hidden').length);
-                                            console.log('Total elements:', $('.product-detail-field').length);
+                                            
+                                            // Rearrange fields for vertical layout
+                                            rearrangeFieldsForNormalMode();
+                                            
+                                            // Adjust label width for better centering
+                                            adjustLabelWidthForNormalMode();
+                                            
+                                            // Switch to single column layout
+                                            $('#left-column').removeClass('col-md-6').addClass('col-md-12');
+                                            $('#right-column').hide();
+                                            
+                                            console.log('Normal mode applied: single column, fields rearranged and centered');
                                         } else {
-                                            // Show all fields for Detailed mode (default)
+                                            // Show all fields for Detailed mode
                                             $('.product-detail-field').show();
-                                            console.log('Showing product-detail-field elements');
-                                            console.log('Visible elements count:', $('.product-detail-field:visible').length);
-                                            console.log('Total elements:', $('.product-detail-field').length);
+                                            
+                                            // Rearrange fields back to original positions
+                                            rearrangeFieldsForDetailedMode();
+                                            
+                                            // Restore original label width
+                                            restoreLabelWidthForDetailedMode();
+                                            
+                                            // Switch back to two-column layout
+                                            $('#left-column').removeClass('col-md-12').addClass('col-md-6');
+                                            $('#right-column').show();
+                                            
+                                            console.log('Detailed mode applied: two columns, original layout');
                                         }
                                     } catch (e) {
                                         console.log('Error in applyFieldVisibility:', e);

@@ -16,25 +16,22 @@
                                     <li>{{ $error }}</li>
                                 @endforeach
                             </ul>
-
                         </div>
                     @endif
                     <form id="form_product">
                         @csrf()
                         <div class="modal-body">
                             <div class="row">
-                                <div class="col-md-6">
+                                <!-- Left Column - Always contains the basic fields -->
+                                <div class="col-md-6" id="left-column">
                                     <div class="form-group row">
                                         <label for="product_name" class="col-md-4 col-form-label text-md-right">
                                             Name: <span class="text-danger">*</span>
                                         </label>
-
-
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="name_edit" name="name"
                                                 aria-describedby="emailHelp" maxlength="50" minlength="2" placeholder=""
                                                 required value="{{ old('name') }}">
-                                            </span>
                                         </div>
                                     </div>
 
@@ -76,8 +73,7 @@
                                                 placeholder="" value="{{ old('saleUoM') }}" min="1" required>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
+
                                     <div class="form-group row">
                                         <label for="min_stock" class="col-md-4 col-form-label text-md-right">Min. Stock
                                             Quantity <span class="text-danger">*</span></label>
@@ -87,7 +83,10 @@
                                                 onkeypress="return isNumberKey(event,this)" required>
                                         </div>
                                     </div>
-
+                                </div>
+                                
+                                <!-- Right Column - Contains additional fields for Detailed mode -->
+                                <div class="col-md-6" id="right-column">
                                     <div class="form-group row product-detail-field" id="max_stock_field">
                                         <label for="max_stock" class="col-md-4 col-form-label text-md-right">Max. Stock
                                             Quantity</label>
@@ -95,6 +94,22 @@
                                             <input type="text" class="form-control" id="max_stock_edits"
                                                 name="max_stock" placeholder="" value="{{ old('max_stock') }}" min="1"
                                                 onkeypress="return isNumberKey(event,this)">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row product-detail-field" id="brand_field">
+                                        <label for="brand" class="col-md-4 col-form-label text-md-right">Brand</label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" id="brand_edit" name="brand"
+                                                placeholder="" value="{{ old('brand') }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row product-detail-field" id="pack_size_field">
+                                        <label for="pack_size" class="col-md-4 col-form-label text-md-right">Pack Size</label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" id="pack_size_edit" name="pack_size"
+                                                placeholder="e.g. 6, 12, 24" value="{{ old('pack_size') }}">
                                         </div>
                                     </div>
 
@@ -149,11 +164,17 @@
                                 if (setting === 'Normal') {
                                     // Hide fields not needed for Normal mode
                                     $('.product-detail-field').hide();
-                                    console.log('Hiding product-detail-field elements');
+                                    // Arrange in single column for vertical layout
+                                    $('#left-column').removeClass('col-md-6').addClass('col-md-12');
+                                    $('#right-column').hide();
+                                    console.log('Hiding product-detail-field elements and switching to single column');
                                 } else {
                                     // Show all fields for Detailed mode (default)
                                     $('.product-detail-field').show();
-                                    console.log('Showing product-detail-field elements');
+                                    // Arrange in two columns
+                                    $('#left-column').removeClass('col-md-12').addClass('col-md-6');
+                                    $('#right-column').show();
+                                    console.log('Showing product-detail-field elements and switching to two columns');
                                 }
                             }
 
