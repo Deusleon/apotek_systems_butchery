@@ -25,3 +25,13 @@ Route::prefix('assistant')->group(function () {
     Route::post('/drug-interactions', 'ApiAssistantController@checkDrugInteractions');
     Route::post('/pharmacy-question', 'ApiAssistantController@askPharmacyQuestion');
 });
+
+// Settings API Routes
+Route::get('/get-setting/{id}', function ($id) {
+    $setting = \App\Setting::find($id);
+    return response()->json([
+        'id' => $setting ? $setting->id : null,
+        'name' => $setting ? $setting->name : null,
+        'value' => $setting ? $setting->value : null
+    ]);
+});

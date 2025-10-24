@@ -70,25 +70,25 @@
 
                                     <div class="form-group row">
                                         <label for="saleUoM" class="col-md-4 col-form-label text-md-right">Unit of
-                                            Measure</label>
+                                            Measure <span class="text-danger">*</span></label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="saleUoM_edit" name="saleUoM"
-                                                placeholder="" value="{{ old('saleUoM') }}" min="1">
+                                                placeholder="" value="{{ old('saleUoM') }}" min="1" required>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group row">
                                         <label for="min_stock" class="col-md-4 col-form-label text-md-right">Min. Stock
-                                            Quantity</label>
+                                            Quantity <span class="text-danger">*</span></label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="min_stock_edits"
                                                 name="min_stock" placeholder="" value="{{ old('min_stock') }}" min="1"
-                                                onkeypress="return isNumberKey(event,this)">
+                                                onkeypress="return isNumberKey(event,this)" required>
                                         </div>
                                     </div>
 
-                                    <div class="form-group row">
+                                    <div class="form-group row product-detail-field" id="max_stock_field">
                                         <label for="max_stock" class="col-md-4 col-form-label text-md-right">Max. Stock
                                             Quantity</label>
                                         <div class="col-md-8">
@@ -98,7 +98,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group row">
+                                    <div class="form-group row product-detail-field" id="product_type_field">
                                         <label for="product_type" class="col-md-4 col-form-label text-md-right">Type
                                             <font color="red">*
                                             </font>
@@ -119,6 +119,61 @@
                             <button type="submit" class="btn btn-primary">Save</button>
                         </div>
                     </form>
+
+                    <script>
+                        $(document).ready(function() {
+                            // Function to get product details option setting via AJAX
+                            function getProductDetailsOption() {
+                                var setting = 'Detailed'; // Default fallback
+                                $.ajax({
+                                    url: '{{ url("api/get-setting/127") }}',
+                                    type: 'GET',
+                                    async: false,
+                                    success: function(data) {
+                                        if (data && data.value) {
+                                            setting = data.value;
+                                            console.log('Fetched setting:', setting);
+                                        }
+                                    },
+                                    error: function(xhr, status, error) {
+                                        console.log('AJAX Error:', status, error);
+                                        console.log('Could not fetch product details option setting, using default');
+                                    }
+                                });
+                                return setting;
+                            }
+
+                            // Function to apply field visibility based on setting
+                            function applyFieldVisibility(setting) {
+                                console.log('Applying visibility for setting:', setting);
+                                if (setting === 'Normal') {
+                                    // Hide fields not needed for Normal mode
+                                    $('.product-detail-field').hide();
+                                    console.log('Hiding product-detail-field elements');
+                                } else {
+                                    // Show all fields for Detailed mode (default)
+                                    $('.product-detail-field').show();
+                                    console.log('Showing product-detail-field elements');
+                                }
+                            }
+
+                            // Get current setting and apply visibility
+                            var currentSetting = getProductDetailsOption();
+                            console.log('Current setting loaded:', currentSetting);
+                            applyFieldVisibility(currentSetting);
+
+                            // Store setting in localStorage for potential future use
+                            localStorage.setItem('product_details_option', currentSetting);
+
+                            // Re-apply visibility when modal is shown (in case setting changes)
+                            $('#create').on('show.bs.modal', function() {
+                                var refreshedSetting = getProductDetailsOption();
+                                console.log('Modal shown, refreshing setting:', refreshedSetting);
+                                applyFieldVisibility(refreshedSetting);
+                                localStorage.setItem('product_details_option', refreshedSetting);
+                            });
+                        });
+                    </script>
                 </div>
             </div>
         </div>
