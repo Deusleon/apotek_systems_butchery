@@ -222,7 +222,18 @@
                 @if(Auth::user()->checkPermission('Approve Purchase Returns'))
                             {
                         data: "action",
-                        defaultContent: "<button type='button' id='approve' class='btn btn-sm btn-rounded btn-primary'>Approve</button> <button type='button' id='reject' class='btn btn-sm btn-rounded btn-danger'>Reject</button>"
+                        render: function (data, type, row) {
+                            // Only show action buttons for pending returns (status 2)
+                            if (row.goods_receiving && row.goods_receiving.status == '2') {
+                                return "<button type='button' id='approve' class='btn btn-sm btn-rounded btn-primary'>Approve</button> <button type='button' id='reject' class='btn btn-sm btn-rounded btn-danger'>Reject</button>";
+                            } else {
+                                return "";
+                            }
+                        },
+                        visible: function(row) {
+                            // Hide the entire column for approved/rejected returns
+                            return row.goods_receiving && row.goods_receiving.status == '2';
+                        }
                     }
                 @else
                         {
