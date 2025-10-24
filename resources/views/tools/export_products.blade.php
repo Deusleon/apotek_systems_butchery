@@ -9,12 +9,12 @@
 @endsection
 
 @section('content-title')
-    Export Stock to Excel
+    Export Stock
 @endsection
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#">Settings / Tools / Export Stock to Excel</a></li>
+    <li class="breadcrumb-item"><a href="#">Settings / Tools / Export Stock</a></li>
 @endsection
 
 @section("content")
@@ -70,20 +70,17 @@
                                 </select>
                             </div>
                         </div> 
-
+{{-- 
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="status">Status</label>
                                 <select name="status" id="status" class="form-control">
-                                    <option value="">All Status</option>
+                                    <option value="">All</option>
                                     <option value="1">Active</option>
                                     <option value="0">Inactive</option>
                                 </select>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
+                        </div> --}}
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="format">Export Format <span class="text-danger">*</span></label>

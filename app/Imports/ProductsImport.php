@@ -78,7 +78,20 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, WithBat
 
         } catch (\Exception $e) {
             $this->failCount++;
-            $this->errors[] = 'Row error: ' . $e->getMessage();
+            $errorMessage = 'Row error: ' . $e->getMessage();
+            $this->errors[] = $errorMessage;
+
+            // Log detailed error information
+            \Illuminate\Support\Facades\Log::error('Products Import Row Failed', [
+                'row_data' => $row,
+                'error_message' => $e->getMessage(),
+                'error_file' => $e->getFile(),
+                'error_line' => $e->getLine(),
+                'stack_trace' => $e->getTraceAsString(),
+                'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                'timestamp' => now()
+            ]);
+
             return null;
         }
     }
@@ -106,7 +119,7 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, WithBat
     public function customValidationMessages()
     {
         return [
-            'product_name.required' => 'Product name is required',
+            'name.required' => 'Product name is required',
             'category.required' => 'Category is required',
             'pack_size.numeric' => 'Pack size must be a number',
             'min_stock.numeric' => 'Min stock must be a number',

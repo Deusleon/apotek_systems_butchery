@@ -37,7 +37,7 @@
                 <li class=""><a href="{{route('goods-receiving.index')}}" class="">Goods Receiving</a></li>
             @endif
             @if(auth()->user()->checkPermission('View Purchase Returns'))
-            <li class=""><a href="{{route('purchase-return.returns')}}" class="">Purchase Returns</a></li>
+                <li class=""><a href="{{route('purchase-return.returns')}}" class="">Purchase Returns</a></li>
             @endif
             @if(auth()->user()->checkPermission('View Purchase Order'))
                 <li class=""><a href="{{route('purchase-order.index')}}" class="">Purchase Order</a></li>
@@ -55,7 +55,7 @@
             <span class="pcoded-mtext">Inventory</span>
         </a>
         <ul class="pcoded-submenu">
-             @if(auth()->user()->checkPermission('View Product List'))
+            @if(auth()->user()->checkPermission('View Product List'))
                 <li class=""><a href="{{route('products.index')}}" class="">Product List</a></li>
             @endif
             @if(auth()->user()->checkPermission('Products Import'))
@@ -72,7 +72,7 @@
             @if(auth()->user()->checkPermission('View Price List'))
                 <li class=""><a href="{{ route('price-list.index') }}" class="">Price List</a></li>
             @endif
-             @if(auth()->user()->checkPermission('View Stock Adjustment'))
+            @if(auth()->user()->checkPermission('View Stock Adjustment'))
                 <li class=""><a href="{{ route('new-stock-adjustment') }}" class="">Stock Adjustment</a></li>
             @endif
             @if(auth()->user()->checkPermission('View Stock Requisition'))
@@ -194,6 +194,9 @@
                                     <span class="pcoded-mtext">Configurations</span></a>
                             </li>
                         @endif
+                        @if(auth()->user()->checkPermission('View Branches'))
+                            <li class=""><a href="{{route('stores.index')}}" class="">Branches</a></li>
+                        @endif
                         @if(auth()->user()->checkPermission('View Product Categories'))
                             <li class=""><a href="{{route('product-categories.index')}}" class="">Product Categories</a></li>
                         @endif
@@ -211,9 +214,6 @@
                         @endif
                         @if(auth()->user()->checkPermission('View Adjustment Reasons'))
                             <li class=""><a href="{{route('adjustment-reasons.index')}}" class="">Adjustment Reasons</a></li>
-                        @endif
-                        @if(auth()->user()->checkPermission('View Branches'))
-                            <li class=""><a href="{{route('stores.index')}}" class="">Branches</a></li>
                         @endif
                         @if(auth()->user()->checkPermission('View Terms and Conditions'))
                             <li class="">
@@ -240,25 +240,37 @@
                 </li>
             @endif
             {{-- @if(auth()->user()->checkPermission('View Alerts'))
-                <li>
-                    <a href="#">Alerts</a>
-                    <ul class="pcoded-submenu">
-                        <li class=""><a href="#" class="">Alerts</a></li>
-                        <li class=""><a href="#" class="">Alerts Details</a></li>
-                        <li class=""><a href="#" class="">Min/Max Levels</a></li>
-                    </ul>
-                </li>
+            <li>
+                <a href="#">Alerts</a>
+                <ul class="pcoded-submenu">
+                    <li class=""><a href="#" class="">Alerts</a></li>
+                    <li class=""><a href="#" class="">Alerts Details</a></li>
+                    <li class=""><a href="#" class="">Min/Max Levels</a></li>
+                </ul>
+            </li>
             @endif --}}
             @if(auth()->user()->checkPermission('View Tools'))
                 <li>
                     <a href="#">Tools</a>
                     <ul class="pcoded-submenu">
-                        <li class=""><a href="{{ route('database-backup.index') }}" class="">Database Backup</a></li>
-                        <li class=""><a href="{{ route('tools.export-products') }}" class="">Export Stock to Excel</a></li>
-                        <li class=""><a href="{{ route('tools.reset-stock-form') }}" class="">Reset Stock</a></li>
-                        <li class=""><a href="{{ route('tools.upload-price-form') }}" class="">Upload Price</a></li>
-                        <li class=""><a href="{{ route('tools.upload-stock-form') }}" class="">Upload Stock</a></li>
-                        <li class=""><a href="{{ route('database-clear.index') }}" class="">Clear Database</a></li>
+                        @if (auth()->user()->checkPermission('View Database Backup'))
+                            <li class=""><a href="{{ route('database-backup.index') }}" class="">Database Backup</a></li>
+                        @endif
+                        @if(auth()->user()->checkPermission('View Export Stock'))
+                            <li class=""><a href="{{ route('tools.export-stock') }}" class="">Export Stock</a></li>
+                        @endif
+                        @if(auth()->user()->checkPermission('View Clear Database'))
+                            <li class=""><a href="{{ route('database-clear.index') }}" class="">Clear Database</a></li>
+                        @endif
+                        @if(auth()->user()->checkPermission('View Reset Stock'))
+                            <li class=""><a href="{{ route('tools.reset-stock-form') }}" class="">Reset Stock</a></li>
+                        @endif
+                        @if(auth()->user()->checkPermission('View Upload Stock'))
+                            <li class=""><a href="{{ route('tools.upload-stock-form') }}" class="">Upload Stock</a></li>
+                        @endif
+                        @if(auth()->user()->checkPermission('View Upload Price'))
+                            <li class=""><a href="{{ route('tools.upload-price-form') }}" class="">Upload Price</a></li>
+                        @endif
                     </ul>
                 </li>
             @endif

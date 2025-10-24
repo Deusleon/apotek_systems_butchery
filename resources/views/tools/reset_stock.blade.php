@@ -42,9 +42,6 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="adjustment_reason">Reason <span class="text-danger">*</span></label>
@@ -59,16 +56,23 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6 justify-content-start d-flex">
-                            <a href="{{ route('home') }}" class="btn btn-secondary ml-2">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="password">Confirmation Password <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="password" name="password"
+                                       placeholder="Enter password" autocomplete="off" required>
+                                <small class="form-text text-muted">Contact system administrator for password</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 justify-content-end d-flex">
+                            <a href="{{ route('home') }}" class="btn btn-danger ml-2">
                                 Cancel
                             </a>
                             <button type="submit" class="btn btn-primary" id="reset-btn">
-                                @if(is_all_store())
-                                    Reset Stock
-                                @else
-                                    Reset Stock
-                                @endif
+                                Reset stock
                             </button>
                         </div>
                     </div>
@@ -113,6 +117,7 @@
         // Form validation before submission
         $('#reset-stock-form').on('submit', function (e) {
             const adjustmentReason = $('#adjustment_reason').val();
+            const password = $('#password').val();
             @if(is_all_store())
                 const storeId = $('#store_id').val();
 
@@ -123,9 +128,15 @@
                 }
             @endif
 
-                    if (!adjustmentReason) {
+            if (!adjustmentReason) {
                 e.preventDefault();
                 toastr.error('Please select an adjustment reason.');
+                return false;
+            }
+
+            if (!password) {
+                e.preventDefault();
+                toastr.error('Please enter the confirmation password.');
                 return false;
             }
 
@@ -147,9 +158,9 @@
                                     </div>
                                     <div class="modal-body">
                                         @if(is_all_store())
-                                            Are you sure you want to reset stock for the selected branch? This action cannot be undone.
+                                            This action will <b>RESET</b> (make quantity zero) for all your products for the specified branch.<br> This action cannot be undone! Make sure you have a recent backup before proceeding.
                                         @else
-                                            Are you sure you want to reset stock for {{ current_store()->name }}? This action cannot be undone.
+                                            This action will <b>RESET</b> (make quantity zero) for all your products in {{ current_store()->name }} branch.<br> This action cannot be undone! Make sure you have a recent backup before proceeding.
                                         @endif
                                     </div>
                                     <div class="modal-footer">

@@ -108,15 +108,58 @@
                     return false;
                 }
 
-                var confirmed = confirm('Are you absolutely sure you want to clear the database? This action cannot be undone!');
-                if (!confirmed) {
-                    e.preventDefault();
-                    return false;
-                }
+                e.preventDefault();
 
-                // Show loading state
-                var submitBtn = $(this).find('button[type="submit"]');
-                submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Clearing...');
+                // Create and show confirmation modal
+                const modalHtml = `
+                    <div class="modal fade" id="confirmClearModal" tabindex="-1" role="dialog" aria-labelledby="confirmClearModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="confirmClearModalLabel">
+                                        Confirm Database Clear
+                                    </h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="alert alert-danger">
+                                        <h6><i class="fas fa-exclamation-triangle"></i> Warning!</h6>
+                                        <p>Are you absolutely sure you want to clear the database? This action will permanently delete all data and cannot be undone!</p>
+                                        <p class="mb-0"><strong>All transaction data, stock, customers, suppliers, and operational records will be removed.</strong></p>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-danger" id="confirmClearBtn">
+                                        <i class="fas fa-trash"></i> Clear Database
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                $('body').append(modalHtml);
+                $('#confirmClearModal').modal('show');
+
+                // Handle confirm button click
+                $('#confirmClearBtn').on('click', function () {
+                    $('#confirmClearModal').modal('hide');
+
+                    // Show loading state
+                    var submitBtn = $('form[action*="database-clear"]').find('button[type="submit"]');
+                    submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Clearing...');
+
+                    // Submit the form
+                    $('form[action*="database-clear"]').off('submit').submit();
+                });
+
+                // Clean up modal when hidden
+                $('#confirmClearModal').on('hidden.bs.modal', function () {
+                    $(this).remove();
+                });
             });
         });
     </script>

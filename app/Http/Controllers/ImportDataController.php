@@ -272,15 +272,6 @@ class ImportDataController extends Controller {
     }
 
     public function previewImport( Request $request ) {
-        // Log::info( 'Request reaching preview route', [
-        //     'method' => $request->method(),
-        //     'headers' => $request->headers->all(),
-        //     'files' => $request->allFiles(),
-        //     'post_size' => $request->server( 'CONTENT_LENGTH' ),
-        //     'max_post_size' => ini_get( 'post_max_size' ),
-        //     'upload_max_filesize' => ini_get( 'upload_max_filesize' )
-        // ] );
-
         try {
             // Validate request
             $validator = Validator::make( $request->all(), [
@@ -443,8 +434,8 @@ class ImportDataController extends Controller {
             $import_history = ImportHistory::create( [
                 'file_name' => $preview[ 'file_name' ],
                 'store_id' => 1,
-                'price_category_id' => 1,
-                'supplier_id' => 1,
+                'price_category_id' => null,
+                'supplier_id' => null,
                 'total_records' => $successful_records + $failed_records,
                 'status' => 'completed',
                 'created_by' => Auth::id(),
@@ -486,7 +477,11 @@ class ImportDataController extends Controller {
         } catch ( \Exception $e ) {
             Log::error( 'Products import process failed', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
+                'file_path' => $file_path,
+                'file_name' => $preview['file_name'] ?? null,
+                'user_id' => Auth::id(),
+                'timestamp' => now()
             ] );
             return back()->with( 'error', 'Import failed: ' . $e->getMessage() );
         }

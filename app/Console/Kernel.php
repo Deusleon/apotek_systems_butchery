@@ -32,7 +32,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('stock:calculate-values')->hourly();
         $schedule->command('stock:check-low')->hourly();
-        $schedule->command('snapshot:oldstock')->dailyAt('00:00')->withoutOverlapping();
+        $schedule->command('snapshot:oldstock')->everyMinute()->withoutOverlapping();
     }
 
     /**

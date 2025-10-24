@@ -16,14 +16,17 @@ class SnapshotOldStockValue extends Command
 
     public function handle()
     {
+        Log::info('SnapshotOldStockValue command started at: ' . Carbon::now()->toDateTimeString());
         $this->info('Starting old stock snapshot...');
         DB::beginTransaction();
 
         try {
-            // snapshot_date is yesterday (so running at 00:00 yields "yesterday" snapshot)
-            $snapshotDate = Carbon::now()->subDay()->toDateString();
+            // snapshot_date is today (so running at 00:00 yields "today" snapshot)
+            $snapshotDate = Carbon::now()->toDateString();
+            Log::info('Snapshot date set to: ' . $snapshotDate);
             $storeId = function_exists('current_store_id') ? current_store_id() : null;
             $isAllStore = function_exists('is_all_store') ? is_all_store() : false;
+            Log::info('Store ID: ' . ($storeId ?? 'null') . ', Is All Store: ' . ($isAllStore ? 'true' : 'false'));
 
             $priceCategories = PriceCategory::all(); // assumes you have PriceCategory model
             if ($priceCategories->isEmpty()) {
@@ -125,11 +128,12 @@ class SnapshotOldStockValue extends Command
             }
 
             DB::commit();
+            Log::info('Snapshot committed successfully for date: ' . $snapshotDate);
             $this->info('Old stock snapshot created for date: ' . $snapshotDate);
             return 0;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error creating old stock snapshot: ' . $e->getMessage());
+            Log::error('Error creating old stock snapshot: ' . $e->getMessage() . ' at line ' . $e->getLine() . ' in ' . $e->getFile());
             $this->error('Snapshot failed: ' . $e->getMessage());
             return 1;
         }

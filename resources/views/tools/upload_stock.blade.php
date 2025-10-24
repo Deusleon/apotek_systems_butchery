@@ -19,6 +19,17 @@
 
 @section("content")
     <div class="col-sm-12">
+        <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active text-uppercase" id="invoice-received" href="{{ route('import-products') }}"
+                    role="tab" aria-controls="quotes_list" aria-selected="false">Upload Stock</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-uppercase" id="order-received" href="{{ route('tools.download-stock-template') }}"
+                    role="tab" aria-controls="new_quotes" aria-selected="true"> Download Template
+                </a>
+            </li>
+        </ul>
         <div class="card">
             <div class="card-body">
                 <form action="{{ route('tools.upload-stock') }}" method="POST" enctype="multipart/form-data">
@@ -54,21 +65,6 @@
                             </div>
                         </div>
                     </div>
-
-                    {{-- <div class="row">
-                        <div class="col-md-12">
-                            <div class="alert alert-info">
-                                <strong>File Format Requirements:</strong>
-                                <ul class="mb-0">
-                                    <li>The file must contain exactly 3 columns: <strong>code</strong>, <strong>product name</strong>, and <strong>quantity</strong></li>
-                                    <li>Code should match the product code/ID or barcode</li>
-                                    <li>Product name should match the product name</li>
-                                    <li>Quantity should be a numeric value (will override existing stock)</li>
-                                    <li>First row should be headers</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div> --}}
 
                     <div class="row">
                         <div class="col-md-6 justify-content-start pl-2 d-flex">
