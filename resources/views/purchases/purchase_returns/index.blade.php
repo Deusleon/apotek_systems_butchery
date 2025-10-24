@@ -308,8 +308,10 @@
                             }
                         },
                         {
-                            data: 'quantity', render: function (data) {
-                                return numberWithCommas(parseFloat(data));
+                            data: 'quantity', render: function (data, type, row) {
+                                // Show current remaining quantity after approved returns
+                                var currentQty = parseFloat(data || 0);
+                                return numberWithCommas(currentQty);
                             }
                         },
                         {
@@ -336,10 +338,10 @@
                         {
                             data: 'action',
                             render: function (data, type, row) {
-                                // Check if there's already a purchase return for this goods_receiving_id
+                                // Disable the return button if the item has a return process ongoing or completed
+                                // Status: 2=pending return, 3=fully returned, 4=rejected, 5=partially returned
                                 var hasReturn = false;
-                                // This will be set by the server-side data or we need to check it
-                                if (row.has_return) {
+                                if (row.status == '2' || row.status == '3' || row.status == '4' || row.status == '5') {
                                     hasReturn = true;
                                 }
 
@@ -415,31 +417,52 @@
 
                         $('#edit-purchase-return').modal('show');
                     } else {
-                        // Open material received edit modal
-                        $('#edit').find('.modal-body #name_edit').val(
-                            (row_data.product.name || '') + ' ' +
-                            (row_data.product.brand || '') + ' ' +
-                            (row_data.product.pack_size || '') +
-                            (row_data.product.sales_uom || '')
-                        );
-                        $('#edit').find('.modal-body #quantity_edit').val(numberWithCommas(row_data.quantity));
-                        $('#edit').find('.modal-body #price_edit').val(formatMoney(row_data.unit_cost));
-                        if (row_data.expire_date) {
-                            $('#edit').find('.modal-body #expire_date_edit').val(moment(row_data.expire_date).format('YYYY-MM-DD'));
-                        } else {
-                            $('#edit').find('.modal-body #expire_date_edit').val('');
-                        }
-                        $('#edit').find('.modal-body #receive_date_edit').val(moment(row_data.created_at).format('YYYY-MM-DD'));
-                        $('#edit').find('.modal-body #id').val(row_data.id);
+                        // Check status before allowing edit
+                        $.ajax({
+                            url: '{{route('getPurchaseReturns')}}',
+                            data: {
+                                "_token": '{{ csrf_token() }}',
+                                "action": "check_status",
+                                "goods_receiving_id": row_data.id
+                            },
+                            type: 'get',
+                            dataType: 'json',
+                            success: function (statusResponse) {
+                                if (statusResponse.has_pending_return) {
+                                    alert('This item has a pending return and cannot be edited.');
+                                    return;
+                                }
 
-                        // ✅ Preselect supplier
-                        if (row_data.supplier && row_data.supplier.id) {
-                            $('#supplier_id_edit').val(row_data.supplier.id).trigger('change');
-                        } else {
-                            $('#supplier_id_edit').val('').trigger('change');
-                        }
+                                // Open material received edit modal
+                                $('#edit').find('.modal-body #name_edit').val(
+                                    (row_data.product.name || '') + ' ' +
+                                    (row_data.product.brand || '') + ' ' +
+                                    (row_data.product.pack_size || '') +
+                                    (row_data.product.sales_uom || '')
+                                );
+                                $('#edit').find('.modal-body #quantity_edit').val(numberWithCommas(row_data.quantity));
+                                $('#edit').find('.modal-body #price_edit').val(formatMoney(row_data.unit_cost));
+                                if (row_data.expire_date) {
+                                    $('#edit').find('.modal-body #expire_date_edit').val(moment(row_data.expire_date).format('YYYY-MM-DD'));
+                                } else {
+                                    $('#edit').find('.modal-body #expire_date_edit').val('');
+                                }
+                                $('#edit').find('.modal-body #receive_date_edit').val(moment(row_data.created_at).format('YYYY-MM-DD'));
+                                $('#edit').find('.modal-body #id').val(row_data.id);
 
-                        $('#edit').modal('show');
+                                // ✅ Preselect supplier
+                                if (row_data.supplier && row_data.supplier.id) {
+                                    $('#supplier_id_edit').val(row_data.supplier.id).trigger('change');
+                                } else {
+                                    $('#supplier_id_edit').val('').trigger('change');
+                                }
+
+                                $('#edit').modal('show');
+                            },
+                            error: function () {
+                                alert('Error checking item status');
+                            }
+                        });
                     }
                 },
                 error: function () {
@@ -451,10 +474,32 @@
 
         $('#received_material_table tbody').on('click', '#delete_btn', function () {
             var row_data = $('#received_material_table').DataTable().row($(this).parents('tr')).data();
-            var message = "Are you sure you want to delete '".concat(row_data.product.name, "'?");
-            $('#delete').find('.modal-body #message').text(message);
-            $('#delete').find('.modal-body #id').val(row_data.id);
-            $('#delete').modal('show');
+
+            // Check status before allowing delete
+            $.ajax({
+                url: '{{route('getPurchaseReturns')}}',
+                data: {
+                    "_token": '{{ csrf_token() }}',
+                    "action": "check_status",
+                    "goods_receiving_id": row_data.id
+                },
+                type: 'get',
+                dataType: 'json',
+                success: function (statusResponse) {
+                    if (statusResponse.has_pending_return) {
+                        alert('This item has a pending return and cannot be deleted.');
+                        return;
+                    }
+
+                    var message = "Are you sure you want to delete '".concat(row_data.product.name, "'?");
+                    $('#delete').find('.modal-body #message').text(message);
+                    $('#delete').find('.modal-body #id').val(row_data.id);
+                    $('#delete').modal('show');
+                },
+                error: function () {
+                    alert('Error checking item status');
+                }
+            });
         });
 
         $('#received_material_table tbody').on('click', '#return_btn', function () {

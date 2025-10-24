@@ -54,6 +54,18 @@ class PurchaseReturnController extends Controller
             }
         }
 
+        if ($request->action == "check_status") {
+            $goodsReceiving = GoodsReceiving::find($request->goods_receiving_id);
+            if ($goodsReceiving) {
+                return response()->json([
+                    'status' => $goodsReceiving->status,
+                    'has_pending_return' => in_array($goodsReceiving->status, [2, 3, 4, 5])
+                ]);
+            } else {
+                return response()->json(['status' => null, 'has_pending_return' => false]);
+            }
+        }
+
         // Handle missing date parameters
         $from = isset($request->date[0]) ? date('Y-m-d', strtotime($request->date[0])) : date('Y-m-d', strtotime('-30 days'));
         $to = isset($request->date[1]) ? date('Y-m-d', strtotime($request->date[1])) : date('Y-m-d');
@@ -75,23 +87,30 @@ class PurchaseReturnController extends Controller
         $pendingGoods = DB::table('inv_incoming_stock')->where('status', 2)->get();
         Log::info('Goods receiving with status 2', ['count' => $pendingGoods->count()]);
 
-        $query = PurchaseReturn::join('inv_incoming_stock', 'inv_incoming_stock.id', '=', 'purchase_returns.goods_receiving_id')
-            ->select('purchase_returns.*', 'inv_incoming_stock.*', 'purchase_returns.quantity as return_quantity', 'inv_incoming_stock.quantity as received_quantity')
+        $query = PurchaseReturn::with(['goodsReceiving' => function($q) {
+            $q->with(['product', 'supplier']);
+        }])
             ->where(DB::Raw("DATE(purchase_returns.date)"), '>=', $from)
             ->where(DB::Raw("DATE(purchase_returns.date)"), '<=', $to);
 
         if ($status == 4) {
-            $query->where('inv_incoming_stock.status', '=', 4);
+            $query->whereHas('goodsReceiving', function($q) {
+                $q->where('status', '=', 4);
+            });
         } else if ($status == 3) {
-            $query->where(function($q) {
-                $q->where('inv_incoming_stock.status', '=', 3)
-                  ->orWhere('inv_incoming_stock.status', '=', 5);
+            $query->whereHas('goodsReceiving', function($q) {
+                $q->where(function($q2) {
+                    $q2->where('status', '=', 3)
+                       ->orWhere('status', '=', 5);
+                });
             });
         } else {
-            $query->where('inv_incoming_stock.status', '=', 2);
+            $query->whereHas('goodsReceiving', function($q) {
+                $q->where('status', '=', 2);
+            });
         }
 
-        $returns = $query->orderBy('purchase_returns.created_at', 'desc')->get();
+        $returns = $query->orderBy('purchase_returns.updated_at', 'desc')->orderBy('purchase_returns.id', 'desc')->get();
 
         Log::info('Query results', [
             'sql' => $query->toSql(),
@@ -107,14 +126,14 @@ class PurchaseReturnController extends Controller
                 $formattedReturns[] = [
                     'id' => $return->id,
                     'goods_receiving_id' => $return->goods_receiving_id,
-                    'quantity' => $return->return_quantity,
+                    'quantity' => $return->quantity, // Use the correct field from purchase_returns table
                     'reason' => $return->reason,
                     'date' => $return->date,
                     'created_at' => $return->created_at,
                     'goods_receiving' => [
                         'id' => $goodsReceiving->id,
                         'product_id' => $goodsReceiving->product_id,
-                        'quantity' => $return->received_quantity,
+                        'quantity' => $goodsReceiving->quantity, // Use the correct field from goods_receiving
                         'unit_cost' => $goodsReceiving->unit_cost,
                         'total_cost' => $goodsReceiving->total_cost,
                         'created_at' => $goodsReceiving->created_at,
@@ -161,21 +180,36 @@ class PurchaseReturnController extends Controller
         }
 
         $goodsReceiving = GoodsReceiving::find($goodsReceivingData['id']);
-        $newqty = $goodsReceivingData['quantity'] - $purchaseReturn->quantity;
+
+        // Get the original received quantity from the goods receiving record before any returns
+        // Since we're approving a return, we need to calculate what the remaining quantity should be
+        $returnedQty = $purchaseReturn->quantity;
+        $currentQty = $goodsReceiving->quantity;
+
+        // The remaining quantity after return approval
+        $newqty = $currentQty - $returnedQty;
 
         // IF Partial return the values are re-calculated
-        if ($newqty != 0) {
-            $status = 5;
-            $goodsReceiving->total_cost = ($goodsReceiving->total_cost / $goodsReceiving->quantity) * $newqty;
+        if ($newqty > 0) {
+            $status = 5; // Partially returned
+            // Recalculate total cost proportionally
+            $unitCost = $goodsReceiving->unit_cost;
+            $goodsReceiving->total_cost = $newqty * $unitCost;
             $goodsReceiving->quantity = $newqty;
         } else {
-            $status = 3;
+            $status = 3; // Fully returned
             $goodsReceiving->total_cost = 0;
+            $goodsReceiving->quantity = 0;
         }
 
         $goodsReceiving->status = $status;
         $goodsReceiving->updated_by = Auth::User()->id;
+        $goodsReceiving->updated_at = now();
         $goodsReceiving->save();
+
+        // Update the purchase return record's updated_at for proper sorting
+        $purchaseReturn->updated_at = now();
+        $purchaseReturn->save();
 
         Log::info('Purchase return approved successfully');
         return response()->json(['success' => 'Purchase return approved successfully']);
@@ -188,7 +222,15 @@ class PurchaseReturnController extends Controller
         $goodsReceiving = GoodsReceiving::find($goodsReceivingData['id']);
         $goodsReceiving->status = 4;
         $goodsReceiving->updated_by = Auth::User()->id;
+        $goodsReceiving->updated_at = now();
         $goodsReceiving->save();
+
+        // Update the purchase return record's updated_at for proper sorting
+        $purchaseReturn = PurchaseReturn::where('goods_receiving_id', $goodsReceivingData['id'])->first();
+        if ($purchaseReturn) {
+            $purchaseReturn->updated_at = now();
+            $purchaseReturn->save();
+        }
 
         Log::info('Purchase return rejected successfully');
         return response()->json(['success' => 'Purchase return rejected successfully']);
@@ -217,7 +259,7 @@ class PurchaseReturnController extends Controller
             'current_status' => $goodsReceiving->status
         ]);
 
-        $purchase_return = new PurchaseReturn;
+        $purchase_return = new PurchaseReturn();
         $purchase_return->goods_receiving_id = $request->goods_receiving_id;
         $purchase_return->quantity = $request->quantity;
         $purchase_return->reason = $request->reason;
@@ -226,6 +268,7 @@ class PurchaseReturnController extends Controller
 
         $goodsReceiving->status = 2;
         $goodsReceiving->updated_by = Auth::User()->id;
+        $goodsReceiving->updated_at = now();
 
         try {
             $goodsReceiving->save();

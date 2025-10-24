@@ -193,8 +193,11 @@
                     render: function (date) { return moment(date).format('YYYY-MM-DD'); }
                 },
                 {
-                    data: 'goods_receiving.quantity',
-                    render: function (data) { return numberWithCommas(Math.floor(data)); }
+                    data: 'goods_receiving',
+                    render: function (item) {
+                        // Show the current remaining quantity after any approved returns
+                        return numberWithCommas(Math.floor(item.quantity || 0));
+                    }
                 },
                 {
                     data: 'date',
@@ -202,7 +205,10 @@
                 },
                 {
                     data: 'quantity',
-                    render: function (data) { return numberWithCommas(Math.floor(data)); }
+                    render: function (data, type, row) {
+                        // Show the exact quantity entered in the return modal
+                        return numberWithCommas(Math.floor(data));
+                    }
                 },
                 {
                     data: 'goods_receiving',
@@ -225,7 +231,9 @@
                         }
                     @endif
                 ],
-            aaSorting: [[0, "desc"]]
+            aaSorting: [[0, "desc"]],
+            order: [[0, "desc"]],
+            bSort: true
         });
 
         function getPurchaseReturns(action, goods_receiving) {
