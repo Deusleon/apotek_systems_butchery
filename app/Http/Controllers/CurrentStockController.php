@@ -365,6 +365,19 @@ class CurrentStockController extends Controller
                 ]);
             }
 
+            // Get min and max dates from inv_old_stock_values, limited to yesterday
+            $dateRange = DB::table('inv_old_stock_values')
+                ->selectRaw('MIN(snapshot_date) as min_date, MAX(snapshot_date) as max_date')
+                ->first();
+
+            $yesterday = \Carbon\Carbon::yesterday()->toDateString();
+            $min_date_raw = $dateRange->min_date ?? $yesterday;
+            $max_date = min($dateRange->max_date ?? $yesterday, $yesterday);
+
+            // Set min_date to January 1 of the min year
+            $min_year = date('Y', strtotime($min_date_raw));
+            $min_date = $min_year . '-01-01';
+
             $query = DB::table('inv_old_stock_values as os')
                 ->join('inv_products as p', 'os.product_id', '=', 'p.id')
                 ->select(
@@ -409,7 +422,9 @@ class CurrentStockController extends Controller
                 'stocks' => $stocks,
                 'price_categories' => $price_categories,
                 'selected_date' => $date,
-                'selected_price_category' => $price_category
+                'selected_price_category' => $price_category,
+                'min_date' => $min_date,
+                'max_date' => $max_date
             ]);
         } catch (\Exception $e) {
             Log::error('Error in getOldStockValue: ' . $e->getMessage());

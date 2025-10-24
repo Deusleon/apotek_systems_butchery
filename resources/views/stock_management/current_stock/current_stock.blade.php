@@ -56,7 +56,7 @@
                             </select>
                         </div>
 
-                        <div class="d-flex" style="width: 245px;">
+                        <div class="d-flex" style="width: 245px; margin-right: -1px;">
                             <label for="category" class="col-form-label text-md-left mr-2">Type:</label>
                             <select name="category" class="js-example-basic-single form-control" id="category_id">
                                 <option name="store_name" value="1">Summary</option>

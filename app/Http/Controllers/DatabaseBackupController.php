@@ -32,7 +32,8 @@ class DatabaseBackupController extends Controller
             // Validate request
             $request->validate([], []); // Add validation rules if needed
 
-            $backupName = 'backup_' . Carbon::now()->format('Y-m-d_H-i-s') . '.sql';
+            // $backupName = 'backup_' . Carbon::now()->format('Y-m-d_H-i-s') . '.sql';
+            $backupName = Carbon::now()->format('Y-m-d-H-i-s') . '.sql';
 
             // Validate environment variables
             $dbHost = env('DB_HOST', '127.0.0.1');
@@ -177,7 +178,7 @@ class DatabaseBackupController extends Controller
             $fileSize = filesize($backupPath);
             Log::info("Database backup created successfully: {$backupName} ({$processedTables} tables processed, {$skippedTables} skipped, " . $this->formatBytes($fileSize) . ")");
 
-            $message = "Database backup created successfully! Processed {$processedTables} tables.";
+            $message = "Database backup created successfully!";
             if ($skippedTables > 0) {
                 $message .= " {$skippedTables} tables were skipped (see logs for details).";
             }
@@ -304,7 +305,7 @@ class DatabaseBackupController extends Controller
                 }
 
                 // Validate filename pattern
-                if (!preg_match('/^backup_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.sql$/', $file)) {
+                if (!preg_match('/^\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}\.sql$/', $file)) {
                     Log::warning('Invalid backup filename found: ' . $file);
                     continue;
                 }
@@ -325,11 +326,28 @@ class DatabaseBackupController extends Controller
                         continue;
                     }
 
+                    // Extract created_by from SQL comment
+                    $createdBy = 'Unknown';
+                    try {
+                        $handle = fopen($filePath, 'r');
+                        if ($handle) {
+                            $firstLine = fgets($handle);
+                            fclose($handle);
+                            if (preg_match('/by user:\s*(.+?)\s*$/', $firstLine, $matches)) {
+                                $createdBy = trim($matches[1]);
+                            }
+                        }
+                        Log::info('Extracted created_by for backup ' . $file . ': ' . $createdBy);
+                    } catch (\Exception $e) {
+                        Log::warning('Failed to extract created_by from ' . $file . ': ' . $e->getMessage());
+                    }
+
                     $backups[] = [
                         'name' => $file,
                         'size' => $fileSize,
                         'created_at' => Carbon::createFromTimestamp($fileTime),
-                        'size_human' => $this->formatBytes($fileSize)
+                        'size_human' => $this->formatBytes($fileSize),
+                        'created_by' => $createdBy
                     ];
                 } catch (\Exception $e) {
                     Log::warning('Error processing backup file: ' . $file . ' - ' . $e->getMessage());
@@ -434,7 +452,7 @@ class DatabaseBackupController extends Controller
             foreach ($tablesToClear as $table) {
                 try {
                     // Verify table exists before attempting to truncate
-                    $tableExists = DB::select("SHOW TABLES LIKE ?", [$table]);
+                    $tableExists = DB::select("SHOW TABLES LIKE '$table'");
                     if (empty($tableExists)) {
                         Log::warning('Table does not exist, skipping: ' . $table);
                         continue;

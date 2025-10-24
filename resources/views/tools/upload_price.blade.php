@@ -19,6 +19,17 @@
 
 @section("content")
     <div class="col-sm-12">
+        <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active text-uppercase" id="invoice-received" href="{{ route('import-products') }}"
+                    role="tab" aria-controls="quotes_list" aria-selected="false">Upload Price</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-uppercase" id="order-received" href="{{ route('tools.download-price-template') }}"
+                    role="tab" aria-controls="new_quotes" aria-selected="true"> Download Template
+                </a>
+            </li>
+        </ul>
         <div class="card">
             <div class="card-body">
                 <form action="{{ route('tools.upload-price') }}" method="POST" enctype="multipart/form-data">
@@ -101,7 +112,7 @@
                 $('#file').prop('disabled', true);
                 $('button[type="submit"]').prop('disabled', true);
             @endif
-            });
+                    });
 
         // File validation function
         function validateFile(input) {

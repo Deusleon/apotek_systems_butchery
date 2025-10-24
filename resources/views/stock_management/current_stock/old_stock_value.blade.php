@@ -43,6 +43,7 @@
                 </li>
             @endif
         </ul>
+        {{-- @dd($max_date) --}}
         <div class="card">
             <div class="card-body">
                 <form method="GET" class="d-flex justify-content-end" action="{{ route('old-stocks') }}">
@@ -140,6 +141,8 @@
                 singleDatePicker: true,
                 showDropdowns: true,
                 autoUpdateInput: false,
+                minDate: '{{ $min_date }}',
+                maxDate: '{{ $max_date }}',
                 locale: {
                     format: 'YYYY-MM-DD'
                 }

@@ -14,13 +14,16 @@
     <div class="col-sm-12">
         <div class="card">
             <div class="card-body">
-                <div class="row justify-content-end align-items-end mb-3">
-                    <div class="col-md-6 text-right pr-1">
-                        <button type="button" class="btn btn-secondary btn-sm mr-2" data-toggle="modal" data-target="#createBackupModal">
-                            Create New Backup
-                        </button>
+                @if (auth()->user()->checkPermission('Create Database Backup'))
+                    <div class="row justify-content-end align-items-end mb-3">
+                        <div class="col-md-6 text-right pr-1">
+                            <button type="button" class="btn btn-secondary btn-sm mr-2" data-toggle="modal"
+                                data-target="#createBackupModal">
+                                Create New Backup
+                            </button>
+                        </div>
                     </div>
-                </div>
+                @endif
 
                 <div class="table-responsive">
                     <table id="backup-table" class="display table nowrap table-striped table-hover" style="width:100%">
@@ -29,7 +32,10 @@
                                 <th>Backup Name</th>
                                 <th>Size</th>
                                 <th>Created At</th>
-                                <th>Actions</th>
+                                <th>Created By</th>
+                                @if(auth()->user()->checkPermission('Download Database Backup') || auth()->user()->checkPermission('Delete Database Backup'))
+                                    <th>Actions</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -38,18 +44,27 @@
                                     <td>{{ $backup['name'] }}</td>
                                     <td>{{ $backup['size_human'] }}</td>
                                     <td>{{ $backup['created_at']->format('Y-m-d H:i:s') }}</td>
-                                    <td>
-                                        <a href="{{ route('database-backup.download', $backup['name']) }}" class="btn btn-success btn-sm btn-rounded">
-                                            Download
-                                        </a>
-                                        <button type="button" class="btn btn-danger btn-sm btn-rounded" onclick="confirmDelete('{{ $backup['name'] }}')">
-                                            Delete
-                                        </button>
-                                    </td>
+                                    <td>{{ $backup['created_by'] }}</td>
+                                    @if (auth()->user()->checkPermission('Download Database Backup') || auth()->user()->checkPermission('Delete Database Backup'))
+                                        <td>
+                                            @if (auth()->user()->checkPermission('Download Database Backup'))
+                                                <a href="{{ route('database-backup.download', $backup['name']) }}"
+                                                    class="btn btn-success btn-sm btn-rounded">
+                                                    Download
+                                                </a>
+                                            @endif
+                                            @if (auth()->user()->checkPermission('Delete Database Backup'))
+                                                <button type="button" class="btn btn-danger btn-sm btn-rounded"
+                                                    onclick="confirmDelete('{{ $backup['name'] }}')">
+                                                    Delete
+                                                </button>
+                                            @endif
+                                        </td>
+                                    @endif
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="text-center">No backups found</td>
+                                    <td colspan="5" class="text-center">No backups found</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -60,12 +75,13 @@
     </div>
 
     <!-- Create Backup Modal -->
-    <div class="modal fade" id="createBackupModal" tabindex="-1" role="dialog" aria-labelledby="createBackupModalLabel" aria-hidden="true">
+    <div class="modal fade" id="createBackupModal" tabindex="-1" role="dialog" aria-labelledby="createBackupModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="createBackupModalLabel">
-                       Create Database Backup
+                        Create Database Backup
                     </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -74,9 +90,11 @@
                 <form action="{{ route('database-backup.create') }}" method="POST">
                     @csrf
                     <div class="modal-body">
-                        <p>Are you sure you want to create a new database backup? This process may take a few moments depending on the database size.</p>
+                        <p>Are you sure you want to create a new database backup? This process may take a few moments
+                            depending on the database size.</p>
                         <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> The backup will be saved in the storage/backups directory and can be downloaded later.
+                            <i class="fas fa-info-circle"></i> The backup will be saved in the storage/backups directory and
+                            can be downloaded later.
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -92,7 +110,8 @@
 
 
     <!-- Delete Confirmation Modal -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -113,7 +132,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-danger">
-                           Delete
+                            Delete
                         </button>
                     </div>
                 </form>

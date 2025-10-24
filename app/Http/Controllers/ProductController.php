@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade as PDF;
 use App\Exports\ProductsExport;
+use App\Exports\PriceTemplateExport;
+use App\Exports\StockTemplateExport;
 use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
@@ -467,7 +469,6 @@ class ProductController extends Controller
 
         return view('tools.export_products', compact('priceCategories', 'categories'));
     }
-
     public function uploadPriceForm()
     {
         if (!Auth()->user()->checkPermission('View Product List')) {
@@ -477,6 +478,24 @@ class ProductController extends Controller
         $priceCategories = PriceCategory::all();
 
         return view('tools.upload_price', compact('priceCategories'));
+    }
+
+    public function downloadPriceTemplate()
+    {
+        if (!Auth()->user()->checkPermission('View Product List')) {
+            abort(403, 'Access Denied');
+        }
+
+        return Excel::download(new PriceTemplateExport(), 'price_upload_template_' . date('Y-m-d') . '.xlsx');
+    }
+
+    public function downloadStockTemplate()
+    {
+        if (!Auth()->user()->checkPermission('View Product List')) {
+            abort(403, 'Access Denied');
+        }
+
+        return Excel::download(new StockTemplateExport(), 'stock_upload_template_' . date('Y-m-d') . '.xlsx');
     }
 
     public function uploadStockForm()
@@ -591,9 +610,10 @@ class ProductController extends Controller
             // Process the data
             $results = $this->processPriceUpload($data, $priceCategoryId);
 
-            $message = "Upload completed successfully.";
-
-            return back()->with('success', $message);
+            if($results){
+                $successMessage = "Price upload completed successfully.";
+                return back()->with('success', $successMessage);
+            }
 
         } catch (\Exception $e) {
             Log::error('Price upload error: ' . $e->getMessage());
@@ -876,7 +896,7 @@ class ProductController extends Controller
                 $rowNumber = $index + 2; // +2 because index starts at 0 and we skip header
 
                 // Debug: Log the row data
-                Log::info("Processing row {$rowNumber}: " . json_encode($row));
+                // Log::info("Processing row {$rowNumber}: " . json_encode($row));
 
                 // Check if all required columns have values
                 if (empty(trim($row['code'] ?? '')) && empty(trim($row['product name'] ?? ''))) {
@@ -917,19 +937,21 @@ class ProductController extends Controller
             // Process the data
             $results = $this->processStockUpload($data, $adjustmentReasonId, $storeId);
 
-            $message = "Stock upload completed successfully.\n\n";
-            // $message .= "Processed: {$results['processed']} rows\n";
-            // $message .= "Updated: {$results['updated']} stock entries\n";
-            // $message .= "Created: {$results['created']} new stock entries\n";
+            $successMessage = "Stock upload completed successfully.";
 
             if ($results['errors'] > 0) {
-                $message .= "Errors: {$results['errors']}\n";
-                $message .= "Please check the logs for details.";
+                $message = "\n\nErrors: {$results['errors']}";
+                $message .= "\n" . $results['error_messages'][0];
+                if (count($results['error_messages']) > 1) {
+                    $message .= "\n... and " . (count($results['error_messages']) - 1) . " more errors";
+                }
+                Log::info('Stock upload completed with errors: ' . implode('; ', $results['error_messages']));
+                // return back()->with('warning', $message);
             }
 
-            return back()->with('success', $message);
+            return back()->with('success', $successMessage);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Stock upload error: ' . $e->getMessage());
             return back()->with('error', 'An error occurred while processing the file. Please try again.');
         }
@@ -954,7 +976,7 @@ class ProductController extends Controller
                 $results['processed']++;
 
                 // Debug: Log the row being processed
-                Log::info("Processing stock upload row: " . json_encode($row));
+                // Log::info("Processing stock upload row: " . json_encode($row));
 
                 // Validate quantity
                 $quantity = $this->validateAndParseQuantity($row['quantity']);
@@ -967,16 +989,16 @@ class ProductController extends Controller
                 }
 
                 // Find product by code or name
-                $product = $this->findProduct($row['code'], $row['product name']);
+                $product = $this->findProduct($row['product name']);
                 if (!$product) {
-                    $errorMsg = "Product {$row['product name']} not found (Code: {$row['code']})";
+                    $errorMsg = "Product {$row['product name']} not found";
                     Log::warning($errorMsg);
                     $results['error_messages'][] = $errorMsg;
                     $results['errors']++;
                     continue;
                 }
 
-                Log::info("Found product: {$product->name} (ID: {$product->id}) for quantity: {$quantity}");
+                // Log::info("Found product: {$product->name} (ID: {$product->id}) for quantity: {$quantity}");
 
                 // Get current stock for this product in the store
                 $currentStocks = CurrentStock::where('product_id', $product->id)
@@ -1020,6 +1042,7 @@ class ProductController extends Controller
                                 'quantity' => $adjustmentQuantity,
                                 'store_id' => $storeId,
                                 'created_by' => $userId,
+                                'updated_at' => now()->format('Y-m-d'),
                                 'movement' => 'IN',
                             ]);
 
@@ -1169,9 +1192,24 @@ class ProductController extends Controller
         $request->validate([
             'adjustment_reason' => 'required|exists:adjustment_reasons,id',
             'store_id' => 'required|exists:inv_stores,id',
+            'password' => 'required|string|min:1|max:255',
         ]);
 
         $storeId = $request->store_id;
+        $providedPassword = trim($request->input('password'));
+        $correctPassword = config('app.db_clear_password');
+
+        // Validate password configuration
+        if (empty($correctPassword)) {
+            Log::error('Database clear password not configured in config/app.php');
+            return back()->with('error', 'Stock reset is not properly configured. Please contact system administrator.');
+        }
+
+        if ($providedPassword !== $correctPassword) {
+            Log::warning('Failed stock reset attempt with incorrect password by user: ' . (auth()->user()->name ?? 'Unknown') . ' (ID: ' . (auth()->id() ?? 'Unknown') . ')');
+            return back()->with('error', 'Incorrect password. Stock reset aborted.');
+        }
+
         Log::info('Stock reset initiated for store ID: ' . $storeId);
 
         // Check if there are any stock records with quantity > 0 in the selected store
@@ -1222,6 +1260,7 @@ class ProductController extends Controller
                     'quantity' => $prevQuantity,
                     'store_id' => $storeId,
                     'created_by' => $userId,
+                    'updated_at' => now()->format('Y-m-d'),
                     'movement' => 'OUT',
                 ]);
 

@@ -115,11 +115,11 @@
                                         <td>{{ $row['data'][1] ?? '' }}</td>
                                         <td>{{ $row['data'][2] ?? '' }}</td>
                                         <td>{{ $row['data'][3] ?? '' }}</td>
-                                        <td>{{ number_format($row['data'][4], 0) ?? '' }}</td>
+                                        <td>{{ is_numeric($row['data'][4]) ? number_format($row['data'][4], 0) : '' }}</td>
                                         <td>{{ $row['data'][5] ?? '' }}</td>
                                         <td>{{ $row['data'][6] ?? '' }}</td>
-                                        <td>{{ number_format($row['data'][7], 0) ?? '' }}</td>
-                                        <td>{{ number_format($row['data'][8], 0) ?? '' }}</td>
+                                        <td>{{ is_numeric($row['data'][7]) ? number_format($row['data'][7], 0) : '' }}</td>
+                                        <td>{{ is_numeric($row['data'][8]) ? number_format($row['data'][8], 0) : '' }}</td>
                                         <td>
                                             @if(!empty($row['errors']))
                                                 <span class="text-danger">

@@ -80,7 +80,7 @@
                             </div>
                             <div class="col-md-2">
                                 <div class="form-group">
-                                    <label for="code">Payment Type<font color="red">*</font></label>
+                                    <label for="code">Payment Type</label>
                                     <select name="payment_type" id="payment_type"
                                         class="js-example-basic-single form-control">
                                         @foreach($payment_type as $payment)

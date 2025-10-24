@@ -82,14 +82,16 @@ Route::middleware(["auth","main_branch"])->group(function () {
     ]);
 
     Route::get('inventory/product-list','ProductController@index')->name('products.index');
-    Route::get('products/export', [ProductController::class, 'export'])->name('products.export');
-    Route::get('tools/upload-price', [ProductController::class, 'uploadPriceForm'])->name('tools.upload-price-form');
-    Route::post('tools/upload-price', [ProductController::class, 'uploadPrice'])->name('tools.upload-price');
-    Route::get('tools/upload-stock', [ProductController::class, 'uploadStockForm'])->name('tools.upload-stock-form');
-    Route::post('tools/upload-stock', [ProductController::class, 'uploadStock'])->name('tools.upload-stock');
-    Route::get('tools/reset-stock', [ProductController::class, 'resetStockForm'])->name('tools.reset-stock-form');
-    Route::post('tools/reset-stock', [ProductController::class, 'resetStock'])->name('tools.reset-stock');
-    Route::get('tools/export-products', [ProductController::class, 'exportForm'])->name('tools.export-products');
+    Route::get('products/export', 'ProductController@export')->name('products.export');
+    Route::get('tools/upload-price', 'ProductController@uploadPriceForm')->name('tools.upload-price-form');
+    Route::post('tools/upload-price', 'ProductController@uploadPrice')->name('tools.upload-price');
+    Route::get('tools/download-price-template', 'ProductController@downloadPriceTemplate')->name('tools.download-price-template');
+    Route::get('tools/upload-stock', 'ProductController@uploadStockForm')->name('tools.upload-stock-form');
+    Route::post('tools/upload-stock', 'ProductController@uploadStock')->name('tools.upload-stock');
+    Route::get('tools/download-stock-template', 'ProductController@downloadStockTemplate')->name('tools.download-stock-template');
+    Route::get('tools/reset-stock', 'ProductController@resetStockForm')->name('tools.reset-stock-form');
+    Route::post('tools/reset-stock', 'ProductController@resetStock')->name('tools.reset-stock');
+    Route::get('tools/export-stock', 'ProductController@exportForm')->name('tools.export-stock');
 
     // Product Import Routes
     Route::prefix('import')->group(function () {
