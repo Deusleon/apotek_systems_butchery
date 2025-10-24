@@ -381,60 +381,60 @@ class StockTransferController extends Controller {
         return $unique;
     }
     public function generateStockTransferPDF( $transfer_no ) {
-        $transfer = DB::table( 'inv_stock_transfers as t' )
-        ->select(
-            't.*',
-            'fs.name as from_store_name',
-            'ts.name as to_store_name',
-            'p.name as product_name',
-            'p.brand',
-            'p.pack_size',
-            'u.name as created_by_name',
-            'up.name as updated_by_name'
-        )
-        ->join( 'inv_stores as fs', 'fs.id', '=', 't.from_store' )
-        ->join( 'inv_stores as ts', 'ts.id', '=', 't.to_store' )
-        ->join( 'inv_current_stock as cs', 'cs.id', '=', 't.stock_id' )
-        ->join( 'inv_products as p', 'p.id', '=', 'cs.product_id' )
-        ->join( 'users as u', 'u.id', '=', 't.created_by' )
-        ->leftJoin( 'users as up', 'up.id', '=', 't.updated_by' )
-        ->where( 't.transfer_no', $transfer_no )
-        ->first();
 
-        if ( !$transfer ) {
-            return back()->with( 'error', 'Transfer not found' );
-        }
+     $pharmacy['name'] = Setting::where('id', 100)->value('value');
+     $pharmacy['address'] = Setting::where('id', 106)->value('value');
+     $pharmacy['phone'] = Setting::where('id', 107)->value('value');
+     $pharmacy['email'] = Setting::where('id', 108)->value('value');
+     $pharmacy['website'] = Setting::where('id', 109)->value('value');
+     $pharmacy['logo'] = Setting::where('id', 105)->value('value');
+     $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
 
-        // Get status text
-        $statuses = [
-            1 => 'Created',
-            2 => 'Assigned',
-            3 => 'Approved',
-            4 => 'In Transit',
-            5 => 'Acknowledged',
-            6 => 'Completed'
-        ];
-        $transfer->status_text = $statuses[ $transfer->status ] ?? 'Unknown';
+         // Get all transfers for this transfer_no with relationships
+         $transfers = StockTransfer::with(['currentStock.product', 'fromStore', 'toStore', 'createdBy', 'updatedBy'])
+             ->where('transfer_no', $transfer_no)
+             ->get();
 
-        // Get audit trail - try to find relevant stock adjustments or provide empty collection
-        try {
-            $audit_trail = DB::table( 'stock_adjustment_logs' )
-            ->where( 'current_stock_id', $transfer->stock_id )
-            ->where( 'created_at', '>=', $transfer->created_at )
-            ->orderBy( 'created_at', 'asc' )
-            ->get();
-        } catch ( Exception $e ) {
-            // If audit table doesn't exist or has issues, provide empty collection
-        $audit_trail = collect();
-        }
+         if ($transfers->isEmpty()) {
+             return back()->with('error', 'Transfer not found');
+         }
 
-        $pdf = PDF::loadView('stock_management.stock_transfer.pdf', [
-            'transfer' => $transfer,
-            'audit_trail' => $audit_trail
-        ]);
+         // Use the first transfer as representative for header info
+         $transfer = $transfers->first();
+         $transfer->all_items = $transfers;
 
-        return $pdf->stream('stock_transfer_' . $transfer_no . '.pdf');
-    }
+         // Get status text
+         $statuses = [
+             'created' => 'Created',
+             'assigned' => 'Assigned',
+             'approved' => 'Approved',
+             'in_transit' => 'In Transit',
+             'acknowledged' => 'Acknowledged',
+             'completed' => 'Completed',
+             'cancelled' => 'Cancelled'
+         ];
+         $transfer->status_text = $statuses[$transfer->status] ?? 'Unknown';
+
+         // Get audit trail - try to find relevant stock adjustments or provide empty collection
+         try {
+             $audit_trail = DB::table( 'stock_adjustment_logs' )
+             ->whereIn( 'current_stock_id', $transfers->pluck('stock_id') )
+             ->where( 'created_at', '>=', $transfer->created_at )
+             ->orderBy( 'created_at', 'asc' )
+             ->get();
+         } catch ( Exception $e ) {
+             // If audit table doesn't exist or has issues, provide empty collection
+         $audit_trail = collect();
+         }
+
+         $pdf = PDF::loadView('stock_management.stock_transfer.pdf', [
+             'transfer' => $transfer,
+             'audit_trail' => $audit_trail,
+             'pharmacy' => $pharmacy
+         ]);
+
+         return $pdf->stream('stock_transfer_' . $transfer_no . '.pdf');
+     }
     public function regenerateStockTransferPDF(Request $request)
     {
         $transfer_no = $request->transfer_no;
@@ -1053,6 +1053,5 @@ class StockTransferController extends Controller {
 
         $this->sendNotifications($transfer, 6, 'completed');
         return response()->json(['message' => 'Transfer completed successfully' ] );
-                }
-
-            }
+    }
+}

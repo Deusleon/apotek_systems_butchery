@@ -163,7 +163,7 @@
                                                                     @endphp
 
                                                                     <button class='badge btn btn-sm btn-rounded mt-2 p-2'
-                                                                        style="width: 120px; {{ $statusInfo["class"] }}">{{ $statusInfo["name"] }}</button>
+                                                                        style="width: auto; {{ $statusInfo["class"] }}">{{ $statusInfo["name"] }}</button>
                                                                 </td>
                                                                 <td class="">
                                                                     @if (Auth()->user()->checkPermission('Edit Stock Transfer'))

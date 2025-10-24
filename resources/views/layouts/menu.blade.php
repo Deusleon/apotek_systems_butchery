@@ -283,8 +283,11 @@
     <label>HELP</label>
 </li>
 
-<li class="nav-item"><a href="{{ url('help/contact-us') }}" class="nav-link"><span class="pcoded-micon"><i
-                class="fas fa-tablet"></i></span><span class="pcoded-mtext">Contact Us</span></a></li>
-<li class="nav-item"><a href="{{ url('help/support') }}" class="nav-link"><span class="pcoded-micon"><i
+{{-- <li class="nav-item"><a href="{{ url('help/contact-us') }}" class="nav-link"><span class="pcoded-micon"><i
+                class="fas fa-tablet"></i></span><span class="pcoded-mtext">Contact Us</span></a></li> --}}
+<li class="nav-item"><a href="{{ route('support.index') }}" class="nav-link"><span class="pcoded-micon"><i
                 class="fas fa-question"></i></span><span class="pcoded-mtext">Support</span></a>
+</li>
+{{-- <li class="nav-item"><a href="{{ route('support.index') }}" class="nav-link"><span class="pcoded-micon"><i
+                class="fas fa-question"></i></span><span class="pcoded-mtext">Support</span></a> --}}
 </li>

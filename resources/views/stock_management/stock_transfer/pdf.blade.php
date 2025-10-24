@@ -130,7 +130,7 @@
                                     $statuses = [
                                         'created' => ['name' => 'Pending', 'class' => 'color: blue;'],
                                         'assigned' => ['name' => 'Assigned', 'class' => 'color: orange;'],
-                                        'approved' => ['name' => 'Approved', 'class' => 'color: yellow;'],
+                                        'approved' => ['name' => 'Approved', 'class' => 'color: orange;'],
                                         'in_transit' => ['name' => 'In Transit', 'class' => 'color: teal;'],
                                         'acknowledged' => ['name' => 'Acknowledged', 'class' => 'color: green;'],
                                         'completed' => ['name' => 'Completed', 'class' => 'color: green;'],
@@ -156,24 +156,30 @@
                     <table id="table-detail" align="center" style="width: 50%;">
                         <tr>
                             <td style="border: none; padding: 5px;"><strong>Created By:</strong></td>
-                            <td style="border: none; padding: 5px;">{{ $transfer->created_by_name ?? 'N/A' }}</td>
+                            <td style="border: none; padding: 5px;">{{ $transfer->createdBy->name ?? 'N/A' }}</td>
                         </tr>
                         <tr>
                             <td style="border: none; padding: 5px;"><strong>Created Date:</strong></td>
                             <td style="border: none; padding: 5px;">{{ date('d-m-Y H:i:s', strtotime($transfer->created_at)) }}</td>
                         </tr>
-                        {{-- @if($transfer->approved_by_name) --}}
+                        @if($transfer->approvedBy)
                         <tr>
                             <td style="border: none; padding: 5px;"><strong>Approved By:</strong></td>
-                            <td style="border: none; padding: 5px;">{{ $transfer->approved_by_name ?? 'N/A' }}</td>
+                            <td style="border: none; padding: 5px;">{{ $transfer->approvedBy->name ?? 'N/A' }}</td>
                         </tr>
-                        {{-- @endif --}}
-                        {{-- @if($transfer->acknowledged_by_name) --}}
+                        @endif
+                        @if($transfer->acknowledgedBy)
                         <tr>
                             <td style="border: none; padding: 5px;"><strong>Acknowledged By:</strong></td>
-                            <td style="border: none; padding: 5px;">{{ $transfer->acknowledged_by_name ?? 'N/A' }}</td>
+                            <td style="border: none; padding: 5px;">{{ $transfer->acknowledgedBy->name ?? 'N/A' }}</td>
                         </tr>
-                        {{-- @endif --}}
+                        @endif
+                        @if($transfer->cancelledBy)
+                        <tr>
+                            <td style="border: none; padding: 5px;"><strong>Cancelled By:</strong></td>
+                            <td style="border: none; padding: 5px;">{{ $transfer->cancelledBy->name ?? 'N/A' }}</td>
+                        </tr>
+                        @endif
                     </table>
                 </div>
             </div>
@@ -195,4 +201,4 @@
     }
     </script>
 </body>
-</html> 
+</html>

@@ -617,6 +617,10 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::view('/help/support', 'help.support');
     Route::view('/help/contact-us', 'help.contact');
 
+    /* SUPPORT */
+    Route::get('/support', 'SupportController@index')->name('support.index');
+    Route::get('/support/download-manual', 'SupportController@downloadManual')->name('support.download-manual');
+
     // Price Management Routes
     Route::get('inventory/current-stock/{id}/pricing', 'CurrentStockController@showPricing')
         ->name('current-stock.pricing')
