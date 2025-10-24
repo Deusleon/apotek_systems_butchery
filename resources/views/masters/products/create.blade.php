@@ -47,7 +47,7 @@
                                     </div>
 
                                     {{-- Brand --}}
-                                    <div class="form-group row">
+                                    <div class="form-group row product-detail-field" id="brand_field">
                                         <label for="brand" class="col-md-4 col-form-label text-md-right">Brand</label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="brand" name="brand"
@@ -56,7 +56,7 @@
                                     </div>
 
                                     {{-- Pack Size --}}
-                                    <div class="form-group row">
+                                    <div class="form-group row product-detail-field" id="pack_size_field">
                                         <label for="pack_size" class="col-md-4 col-form-label text-md-right">Pack
                                             Size</label>
                                         <div class="col-md-8">
@@ -88,26 +88,26 @@
 
                                     {{-- Unit of Measure --}}
                                     <div class="form-group row">
-                                        <label for="saleUoM" class="col-md-4 col-form-label text-md-right">Unit</label>
+                                        <label for="saleUoM" class="col-md-4 col-form-label text-md-right">Unit <span class="text-danger">*</span></label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="saleUoM_edit" name="sale_uom"
-                                                placeholder="e.g. pcs, kg, ml" value="{{ old('sale_uom') }}">
+                                                placeholder="e.g. pcs, kg, ml" value="{{ old('sale_uom') }}" required>
                                         </div>
                                     </div>
 
                                     {{-- Min Stock --}}
                                     <div class="form-group row">
                                         <label for="min_quantinty" class="col-md-4 col-form-label text-md-right">Min.
-                                            Stock</label>
+                                            Stock <span class="text-danger">*</span></label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="min_stock_edits"
                                                 name="min_quantinty" value="{{ old('min_quantinty') }}"
-                                                onkeypress="return isNumberKey(event,this)">
+                                                onkeypress="return isNumberKey(event,this)" required>
                                         </div>
                                     </div>
 
                                     {{-- Max Stock --}}
-                                    <div class="form-group row">
+                                    <div class="form-group row product-detail-field" id="max_stock_field">
                                         <label for="max_quantinty" class="col-md-4 col-form-label text-md-right">Max.
                                             Stock</label>
                                         <div class="col-md-8">
@@ -136,6 +136,108 @@
                             <button type="submit" class="btn btn-primary">Save</button>
                         </div>
                     </form>
+
+                    <script>
+                        // Wait for jQuery and global function to be available
+                        function initializeModalScript() {
+                            if (typeof $ === 'undefined') {
+                                console.log('jQuery not available for modal, retrying...');
+                                setTimeout(initializeModalScript, 100);
+                                return;
+                            }
+
+                            if (typeof window.getProductDetailsOption === 'undefined') {
+                                console.log('Global function not available for modal, retrying...');
+                                setTimeout(initializeModalScript, 100);
+                                return;
+                            }
+
+                            console.log('Modal script initialized with jQuery and global function available');
+
+                            $(document).ready(function() {
+                                console.log('Modal document ready');
+
+                                // Function to apply field visibility based on setting
+                                function applyFieldVisibility(setting) {
+                                    try {
+                                        console.log('Applying visibility for setting:', setting);
+                                        if (setting === 'Normal') {
+                                            // Hide fields not needed for Normal mode
+                                            $('.product-detail-field').hide();
+                                            console.log('Hiding product-detail-field elements');
+                                            console.log('Hidden elements count:', $('.product-detail-field:hidden').length);
+                                            console.log('Total elements:', $('.product-detail-field').length);
+                                        } else {
+                                            // Show all fields for Detailed mode (default)
+                                            $('.product-detail-field').show();
+                                            console.log('Showing product-detail-field elements');
+                                            console.log('Visible elements count:', $('.product-detail-field:visible').length);
+                                            console.log('Total elements:', $('.product-detail-field').length);
+                                        }
+                                    } catch (e) {
+                                        console.log('Error in applyFieldVisibility:', e);
+                                    }
+                                }
+
+                                // Get current setting and apply visibility using global function
+                                try {
+                                    var currentSetting = window.getProductDetailsOption();
+                                    console.log('Current setting loaded:', currentSetting);
+                                    applyFieldVisibility(currentSetting);
+
+                                    // Store setting in localStorage for potential future use
+                                    localStorage.setItem('product_details_option', currentSetting);
+                                } catch (e) {
+                                    console.log('Error loading initial setting:', e);
+                                }
+
+                                // Re-apply visibility when modal is shown (in case setting changes)
+                                $('#create').on('show.bs.modal', function() {
+                                    console.log('Modal show event triggered');
+                                    setTimeout(function() {
+                                        try {
+                                            var refreshedSetting = window.getProductDetailsOption();
+                                            console.log('Modal shown, refreshing setting:', refreshedSetting);
+                                            applyFieldVisibility(refreshedSetting);
+                                            localStorage.setItem('product_details_option', refreshedSetting);
+                                        } catch (e) {
+                                            console.log('Error in modal show event:', e);
+                                        }
+                                    }, 100);
+                                });
+
+                                // Also apply visibility immediately when modal is about to be shown
+                                $('#create').on('shown.bs.modal', function() {
+                                    console.log('Modal fully shown, ensuring visibility is correct');
+                                    setTimeout(function() {
+                                        try {
+                                            var finalSetting = window.getProductDetailsOption();
+                                            applyFieldVisibility(finalSetting);
+                                        } catch (e) {
+                                            console.log('Error in modal shown event:', e);
+                                        }
+                                    }, 200);
+                                });
+
+                                // Debug function
+                                window.debugModal = function() {
+                                    try {
+                                        console.log('Modal debug:');
+                                        console.log('- Current setting:', window.getProductDetailsOption());
+                                        console.log('- Hidden elements:', $('.product-detail-field:hidden').length);
+                                        console.log('- Visible elements:', $('.product-detail-field:visible').length);
+                                        console.log('- Total product-detail-field elements:', $('.product-detail-field').length);
+                                        console.log('- Elements exist:', $('.product-detail-field').length > 0);
+                                    } catch (e) {
+                                        console.log('Error in debugModal:', e);
+                                    }
+                                };
+                            });
+                        }
+
+                        // Start initialization
+                        initializeModalScript();
+                    </script>
                 </div>
             </div>
         </div>

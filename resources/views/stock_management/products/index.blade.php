@@ -138,6 +138,70 @@
         @include('masters.products.delete')
         @include('masters.products.show')
 
+        <script>
+            // Wait for jQuery to be available
+            function initializeProductDetailsOption() {
+                if (typeof $ === 'undefined') {
+                    console.log('jQuery not available, retrying...');
+                    setTimeout(initializeProductDetailsOption, 100);
+                    return;
+                }
+
+                console.log('jQuery available, initializing product details option...');
+
+                // Global function to get product details option setting
+                window.getProductDetailsOption = function() {
+                    var setting = 'Detailed'; // Default fallback
+                    try {
+                        $.ajax({
+                            url: '{{ url("api/get-setting/127") }}',
+                            type: 'GET',
+                            async: false,
+                            success: function(data) {
+                                if (data && data.value) {
+                                    setting = data.value;
+                                    console.log('Global setting fetched:', setting);
+                                } else {
+                                    console.log('No data or value in response:', data);
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.log('Global AJAX Error:', status, error);
+                                console.log('XHR response:', xhr.responseText);
+                                console.log('Could not fetch product details option setting, using default');
+                            }
+                        });
+                    } catch (e) {
+                        console.log('Exception in getProductDetailsOption:', e);
+                    }
+                    return setting;
+                };
+
+                // Initialize the global function immediately when page loads
+                $(document).ready(function() {
+                    console.log('Page loaded, initializing product details option...');
+                    try {
+                        var initialSetting = window.getProductDetailsOption();
+                        console.log('Initial setting on page load:', initialSetting);
+                    } catch (e) {
+                        console.log('Error initializing setting:', e);
+                    }
+
+                    // Make the function globally available for debugging
+                    window.debugSetting = function() {
+                        try {
+                            console.log('Current setting:', window.getProductDetailsOption());
+                        } catch (e) {
+                            console.log('Error in debugSetting:', e);
+                        }
+                    };
+                });
+            }
+
+            // Start initialization
+            initializeProductDetailsOption();
+        </script>
+
         <!-- Product Details Modal -->
         <div class="modal fade" id="show" tabindex="-1" role="dialog" aria-labelledby="productDetailsModal"
             aria-hidden="true" hidden>
