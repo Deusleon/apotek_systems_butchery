@@ -100,10 +100,10 @@ Route::middleware(["auth","main_branch"])->group(function () {
         Route::get('/download-template', 'ImportDataController@downloadStockTemplate')->name('download-template');
         Route::get('/download-products-template', 'ImportDataController@downloadTemplate' )->name('download-products-template');
         // Route::get('/preview', 'ImportDataController@showPreview')->name('show-preview');
-        Route::post('/preview', 'ImportDataController@previewStockImport')
+        Route::post('/previewStock', 'ImportDataController@previewStockImport')
             ->middleware(['web', 'log.upload'])
             ->name('preview-import');
-        Route::post('/preview/import', 'ImportDataController@previewImport')
+        Route::post('/previewProducts', 'ImportDataController@previewImport')
             ->middleware(['web', 'log.upload'])
             ->name('preview-products-import');
         Route::post('/record', 'ImportDataController@recordStockImport')->name('record-import');

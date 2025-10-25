@@ -67,21 +67,27 @@ class ImportDataController extends Controller {
         $sheet->setCellValue( 'F1', 'Expiry' );
 
         // Fetch all products from database
-        $products = Product::orderBy('name')->get();
+        $products = Product::orderBy( 'name' )->get();
 
         $row = 2;
         foreach ( $products as $product ) {
-            $sheet->setCellValue( 'A'.$row, $product->id ); // Product Code (ID)
-            $sheet->setCellValue( 'B'.$row, $product->name ); // Product Name
-            $sheet->setCellValue( 'C'.$row, '' ); // Buy Price (empty for user input)
-            $sheet->setCellValue( 'D'.$row, '' ); // Sell Price (empty for user input)
-            $sheet->setCellValue( 'E'.$row, '' ); // Quantity (empty for user input)
-            $sheet->setCellValue( 'F'.$row, '' ); // Expiry (empty for user input)
+            $sheet->setCellValue( 'A'.$row, $product->id );
+            // Product Code ( ID )
+            $sheet->setCellValue( 'B'.$row, $product->name );
+            // Product Name
+            $sheet->setCellValue( 'C'.$row, '' );
+            // Buy Price ( empty for user input )
+            $sheet->setCellValue( 'D'.$row, '' );
+            // Sell Price ( empty for user input )
+            $sheet->setCellValue( 'E'.$row, '' );
+            // Quantity ( empty for user input )
+            $sheet->setCellValue( 'F'.$row, '' );
+            // Expiry ( empty for user input )
             $row++;
         }
 
         // If no products exist, add a sample row
-        if ($products->isEmpty()) {
+        if ( $products->isEmpty() ) {
             $sheet->setCellValue( 'A2', '1' );
             $sheet->setCellValue( 'B2', 'Sample Product - Please add products first' );
             $sheet->setCellValue( 'C2', '' );
@@ -99,7 +105,8 @@ class ImportDataController extends Controller {
 
         return response()->download($tempFile, $fileName, [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'Content-Disposition' => 'attachment; filename="' . $fileName . '"'
+            'Content-Disposition' => 'attachment;
+        filename = "' . $fileName . '"'
         ])->deleteFileAfterSend(true);
     }
 
@@ -139,24 +146,16 @@ class ImportDataController extends Controller {
         $fileName = 'products_import_template.xlsx';
 
         // Use Laravel's response()->download() for proper headers
-        $tempFile = tempnam(sys_get_temp_dir(), 'products_template');
-        $writer->save($tempFile);
+        $tempFile = tempnam( sys_get_temp_dir(), 'products_template' );
+        $writer->save( $tempFile );
 
-        return response()->download($tempFile, $fileName, [
+        return response()->download( $tempFile, $fileName, [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             'Content-Disposition' => 'attachment; filename="' . $fileName . '"'
-        ])->deleteFileAfterSend(true);
+        ] )->deleteFileAfterSend( true );
     }
 
     public function previewStockImport( Request $request ) {
-        // Log::info( 'Request reaching preview route', [
-        //     'method' => $request->method(),
-        //     'headers' => $request->headers->all(),
-        //     'files' => $request->allFiles(),
-        //     'post_size' => $request->server( 'CONTENT_LENGTH' ),
-        //     'max_post_size' => ini_get( 'post_max_size' ),
-        //     'upload_max_filesize' => ini_get( 'upload_max_filesize' )
-        // ] );
 
         try {
             // Validate request
@@ -216,6 +215,14 @@ class ImportDataController extends Controller {
                 $preview_data = [];
 
                 foreach ( $excel_raw_data[ 0 ] as $index => $row ) {
+                    
+                    $expectedColumns = 6;
+                    $actualColumns = count( $row );
+
+                    if ( $actualColumns < $expectedColumns ) {
+                        return redirect()->route( 'import-stock' )->with( 'error', 'The file uploaded is missing required columns. Download template and fill all the required columns.' );
+                    }
+
                     if ( $index === 0 ) continue;
                     // Skip header row
                     if ( empty( $row[ 0 ] ) ) continue;
@@ -279,7 +286,7 @@ class ImportDataController extends Controller {
                     'required',
                     'file',
                     'mimes:xlsx,xls,csv',
-                    'max:20480' // 20MB in kilobytes
+                    'max:20480'
                 ],
             ], [
                 'file.required' => 'Please select a file to import',
@@ -327,6 +334,15 @@ class ImportDataController extends Controller {
                 $preview_data = [];
 
                 foreach ( $excel_raw_data[ 0 ] as $index => $row ) {
+
+                    $expectedColumns = 9;
+                    // total number of columns expected ( 0–8 indexes )
+                    $actualColumns = count( $row );
+
+                    if ( $actualColumns < $expectedColumns ) {
+                        return redirect()->route( 'import-products' )->with( 'error', 'The file uploaded is missing required columns. Download template and fill all the required columns.' );
+                    }
+
                     if ( $index === 0 ) continue;
                     // Skip header row
                     if ( empty( $row[ 0 ] ) ) continue;
@@ -400,22 +416,22 @@ class ImportDataController extends Controller {
     }
 
     public function recordImport( Request $request ) {
-        $start_time = microtime(true);
-        Log::info( 'Starting products import process', ['start_time' => $start_time] );
+        $start_time = microtime( true );
+        Log::info( 'Starting products import process', [ 'start_time' => $start_time ] );
 
         // Get the import preview data from session
         $preview = Session::get( 'import_preview' );
 
         if ( !$preview || !isset( $preview[ 'file_path' ] ) ) {
             Log::error( 'No import data found in session' );
-            return back()->with( 'error', 'No import data found. Please try uploading your file again.' );
+            return redirect()->route( 'import-products' )->with( 'error', 'No import data found. Please try uploading your file again.' );
         }
 
         $file_path = storage_path( 'app/public/' . $preview[ 'file_path' ] );
 
         if ( !file_exists( $file_path ) ) {
             Log::error( 'Import file not found at path: ' . $file_path );
-            return back()->with( 'error', 'Import file not found. Please try uploading your file again.' );
+            return redirect()->route( 'import-products' )->with( 'error', 'Import file not found. Please try uploading your file again.' );
         }
 
         try {
@@ -423,12 +439,23 @@ class ImportDataController extends Controller {
 
             // Use the improved ProductsImport class
             $import = new \App\Imports\ProductsImport();
-            Excel::import($import, $file_path);
+            try {
+                Excel::import( $import, $file_path );
+            } catch ( \Maatwebsite\Excel\Validators\ValidationException $e ) {
+                $failures = $e->failures();
+
+                $messages = [];
+                foreach ( $failures as $failure ) {
+                    $messages[] = "On row {$failure->row()}, " . implode( ', ', $failure->errors() );
+                }
+                return redirect()->route( 'import-products' )->with( 'error', $messages[ 0 ] );
+                // dd( $messages );
+            }
 
             $results = $import->getResults();
-            $successful_records = $results['success_count'];
-            $failed_records = $results['fail_count'];
-            $errors = $results['errors'];
+            $successful_records = $results[ 'success_count' ];
+            $failed_records = $results[ 'fail_count' ];
+            $errors = $results[ 'errors' ];
 
             // Create import history record
             $import_history = ImportHistory::create( [
@@ -443,12 +470,12 @@ class ImportDataController extends Controller {
                 'successful_records' => $successful_records,
                 'failed_records' => $failed_records,
                 'progress' => 100,
-                'error_log' => json_encode($errors),
-                'processed_rows' => json_encode(range(1, $successful_records + $failed_records)),
+                'error_log' => json_encode( $errors ),
+                'processed_rows' => json_encode( range( 1, $successful_records + $failed_records ) ),
                 'completed_at' => now()
             ] );
 
-            $end_time = microtime(true);
+            $end_time = microtime( true );
             Log::info( 'Products import completed', [
                 'successful_records' => $successful_records,
                 'failed_records' => $failed_records,
@@ -479,31 +506,30 @@ class ImportDataController extends Controller {
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'file_path' => $file_path,
-                'file_name' => $preview['file_name'] ?? null,
+                'file_name' => $preview[ 'file_name' ] ?? null,
                 'user_id' => Auth::id(),
                 'timestamp' => now()
             ] );
-            return back()->with( 'error', 'Import failed: ' . $e->getMessage() );
+            return redirect()->route( 'import-products' )->with( 'error', 'Import failed: ' . $e->getMessage() );
         }
     }
-
     public function recordStockImport( Request $request ) {
-        $start_time = microtime(true);
-        Log::info( 'Starting stock import process', ['start_time' => $start_time] );
+        $start_time = microtime( true );
+        // Log::info( 'Starting stock import process', [ 'start_time' => $start_time ] );
 
         // Get the import preview data from session
         $preview = Session::get( 'import_preview' );
 
         if ( !$preview || !isset( $preview[ 'file_path' ] ) ) {
             Log::error( 'No import data found in session' );
-            return back()->with( 'error', 'No import data found. Please try uploading your file again.' );
+            return redirect()->route( 'import-data' )->with( 'error', 'No import data found. Please try uploading your file again.' );
         }
 
         $file_path = storage_path( 'app/public/' . $preview[ 'file_path' ] );
 
         if ( !file_exists( $file_path ) ) {
             Log::error( 'Import file not found at path: ' . $file_path );
-            return back()->with( 'error', 'Import file not found. Please try uploading your file again.' );
+            return redirect()->route( 'import-data' )->with( 'error', 'Import file not found. Please try uploading your file again.' );
         }
 
         try {
@@ -515,8 +541,9 @@ class ImportDataController extends Controller {
                 return back()->with( 'error', 'The file appears to be empty or invalid.' );
             }
 
-            $total_rows = count( $excel_raw_data[ 0 ] ) - 1; // Minus header
-            Log::info( 'Creating import history record', ['total_rows' => $total_rows] );
+            $total_rows = count( $excel_raw_data[ 0 ] ) - 1;
+            // Minus header
+            Log::info( 'Creating import history record', [ 'total_rows' => $total_rows ] );
 
             // Create import history record
             $import_history = ImportHistory::create( [
@@ -540,22 +567,24 @@ class ImportDataController extends Controller {
             $error_log = [];
             $processed_rows = [];
 
-            Log::info( 'Starting to process stock rows in batches', [ 'total_rows' => $total_rows ] );
+            // Log::info( 'Starting to process stock rows in batches', [ 'total_rows' => $total_rows ] );
 
-            // Process in batches of 50 rows for stock import (smaller batches due to more operations)
+            // Process in batches of 50 rows for stock import ( smaller batches due to more operations )
             $batch_size = 50;
-            $batches = array_chunk(array_slice($excel_raw_data[0], 1), $batch_size); // Skip header
+            $batches = array_chunk( array_slice( $excel_raw_data[ 0 ], 1 ), $batch_size );
+            // Skip header
 
             foreach ( $batches as $batch_index => $batch ) {
-                $batch_start_time = microtime(true);
+                $batch_start_time = microtime( true );
                 Log::info( 'Processing stock batch', [
                     'batch_index' => $batch_index + 1,
-                    'batch_size' => count($batch),
+                    'batch_size' => count( $batch ),
                     'start_time' => $batch_start_time
                 ] );
 
                 foreach ( $batch as $row_index => $row ) {
-                    $global_index = ($batch_index * $batch_size) + $row_index + 1; // +1 for header offset
+                    $global_index = ( $batch_index * $batch_size ) + $row_index + 1;
+                    // +1 for header offset
 
                     try {
                         DB::beginTransaction();
@@ -624,9 +653,9 @@ class ImportDataController extends Controller {
                     }
                 }
 
-                // Update progress after each batch (less frequent updates)
-                $progress = round( (($batch_index + 1) * $batch_size / $total_rows) * 100 );
-                if ($progress > 100) $progress = 100;
+                // Update progress after each batch ( less frequent updates )
+                $progress = round( ( ( $batch_index + 1 ) * $batch_size / $total_rows ) * 100 );
+                if ( $progress > 100 ) $progress = 100;
 
                 $import_history->update( [
                     'progress' => $progress,
@@ -636,7 +665,7 @@ class ImportDataController extends Controller {
                     'processed_rows' => json_encode( $processed_rows )
                 ] );
 
-                $batch_end_time = microtime(true);
+                $batch_end_time = microtime( true );
                 Log::info( 'Stock batch processed', [
                     'batch_index' => $batch_index + 1,
                     'batch_time' => $batch_end_time - $batch_start_time,
@@ -651,7 +680,7 @@ class ImportDataController extends Controller {
                 'progress' => 100
             ] );
 
-            $end_time = microtime(true);
+            $end_time = microtime( true );
             Log::info( 'Stock import completed', [
                 'successful_records' => $successful_records,
                 'failed_records' => $failed_records,
@@ -675,17 +704,16 @@ class ImportDataController extends Controller {
                 return redirect()->route( 'import-data' )->with( 'success', $message );
             }
 
-        } catch ( \Exception $e ) {
+        } catch ( Exception $e ) {
             Log::error( 'Stock import process failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ] );
-            return back()->with( 'error', 'Import failed: ' . $e->getMessage() );
+            return redirect()->route( 'import-data' )->with( 'error', 'Import failed: ' . $e->getMessage() );
         }
     }
-
     private function validateRow( $row, $row_number ) {
-        Log::info( 'Validating row', [ 'row_number' => $row_number ] );
+        // Log::info( 'Validating row', [ 'row_number' => $row_number ] );
 
         $errors = [];
 
@@ -721,19 +749,18 @@ class ImportDataController extends Controller {
                 'errors' => $errors
             ] );
         } else {
-            Log::info( 'Row validation passed', [ 'row_number' => $row_number ] );
+            // Log::info( 'Row validation passed', [ 'row_number' => $row_number ] );
         }
 
         return $errors;
     }
-
     private function validateStockRow( $row, $row_number ) {
-        Log::info( 'Validating row', [ 'row_number' => $row_number ] );
+        // Log::info( 'Validating row', [ 'row_number' => $row_number ] );
 
         $errors = [];
 
         // Required fields
-        if ( empty( $row[ 0 ] ) ) $errors[] = 'Product code is required';
+        // if ( empty( $row[ 0 ] ) ) $errors[] = 'Product code is required';
         if ( empty( $row[ 1 ] ) ) $errors[] = 'Product name is required';
         if ( empty( $row[ 2 ] ) ) $errors[] = 'Buy price is required';
         if ( empty( $row[ 3 ] ) ) $errors[] = 'Sell price is required';
@@ -757,7 +784,7 @@ class ImportDataController extends Controller {
                 'errors' => $errors
             ] );
         } else {
-            Log::info( 'Row validation passed', [ 'row_number' => $row_number ] );
+            // Log::info( 'Row validation passed', [ 'row_number' => $row_number ] );
         }
 
         return $errors;
