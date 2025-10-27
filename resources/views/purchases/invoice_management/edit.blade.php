@@ -70,7 +70,7 @@
                                     <div class="form-group">
                                         <label for="Amount">Remain Balance</label>
                                         <input type="text" class="form-control" id="balance_edit" name="balance"
-                                               aria-describedby="emailHelp" readonly value="0">
+                                               aria-describedby="emailHelp" value="0" onkeypress="return isNumberKey(event,this)">
                                     </div>
                                 </div>
                             </div>
@@ -97,7 +97,7 @@
                                     <div class="form-group">
                                         <label for="status">Payment Due Date</label>
                                         <input type="text" name="payment_due_date" class="form-control"
-                                               id="due_date_edit" readonly>
+                                               id="due_date_edit" onchange="calculateGracePeriodEdit()">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -179,6 +179,25 @@
             document.getElementById("due_date_edit").value = invoice_date.getFullYear() + '-' + month + '-' + invoice_date.getDate();
         }
 
+    }
+
+    function calculateGracePeriodEdit() {
+        var invoice_date_str = document.getElementById("date_edit").value;
+        var due_date_str = document.getElementById("due_date_edit").value;
+
+        if (!invoice_date_str || !due_date_str) return;
+
+        var invoice_date = new Date(invoice_date_str);
+        var due_date = new Date(due_date_str);
+
+        if (invoice_date.toString() === 'Invalid Date' || due_date.toString() === 'Invalid Date') return;
+
+        var time_diff = due_date.getTime() - invoice_date.getTime();
+        var days_diff = Math.ceil(time_diff / (1000 * 3600 * 24));
+
+        if (days_diff >= 0) {
+            document.getElementById("period_edit").value = days_diff;
+        }
     }
 
 </script>

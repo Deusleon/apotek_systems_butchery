@@ -71,7 +71,7 @@
                                     <div class="form-group">
                                         <label for="Amount">Received Amount</label>
                                         <input type="text" class="form-control" id="received_amount_id" name="received_amount"
-                                               aria-describedby="emailHelp" readonly value="0">
+                                               aria-describedby="emailHelp" value="0" onkeypress="return isNumberKey(event,this)">
                                     </div>
                                 </div>
                             </div>
@@ -102,7 +102,7 @@
                                     <div class="form-group">
                                         <label for="status">Payment Due Date</label>
                                         <input type="text" name="payment_due_date" class="form-control" id="due_d"
-                                               readonly>
+                                               onchange="calculateGracePeriod()">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -173,6 +173,25 @@
             $('#create').find('.modal-body #amount_error').text('Cannot exceed invoice amount');
         }
 
+    }
+
+    function calculateGracePeriod() {
+        var invoice_date_str = document.getElementById("d_auto").value;
+        var due_date_str = document.getElementById("due_d").value;
+
+        if (!invoice_date_str || !due_date_str) return;
+
+        var invoice_date = new Date(invoice_date_str);
+        var due_date = new Date(due_date_str);
+
+        if (invoice_date.toString() === 'Invalid Date' || due_date.toString() === 'Invalid Date') return;
+
+        var time_diff = due_date.getTime() - invoice_date.getTime();
+        var days_diff = Math.ceil(time_diff / (1000 * 3600 * 24));
+
+        if (days_diff >= 0) {
+            document.getElementById("period_id").value = days_diff;
+        }
     }
 
 </script>

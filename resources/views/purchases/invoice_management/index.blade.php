@@ -158,6 +158,23 @@ Invoices
         }
     });
 
+    // Initialize date pickers for create and edit modals
+    $(document).ready(function() {
+        // Date picker for create modal due date
+        $('#due_d').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true
+        });
+
+        // Date picker for edit modal due date
+        $('#due_date_edit').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true
+        });
+    });
+
     $('#invoice_data_table tbody').on('click', '#edit_btn', function() {
         var data = invoice_data_table.row($(this).parents('tr')).data();
         var index = invoice_data_table.row($(this).parents('tr')).index();
