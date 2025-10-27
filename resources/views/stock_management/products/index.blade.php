@@ -50,23 +50,23 @@
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                     <div class="row mb-3">
                         <!-- <div class="col-md-6">
-                                                                    <div class="btn-group">
-                                                                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                            <i class="fas fa-download mr-1"></i> Export
-                                                                        </button>
-                                                                        <div class="dropdown-menu">
-                                                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'pdf']) }}" target="_blank">
-                                                                                <i class="far fa-file-pdf text-danger mr-2"></i>PDF
-                                                                            </a>
-                                                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'excel']) }}">
-                                                                                <i class="far fa-file-excel text-success mr-2"></i>Excel
-                                                                            </a>
-                                                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'csv']) }}">
-                                                                                <i class="fas fa-file-csv text-info mr-2"></i>CSV
-                                                                            </a>
-                                                                        </div>
-                                                                    </div>
-                                                                </div> -->
+                                                                                                                <div class="btn-group">
+                                                                                                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                                                                        <i class="fas fa-download mr-1"></i> Export
+                                                                                                                    </button>
+                                                                                                                    <div class="dropdown-menu">
+                                                                                                                        <a class="dropdown-item" href="{{ route('products.export', ['format' => 'pdf']) }}" target="_blank">
+                                                                                                                            <i class="far fa-file-pdf text-danger mr-2"></i>PDF
+                                                                                                                        </a>
+                                                                                                                        <a class="dropdown-item" href="{{ route('products.export', ['format' => 'excel']) }}">
+                                                                                                                            <i class="far fa-file-excel text-success mr-2"></i>Excel
+                                                                                                                        </a>
+                                                                                                                        <a class="dropdown-item" href="{{ route('products.export', ['format' => 'csv']) }}">
+                                                                                                                            <i class="fas fa-file-csv text-info mr-2"></i>CSV
+                                                                                                                        </a>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                            </div> -->
                     </div>
                     <div class="row justify-content-end align-items-end mb-3">
                         <!-- Status Filter -->
@@ -95,11 +95,19 @@
                                 </select>
                             </div>
                         </div>
+                        <input type="hidden" name="" id="is_detailed" value="{{ $is_detailed }}">
                         <div class="col-md-3 text-right">
                             @if(auth()->user()->checkPermission('Add Products'))
-                                <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#create">
-                                    <i class="fas fa-plus mr-1"></i>Add Product
-                                </button>
+                                @if($is_detailed === 'Normal')
+                                    <button type="button" class="btn btn-secondary" data-toggle="modal"
+                                        data-target="#create_normal">
+                                        <i class="fas fa-plus mr-1"></i>Add Product
+                                    </button>
+                                @else
+                                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#create">
+                                        <i class="fas fa-plus mr-1"></i>Add Product
+                                    </button>
+                                @endif
                             @endif
                         </div>
                     </div>
@@ -133,74 +141,16 @@
             </div>
         </div>
 
+        @include('masters.products.create_normal')
         @include('masters.products.create')
         @include('masters.products.edit')
+        @include('masters.products.edit_normal')
         @include('masters.products.delete')
-        @include('masters.products.show')
-
-        <script>
-            // Wait for jQuery to be available
-            function initializeProductDetailsOption() {
-                if (typeof $ === 'undefined') {
-                    console.log('jQuery not available, retrying...');
-                    setTimeout(initializeProductDetailsOption, 100);
-                    return;
-                }
-
-                console.log('jQuery available, initializing product details option...');
-
-                // Global function to get product details option setting
-                window.getProductDetailsOption = function() {
-                    var setting = 'Detailed'; // Default fallback
-                    try {
-                        $.ajax({
-                            url: '{{ url("api/get-setting/127") }}',
-                            type: 'GET',
-                            async: false,
-                            success: function(data) {
-                                if (data && data.value) {
-                                    setting = data.value;
-                                    console.log('Global setting fetched:', setting);
-                                } else {
-                                    console.log('No data or value in response:', data);
-                                }
-                            },
-                            error: function(xhr, status, error) {
-                                console.log('Global AJAX Error:', status, error);
-                                console.log('XHR response:', xhr.responseText);
-                                console.log('Could not fetch product details option setting, using default');
-                            }
-                        });
-                    } catch (e) {
-                        console.log('Exception in getProductDetailsOption:', e);
-                    }
-                    return setting;
-                };
-
-                // Initialize the global function immediately when page loads
-                $(document).ready(function() {
-                    console.log('Page loaded, initializing product details option...');
-                    try {
-                        var initialSetting = window.getProductDetailsOption();
-                        console.log('Initial setting on page load:', initialSetting);
-                    } catch (e) {
-                        console.log('Error initializing setting:', e);
-                    }
-
-                    // Make the function globally available for debugging
-                    window.debugSetting = function() {
-                        try {
-                            console.log('Current setting:', window.getProductDetailsOption());
-                        } catch (e) {
-                            console.log('Error in debugSetting:', e);
-                        }
-                    };
-                });
-            }
-
-            // Start initialization
-            initializeProductDetailsOption();
-        </script>
+        @if ($is_detailed === 'Detailed')
+            @include('masters.products.show')
+        @else
+            @include('masters.products.show_normal')
+        @endif
 
         <!-- Product Details Modal -->
         <div class="modal fade" id="show" tabindex="-1" role="dialog" aria-labelledby="productDetailsModal"
@@ -351,28 +301,28 @@
                             "searchable": false,
                             "render": function (data, type, row) {
                                 let buttons = `
-                                                        <button type="button" class="btn btn-success btn-sm btn-rounded show-modal">
-                                                            Show
-                                                        </button>
-                                                    `;
+                                                                                                    <button type="button" class="btn btn-success btn-sm btn-rounded show-modal">
+                                                                                                        Show
+                                                                                                    </button>
+                                                                                                `;
 
                                 @if(auth()->user()->checkPermission('Edit Products'))
                                     buttons += `
-                                                                                <button type="button" class="btn btn-primary btn-sm btn-rounded" id="edits">
-                                                                                    Edit
-                                                                                </button>
-                                                                            `;
+                                                                                                                                                                        <button type="button" class="btn btn-primary btn-sm btn-rounded" id="edits">
+                                                                                                                                                                            Edit
+                                                                                                                                                                        </button>
+                                                                                                                                                                    `;
                                 @endif
 
                                 @if(auth()->user()->checkPermission('Delete Products'))
                                     buttons += `
-                                                                                <button type="button" class="btn btn-danger btn-sm btn-rounded" id="deletes">
-                                                                                    Delete
-                                                                                </button>
-                                                                            `;
+                                                                                                                                                                        <button type="button" class="btn btn-danger btn-sm btn-rounded" id="deletes">
+                                                                                                                                                                            Delete
+                                                                                                                                                                        </button>
+                                                                                                                                                                    `;
                                 @endif
 
-                                                    return buttons;
+                                                                                                return buttons;
                             }
 
                         }
@@ -402,16 +352,20 @@
 
             });
 
-
-
             $(document).on('click', '.show-modal', function (e) {
+                var product_option = document.getElementById('is_detailed').value;
+                var is_detailed = product_option === 'Detailed' ? true : false;
+
                 e.preventDefault();
                 var table = $('#fixed-header1').DataTable();
                 var row = $(this).closest('tr');
                 var row_data = table.row(row).data();
+                // if (is_detailed) {
+                    $('#show').modal('show');
+                // } else {
+                //     $('#show_normal').modal('show');
 
-                // Show modal
-                $('#show').modal('show');
+                // }
 
                 // Populate modal with data
                 $('#show #name_edit').html(row_data.name || 'N/A');
@@ -420,32 +374,45 @@
                 $('#show #category_edit').html(row_data.category ? row_data.category.name : 'N/A');
                 $('#show #sale_edit').html(row_data.sales_uom || 'N/A');
                 $('#show #pack_size_show').html(row_data.pack_size || 'N/A');
-                $('#show #min_quantinty_show').html(row_data.min_quantinty>0 ? numberWithCommas(row_data.min_quantinty) : 'N/A');
-                $('#show #max_quantinty_show').html(row_data.max_quantinty>0 ? numberWithCommas(row_data.max_quantinty) : 'N/A');
+                $('#show #min_quantinty_show').html(row_data.min_quantinty > 0 ? numberWithCommas(row_data.min_quantinty) : 'N/A');
+                $('#show #max_quantinty_show').html(row_data.max_quantinty > 0 ? numberWithCommas(row_data.max_quantinty) : 'N/A');
                 $('#show #status').html(row_data.status === 1 ? 'Active' : 'Inactive');
             });
 
             $('#product-table').on('click', '#edits', function () {
+                var product_option = document.getElementById('is_detailed').value;
+                var is_detailed = product_option === 'Detailed' ? true : false;
                 var table = $('#fixed-header1').DataTable();
                 var row_data = table.row($(this).parents('tr')).data();
-                $('#edit').modal('show');
+                if (is_detailed) {
+                    $('#edit').modal('show');
+                    var form = $('#form_product_edit');
+                } else {
+                    $('#edit_normal').modal('show');
+                    var form = $('#form_product_edit_normal');
+                }
 
-                // Update form action with product ID
-                var form = $('#form_product_edit');
                 var action = form.attr('action');
                 form.attr('action', action.replace(':id', row_data.id));
                 console.log('Edit-DATA:', row_data);
                 $('#edit').find('.modal-body #name_edit').val(row_data.name);
+                $('#edit_normal').find('.modal-body #name_edit_normal').val(row_data.name);
                 $('#edit').find('.modal-body #barcode_edits').val(row_data.barcode);
+                $('#edit_normal').find('.modal-body #barcode_edits_normal').val(row_data.barcode);
                 $('#edit').find('.modal-body #brand_edits').val(row_data.brand);
                 $('#edit').find('.modal-body #pack_size_edit').val(row_data.pack_size);
                 $('#edit').find('.modal-body #category_options').val(row_data.category_id);
+                $('#edit_normal').find('.modal-body #category_options_normal').val(row_data.category_id);
                 $('#edit').find('.modal-body #sale_edit').val(row_data.sales_uom);
-                $('#edit').find('.modal-body #min_stock_edit').val(row_data.min_quantinty>0 ? numberWithCommas(row_data.min_quantinty) : '');
-                $('#edit').find('.modal-body #max_stock_edit').val(row_data.max_quantinty>0 ? numberWithCommas(row_data.max_quantinty) : '');
+                $('#edit_normal').find('.modal-body #sale_edit_normal').val(row_data.sales_uom);
+                $('#edit').find('.modal-body #min_stock_edit').val(row_data.min_quantinty > 0 ? numberWithCommas(row_data.min_quantinty) : '');
+                $('#edit_normal').find('.modal-body #min_stock_edit_normal').val(row_data.min_quantinty > 0 ? numberWithCommas(row_data.min_quantinty) : '');
+                $('#edit').find('.modal-body #max_stock_edit').val(row_data.max_quantinty > 0 ? numberWithCommas(row_data.max_quantinty) : '');
                 $('#edit').find('.modal-body #product_type').val(row_data.type);
                 $('#edit').find('.modal-body #status_edit').val(row_data.status);
+                $('#edit_normal').find('.modal-body #status_edit_normal').val(row_data.status);
                 $('#edit').find('.modal-body #id').val(row_data.id);
+                $('#edit_normal').find('.modal-body #id_normal').val(row_data.id);
             });
 
             $('#product-table').on('click', '#deletes', function () {
@@ -469,8 +436,6 @@
                 $('#delete').modal('show');
 
             });
-
-
 
             /*barcode*/
             $(window).ready(function () {
@@ -501,6 +466,12 @@
 
             function createOption() {
                 var category = document.getElementById('category_option');
+                var category_id = category.options[category.selectedIndex].value;
+                filterCategory(category_id);
+            }
+
+            function createOptionNormal() {
+                var category = document.getElementById('category_option_normal');
                 var category_id = category.options[category.selectedIndex].value;
                 filterCategory(category_id);
             }
@@ -564,22 +535,28 @@
             }
 
             function saveFormData() {
+                let $visibleForm = $('.modal.show form');
+                if (!$visibleForm.length) {
+                    notify('No active form found', 'top', 'right', 'danger');
+                    return;
+                }
 
-                var form = $('#form_product').serialize();
+                let formData = $visibleForm.serialize();
 
                 $.ajax({
                     url: '{{ route('store-products') }}',
                     type: "post",
                     dataType: "json",
-                    data: form,
+                    data: formData,
                     success: function (data) {
                         console.log('Response Data', data);
                         if (data[0].message === 'success') {
                             notify('Product added successfully', 'top', 'right', 'success');
-                            // document.getElementById('form_product').reset();
                             let categoryVal = $('#category_option').val();
+                            let categoryValNormal = $('#category_option_normal').val();
                             $('#form_product')[0].reset();
                             $('#category_option').val(categoryVal).change();
+                            $('#category_option_normal').val(categoryValNormal).change();
                         } else {
                             notify('Product name exists', 'top', 'right', 'danger');
                             // $('#category_option').val('0').change();
@@ -606,7 +583,22 @@
                 });
             }
 
+            $('#form_product_normal').on('submit', function (e) {
+                e.preventDefault();
+                console.log('Submit clicked');
+                var category = document.getElementById('category_option_normal');
+                var category_id = category.options[category.selectedIndex].value;
 
+                if (Number(category_id) === 0) {
+                    document.getElementById('category_border').style.display = 'block';
+                    return false;
+                }
+
+                document.getElementById('category_border').style.display = 'none';
+
+                saveFormData();
+
+            });
 
             $('#form_product').on('submit', function (e) {
                 e.preventDefault();
@@ -635,6 +627,18 @@
 
                 document.getElementById('category_borders').style.display = 'none';
 
+            });
+
+            $('#form_product_edit_normal').on('submit', function (e) {
+                var category = document.getElementById('category_options_normal');
+                var category_id = category.options[category.selectedIndex].value;
+
+                if (Number(category_id) === 0) {
+                    document.getElementById('category_borders_normal').style.display = 'block';
+                    return false;
+                }
+
+                document.getElementById('category_borders_normal').style.display = 'none';
             });
 
             $('#pack_size_edit').on('change', function () {
@@ -671,6 +675,18 @@
 
             });
 
+            $('#min_stock_edit_normal').on('change', function () {
+                var min = document.getElementById('min_stock_edit_normal').value;
+
+                if (min !== '') {
+                    document.getElementById('min_stock_edit_normal').value =
+                        numberWithCommas(parseFloat(min.replace(/\,/g, ''), 10));
+                } else {
+                    document.getElementById('min_stock_edit_normal').value = '';
+                }
+
+            });
+
             $('#max_stock_edit').on('change', function () {
                 var max = document.getElementById('max_stock_edit').value;
                 if (max !== '') {
@@ -683,6 +699,18 @@
             });
 
             $('#min_stock_edits').on('change', function () {
+                var min = document.getElementById('min_stock_edits').value;
+
+                if (min !== '') {
+                    document.getElementById('min_stock_edits').value =
+                        numberWithCommas(parseFloat(min.replace(/\,/g, ''), 10));
+                } else {
+                    document.getElementById('min_stock_edits').value = '';
+                }
+
+            });
+
+            $('#min_stock_edits_normal').on('change', function () {
                 var min = document.getElementById('min_stock_edits').value;
 
                 if (min !== '') {
@@ -707,6 +735,10 @@
 
             $('#category_option').select2({
                 dropdownParent: $('#create')
+            });
+
+            $('#category_option_normal').select2({
+                dropdownParent: $('#create_normal')
             });
 
             $('#sub_category').select2({

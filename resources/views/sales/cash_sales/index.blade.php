@@ -243,7 +243,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <hr>
                         @endif
                         <hr>
                         <div class="row">
@@ -298,6 +297,11 @@
 
             }
         };
+
+        // Load cart from localStorage on page load
+        var cart = JSON.parse(localStorage.getItem('cart')) || [];
+        var default_cart = JSON.parse(localStorage.getItem('default_cart')) || [];
+        var order_cart = JSON.parse(localStorage.getItem('order_cart')) || [];
 
     </script>
     <script src="{{asset('assets/apotek/js/notification.js')}}"></script>

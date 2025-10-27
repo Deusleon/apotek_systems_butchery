@@ -95,6 +95,12 @@ class UserController extends Controller
                 'store_id' => 'required|exists:inv_stores,id',
             ]);
 
+            $existingUser = User::where('name', $request->name)->count();
+            if ($existingUser > 0) {
+                session()->flash("alert-danger", "User with the same name already exists!");
+                return back()->withInput();
+            }
+
             $user = new User;
             $user->name = $request->name;
             $user->position = $request->position;
@@ -105,7 +111,6 @@ class UserController extends Controller
             $user->store_id = $request->store_id;
             $user->save();
 
-            // ✅ resolve role id to role name before syncing
             $role = Role::find($request->role);
             if ($role) {
                 $user->syncRoles($role->name);
@@ -133,6 +138,14 @@ class UserController extends Controller
             'store_id' => 'required',
         ]);
 
+        // $existingUser = User::where('name', $request->name1)->count();
+        $existingUser = User::where('name', $request->name1)
+            ->where('id', '!=', $request->UserID)
+            ->count();
+        if ($existingUser > 0) {
+            session()->flash("alert-danger", "User with the same name already exists!");
+            return back()->withInput();
+        }
 
         $user = User::findOrFail($request->UserID);
         $user->name = $request->name1;
