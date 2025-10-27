@@ -30,21 +30,31 @@ function getHistory(range) {
     }
 }
 
+var isDiscountEnabled = $("#discount_enabled").val() === "YES";
+var columns = [
+    { title: "Receipt #", searchable: true },
+    { title: "Customer", searchable: true },
+    { title: "Date", searchable: true },
+    { title: "Sub Total", searchable: true },
+    { title: "VAT", searchable: true },
+];
+
+if (isDiscountEnabled) {
+    columns.push({ title: "Discount", searchable: true });
+}
+
+columns.push(
+    { title: "Amount", searchable: true },
+    { title: "Action", orderable: false, searchable: false }
+);
+
 var saleHistoryTable = $("#sale_history_dataTable").DataTable({
     responsive: true,
     order: [[2, "desc"]],
     searching: true,
-    columns: [
-        { title: "Receipt #", searchable: true },
-        { title: "Customer", searchable: true },
-        { title: "Date", searchable: true },
-        { title: "Sub Total", searchable: true },
-        { title: "VAT", searchable: true },
-        { title: "Discount", searchable: true },
-        { title: "Amount", searchable: true },
-        { title: "Action", orderable: false, searchable: false },
-    ],
+    columns: columns,
 });
+
 
 var saleHistoryDataTable;
 
@@ -69,46 +79,52 @@ function populateTable(data) {
     // Clear old rows
     saleHistoryTable.clear();
 
-    // Add new rows
     data.forEach(function (item) {
         let receipt_url = config.routes.receiptBaseUrl.replace(
             ":receipt",
             item.receipt_number
         );
-        let actions = "";
 
-        actions += `<button type='button' class='btn btn-sm show-sales btn-rounded btn-success'
-                    data-receipt='${item.receipt_number}'
-                    data-customer='${item.customer.name}'
-                    data-sale-id='${item.id}'
-                    data-date='${moment(item.date).format("YYYY-MM-DD")}'>
-                    Show
-                </button>`;
+        let actions = `
+            <button type='button' class='btn btn-sm show-sales btn-rounded btn-success'
+                data-receipt='${item.receipt_number}'
+                data-customer='${item.customer.name}'
+                data-sale-id='${item.id}'
+                data-date='${moment(item.date).format("YYYY-MM-DD")}'>
+                Show
+            </button>
+        `;
 
-        if (
-            typeof canPrintSalesHistory !== "undefined" &&
-            canPrintSalesHistory
-        ) {
-            actions += `<a href="${receipt_url}" target="_blank">
+        if (typeof canPrintSalesHistory !== "undefined" && canPrintSalesHistory) {
+            actions += `
+                <a href="${receipt_url}" target="_blank">
                     <button class="btn btn-sm btn-rounded btn-secondary" type="button">
                         <span class="fa fa-print"></span>
                         Print
                     </button>
-                </a>`;
+                </a>
+            `;
         }
 
-        saleHistoryTable.row.add([
+        // 👇 Build row data dynamically
+        let row = [
             item.receipt_number,
             item.customer.name,
             moment(item.date).format("YYYY-MM-DD"),
             formatMoney(Number(item.total_amount) - Number(item.total_vat)),
             formatMoney(Number(item.total_vat)),
-            formatMoney(Number(item.total_discount)),
-            formatMoney(
-                Number(item.total_amount) - Number(item.total_discount)
-            ),
-            actions,
-        ]);
+        ];
+
+        if (isDiscountEnabled) {
+            row.push(formatMoney(Number(item.total_discount)));
+        }
+
+        row.push(
+            formatMoney(Number(item.total_amount) - Number(item.total_discount)),
+            actions
+        );
+
+        saleHistoryTable.row.add(row);
     });
 
     // Redraw the table

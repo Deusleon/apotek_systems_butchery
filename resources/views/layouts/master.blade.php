@@ -254,7 +254,6 @@ $store_id = Auth::user()->store_id;
                 </li>
 
             </ul>
-
             <ul class="navbar-nav ml-auto">
                 @php
                     $userStore = Auth::user()->store;
@@ -304,9 +303,19 @@ $store_id = Auth::user()->store_id;
                 </li>
                 <li>
                     <div class="dropdown">
-                        @if(auth()->user()->unreadNotifications->count() != 0)
+                        @php
+                            $notificationCount = 0;
+                            foreach(auth()->user()->unreadNotifications as $notification) {
+                                $data = $notification->data;
+                                if(isset($data['out_of_stock_count']) && $data['out_of_stock_count'] > 0) $notificationCount += 1;
+                                if(isset($data['below_min_level_count']) && $data['below_min_level_count'] > 0) $notificationCount += 1;
+                                if(isset($data['expired_count']) && $data['expired_count'] > 0) $notificationCount += 1;
+                                if(isset($data['expiring_soon_count']) && $data['expiring_soon_count'] > 0) $notificationCount += 1;
+                            }
+                        @endphp
+                        @if($notificationCount > 0)
                             <span class="badge text-white badge-pill badge-notify"
-                                id="span_counter">{{ auth()->user()->unreadNotifications->count() }}</span>
+                                id="span_counter">{{ $notificationCount }}</span>
                         @else
                             <span class="badge text-white badge-pill badge-notify" id="span_counter"></span>
                         @endif

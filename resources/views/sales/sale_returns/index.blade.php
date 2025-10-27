@@ -71,6 +71,7 @@
                                 </button>
                             </div>
                         </div>
+                        <input type="hidden" name="" value="{{ $enable_discount }}" id="discount_enabled">
                         <div id="sales">
                             <div class="d-flex justify-content-end mb-3 align-items-center">
                                 <label class="mr-2" for="">Date:</label>
@@ -86,7 +87,9 @@
                                             <th>Date</th>
                                             <th>Sub Total</th>
                                             <th>VAT</th>
-                                            <th>Discount</th>
+                                            @if ($enable_discount === 'YES')
+                                                <th>Discount</th>
+                                            @endif
                                             <th>Amount</th>
                                             <th>Action</th>
                                         </tr>
@@ -255,6 +258,68 @@
 
             $("#sale_list_return_table").dataTable().fnDestroy();
 
+            var discountEnabled = $('#discount_enabled').val() === 'YES';
+
+            var columns = [
+                { 'data': 'receipt_number' },
+                {
+                    'data': 'customer', render: function (customer) {
+                        if (customer) {
+                            return customer.name
+                        }
+                        return '';
+                    }
+                },
+                {
+                    'data': 'date', render: function (date) {
+                        return moment(date).format('YYYY-MM-DD');
+                    }
+                },
+                {
+                    'data': 'cost', render: function (cost) {
+                        if (cost) {
+                            return formatMoney(cost.vat);
+                        }
+                        return '';
+                    }
+                },
+                {
+                    'data': 'cost', render: function (cost) {
+                        if (cost) {
+                            return formatMoney(cost.vat);
+                        }
+                        return '';
+                    }
+                }
+            ];
+
+            if (discountEnabled) {
+                columns.push({
+                    'data': 'cost.discount', render: function (discount) {
+                        return formatMoney(discount);
+                    }
+                });
+            }
+
+            columns.push({
+                'data': 'cost', render: function (cost) {
+                    if (cost) {
+                        return formatMoney(((cost.amount - cost.discount)));
+                    }
+                    return '';
+                }
+            });
+
+            columns.push({
+                'data': "action",
+                defaultContent: "<button type='button' id='open_btn' class='btn btn-sm btn-rounded btn-success'>Open</button>"
+            });
+
+            var nonOrderableTargets = [];
+            for (var i = 3; i < columns.length; i++) {
+                nonOrderableTargets.push(i);
+            }
+
             $('#sale_list_return_table').DataTable({
                 "processing": true,
                 "serverSide": true,
@@ -268,58 +333,10 @@
                         range: range
                     }
                 },
-                "columns": [
-                    { 'data': 'receipt_number' },
-                    {
-                        'data': 'customer', render: function (customer) {
-                            if (customer) {
-                                return customer.name
-                            }
-                            return '';
-                        }
-                    },
-                    {
-                        'data': 'date', render: function (date) {
-                            return moment(date).format('YYYY-MM-DD');
-                        }
-                    },
-                    {
-                        'data': 'cost', render: function (cost) {
-                            if (cost) {
-                                return formatMoney(cost.vat);
-                            }
-                            return '';
-                        }
-                    },
-
-                    {
-                        'data': 'cost', render: function (cost) {
-                            if (cost) {
-                                return formatMoney(cost.vat);
-                            }
-                            return '';
-                        }
-                    },
-                    {
-                        'data': 'cost.discount', render: function (discount) {
-                            return formatMoney(discount);
-                        }
-                    },
-                    {
-                        'data': 'cost', render: function (cost) {
-                            if (cost) {
-                                return formatMoney(((cost.amount - cost.discount)));
-                            }
-                            return '';
-                        }
-                    },
-                    {
-                        'data': "action",
-                        defaultContent: "<button type='button' id='open_btn' class='btn btn-sm btn-rounded btn-success'>Open</button>"
-                    }
-                ], aaSorting: [[1, 'desc']],
+                "columns": columns,
+                aaSorting: [[1, 'desc']],
                 "columnDefs": [
-                    { "orderable": false, "targets": [3, 4, 5, 6, 7] }
+                    { "orderable": false, "targets": nonOrderableTargets }
                 ]
 
             });

@@ -36,6 +36,7 @@ class GeneralSettingController extends Controller
            'proforma_invoice_terms' => 'nullable|string|max:5000',
            'purchase_order_terms' => 'nullable|string|max:5000',
            'delivery_note_terms' => 'nullable|string|max:5000',
+           'credit_note_terms' => 'nullable|string|max:5000',
        ]);
 
        try {
@@ -47,6 +48,7 @@ class GeneralSettingController extends Controller
            $receipt->proforma_invoice_terms = $request->proforma_invoice_terms;
            $receipt->purchase_order_terms = $request->purchase_order_terms;
            $receipt->delivery_note_terms = $request->delivery_note_terms;
+           $receipt->credit_note_terms = $request->credit_note_terms;
            $receipt->save();
 
            session()->flash("alert-success","Terms and conditions updated successfully!");

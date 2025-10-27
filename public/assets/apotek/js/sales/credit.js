@@ -171,7 +171,7 @@ $("#products").on("change", function (e) {
             $("#credit_barcode_input").focus();
         }, 30);
     } else {
-        notify("Select Customer First", "top", "right", "warning");
+        notify("Please select customer first", "top", "right", "warning");
 
         $("#products option").prop("selected", function () {
             return this.defaultSelected;
@@ -232,7 +232,7 @@ function fetchProductByBarcode(barcode) {
                 // For credit sales require customer selected
                 let customer_id = $("#customer_id").val();
                 if (!customer_id || customer_id === "") {
-                    notify("Select Customer First", "top", "right", "warning");
+                    notify("Please select customer first", "top", "right", "warning");
                     return;
                 }
 
@@ -972,20 +972,20 @@ function deselect() {
     // rePopulateSelect2Customer();
     $("#customer_id").val("").change();
     if (discount_enable === "YES") {
-        document.getElementById("sale_discount").value = 0.0;
+        document.getElementById("sale_discount").value = '0.00';
     }
     document.getElementById("grace_period").value = "";
     // var backDate = document.getElementById("cash_sale_date");
     // if (backDate) {
     //     backDate.value = "";
     // }
-    document.getElementById("sub_total").value = 0.0;
-    document.getElementById("total_vat").value = 0.0;
-    document.getElementById("total").value = 0.0;
+    document.getElementById("sub_total").value = '0.00';
+    document.getElementById("total_vat").value = '0.00';
+    document.getElementById("total").value = '0.00';
     document.getElementById("total_items").innerHTML = 0;
     try {
-        document.getElementById("sale_paid").value = 0.0;
-        document.getElementById("change_amount").value = 0.0;
+        document.getElementById("sale_paid").value = '0.00';
+        document.getElementById("change_amount").value = '0.00';
     } catch (e) {}
 
     sub_total = 0;
@@ -1001,11 +1001,9 @@ function deselect1() {
     // $('#price_category').val('').change();
     $("#customer_id").val("").change();
     $("#grace_period").val("").change();
-    try {
-        document.getElementById("credit_sale_date").value = "";
-        document.getElementById("sale_paid").value = 0;
-        document.getElementById("sale_discount").value = 0;
-        document.getElementById("remark").value = "";
+            try {
+        document.getElementById("sale_paid").value = '0.00';
+        document.getElementById("sale_discount").value = '0.00';
         document.getElementById("total_items").innerHTML = 0;
     } catch (e) {
         console.log("cancel_error");
@@ -1451,6 +1449,9 @@ $("#credit_payment_table tbody").on("click", "#pay_btn", function () {
     $("#credit-sale-payment")
         .find(".modal-body #customer-id")
         .val(data.customer_id);
+    $("#credit-sale-payment")
+        .find(".modal-body #customer_name")
+        .val(data.name);
     $("#credit-sale-payment")
         .find(".modal-body #receipt-number")
         .val(data.receipt_number);

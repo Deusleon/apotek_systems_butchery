@@ -9,36 +9,36 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
-{
+ {
 
     public function index()
-    {
+ {
         $roles = Role::get();
         $permissions = Permission::get();
-        foreach ($roles as $role) {
-            $role_count = DB::table('model_has_roles')->where('role_id', $role->id)->count();
+        foreach ( $roles as $role ) {
+            $role_count = DB::table( 'model_has_roles' )->where( 'role_id', $role->id )->count();
 
-            if ($role_count > 0) {
-                $role['is_used'] = 'yes';
+            if ( $role_count > 0 ) {
+                $role[ 'is_used' ] = 'yes';
             }
 
-            if ($role_count == 0) {
-                $role['is_used'] = 'no';
+            if ( $role_count == 0 ) {
+                $role[ 'is_used' ] = 'no';
             }
 
         }
-        return view("roles.index", compact("roles", "permissions"));
+        return view( 'roles.index', compact( 'roles', 'permissions' ) );
     }
 
     public function create()
-    {
-        $permissions = Permission::get()->groupBy('category')->sortKeys();
-        return view("roles.create", compact("permissions"));
+ {
+        $permissions = Permission::get()->groupBy( 'category' )->sortKeys();
+        return view( 'roles.create', compact( 'permissions' ) );
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
+    public function store( Request $request )
+ {
+        $request->validate( [
             'name' => 'unique:roles|required|string|min:2|max:50',
             'description' => 'required|string|min:5|max:50',
             'permissions' => 'required',
@@ -46,65 +46,67 @@ class RoleController extends Controller
             'name.unique' => 'Role with this name exist',
         ] );
 
-        $role = Role::create([
+        $role = Role::create( [
             'name' => $request->name,
             'description' => $request->description
-        ]);
-        $role->givePermissionTo($request->permissions);
+        ] );
+        $role->givePermissionTo( $request->permissions );
 
-        session()->flash("alert-success", "Role created successfully!");
-        return redirect()->route('roles.index');
+        session()->flash( 'alert-success', 'Role created successfully!' );
+        return redirect()->route( 'roles.index' );
     }
 
+    public function edit( $id )
+ {
+        $role = Role::find( $id );
 
-    public function edit($id)
-    {
-        $role = Role::find($id);
-
-        $AssignedPermissions = DB::select("SELECT permission_id id FROM role_has_permissions where role_id = " . $id . "");
-        $permissionsAll = Permission::get()->groupBy('category')->sortKeys();
+        $AssignedPermissions = DB::select( 'SELECT permission_id id FROM role_has_permissions where role_id = ' . $id . '' );
+        $permissionsAll = Permission::get()->groupBy( 'category' )->sortKeys();
 
         $permissionsAssigned = [];
-        foreach ($AssignedPermissions as $p) {
+        foreach ( $AssignedPermissions as $p ) {
             $permissionsAssigned[] = $p->id;
         }
 
-        return view("roles.edit", compact('role', 'permissionsAll', 'permissionsAssigned'));
+        return view( 'roles.edit', compact( 'role', 'permissionsAll', 'permissionsAssigned' ) );
     }
 
+    public function update( Request $request )
+ {
+        $validated = $request->validate( [
+            'id' => 'required|exists:roles,id',
+            'name' => 'required|string|min:2|max:50|unique:roles,name,' . $request->id,
+            'description' => 'required|string|min:2|max:255',
+            'permissions' => 'required|array|min:1',
+        ], [
+            'name.unique' => 'Role with this name exist',
+        ] );
 
-    public function update(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|min:2|max:50',
-            'description' => 'required|string|min:2|max:50',
-            'permissions' => 'required',
-        ]);
+        $role = Role::findOrFail( $validated[ 'id' ] );
 
+        $role->update( [
+            'name' => $validated[ 'name' ],
+            'description' => $validated[ 'description' ],
+        ] );
 
-        $role = Role::findOrfail($request->id);
-        $role->name = $request->name;
-        $role->description = $request->description;
+        $role->syncPermissions( $validated[ 'permissions' ] );
 
-        $role->save();
-        $role->syncPermissions($request->permissions);
+        session()->flash( 'alert-success', 'Role updated successfully!' );
 
-        session()->flash("alert-success", "Role updated successfully!");
-        return redirect()->route('roles.index');
-
+        return redirect()->route( 'roles.index' );
     }
 
-    public function destroy(Request $request)
-    {
+    public function destroy( Request $request )
+ {
         try {
-            $role = Role::find($request->role_id);
-            $role->syncPermissions([]);
+            $role = Role::find( $request->role_id );
+            $role->syncPermissions( [] );
 
-            Role::destroy($request->role_id);
-            session()->flash("alert-success", "Role deleted successfully!");
+            Role::destroy( $request->role_id );
+            session()->flash( 'alert-success', 'Role deleted successfully!' );
             return back();
-        } catch (Exception $exception) {
-            session()->flash("alert-danger", "Role in use!");
+        } catch ( Exception $exception ) {
+            session()->flash( 'alert-danger', 'Role in use!' );
             return back();
         }
     }

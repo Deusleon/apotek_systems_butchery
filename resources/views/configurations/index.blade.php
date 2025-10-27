@@ -274,7 +274,7 @@
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="invoice"><option value="YES">YES</option><option value="NO">NO</option></select>';
                     break;
                 case 117:
-                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata"><option value="YES">YES</option><option value="NO">NO</option></select>';
+                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="reprint_receipt"><option value="YES">YES</option><option value="NO">NO</option></select>';
                     break;
                 case 119:
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="receipt_size">' +
@@ -298,7 +298,7 @@
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="support_multi_store"><option value="YES">YES</option><option value="NO">NO</option></select>';
                     break;
                 case 122:
-                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="store">   @foreach($store as $store)<option value="{{$store->name}}">{{$store->name}}</option>@endforeach</select>';
+                    document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="store">   @foreach($store as $store) @if($store->id > 1)<option value="{{$store->name}}">{{$store->name}}</option>@endif @endforeach</select>';
                     break;
                 case 123:
                     document.getElementById("formInput").innerHTML = '<select  class="js-example-basic-single form-control"name="formdata" id="back_date"><option value="YES">YES</option><option value="NO">NO</option></select>';
@@ -325,6 +325,10 @@
 
             if ($('#back_date').length) {
                 document.getElementById('back_date').value = data[2];
+            }
+            
+            if ($('#reprint_receipt').length) {
+                document.getElementById('reprint_receipt').value = data[2];
             }
 
             if ($('#invoice').length) {

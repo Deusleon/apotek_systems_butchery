@@ -280,7 +280,7 @@ Route::middleware(["auth","main_branch"])->group(function () {
     Route::get('sales/credits-tracking', 'SaleController@creditsTracking')->name('credits-tracking.creditsTracking');
     Route::get('sales/credit-payments', 'SaleController@getCreditsCustomers')->name('credit-payments.getCreditsCustomers');
     Route::post('sales/credit-payments', 'SaleController@CreditSalePayment')->name('credit-payments.creditSalePayment');
-    Route::get('sales/sale-histories', 'SaleController@SalesHistory')->name('sale-histories.SalesHistory');
+    Route::get('sales/sales-history', 'SaleController@SalesHistory')->name('sale-histories.SalesHistory');
     Route::post('sales/sale-date', 'SaleController@getSalesHistory')->name('getSalesHistory');
     Route::post('sales/sales-data', 'SaleController@getSalesHistoryData')->name('getSalesHistoryData');
     Route::post('sales/select-products', 'SaleController@selectProducts')->name('selectProducts');

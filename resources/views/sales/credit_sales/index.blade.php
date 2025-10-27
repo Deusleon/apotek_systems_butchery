@@ -119,7 +119,7 @@
                                 <input type="hidden" name="" id="is_all_store" value="{{ current_store()->name }}">
                                 <div id="sale-panel">
                                     <div class="row">
-                                        <div class="col-md-2">
+                                        <div class="col-md-3">
                                             <div class="form-group">
                                                 <label id="cat_label">Sales Type<font color="red">*</font></label>
                                                 <select id="price_category" class="js-example-basic-single form-control"
@@ -143,7 +143,7 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-md-2">
+                                        <div class="col-md-2" hidden>
                                             <div class="form-group">
                                                 <label for="code">Payment Type</label>
                                                 <select name="payment_type" id="payment_type"
@@ -156,7 +156,7 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-md-2">
+                                        <div class="col-md-3">
                                             <div class="form-group">
                                                 <label for="code">Customer Name<font color="red">*</font></label>
                                                 <select name="customer_id" id="customer_id"
@@ -319,7 +319,7 @@
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div style="width: 99%">
-                                                        <label>Grace Period(In Days)<font color="red">*</font></label>
+                                                        <label>Grace Period (Days)<font color="red">*</font></label>
                                                         <select class="js-example-basic-single form-control" name="grace_period"
                                                             id="grace_period" required>
                                                             <option value="">Select period</option>
@@ -348,9 +348,9 @@
                                     <hr>
                                     <div class="row">
                                         <div class="col-md-8">
-                                            <div class="form-group"><textarea id="remark" name="remark" class="form-control"
+                                            {{-- <div class="form-group"><textarea id="remark" name="remark" class="form-control"
                                                     rows="3" placeholder="Enter Remarks Here"></textarea>
-                                            </div>
+                                            </div> --}}
                                         </div>
 
                                         <div class="col-md-4">

@@ -20,7 +20,7 @@ try {
 }
 
 try {
-    discount_enable = document.getElementById("enable_discount").value;
+    discount_enable = document.getElementById("discount_enabled").value;
 } catch (e) {
     console.log("discount error");
 }
@@ -56,6 +56,7 @@ var items_table = $("#items_table").DataTable({
             render: function (discount) {
                 return formatMoney(discount);
             },
+            visible: discount_enable === "YES",
         },
         {
             title: "Amount",
@@ -1055,7 +1056,7 @@ $("#products").on("change", function (event) {
         valueCollection();
         $("#barcode_input").focus();
     } else {
-        notify("Select Customer First", "top", "right", "warning");
+        notify("Please select customer first", "top", "right", "warning");
 
         $("#products option").prop("selected", function () {
             return this.defaultSelected;

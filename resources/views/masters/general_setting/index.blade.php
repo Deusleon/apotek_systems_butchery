@@ -33,33 +33,20 @@
                 <form action="{{route('general-settings.updateReceipt')}}" method="post">
                     @csrf()
                     @method("PUT")
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="cash_sale_terms">Cash Sale Terms & Conditions</label>
-                                <textarea class="form-control" id="cash_sale_terms" name="cash_sale_terms" rows="4" placeholder="Enter terms & conditions for cash sales">{{old('cash_sale_terms', $setting->cash_sale_terms)}}</textarea>
+                                <label for="cash_sale_terms">Cash Sales</label>
+                                <textarea class="form-control" id="cash_sale_terms" name="cash_sale_terms" rows="4"
+                                    placeholder="Enter terms & conditions for cash sales">{{old('cash_sale_terms', $setting->cash_sale_terms)}}</textarea>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="credit_sale_terms">Credit Sale Terms & Conditions</label>
-                                <textarea class="form-control" id="credit_sale_terms" name="credit_sale_terms" rows="4" placeholder="Enter terms & conditions for credit sales">{{old('credit_sale_terms', $setting->credit_sale_terms)}}</textarea>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="proforma_invoice_terms">Proforma Invoice Terms & Conditions</label>
-                                <textarea class="form-control" id="proforma_invoice_terms" name="proforma_invoice_terms" rows="4" placeholder="Enter terms & conditions for proforma invoices">{{old('proforma_invoice_terms', $setting->proforma_invoice_terms)}}</textarea>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="purchase_order_terms">Purchase Order Terms & Conditions</label>
-                                <textarea class="form-control" id="purchase_order_terms" name="purchase_order_terms" rows="4" placeholder="Enter terms & conditions for purchase orders">{{old('purchase_order_terms', $setting->purchase_order_terms)}}</textarea>
+                                <label for="credit_sale_terms">Credit Sales</label>
+                                <textarea class="form-control" id="credit_sale_terms" name="credit_sale_terms" rows="4"
+                                    placeholder="Enter terms & conditions for credit sales">{{old('credit_sale_terms', $setting->credit_sale_terms)}}</textarea>
                             </div>
                         </div>
                     </div>
@@ -67,8 +54,36 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="delivery_note_terms">Delivery Note Terms & Conditions</label>
-                                <textarea class="form-control" id="delivery_note_terms" name="delivery_note_terms" rows="4" placeholder="Enter terms & conditions for delivery notes">{{old('delivery_note_terms', $setting->delivery_note_terms)}}</textarea>
+                                <label for="proforma_invoice_terms">Proforma Invoice</label>
+                                <textarea class="form-control" id="proforma_invoice_terms" name="proforma_invoice_terms"
+                                    rows="4"
+                                    placeholder="Enter terms & conditions for proforma invoices">{{old('proforma_invoice_terms', $setting->proforma_invoice_terms)}}</textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="purchase_order_terms">Purchase Order</label>
+                                <textarea class="form-control" id="purchase_order_terms" name="purchase_order_terms"
+                                    rows="4"
+                                    placeholder="Enter terms & conditions for purchase orders">{{old('purchase_order_terms', $setting->purchase_order_terms)}}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="delivery_note_terms">Delivery Note</label>
+                                <textarea class="form-control" id="delivery_note_terms" name="delivery_note_terms" rows="4"
+                                    placeholder="Enter terms & conditions for delivery note">{{old('delivery_note_terms', $setting->delivery_note_terms)}}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="credit_note_terms">Credit Note</label>
+                                <textarea class="form-control" id="credit_note_terms" name="credit_note_terms" rows="4"
+                                    placeholder="Enter terms & conditions for credit note">{{old('credit_note_terms', $setting->credit_note_terms)}}</textarea>
                             </div>
                         </div>
                     </div>
@@ -85,7 +100,7 @@
 @endsection
 
 @push("page_scripts")
-@include('partials.notification')
+    @include('partials.notification')
 
     <!-- Input mask Js -->
     <script src="{{asset("assets/plugins/inputmask/js/inputmask.min.js")}}"></script>
@@ -95,16 +110,16 @@
     <script src="{{asset("assets/js/pages/form-masking-custom.js")}}"></script>
 
     <script type="text/javascript">
-//Maintain the current Pill on reload
-$(function() {
-    $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
-        localStorage.setItem('lastPill', $(this).attr('href'));
-    });
-        var lastPill = localStorage.getItem('lastPill');
-    if (lastPill) {
-        $('[href="' + lastPill + '"]').tab('show');
-    }
-});
+        //Maintain the current Pill on reload
+        $(function () {
+            $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
+                localStorage.setItem('lastPill', $(this).attr('href'));
+            });
+            var lastPill = localStorage.getItem('lastPill');
+            if (lastPill) {
+                $('[href="' + lastPill + '"]').tab('show');
+            }
+        });
     </script>
 
 @endpush

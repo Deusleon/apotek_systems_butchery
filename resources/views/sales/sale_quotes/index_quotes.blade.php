@@ -415,41 +415,41 @@
                             let buttons = ``;
 
                             buttons += `
-                                                                                                            <button class="btn btn-sm btn-rounded btn-success" type="button"
-                                                                                                                    onclick="showQuoteDetails(event)"
-                                                                                                                    id="quote_details">Show
-                                                                                                            </button>`;
+                                                                                                                    <button class="btn btn-sm btn-rounded btn-success" type="button"
+                                                                                                                            onclick="showQuoteDetails(event)"
+                                                                                                                            id="quote_details">Show
+                                                                                                                    </button>`;
                             @if(auth()->user()->checkPermission('Print Sales Orders'))
                                 buttons += `
-                                                                                                                                                    <a href="${receipt_url}" target="_blank">
-                                                                                                                                                        <button class="btn btn-sm btn-rounded btn-secondary" type="button">
-                                                                                                                                                            <span class="fa fa-print" aria-hidden="true"></span>
-                                                                                                                                                            Print
-                                                                                                                                                        </button>
-                                                                                                                                                    </a>`;
+                                                                                                                                                                    <a href="${receipt_url}" target="_blank">
+                                                                                                                                                                        <button class="btn btn-sm btn-rounded btn-secondary" type="button">
+                                                                                                                                                                            <span class="fa fa-print" aria-hidden="true"></span>
+                                                                                                                                                                            Print
+                                                                                                                                                                        </button>
+                                                                                                                                                                    </a>`;
                             @endif
 
-                                                                                     if (parseInt(row.status, 10) === 1) {
+                                                                                             if (parseInt(row.status, 10) === 1) {
                                 @if(auth()->user()->checkPermission('Edit Sales Orders'))
                                     buttons += `
-                                                                                                                                                <a class="btn btn-sm btn-rounded btn-info" href="${update_url}">
-                                                                                                                                                    Edit
-                                                                                                                                                </a>`;
+                                                                                                                                                                <a class="btn btn-sm btn-rounded btn-info" href="${update_url}">
+                                                                                                                                                                    Edit
+                                                                                                                                                                </a>`;
                                 @endif
                                 @if(auth()->user()->checkPermission('Convert Sales Orders'))
                                     buttons += `
-                                                                                                                                            <button class="btn btn-sm btn-rounded btn-warning"
-                                                                                                                                                    type="button"
-                                                                                                                                                    onclick="convertQuoteToSale(${row.id})">
-                                                                                                                                                Convert
-                                                                                                                                            </button>`;
+                                                                                                                                                            <button class="btn btn-sm btn-rounded btn-warning"
+                                                                                                                                                                    type="button"
+                                                                                                                                                                    onclick="convertQuoteToSale(${row.id})">
+                                                                                                                                                                Convert
+                                                                                                                                                            </button>`;
                                 @endif
-                                                                                                } else {
+                                                                                                        } else {
                                 buttons += `
-                                                                                                <button class="btn btn-sm btn-rounded btn-primary opacity-75"
-                                                                                                        type="button" disabled>
-                                                                                                    Sold
-                                                                                                </button>`;
+                                                                                                        <button class="btn btn-sm btn-rounded btn-primary opacity-75"
+                                                                                                                type="button" disabled>
+                                                                                                            Sold
+                                                                                                        </button>`;
                             }
 
                             return buttons;
@@ -487,7 +487,7 @@
                     },
                 ],
                 language: {
-                    emptyTable: "No Sales Order Data Available in the Table"
+                    emptyTable: "No data available in table"
                 },
                 aaSorting: [
                     [2, 'desc']
@@ -547,10 +547,10 @@
     <!-- Professional Conversion Modal -->
     <div class="modal fade" id="professionalConvertModal" tabindex="-1" role="dialog"
         aria-labelledby="professionalConvertModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-top" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Convert Sales Order to Sale</h5>
+                    <h5 class="modal-title">Convert Sales Order</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -562,6 +562,16 @@
                         <select class="form-control" id="salesType" onchange="salesType(this)" required>
                             <option value="cash" selected>Cash Sale</option>
                             <option value="credit">Credit Sale</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="paymentType">
+                        <label for="payment_type">Payment Type <span
+                                class="text-danger">*</span></label>
+                        <select name="payment_type" id="payment_type" class="form-control" required>
+                                <option value="" disabled>Select Payment</option>
+                            @foreach($payment_type as $payment)
+                                <option value="{{$payment->id}}">{{$payment->name}}</option>
+                            @endforeach
                         </select>
                     </div>
                     {{-- <div class="form-group" id="gracePeriodDiv">
@@ -582,7 +592,7 @@
                         </select>
                     </div>
                     <input type="hidden" name="" id="convert_id">
-                    <div class="form-group mt-3">
+                    <div class="form-group mt-3" hidden>
                         <label for="conversionNotes">Conversion Notes</label>
                         <textarea class="form-control" id="conversionNotes" rows="3"
                             placeholder="(Optional) Add any notes about this conversion..."></textarea>
@@ -741,13 +751,15 @@
         var type = document.getElementById('salesType').value;
         // console.log('Sale type changed: ', type);
         if (type === 'credit') {
+            document.getElementById('paymentType').style.display = "none";
             document.getElementById('gracePeriod').setAttribute('required', 'required');
             document.getElementById('gracePeriodDiv').style.display = "block";
         } else {
             document.getElementById('gracePeriodDiv').style.display = "none";
+            document.getElementById('paymentType').style.display = "block";
         }
     };
-
+    
     $('#gracePeriod').select2({
         dropdownParent: $('#professionalConvertModal')
     });
@@ -765,6 +777,7 @@
         const note = document.getElementById('conversionNotes').value;
         const sale_type = document.getElementById('salesType').value;
         const grace_period = document.getElementById('gracePeriod').value;
+        const payment_type = document.getElementById('payment_type').value;
         if (sale_type === 'credit' && (grace_period === '' || grace_period == 0)) {
             notify("Grace period is required for credit sales", "top", "right", "warning");
             return;
@@ -777,6 +790,7 @@
                 quote_id: quoteId,
                 notes: note,
                 sale_type: sale_type,
+                payment_type: payment_type,
                 grace_period: grace_period,
                 _token: '{{ csrf_token() }}'
             },

@@ -14,7 +14,9 @@ class StoreController extends Controller
     //
     public function index()
     {
-        $stores = Store::orderBy('id', 'DESC')->get();
+        $stores = Store::where('id', '>', 1)->orderBy('id', 'DESC')->get();
+        $defaultStore = Setting::where('id',  122)->value('value');
+        $defaultStoreId = Store::where('name',  $defaultStore)->value('id');
         $count = $stores->count();
         foreach ( $stores as $store ) {
             $store_count = DB::table( 'users' )->where( 'store_id', $store->id )->count();
@@ -28,7 +30,7 @@ class StoreController extends Controller
             }
 
         }
-        return view('masters.stores.index', compact("stores", 'count'));
+        return view('masters.stores.index', compact("stores", 'defaultStoreId', 'count'));
     }
 
     public function store(Request $request)
@@ -58,8 +60,6 @@ class StoreController extends Controller
     {
         $default_store = Auth::user()->store->name ?? 'Default Store';
 
-
-
         try {
             $check_store = Store::find($request->id);
 
@@ -82,6 +82,13 @@ class StoreController extends Controller
 
     public function update(Request $request, $id)
     {
+        $exist = Store::where('name','=',strtoupper($request->name))->count();
+
+        if($exist>0)
+        {
+            session()->flash("alert-danger", "Branch Name Exists!");
+            return back();
+        }
         $store = Store::find($request->id);
         $store->name = $request->name;
         try {

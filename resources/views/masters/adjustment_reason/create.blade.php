@@ -17,7 +17,7 @@
                         <label for="code" class="col-md-4 col-form-label text-md-right">Reason <font
                                 color="red">*</font></label>
                         <div class="col-md-8">
-                            <input type="text" class="form-control" id="reason" name="reason"
+                            <input type="text" class="form-control" id="reason" name="reason" placeholder="Enter reason"
                                    aria-describedby="emailHelp" required maxlength="30">
                         </div>
                     </div>
