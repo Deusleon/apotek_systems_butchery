@@ -1171,7 +1171,7 @@ $("#sale_paid").on("change", function (evt) {
 
 $("#products").select2({
     placeholder: "Select Product...",
-    allowClear: true,
+    allowClear: false,
 });
 
 function storeLocally(id) {

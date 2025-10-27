@@ -36,6 +36,7 @@ class SaleQuoteController extends Controller {
         $vat = Setting::where( 'id', 120 )->value( 'value' ) / 100;
         //Get VAT %
         $enable_discount = Setting::where( 'id', 111 )->value( 'value' );
+        $fixed_price = Setting::where('id', 124)->value('value');
 
         /*get default Price Category*/
         $default_sale_type = Setting::where( 'id', 125 )->value( 'value' );
@@ -63,7 +64,8 @@ class SaleQuoteController extends Controller {
         ->with( compact( 'price_category' ) )
         ->with( compact( 'default_sale_type' ) )
         ->with( compact( 'current_stock' ) )
-        ->with( compact( 'enable_discount' ) );
+        ->with( compact( 'enable_discount' ) )
+        ->with( compact( 'fixed_price' ) );
     }
 
     public function orderList() {

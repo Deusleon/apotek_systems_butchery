@@ -33,11 +33,10 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="code" class="col-md-4 col-form-label text-md-right">Phone<font
-                                        color="red">*</font></label>
+                                <label for="code" class="col-md-4 col-form-label text-md-right">Phone</label>
                                 <div class="col-md-8">
                                     <input type="text" class="form-control"
-                                           id="phone_edit" name="phone" required>
+                                           id="phone_edit" name="phone">
                                     {{-- <span id="valid-msg-edit" class="hide"></span> --}}
                                     {{-- <span id="error-msg-edit" class="text text-danger"></span> --}}
                                     <small id="valid-msg-edit" class="hide"></small>

@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Sale Returns Report</title>
+    <title>Sales Returns Report</title>
 
     <style>
         body {
@@ -110,7 +110,7 @@
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}</h3>
-        <h2 align="center" style="margin-top: -1%">Sale Returns Report</h2>
+        <h2 align="center" style="margin-top: -1%">Sales Returns Report</h2>
         <h4 align="center" style="margin-top: -1%">{{$pharmacy['date_range']}}</h4>
 
         <div class="row" style="margin-top: 2%;">

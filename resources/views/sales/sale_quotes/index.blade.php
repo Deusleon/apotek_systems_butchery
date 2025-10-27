@@ -76,6 +76,15 @@
 
                             </div>
                         @endif
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button style="float: right;margin-bottom: 2%;" type="button" class="btn btn-secondary btn-sm"
+                                    data-toggle="modal" data-target="#create"> Add
+                                    New Customer
+                                </button>
+                            </div>
+
+                        </div>
                         @csrf()
                         <input type="hidden" name="" id="is_all_store" value="{{ current_store()->name }}">
                         <div class="row">
@@ -119,7 +128,7 @@
                         <div class="row" id="detail">
                             <hr>
                             <div class="table-responsive" style="width: 100%;">
-                                <table id="cart_table" class="table nowrap table-striped table-hover" width="100%"></table>
+                                <table id="cart_table" class="table nowrap table-striped table-hover pl-3 pr-3" width="100%"></table>
                             </div>
 
                         </div>
@@ -172,7 +181,7 @@
                             <input type="hidden" id="price_cat" name="price_category_id">
                             <input type="hidden" id="discount_value" name="discount_amount">
                             <input type="hidden" id="order_cart" name="cart">
-                            <input type="hidden" value="" id="fixed_price">
+                            <input type="hidden" value="{{$fixed_price}}" id="fixed_price">
 
                             <input type="hidden" value="" id="category">
                             <input type="hidden" value="" id="customers">
@@ -180,8 +189,8 @@
                             <input type="hidden" value="{{ $enable_discount }}" id="enable_discount">
 
                         </div>
-                        <hr>
-                        <div class="row">
+                        {{-- <hr> --}}
+                        <div class="row" hidden>
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label>Remarks</label>
@@ -848,7 +857,6 @@
 
             // Product selection event handler
             $("#products").on('change', function (event) {
-                // let customer_id = document.getElementById("customer_id").value;
                 let selectedProduct = $(this).val();
 
                 if (selectedProduct && selectedProduct !== '') {
@@ -859,6 +867,8 @@
                         $(this).val('').trigger('change');
                     }, 100);
                     setTimeout(function () { $('#quote_barcode_input').focus(); }, 150);
+                    // Make sales type readonly after starting to add items
+                    $('#price_category').prop('disabled', true);
                 }
             });
 
@@ -879,7 +889,7 @@
             // Initialize customer select2
             $('#customer_id').select2({
                 placeholder: 'Select Customer',
-                allowClear: true
+                allowClear: false
             });
 
             // Initialize price category select2
@@ -891,7 +901,7 @@
             // Initialize products select2
             $('#products').select2({
                 placeholder: 'Select Product',
-                allowClear: true,
+                allowClear: false,
                 data: []
             });
 
@@ -899,6 +909,10 @@
                 var selectedCategory = $(this).val();
                 // console.log('Price category changed to:', selectedCategory);
                 loadProducts();
+                // Make sales type readonly after starting to add items
+                if (cart.length > 0) {
+                    $(this).prop('disabled', true);
+                }
             });
 
             $('#customer_id').on('change', function () {
@@ -915,11 +929,15 @@
                     var r = confirm('Cancel quote?');
                     if (r === true) {
                         deselectQuote();
+                        // Re-enable sales type when cart is cleared
+                        $('#price_category').prop('disabled', false);
                     } else {
                         return false;
                     }
                 } else {
                     deselectQuote();
+                    // Re-enable sales type when cart is cleared
+                    $('#price_category').prop('disabled', false);
                 }
             });
 
@@ -1028,7 +1046,7 @@
                         // Clear form
                         deselectQuote();
                         $('#customer_id').val(null).trigger('change.select2');
-                        $('#price_category').val('').trigger('change');
+                        $('#price_category').prop('disabled', false);
                         $('#remark').val('');
 
                         // Re-enable save button

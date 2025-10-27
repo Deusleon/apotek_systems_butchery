@@ -46,11 +46,11 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label for="phone" class="col-md-4 col-form-label text-md-right">Phone<font color="red">*</font>
+                        <label for="phone" class="col-md-4 col-form-label text-md-right">Phone
                         </label>
                         <div class="col-md-8">
                             <input type="text" class="form-control uniform-input" id="phone" name="phone"
-                                value="{{ old('phone') }}" required data-mask="999999999999">
+                                value="{{ old('phone') }}" data-mask="999999999999">
                             <small id="validation-msg" class="hide"></small>
                         </div>
                     </div>

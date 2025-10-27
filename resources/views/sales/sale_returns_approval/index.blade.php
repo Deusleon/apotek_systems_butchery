@@ -126,7 +126,7 @@
                 <div class="card-body">
                     <div class="form-group row">
 
-                        <p>You do not have permission to View Sale Return Approval</p>
+                        <p>You do not have permission to View Sales Return Approval</p>
 
                     </div>
                 </div>

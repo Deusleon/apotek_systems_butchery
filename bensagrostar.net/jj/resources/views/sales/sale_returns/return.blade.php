@@ -3,7 +3,7 @@
     <div class="modal-dialog" style="width: 60%">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Sale Return</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Sales Return</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>

@@ -112,7 +112,7 @@ class SaleController extends Controller
         $price_category = PriceCategory::all();
         //Check customer
         $customers = Customer::orderBy('name', 'ASC')
-            ->where('payment_term',2)
+            // ->where('payment_term',2)
             ->get();
         $current_stock = CurrentStock::all();
         return View::make('sales.credit_sales.index')
@@ -841,7 +841,7 @@ class SaleController extends Controller
             ->groupBy('sale_id');
 
         // Main query: join aggregated subquery
-        $query = Sale::with(['customer', 'cost'])
+        $query = Sale::with(['customer', 'cost', 'user'])
             ->joinSub($salesDetailsSubquery, 'sales_summary', function ($join) {
                 $join->on('sales.id', '=', 'sales_summary.sale_id');
             });
