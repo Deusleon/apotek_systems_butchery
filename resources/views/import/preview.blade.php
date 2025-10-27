@@ -127,9 +127,9 @@
                                         <td>{{ $row['data'][9] ?? 'stockable' }}</td>
                                         <td>{{ isset($row['data'][10]) ? ($row['data'][10] ? 'Active' : 'Inactive') : 'Active' }}
                                         </td> --}}
-                                        <td>{{ number_format($row['data'][2], 0) ?? '' }}</td>
-                                        <td>{{ number_format($row['data'][3], 0) ?? '' }}</td>
-                                        <td>{{ number_format($row['data'][4], 0) ?? '' }}</td>
+                                        <td>{{ is_numeric($row['data'][2]) ? number_format($row['data'][2], 0) : '' }}</td>
+                                        <td>{{ is_numeric($row['data'][3]) ? number_format($row['data'][3], 0) : '' }}</td>
+                                        <td>{{ is_numeric($row['data'][4]) ? number_format($row['data'][4], 0) : '' }}</td>
                                         <td>{{ $row['data'][5] ?? '' }}</td>
                                         <td>
                                             @if(!empty($row['errors']))

@@ -233,9 +233,9 @@
                                     <td>{{ $history->store->name ?? 'N/A' }}</td>
                                     <td>{{ $history->priceCategory->name ?? 'N/A' }}</td>
                                     <td>{{ $history->supplier->name ?? 'N/A' }}</td>
-                                    <td>{{ number_format($history->total_records, 0) }}</td>
-                                    <td class="text-success">{{ number_format($history->successful_records, 0) }}</td>
-                                    <td class="text-danger">{{ number_format($history->failed_records, 0) }}</td>
+                                    <td>{{ is_numeric($history->total_records) ? number_format($history->total_records, 0) : '' }}</td>
+                                    <td class="text-success">{{ is_numeric($history->successful_records) ? number_format($history->successful_records, 0) : '' }}</td>
+                                    <td class="text-danger">{{ is_numeric($history->failed_records) ? number_format($history->failed_records, 0) : '' }}</td>
                                     <td>
                                         <span class="status-badge btn btn-rounded status-{{ $history->status }}">
                                             {{ ucfirst($history->status) }}

@@ -162,7 +162,7 @@ $("#products").on("change", function () {
     if (customer_id !== "") {
         valueCollection();
     } else {
-        notify("Select Customer First", "top", "right", "warning");
+        notify("Please select customer first", "top", "right", "warning");
 
         $("#products option").prop("selected", function () {
             return this.defaultSelected;

@@ -117,7 +117,6 @@
                             </div>
 
                         </div>
-                        <hr>
                         <input type="hidden" name="" id="is_backdate_enabled" value="{{$back_date}}">
                         @if($back_date == "NO")
                             <div class="row">
@@ -227,7 +226,6 @@
                         <input type="hidden" value="{{$customers}}" id="customers">
                         <input type="hidden" value="{{$fixed_price}}" id="fixed_price">
                         <input type="hidden" value="{{$enable_discount}}" id="enable_discount">
-
                         @if($enable_paid === "YES")
                             <hr>
                             <div class="row">
@@ -247,7 +245,7 @@
                             </div>
                             <hr>
                         @endif
-
+                        <hr>
                         <div class="row">
                             <div class="col-md-6 d-flex">
                                 <div>

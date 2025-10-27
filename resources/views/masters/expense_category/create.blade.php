@@ -13,7 +13,7 @@
                     <div class="form-group row">
                         <label for="code" class="col-md-4 col-form-label text-md-right">Category Name <font color="red">*</font></label>
                         <div class="col-md-8">
-                            <input type="text" class="form-control" id="name_edit" name="name"
+                            <input type="text" class="form-control" id="name_edit" name="name" placeholder="Enter category name"
                                    aria-describedby="emailHelp" maxlength="40" required="true">
                         </div>
                     </div>

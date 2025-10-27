@@ -14,6 +14,7 @@ class GeneralSetting extends Model
         'proforma_invoice_terms',
         'purchase_order_terms',
         'delivery_note_terms',
+        'credit_note_terms',
     ];
 
     public function setCreatedAt($value)

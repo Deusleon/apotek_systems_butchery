@@ -8,6 +8,7 @@ use App\GeneralSetting;
 use App\PriceCategory;
 use App\Sale;
 use App\SalesCredit;
+use App\PaymentType;
 use App\SalesDetail;
 use App\SalesQuote;
 use App\SalesQuoteDetail;
@@ -74,6 +75,7 @@ class SaleQuoteController extends Controller {
         /*get default Price Category*/
         $default_sale_type = Setting::where( 'id', 125 )->value( 'value' );
         $sale_type = PriceCategory::where( 'name', $default_sale_type )->first();
+        $payment_type = PaymentType::all();
 
         if ( $sale_type != null ) {
             $default_sale_type = $sale_type->id;
@@ -98,7 +100,8 @@ class SaleQuoteController extends Controller {
         ->with( compact( 'price_category' ) )
         ->with( compact( 'default_sale_type' ) )
         ->with( compact( 'current_stock' ) )
-        ->with( compact( 'enable_discount' ) );
+        ->with( compact( 'enable_discount' ) )
+        ->with( compact( 'payment_type' ) );
     }
 
     public function getQuotes( Request $request ) {
@@ -715,6 +718,7 @@ class SaleQuoteController extends Controller {
     public function convertToSales( Request $request ) {
         $quoteId = $request->quote_id;
         $saleType = $request->sale_type;
+        $payment_type = $request->payment_type;
         $gracePeriod = $request->grace_period;
         $remarks = $request->notes;
         $receipt_print = Setting::where('id', 117)->value('value');
@@ -761,6 +765,7 @@ class SaleQuoteController extends Controller {
                 'receipt_number' => $quote_details[ 0 ]->quote_number,
                 'customer_id' => $quote_details[ 0 ]->customer_id,
                 'price_category_id' => $quote_details[ 0 ]->price_category_id,
+                'payment_type_id' => $payment_type,
                 'date' => now(),
                 'created_by' => Auth::User()->id
             ) );
@@ -865,14 +870,14 @@ class SaleQuoteController extends Controller {
             if($receipt_print === "YES"){
             return [
                 'status' => 'success',
-                'message' => 'Order converted to sales successfully',
+                'message' => 'Order converted successfully',
                 'sale_id' => $sale,
                 'redirect_to' => 'receipt'
             ];
         }else{
             return [
                 'status' => 'success',
-                'message' => 'Order converted to sales successfully',
+                'message' => 'Order converted successfully',
                 'sale_id' => $sale,
                 'redirect_to' => 'quote'
             ];

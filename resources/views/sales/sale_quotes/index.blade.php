@@ -553,7 +553,7 @@
                 let customer_id = document.getElementById("customer_id").value;
 
                 if (!customer_id) {
-                    notify('Select Customer First', 'top', 'right', 'warning');
+                    notify('Please select customer first', 'top', 'right', 'warning');
                     $(this).val(null).trigger('change.select2');
                     return;
                 }
@@ -730,7 +730,7 @@
                             // For credit sales require customer selected
                             let customer_id = $("#customer_id").val();
                             if (!customer_id || customer_id === "") {
-                                notify("Select Customer First", "top", "right", "warning");
+                                notify("Please select customer first", "top", "right", "warning");
                                 return;
                             }
 

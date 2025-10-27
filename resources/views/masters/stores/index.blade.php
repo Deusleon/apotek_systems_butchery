@@ -55,15 +55,17 @@
                                                                 </button>
                                                             </a>
                                                         @endif
-                                                        @if(auth()->user()->checkPermission('Delete Branches'))
-                                                            @if($store->is_used === 'no')
-                                                                <a href="#">
-                                                                    <button class="btn btn-sm btn-rounded btn-danger" data-id="{{$store->id}}"
-                                                                        data-name="{{$store->name}}" type="button" data-toggle="modal"
-                                                                        data-target="#delete">
-                                                                        Delete
-                                                                    </button>
-                                                                </a>
+                                                        @if($store->id != $defaultStoreId)
+                                                            @if(auth()->user()->checkPermission('Delete Branches'))
+                                                                @if($store->is_used === 'no')
+                                                                    <a href="#">
+                                                                        <button class="btn btn-sm btn-rounded btn-danger" data-id="{{$store->id}}"
+                                                                            data-name="{{$store->name}}" type="button" data-toggle="modal"
+                                                                            data-target="#delete">
+                                                                            Delete
+                                                                        </button>
+                                                                    </a>
+                                                                @endif
                                                             @endif
                                                         @endif
                                                     </td>

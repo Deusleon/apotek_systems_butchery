@@ -91,7 +91,7 @@
         $('#deleteModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
             var id = button.data('id');
-            var message = "Are you sure you want to delete Role '".concat(button.data('name'), "'?");
+            var message = "Are you sure you want to delete role '".concat(button.data('name'), "'?");
             var modal = $(this);
             modal.find('.modal-body #message').text(message);
             modal.find('.modal-body #role_id').val(id)

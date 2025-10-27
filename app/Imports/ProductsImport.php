@@ -38,7 +38,7 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, WithBat
             );
 
             // Check if product already exists by name + category
-            $existingProduct = Product::where( 'name', trim( $row[ 'name' ] ) )
+            $existingProduct = Product::where( 'name', trim( $row[ 'product_name' ] ) )
             ->where( 'category_id', $category->id )
             ->first();
 
@@ -61,7 +61,7 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, WithBat
             // Create new product
             $product = new Product([
                 'barcode' => $row['barcode'] ?? null,
-                'name' => trim($row['name']),
+                'name' => trim($row['product_name']),
                 'brand' => $row['brand'] ?? null,
                 'pack_size' => $row['pack_size'] ?? null,
                 'sales_uom' => $row['unit'] ?? null,
@@ -102,12 +102,12 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, WithBat
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
+            'product_name' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'pack_size' => 'nullable|numeric|min:0',
             'min_stock' => 'nullable|numeric|min:0',
             'max_stock' => 'nullable|numeric|min:0',
-            'barcode' => 'nullable|string|max:255',
+            'barcode' => 'nullable|max:255',
             'brand' => 'nullable|string|max:255',
             'unit' => 'nullable|string|max:50',
         ];
@@ -119,7 +119,7 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, WithBat
     public function customValidationMessages()
     {
         return [
-            'name.required' => 'Product name is required',
+            'product_name.required' => 'Product name is required',
             'category.required' => 'Category is required',
             'pack_size.numeric' => 'Pack size must be a number',
             'min_stock.numeric' => 'Min stock must be a number',

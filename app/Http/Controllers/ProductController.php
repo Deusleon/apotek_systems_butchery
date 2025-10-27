@@ -146,9 +146,9 @@ class ProductController extends Controller
         'name.unique' => 'Product name exist',
         'barcode.unique' => 'Product barcode exist',
     ]);
-        $min_quantinty = str_replace(',', '', $request->input('min_quantinty'));
-        $max_quantinty = str_replace(',', '', $request->input('max_quantinty'));
-        $pack_size = str_replace(',', '', $request->input('pack_size'));
+        $min_quantinty = str_replace(',', '', $request->input('min_quantinty')) ?? null;
+        $max_quantinty = str_replace(',', '', $request->input('max_quantinty')) ?? null;
+        $pack_size = str_replace(',', '', $request->input('pack_size')) ?? null;
 
         try {
             $product = Product::findOrFail($request->id);
@@ -177,7 +177,7 @@ class ProductController extends Controller
         
         $stock_count2 = DB::table('inv_incoming_stock')->where('product_id', $request->product_id)->count();
 
-        if($stock_count > 0 && $stock_count2 > 0 )
+        if($stock_count > 0 || $stock_count2 > 0 )
         {
             $product = Product::find($request->product_id);
             $product->status = 0;

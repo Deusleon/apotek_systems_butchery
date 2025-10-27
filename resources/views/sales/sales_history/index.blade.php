@@ -69,6 +69,7 @@
                         <label class="mr-2" for="">Date:</label>
                         <input type="text" id="daterange" class="form-control w-auto">
                     </div>
+                    <input type="hidden" name="" value="{{ $enable_discount }}" id="discount_enabled">
                     <form id="sale_receipt_reprint_form" action="{{route('sale-reprint-receipt')}}" method="post"
                         enctype="multipart/form-data" target="_blank">
                         @csrf()
@@ -85,7 +86,9 @@
                                         <th>Date</th>
                                         <th>Sub Total</th>
                                         <th>VAT</th>
+                                        @if ($enable_discount === 'YES')
                                         <th>Discount</th>
+                                        @endif
                                         <th>Amount</th>
                                         <th>Action</th>
                                     </tr>

@@ -24,10 +24,12 @@ class SaleReturnController extends Controller
         $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
         $sales = Sale::where(DB::Raw("DATE_FORMAT(date,'%m-%d-%Y')"), '=', $date)->orderBy('id', 'desc')->get();
         $count = $sales->count();
+        $enable_discount = Setting::where( 'id', 111 )->value( 'value' );
         return View::make('sales.sale_returns.index')
             ->with(compact('vat'))
             ->with(compact('sales'))
-            ->with(compact('count'));
+            ->with(compact('count'))
+            ->with(compact('enable_discount'));
     }
     public function getSales(Request $request)
     {

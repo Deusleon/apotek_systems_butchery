@@ -8,10 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AdjustmentReasonController extends Controller
-{
+ {
     public function index()
-    {
-        $adjustment = AdjustmentReason::orderBy('id', 'ASC')->get();
+ {
+        $adjustment = AdjustmentReason::orderBy( 'id', 'ASC' )->get();
         foreach ( $adjustment as $reason ) {
             $reason_count = DB::table( 'inv_stock_adjustments' )->where( 'reason', $reason->reason )->count();
 
@@ -24,61 +24,63 @@ class AdjustmentReasonController extends Controller
             }
 
         }
-        return view('masters.adjustment_reason.index')->with('adjustment', $adjustment);
+        return view( 'masters.adjustment_reason.index' )->with( 'adjustment', $adjustment );
     }
 
-    public function store(Request $request)
-    {
-        $existing = AdjustmentReason::where('reason',$request->reason)->count();
+    public function store( Request $request )
+ {
+        $existing = AdjustmentReason::where( 'reason', $request->reason )->count();
 
-        if($existing > 0)
-        {
-            session()->flash("alert-danger", "Reason Exists!");
+        if ( $existing > 0 )
+ {
+            session()->flash( 'alert-danger', 'Reason Exists!' );
             return back();
         }
         try {
             $adjustment = new AdjustmentReason;
             $adjustment->reason = $request->reason;
             $adjustment->save();
-            session()->flash("alert-success", "Reason added successfully!");
+            session()->flash( 'alert-success', 'Reason added successfully!' );
             return back();
-        } catch (Exception $exception) {
-            session()->flash("alert-danger", "Reason Exists!");
+        } catch ( Exception $exception ) {
+            session()->flash( 'alert-danger', 'Reason Exists!' );
             return back();
         }
     }
 
-    public function update(Request $request)
-    {
-        $existing = AdjustmentReason::where('reason',$request->name)->count();
+    public function update( Request $request )
+ {
+        $request->validate( [
+            'adjustment_id' => 'required|exists:adjustment_reasons,id',
+            'name' => 'required|string|max:255',
+        ] );
 
-        if($existing > 0)
-        {
-            session()->flash("alert-danger", "Reason Exists!");
-            return back();
+        $exists = AdjustmentReason::where( 'reason', $request->name )
+        ->where( 'id', '!=', $request->adjustment_id )
+        ->exists();
+
+        if ( $exists ) {
+            return back()->with( 'alert-danger', 'Reason already exists!' );
         }
 
-        $adjustment = AdjustmentReason::find($request->adjustment_id);
+        $adjustment = AdjustmentReason::findOrFail( $request->adjustment_id );
         $adjustment->reason = $request->name;
-        try {
-            $adjustment->save();
-            session()->flash("alert-success", "Reason updated successfully!");
-            return back();
-        } catch (Exception $exception) {
-            session()->flash("alert-danger", "Reason exists!");
-            return back();
+
+        if ( $adjustment->save() ) {
+            return back()->with( 'alert-success', 'Reason updated successfully!' );
         }
 
+        return back()->with( 'alert-danger', 'Failed to update reason!' );
     }
 
-   public function destroy(Request $request)
-    {
-         try {
-             AdjustmentReason::destroy($request->adjustment_id);
-             session()->flash("alert-danger", "Reason Deleted successfully!");
+    public function destroy( Request $request )
+ {
+        try {
+            AdjustmentReason::destroy( $request->adjustment_id );
+            session()->flash( 'alert-danger', 'Reason Deleted successfully!' );
             return back();
-         } catch (Exception $exception) {
-             session()->flash("alert-danger", "Reason in use!");
+        } catch ( Exception $exception ) {
+            session()->flash( 'alert-danger', 'Reason in use!' );
             return back();
         }
 

@@ -13,8 +13,6 @@ class Store extends Model
     public function currentStock(){
         return $this->hasMany(currentStock::class,'store_id');
     }
-
-
     public function adjustment(){
         return $this->hasMany(StockAdjustment::class,'created_by');
     }

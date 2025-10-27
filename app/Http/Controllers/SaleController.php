@@ -745,7 +745,6 @@ class SaleController extends Controller
 
 
     }
-    
     public function storeCreditSale(Request $request)
 {
     Log::info($request->all());
@@ -801,7 +800,6 @@ class SaleController extends Controller
         return back();
     }
 }
-
 
     public function getSalesHistory(Request $request)
     {
@@ -916,8 +914,9 @@ class SaleController extends Controller
 
         $vat = Setting::where('id', 120)->value('value') / 100; 
         $customers = Customer::orderBy('name', 'ASC')->get();
+        $enable_discount = Setting::where( 'id', 111 )->value( 'value' );
         return View::make('sales.sales_history.index')
-            ->with(compact('vat'))->with(compact('customers'));
+            ->with(compact('vat'))->with(compact('customers', 'enable_discount'));
     }
     public function creditsTracking()
     {
