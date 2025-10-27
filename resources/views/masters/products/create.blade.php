@@ -48,10 +48,11 @@
                                     </div>
 
                                     {{-- Brand --}}
-                                    <div class="form-group row product-detail-field" id="brand_field">
-                                        <label for="brand" class="col-md-4 col-form-label text-md-right">Brand</label>
+                                    <div class="form-group row product-detail-field" id="pack_size_field">
+                                        <label for="pack_size"
+                                            class="col-md-4 col-form-label text-md-right">Brand</label>
                                         <div class="col-md-8">
-                                            <input type="text" class="form-control" id="brand" name="brand"
+                                            <input type="text" class="form-control" id="brand_edits" name="brand"
                                                 value="{{ old('brand') }}">
                                         </div>
                                     </div>
@@ -68,7 +69,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Right Column - Will be hidden in Normal mode -->
                                 <div class="col-md-6" id="right-column">
                                     {{-- Category --}}
@@ -91,21 +92,21 @@
 
                                     {{-- Unit of Measure --}}
                                     <div class="form-group row">
-                                        <label for="saleUoM" class="col-md-4 col-form-label text-md-right">Unit <span class="text-danger">*</span></label>
+                                        <label for="saleUoM" class="col-md-4 col-form-label text-md-right">Unit </label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="saleUoM_edit" name="sale_uom"
-                                                placeholder="e.g. pcs, kg, ml" value="{{ old('sale_uom') }}" required>
+                                                placeholder="e.g. pcs, kg, ml" value="{{ old('sale_uom') }}">
                                         </div>
                                     </div>
 
                                     {{-- Min Stock --}}
                                     <div class="form-group row">
                                         <label for="min_quantinty" class="col-md-4 col-form-label text-md-right">Min.
-                                            Stock <span class="text-danger">*</span></label>
+                                            Stock </label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control" id="min_stock_edits"
                                                 name="min_quantinty" value="{{ old('min_quantinty') }}"
-                                                onkeypress="return isNumberKey(event,this)" required>
+                                                onkeypress="return isNumberKey(event,this)">
                                         </div>
                                     </div>
 
@@ -121,206 +122,15 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            {{-- Product Type --}}
-                            <!--<div class="form-group row">
-                                <label for="product_type" class="col-md-4 col-form-label text-md-right">Type <font color="red">*</font></label>
-                                <div class="col-md-8">
-                                    <select name="product_type" class="form-control" id="product_type">
-                                        <option selected value="stockable">Stockable</option>
-                                        <option value="consumable">Service</option>
-                                    </select>
-                                </div>
-                            </div>-->
 
                             <input type="hidden" name="id" id="id">
                         </div>
 
                         <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Save</button>
                         </div>
                     </form>
-
-                    <script>
-                        // Wait for jQuery and global function to be available
-                        function initializeModalScript() {
-                            if (typeof $ === 'undefined') {
-                                console.log('jQuery not available for modal, retrying...');
-                                setTimeout(initializeModalScript, 100);
-                                return;
-                            }
-
-                            if (typeof window.getProductDetailsOption === 'undefined') {
-                                console.log('Global function not available for modal, retrying...');
-                                setTimeout(initializeModalScript, 100);
-                                return;
-                            }
-
-                            console.log('Modal script initialized with jQuery and global function available');
-
-                            $(document).ready(function() {
-                                console.log('Modal document ready');
-
-                                // Function to adjust label width for better centering in Normal mode
-                                function adjustLabelWidthForNormalMode() {
-                                    console.log('Adjusting label width for Normal mode');
-                                    // Change label columns from 4 to 3 and input columns from 8 to 9 for better balance
-                                    $('#left-column .form-group.row .col-form-label').removeClass('col-md-4').addClass('col-md-3');
-                                    $('#left-column .form-group.row .col-md-8').removeClass('col-md-8').addClass('col-md-9');
-                                }
-
-                                // Function to restore original label width for Detailed mode
-                                function restoreLabelWidthForDetailedMode() {
-                                    console.log('Restoring original label width for Detailed mode');
-                                    $('#left-column .form-group.row .col-form-label').removeClass('col-md-3').addClass('col-md-4');
-                                    $('#left-column .form-group.row .col-md-9').removeClass('col-md-9').addClass('col-md-8');
-                                    $('#right-column .form-group.row .col-form-label').removeClass('col-md-3').addClass('col-md-4');
-                                    $('#right-column .form-group.row .col-md-9').removeClass('col-md-9').addClass('col-md-8');
-                                }
-
-                                // Function to rearrange fields for Normal mode
-                                function rearrangeFieldsForNormalMode() {
-                                    console.log('Rearranging fields for Normal mode');
-                                    
-                                    // Move Category, Unit, and Min Stock from right column to left column
-                                    const categoryField = $('#right-column .form-group.row').eq(0); // Category
-                                    const unitField = $('#right-column .form-group.row').eq(1); // Unit
-                                    const minStockField = $('#right-column .form-group.row').eq(2); // Min Stock
-                                    
-                                    // Append them to left column after Barcode
-                                    const barcodeField = $('#left-column .form-group.row').eq(1); // Barcode
-                                    
-                                    if (categoryField.length && unitField.length && minStockField.length) {
-                                        categoryField.insertAfter(barcodeField);
-                                        unitField.insertAfter(categoryField);
-                                        minStockField.insertAfter(unitField);
-                                        console.log('Fields rearranged successfully');
-                                    } else {
-                                        console.log('Could not find all fields for rearrangement');
-                                    }
-                                }
-
-                                // Function to rearrange fields for Detailed mode
-                                function rearrangeFieldsForDetailedMode() {
-                                    console.log('Rearranging fields for Detailed mode');
-                                    
-                                    // Move Category, Unit, and Min Stock back to right column
-                                    const categoryField = $('#left-column .form-group.row').eq(2); // Category (after Name, Barcode)
-                                    const unitField = $('#left-column .form-group.row').eq(3); // Unit
-                                    const minStockField = $('#left-column .form-group.row').eq(4); // Min Stock
-                                    
-                                    // Move them back to right column
-                                    const rightColumn = $('#right-column');
-                                    
-                                    if (categoryField.length && unitField.length && minStockField.length) {
-                                        rightColumn.prepend(minStockField);
-                                        rightColumn.prepend(unitField);
-                                        rightColumn.prepend(categoryField);
-                                        console.log('Fields moved back to right column');
-                                    } else {
-                                        console.log('Could not find all fields for detailed mode rearrangement');
-                                    }
-                                }
-
-                                // Function to apply field visibility based on setting
-                                function applyFieldVisibility(setting) {
-                                    try {
-                                        console.log('Applying visibility for setting:', setting);
-                                        if (setting === 'Normal') {
-                                            // Hide fields not needed for Normal mode
-                                            $('.product-detail-field').hide();
-                                            
-                                            // Rearrange fields for vertical layout
-                                            rearrangeFieldsForNormalMode();
-                                            
-                                            // Adjust label width for better centering
-                                            adjustLabelWidthForNormalMode();
-                                            
-                                            // Switch to single column layout
-                                            $('#left-column').removeClass('col-md-6').addClass('col-md-12');
-                                            $('#right-column').hide();
-                                            
-                                            console.log('Normal mode applied: single column, fields rearranged and centered');
-                                        } else {
-                                            // Show all fields for Detailed mode
-                                            $('.product-detail-field').show();
-                                            
-                                            // Rearrange fields back to original positions
-                                            rearrangeFieldsForDetailedMode();
-                                            
-                                            // Restore original label width
-                                            restoreLabelWidthForDetailedMode();
-                                            
-                                            // Switch back to two-column layout
-                                            $('#left-column').removeClass('col-md-12').addClass('col-md-6');
-                                            $('#right-column').show();
-                                            
-                                            console.log('Detailed mode applied: two columns, original layout');
-                                        }
-                                    } catch (e) {
-                                        console.log('Error in applyFieldVisibility:', e);
-                                    }
-                                }
-
-                                // Get current setting and apply visibility using global function
-                                try {
-                                    var currentSetting = window.getProductDetailsOption();
-                                    console.log('Current setting loaded:', currentSetting);
-                                    applyFieldVisibility(currentSetting);
-
-                                    // Store setting in localStorage for potential future use
-                                    localStorage.setItem('product_details_option', currentSetting);
-                                } catch (e) {
-                                    console.log('Error loading initial setting:', e);
-                                }
-
-                                // Re-apply visibility when modal is shown (in case setting changes)
-                                $('#create').on('show.bs.modal', function() {
-                                    console.log('Modal show event triggered');
-                                    setTimeout(function() {
-                                        try {
-                                            var refreshedSetting = window.getProductDetailsOption();
-                                            console.log('Modal shown, refreshing setting:', refreshedSetting);
-                                            applyFieldVisibility(refreshedSetting);
-                                            localStorage.setItem('product_details_option', refreshedSetting);
-                                        } catch (e) {
-                                            console.log('Error in modal show event:', e);
-                                        }
-                                    }, 100);
-                                });
-
-                                // Also apply visibility immediately when modal is about to be shown
-                                $('#create').on('shown.bs.modal', function() {
-                                    console.log('Modal fully shown, ensuring visibility is correct');
-                                    setTimeout(function() {
-                                        try {
-                                            var finalSetting = window.getProductDetailsOption();
-                                            applyFieldVisibility(finalSetting);
-                                        } catch (e) {
-                                            console.log('Error in modal shown event:', e);
-                                        }
-                                    }, 200);
-                                });
-
-                                // Debug function
-                                window.debugModal = function() {
-                                    try {
-                                        console.log('Modal debug:');
-                                        console.log('- Current setting:', window.getProductDetailsOption());
-                                        console.log('- Hidden elements:', $('.product-detail-field:hidden').length);
-                                        console.log('- Visible elements:', $('.product-detail-field:visible').length);
-                                        console.log('- Total product-detail-field elements:', $('.product-detail-field').length);
-                                        console.log('- Elements exist:', $('.product-detail-field').length > 0);
-                                    } catch (e) {
-                                        console.log('Error in debugModal:', e);
-                                    }
-                                };
-                            });
-                        }
-
-                        // Start initialization
-                        initializeModalScript();
-                    </script>
                 </div>
             </div>
         </div>
