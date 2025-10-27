@@ -219,6 +219,8 @@
                 singleDatePicker: true,
                 showDropdowns: true,
                 autoUpdateInput: false,
+                minDate: moment().add(1, 'days'), // Start from tomorrow
+                maxDate: moment().add(5, 'years'), // Up to 5 years later
                 locale: {
                     format: 'YYYY-MM-DD'
                 }
@@ -409,7 +411,10 @@
 
         $('#price_edit').on('change', function () {
             var price = document.getElementById('price_edit').value;
-            document.getElementById('price_edit').value = formatMoney(price);
+            // Remove commas for processing
+            var cleanPrice = price.replace(/,/g, '');
+            // Format with commas
+            document.getElementById('price_edit').value = formatMoney(cleanPrice);
         });
 
         $('#quantity_edit').on('change', function () {
