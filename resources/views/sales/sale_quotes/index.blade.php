@@ -270,9 +270,9 @@
             loadProducts();
             setTimeout(function () { $('#quote_barcode_input').focus(); }, 150);
             // Global variables
-            var cart = [];
-            var default_cart = [];
-            var order_cart = [];
+            var cart = JSON.parse(localStorage.getItem('cart')) || [];
+            var default_cart = JSON.parse(localStorage.getItem('default_cart')) || [];
+            var order_cart = JSON.parse(localStorage.getItem('order_cart')) || [];
             var tax = parseFloat(document.getElementById('vat').value) || 0;
             var sale_discount = 0;
             var discount_enable = document.getElementById('enable_discount').value === 'YES';
@@ -426,6 +426,11 @@
                     cart_table.clear();
                     cart_table.rows.add(cart);
                     cart_table.draw();
+    
+                    // Save cart to localStorage for persistence on page reload
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    localStorage.setItem('default_cart', JSON.stringify(default_cart));
+                    localStorage.setItem('order_cart', JSON.stringify(order_cart));
 
                     var quantity_ = quantity.split('<');
                     document.getElementById("edit_quantity").value = quantity_[0];
@@ -883,6 +888,10 @@
                 }
                 discount(); // Update totals
                 document.getElementById('total_items').innerHTML = 0;
+                // Clear localStorage to prevent cart persistence on page reload
+                localStorage.removeItem('cart');
+                localStorage.removeItem('default_cart');
+                localStorage.removeItem('order_cart');
                 // console.log('Cart cleared');
             }
 
