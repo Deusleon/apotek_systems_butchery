@@ -2,7 +2,6 @@
 
 @section('content-title')
 Invoices
-
 @endsection
 
 @section('content-sub-title')
@@ -43,7 +42,7 @@ Invoices
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="supplier">Supplier Name *</label>
+                            <label for="supplier">Supplier Name <font color="red">*</font></label>
                             <select name="supplier_id" class="form-control" id="supplier" required="true">
                                 <option selected="true" value="" disabled="disabled">Select Supplier...</option>
                                 @foreach($suppliers as $supplier)
@@ -58,7 +57,7 @@ Invoices
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="invoice">Invoice # *</label>
+                            <label for="invoice">Invoice # <font color="red">*</font></label>
                             <select name="invoice_id" class="form-control" id="invoice" required="true" disabled>
                                 <option selected="true" value="" disabled="disabled">Select Invoice...</option>
                             </select>
@@ -72,7 +71,7 @@ Invoices
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="amount_paid">Amount Paid *</label>
+                            <label for="amount_paid">Amount Paid <font color="red">*</font></label>
                             <input type="text" class="form-control" id="amount_paid" name="amount_paid"
                                    aria-describedby="emailHelp" required="true"
                                    onkeypress="return isNumberKey(event,this)">
@@ -81,7 +80,7 @@ Invoices
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="payment_method">Pay Method *</label>
+                            <label for="payment_method">Pay Method <font color="red">*</font></label>
                             <select name="payment_method" class="form-control" id="payment_method" required="true">
                                 <option value="" disabled selected>Select Method</option>
                                 <option value="cash">CASH</option>
@@ -97,9 +96,17 @@ Invoices
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="payment_date">Payment Date *</label>
-                            <input type="text" class="form-control" id="payment_date" name="payment_date"
-                                   aria-describedby="emailHelp" readonly required="true">
+                            <label for="payment_date">Payment Date <font color="red">*</font></label>
+                            <div class="input-group">
+                                <input type="text" class="form-control datepicker" id="payment_date" name="payment_date"
+                                       aria-describedby="emailHelp" required="true"
+                                       style="background-color: white; cursor: pointer;">
+                                <div class="input-group-append">
+                                    <span class="input-group-text" style="cursor: pointer;">
+                                        <i class="feather icon-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
                             <span id="date_warning" style="display: none; color: red; font-size: 0.9em">Payment date required</span>
                         </div>
                     </div>
@@ -118,14 +125,49 @@ Invoices
             </form>
         </div>
     </div>
+</div>
 
+<style>
+    .datepicker {
+        z-index: 9999 !important;
+    }
+    .datepicker-dropdown {
+        padding: 10px;
+        border-radius: 4px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .datepicker table {
+        width: 100%;
+    }
+    .datepicker table tr td,
+    .datepicker table tr th {
+        text-align: center;
+        padding: 5px;
+        border-radius: 3px;
+    }
+    .datepicker table tr td.day:hover {
+        background-color: #f8f9fa;
+    }
+    .datepicker table tr td.active,
+    .datepicker table tr td.active:hover {
+        background-color: #007bff;
+        color: white;
+    }
+    .datepicker table tr td.today {
+        background-color: #e9ecef;
+    }
+</style>
 @endsection
+
+@push("page_styles")
+<link href="{{ asset('assets/plugins/bootstrap-datetimepicker/css/bootstrap-datepicker.min.css') }}" rel="stylesheet">
+@endpush
 
 @push("page_scripts")
 @include('partials.notification')
-<script src="{{asset("assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js")}}"></script>
-<script src="{{asset("assets/js/pages/ac-datepicker.js")}}"></script>
-<script src="{{asset("assets/apotek/js/notification.js")}}"></script>
+<script src="{{ asset('assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js') }}"></script>
+<script src="{{ asset('assets/js/pages/ac-datepicker.js') }}"></script>
+<script src="{{ asset('assets/apotek/js/notification.js') }}"></script>
 
 <script>
     $.ajaxSetup({
@@ -134,12 +176,34 @@ Invoices
         }
     });
 
-    // Initialize date picker
-    $('#payment_date').datepicker({
+    // Initialize date picker for payment date
+    $(document).ready(function() {
+        $('#payment_date').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true,
+            todayBtn: "linked",
+            clearBtn: false,
+            orientation: "bottom auto",
+            zIndexOffset: 9999,
+            templates: {
+                leftArrow: '<i class="feather icon-chevron-left"></i>',
+                rightArrow: '<i class="feather icon-chevron-right"></i>'
+            }
+        }).datepicker('setDate', new Date());
+
+        // Also trigger click on calendar icon
+        $('.input-group-text').on('click', function() {
+            $('#payment_date').datepicker('show');
+        });
+    });
+
+    // Initialize date picker for edit modal (if exists)
+    $('#edit_payment_date').datepicker({
         format: 'yyyy-mm-dd',
         autoclose: true,
         todayHighlight: true
-    }).datepicker('setDate', new Date());
+    });
 
     // Format money function
     function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
@@ -292,7 +356,9 @@ Invoices
                     $('#payment_date').datepicker('setDate', new Date());
 
                     // Reload payment history table
-                    paymentHistoryTable.ajax.reload();
+                    if (typeof paymentHistoryTable !== 'undefined') {
+                        paymentHistoryTable.ajax.reload();
+                    }
                 } else {
                     notify(response.error || 'Payment failed!', 'top', 'right', 'danger');
                 }
