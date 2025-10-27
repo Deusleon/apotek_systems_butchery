@@ -12,27 +12,27 @@
             </div>
             <div class="modal-body">
                 <div class="row mb-3 gap-3 width-100">
-                    <label class="col text-right">Name:</label>
+                    <label class="col-5 text-right">Name:</label>
                     <div class="col text-dark" id="name_edit"></div>
                 </div>
                 <div class="row mb-3 gap-3">
-                    <label class="col text-right">Barcode:</label>
+                    <label class="col-5 text-right">Barcode:</label>
                     <div class="col text-dark" id="barcode_edit"></div>
                 </div>
                 <div class="row mb-3 gap-3">
-                    <label class="col text-right">Category:</label>
+                    <label class="col-5 text-right">Category:</label>
                     <div class="col text-dark" id="category_edit"></div>
                 </div>
                 <div class="row mb-3 gap-3">
-                    <label class="col text-right">Unit of Measure:</label>
+                    <label class="col-5 text-right">Unit of Measure:</label>
                     <div class="col text-dark" id="sale_edit"></div>
                 </div>
                 <div class="row mb-3 gap-3">
-                    <label class="col text-right">Min. Stock Quantity:</label>
+                    <label class="col-5 text-right">Min. Stock Quantity:</label>
                     <div class="col text-dark" id="min_quantinty_show"></div>
                 </div>
                 <div class="row gap-3">
-                    <label class="col text-right">Status:</label>
+                    <label class="col-5 text-right">Status:</label>
                     <div class="col text-dark" id="status"></div>
                 </div>
             </div>
