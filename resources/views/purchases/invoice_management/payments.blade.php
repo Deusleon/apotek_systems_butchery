@@ -101,11 +101,6 @@ Invoices
                                 <input type="text" class="form-control datepicker" id="payment_date" name="payment_date"
                                        aria-describedby="emailHelp" required="true"
                                        style="background-color: white; cursor: pointer;">
-                                <div class="input-group-append">
-                                    <span class="input-group-text" style="cursor: pointer;">
-                                        <i class="feather icon-calendar"></i>
-                                    </span>
-                                </div>
                             </div>
                             <span id="date_warning" style="display: none; color: red; font-size: 0.9em">Payment date required</span>
                         </div>
@@ -176,25 +171,33 @@ Invoices
         }
     });
 
-    // Initialize date picker for payment date
+    // Initialize date picker for payment date (similar to material received expiry date)
     $(document).ready(function() {
-        $('#payment_date').datepicker({
-            format: 'yyyy-mm-dd',
-            autoclose: true,
-            todayHighlight: true,
-            todayBtn: "linked",
-            clearBtn: false,
-            orientation: "bottom auto",
-            zIndexOffset: 9999,
-            templates: {
-                leftArrow: '<i class="feather icon-chevron-left"></i>',
-                rightArrow: '<i class="feather icon-chevron-right"></i>'
+        $('#payment_date').daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            autoUpdateInput: false,
+            locale: {
+                format: 'YYYY-MM-DD'
             }
-        }).datepicker('setDate', new Date());
+        });
 
-        // Also trigger click on calendar icon
-        $('.input-group-text').on('click', function() {
-            $('#payment_date').datepicker('show');
+        // Apply date selection
+        $('input[name="payment_date"]').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('YYYY-MM-DD'));
+        });
+
+        // Cancel date selection
+        $('input[name="payment_date"]').on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+        });
+
+        // Set default date to today
+        $('#payment_date').val(moment().format('YYYY-MM-DD'));
+
+        // Prevent manual typing
+        $('#payment_date').keydown(function (event) {
+            return false;
         });
     });
 
