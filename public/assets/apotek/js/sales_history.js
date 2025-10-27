@@ -45,6 +45,7 @@ if (isDiscountEnabled) {
 
 columns.push(
     { title: "Amount", searchable: true },
+    { title: "Created By", searchable: true },
     { title: "Action", orderable: false, searchable: false }
 );
 
@@ -89,6 +90,7 @@ function populateTable(data) {
             <button type='button' class='btn btn-sm show-sales btn-rounded btn-success'
                 data-receipt='${item.receipt_number}'
                 data-customer='${item.customer.name}'
+                data-created-by='${item.user.name}'
                 data-sale-id='${item.id}'
                 data-date='${moment(item.date).format("YYYY-MM-DD")}'>
                 Show
@@ -106,7 +108,6 @@ function populateTable(data) {
             `;
         }
 
-        // 👇 Build row data dynamically
         let row = [
             item.receipt_number,
             item.customer.name,
@@ -121,6 +122,7 @@ function populateTable(data) {
 
         row.push(
             formatMoney(Number(item.total_amount) - Number(item.total_discount)),
+            item.user.name,
             actions
         );
 
@@ -136,9 +138,11 @@ $(document).on("click", ".show-sales", function () {
     var customer = $(this).data("customer");
     var date = $(this).data("date");
     var saleId = $(this).data("sale-id");
+    var createdBy = $(this).data("created-by");
     $("#sale-details").modal("show");
     $("#receipt_no").text(receipt);
     $("#customer_name").text(customer);
+    $("#created_by").text(createdBy);
     $("#sales_date").text(date);
     getHistoryData(saleId);
 });

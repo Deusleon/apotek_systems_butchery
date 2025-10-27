@@ -1040,7 +1040,7 @@ $("#sale_paid").on("change", function (evt) {
 
 $("#products").select2({
     placeholder: "Select Product...",
-    allowClear: true,
+    allowClear: false,
 });
 
 $("#products").on("change", function (event) {
@@ -1384,7 +1384,7 @@ function populateProducts(optionsList) {
 
     // Re-init select2 (only if plugin loaded)
     if ($.fn.select2) {
-        $sel.select2({ placeholder: "Select Product...", allowClear: true });
+        $sel.select2({ placeholder: "Select Product...", allowClear: false });
     } else {
         console.error("Select2 not loaded");
     }

@@ -1,12 +1,12 @@
 @extends("layouts.master")
 
 @section('content-title')
-    Sale Returns Approval
+    Sales Returns Approval
 @endsection
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#">Sales / Sale Returns Approval</a></li>
+    <li class="breadcrumb-item"><a href="#">Sales / Sales Returns Approval</a></li>
 @endsection
 
 
@@ -131,7 +131,7 @@
                 <div class="card-body">
                     <div class="form-group row">
 
-                        <p>You do not have permission to View Sale Return Approval</p>
+                        <p>You do not have permission to View Sales Return Approval</p>
 
                     </div>
                 </div>

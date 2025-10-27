@@ -9,19 +9,25 @@
       </div>
       <div class="modal-body">
         <div class="row">
-          <div class="col-4">
+          <div class="col-3">
             <div class="row">
               <span class="col-12">Receipt Number:</span>
               <span id="receipt_no" class="text-body col-12"></span>
             </div>
           </div>
-          <div class="col-4">
+          <div class="col-3">
             <div class="row">
               <span class="col-12">Custmer Name:</span>
               <span id="customer_name" class="text-body col-12"></span>
             </div>
           </div>
-          <div class="col-4">
+          <div class="col-3">
+            <div class="row">
+              <span class="col-12">Created By:</span>
+              <span id="created_by" class="text-body col-12"></span>
+            </div>
+          </div>
+          <div class="col-3">
             <div class="row">
               <span class="col-12">Date:</span>
               <span id="sales_date" class="text-body col-12"></span>

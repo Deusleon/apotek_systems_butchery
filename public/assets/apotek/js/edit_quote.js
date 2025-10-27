@@ -1,6 +1,6 @@
 $("#products").select2({
     placeholder: "Select Product...",
-    allowClear: true,
+    allowClear: false,
 });
 
 $("#price_category").change(function () {
