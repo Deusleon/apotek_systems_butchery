@@ -5,10 +5,6 @@
         .table-responsive {
             overflow-x: auto;
         }
-        .btn-edit {
-            padding: 2px 8px;
-            font-size: 14px;
-        }
     </style>
 @endsection
 
@@ -59,7 +55,7 @@
                                         <td>{{ floor($data->quantity) == $data->quantity ? number_format($data->quantity, 0) : number_format($data->quantity, 1) }}</td>
                                         <td>
                                             @if(auth()->user()->checkPermission('Edit Stock Details'))
-                                                <button type="button" class="btn btn-primary btn-rounded btn-sm btn-edit"
+                                                <button type="button" class="btn btn-info btn-rounded btn-sm btn-edit"
                                                     onclick="editStockDetails({{ $data->id }}, '{{ $data->batch_number ?? '' }}', '{{ $data->expiry_date ?? '' }}')">
                                                     Edit
                                                 </button>
@@ -96,7 +92,9 @@
                         @if ($expireEnabled)
                         <div class="form-group">
                             <label for="edit_expiry_date">Expiry Date</label>
-                            <input type="date" class="form-control" id="edit_expiry_date" name="expiry_date">
+                            <input type="text" class="form-control" id="edit_expiry_date" name="expiry_date"
+                                   min="{{ date('Y-m-d', strtotime('+1 day')) }}"
+                                   max="{{ date('Y-m-d', strtotime('+5 years')) }}">
                         </div>
                         @endif
                     </div>
@@ -123,6 +121,26 @@
             $('#stock-details-table').DataTable({
                 responsive: true,
                 order: [[0, 'asc']]
+            });
+
+            // Initialize date picker for expiry date
+            $('#edit_expiry_date').daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: true,
+                autoUpdateInput: false,
+                minDate: moment().add(1, 'days'),
+                maxDate: moment().add(5, 'years'),
+                locale: {
+                    format: 'YYYY-MM-DD'
+                }
+            });
+
+            $('#edit_expiry_date').on('apply.daterangepicker', function (ev, picker) {
+                $(this).val(picker.startDate.format('YYYY-MM-DD'));
+            });
+
+            $('#edit_expiry_date').on('cancel.daterangepicker', function (ev, picker) {
+                $(this).val('');
             });
         });
 
