@@ -67,7 +67,7 @@
         }
     </style>
 
-    <div class="col-sm-12">
+    <div class="col-sm-12 p-0">
         <div class="card-block">
 
             <div class="col-sm-12">
@@ -176,7 +176,7 @@
                                     <div class="row" id="detail">
                                         <hr>
                                         <div class="table table responsive" style="width: 100%;">
-                                            <table id="cart_table" class="table nowrap table-striped table-hover" width="100%">
+                                            <table id="cart_table" class="table nowrap table-striped table-hover pl-3 pr-3" width="100%">
                                             </table>
                                         </div>
 
@@ -681,6 +681,11 @@
             }
         };
         var canAddCreditPayment = {{ auth()->user()->checkPermission('Add Credit Payment') ? 'true' : 'false' }};
+
+        // Load cart from localStorage on page load
+        var cart = JSON.parse(localStorage.getItem('cart')) || [];
+        var default_cart = JSON.parse(localStorage.getItem('default_cart')) || [];
+        var order_cart = JSON.parse(localStorage.getItem('order_cart')) || [];
 
     </script>
     <script src="{{asset("assets/plugins/moment/js/moment.js")}}"></script>

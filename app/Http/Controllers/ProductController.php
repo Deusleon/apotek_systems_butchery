@@ -8,6 +8,7 @@ use App\Product;
 use App\SubCategory;
 use App\PriceCategory;
 use App\CurrentStock;
+use App\Setting;
 use App\PriceList;
 use App\StockAdjustment;
 use App\StockTracking;
@@ -35,6 +36,7 @@ class ProductController extends Controller
         $products = Product::all();
         $category = Category::orderBy('name', 'asc')->get();
         $sub_category = SubCategory::all();
+        $is_detailed = Setting::where('id', 127)->value('value');
 
 
         foreach ($products as $product)
@@ -65,7 +67,8 @@ class ProductController extends Controller
         return view('stock_management.products.index')->with([
             'products' => $products,
             'categories' => $category,
-            'sub_categories' => $sub_category
+            'sub_categories' => $sub_category,
+            'is_detailed' => $is_detailed
         ]);
     }
     public function store(Request $request)
@@ -116,7 +119,7 @@ class ProductController extends Controller
     }
     public function update(Request $request)
     {
-        
+        // dd($request->all());   
         $this->validate($request, [
             'name' => [
                 'required',
@@ -137,10 +140,6 @@ class ProductController extends Controller
             'brand' => 'nullable|string|max:100',
             'category' => 'required|exists:inv_categories,id',
             'sale_uom' => 'nullable|string|max:50',
-            // 'pack_size' => 'nullable|string|max:50',
-            // 'min_quantinty' => 'nullable|numeric|min:0',
-            // 'max_quantinty' => 'nullable|numeric|min:0',
-            // 'product_type' => 'nullable|in:stockable,consumable',
             'status' => 'nullable|in:0,1'
         ], [
         'name.unique' => 'Product name exist',

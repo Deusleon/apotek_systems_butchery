@@ -964,6 +964,11 @@ function discount() {
     cart_table.clear();
     cart_table.rows.add(cart);
     cart_table.draw();
+
+    // Save cart to localStorage for persistence on page reload
+    localStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.setItem('default_cart', JSON.stringify(default_cart));
+    localStorage.setItem('order_cart', JSON.stringify(order_cart));
 }
 
 function deselect() {
@@ -994,6 +999,10 @@ function deselect() {
     order_cart = [];
     default_cart = [];
     discount();
+    // Clear localStorage when cancelling
+    localStorage.removeItem('cart');
+    localStorage.removeItem('default_cart');
+    localStorage.removeItem('order_cart');
 }
 
 function deselect1() {
@@ -1014,6 +1023,10 @@ function deselect1() {
     order_cart = [];
     default_cart = [];
     discount();
+    // Clear localStorage when cancelling
+    localStorage.removeItem('cart');
+    localStorage.removeItem('default_cart');
+    localStorage.removeItem('order_cart');
 }
 
 function deselectQuote() {
@@ -1171,7 +1184,7 @@ $("#sale_paid").on("change", function (evt) {
 
 $("#products").select2({
     placeholder: "Select Product...",
-    allowClear: true,
+    allowClear: false,
 });
 
 function storeLocally(id) {

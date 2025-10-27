@@ -90,6 +90,7 @@
                                         <th>Discount</th>
                                         @endif
                                         <th>Amount</th>
+                                        <th>Created By</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>

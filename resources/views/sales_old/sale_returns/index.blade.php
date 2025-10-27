@@ -196,7 +196,7 @@
                     <div class="card-body">
                         <div class="form-group row">
 
-                            <p>You do not have permission to View Sale Return</p>
+                            <p>You do not have permission to View Sales Return</p>
 
                         </div>
                     </div>

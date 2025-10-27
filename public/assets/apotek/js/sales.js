@@ -817,6 +817,11 @@ function discount() {
     cart_table.clear();
     cart_table.rows.add(cart);
     cart_table.draw();
+
+    // Save cart to localStorage for persistence on page reload
+    localStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.setItem('default_cart', JSON.stringify(default_cart));
+    localStorage.setItem('order_cart', JSON.stringify(order_cart));
 }
 
 function deselect() {
@@ -843,6 +848,10 @@ function deselect() {
     default_cart = [];
     discount();
     $("#barcode_input").focus();
+    // Clear localStorage when cancelling
+    localStorage.removeItem('cart');
+    localStorage.removeItem('default_cart');
+    localStorage.removeItem('order_cart');
 }
 
 function deselect1() {
@@ -862,6 +871,10 @@ function deselect1() {
     default_cart = [];
     discount();
     $("#barcode_input").focus();
+    // Clear localStorage when cancelling
+    localStorage.removeItem('cart');
+    localStorage.removeItem('default_cart');
+    localStorage.removeItem('order_cart');
 }
 
 function deselectQuote() {
@@ -1040,7 +1053,7 @@ $("#sale_paid").on("change", function (evt) {
 
 $("#products").select2({
     placeholder: "Select Product...",
-    allowClear: true,
+    allowClear: false,
 });
 
 $("#products").on("change", function (event) {
@@ -1384,7 +1397,7 @@ function populateProducts(optionsList) {
 
     // Re-init select2 (only if plugin loaded)
     if ($.fn.select2) {
-        $sel.select2({ placeholder: "Select Product...", allowClear: true });
+        $sel.select2({ placeholder: "Select Product...", allowClear: false });
     } else {
         console.error("Select2 not loaded");
     }
