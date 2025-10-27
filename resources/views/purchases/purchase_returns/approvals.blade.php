@@ -86,7 +86,7 @@
                                 <th>Qty Returned</th>
                                 <th>Refund Amount</th>
                                 @if(Auth::user()->checkPermission('Approve Purchase Returns'))
-                                    <th>Action</th>
+                                    <th id="action_header">Action</th>
                                 @else
                                     <th style="display: none"></th>
                                 @endif
@@ -271,14 +271,18 @@
                         setTimeout(function () { getPurchaseReturns(); }, 100);
                         return;
                     } else {
-                        if (status == 3 || status == 4) {
-                            purchase_returns_table.column(6).visible(false);
-                        } else {
-                            purchase_returns_table.column(6).visible(true);
-                        }
                         purchase_returns_table.clear();
                         purchase_returns_table.rows.add(data);
                         purchase_returns_table.draw();
+
+                        // Hide/show action column based on status after drawing the table
+                        if (status == 3 || status == 4) {
+                            purchase_returns_table.column(7).visible(false);
+                            $('#action_header').hide();
+                        } else {
+                            purchase_returns_table.column(7).visible(true);
+                            $('#action_header').show();
+                        }
                     }
                 },
                 error: function (xhr, status, error) {
