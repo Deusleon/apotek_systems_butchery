@@ -11,6 +11,7 @@ use App\PriceCategory;
 use App\PriceList;
 use App\Product;
 use App\StockTracking;
+use App\Setting;
 use App\Store;
 use App\Supplier;
 use Exception;
@@ -113,34 +114,59 @@ class ImportDataController extends Controller {
     public function downloadTemplate() {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
+        $is_detailed = Setting::where( 'id', 127 )->value( 'value' );
 
         // Headers with proper column names matching Excel structure
-        $headers = [
+        if ($is_detailed === 'Detailed') {
+            $headers = [
+                'A1' => 'Code',
+                'B1' => 'Name',
+                'C1' => 'Barcode',
+                'D1' => 'Brand',
+                'E1' => 'Pack Size',
+                'F1' => 'Category',
+                'G1' => 'Unit',
+                'H1' => 'Min Stock',
+                'I1' => 'Max Stock'
+            ];
+        }
+
+        if ($is_detailed === 'Normal') {
+            $headers = [
             'A1' => 'Code',
             'B1' => 'Name',
             'C1' => 'Barcode',
-            'D1' => 'Brand',
-            'E1' => 'Pack Size',
-            'F1' => 'Unit',
-            'G1' => 'Category',
-            'H1' => 'Min Stock',
-            'I1' => 'Max Stock'
+            'D1' => 'Category',
+            'E1' => 'Unit',
+            'F1' => 'Min Stock',
         ];
+    }
 
         foreach ($headers as $cell => $value) {
             $sheet->setCellValue($cell, $value);
         }
 
-        // Single sample data row matching the column structure
-        $sheet->setCellValue('A2', '100001'); // Code
-        $sheet->setCellValue('B2', 'Sample Product'); // Name
-        $sheet->setCellValue('C2', '123456789'); // Barcode
-        $sheet->setCellValue('D2', 'Brand A'); // Brand
-        $sheet->setCellValue('E2', 10); // Pack Size
-        $sheet->setCellValue('F2', 'PCS'); // Unit
-        $sheet->setCellValue('G2', 'Category 1'); // Category
-        $sheet->setCellValue('H2', 5); // Min Stock
-        $sheet->setCellValue('I2', 100); // Max Stock
+        if( $is_detailed === 'Detailed' ) {
+            // Sample row for Detailed
+            $sheet->setCellValue( 'A2', '100001' );
+            $sheet->setCellValue( 'B2', 'Sample Product' );
+            $sheet->setCellValue( 'C2', '1234567890123' );
+            $sheet->setCellValue( 'D2', 'Sample Brand' );
+            $sheet->setCellValue( 'E2', '500' );
+            $sheet->setCellValue( 'F2', 'ml' );
+            $sheet->setCellValue( 'G2', 'BEVERAGE' );
+            $sheet->setCellValue( 'H2', '10' );
+            $sheet->setCellValue( 'I2', '100' );
+        }
+        if( $is_detailed === 'Normal' ) {
+            // Sample row for Normal
+            $sheet->setCellValue( 'A2', '100001' );
+            $sheet->setCellValue( 'B2', 'Sample Product' );
+            $sheet->setCellValue( 'C2', '1234567890123' );
+            $sheet->setCellValue( 'D2', 'BEVERAGE' );
+            $sheet->setCellValue( 'E2', 'ml' );
+            $sheet->setCellValue( 'F2', '10' );
+        }
 
         $writer = new Xlsx($spreadsheet);
         $fileName = 'products_import_template.xlsx';
@@ -215,7 +241,7 @@ class ImportDataController extends Controller {
                 $preview_data = [];
 
                 foreach ( $excel_raw_data[ 0 ] as $index => $row ) {
-                    
+
                     $expectedColumns = 6;
                     $actualColumns = count( $row );
 
@@ -335,8 +361,14 @@ class ImportDataController extends Controller {
 
                 foreach ( $excel_raw_data[ 0 ] as $index => $row ) {
 
-                    $expectedColumns = 9;
-                    // total number of columns expected ( 0–8 indexes )
+                    $is_detailed = Setting::where( 'id', 127 )->value( 'value' );
+
+                    if ( $is_detailed === 'Detailed' ) {
+                        $expectedColumns = 9;
+                    } else if ( $is_detailed === 'Normal' ) {
+                        $expectedColumns = 6;
+                    }
+
                     $actualColumns = count( $row );
 
                     if ( $actualColumns < $expectedColumns ) {
@@ -349,7 +381,11 @@ class ImportDataController extends Controller {
                     // Skip empty rows
 
                     $row_number = $index + 1;
-                    $row_errors = $this->validateRow( $row, $row_number );
+                    if ( $is_detailed === 'Detailed' ) {
+                        $row_errors = $this->validateRow( $row, $row_number );
+                    } else if ( $is_detailed === 'Normal' ) {
+                        $row_errors = $this->validateRowNormal( $row, $row_number );
+                    }
 
                     $preview_data[] = [
                         'row_number' => $row_number,
@@ -378,7 +414,8 @@ class ImportDataController extends Controller {
                 return view( 'import.preview_products', [
                     'preview_data' => $preview_data,
                     'store_id' => $request->store_id,
-                    'temp_file' => $path // Changed to use the full path
+                    'temp_file' => $path,
+                    'is_detailed' => $is_detailed
                 ] );
 
             } catch ( \Exception $e ) {
@@ -513,6 +550,7 @@ class ImportDataController extends Controller {
             return redirect()->route( 'import-products' )->with( 'error', 'Import failed: ' . $e->getMessage() );
         }
     }
+
     public function recordStockImport( Request $request ) {
         $start_time = microtime( true );
         // Log::info( 'Starting stock import process', [ 'start_time' => $start_time ] );
@@ -712,6 +750,7 @@ class ImportDataController extends Controller {
             return redirect()->route( 'import-data' )->with( 'error', 'Import failed: ' . $e->getMessage() );
         }
     }
+
     private function validateRow( $row, $row_number ) {
         // Log::info( 'Validating row', [ 'row_number' => $row_number ] );
 
@@ -754,6 +793,43 @@ class ImportDataController extends Controller {
 
         return $errors;
     }
+
+    private function validateRowNormal( $row, $row_number ) {
+        // Log::info( 'Validating row', [ 'row_number' => $row_number ] );
+
+        $errors = [];
+
+        // Required fields
+        if ( empty( $row[ 1 ] ) ) $errors[] = 'Product name is required';
+        if ( empty( $row[ 3 ] ) ) $errors[] = 'Category is required';
+
+        // Numeric validations
+        if ( !empty( $row[ 5 ] ) && !is_numeric( $row[ 5 ] ) ) $errors[] = 'Min stock must be numeric';
+
+        // Uniqueness validation ( name+category )
+        if ( !empty( $row[ 1 ] ) && !empty( $row[ 3 ] ) ) {
+            $exists = DB::table( 'inv_products' )
+            ->where( 'name', $row[ 1 ] )
+            ->where( 'category_id', $row[ 3 ] )
+            ->exists();
+
+            if ( $exists ) {
+                $errors[] = "Product '{$row[1]}' already exists in this category";
+            }
+        }
+
+        if ( !empty( $errors ) ) {
+            Log::warning( 'Row validation failed', [
+                'row_number' => $row_number,
+                'errors' => $errors
+            ] );
+        } else {
+            // Log::info( 'Row validation passed', [ 'row_number' => $row_number ] );
+        }
+
+        return $errors;
+    }
+
     private function validateStockRow( $row, $row_number ) {
         // Log::info( 'Validating row', [ 'row_number' => $row_number ] );
 

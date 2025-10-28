@@ -48,7 +48,7 @@ class SaleQuoteController extends Controller {
             $default_sale_type = optional(PriceCategory::first())->id ?? '';
         }
 
-        $price_category = PriceCategory::all();
+        $price_category = PriceCategory::orderBy('name', 'ASC')->get();
         $sale_quotes = SalesQuote::orderBy( 'id', 'DESC' )
         ->where( 'store_id', '=', $store_id )
         ->get();

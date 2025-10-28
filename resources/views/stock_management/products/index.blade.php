@@ -50,23 +50,23 @@
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                     <div class="row mb-3">
                         <!-- <div class="col-md-6">
-                                                                                                                <div class="btn-group">
-                                                                                                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                                                                        <i class="fas fa-download mr-1"></i> Export
-                                                                                                                    </button>
-                                                                                                                    <div class="dropdown-menu">
-                                                                                                                        <a class="dropdown-item" href="{{ route('products.export', ['format' => 'pdf']) }}" target="_blank">
-                                                                                                                            <i class="far fa-file-pdf text-danger mr-2"></i>PDF
-                                                                                                                        </a>
-                                                                                                                        <a class="dropdown-item" href="{{ route('products.export', ['format' => 'excel']) }}">
-                                                                                                                            <i class="far fa-file-excel text-success mr-2"></i>Excel
-                                                                                                                        </a>
-                                                                                                                        <a class="dropdown-item" href="{{ route('products.export', ['format' => 'csv']) }}">
-                                                                                                                            <i class="fas fa-file-csv text-info mr-2"></i>CSV
-                                                                                                                        </a>
+                                                                                                                    <div class="btn-group">
+                                                                                                                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                                                                            <i class="fas fa-download mr-1"></i> Export
+                                                                                                                        </button>
+                                                                                                                        <div class="dropdown-menu">
+                                                                                                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'pdf']) }}" target="_blank">
+                                                                                                                                <i class="far fa-file-pdf text-danger mr-2"></i>PDF
+                                                                                                                            </a>
+                                                                                                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'excel']) }}">
+                                                                                                                                <i class="far fa-file-excel text-success mr-2"></i>Excel
+                                                                                                                            </a>
+                                                                                                                            <a class="dropdown-item" href="{{ route('products.export', ['format' => 'csv']) }}">
+                                                                                                                                <i class="fas fa-file-csv text-info mr-2"></i>CSV
+                                                                                                                            </a>
+                                                                                                                        </div>
                                                                                                                     </div>
-                                                                                                                </div>
-                                                                                                            </div> -->
+                                                                                                                </div> -->
                     </div>
                     <div class="row justify-content-end align-items-end mb-3">
                         <!-- Status Filter -->
@@ -76,7 +76,7 @@
                                 <select name="status-filter" class="js-example-basic-single form-control"
                                     id="status-filter">
                                     <option value="">All</option>
-                                    <option value="1">Active</option>
+                                    <option value="1" selected>Active</option>
                                     <option value="0">Inactive</option>
                                     <option value="unused">Unused</option>
                                 </select>
@@ -301,28 +301,28 @@
                             "searchable": false,
                             "render": function (data, type, row) {
                                 let buttons = `
-                                                                                                    <button type="button" class="btn btn-success btn-sm btn-rounded show-modal">
-                                                                                                        Show
-                                                                                                    </button>
-                                                                                                `;
+                                                                                                        <button type="button" class="btn btn-success btn-sm btn-rounded show-modal">
+                                                                                                            Show
+                                                                                                        </button>
+                                                                                                    `;
 
                                 @if(auth()->user()->checkPermission('Edit Products'))
                                     buttons += `
-                                                                                                                                                                        <button type="button" class="btn btn-primary btn-sm btn-rounded" id="edits">
-                                                                                                                                                                            Edit
-                                                                                                                                                                        </button>
-                                                                                                                                                                    `;
+                                                                                                                                                                                <button type="button" class="btn btn-primary btn-sm btn-rounded" id="edits">
+                                                                                                                                                                                    Edit
+                                                                                                                                                                                </button>
+                                                                                                                                                                            `;
                                 @endif
 
                                 @if(auth()->user()->checkPermission('Delete Products'))
                                     buttons += `
-                                                                                                                                                                        <button type="button" class="btn btn-danger btn-sm btn-rounded" id="deletes">
-                                                                                                                                                                            Delete
-                                                                                                                                                                        </button>
-                                                                                                                                                                    `;
+                                                                                                                                                                                <button type="button" class="btn btn-danger btn-sm btn-rounded" id="deletes">
+                                                                                                                                                                                    Delete
+                                                                                                                                                                                </button>
+                                                                                                                                                                            `;
                                 @endif
 
-                                                                                                return buttons;
+                                                                                                    return buttons;
                             }
 
                         }
@@ -349,6 +349,9 @@
                 $('#create').on('hide.bs.modal', function () {
                     table.draw();
                 });
+                $('#create_normal').on('hide.bs.modal', function () {
+                    table.draw();
+                });
 
             });
 
@@ -360,12 +363,7 @@
                 var table = $('#fixed-header1').DataTable();
                 var row = $(this).closest('tr');
                 var row_data = table.row(row).data();
-                // if (is_detailed) {
-                    $('#show').modal('show');
-                // } else {
-                //     $('#show_normal').modal('show');
-
-                // }
+                $('#show').modal('show');
 
                 // Populate modal with data
                 $('#show #name_edit').html(row_data.name || 'N/A');
@@ -555,6 +553,7 @@
                             let categoryVal = $('#category_option').val();
                             let categoryValNormal = $('#category_option_normal').val();
                             $('#form_product')[0].reset();
+                            $('#form_product_normal')[0].reset();
                             $('#category_option').val(categoryVal).change();
                             $('#category_option_normal').val(categoryValNormal).change();
                         } else {
@@ -711,15 +710,14 @@
             });
 
             $('#min_stock_edits_normal').on('change', function () {
-                var min = document.getElementById('min_stock_edits').value;
+                var min = document.getElementById('min_stock_edits_normal').value;
 
                 if (min !== '') {
-                    document.getElementById('min_stock_edits').value =
+                    document.getElementById('min_stock_edits_normal').value =
                         numberWithCommas(parseFloat(min.replace(/\,/g, ''), 10));
                 } else {
-                    document.getElementById('min_stock_edits').value = '';
+                    document.getElementById('min_stock_edits_normal').value = '';
                 }
-
             });
 
             $('#max_stock_edits').on('change', function () {

@@ -48,7 +48,8 @@
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="{{ route('import-data') }}">Inventory / Products Import / Preview Products Import</a></li>
+    <li class="breadcrumb-item"><a href="{{ route('import-data') }}">Inventory / Products Import / Preview Products
+            Import</a></li>
 @endsection
 
 @section("content")
@@ -100,12 +101,16 @@
                                 <tr>
                                     <th>Product Name</th>
                                     <th>Barcode</th>
-                                    <th>Brand</th>
-                                    <th>Pack Size</th>
-                                    <th>Unit</th>
+                                    @if ($is_detailed === 'Detailed')
+                                        <th>Brand</th>
+                                        <th>Pack Size</th>
+                                    @endif
                                     <th>Category</th>
+                                    <th>Unit</th>
                                     <th>Min Stock</th>
-                                    <th>Max Stock</th>
+                                    @if ($is_detailed === 'Detailed')
+                                        <th>Max Stock</th>
+                                    @endif
                                     <th>Validation</th>
                                 </tr>
                             </thead>
@@ -115,11 +120,18 @@
                                         <td>{{ $row['data'][1] ?? '' }}</td>
                                         <td>{{ $row['data'][2] ?? '' }}</td>
                                         <td>{{ $row['data'][3] ?? '' }}</td>
-                                        <td>{{ is_numeric($row['data'][4]) ? number_format($row['data'][4], 0) : '' }}</td>
+                                        @if ($is_detailed === 'Detailed')
+                                            <td>{{ is_numeric($row['data'][4]) ? number_format($row['data'][4], 0) : '' }}</td>
+                                        @endif
+                                        @if ($is_detailed === 'Normal')
+                                            <td>{{ $row['data'][4] ?? '' }}</td>
+                                        @endif
                                         <td>{{ $row['data'][5] ?? '' }}</td>
-                                        <td>{{ $row['data'][6] ?? '' }}</td>
-                                        <td>{{ is_numeric($row['data'][7]) ? number_format($row['data'][7], 0) : '' }}</td>
-                                        <td>{{ is_numeric($row['data'][8]) ? number_format($row['data'][8], 0) : '' }}</td>
+                                        @if ($is_detailed === 'Detailed')
+                                            <td>{{ $row['data'][6] ?? '' }}</td>
+                                            <td>{{ is_numeric($row['data'][7]) ? number_format($row['data'][7], 0) : '' }}</td>
+                                            <td>{{ is_numeric($row['data'][8]) ? number_format($row['data'][8], 0) : '' }}</td>
+                                        @endif
                                         <td>
                                             @if(!empty($row['errors']))
                                                 <span class="text-danger">

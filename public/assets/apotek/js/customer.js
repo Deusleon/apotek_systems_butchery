@@ -33,7 +33,7 @@ $(document).on("submit", "#create_customer", function (e) {
 
             $("#create").modal("hide");
             form[0].reset();
-            notify("New customer added successfully", "top", "right", "success");
+            notify("Customer added successfully", "top", "right", "success");
         },
         error: function (xhr) {
             console.log("Server returned error:", xhr);

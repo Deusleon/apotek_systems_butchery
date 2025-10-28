@@ -1582,7 +1582,7 @@ function saveCashSale() {
             printReceipt(response.redirect_to);
         },
         complete: function () {
-            notify("Sale recorded successfully", "top", "right", "success");
+            notify("Sales recorded successfully", "top", "right", "success");
             deselect();
             $("#save_btn").attr("disabled", false);
             $("#barcode_input").focus();

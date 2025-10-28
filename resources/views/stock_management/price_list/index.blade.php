@@ -64,7 +64,7 @@
                                 <select name="price_category" class="js-example-basic-single form-control"
                                     id="price_category">
                                     @foreach($price_categories as $price_category)
-                                        <option value="{{$price_category->id}}">
+                                        <option value="{{$price_category->id}}" {{ $default_sale_type === $price_category->name ? 'selected' : ''  }}>
                                             {{ $price_category->name }}
                                         </option>
                                     @endforeach

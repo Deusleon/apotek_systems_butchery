@@ -32,7 +32,7 @@ class SaleController extends Controller
                 abort(403, 'Access Denied');
             }
 
-            $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
+            $vat = Setting::where('id', 120)->value('value') / 100;
             $back_date = Setting::where('id', 114)->value('value');
             $fixed_price = Setting::where('id', 124)->value('value');
             $enable_discount = Setting::where('id', 111)->value('value');
@@ -40,16 +40,16 @@ class SaleController extends Controller
 
             /*get default Price Category*/
             $default_sale_type = Setting::where('id', 125)->value('value');
-            $sale_type = PriceCategory::where('name', $default_sale_type)->first();
+            $sale_type = PriceCategory::where('name', $default_sale_type)->orderBy('name', 'ASC')->first();
             $payment_type = PaymentType::all();
 
             if ($sale_type != null) {
                 $default_sale_type = $sale_type->id;
             } else {
-                $default_sale_type = optional(PriceCategory::first())->id ?? '';
+                $default_sale_type = optional(PriceCategory::orderBy('name', 'ASC')->first())->id ?? '';
             }
 
-            $price_category = PriceCategory::all();
+            $price_category = PriceCategory::orderBy('name', 'ASC')->get();
             $customers = Customer::orderBy('name', 'ASC')->get();
             $default_customer = Customer::where('name', 'CASH')->value('id');
             $current_stock = CurrentStock::all();
@@ -109,7 +109,7 @@ class SaleController extends Controller
         }
 
 
-        $price_category = PriceCategory::all();
+        $price_category = PriceCategory::orderBy('name', 'ASC')->get();
         //Check customer
         $customers = Customer::orderBy('name', 'ASC')
             // ->where('payment_term',2)
@@ -581,13 +581,13 @@ class SaleController extends Controller
                 }
 
                 DB::commit();
-                Log::info('Sale recorded successfully', ['receipt_number' => $receipt_number, 'user_id' => Auth::id()]);
-                session()->flash("alert-success", "Sale recorded successfully!");
+                Log::info('Sales recorded successfully', ['receipt_number' => $receipt_number, 'user_id' => Auth::id()]);
+                session()->flash("alert-success", "Sales recorded successfully!");
 
             } catch (\Exception $e) {
                 DB::rollBack();
                 Log::error('Database error in sale store: ' . $e->getMessage());
-                session()->flash("alert-danger", "Failed to save sale. Please try again.");
+                session()->flash("alert-danger", "Failed to record sales. Please try again.");
                 return back();
             }
 
