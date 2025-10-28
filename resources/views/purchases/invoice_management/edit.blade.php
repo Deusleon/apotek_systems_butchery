@@ -60,7 +60,7 @@
                                         <input type="text" class="form-control" id="amount_paid_edit"
                                                name="paid_amount" aria-describedby="emailHelp"
                                                onchange=" editSubtract()"
-                                               required="true" onkeypress="return isNumberKey(event,this)">
+                                               required="true" onkeypress="return isNumberKey(event,this)" readonly>
                                         <span class="help-inline">
                                         <div class="text text-danger" id="amount_error"></div>
                                         </span>
