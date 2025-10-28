@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\CurrentStock;
 use App\Notifications\LowStockAlert;
 use App\User;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Console\Command;
 
 class CheckLowStock extends Command
@@ -42,7 +43,7 @@ class CheckLowStock extends Command
             }
             $this->info("Sent low stock alert for {$stock->product->name} at {$stock->store->name}");
         }
-
+        Log::info("Completed checking " . $lowStockItems->count() . " low stock items. AT" . now());
         $this->info("Completed checking " . $lowStockItems->count() . " low stock items.");
     }
 } 

@@ -327,7 +327,7 @@ $store_id = Auth::user()->store_id;
                             <div class="noti-head">
                                 <h6 class="d-inline-block m-b-0">Notifications</h6>
                                 <div class="float-right">
-                                    <a href="#!" id="mark_as_read" class="m-r-10">mark as read</a>
+                                    {{-- <a href="#!" id="mark_as_read" class="m-r-10">mark as read</a> --}}
                                     {{-- <a href="#!">clear all</a>--}}
                                 </div>
                             </div>

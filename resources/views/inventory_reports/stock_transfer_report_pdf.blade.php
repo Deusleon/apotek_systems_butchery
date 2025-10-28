@@ -123,7 +123,16 @@
                         <tr>
                             <td align="center">{{$loop->iteration}}.</td>
                             <td align="left">{{date('Y-m-d', strtotime($item->created_at))}}</td>
-                            <td>{{($item->currentStock['product']['name'] . ' ' ?? '') . ($item->currentStock['product']['brand'] . ' ' ?? '') . ($item->currentStock['product']['pack_size'] ?? '') . $item->currentStock['product']['sales_uom'] ?? ''}}
+                            <td>
+                                @if($item->currentStock && $item->currentStock->product)
+                                    {{ $item->currentStock->product->name ?? '' }}
+                                    {{ $item->currentStock->product->brand ?? '' }}
+                                    {{ $item->currentStock->product->pack_size ?? '' }}
+                                    {{ $item->currentStock->product->sales_uom ?? '' }}
+                                @else
+                                    Unkown
+                                @endif
+                                {{-- {{($item->currentStock['product']['name'] . ' ' ?? '') . ($item->currentStock['product']['brand'] . ' ' ?? '') . ($item->currentStock['product']['pack_size'] ?? '') . $item->currentStock['product']['sales_uom'] ?? ''}} --}}
                             </td>
                             <td align="left">{{$item->transfer_no}}</td>
                             <td align="center">{{number_format($item->transfer_qty)}}</td>
