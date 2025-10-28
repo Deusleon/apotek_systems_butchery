@@ -750,9 +750,6 @@ class HomeController extends Controller {
     }
     public function deadStock($isAjax)
     {
-        if (!Auth()->user()->checkPermission('View Inventory Summary')) {
-            abort(403, 'Access Denied');
-        }
 
         $store_id = current_store_id();
 
@@ -811,9 +808,6 @@ class HomeController extends Controller {
     }
     public function expireInThreeMonths($isAjax)
     {
-        if (!Auth()->user()->checkPermission('View Inventory Summary')) {
-            abort(403, 'Access Denied');
-        }
 
         $store_id = current_store_id();
 

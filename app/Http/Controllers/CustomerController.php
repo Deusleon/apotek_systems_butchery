@@ -59,7 +59,7 @@ class CustomerController extends Controller {
             return response()->json( [ 'customer' => $customer ] );
         }
 
-        session()->flash( 'alert-success', 'Customer Added Successfully!' );
+        session()->flash( 'alert-success', 'Customer added successfully!' );
         return back();
     }
 
@@ -89,7 +89,7 @@ class CustomerController extends Controller {
 
         $customer->save();
 
-        session()->flash( 'alert-success', 'Customer Updated Successfully!' );
+        session()->flash( 'alert-success', 'Customer updated successfully!' );
         return back();
     }
 
@@ -102,7 +102,7 @@ class CustomerController extends Controller {
                 return back();
             }
             Customer::find( $request->id )->delete();
-            session()->flash( 'alert-success', 'Customer Deleted successfully!' );
+            session()->flash( 'alert-success', 'Customer deleted successfully!' );
             return back();
         } catch ( Exception $exception ) {
             session()->flash( 'alert-danger', 'Customer in use!' );

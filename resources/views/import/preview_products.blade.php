@@ -106,7 +106,9 @@
                                         <th>Pack Size</th>
                                     @endif
                                     <th>Category</th>
-                                    <th>Unit</th>
+                                    @if ($is_detailed === 'Detailed')
+                                        <th>Unit</th>
+                                    @endif
                                     <th>Min Stock</th>
                                     @if ($is_detailed === 'Detailed')
                                         <th>Max Stock</th>
@@ -126,8 +128,8 @@
                                         @if ($is_detailed === 'Normal')
                                             <td>{{ $row['data'][4] ?? '' }}</td>
                                         @endif
-                                        <td>{{ $row['data'][5] ?? '' }}</td>
                                         @if ($is_detailed === 'Detailed')
+                                            <td>{{ $row['data'][5] ?? '' }}</td>
                                             <td>{{ $row['data'][6] ?? '' }}</td>
                                             <td>{{ is_numeric($row['data'][7]) ? number_format($row['data'][7], 0) : '' }}</td>
                                             <td>{{ is_numeric($row['data'][8]) ? number_format($row['data'][8], 0) : '' }}</td>
