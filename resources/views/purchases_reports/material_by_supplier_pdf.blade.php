@@ -9,13 +9,23 @@
         }
 
         body {
-            /*font-size: 30px;*/
+            font-size: 13px;
         }
 
-        table, th, td {
-            /*border: 1px solid black;*/
+        * {
+            font-family: Verdana, Arial, sans-serif;
+        }
+
+        table,
+        th {
             border-collapse: collapse;
-            padding: 10px;
+            padding: 8px;
+        }
+
+        table,
+        td {
+            border-collapse: collapse;
+            padding: 5px;
         }
 
         table {
@@ -36,16 +46,14 @@
         }
 
         #table-detail {
-            /*border-spacing: 5px;*/
             width: 100%;
-            margin-top: -10%;
         }
 
-        #table-detail tr > {
+        #table-detail tr> {
             line-height: 13px;
         }
 
-        tr:nth-child(even) {
+        #table-detail tr:nth-child(even) {
             background-color: #f2f2f2;
         }
 
@@ -71,9 +79,7 @@
             max-width: 160px;
             max-height: 160px;
         }
-
     </style>
-
 </head>
 <body>
 <div class="row">
@@ -85,34 +91,39 @@
         </div>
     </div>
 </div>
-<h4 align="center">{{$pharmacy['name']}}</h4>
-<h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
-<h2 align="center" style="margin-top: -2%">Material Received Report</h2>
-<div class="row" style="margin-top: 10%;">
-    <div class="col-md-12">
-        <table id="table-detail" align="center">
-            <!-- loop the product names here -->
-            <thead>
-            <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                <th align="left">Product Name</th>
-                <th align="center">Quantity</th>
-                <th align="right">Buy Price</th>
-                <th align="right">Sell Price</th>
-                <th align="left">Expiry Date</th>
-                <th align="left">Receive Date</th>
-            </tr>
-            </thead>
-            @foreach($data as $item)
-                <tr>
-                    <td align="left">{{$item->product_name}}</td>
-                    <td align="center">{{number_format($item->quantity,0)}}</td>
-                    <td align="right">{{number_format($item->unit_cost,2)}}</td>
-                    <td align="right">{{number_format($item->sell_price,2)}}</td>
-                    <td align="left">{{$item->expire_date}}</td>
-                    <td align="left">{{date('Y-m-d',strtotime($item->created_at))}}</td>
+
+<div class="row" style="padding-top: -2%">
+    <h1 align="center">{{$pharmacy['name']}}</h1>
+    <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
+    <h2 align="center" style="margin-top: -1%">Material Received Report</h2>
+
+    <div class="row">
+        <div class="col-md-12">
+            <table id="table-detail" align="center">
+                <thead>
+                <tr style="background: #1f273b; color: white;">
+                    <th align="left" style="width: 1%;">#</th>
+                    <th align="left">Product Name</th>
+                    <th align="center">Quantity</th>
+                    <th align="right">Buy Price</th>
+                    <th align="right">Sell Price</th>
+                    <th align="left">Expiry Date</th>
+                    <th align="left">Receive Date</th>
                 </tr>
-            @endforeach
-        </table>
+                </thead>
+                @foreach($data as $item)
+                    <tr>
+                        <td align="left">{{$loop->iteration}}.</td>
+                        <td align="left">{{$item->product_name}}</td>
+                        <td align="center">{{number_format($item->quantity,0)}}</td>
+                        <td align="right">{{number_format($item->unit_cost,2)}}</td>
+                        <td align="right">{{number_format($item->sell_price,2)}}</td>
+                        <td align="left">{{$item->expire_date}}</td>
+                        <td align="left">{{date('Y-m-d',strtotime($item->created_at))}}</td>
+                    </tr>
+                @endforeach
+            </table>
+        </div>
     </div>
 </div>
 
@@ -124,9 +135,9 @@
         $font = null;
         $size = 10;
         $color = array(0,0,0);
-        $word_space = 0.0;  //  default
-        $char_space = 0.0;  //  default
-        $angle = 0.0;   //  default
+        $word_space = 0.0;
+        $char_space = 0.0;
+        $angle = 0.0;
         $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
      }
 </script>
