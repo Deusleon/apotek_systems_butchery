@@ -142,6 +142,8 @@
             $('#create').on('show.bs.modal', function () {
                 var modal = $(this);
                 initPhoneValidation("#phone_edit", "#save_btn", modal);
+                // Phone is optional, so enable save button initially
+                $('#save_btn').prop('disabled', false);
             });
         });
 
@@ -208,7 +210,8 @@
                 input.classList.remove("error");
                 if (validMsg) validMsg.classList.add("hide");
                 if (errorMsg) { errorMsg.classList.add("hide"); errorMsg.innerHTML = ""; }
-                $(saveBtnSelector).prop('disabled', true);
+                // Don't disable button on reset for optional phone field
+                // $(saveBtnSelector).prop('disabled', true);
             }
 
             function validateNumber() {
@@ -220,11 +223,15 @@
                         input.value = input._itiInstance.getNumber();
                     } else {
                         input.classList.add("error");
-                        $(saveBtnSelector).prop('disabled', true);
+                        // For optional field, don't disable button on invalid number - just show error
+                        // $(saveBtnSelector).prop('disabled', true);
                         const errorCode = input._itiInstance.getValidationError();
                         if (errorMsg) errorMsg.innerHTML = errorMap[errorCode] || "Invalid Number";
                         if (errorMsg) errorMsg.classList.remove("hide");
                     }
+                } else {
+                    // Empty phone is valid (optional field)
+                    $(saveBtnSelector).prop('disabled', false);
                 }
             }
 
@@ -239,7 +246,8 @@
                     input._itiInstance.destroy();
                 }
                 delete input._itiInstance;
-                $(saveBtnSelector).prop('disabled', true);
+                // Don't disable button on cleanup for optional field
+                // $(saveBtnSelector).prop('disabled', true);
             });
         }
     </script>
