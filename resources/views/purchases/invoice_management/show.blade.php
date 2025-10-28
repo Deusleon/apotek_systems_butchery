@@ -8,7 +8,7 @@
                 </button>
             </div>
 
-            <div class="modal-body" style="font-size: 15px;">
+            <div class="modal-body">
                 
                 <!-- Row 1 -->
                 <div class="form-group row mb-2">
@@ -70,8 +70,8 @@
                 <div class="row mt-3">
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label for="remarks" >Remarks / Description</label>
-                            <textarea readonly id="remarks" class="form-control" rows="3"></textarea>
+                            <label for="remarks">Remarks / Description</label>
+                            <textarea readonly id="remarks" class="form-control-plaintext" rows="3"></textarea>
                         </div>
                     </div>
                 </div>

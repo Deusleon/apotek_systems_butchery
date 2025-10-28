@@ -68,8 +68,8 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label for="Amount">Remain Balance</label>
-                                        <input type="text" class="form-control" id="balance_edit" name="balance"
+                                        <label for="Amount">Received Amount</label>
+                                        <input type="text" class="form-control" id="received_amount_edit" name="received_amount"
                                                aria-describedby="emailHelp" value="0" onkeypress="return isNumberKey(event,this)">
                                     </div>
                                 </div>
@@ -151,7 +151,7 @@
 
             //not zero then sub
             var remain_amount = invoice_amount - paid_amount;
-            document.getElementById("balance_edit").value = formatMoney(remain_amount);
+            document.getElementById("received_amount_edit").value = formatMoney(remain_amount);
             document.getElementById('amount_error').style.display = 'none';
 
         } else if ((Number(invoice_amount) < Number(paid_amount)) && (Number(invoice_amount) && Number(paid_amount) !== Number(0))) {

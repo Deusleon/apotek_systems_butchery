@@ -125,6 +125,7 @@ class InvoiceController extends Controller
 
             // Received status is already stored in received_status field
             $value->received_status = $value->received_status;
+            $value->remarks = $value->remarks;
         }
 
         return response()->json($invoice_history);
@@ -161,6 +162,7 @@ class InvoiceController extends Controller
 
             // Received status is already stored in received_status field
             $value->received_status = $value->received_status;
+            $value->remarks = $value->remarks;
         }
 
         return response()->json($invoice_history);

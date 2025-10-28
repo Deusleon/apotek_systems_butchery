@@ -186,7 +186,7 @@ Invoices
         $('#edit').find('.modal-body #supplier_edit').val(data.supplier_id);
         $('#edit').find('.modal-body #amount_edit').val(formatMoney(data.invoice_amount));
         $('#edit').find('.modal-body #amount_paid_edit').val(formatMoney(data.paid_amount));
-        $('#edit').find('.modal-body #balance_edit').val(formatMoney(data.remain_balance));
+        $('#edit').find('.modal-body #received_amount_edit').val(formatMoney(data.received_amount || 0));
         $('#edit').find('.modal-body #period_edit').val(data.grace_period);
         $('#edit').find('.modal-body #received_status_edit').val(data.received_status);
         $('#edit').find('.modal-body #due_date_edit').val(moment(data.payment_due_date).format('YYYY-MM-DD'));
@@ -209,7 +209,7 @@ Invoices
         $('#show').find('.modal-body #period').val(data.grace_period);
         $('#show').find('.modal-body #due').val(data.due_date);
         $('#show').find('.modal-body #status').val(data.received_status);
-        $('#show').find('.modal-body #remarks').val(data.remarks);
+        document.getElementById('remarks').value = data.remarks || '';
     });
     $(document).ready(function() {
         subtract();
