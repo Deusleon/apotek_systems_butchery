@@ -60,7 +60,7 @@ class StockAdjustmentController extends Controller
         ->orderBy('created_at', 'desc')
         ->get()
         ->groupBy(function($item) {
-            return $item->currentStock->product_id; 
+            return optional($item->currentStock)->product_id ?? 'Unknown Product';
         })
         ->map(function($logs) {
             return $logs->groupBy(function($item) {

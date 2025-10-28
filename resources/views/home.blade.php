@@ -69,8 +69,8 @@
 
 
         /**
-                                                              Component
-                                                            **/
+                                                                      Component
+                                                                    **/
 
         label {
             width: 100%;
@@ -276,42 +276,59 @@
                     @if(auth()->user()->checkPermission('View Inventory Summary') || auth()->user()->checkPermission('View Inventory Summary'))
                         <div class="tab-pane fade" id="pills-stock" role="tabpanel" aria-labelledby="pills-stock-tab">
                             {{-- row starts --}}
-                            @if ($expireEnabled)
-                                <div class="row">
-                                    <div class="col-md-4 col-lg-4 col-sm-4">
-                                        <label>
-                                            <input type="radio" name="stock" id="out_of_stock" class="card-input-element" />
-                                            <div class="panel panel-default card-input">
-                                                <div class="card">
-                                                    <div class="card-block">
-                                                        <div class="panel-heading">
-                                                            <h5>Out of Stock</h5>
-                                                        </div>
-                                                        <div class="panel-body">
-                                                            <h3 class="text-c-red">{{$outOfStock}}</h3>
-                                                        </div>
+                            <div class="row">
+                                <div class="col-md-4 col-lg-4 col-sm-4">
+                                    <label>
+                                        <input type="radio" name="stock" id="out_of_stock" class="card-input-element" />
+                                        <div class="panel panel-default card-input">
+                                            <div class="card">
+                                                <div class="card-block">
+                                                    <div class="panel-heading">
+                                                        <h5>Out of Stock</h5>
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <h3 class="text-c-red">{{$outOfStock}}</h3>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </label>
-                                    </div>
-                                    <div class="col-md-4 col-lg-4 col-sm-4">
-                                        <label>
-                                            <input type="radio" name="stock" id="below" class="card-input-element" />
-                                            <div class="panel panel-default card-input">
-                                                <div class="card">
-                                                    <div class="card-block">
-                                                        <div class="panel-heading">
-                                                            <h5>Below Min Level</h5>
-                                                        </div>
-                                                        <div class="panel-body text-c-yellow">
-                                                            <h3 class="text-c-yellow">{{$belowMinLevel->count()}}</h3>
-                                                        </div>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="col-md-4 col-lg-4 col-sm-4">
+                                    <label>
+                                        <input type="radio" name="stock" id="below" class="card-input-element" />
+                                        <div class="panel panel-default card-input">
+                                            <div class="card">
+                                                <div class="card-block">
+                                                    <div class="panel-heading">
+                                                        <h5>Below Min Level</h5>
+                                                    </div>
+                                                    <div class="panel-body text-c-yellow">
+                                                        <h3 class="text-c-yellow">{{$belowMinLevel->count()}}</h3>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </label>
-                                    </div>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="col-md-4 col-lg-4 col-sm-4">
+                                    <label>
+                                        <input type="radio" name="stock" id="fastMoving" class="card-input-element" />
+                                        <div class="panel panel-default card-input">
+                                            <div class="card">
+                                                <div class="card-block">
+                                                    <div class="panel-heading">
+                                                        <h5>Fast Moving</h5>
+                                                    </div>
+                                                    <div class="panel-body text-c-green">
+                                                        <h3 class="text-c-green">{{$fast_moving}}</h3>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                                @if ($expireEnabled)
                                     <div class="col-md-4 col-lg-4 col-sm-4">
                                         <label>
                                             <input type="radio" name="stock" id="deadStock" class="card-input-element" />
@@ -323,23 +340,6 @@
                                                         </div>
                                                         <div class="panel-body text-c-red">
                                                             <h3 class="text-c-red">{{$deadStock->count()}}</h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </label>
-                                    </div>
-                                    <div class="col-md-4 col-lg-4 col-sm-4">
-                                        <label>
-                                            <input type="radio" name="stock" id="fastMoving" class="card-input-element" />
-                                            <div class="panel panel-default card-input">
-                                                <div class="card">
-                                                    <div class="card-block">
-                                                        <div class="panel-heading">
-                                                            <h5>Fast Moving</h5>
-                                                        </div>
-                                                        <div class="panel-body text-c-green">
-                                                            <h3 class="text-c-green">{{$fast_moving}}</h3>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -380,79 +380,8 @@
                                             </div>
                                         </label>
                                     </div>
-                                </div>
-                            @else
-                                <div class="row">
-                                    <div class="col-md-3 col-lg-3 col-sm-3">
-                                        <label>
-                                            <input type="radio" name="stock" id="out_of_stock" class="card-input-element" />
-                                            <div class="panel panel-default card-input">
-                                                <div class="card">
-                                                    <div class="card-block">
-                                                        <div class="panel-heading">
-                                                            <h5>Out of Stock</h5>
-                                                        </div>
-                                                        <div class="panel-body">
-                                                            <h3 class="text-c-red">{{$outOfStock}}</h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </label>
-                                    </div>
-                                    <div class="col-md-3 col-lg-3 col-sm-3">
-                                        <label>
-                                            <input type="radio" name="stock" id="below" class="card-input-element" />
-                                            <div class="panel panel-default card-input">
-                                                <div class="card">
-                                                    <div class="card-block">
-                                                        <div class="panel-heading">
-                                                            <h5>Below Min Level</h5>
-                                                        </div>
-                                                        <div class="panel-body text-c-yellow">
-                                                            <h3 class="text-c-yellow">{{$belowMinLevel->count()}}</h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </label>
-                                    </div>
-                                    <div class="col-md-3 col-lg-3 col-sm-3">
-                                        <label>
-                                            <input type="radio" name="stock" id="deadStock" class="card-input-element" />
-                                            <div class="panel panel-default card-input">
-                                                <div class="card">
-                                                    <div class="card-block">
-                                                        <div class="panel-heading">
-                                                            <h5>Dead Stock</h5>
-                                                        </div>
-                                                        <div class="panel-body text-c-red">
-                                                            <h3 class="text-c-red">{{$deadStock->count()}}</h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </label>
-                                    </div>
-                                    <div class="col-md-3 col-lg-3 col-sm-3">
-                                        <label>
-                                            <input type="radio" name="stock" id="fastMoving" class="card-input-element" />
-                                            <div class="panel panel-default card-input">
-                                                <div class="card">
-                                                    <div class="card-block">
-                                                        <div class="panel-heading">
-                                                            <h5>Fast Moving</h5>
-                                                        </div>
-                                                        <div class="panel-body text-c-green">
-                                                            <h3 class="text-c-green">{{$fast_moving}}</h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </label>
-                                    </div>
-                                </div>
-                            @endif
+                                @endif
+                            </div>
                             <div class="row">
                                 <!-- [ Out of stock start -->
                                 <div class="col-xl-12 col-md-12">
@@ -495,24 +424,26 @@
                                         </table>
                                     </div>
 
-                                    <div class="table-responsive" style="display: none" id="dead_stock_table">
-                                        <table id="dead_stock_items" class="display table nowrap table-striped table-hover"
-                                            style="width:100%">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: 1%;">#</th>
-                                                    <th>Product Name</th>
-                                                    <th>Quantity</th>
-                                                    @if ($expireEnabled)
-                                                    <th>Expiry Date</th>
-                                                    @endif
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+                                    @if ($expireEnabled)
+                                        <div class="table-responsive" style="display: none" id="dead_stock_table">
+                                            <table id="dead_stock_items" class="display table nowrap table-striped table-hover"
+                                                style="width:100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 1%;">#</th>
+                                                        <th>Product Name</th>
+                                                        <th>Quantity</th>
+                                                        @if ($expireEnabled)
+                                                            <th>Expiry Date</th>
+                                                        @endif
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
 
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    @endif
 
                                     <div class="table-responsive" style="display: none" id="stock_items_fast_table">
                                         <table id="stock_items_fast" class="display table nowrap table-striped table-hover"
@@ -536,22 +467,22 @@
                                     </div>
 
                                     @if ($expireEnabled)
-                                    <div class="table-responsive" style="display: none" id="stock_items_expired_table">
-                                        <table id="stock_items_expired" class="display table nowrap table-striped table-hover"
-                                            style="width:100%">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width: 1%;">#</th>
-                                                    <th>Product Name</th>
-                                                    <th>Quantity</th>
-                                                    <th>Expiry Date</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+                                        <div class="table-responsive" style="display: none" id="stock_items_expired_table">
+                                            <table id="stock_items_expired" class="display table nowrap table-striped table-hover"
+                                                style="width:100%">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 1%;">#</th>
+                                                        <th>Product Name</th>
+                                                        <th>Quantity</th>
+                                                        <th>Expiry Date</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
 
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     @endif
 
                                 </div>

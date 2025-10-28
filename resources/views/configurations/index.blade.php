@@ -47,6 +47,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {{-- @dd($configurations) --}}
                                 <tr>
                                     @foreach($configurations as $setting)
                                             <td hidden>{{$setting->id}}</td>
@@ -108,12 +109,6 @@
             var appended = document.getElementById("appended");
             var phone_number = document.getElementById("phone_number");
             document.getElementById("formInput").innerHTML = '';
-            // if (appended) {
-            //     document.getElementById("formInput").innerHTML = '';
-            // }
-            // if (phone_number) {
-            //     document.getElementById("formInput").innerHTML = '';
-            // }
             switch (Number(data[0])) {
                 case 100:
                     element.setAttribute("type", "text");

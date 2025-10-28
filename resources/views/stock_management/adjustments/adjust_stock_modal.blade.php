@@ -30,7 +30,7 @@
                 <input type="hidden" name="from_type" id="from_type">
             </div>
             <div class="row mt-3">
-                <label>Reason</label>
+                <label>Reason <font class="text-danger">*</font></label>
                 <select name="reason" id="reason" class="form-control select2 @error('reason') is-invalid @enderror"
                   required>
                   <option value="">Select Reason</option>

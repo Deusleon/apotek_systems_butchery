@@ -20,11 +20,12 @@ use Yajra\DataTables\DataTables;
 class PriceListController extends Controller {
 
     public function index( Request $request ) {
-        if (!Auth()->user()->checkPermission('View Price List')) {
-            abort(403, 'Access Denied');
+        if ( !Auth()->user()->checkPermission( 'View Price List' ) ) {
+            abort( 403, 'Access Denied' );
         }
         $store_id = current_store_id();
-        $price_categories = PriceCategory::all();
+        $price_categories = PriceCategory::orderBy( 'name', 'ASC' )->get();
+        $default_sale_type = Setting::where( 'id', 125 )->value( 'value' );
         $batch_enabled = Setting::where( 'id', 110 )->value( 'value' );
 
         $query = DB::table( 'inv_current_stock' )
@@ -39,20 +40,20 @@ class PriceListController extends Controller {
             'inv_current_stock.unit_cost as unit_cost',
             'sales_prices.price as price',
             // DB::raw( '((sales_prices.price - inv_current_stock.unit_cost) / inv_current_stock.unit_cost) * 100 as profit' ),
-            DB::raw("
+            DB::raw( "
                 CASE 
                     WHEN inv_current_stock.unit_cost > 0 
                     THEN ((sales_prices.price - inv_current_stock.unit_cost) / inv_current_stock.unit_cost) * 100 
                     ELSE 0 
                 END as profit
-            "),
+            " ),
             'inv_current_stock.id as id',
             'price_categories.name as price_category_name',
             'sales_prices.price_category_id as price_category_id'
         )
         ->where( 'inv_current_stock.quantity', '>', 0 );
-        if (!is_all_store()) {
-            $query->where('inv_current_stock.store_id', $store_id);
+        if ( !is_all_store() ) {
+            $query->where( 'inv_current_stock.store_id', $store_id );
         }
 
         $current_stocks = $query->get();
@@ -64,16 +65,18 @@ class PriceListController extends Controller {
             ->select( 'product_name as name', 'inv_products.brand as brand', 'inv_products.pack_size as pack_size', 'inv_products.sales_uom as sales_uom', 'unit_cost', 'selling_price as price', 'stock_details.updated_at', 'price_category_id' )
             ->where( 'store_id', $store_id )
             ->get();
-        } catch (\Exception $e) {
-            Log::warning('stock_details table query failed, using empty collection: ' . $e->getMessage());
-            $stocks = collect(); // Return empty collection if table doesn't exist
+        } catch ( \Exception $e ) {
+            Log::warning( 'stock_details table query failed, using empty collection: ' . $e->getMessage() );
+            $stocks = collect();
+            // Return empty collection if table doesn't exist
         }
 
         return view( 'stock_management.price_list.index' )->with( [
             'price_categories' => $price_categories,
             'stocks' => $stocks,
             'current_stocks' => $current_stocks,
-            'batch_enabled' => $batch_enabled
+            'batch_enabled' => $batch_enabled,
+            'default_sale_type' => $default_sale_type
         ] );
     }
 
@@ -121,7 +124,7 @@ class PriceListController extends Controller {
                     'cs.unit_cost as unit_cost',
                     'cs.batch_number as batch_number',
                     'sp.price as price',
-                    DB::raw('((sp.price - cs.unit_cost)/cs.unit_cost)*100 as profit'),
+                    DB::raw('( ( sp.price - cs.unit_cost )/cs.unit_cost )*100 as profit'),
                     'cs.id as id',
                     'sp.price_category_id as price_category_id'
                 )
@@ -144,7 +147,7 @@ class PriceListController extends Controller {
                     'cs.unit_cost as unit_cost',
                     'cs.batch_number as batch_number',
                     'sp.price as price',
-                    DB::raw('((sp.price - cs.unit_cost)/cs.unit_cost)*100 as profit'),
+                    DB::raw('( ( sp.price - cs.unit_cost )/cs.unit_cost )*100 as profit'),
                     'cs.id as id',
                     'sp.price_category_id as price_category_id',
                     'cs.created_at as purchased_at',
@@ -162,7 +165,6 @@ class PriceListController extends Controller {
         }
         return response()->json( $stocks );
     }
-
     public function filteredPriceList() {
         $store_id = current_store_id();
         $stocks = DB::table( 'inv_current_stock' )
@@ -177,7 +179,6 @@ class PriceListController extends Controller {
 
         return $stocks;
     }
-
     public function updateFormer( Request $request ) {
         if ( $request->id != null ) {
             $prices = PriceList::find( $request->id );
@@ -196,58 +197,6 @@ class PriceListController extends Controller {
             return redirect()->route( 'price-list.index' );
         }
     }
-
-    // public function update( Request $request ) {
-    //     $request->validate( [
-    //         'unit_cost' => 'required|numeric|min:0',
-    //         'sell_price' => 'required|numeric|min:0',
-    //         'price_category_id' => 'required|exists:price_categories,id',
-    //         'selected_type' => 'required|string',
-    //     ] );
-
-    //     if ( !isset( $request->id ) ) {
-    //         return redirect()->back()->with( 'alert-danger', 'Invalid request.' );
-    //     }
-
-    //     DB::beginTransaction();
-    //     try {
-    //         $current_stock = CurrentStock::findOrFail( $request->id );
-
-    //         $current_stock->update( [
-    //             'unit_cost' => $request->unit_cost
-    //         ] );
-
-    //         if ( $request->selected_type === 'pending' ) {
-    //             // Insert new price record
-    //             PriceList::create( [
-    //                 'stock_id' => $request->id,
-    //                 'price_category_id' => $request->price_category_id,
-    //                 'price' => $request->sell_price,
-    //                 'created_by' => Auth::user()->id,
-    //                 'updated_by' => Auth::user()->id,
-    //             ] );
-    //         } else if ( $request->selected_type === '1' ) {
-    //             // Update existing record
-    //             PriceList::where( 'stock_id', $request->id )
-    //             ->update( [
-    //                 'price_category_id' => $request->price_category_id,
-    //                 'price' => $request->sell_price,
-    //                 'updated_by' => Auth::user()->id,
-    //             ] );
-    //         }
-    //         DB::commit();
-
-    //         session()->flash( 'alert-success', 'Price updated successfully!' );
-    //         return redirect()->route( 'price-list.index' );
-
-    //     } catch ( \Exception $e ) {
-    //         DB::rollBack();
-    //         Log::error( 'Error updating price list: ' . $e->getMessage() );
-    //         session()->flash( 'alert-danger', 'Failed to update price. Please try again.' );
-    //         return redirect()->back()->withInput();
-    //     }
-    // }
-
     public function update(Request $request)
 {
     $request->validate([
@@ -341,8 +290,6 @@ class PriceListController extends Controller {
         return redirect()->back()->withInput();
     }
 }
-
-
     public function store( Request $request ) {
         $prices = new PriceList;
         $prices->stock_id = $request->stock_id;
@@ -365,7 +312,7 @@ class PriceListController extends Controller {
             try {
                 $prices = DB::table( 'stock_details' )
                 ->select( '*' )
-                ->where( 'product_id', ' = ', $request->product_id )
+                ->where( 'product_id', '=', $request->product_id )
                 ->where( 'price_category_id', $request->price_category_id )
                 ->orderBy( 'id', 'desc' )
                 ->take( 5 )
@@ -385,8 +332,8 @@ class PriceListController extends Controller {
         if ( $request->ajax() ) {
             $check = array();
             $price_list = PriceList::select( 'sales_prices.id as id', 'stock_id', 'price' )->where( 'price_category_id', $request->category_id )
-            ->join( 'inv_current_stock', 'inv_current_stock.id', ' = ', 'sales_prices.stock_id' )
-            ->join( 'inv_products', 'inv_products.id', ' = ', 'inv_current_stock.product_id' )
+            ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id' )
+            ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
             ->orderBy( 'stock_id', 'desc' )
             ->where( 'product_id', $request->product_id )
             ->first( 'price' );
@@ -409,7 +356,6 @@ class PriceListController extends Controller {
 
         }
     }
-
     public function allPriceList( Request $request ) {
 
         $columns = array(
@@ -422,8 +368,8 @@ class PriceListController extends Controller {
         $category_id = $request->price_category;
 
         $totalData = PriceList::where( 'price_category_id', $category_id )
-        ->join( 'inv_current_stock', 'inv_current_stock.id', ' = ', 'sales_prices.stock_id' )
-        ->join( 'inv_products', 'inv_products.id', ' = ', 'inv_current_stock.product_id' )
+        ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id' )
+        ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
         ->where( 'quantity', '>', 0 )
         ->Where( 'inv_products.status', '1' )
         ->groupBy( 'product_id' )
@@ -439,8 +385,8 @@ class PriceListController extends Controller {
 
         if ( empty( $request->input( 'search.value' ) ) ) {
             $products = PriceList::where( 'price_category_id', $category_id )
-            ->join( 'inv_current_stock', 'inv_current_stock.id', ' = ', 'sales_prices.stock_id' )
-            ->join( 'inv_products', 'inv_products.id', ' = ', 'inv_current_stock.product_id' )
+            ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id' )
+            ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
             ->where( 'quantity', '>', 0 )
             ->Where( 'inv_products.status', '1' )
             ->groupby( 'product_id' )
@@ -452,8 +398,8 @@ class PriceListController extends Controller {
             $search = $request->input( 'search.value' );
 
             $products = PriceList::where( 'price_category_id', $category_id )
-            ->join( 'inv_current_stock', 'inv_current_stock.id', ' = ', 'sales_prices.stock_id' )
-            ->join( 'inv_products', 'inv_products.id', ' = ', 'inv_current_stock.product_id' )
+            ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id' )
+            ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
             ->where( 'quantity', '>', 0 )
             ->where( 'unit_cost', 'LIKE', "%{$search}%" )
             ->orWhere( 'inv_products.name', 'LIKE', "%{$search}%" )
@@ -466,8 +412,8 @@ class PriceListController extends Controller {
             ->get();
 
             $totalFiltered = PriceList::where( 'price_category_id', $category_id )
-            ->join( 'inv_current_stock', 'inv_current_stock.id', ' = ', 'sales_prices.stock_id' )
-            ->join( 'inv_products', 'inv_products.id', ' = ', 'inv_current_stock.product_id' )
+            ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id' )
+            ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
             ->where( 'quantity', '>', 0 )
             ->where( 'unit_cost', 'LIKE', "%{$search}%" )
             ->orWhere( 'inv_products.name', 'LIKE', "%{$search}%" )
@@ -485,8 +431,8 @@ class PriceListController extends Controller {
                     try {
                         $datas = PriceList::select( 'stock_id', 'price' )
                         ->where( 'price_category_id', $category_id )
-                        ->join( 'inv_current_stock', 'inv_current_stock.id', ' = ', 'sales_prices.stock_id' )
-                        ->join( 'inv_products', 'inv_products.id', ' = ', 'inv_current_stock.product_id' )
+                        ->join( 'inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id' )
+                        ->join( 'inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id' )
                         ->orderBy( 'sales_prices.id', 'desc' )
                         ->where( 'product_id', $product->id )
                         ->first( 'price' );

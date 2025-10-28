@@ -12,13 +12,13 @@
                 @csrf()
                 @method("PUT")
 
-                <div class="modal-body">
+                <div class="modal-body pl-0 pr-0">
                     {{-- Product Name --}}
                     <div class="col-12 d-flex mb-3">
-                        <label for="name" class="col-md-4 col-form-label text-md-right">
+                        <label for="name" class="col-md-3 col-form-label text-md-right">
                             Name<span class="text-danger">*</span>
                         </label>
-                        <div class="col-md-8">
+                        <div class="col-md-9">
                             <input type="text" class="form-control" id="name_edit_normal" name="name" maxlength="50"
                                 minlength="2" required value="{{ old('name') }}">
                         </div>
@@ -26,8 +26,8 @@
 
                     {{-- Barcode --}}
                     <div class="col-12 d-flex mb-3">
-                        <label for="barcode" class="col-md-4 col-form-label text-md-right">Barcode</label>
-                        <div class="col-md-8">
+                        <label for="barcode" class="col-md-3 col-form-label text-md-right">Barcode</label>
+                        <div class="col-md-9">
                             <input type="text" class="form-control" id="barcode_edits_normal" name="barcode"
                                 value="{{ old('barcode') }}" autocomplete="off">
                         </div>
@@ -35,9 +35,9 @@
 
                     {{-- Category --}}
                     <div class="col-12 d-flex mb-3">
-                        <label for="category" class="col-md-4 col-form-label text-md-right">Category <span
+                        <label for="category" class="col-md-3 col-form-label text-md-right">Category <span
                                 class="text-danger">*</span></label>
-                        <div class="col-md-8">
+                        <div class="col-md-9">
                             <select name="category" class="form-control" id="category_options_normal" required
                                 onchange="createOption()">
                                 <option selected value="">Select Category</option>
@@ -51,8 +51,8 @@
                     </div>
                     {{-- Unit of Measure --}}
                     <div class="col-12 d-flex mb-3">
-                        <label for="saleUoM" class="col-md-4 col-form-label text-md-right">Unit</label>
-                        <div class="col-md-8">
+                        <label for="saleUoM" class="col-md-3 col-form-label text-md-right">Unit</label>
+                        <div class="col-md-9">
                             <input type="text" class="form-control" id="sale_edit_normal" name="sale_uom"
                                 placeholder="e.g. pcs, kg, ml" value="{{ old('sale_uom') }}">
                         </div>
@@ -60,9 +60,9 @@
 
                     {{-- Min Stock --}}
                     <div class="col-12 d-flex mb-3">
-                        <label for="min_quantinty" class="col-md-4 col-form-label text-md-right">Min. Stock
+                        <label for="min_quantinty" class="col-md-3 col-form-label text-md-right">Min. Stock
                         </label>
-                        <div class="col-md-8">
+                        <div class="col-md-9">
                             <input type="text" class="form-control" id="min_stock_edit_normal" name="min_quantinty"
                                 value="{{ old('min_quantinty') }}" onkeypress="return isNumberKey(event,this)">
                         </div>
@@ -70,8 +70,8 @@
 
                     {{-- Status --}}
                     <div class="col-12 d-flex mb-3">
-                        <label for="max_quantinty" class="col-md-4 col-form-label text-md-right">Status</label>
-                        <div class="col-md-8">
+                        <label for="max_quantinty" class="col-md-3 col-form-label text-md-right">Status</label>
+                        <div class="col-md-9">
                             <select name="status" class="form-control" id="status_edit_normal" required>
                                 <option value="1">Active</option>
                                 <option value="0">Inactive</option>

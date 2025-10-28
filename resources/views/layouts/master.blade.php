@@ -260,6 +260,8 @@ $store_id = Auth::user()->store_id;
                     $canAccessAll = Auth::user()->store->name === "ALL";
                     $multiStore = Setting::where('id', 121)->value('value');
                     $multiStoreEnabled = $multiStore === 'YES';
+                    $expiry = Setting::where('id', 123)->value('value');
+                    $expiryEnabled = $expiry === 'YES';
                     $defaultStore = Setting::where('id', 122)->value('value');
                 @endphp
 
@@ -348,19 +350,23 @@ $store_id = Auth::user()->store_id;
                                                 <span class="text-c-yellow">{{ number_format($data['below_min_level_count']) }}</span>
                                             </div>
                                         @endif
-                                        {{-- 3. Expired --}}
-                                        @if(isset($data['expired_count']))
-                                            <div class="p-1 pl-3">
-                                                <span>Expired:</span>
-                                                <span class="text-c-red">{{ number_format($data['expired_count']) }}</span>
-                                            </div>
+                                        @if ($expiryEnabled)
+                                            {{-- 3. Expired --}}
+                                            @if(isset($data['expired_count']))
+                                                <div class="p-1 pl-3">
+                                                    <span>Expired:</span>
+                                                    <span class="text-c-red">{{ number_format($data['expired_count']) }}</span>
+                                                </div>
+                                            @endif
                                         @endif
-                                        {{-- 3. Expired --}}
-                                        @if(isset($data['expiring_soon_count']))
-                                            <div class="p-1 pl-3">
-                                                <span>Expire in 3 Months:</span>
-                                                <span class="text-c-yellow">{{ number_format($data['expiring_soon_count']) }}</span>
-                                            </div>
+                                        @if ($expiryEnabled)
+                                            {{-- 4. Expired --}}
+                                            @if(isset($data['expiring_soon_count']))
+                                                <div class="p-1 pl-3">
+                                                    <span>Expire in 3 Months:</span>
+                                                    <span class="text-c-yellow">{{ number_format($data['expiring_soon_count']) }}</span>
+                                                </div>
+                                            @endif
                                         @endif
                                 @empty
                                     <div class="text-muted p-3 text-sm">No new notifications</div>
