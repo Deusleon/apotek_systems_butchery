@@ -9,16 +9,23 @@
         }
 
         body {
-            font-size: 12px;
+            font-size: 13px;
         }
 
         * {
             font-family: Verdana, Arial, sans-serif;
         }
 
-        table, th, td {
+        table,
+        th {
             border-collapse: collapse;
-            padding: 10px;
+            padding: 8px;
+        }
+
+        table,
+        td {
+            border-collapse: collapse;
+            padding: 5px;
         }
 
         table {
@@ -40,21 +47,20 @@
 
         #table-detail {
             width: 100%;
-            margin-bottom: 0%;
         }
 
         #table-detail-main {
-            width: 102%;
-            margin-top: 1%;
-            margin-bottom: -6%;
+            width: 103%;
+            margin-top: 2%;
+            margin-bottom: -2%;
             border-collapse: collapse;
         }
 
-        #table-detail tr > {
+        #table-detail tr> {
             line-height: 13px;
         }
 
-        tr:nth-child(even) {
+        #table-detail tr:nth-child(even) {
             background-color: #f2f2f2;
         }
 
@@ -64,6 +70,17 @@
 
         h4 {
             font-weight: normal;
+        }
+
+        #container .logo-container {
+            padding-top: -2%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        #container .logo-container img {
+            max-width: 160px;
+            max-height: 160px;
         }
 
         .full-row {
@@ -95,18 +112,6 @@
             font-size: 13px;
             width: 15%;
         }
-
-        #container .logo-container {
-            padding-top: -2%;
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        #container .logo-container img {
-            max-width: 160px;
-            max-height: 160px;
-        }
-
     </style>
 </head>
 <body>
@@ -145,7 +150,8 @@
 
                 <table id="table-detail" align="center">
                     <thead>
-                    <tr style="background: #1f273b; color: white; font-size: 0.9em">
+                    <tr style="background: #1f273b; color: white;">
+                        <th align="left" style="width: 1%;">#</th>
                         <th align="left">Product Name</th>
                         <th align="center">Quantity</th>
                         <th align="right">Buy Price</th>
@@ -158,6 +164,7 @@
 
                     @foreach($items as $item)
                         <tr>
+                            <td align="left">{{$loop->iteration}}.</td>
                             <td align="left">{{$item['product_name']}}</td>
                             <td align="center">{{number_format($item['quantity'],0)}}</td>
                             <td align="right">{{number_format($item['unit_cost'],2)}}</td>
@@ -215,23 +222,23 @@
             @endforeach
 
             <!-- GRAND TOTAL SUMMARY - Centered like Cash Sales -->
-            <div style="margin-top: 20px; padding-top: 10px;">
+            <div style="margin-top: 10px; padding-top: 5px;">
                 <h3 align="center"><b>Total Summary</b></h3>
                 <table style="min-width: 25%; width: auto; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
                     <tr>
-                        <td style="padding: 6px; text-align: right;"><b>Total Buy</b></td>
-                        <td style="padding: 6px; text-align: center;"><b>:</b></td>
-                        <td style="padding: 6px; text-align: right;"><b>{{ number_format($grand_total_cost, 2) }}</b></td>
+                        <td style="padding: 4px; text-align: right;"><b>Total Buy</b></td>
+                        <td style="padding: 4px; text-align: center;"><b>:</b></td>
+                        <td style="padding: 4px; text-align: right;"><b>{{ number_format($grand_total_cost, 2) }}</b></td>
                     </tr>
                     <tr>
-                        <td style="padding: 6px; text-align: right;"><b>Total Sales</b></td>
-                        <td style="padding: 6px; text-align: center;"><b>:</b></td>
-                        <td style="padding: 6px; text-align: right;"><b>{{ number_format($grand_total_sell, 2) }}</b></td>
+                        <td style="padding: 4px; text-align: right;"><b>Total Sales</b></td>
+                        <td style="padding: 4px; text-align: center;"><b>:</b></td>
+                        <td style="padding: 4px; text-align: right;"><b>{{ number_format($grand_total_sell, 2) }}</b></td>
                     </tr>
                     <tr>
-                        <td style="padding: 6px; text-align: right;"><b>Total Profit</b></td>
-                        <td style="padding: 6px; text-align: center;"><b>:</b></td>
-                        <td style="padding: 6px; text-align: right;"><b>{{ number_format($grand_total_profit, 2) }}</b></td>
+                        <td style="padding: 4px; text-align: right;"><b>Total Profit</b></td>
+                        <td style="padding: 4px; text-align: center;"><b>:</b></td>
+                        <td style="padding: 4px; text-align: right;"><b>{{ number_format($grand_total_profit, 2) }}</b></td>
                     </tr>
                 </table>
             </div>

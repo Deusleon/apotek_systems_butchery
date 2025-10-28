@@ -9,16 +9,23 @@
         }
 
         body {
-            font-size: 12px;
+            font-size: 13px;
         }
 
         * {
             font-family: Verdana, Arial, sans-serif;
         }
 
-        table, th, td {
+        table,
+        th {
             border-collapse: collapse;
-            padding: 10px;
+            padding: 8px;
+        }
+
+        table,
+        td {
+            border-collapse: collapse;
+            padding: 5px;
         }
 
         table {
@@ -44,16 +51,16 @@
 
         #table-detail-main {
             width: 103%;
-            margin-top: -10%;
-            margin-bottom: -6%;
+            margin-top: 2%;
+            margin-bottom: -2%;
             border-collapse: collapse;
         }
 
-        #table-detail tr > {
+        #table-detail tr> {
             line-height: 13px;
         }
 
-        tr:nth-child(even) {
+        #table-detail tr:nth-child(even) {
             background-color: #f2f2f2;
         }
 
@@ -99,7 +106,7 @@
             width: 15%;
         }
 
-         #container .logo-container {
+        #container .logo-container {
             padding-top: -2%;
             text-align: center;
             vertical-align: middle;
@@ -109,9 +116,7 @@
             max-width: 160px;
             max-height: 160px;
         }
-
     </style>
-
 </head>
 <body>
 
@@ -124,6 +129,7 @@
         </div>
     </div>
 </div>
+
 <div class="row" style="padding-top: -2%">
     <h1 align="center">{{$pharmacy['name']}}</h1>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
@@ -132,21 +138,21 @@
     <h2 align="center" style="margin-top: -1%">Material Received Report</h2>
     <h4 align="center" style="margin-top: -1%">From: {{date('Y-m-d',strtotime($data->first()->dates[0]))}} To: {{date('Y-m-d',strtotime($data->first()->dates[1]))}}</h4>
 
-    <div class="row" style="margin-top: 10%;">
+    <div class="row">
         <div class="col-md-12">
-
             <table id="table-detail-main">
                 <tr>
-                    <td>Supplier: {{$data->first()->supplier_name}}</td>
+                    <td><b>Supplier:</b> {{$data->first()->supplier_name}}</td>
                     @if(!(empty($data->first()->invoice_nos)))
-                        <td>Invoice: {{$data->first()->invoice_nos}}</td>
+                        <td><b>Invoice:</b> {{$data->first()->invoice_nos}}</td>
                     @endif
                 </tr>
             </table>
 
             <table id="table-detail" align="center">
                 <thead>
-                <tr style="background: #1f273b; color: white; font-size: 0.9em">
+                <tr style="background: #1f273b; color: white;">
+                    <th align="left" style="width: 1%;">#</th>
                     <th align="left">Product Name</th>
                     <th align="center">Quantity</th>
                     <th align="right">Buy Price</th>
@@ -158,6 +164,7 @@
                 </thead>
                 @foreach($data as $item)
                     <tr>
+                        <td align="left">{{$loop->iteration}}.</td>
                         <td align="left">
                             {{$item->product['name'].' '.$item->product['brand'].' '.$item->product['pack_size'].$item->product['sales_uom']}}
                         </td>
@@ -170,6 +177,7 @@
                     </tr>
                 @endforeach
             </table>
+
             <hr>
 
             <div class="full-row" style="padding-top: 1%">
@@ -207,7 +215,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
