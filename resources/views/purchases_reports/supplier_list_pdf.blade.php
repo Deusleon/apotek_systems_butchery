@@ -5,17 +5,23 @@
 
     <style>
         body {
-            font-size: 12px;
+            font-size: 13px;
         }
 
         * {
             font-family: Verdana, Arial, sans-serif;
         }
 
-        table, th, td {
-            /*border: 1px solid black;*/
+        table,
+        th {
             border-collapse: collapse;
-            padding: 10px;
+            padding: 8px;
+        }
+
+        table,
+        td {
+            border-collapse: collapse;
+            padding: 5px;
         }
 
         table {
@@ -36,23 +42,21 @@
         }
 
         #table-detail {
-            /*border-spacing: 5px;*/
             width: 100%;
-            margin-top: -10%;
         }
 
         #table-detail-main {
             width: 103%;
-            margin-top: -10%;
-            margin-bottom: 1%;
+            margin-top: 2%;
+            margin-bottom: -2%;
             border-collapse: collapse;
         }
 
-        #table-detail tr > {
+        #table-detail tr> {
             line-height: 13px;
         }
 
-        tr:nth-child(even) {
+        #table-detail tr:nth-child(even) {
             background-color: #f2f2f2;
         }
 
@@ -68,7 +72,7 @@
             font-weight: normal;
         }
 
-         #container .logo-container {
+        #container .logo-container {
             padding-top: -2%;
             text-align: center;
             vertical-align: middle;
@@ -78,9 +82,7 @@
             max-width: 160px;
             max-height: 160px;
         }
-
     </style>
-
 </head>
 <body>
 
@@ -93,34 +95,35 @@
         </div>
     </div>
 </div>
+
 <div class="row" style="padding-top: -2%">
     <h1 align="center">{{$pharmacy['name']}}</h1>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
     <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
     <h2 align="center" style="margin-top: -1%">Supplier List</h2>
-    <div class="row" style="margin-top: 10%;">
-        <div class="col-md-12">
 
+    <div class="row">
+        <div class="col-md-12">
             <table id="table-detail" align="center">
-                <!-- loop the product names here -->
                 <thead>
                 <tr style="background: #1f273b; color: white;">
-                    <th>Name</th>
-                    <th>Contact Person</th>
-                    <th>Phone</th>
-                    <th>Email</th>
-                    <th>Address</th>
+                    <th align="left" style="width: 1%;">#</th>
+                    <th align="left">Name</th>
+                    <th align="left">Contact Person</th>
+                    <th align="left">Phone</th>
+                    <th align="left">Email</th>
+                    <th align="left">Address</th>
                 </tr>
                 </thead>
                 @foreach($data as $item)
                     <tr>
-                        <td>{{$item->name}}</td>
-                        <td>{{$item->contact_person}}</td>
-                        <td>{{$item->mobile}}</td>
-                        <td>{{$item->email}}</td>
-                        <td>{{$item->address}}</td>
-                        </td>
+                        <td align="left">{{$loop->iteration}}.</td>
+                        <td align="left">{{$item->name}}</td>
+                        <td align="left">{{$item->contact_person}}</td>
+                        <td align="left">{{$item->mobile}}</td>
+                        <td align="left">{{$item->email}}</td>
+                        <td align="left">{{$item->address}}</td>
                     </tr>
                 @endforeach
             </table>
@@ -136,17 +139,12 @@
         $font = null;
         $size = 10;
         $color = array(0,0,0);
-        $word_space = 0.0;  //  default
-        $char_space = 0.0;  //  default
-        $angle = 0.0;   //  default
+        $word_space = 0.0;
+        $char_space = 0.0;
+        $angle = 0.0;
         $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
-
-
      }
-
-
 </script>
 
 </body>
 </html>
-
