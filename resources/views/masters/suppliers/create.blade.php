@@ -28,7 +28,7 @@
                             <div class="col-md-8">
                                 <input type="text" class="form-control" id="name" name="name"
                                        aria-describedby="emailHelp"
-                                       required maxlength="20">
+                                       required maxlength="50">
                             </div>
                         </div>
 
@@ -42,14 +42,13 @@
                         </div>
 
                         <div class="form-group row">
-                            <label for="mobile" class="col-md-4 col-form-label text-md-right">Phone<font
-                                    color="red">*</font></label>
+                            <label for="mobile" class="col-md-4 col-form-label text-md-right">Phone</label>
                             <div class="col-md-8">
                                 {{--                                <input type="text" class="form-control  mob_no" id="phone_edit" name="phone"--}}
                                 {{--                                       data-mask="9999 999 999"--}}
-                                {{--                                       pattern="^0\d{3}[\-]\d{3}[\-]\d{3}$" title="Eg:0777-777-777" required>--}}
+                                {{--                                       pattern="^0\d{3}[\-]\d{3}[\-]\d{3}$" title="Eg:0777-777-777" >--}}
                                 <input type="text" class="form-control"
-                                       id="phone_edit" name="phone" required style="width: 100%;" placeholder="">
+                                       id="phone_edit" name="phone" style="width: 100%;" placeholder="">
                                 <span id="valid-msg" class="hide"></span>
                                 <span id="error-msg" class="text text-danger"></span>
                                 <span class="text-danger">
