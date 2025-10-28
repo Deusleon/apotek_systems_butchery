@@ -106,10 +106,7 @@
 
     @endsection
 
-
-
     @section("content")
-
         <div class="col-sm-12">
 
             <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
@@ -175,7 +172,6 @@
 
 
             </ul>
-
 
             <div class="tab-content" id="pills-tabContent">
                 {{-- Tab 1 --}}
@@ -945,8 +941,6 @@
 
         </div>
         </div>
-
-
     @endsection
 
     @push("page_scripts")
