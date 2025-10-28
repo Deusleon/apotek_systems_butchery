@@ -356,7 +356,8 @@ Invoices
                     $('#payment_form')[0].reset();
                     $('#supplier').val('').trigger('change');
                     $('#invoice').empty().append('<option value="" disabled selected>Select Invoice...</option>').prop('disabled', true);
-                    $('#payment_date').datepicker('setDate', new Date());
+                    $('#payment_method').val('');
+                    $('#payment_date').val(moment().format('YYYY-MM-DD'));
 
                     // Reload payment history table
                     if (typeof paymentHistoryTable !== 'undefined') {
