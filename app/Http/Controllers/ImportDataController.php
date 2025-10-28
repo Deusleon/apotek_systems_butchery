@@ -119,26 +119,26 @@ class ImportDataController extends Controller {
         // Headers with proper column names matching Excel structure
         if ($is_detailed === 'Detailed') {
             $headers = [
-                'A1' => 'Code',
-                'B1' => 'Name',
-                'C1' => 'Barcode',
-                'D1' => 'Brand',
-                'E1' => 'Pack Size',
-                'F1' => 'Category',
-                'G1' => 'Unit',
-                'H1' => 'Min Stock',
-                'I1' => 'Max Stock'
+                'A1' => 'code',
+                'B1' => 'product_name',
+                'C1' => 'barcode',
+                'D1' => 'brand',
+                'E1' => 'pack_size',
+                'F1' => 'category',
+                'G1' => 'unit',
+                'H1' => 'min_stock',
+                'I1' => 'max_stock'
             ];
         }
 
         if ($is_detailed === 'Normal') {
             $headers = [
-            'A1' => 'Code',
-            'B1' => 'Name',
-            'C1' => 'Barcode',
-            'D1' => 'Category',
-            'E1' => 'Unit',
-            'F1' => 'Min Stock',
+            'A1' => 'code',
+            'B1' => 'product_name',
+            'C1' => 'barcode',
+            'D1' => 'category',
+            // 'E1' => 'Unit',
+            'E1' => 'min_stock',
         ];
     }
 
@@ -164,8 +164,8 @@ class ImportDataController extends Controller {
             $sheet->setCellValue( 'B2', 'Sample Product' );
             $sheet->setCellValue( 'C2', '1234567890123' );
             $sheet->setCellValue( 'D2', 'BEVERAGE' );
-            $sheet->setCellValue( 'E2', 'ml' );
-            $sheet->setCellValue( 'F2', '10' );
+            // $sheet->setCellValue( 'E2', 'ml' );
+            $sheet->setCellValue( 'E2', '10' );
         }
 
         $writer = new Xlsx($spreadsheet);
@@ -366,7 +366,7 @@ class ImportDataController extends Controller {
                     if ( $is_detailed === 'Detailed' ) {
                         $expectedColumns = 9;
                     } else if ( $is_detailed === 'Normal' ) {
-                        $expectedColumns = 6;
+                        $expectedColumns = 5;
                     }
 
                     $actualColumns = count( $row );
@@ -804,7 +804,7 @@ class ImportDataController extends Controller {
         if ( empty( $row[ 3 ] ) ) $errors[] = 'Category is required';
 
         // Numeric validations
-        if ( !empty( $row[ 5 ] ) && !is_numeric( $row[ 5 ] ) ) $errors[] = 'Min stock must be numeric';
+        if ( !empty( $row[ 4 ] ) && !is_numeric( $row[ 4 ] ) ) $errors[] = 'Min stock must be numeric';
 
         // Uniqueness validation ( name+category )
         if ( !empty( $row[ 1 ] ) && !empty( $row[ 3 ] ) ) {

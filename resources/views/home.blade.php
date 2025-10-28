@@ -69,8 +69,8 @@
 
 
         /**
-                                                                              Component
-                                                                            **/
+                                                                                                  Component
+                                                                                                **/
 
         label {
             width: 100%;
@@ -109,71 +109,99 @@
     @section("content")
         <div class="col-sm-12">
 
-            <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-                @if(auth()->user()->checkPermission('View Sales Summary'))
-                    <li class="nav-item">
-                        <a class="nav-link active" data-toggle="pill" href="#pills-home" role="tab" aria-selected="true">Sales
-                        </a>
-                    </li>
-                @endif
+            @if(
+                    auth()->user()->checkPermission('View Sales Summary') ||
+                    auth()->user()->checkPermission('View Purchasing Summary') ||
+                    auth()->user()->checkPermission('View Inventory Summary') ||
+                    auth()->user()->checkPermission('View Transport Summary') ||
+                    auth()->user()->checkPermission('View Accounting Summary')
+                )
+                <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                    @if(auth()->user()->checkPermission('View Sales Summary'))
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="pill" href="#pills-home" role="tab" aria-selected="true">Sales
+                            </a>
+                        </li>
+                    @endif
 
-                @if(auth()->user()->checkPermission('View Purchasing Summary'))
-                    <li class="nav-item">
-                        {{-- @if(!auth()->user()->checkPermission('View Purchase Summary'))
-                        <a class="nav-link active" data-toggle="pill" href="#pills-purchase" role="tab"
-                            aria-selected="false">Purchasing</a>
-                        @endif --}}
-
-                        @if(auth()->user()->checkPermission('View Purchasing Summary'))
-                            <a class="nav-link" data-toggle="pill" href="#pills-purchase" role="tab"
+                    @if(auth()->user()->checkPermission('View Purchasing Summary'))
+                        <li class="nav-item">
+                            {{-- @if(!auth()->user()->checkPermission('View Purchase Summary'))
+                            <a class="nav-link active" data-toggle="pill" href="#pills-purchase" role="tab"
                                 aria-selected="false">Purchasing</a>
-                        @endif
+                            @endif --}}
 
-                    </li>
-                @endif
+                            @if(auth()->user()->checkPermission('View Purchasing Summary'))
+                                <a class="nav-link" data-toggle="pill" href="#pills-purchase" role="tab"
+                                    aria-selected="false">Purchasing</a>
+                            @endif
 
-                @if(auth()->user()->checkPermission('View Inventory Summary'))
-                    <li class="nav-item">
-                        {{-- @if(!auth()->user()->checkPermission('View Inventory Summary'))
-                        <a class="nav-link active" data-toggle="pill" href="#pills-stock" role="tab" aria-selected="false">Inventory
-                        </a>
-                        @endif --}}
+                        </li>
+                    @endif
 
-                        @if(auth()->user()->checkPermission('View Inventory Summary'))
-                            <a class="nav-link" data-toggle="pill" href="#pills-stock" role="tab" aria-selected="false">Inventory
+                    @if(auth()->user()->checkPermission('View Inventory Summary'))
+                        <li class="nav-item">
+                            {{-- @if(!auth()->user()->checkPermission('View Inventory Summary'))
+                            <a class="nav-link active" data-toggle="pill" href="#pills-stock" role="tab" aria-selected="false">Inventory
                             </a>
-                        @endif
-                    </li>
-                @endif
+                            @endif --}}
 
-                @if(auth()->user()->checkPermission('View Transport Summary'))
-                    <li class="nav-item">
-                        <a class="nav-link" data-toggle="pill" href="#pills-transport" role="tab" aria-selected="false">Transport
-                        </a>
-                    </li>
-                @endif
+                            @if(auth()->user()->checkPermission('View Inventory Summary'))
+                                <a class="nav-link" data-toggle="pill" href="#pills-stock" role="tab" aria-selected="false">Inventory
+                                </a>
+                            @endif
+                        </li>
+                    @endif
 
-                @if(auth()->user()->checkPermission('View Accounting Summary'))
-                    <li class="nav-item">
-                        {{-- @if(!auth()->user()->checkPermission('View Sales Summary') && !auth()->user()->checkPermission('View
-                        Purchasing Summary') && !auth()->user()->checkPermission('View Inventory Summary'))
-                        <a class="nav-link active" data-toggle="pill" href="#pills-expense" role="tab"
-                            aria-selected="false">Accounting
-                            Summary</a>
-                        @endif --}}
-
-                        @if(auth()->user()->checkPermission('View Accounting Summary') || auth()->user()->checkPermission('View Purchasing Summary') || auth()->user()->checkPermission('View Inventory Summary'))
-                            <a class="nav-link" data-toggle="pill" href="#pills-expense" role="tab" aria-selected="false">Accounting
+                    @if(auth()->user()->checkPermission('View Transport Summary'))
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="pill" href="#pills-transport" role="tab" aria-selected="false">Transport
                             </a>
-                        @endif
+                        </li>
+                    @endif
 
-                    </li>
-                @endif
+                    @if(auth()->user()->checkPermission('View Accounting Summary'))
+                        <li class="nav-item">
+                            {{-- @if(!auth()->user()->checkPermission('View Sales Summary') && !auth()->user()->checkPermission('View
+                            Purchasing Summary') && !auth()->user()->checkPermission('View Inventory Summary'))
+                            <a class="nav-link active" data-toggle="pill" href="#pills-expense" role="tab"
+                                aria-selected="false">Accounting
+                                Summary</a>
+                            @endif --}}
+
+                            @if(auth()->user()->checkPermission('View Accounting Summary') || auth()->user()->checkPermission('View Purchasing Summary') || auth()->user()->checkPermission('View Inventory Summary'))
+                                <a class="nav-link" data-toggle="pill" href="#pills-expense" role="tab" aria-selected="false">Accounting
+                                </a>
+                            @endif
+
+                        </li>
+                    @endif
 
 
-            </ul>
+                </ul>
+            @endif
 
             <div class="tab-content" id="pills-tabContent">
+                {{-- Default tab for users without any summary permissions --}}
+                @if(
+                        !auth()->user()->checkPermission('View Sales Summary') &&
+                        !auth()->user()->checkPermission('View Purchasing Summary') &&
+                        !auth()->user()->checkPermission('View Inventory Summary') &&
+                        !auth()->user()->checkPermission('View Transport Summary') &&
+                        !auth()->user()->checkPermission('View Accounting Summary')
+                    )
+                    {{-- Tab 0 --}}
+                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3 for=""><b>Welcome! </b> {{ auth()->user()->name }}</h3>
+                            </div>
+                        </div>
+
+                    </div>
+                @endif
+                {{-- end Tab 0 --}}
+
                 {{-- Tab 1 --}}
                 @if(auth()->user()->checkPermission('View Sales Summary'))
                     <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
@@ -964,7 +992,7 @@
             });
             var expire = document.getElementById('expireEnabled').value;
             var expireEnabled = expire === 'YES' ? true : false;
-            
+
             $('#out_of_stock').on('click', function () {
 
                 document.getElementById('stock_items_table').style.display = 'block';

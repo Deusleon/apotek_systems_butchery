@@ -31,7 +31,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('stock:calculate-values')->hourly();
-        $schedule->command('stock:check-low')->hourly();
+        $schedule->command('stock:check-low')->Daily();
         $schedule->command('snapshot:oldstock')->everyMinute()->withoutOverlapping();
     }
 
