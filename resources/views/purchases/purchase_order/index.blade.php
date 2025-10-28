@@ -96,13 +96,13 @@
 
                             <div class="row">
                                 <div class="col-md-8">
-                                    <div class="form-group" style="padding-top: 10px">
+                                    <!-- <div class="form-group" style="padding-top: 10px">
                                         <div style="width: 99%">
                                             <label> <b> Remarks</b></label>
                                             <textarea class="form-control" id="note" name="note" rows="2"
                                                 placeholder="Enter Remarks Here.."></textarea>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                                 <input type="hidden" id="purchase_discount" name="discount_amount" class="form-control"
                                     value="0" />

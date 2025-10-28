@@ -39,24 +39,23 @@ public function approve(Request $request, $id)
 {
     try {
         Log::info('Approving order ID: ' . $id); // Add logging
-        
+
         $order = Order::findOrFail($id);
-        
+
         // Update order status to '2' (Approved)
         $order->status = '2';
         $order->save();
-
-        session()->flash("alert-success", "Order approved Successfully!");
 
         Log::info('Order approved successfully: ' . $id); // Add logging
 
         return response()->json([
             'success' => true,
-            'message' => 'Order approved successfully!'
+            'message' => 'Order approved successfully!',
+            'status' => '2'
         ]);
     } catch (\Exception $e) {
         Log::error('Error approving order: ' . $e->getMessage()); // Add logging
-        
+
         return response()->json([
             'success' => false,
             'message' => 'Error approving order: ' . $e->getMessage()
@@ -127,9 +126,7 @@ public function approve(Request $request, $id)
                     if (!is_all_store()) {
                         $q->where('store_id', $store_id);
                     }
-                    $q->select('product_id', DB::raw('SUM(quantity) as total_qty'))
-                    ->groupBy('product_id')
-                    ->havingRaw('SUM(quantity) <= 0');
+                    $q->havingRaw('SUM(quantity) <= 0');
                 });
 
             } elseif ($request->status == 'below_min') {
@@ -137,10 +134,8 @@ public function approve(Request $request, $id)
                     if (!is_all_store()) {
                         $q->where('store_id', $store_id);
                     }
-                    $q->select('product_id', DB::raw('SUM(quantity) as total_qty'))
-                    ->groupBy('product_id')
-                    ->havingRaw('SUM(quantity) < MAX(min_quantinty)')
-                    ->havingRaw('SUM(quantity) > 0');
+                    $q->whereColumn('quantity', '<', 'min_quantinty')
+                      ->where('quantity', '>', 0);
                 });
             }
 
@@ -177,17 +172,24 @@ public function approve(Request $request, $id)
     {
 
         if ($request->ajax()) {
+            $store_id = current_store_id();
             $max_prices = array();
             $query = Product::where('status', 1)
                 ->where('name', 'LIKE', "%{$request->word}%");
 
             // Filter based on status
             if ($request->status == 'out_stock') {
-                $query->whereDoesntHave('currentStock', function($q) {
+                $query->whereDoesntHave('currentStock', function($q) use ($store_id) {
+                    if (!is_all_store()) {
+                        $q->where('store_id', $store_id);
+                    }
                     $q->where('quantity', '>', 0);
                 });
             } elseif ($request->status == 'below_min') {
-                $query->whereHas('currentStock', function($q) {
+                $query->whereHas('currentStock', function($q) use ($store_id) {
+                    if (!is_all_store()) {
+                        $q->where('store_id', $store_id);
+                    }
                     $q->whereColumn('quantity', '<=', 'min_quantinty');
                 });
             }
@@ -197,20 +199,22 @@ public function approve(Request $request, $id)
 
             foreach ($current_stock as $stock) {
 
-                $data = GoodsReceiving::select('unit_cost', 'product_id')
+                $data = GoodsReceiving::select('inv_incoming_stock.id', 'unit_cost', 'product_id')
                     ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
                     ->where('inv_products.status', 1)
                     ->where('supplier_id', $request->supplier_id)
                     ->where('product_id', $stock->id)
                     ->orderBy('inv_incoming_stock.id', 'desc')
-                    ->first('unit_cost');
+                    ->first();
 
-                array_push($max_prices, array(
-                    'name' => $stock->name . ' ' . ($stock->brand ?? '') . ' ' . ($stock->pack_size ?? '') . ' ' . ($stock->sales_uom ?? ''),
-                    'unit_cost' => $data['unit_cost'],
-                    'product_id' => $stock->id,
-                    'incoming_id' => $data['id']
-                ));
+                if ($data) {
+                    array_push($max_prices, array(
+                        'name' => $stock->name . ' ' . ($stock->brand ?? '') . ' ' . ($stock->pack_size ?? '') . ' ' . ($stock->sales_uom ?? ''),
+                        'unit_cost' => $data->unit_cost,
+                        'product_id' => $stock->id,
+                        'incoming_id' => $data->id
+                    ));
+                }
 
             }
 

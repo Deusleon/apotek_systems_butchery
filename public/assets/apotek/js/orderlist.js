@@ -356,21 +356,20 @@ function applyClientApprove() {
                         .draw(false);
                 }
 
-                // Show success message
-                try {
-                    if (window.toastr && typeof toastr.success === "function") {
-                        toastr.success(response.message);
-                    } else if (typeof success_noti === "function") {
-                        success_noti(response.message);
-                    } else if (typeof notify === "function") {
-                        notify("success", response.message);
-                    } else {
-                        alert(response.message);
-                    }
-                } catch (e) {
-                    console.log(e);
+                // Show success message immediately
+                if (typeof success_noti === "function") {
+                    success_noti(response.message);
+                } else if (typeof notify === "function") {
+                    notify(response.message, "top", "right", "success");
+                } else {
                     alert(response.message);
                 }
+
+                // Close the approval modal
+                $("#approve-order").modal("hide");
+
+                // Update modal buttons to reflect new status
+                updateModalButtons(response.status);
             } else {
                 console.error("API Error:", response.message);
                 alert("Error: " + response.message);
@@ -403,7 +402,6 @@ $(document)
     .off("click", "#approve_yes_btn")
     .on("click", "#approve_yes_btn", function () {
         applyClientApprove(); // This now handles the success message internally
-        $("#approve-order").modal("hide");
     });
 
 // If cancel → just close confirm, (optionally reopen details modal)

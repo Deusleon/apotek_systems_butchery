@@ -5,72 +5,77 @@ var purchase_items = [];
 var set_button = 0;
 var tax = Number(document.getElementById("vats").value);
 
-var cart_table = $('#cart_table').DataTable({
+var cart_table = $("#cart_table").DataTable({
     searching: false,
     bPaginate: false,
     bInfo: false,
     ordering: false,
     data: cart,
     columns: [
-        {title: "Product Name"},
-        {title: "Quantity"},
-        {title: "Price"},
-        {title: "VAT"},
-        {title: "Amount"},
-        {title: "Stock Id"},
-        {title: "Product Id"},
+        { title: "Product Name", data: 0 },
+        { title: "Quantity", data: 1 },
+        { title: "Price", data: 2 },
+        { title: "VAT", data: 3 },
+        { title: "Amount", data: 4 },
+        { title: "Stock Id", data: 5 },
+        { title: "Product Id", data: 6 },
         {
             title: "Action",
-            defaultContent: "<div><input type='button' value='Edit' id='edit_btn' class='btn btn-info btn-rounded btn-sm'/><input type='button' value='Delete' id='delete_btn' class='btn btn-danger btn-rounded btn-sm'/></div>"
-        }
-    ]
+            data: null,
+            defaultContent:
+                "<div><input type='button' value='Edit' id='edit_btn' class='btn btn-info btn-rounded btn-sm'/><input type='button' value='Delete' id='delete_btn' class='btn btn-danger btn-rounded btn-sm'/></div>",
+        },
+    ],
 });
 cart_table.columns([5, 6]).visible(false);
 
-$('#cart_table tbody').on('click', '#edit_btn', function () {
+$("#cart_table tbody").on("click", "#edit_btn", function () {
     var quantity;
     if (set_button === 0) {
-        var row_data = cart_table.row($(this).parents('tr')).data();
-        var index = cart_table.row($(this).parents('tr')).index();
-        quantity = row_data[1].toString().replace(',', '');
+        var row_data = cart_table.row($(this).parents("tr")).data();
+        var index = cart_table.row($(this).parents("tr")).index();
+        quantity = row_data[1].toString().replace(",", "");
         price = row_data[2];
-        row_data[1] = "<input type='text' min='1' onkeypress='return isNumberKey(event,this)' style='width: 80%' class='form-control' id='edit_quantity' value='1' required/>";
-        row_data[2] = "<input type='text' onkeypress='return isNumberKey(event,this)' style='width: 110%' class='form-control' id='edit_price' required/>";
+        row_data[1] =
+            "<input type='text' min='1' onkeypress='return isNumberKey(event,this)' style='width: 80%' class='form-control' id='edit_quantity' value='1' required/>";
+        row_data[2] =
+            "<input type='text' onkeypress='return isNumberKey(event,this)' style='width: 110%' class='form-control' id='edit_price' required/>";
 
         cart[index] = row_data;
         cart_table.clear();
         cart_table.rows.add(cart);
         cart_table.draw();
-        price_value = parseFloat(price.replace(/\,/g, ''), 10);
+        price_value = parseFloat(price.replace(/\,/g, ""), 10);
         if (isNaN(price_value)) {
-
             price_value = 0;
         }
-
 
         document.getElementById("edit_quantity").value = quantity;
         document.getElementById("edit_price").value = formatMoney(price_value);
         set_button = 1;
-
     } else {
         // document.getElementById("edit_quantity").value
-        $('#edit_quantity').change();
+        $("#edit_quantity").change();
     }
 });
 
-
-$('#cart_table tbody').on('change', '#edit_quantity', function () {
+$("#cart_table tbody").on("change", "#edit_quantity", function () {
     set_button = 0;
-    var row_data = cart_table.row($(this).parents('tr')).data();
-    var index = cart_table.row($(this).parents('tr')).index();
+    var row_data = cart_table.row($(this).parents("tr")).data();
+    var index = cart_table.row($(this).parents("tr")).index();
 
-    if (document.getElementById("edit_quantity").value === '' || document.getElementById("edit_quantity").value === '0' ) {
+    if (
+        document.getElementById("edit_quantity").value === "" ||
+        document.getElementById("edit_quantity").value === "0"
+    ) {
         edit_btn_set = 1;
-        notify('Quantity is required', 'top', 'right', 'warning');
+        notify("Quantity is required", "top", "right", "warning");
         return false;
     }
-    
-    row_data[1] = numberWithCommas(document.getElementById("edit_quantity").value);
+
+    row_data[1] = numberWithCommas(
+        document.getElementById("edit_quantity").value
+    );
     row_data[2] = document.getElementById("edit_price").value;
     quantity = Number(row_data[1]);
 
@@ -78,17 +83,18 @@ $('#cart_table tbody').on('change', '#edit_quantity', function () {
     discount();
     cart_table.clear();
     cart_table.rows.add(cart);
-    cart_table.draw();
+    cart_table.draw(false);
 });
 
-
-$('#cart_table tbody').on('change', '#edit_price', function () {
+$("#cart_table tbody").on("change", "#edit_price", function () {
     set_button = 0;
-    var row_data = cart_table.row($(this).parents('tr')).data();
-    var index = cart_table.row($(this).parents('tr')).index();
-    row_data[1] = numberWithCommas(document.getElementById("edit_quantity").value);
+    var row_data = cart_table.row($(this).parents("tr")).data();
+    var index = cart_table.row($(this).parents("tr")).index();
+    row_data[1] = numberWithCommas(
+        document.getElementById("edit_quantity").value
+    );
     row_data[2] = document.getElementById("edit_price").value;
-    default_cart[index][1] = parseFloat(row_data[2].replace(/\,/g, ''), 10);
+    default_cart[index][1] = parseFloat(row_data[2].replace(/\,/g, ""), 10);
     row_data[2] = default_cart[index][1];
 
     row_data[3] = formatMoney(default_cart[index][1] * row_data[2] * tax);
@@ -100,27 +106,25 @@ $('#cart_table tbody').on('change', '#edit_price', function () {
     discount();
     cart_table.clear();
     cart_table.rows.add(cart);
-    cart_table.draw();
-
+    cart_table.draw(false);
 });
 
-
-$('#cart_table tbody').on('click', '#delete_btn', function () {
+$("#cart_table tbody").on("click", "#delete_btn", function () {
     set_button = 0;
-    var index = cart_table.row($(this).parents('tr')).index();
+    var index = cart_table.row($(this).parents("tr")).index();
     cart.splice(index, 1);
     default_cart.splice(index, 1);
     discount();
     cart_table.clear();
     cart_table.rows.add(cart);
-    cart_table.draw();
+    cart_table.draw(false);
 });
 
-$('#deselect-all').on('click', function () {
+$("#deselect-all").on("click", function () {
     /*confirmation window*/
     var cart_data = document.getElementById("order_cart").value;
-    if (!(cart_data === '' || cart_data === 'undefined')) {
-        var r = confirm('Cancel the order?');
+    if (!(cart_data === "" || cart_data === "undefined")) {
+        var r = confirm("Cancel the order?");
         if (r === true) {
             /*continue*/
             deselect();
@@ -129,70 +133,114 @@ $('#deselect-all').on('click', function () {
             return false;
         }
     }
-
-
 });
 
 function formatMoney(amount, decimalCount = 2, decimal = ".", thousands = ",") {
-
     try {
         decimalCount = Math.abs(decimalCount);
         decimalCount = isNaN(decimalCount) ? 2 : decimalCount;
 
         const negativeSign = amount < 0 ? "-" : "";
 
-        let i = parseInt(amount = Math.abs(Number(amount) || 0).toFixed(decimalCount)).toString();
-        let j = (i.length > 3) ? i.length % 3 : 0;
+        let i = parseInt(
+            (amount = Math.abs(Number(amount) || 0).toFixed(decimalCount))
+        ).toString();
+        let j = i.length > 3 ? i.length % 3 : 0;
 
-        return negativeSign + (j ? i.substr(0, j) + thousands : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) + (decimalCount ? decimal + Math.abs(amount - i).toFixed(decimalCount).slice(2) : "");
+        return (
+            negativeSign +
+            (j ? i.substr(0, j) + thousands : "") +
+            i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousands) +
+            (decimalCount
+                ? decimal +
+                  Math.abs(amount - i)
+                      .toFixed(decimalCount)
+                      .slice(2)
+                : "")
+        );
     } catch (e) {
-        console.log(e)
+        console.log(e);
     }
 }
 
 function discount() {
     sale_dicount = document.getElementById("purchase_discount").value;
-    var sub_total, total_vat, total = 0;
+    var sub_total,
+        total_vat,
+        total = 0;
     var purchase_order_cart = [];
     var stringified_cart;
 
     if (cart[0]) {
+        var reduced__obj_cart = {},
+            incremental_cart;
 
-        var reduced__obj_cart = {}, incremental_cart;
-
-        for (var i = 0, c; c = cart[i]; ++i) {
+        for (var i = 0, c; (c = cart[i]); ++i) {
             if (undefined === reduced__obj_cart[c[0]]) {
                 reduced__obj_cart[c[0]] = c;
-                reduced__obj_cart[c[0]][4] = formatMoney(Number(reduced__obj_cart[c[0]][1].toString().replace(',', '')
-                    * parseFloat(reduced__obj_cart[c[0]][2].replace(/\,/g, ''), 10)) * (1 + tax));
-                reduced__obj_cart[c[0]][3] = formatMoney(Number(reduced__obj_cart[c[0]][1].toString().replace(',', '')
-                    * parseFloat(reduced__obj_cart[c[0]][2].replace(/\,/g, ''), 10) * tax));
+                reduced__obj_cart[c[0]][4] = formatMoney(
+                    Number(
+                        reduced__obj_cart[c[0]][1].toString().replace(",", "") *
+                            parseFloat(
+                                reduced__obj_cart[c[0]][2].replace(/\,/g, ""),
+                                10
+                            )
+                    ) *
+                        (1 + tax)
+                );
+                reduced__obj_cart[c[0]][3] = formatMoney(
+                    Number(
+                        reduced__obj_cart[c[0]][1].toString().replace(",", "") *
+                            parseFloat(
+                                reduced__obj_cart[c[0]][2].replace(/\,/g, ""),
+                                10
+                            ) *
+                            tax
+                    )
+                );
             } else {
+                reduced__obj_cart[c[0]][1] =
+                    Number(
+                        reduced__obj_cart[c[0]][1].toString().replace(",", "")
+                    ) + Number(c[1]);
+                reduced__obj_cart[c[0]][4] = formatMoney(
+                    Number(
+                        reduced__obj_cart[c[0]][1].toString().replace(",", "")
+                    ) *
+                        parseFloat(
+                            reduced__obj_cart[c[0]][2].replace(/\,/g, ""),
+                            10
+                        ) *
+                        (1 + tax)
+                );
+                reduced__obj_cart[c[0]][3] = formatMoney(
+                    Number(
+                        reduced__obj_cart[c[0]][1].toString().replace(",", "")
+                    ) *
+                        parseFloat(
+                            reduced__obj_cart[c[0]][2].replace(/\,/g, ""),
+                            10
+                        ) *
+                        tax
+                );
 
-                reduced__obj_cart[c[0]][1] = Number(reduced__obj_cart[c[0]][1].toString().replace(',', '')) + Number(c[1]);
-                reduced__obj_cart[c[0]][4] = formatMoney(Number(reduced__obj_cart[c[0]][1].toString().replace(',', ''))
-                    * parseFloat(reduced__obj_cart[c[0]][2].replace(/\,/g, ''), 10) * (1 + tax));
-                reduced__obj_cart[c[0]][3] = formatMoney(Number(reduced__obj_cart[c[0]][1].toString().replace(',', ''))
-                    * parseFloat(reduced__obj_cart[c[0]][2].replace(/\,/g, ''), 10) * tax);
-
-                reduced__obj_cart[c[0]][1] = numberWithCommas(reduced__obj_cart[c[0]][1]);
-
+                reduced__obj_cart[c[0]][1] = numberWithCommas(
+                    reduced__obj_cart[c[0]][1]
+                );
             }
-
         }
 
         incremental_cart = Object.keys(reduced__obj_cart).map(function (val) {
-            return reduced__obj_cart[val]
+            return reduced__obj_cart[val];
         });
 
         cart = incremental_cart;
 
         cart.forEach(function (item, index, arr) {
-
             var purchase_product = {};
-            sub_total += parseFloat(item[2].replace(/\,/g, ''), 10);
-            total_vat += parseFloat(item[3].replace(/\,/g, ''), 10);
-            total += parseFloat(item[4].replace(/\,/g, ''), 10);
+            sub_total += parseFloat(item[2].replace(/\,/g, ""), 10);
+            total_vat += parseFloat(item[3].replace(/\,/g, ""), 10);
+            total += parseFloat(item[4].replace(/\,/g, ""), 10);
 
             purchase_product.quantity = item[1];
             purchase_product.stock_id = item[5];
@@ -202,7 +250,6 @@ function discount() {
             purchase_product.vat = item[3];
             purchase_product.amount = item[4];
             purchase_order_cart.push(purchase_product);
-
         });
 
         total = total - sale_dicount;
@@ -221,27 +268,25 @@ function discount() {
     document.getElementById("sub_total").value = formatMoney(sub_total);
 
     // document.getElementById("paid_value").value = sale_paid_amount;
-    $('div.sub-total').text(formatMoney(sub_total)).css("font-weight", "Bold");
-    $('div.tax-amount').text(formatMoney(total_vat)).css("font-weight", "Bold");
-    $('div.total-amount').text(formatMoney(total)).css("font-weight", "Bold");
-
+    $("div.sub-total").text(formatMoney(sub_total)).css("font-weight", "Bold");
+    $("div.tax-amount").text(formatMoney(total_vat)).css("font-weight", "Bold");
+    $("div.total-amount").text(formatMoney(total)).css("font-weight", "Bold");
 
     var carts = document.getElementById("order_cart").value;
-    if (carts === '' || carts === 'undefined') {
-        $('#supplier').prop('disabled', false);
-        $('#select_id').prop('disabled', false);
+    if (carts === "" || carts === "undefined") {
+        $("#supplier").prop("disabled", false);
+        $("#select_id").prop("disabled", false);
     }
-
 }
 
-$('#select_id').on('change', function () {
+$("#select_id").on("change", function () {
     val();
 });
 
 function val() {
-    $('#edit_quantity').change();
+    $("#edit_quantity").change();
     /*supplier option*/
-    $('#supplier').prop('disabled', true);
+    $("#supplier").prop("disabled", true);
 
     /*set values to table*/
     var item = [];
@@ -249,7 +294,7 @@ function val() {
     product = document.getElementById("select_id").value;
     document.getElementById("select_id").value = "";
     console.log(product);
-    var selected_fields = product.split(',');
+    var selected_fields = JSON.parse(product);
     var item_name = selected_fields[0];
     var price = Number(selected_fields[1]);
     var vat = Number((price * tax).toFixed(2));
@@ -271,18 +316,17 @@ function val() {
     discount();
     cart_table.clear();
     cart_table.rows.add(cart);
-    cart_table.draw();
-
+    cart_table.draw(false);
 }
 
-$('cancel-all').on('click', function () {
+$("cancel-all").on("click", function () {
     set_button = 0;
     deselect();
 });
 
 function deselect() {
-    $('#supplier').prop('disabled', false);
-    $('#select_id').prop('disabled', false);
+    $("#supplier").prop("disabled", false);
+    $("#select_id").prop("disabled", false);
     sub_total = 0;
     total = 0;
     total_vat = 0;
@@ -294,45 +338,48 @@ function deselect() {
     document.getElementById("order_cart").value = cart;
     cart_table.clear();
     cart_table.rows.add(cart);
-    cart_table.draw();
+    cart_table.draw(false);
 }
 
 function numberWithCommas(digit) {
-    return String(parseFloat(digit)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return String(parseFloat(digit))
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 function isNumberKey(evt, obj) {
-
-    var charCode = (evt.which) ? evt.which : event.keyCode;
+    var charCode = evt.which ? evt.which : event.keyCode;
     var value = obj.value;
     var dotcontains = value.indexOf(".") !== -1;
-    if (dotcontains)
-        if (charCode === 46) return false;
+    if (dotcontains) if (charCode === 46) return false;
     if (charCode === 46) return true;
-    if (charCode > 31 && (charCode < 48 || charCode > 57))
-        return false;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) return false;
     return true;
 }
 
-$('#order_form').on('submit', function () {
+$("#order_form").on("submit", function () {
     var cart = document.getElementById("order_cart").value;
 
-    if (cart === '' || cart === 'undefined') {
-        notify('Purchase order list empty', 'top', 'right', 'warning');
+    if (cart === "" || cart === "undefined") {
+        notify("Purchase order list empty", "top", "right", "warning");
         return false;
     }
 
     var check_cart_to_array = JSON.parse(cart);
 
     var price = "price";
-    var quantity = 'quantity';
+    var quantity = "quantity";
 
     for (var key in check_cart_to_array) {
-
         if (check_cart_to_array[key].hasOwnProperty(price)) {
             //present
             if (parseFloat(check_cart_to_array[key][price]) === Number(0)) {
-                notify(check_cart_to_array[key].item_name + ' price cannot be 0 ', 'top', 'right', 'warning');
+                notify(
+                    check_cart_to_array[key].item_name + " price cannot be 0 ",
+                    "top",
+                    "right",
+                    "warning"
+                );
                 // $('#from_id').prop('disabled', true);
                 return false;
             }
@@ -341,58 +388,75 @@ $('#order_form').on('submit', function () {
         if (check_cart_to_array[key].hasOwnProperty(quantity)) {
             //present
             if (parseFloat(check_cart_to_array[key][quantity]) === Number(0)) {
-                notify(check_cart_to_array[key].item_name + ' quantity cannot be 0 ', 'top', 'right', 'warning');
+                notify(
+                    check_cart_to_array[key].item_name +
+                        " quantity cannot be 0 ",
+                    "top",
+                    "right",
+                    "warning"
+                );
                 // $('#from_id').prop('disabled', true);
                 return false;
             }
         }
-
     }
-
 });
 
-$('#select_id').prop('disabled', true);
+$("#select_id").prop("disabled", true);
 
 function filterSupplierProduct() {
     /*ajax filter products by supplier*/
-    var supplier = document.getElementById('supplier');
+    var supplier = document.getElementById("supplier");
     var supplier_id = supplier.options[supplier.selectedIndex].value;
-    document.getElementById('supplier_ids').value = supplier_id;
+    var status = document.getElementById("product_status").value;
+    document.getElementById("supplier_ids").value = supplier_id;
 
     $.ajax({
         url: config.routes.filterSupplierProduct,
         type: "get",
         dataType: "json",
         data: {
-            supplier_id: supplier_id
+            supplier_id: supplier_id,
+            status: status,
         },
         success: function (data) {
-            $('#select_id').prop('disabled', false);
+            $("#select_id").prop("disabled", false);
             $("#select_id option").remove();
-            $('#select_id').append($('<option>', {
-                value: '',
-                text: 'Select Product...',
-                disabled: true,
-                selected: true
-            }));
+            $("#select_id").append(
+                $("<option>", {
+                    value: "",
+                    text: "Select Product...",
+                    disabled: true,
+                    selected: true,
+                })
+            );
             $.each(data, function (id, detail) {
+                var datas = JSON.stringify([
+                    detail.name,
+                    detail.unit_cost,
+                    detail.product_id,
+                    detail.incoming_id,
+                ]);
 
-                var datas = [detail.name, detail.unit_cost, detail.product_id, detail.incoming_id];
-
-                $('#select_id').append($('<option>', {value: datas, text: detail.name}));
+                $("#select_id").append(
+                    $("<option>", { value: datas, text: detail.name })
+                );
             });
         },
         complete: function () {
             // $('#loading').hide();
-        }
+        },
     });
 }
 
-$('#select_id').select2({
+$("#select_id").select2({
     language: {
         noResults: function () {
-            var search_input = $("#select_id").data('select2').$dropdown.find("input").val();
-            var supplier = document.getElementById('supplier');
+            var search_input = $("#select_id")
+                .data("select2")
+                .$dropdown.find("input")
+                .val();
+            var supplier = document.getElementById("supplier");
             var supplier_id = supplier.options[supplier.selectedIndex].value;
 
             /*make ajax call for more*/
@@ -402,26 +466,34 @@ $('#select_id').select2({
                 dataType: "json",
                 data: {
                     word: search_input,
-                    supplier_id: supplier_id
+                    supplier_id: supplier_id,
                 },
                 success: function (data) {
-                    $('#select_id').prop('disabled', false);
-                    $('#supplier').prop('disabled', true);
+                    $("#select_id").prop("disabled", false);
+                    $("#supplier").prop("disabled", true);
                     $("#select_id option").remove();
-                    $('#select_id').append($('<option>', {
-                        value: '',
-                        text: 'Select Product...',
-                        disabled: true,
-                        selected: true
-                    }));
+                    $("#select_id").append(
+                        $("<option>", {
+                            value: "",
+                            text: "Select Product...",
+                            disabled: true,
+                            selected: true,
+                        })
+                    );
                     $.each(data, function (id, detail) {
+                        var datas = JSON.stringify([
+                            detail.name,
+                            detail.unit_cost,
+                            detail.product_id,
+                            detail.incoming_id,
+                        ]);
 
-                        var datas = [detail.name, detail.unit_cost, detail.product_id, detail.incoming_id];
-
-                        $('#select_id').append($('<option>', {value: datas, text: detail.name}));
+                        $("#select_id").append(
+                            $("<option>", { value: datas, text: detail.name })
+                        );
                     });
-                }
+                },
             });
-        }
-    }
+        },
+    },
 });
