@@ -95,6 +95,11 @@ class LoginController extends Controller {
                 'current_store_id' => 1,
                 'store' => 'ALL',
             ] );
+        } else if ( ( strtoupper( $store->name ) === 'ALL' || $store->id == 1 ) && !$multiStoreEnabled ) {
+            session( [
+                'current_store_id' => $storeId,
+                'store' => $store->defaultStore,
+            ] );
         } else {
             session( [
                 'current_store_id' => $store->id,

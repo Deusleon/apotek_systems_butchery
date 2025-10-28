@@ -1287,7 +1287,7 @@ unset($dayData);
         ];
     }
     private function saleReturnReport($from, $to) {
-        if (!Auth()->user()->checkPermission('Sales Return Report')) {
+        if (!Auth()->user()->checkPermission('Sales Returns Report')) {
             abort(403, 'Access Denied');
         }
         $store_id = current_store_id();

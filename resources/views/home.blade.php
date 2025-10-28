@@ -69,8 +69,8 @@
 
 
         /**
-                                                                      Component
-                                                                    **/
+                                                                              Component
+                                                                            **/
 
         label {
             width: 100%;
@@ -328,6 +328,7 @@
                                         </div>
                                     </label>
                                 </div>
+                                <input type="hidden" name="" id="expireEnabled" value="{{ $expireEnabled }}">
                                 @if ($expireEnabled)
                                     <div class="col-md-4 col-lg-4 col-sm-4">
                                         <label>
@@ -967,14 +968,18 @@
                 var a = document.getElementById('out_of_stock');
                 a.click();
             });
-
+            var expire = document.getElementById('expireEnabled').value;
+            var expireEnabled = expire === 'YES' ? true : false;
+            
             $('#out_of_stock').on('click', function () {
 
                 document.getElementById('stock_items_table').style.display = 'block';
-                document.getElementById('stock_items_expired_table').style.display = 'none';
+                if (expireEnabled) {
+                    document.getElementById('stock_items_expired_table').style.display = 'none';
+                    document.getElementById('dead_stock_table').style.display = 'none';
+                }
                 document.getElementById('stock_items_fast_table').style.display = 'none';
                 document.getElementById('below_items_table').style.display = 'none';
-                document.getElementById('dead_stock_table').style.display = 'none';
 
                 $('#stock_items').DataTable().clear().destroy();
                 $('#stock_items').DataTable({
@@ -1015,9 +1020,11 @@
             $('#fastMoving').on('click', function () {
 
                 document.getElementById('stock_items_table').style.display = 'none';
-                document.getElementById('stock_items_expired_table').style.display = 'none';
+                if (expireEnabled) {
+                    document.getElementById('stock_items_expired_table').style.display = 'none';
+                    document.getElementById('dead_stock_table').style.display = 'none';
+                }
                 document.getElementById('below_items_table').style.display = 'none';
-                document.getElementById('dead_stock_table').style.display = 'none';
                 document.getElementById('stock_items_fast_table').style.display = 'block';
 
                 $('#stock_items_fast').DataTable().clear().destroy();
@@ -1091,9 +1098,11 @@
             $('#below').on('click', function () {
 
                 document.getElementById('stock_items_table').style.display = 'none';
-                document.getElementById('stock_items_expired_table').style.display = 'none';
+                if (expireEnabled) {
+                    document.getElementById('stock_items_expired_table').style.display = 'none';
+                    document.getElementById('dead_stock_table').style.display = 'none';
+                }
                 document.getElementById('stock_items_fast_table').style.display = 'none';
-                document.getElementById('dead_stock_table').style.display = 'none';
                 document.getElementById('below_items_table').style.display = 'block';
 
                 $('#below_stock_items').DataTable().clear().destroy();

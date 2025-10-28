@@ -60,13 +60,13 @@
                                     </div>
                                 </div>
                                 {{-- Unit of Measure --}}
-                                <div class="col-12 d-flex mb-3">
+                                {{-- <div class="col-12 d-flex mb-3" hidden>
                                     <label for="saleUoM" class="col-md-3 col-form-label text-md-right">Unit </label>
                                     <div class="col-md-9">
                                         <input type="text" class="form-control" id="saleUoM_edit_normal" name="sale_uom"
                                             placeholder="e.g. pcs, kg, ml" value="{{ old('sale_uom') }}">
                                     </div>
-                                </div>
+                                </div> --}}
                                 {{-- Min Stock --}}
                                 <div class="col-12 d-flex mb-3">
                                     <label for="min_quantinty" class="col-md-3 col-form-label text-md-right">Min.

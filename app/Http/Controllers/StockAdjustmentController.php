@@ -188,7 +188,7 @@ class StockAdjustmentController extends Controller
     public function create()
     {
         $stocks = CurrentStock::with(['product'])
-            ->whereHas('product') // Only get stocks that have a valid product
+            ->whereHas('product') 
             ->where('store_id', session('store_id', 1))
             ->get();
                 
@@ -262,6 +262,7 @@ class StockAdjustmentController extends Controller
                     'quantity' => $adjQty,
                     'store_id' => $storeId,
                     'created_by' => Auth::id(),
+                    'updated_at' => now()->format('Y-m-d'),
                     'movement' => $type === 'increase' ? 'IN' : 'OUT',
                 ]);
 

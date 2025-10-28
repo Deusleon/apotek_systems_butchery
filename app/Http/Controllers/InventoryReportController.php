@@ -336,7 +336,7 @@ class InventoryReportController extends Controller
 
     private function currentStockByStoreReport($store)
     {
-        if (!Auth()->user()->checkPermission('Current Stock Report')) {
+        if (!Auth()->user()->checkPermission('Current Stock Summary Report')) {
             abort(403, 'Access Denied');
         }
         $query = CurrentStock::with(['product', 'store'])
@@ -385,7 +385,7 @@ class InventoryReportController extends Controller
         return $results_data;
     }
     private function currentStockByStoreDeailedReport($store, $category){
-        if (!Auth()->user()->checkPermission('Current Stock Report')) {
+        if (!Auth()->user()->checkPermission('Current Stock Detailed Report')) {
             abort(403, 'Access Denied');
         }
 
@@ -695,7 +695,7 @@ class InventoryReportController extends Controller
     }
     private function outgoingTrackingReport() 
     {
-        if (!Auth()->user()->checkPermission('Outgoing Tracking Report')) {
+        if (!Auth()->user()->checkPermission('Outgoing Stock Detailed Report')) {
             abort(403, 'Access Denied');
         }
         $store_id = current_store_id();
@@ -732,7 +732,7 @@ class InventoryReportController extends Controller
     }  
     private function outgoingTrackingSummaryReport() 
     {
-        if (!Auth()->user()->checkPermission('Outgoing Tracking Report')) {
+        if (!Auth()->user()->checkPermission('Outgoing Stock Summary Report')) {
             abort(403, 'Access Denied');
         }
         $store_id = current_store_id();
@@ -763,7 +763,7 @@ class InventoryReportController extends Controller
     }
     private function fastMovingReport()
     {
-        if (!Auth()->user()->checkPermission('Fast Moving Report')) {
+        if (!Auth()->user()->checkPermission('Fast Moving Products Report')) {
             abort(403, 'Access Denied');
         }
 

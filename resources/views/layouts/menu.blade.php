@@ -279,9 +279,9 @@
     @endif
 </li>
 
-<li class="nav-item pcoded-menu-caption">
+{{-- <li class="nav-item pcoded-menu-caption">
     <label>HELP</label>
-</li>
+</li> --}}
 
 {{-- <li class="nav-item"><a href="{{ url('help/contact-us') }}" class="nav-link"><span class="pcoded-micon"><i
                 class="fas fa-tablet"></i></span><span class="pcoded-mtext">Contact Us</span></a></li> --}}

@@ -23,7 +23,7 @@
                     <label class="col-5 text-right">Category:</label>
                     <div class="col text-dark" id="category_edit"></div>
                 </div>
-                <div class="row mb-3 gap-3">
+                <div class="row mb-3 gap-3" hidden>
                     <label class="col-5 text-right">Unit of Measure:</label>
                     <div class="col text-dark" id="sale_edit"></div>
                 </div>
