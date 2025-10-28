@@ -72,7 +72,8 @@
                         <div class="d-flex align-items-center" style="width: 256px;">
                             <label for="price_category" class="form-label mb-0"
                                 style="white-space: nowrap; margin-right: 10px;">Status:</label>
-                            <select id="retun_status" class="js-example-basic-single form-control" onchange="getRetunedProducts()">
+                            <select id="retun_status" class="js-example-basic-single form-control"
+                                onchange="getRetunedProducts()">
                                 <option value="2">Pending</option>
                                 <option value="3">Approved</option>
                                 <option value="4">Rejected</option>
@@ -236,7 +237,7 @@
                     }
                 },
                 @if(Auth::user()->checkPermission('Approve Sales Returns'))
-                                                                        {
+                                                                                                {
                         data: "action",
                         defaultContent: "<button type='button' id='approve' class='btn btn-sm btn-rounded btn-primary'>Approve</button><button type='button' id='reject' class='btn btn-sm btn-rounded btn-danger'>Reject</button>"
                     }
@@ -247,7 +248,7 @@
                         }
                     @endif
 
-                                        ], aaSorting: [[1, "desc"]]
+                                                    ], aaSorting: [[1, "desc"]]
         });
 
         function getRetunedProducts(action, product) {
@@ -292,6 +293,11 @@
                     },
                     complete: function () {
                         $('#loading').hide();
+                        if (action === 'approve') {
+                            notify("Sales return approved successfully", "top", "right", "success");
+                        } else if (action === 'reject') {
+                            notify("Sales return rejected successfully", "top", "right", "danger");
+                        }
                     }
                 });
             }
