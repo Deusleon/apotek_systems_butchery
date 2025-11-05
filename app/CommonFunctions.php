@@ -124,13 +124,11 @@ class CommonFunctions
                 DB::table('notifications')
                     ->where('id', $existing_notification->id)
                     ->update([
-                        'data' => json_encode($new_data), // Replace with fresh data
+                        'data' => json_encode($new_data), 
                         'updated_at' => now()
                     ]);
 
-                // Log::info("[CommonFunctions.php] Updated existing {$notification_class} for user {$user->id} with store_id {$store_id}");
             } else {
-                // Log::info("[CommonFunctions.php] Notification for user {$user->id} is still fresh, skipping update");
             }
         } else {
             // Create new notification

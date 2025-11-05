@@ -260,7 +260,6 @@ class CurrentStockController extends Controller
             'price_categories' => $price_categories
         ]);
     }
-    
     public function getStockValue(Request $request)
     {
         $store_id = current_store_id();
@@ -342,7 +341,6 @@ class CurrentStockController extends Controller
             ], 500);
         }
     }
-
     public function getOldStockValue(Request $request)
     {
         // dd($request->all());
@@ -439,7 +437,6 @@ class CurrentStockController extends Controller
             ]);
         }
     }
-
     public function filterStockValue(Request $request)
     {
 
@@ -546,7 +543,6 @@ class CurrentStockController extends Controller
             'detailed'=>$detailed,
             'outstock'=>$outstock]);
     }
-
     public function currentStockApi(Request $request)
     {
         try {
@@ -610,7 +606,6 @@ class CurrentStockController extends Controller
             ], 500);
         }
     }
-
     public function index()
     {
         $stocks = CurrentStock::with(['product', 'store'])
@@ -631,7 +626,6 @@ class CurrentStockController extends Controller
 
         return view('stock_management.current_stock.index', compact('stocks'));
     }
-
     public function edit($productId)
     {
         $store_id = Auth::user()->store_id;
@@ -659,7 +653,6 @@ class CurrentStockController extends Controller
             'stocks' => $stocks
         ]);
     }
-
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -700,7 +693,6 @@ class CurrentStockController extends Controller
             return response()->json(['message' => 'An error occurred while updating the stock details.'], 500);
         }
     }
-
     public function filter(Request $request)
     {
         if ($request->ajax()) {
@@ -740,7 +732,6 @@ class CurrentStockController extends Controller
         }
 
     }
-
     public function currentStockDetail(Request $request)
     {
 
@@ -757,7 +748,6 @@ class CurrentStockController extends Controller
             return json_decode($current_stock, true);
         }
     }
-
     public function currentStockPricing(Request $request)
     {
 
@@ -809,7 +799,6 @@ class CurrentStockController extends Controller
 
         }
     }
-
     public function allInStock(Request $request)
     {
 
@@ -1092,7 +1081,6 @@ class CurrentStockController extends Controller
             'priceHistory'
         ));
     }
-
     public function updatePrice(Request $request)
     {
         $request->validate([

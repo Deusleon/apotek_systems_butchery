@@ -58,9 +58,9 @@
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                     <div class="row d-flex justify-content-end mb-3 mr-0">
                         <div class="d-flex justify-content-end mr-3">
-                            <div class="d-flex align-items-center" style="width: 274px;">
+                            <div class="d-flex align-items-center" style="width: 280px;">
                                 <label for="price_category" class="form-label mb-0"
-                                    style="white-space: nowrap; margin-right: 10px;">Category:</label>
+                                    style="white-space: nowrap; margin-right: 8px;">Category:</label>
                                 <select name="price_category" class="js-example-basic-single form-control"
                                     id="price_category">
                                     @foreach($price_categories as $price_category)
@@ -72,9 +72,9 @@
                             </div>
                         </div>
                         <div class="d-flex justify-content-end">
-                            <div class="d-flex align-items-center" style="width: 247px;">
+                            <div class="d-flex align-items-center" style="width: 255px;">
                                 <label for="price_category" class="form-label mb-0"
-                                    style="white-space: nowrap; margin-right: 10px;">Type:</label>
+                                    style="white-space: nowrap; margin-right: 8px;">Type:</label>
                                 <select name="type_id" class="js-example-basic-single form-control" id="type_id">
                                     <option readonly value="" id="store_name_edit" disabled>Select Type...
                                     </option>

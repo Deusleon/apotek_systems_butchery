@@ -24,11 +24,11 @@
                     <div class="col text-dark" id="category_edit"></div>
                 </div>
                 <div class="row mb-3 gap-3" hidden>
-                    <label class="col-5 text-right">Unit of Measure:</label>
+                    <label class="col-5 text-right">Unit:</label>
                     <div class="col text-dark" id="sale_edit"></div>
                 </div>
                 <div class="row mb-3 gap-3">
-                    <label class="col-5 text-right">Min. Stock Quantity:</label>
+                    <label class="col-5 text-right">Min. Stock:</label>
                     <div class="col text-dark" id="min_quantinty_show"></div>
                 </div>
                 <div class="row gap-3">
