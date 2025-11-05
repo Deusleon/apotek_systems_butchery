@@ -47,10 +47,10 @@
             <div class="card-body">
                 <div class="d-flex justify-content-end mb-3">
                     <form method="POST" action="{{ route('current_stock_value') }}" class="d-flex align-items-center"
-                        style="width: 284px;">
+                        style="width: 290px;">
                         @csrf
                         <label for="price_category" class="form-label mb-0"
-                            style="white-space: nowrap; margin-right: 10px;">Price Type:</label>
+                            style="white-space: nowrap; margin-right: 8px;">Price Type:</label>
                         <select name="price_category" id="price_category" class="form-control"
                             onchange="this.form.submit()">
                             @foreach($price_categories as $price_category)
@@ -68,7 +68,7 @@
 
                         <thead>
                             <tr>
-                                <th>Product Name</th> <!-- Product| npk| brand| pack size -->
+                                <th>Product Name</th> 
                                 <th style="text-align: center">Quantity</th>
                                 <th style="text-align: right">Buy Price</th>
                                 <th style="text-align: right">Sell Price</th>
@@ -85,7 +85,7 @@
                             @foreach ($stocks as $stock)
                                                     {{-- @if($stock->buying_price > 0) --}}
                                                     <tr>
-                                                        <td id="name_{{ $stock->product_id }}">
+                                                        <td style="width: 40%; white-space: pre-line;" id="name_{{ $stock->product_id }}">
                                                             {{ trim(
                                     ($stock->name ?? '') .
                                     (!empty($stock->brand) ? ' ' . $stock->brand : '') .

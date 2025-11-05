@@ -153,7 +153,7 @@
         @endif
 
         <!-- Product Details Modal -->
-        <div class="modal fade" id="show" tabindex="-1" role="dialog" aria-labelledby="productDetailsModal"
+        {{-- <div class="modal fade" id="show" tabindex="-1" role="dialog" aria-labelledby="productDetailsModal"
             aria-hidden="true" hidden>
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content shadow-sm border-0">
@@ -236,7 +236,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
 @endsection
 
     @push("page_scripts")
@@ -374,7 +374,7 @@
                 $('#show #pack_size_show').html(row_data.pack_size || 'N/A');
                 $('#show #min_quantinty_show').html(row_data.min_quantinty > 0 ? numberWithCommas(row_data.min_quantinty) : 'N/A');
                 $('#show #max_quantinty_show').html(row_data.max_quantinty > 0 ? numberWithCommas(row_data.max_quantinty) : 'N/A');
-                $('#show #status').html(row_data.status === 1 ? 'Active' : 'Inactive');
+                $('#show #status').html(row_data.status == 1 ? 'Active' : 'Inactive');
             });
 
             $('#product-table').on('click', '#edits', function () {
