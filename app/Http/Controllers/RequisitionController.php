@@ -180,7 +180,7 @@ class RequisitionController extends Controller
 
         public function store(Request $request)
     {
-        if (!Auth()->user()->checkPermission('Create Requisitions')) {
+        if (!Auth()->user()->checkPermission('Create Stock Requisition')) {
             abort(403, 'Access Denied');
         }
 
@@ -249,7 +249,7 @@ class RequisitionController extends Controller
 
     public function show($id)
 {
-    if (!Auth()->user()->checkPermission('Edit Requisitions')) {
+    if (!Auth()->user()->checkPermission('Edit Stock Requisition')) {
         abort(403, 'Access Denied');
     }
 
@@ -387,7 +387,7 @@ class RequisitionController extends Controller
 
     public function update(Request $request)
     {
-        if (!Auth()->user()->checkPermission('Create Requisitions')) {
+        if (!Auth()->user()->checkPermission('Edit Stock Requisition')) {
             abort(403, 'Access Denied');
         }
 

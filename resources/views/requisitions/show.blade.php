@@ -52,7 +52,7 @@
                             </div>
                             <div class="row">
                                 <div class="form-group col-md-3">
-                                     <label for="from_store">Requesting From<font color="red">*</font></label>
+                                     <label for="from_store">Supplying Branch<font color="red">*</font></label>
                                      @if(current_store()->id != 1)
                                          <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
                                              <option value="">Select Branch...</option>
@@ -80,7 +80,7 @@
                                              @endforeach
                                          </select>
                                      @endif
-                                 </div>
+                                </div>
                                 <div class="form-group col-md-6">
                                     <label for="products">Select Products <font color="red">*</font></label>
                                     <select name="products" class="js-example-basic-single form-control products"
@@ -183,6 +183,51 @@
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
         let datas = @json($requisitionDet);
         console.log(datas);
+
+        // Initialize Select2 for from_store with pre-selected value
+        $(document).ready(function() {
+            $('#from_store').select2();
+            // Set the pre-selected value for Select2 and trigger change to load products
+            $('#from_store').val({{ $requisition->from_store }}).trigger('change');
+        });
+
+        // Handle branch selection change
+        $('#from_store').on('change', function() {
+            const selectedStore = $(this).val();
+
+            if (selectedStore) {
+                // Fetch filtered products for the selected branch
+                $.ajax({
+                    url: "{{ route('requisitions.get-products-by-store', ':store_id') }}".replace(':store_id', selectedStore),
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(products) {
+                        // Clear existing options except the first one
+                        $('#products').find('option:not(:first)').remove();
+
+                        // Add filtered products
+                        products.forEach(function(product) {
+                            const option = new Option(
+                                product.name + ' ' + (product.brand || '') + ' ' + (product.pack_size || '') + (product.sales_uom || ''),
+                                JSON.stringify(product)
+                            );
+                            $('#products').append(option);
+                        });
+
+                        // Reinitialize select2 if needed
+                        $('#products').trigger('change.select2');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching products:', error);
+                        notify('Error loading products for selected branch', 'top', 'right', 'danger');
+                    }
+                });
+            } else {
+                // Clear products when no branch is selected
+                $('#products').find('option:not(:first)').remove();
+                $('#products').trigger('change.select2');
+            }
+        });
         let cart = {
             data: datas,
             drawTable: function() {
