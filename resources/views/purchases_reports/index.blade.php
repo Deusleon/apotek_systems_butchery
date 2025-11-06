@@ -73,13 +73,23 @@
                                     <select id="report_option" name="report_option" onchange="reportOption()"
                                             class="js-example-basic-single form-control drop">
                                         <option selected="true" value="0" disabled="disabled">Select report</option>
+                                        @if(auth()->user()->checkPermission('Material Received Report'))
                                         <option value="1">Material Received Report</option>
+                                        @endif
+                                        @if(auth()->user()->checkPermission('Invoice Summary Report'))
                                         <option value="2">Invoice Summary Report</option>
+                                        @endif
                                         {{--                                        <option value="3">Invoice Details Report</option>--}}
+                                        @if(auth()->user()->checkPermission('List of Supplier'))
                                         <option value="4">List of Supplier</option>
+                                        @endif
                                         {{--                                        <option value="5">Supplier Price Comparison</option>--}}
+                                        @if(auth()->user()->checkPermission('Purchase Order Details Report'))
                                         <option value="6">Purchase Order Details Report</option>
+                                        @endif
+                                        @if(auth()->user()->checkPermission('Purchase Return Report'))
                                         <option value="7">Purchase Return Report</option>
+                                        @endif
                                     </select>
                                 </div>
                             </div>

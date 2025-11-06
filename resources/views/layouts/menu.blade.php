@@ -157,8 +157,8 @@
             @if(auth()->user()->checkPermission('View Sales Reports'))
                 <li class=""><a href="{{route('sale-report-index')}}" class="">Sales Reports</a></li>
             @endif
-            @if(auth()->user()->checkPermission('View Purchase Reports'))
-                <li class=""><a href="{{route('purchase-report-index')}}" class="">Purchase Reports</a>
+            @if(auth()->user()->checkPermission('View Purchasing Reports'))
+                <li class=""><a href="{{route('purchase-report-index')}}" class="">Purchasing Reports</a>
                 </li>
             @endif
             @if(auth()->user()->checkPermission('View Inventory Reports'))

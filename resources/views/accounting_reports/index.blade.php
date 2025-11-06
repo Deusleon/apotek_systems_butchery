@@ -74,12 +74,24 @@
                                     <select id="report_option" name="report_option" onchange="reportOption()"
                                             class="js-example-basic-single form-control drop" required>
                                         <option selected="true" value="" disabled="disabled">Select report</option>
+                                        @if(auth()->user()->checkPermission('Current Stock Value'))
                                         <option value="1">Current Stock Value</option>
+                                        @endif
+                                        @if(auth()->user()->checkPermission('Gross Profit Detail'))
                                         <option value="2">Gross Profit Detail</option>
+                                        @endif
+                                        @if(auth()->user()->checkPermission('Gross Profit Summary'))
                                         <option value="3">Gross Profit Summary</option>
+                                        @endif
+                                        @if(auth()->user()->checkPermission('Expense Report'))
                                         <option value="4">Expense Report</option>
+                                        @endif
+                                        @if(auth()->user()->checkPermission('Income Statement Report'))
                                         <option value="5">Income Statement Report</option>
+                                        @endif
+                                        @if(auth()->user()->checkPermission('Cost of Expired Products'))
                                         <option value="6">Cost of Expired Products</option>
+                                        @endif
                                     </select>
                                 </div>
                             </div>
