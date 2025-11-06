@@ -200,7 +200,7 @@ Route::middleware(["auth","main_branch"])->group(function () {
         Route::get('purchasing/purchase_returns/approvals', 'PurchaseReturnController@approvals')->name('purchase-returns.approvals');
         Route::post('purchase-returns', 'PurchaseReturnController@store')->name('purchase-returns.store');
         Route::put('purchase-returns/{id}', 'PurchaseReturnController@update')->name('purchase-returns.update');
-        Route::get('get-purchase-returns', 'PurchaseReturnController@getPurchaseReturns')->name('getPurchaseReturns');
+        Route::post('get-purchase-returns', 'PurchaseReturnController@getPurchaseReturns')->name('getPurchaseReturns');
     //Purchase Order routes
     Route::resource('purchasing/purchase-order', 'OrderController')->only([
         'index', 'store', 'update', 'destroy'

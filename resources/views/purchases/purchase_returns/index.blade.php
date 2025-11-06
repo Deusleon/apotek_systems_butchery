@@ -86,7 +86,7 @@
                 <div class="filter-controls">
                     <div class="filter-control" style="min-width: 260px;" hidden>
                         <label for="supplier" class="col-form-label text-md-right">Supplier:</label>
-                        <select class="js-example-basic-single form-control" id="supplier" onchange="getMaterialsReceived()">
+                        <select class="js-example-basic-single form-control" id="supplier" onchange="getPurchaseReturns()">
                             <option value="">Select Supplier</option>
                             @foreach($suppliers as $supplier)
                                 <option value="{{$supplier->id}}">{{$supplier->name}}</option>
@@ -109,7 +109,7 @@
                 <div class="col-md-4" hidden>
                     <label for="code">Product</label>
                     <select id="received_product" class="js-example-basic-single form-control"
-                        onchange="getMaterialsReceived()">
+                        onchange="getPurchaseReturns()">
                         <option value="">Select Product</option>
                         @foreach($products as $stock)
                             <option value="{{$stock->id}}">{{$stock->name}}</option>
@@ -155,6 +155,25 @@
     @include('purchases.purchase_returns.edit')
     @include('purchases.purchase_returns.returns')
 
+    <script>
+        // Initialize intlTelInput if phone input exists
+        $(document).ready(function() {
+            var phoneInput = document.querySelector("input[type='tel']");
+            if (phoneInput) {
+                window.intlTelInput(phoneInput, {
+                    initialCountry: "auto",
+                    geoIpLookup: function(callback) {
+                        $.get('https://ipinfo.io', function() {}, "jsonp").always(function(resp) {
+                            var countryCode = (resp && resp.country) ? resp.country : "us";
+                            callback(countryCode);
+                        });
+                    },
+                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+                });
+            }
+        });
+    </script>
+
 @endsection
 @push("page_scripts")
     @include('partials.notification')
@@ -178,7 +197,7 @@
                 $(this).val(
                     picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD')
                 );
-                getMaterialsReceived();
+                getPurchaseReturns();
             });
 
 
@@ -254,10 +273,10 @@
     <script type="text/javascript">
 
         $(document).ready(function () {
-            getMaterialsReceived();
+            getPurchaseReturns();
         });
 
-        function getMaterialsReceived() {
+        function getPurchaseReturns() {
             var product_id = document.getElementById("received_product").value;
             var supplier_id = document.getElementById("supplier").value;
             var range = document.getElementById("receive_date").value;
@@ -277,7 +296,7 @@
                     "processing": true,
                     "serverSide": true,
                     "ajax": {
-                        "url": '{{route('getMaterialsReceived')}}',
+                        "url": '{{route('getPurchaseReturns')}}',
                         "dataType": "json",
                         "type": "post",
                         "cache": false,
@@ -291,57 +310,58 @@
                     "columns": [
                         { data: 'id' },
                         {
-                            data: 'product',
+                            data: 'goods_receiving.product',
                             render: function (data) {
+                                if (!data || !data.name) return 'Loading...';
                                 return (data.name || '') + ' ' + (data.brand || '') + ' ' + (data.pack_size || '') + (data.sales_uom || '');
                             }
                         },
                         {
-                            data: 'supplier',
+                            data: 'goods_receiving.supplier',
                             render: function (data) {
                                 return data ? data.name : 'N/A';
                             }
                         },
                         {
-                            data: 'ordered_qty', render: function (data) {
-                                return numberWithCommas(parseFloat(data));
+                            data: 'goods_receiving.ordered_qty', render: function (data) {
+                                return numberWithCommas(parseFloat(data || 0));
                             }
                         },
                         {
-                            data: 'quantity', render: function (data, type, row) {
+                            data: 'goods_receiving.quantity', render: function (data, type, row) {
                                 // Show current remaining quantity after approved returns
                                 var currentQty = parseFloat(data || 0);
                                 return numberWithCommas(currentQty);
                             }
                         },
                         {
-                            data: 'remaining_qty', render: function (data) {
-                                return numberWithCommas(parseFloat(data));
+                            data: 'goods_receiving.remaining_qty', render: function (data) {
+                                return numberWithCommas(parseFloat(data || 0));
                             }
                         },
                         {
-                            data: 'unit_cost', render: function (unit_cost) {
-                                return formatMoney(unit_cost)
+                            data: 'goods_receiving.unit_cost', render: function (unit_cost) {
+                                return formatMoney(unit_cost || 0)
                             }
                         },
                         {
-                            data: 'total_cost', render: function (total_cost) {
-                                return formatMoney(total_cost)
+                            data: 'goods_receiving.total_cost', render: function (total_cost) {
+                                return formatMoney(total_cost || 0)
                             }
                         },
                         {
-                            data: 'created_at', render: function (date) {
+                            data: 'goods_receiving.created_at', render: function (date) {
                                 return moment(date).format('Y-MM-DD');
                             }
                         },
-                        { data: 'user.name' },
+                        { data: 'goods_receiving.user.name' },
                         {
                             data: 'action',
                             render: function (data, type, row) {
                                 // Disable the return button if the item has a return process ongoing or completed
                                 // Status: 2=pending return, 3=fully returned, 4=rejected, 5=partially returned
                                 var hasReturn = false;
-                                if (row.status == '2' || row.status == '3' || row.status == '4' || row.status == '5') {
+                                if (row.goods_receiving && (row.goods_receiving.status == '2' || row.goods_receiving.status == '3' || row.goods_receiving.status == '4' || row.goods_receiving.status == '5')) {
                                     hasReturn = true;
                                 }
 
@@ -392,23 +412,23 @@
                 data: {
                     "_token": '{{ csrf_token() }}',
                     "action": "check_return",
-                    "goods_receiving_id": row_data.id
+                    "goods_receiving_id": row_data.goods_receiving ? row_data.goods_receiving.id : row_data.id
                 },
-                type: 'get',
+                type: 'post',
                 dataType: 'json',
                 success: function (response) {
                     if (response.has_return) {
                         // Open purchase return edit modal
                         $('#edit-purchase-return').find('.modal-body #edit_product_name').val(
-                            (row_data.product.name || '') + ' ' +
-                            (row_data.product.brand || '') + ' ' +
-                            (row_data.product.pack_size || '') +
-                            (row_data.product.sales_uom || '')
+                            (row_data.goods_receiving.product.name || '') + ' ' +
+                            (row_data.goods_receiving.product.brand || '') + ' ' +
+                            (row_data.goods_receiving.product.pack_size || '') +
+                            (row_data.goods_receiving.product.sales_uom || '')
                         );
                         $('#edit-purchase-return').find('.modal-body #edit_rtn_qty_to_show').val(numberWithCommas(response.return_quantity));
                         $('#edit-purchase-return').find('.modal-body #edit_rtn_qty').val(response.return_quantity);
                         $('#edit-purchase-return').find('.modal-body #edit_reason').val(response.reason);
-                        $('#edit-purchase-return').find('.modal-body #edit_goods_receiving_id').val(row_data.id);
+                        $('#edit-purchase-return').find('.modal-body #edit_goods_receiving_id').val(row_data.goods_receiving ? row_data.goods_receiving.id : row_data.id);
                         $('#edit-purchase-return').find('.modal-body #edit_return_id').val(response.return_id);
 
                         // Set form action dynamically
@@ -423,9 +443,9 @@
                             data: {
                                 "_token": '{{ csrf_token() }}',
                                 "action": "check_status",
-                                "goods_receiving_id": row_data.id
+                                "goods_receiving_id": row_data.goods_receiving ? row_data.goods_receiving.id : row_data.id
                             },
-                            type: 'get',
+                            type: 'post',
                             dataType: 'json',
                             success: function (statusResponse) {
                                 if (statusResponse.has_pending_return) {
@@ -435,24 +455,24 @@
 
                                 // Open material received edit modal
                                 $('#edit').find('.modal-body #name_edit').val(
-                                    (row_data.product.name || '') + ' ' +
-                                    (row_data.product.brand || '') + ' ' +
-                                    (row_data.product.pack_size || '') +
-                                    (row_data.product.sales_uom || '')
+                                    (row_data.goods_receiving.product.name || '') + ' ' +
+                                    (row_data.goods_receiving.product.brand || '') + ' ' +
+                                    (row_data.goods_receiving.product.pack_size || '') +
+                                    (row_data.goods_receiving.product.sales_uom || '')
                                 );
-                                $('#edit').find('.modal-body #quantity_edit').val(numberWithCommas(row_data.quantity));
-                                $('#edit').find('.modal-body #price_edit').val(formatMoney(row_data.unit_cost));
-                                if (row_data.expire_date) {
-                                    $('#edit').find('.modal-body #expire_date_edit').val(moment(row_data.expire_date).format('YYYY-MM-DD'));
+                                $('#edit').find('.modal-body #quantity_edit').val(numberWithCommas(row_data.goods_receiving.quantity));
+                                $('#edit').find('.modal-body #price_edit').val(formatMoney(row_data.goods_receiving.unit_cost));
+                                if (row_data.goods_receiving.expire_date) {
+                                    $('#edit').find('.modal-body #expire_date_edit').val(moment(row_data.goods_receiving.expire_date).format('YYYY-MM-DD'));
                                 } else {
                                     $('#edit').find('.modal-body #expire_date_edit').val('');
                                 }
-                                $('#edit').find('.modal-body #receive_date_edit').val(moment(row_data.created_at).format('YYYY-MM-DD'));
-                                $('#edit').find('.modal-body #id').val(row_data.id);
+                                $('#edit').find('.modal-body #receive_date_edit').val(moment(row_data.goods_receiving.created_at).format('YYYY-MM-DD'));
+                                $('#edit').find('.modal-body #id').val(row_data.goods_receiving ? row_data.goods_receiving.id : row_data.id);
 
                                 // ✅ Preselect supplier
-                                if (row_data.supplier && row_data.supplier.id) {
-                                    $('#supplier_id_edit').val(row_data.supplier.id).trigger('change');
+                                if (row_data.goods_receiving.supplier && row_data.goods_receiving.supplier.id) {
+                                    $('#supplier_id_edit').val(row_data.goods_receiving.supplier.id).trigger('change');
                                 } else {
                                     $('#supplier_id_edit').val('').trigger('change');
                                 }
@@ -481,9 +501,9 @@
                 data: {
                     "_token": '{{ csrf_token() }}',
                     "action": "check_status",
-                    "goods_receiving_id": row_data.id
+                    "goods_receiving_id": row_data.goods_receiving ? row_data.goods_receiving.id : row_data.id
                 },
-                type: 'get',
+                type: 'post',
                 dataType: 'json',
                 success: function (statusResponse) {
                     if (statusResponse.has_pending_return) {
@@ -491,9 +511,9 @@
                         return;
                     }
 
-                    var message = "Are you sure you want to delete '".concat(row_data.product.name, "'?");
+                    var message = "Are you sure you want to delete '".concat(row_data.goods_receiving.product.name, "'?");
                     $('#delete').find('.modal-body #message').text(message);
-                    $('#delete').find('.modal-body #id').val(row_data.id);
+                    $('#delete').find('.modal-body #id').val(row_data.goods_receiving ? row_data.goods_receiving.id : row_data.id);
                     $('#delete').modal('show');
                 },
                 error: function () {
@@ -506,22 +526,22 @@
             var row_data = $('#received_material_table').DataTable().row($(this).parents('tr')).data();
             $("#purchase-return").modal("show");
             $("#purchase-return").find(".modal-body #product_name").val(
-                (row_data.product.name || '') + ' ' +
-                (row_data.product.brand || '') + ' ' +
-                (row_data.product.pack_size || '') +
-                (row_data.product.sales_uom || '')
+                (row_data.goods_receiving.product.name || '') + ' ' +
+                (row_data.goods_receiving.product.brand || '') + ' ' +
+                (row_data.goods_receiving.product.pack_size || '') +
+                (row_data.goods_receiving.product.sales_uom || '')
             );
-            $("#purchase-return").find(".modal-body #goods_receiving_id").val(row_data.id);
-            $("#purchase-return").find(".modal-body #original_qty").val(row_data.quantity);
+            $("#purchase-return").find(".modal-body #goods_receiving_id").val(row_data.goods_receiving ? row_data.goods_receiving.id : row_data.id);
+            $("#purchase-return").find(".modal-body #original_qty").val(row_data.goods_receiving.quantity);
             document.getElementById("save_btn").style.display = "block";
             $("#purchase-return").on("change", "#rtn_qty_to_show", function () {
                 var quantity = document.getElementById("rtn_qty").value;
-                if (Number(quantity) > Number(row_data.quantity) || Number(quantity) < 0) {
+                if (Number(quantity) > Number(row_data.goods_receiving.quantity) || Number(quantity) < 0) {
                     document.getElementById("save_btn").disabled = "true";
                     document.getElementById("qty_error").style.display = "block";
                     $("#purchase-return")
                         .find(".modal-body #qty_error")
-                        .text("Maximum quantity is " + Math.floor(row_data.quantity));
+                        .text("Maximum quantity is " + Math.floor(row_data.goods_receiving.quantity));
                 } else {
                     document.getElementById("qty_error").style.display = "none";
                     $("#save_btn").prop("disabled", false);

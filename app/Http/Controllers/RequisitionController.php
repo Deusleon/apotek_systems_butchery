@@ -134,7 +134,7 @@ class RequisitionController extends Controller
 
     function search_items(Request $request)
     {
-        if (!Auth()->user()->checkPermission('Create Requisitions')) {
+        if (!Auth()->user()->checkPermission('Create Stock Requisition')) {
             abort(403, 'Access Denied');
         }
 
@@ -155,7 +155,7 @@ class RequisitionController extends Controller
 
     public function getProductsByStore(Request $request, $store_id)
     {
-        if (!Auth()->user()->checkPermission('Create Requisitions')) {
+        if (!Auth()->user()->checkPermission('Create Stock Requisition')) {
             abort(403, 'Access Denied');
         }
 
