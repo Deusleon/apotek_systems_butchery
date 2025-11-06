@@ -207,11 +207,9 @@ class RequisitionController extends Controller
 
         $req_no = date('m') . date('d') . str_pad($Id, 5, '0', STR_PAD_LEFT);
 
-        if(current_store()->id === 1) {
+        if(Auth::user()->store_id === 1) {
             $from_store = $request->from_store;
-        }
-
-        if(current_store()->id != 1) {
+        } else {
             $from_store = Auth::user()->store_id;
         }
 
@@ -399,11 +397,9 @@ class RequisitionController extends Controller
         $req_id = $request->requisition_id;
         $remarks = $request->remark;
 
-        if(current_store()->id === 1) {
+        if(Auth::user()->store_id === 1) {
             $from_store = $request->from_store;
-        }
-
-        if(current_store()->id != 1) {
+        } else {
             $from_store = Auth::user()->store_id;
         }
 

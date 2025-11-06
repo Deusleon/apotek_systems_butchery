@@ -53,7 +53,7 @@
                             <div class="row">
                                 <div class="form-group col-md-3">
                                      <label for="from_store">Supplying Branch<font color="red">*</font></label>
-                                     @if(current_store()->id != 1)
+                                     @if(Auth::user()->store_id === 1)
                                          <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
                                              <option value="">Select Branch...</option>
                                              @foreach ($stores as $item)
@@ -65,13 +65,11 @@
                                                  @endif
                                              @endforeach
                                          </select>
-                                     @endif
-
-                                     @if(current_store()->id === 1)
+                                     @else
                                          <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
                                              <option value="">Select Branch...</option>
                                              @foreach ($stores as $item)
-                                                 @if(strtoupper($item->name) !== 'ALL')
+                                                 @if($item->id != Auth::user()->store_id)
                                                      <option value="{{ $item->id }}"
                                                          {{ $item->id == $requisition->from_store ? 'selected' : '' }}>
                                                          {{ $item->name }}
