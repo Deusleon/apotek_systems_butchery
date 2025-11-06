@@ -143,8 +143,8 @@ class CreatePermissionsTable extends Migration
             ['name' => 'View Invoices', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:20', 'updated_at' => '2024-11-23 08:25:20', 'category' => 'ACCOUNTING'],
             ['name' => 'Add Invoices', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:36', 'updated_at' => '2024-11-23 08:25:36', 'category' => 'ACCOUNTING'],
             ['name' => 'Edit Invoices', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'ACCOUNTING'],
-            ['name' => 'View payments', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:36', 'updated_at' => '2024-11-23 08:25:36', 'category' => 'ACCOUNTING'],
-            ['name' => 'View payment history', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:36', 'updated_at' => '2024-11-23 08:25:36', 'category' => 'ACCOUNTING'],
+            ['name' => 'View Payments', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:36', 'updated_at' => '2024-11-23 08:25:36', 'category' => 'ACCOUNTING'],
+            ['name' => 'View Payment History', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:36', 'updated_at' => '2024-11-23 08:25:36', 'category' => 'ACCOUNTING'],
             // Purchasing Sub Modules
             ['name' => 'View Goods Receiving', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'PURCHASING'],
             ['name' => 'Invoice Receiving', 'guard_name' => 'web', 'created_at' => '2024-11-15 19:14:30', 'updated_at' => '2024-11-15 19:14:30', 'category' => 'PURCHASING'],
