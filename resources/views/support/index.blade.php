@@ -67,7 +67,7 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link text-uppercase" id="order-received" href="{{ route('support.download-manual') }}"
-                    role="tab" aria-controls="new_quotes" aria-selected="true"> Download User Manual
+                    role="tab" aria-controls="new_quotes" aria-selected="true"> User Guide
                 </a>
             </li>
         </ul>

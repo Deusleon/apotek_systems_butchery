@@ -66,13 +66,13 @@ Invoices
                     </a>
                 </li>
             @endif
-            @if (auth()->user()->checkPermission('View payments'))
+            @if (auth()->user()->checkPermission('View Payments'))
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" href="{{ url('accounting/invoices/payments') }}">Payments
                     </a>
                 </li>
             @endif
-            @if (auth()->user()->checkPermission('View payment history'))
+            @if (auth()->user()->checkPermission('View Payment History'))
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" href="{{ url('accounting/invoices/payments-history') }}">Payment History
                     </a>
