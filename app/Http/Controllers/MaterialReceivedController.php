@@ -98,7 +98,11 @@ class MaterialReceivedController extends Controller
                 'inv_incoming_stock.id',
                 'product_id', 'quantity', 'unit_cost', 'total_cost',
                 'expire_date', 'inv_incoming_stock.created_at',
-                'supplier_id', 'created_by'
+                'supplier_id', 'created_by',
+                'inv_products.name as product_name',
+                'inv_products.brand as product_brand',
+                'inv_products.pack_size as product_pack_size',
+                'inv_products.sales_uom as product_sales_uom'
             )
             ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
             ->join('users', 'users.id', '=', 'inv_incoming_stock.created_by')
@@ -115,7 +119,11 @@ class MaterialReceivedController extends Controller
                 'inv_incoming_stock.id',
                 'product_id', 'quantity', 'unit_cost', 'total_cost',
                 'expire_date', 'inv_incoming_stock.created_at',
-                'supplier_id', 'created_by'
+                'supplier_id', 'created_by',
+                'inv_products.name as product_name',
+                'inv_products.brand as product_brand',
+                'inv_products.pack_size as product_pack_size',
+                'inv_products.sales_uom as product_sales_uom'
             )
             ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
             ->join('users', 'users.id', '=', 'inv_incoming_stock.created_by')
@@ -141,7 +149,11 @@ class MaterialReceivedController extends Controller
                     'inv_incoming_stock.id',
                     'product_id', 'quantity', 'unit_cost', 'total_cost',
                     'expire_date', 'inv_incoming_stock.created_at',
-                    'supplier_id', 'created_by'
+                    'supplier_id', 'created_by',
+                    'inv_products.name as product_name',
+                    'inv_products.brand as product_brand',
+                    'inv_products.pack_size as product_pack_size',
+                    'inv_products.sales_uom as product_sales_uom'
                 )
                 ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
                 ->join('users', 'users.id', '=', 'inv_incoming_stock.created_by')
@@ -162,7 +174,11 @@ class MaterialReceivedController extends Controller
                     'inv_incoming_stock.id',
                     'product_id', 'quantity', 'unit_cost', 'total_cost',
                     'expire_date', 'inv_incoming_stock.created_at',
-                    'supplier_id', 'created_by'
+                    'supplier_id', 'created_by',
+                    'inv_products.name as product_name',
+                    'inv_products.brand as product_brand',
+                    'inv_products.pack_size as product_pack_size',
+                    'inv_products.sales_uom as product_sales_uom'
                 )
                 ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
                 ->join('users', 'users.id', '=', 'inv_incoming_stock.created_by')
@@ -185,7 +201,11 @@ class MaterialReceivedController extends Controller
                     'inv_incoming_stock.id',
                     'product_id', 'quantity', 'unit_cost', 'total_cost',
                     'expire_date', 'inv_incoming_stock.created_at',
-                    'supplier_id', 'created_by'
+                    'supplier_id', 'created_by',
+                    'inv_products.name as product_name',
+                    'inv_products.brand as product_brand',
+                    'inv_products.pack_size as product_pack_size',
+                    'inv_products.sales_uom as product_sales_uom'
                 )
                 ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
                 ->join('users', 'users.id', '=', 'inv_incoming_stock.created_by')
@@ -235,7 +255,11 @@ class MaterialReceivedController extends Controller
                     'inv_incoming_stock.id',
                     'product_id', 'quantity', 'unit_cost', 'total_cost',
                     'expire_date', 'inv_incoming_stock.created_at',
-                    'supplier_id', 'created_by'
+                    'supplier_id', 'created_by',
+                    'inv_products.name as product_name',
+                    'inv_products.brand as product_brand',
+                    'inv_products.pack_size as product_pack_size',
+                    'inv_products.sales_uom as product_sales_uom'
                 )
                 ->join('inv_products', 'inv_products.id', '=', 'inv_incoming_stock.product_id')
                 ->join('users', 'users.id', '=', 'inv_incoming_stock.created_by')
@@ -284,9 +308,8 @@ class MaterialReceivedController extends Controller
 
     if (!empty($material_received)) {
         foreach ($material_received as $value) {
-            $value->product;
-            $value->supplier;
-            $value->user;
+            // Load relationships only if needed for other operations
+            $value->load('supplier', 'user');
 
             // Check if there's already a purchase return for this goods_receiving_id
             $value->has_return = PurchaseReturn::where('goods_receiving_id', $value->id)->exists();

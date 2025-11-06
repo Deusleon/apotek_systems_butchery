@@ -142,7 +142,9 @@
                                 <th>Amount</th>
                                 <th>Receive Date</th>
                                 <th>Received By</th>
-                                <th>Action</th>
+                                @if(auth()->user()->checkPermission('Edit Material Received') || auth()->user()->checkPermission('Delete Material Received'))
+                                    <th>Action</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -279,7 +281,11 @@
             if (product_id || date || supplier_id) {
                 // $('#loading').show();
 
-                $("#received_material_table").dataTable().fnDestroy();
+                // Clear the table completely before destroying and recreating
+                if ($.fn.DataTable.isDataTable('#received_material_table')) {
+                    $('#received_material_table').DataTable().clear().destroy();
+                }
+                $('#received_material_table tbody').empty();
 
                 var received_material_table = $('#received_material_table').DataTable({
                     "processing": true,
@@ -289,19 +295,30 @@
                         "dataType": "json",
                         "type": "post",
                         "cache": false,
-                        "data": {
-                            "_token": '{{ csrf_token() }}',
-                            "product_id": product_id,
-                            "supplier_id": supplier_id,
-                            "date": date
+                        "data": function(d) {
+                            d._token = '{{ csrf_token() }}';
+                            d.product_id = product_id;
+                            d.supplier_id = supplier_id;
+                            d.date = date;
+                            return d;
+                        },
+                        "beforeSend": function() {
+                            // Show loading state and clear any existing content
+                            @if(auth()->user()->checkPermission('Edit Material Received') || auth()->user()->checkPermission('Delete Material Received'))
+                            $('#received_material_table tbody').html('<tr><td colspan="10" class="text-center"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>');
+                            @else
+                            $('#received_material_table tbody').html('<tr><td colspan="9" class="text-center"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>');
+                            @endif
                         }
                     },
                     "columns": [
                         { data: 'id' },
                         {
-                            data: 'product',
-                            render: function (data) {
-                                return (data.name || '') + ' ' + (data.brand || '') + ' ' + (data.pack_size || '') + (data.sales_uom || '');
+                            data: 'product_name',
+                            render: function (data, type, row) {
+                                // Use the joined product data directly from the query
+                                var productName = (data || '') + ' ' + (row.product_brand || '') + ' ' + (row.product_pack_size || '') + (row.product_sales_uom || '');
+                                return productName.trim();
                             }
                         },
                         {
@@ -334,10 +351,12 @@
                                 return moment(date).format('Y-MM-DD');
                             }
                         },
-                        { data: 'user.name' },
-                       {
+                        { data: 'user.name' }
+                        @if(auth()->user()->checkPermission('Edit Material Received') || auth()->user()->checkPermission('Delete Material Received'))
+                        ,
+                        {
                             data: 'action',
-                            defaultContent: 
+                            defaultContent:
                                 `<div>
                                     @if(auth()->user()->checkPermission('Edit Material Received'))
                                         <input type='button' value='Edit' id='edit_btn' class='btn btn-info btn-rounded btn-sm'/>
@@ -348,6 +367,7 @@
                                     @endif
                                 </div>`
                         }
+                        @endif
 
                     ], "columnDefs": [
                         {
@@ -355,7 +375,23 @@
                             "visible": false
                         }
                     ],
-                    "order": [[0, "desc"]]
+                    "order": [[0, "desc"]],
+                    "drawCallback": function(settings) {
+                        // Force re-render of all product cells to ensure proper display
+                        $('#received_material_table tbody tr').each(function() {
+                            var $row = $(this);
+                            var rowData = $('#received_material_table').DataTable().row($row).data();
+                            if (rowData && rowData.product_name !== undefined) {
+                                var productCell = $row.find('td').eq(1);
+                                var currentText = productCell.text().trim();
+                                // Only update if it's showing wrong data (IDs or empty)
+                                if (currentText === '' || currentText === '0' || /^\d+$/.test(currentText) || currentText !== rowData.product_name) {
+                                    var productName = (rowData.product_name || '') + ' ' + (rowData.product_brand || '') + ' ' + (rowData.product_pack_size || '') + (rowData.product_sales_uom || '');
+                                    productCell.text(productName.trim());
+                                }
+                            }
+                        });
+                    }
 
                 });
 
@@ -375,10 +411,10 @@
             var row_data = $('#received_material_table').DataTable().row($(this).parents('tr')).data();
 
             $('#edit').find('.modal-body #name_edit').val(
-                (row_data.product.name || '') + ' ' +
-                (row_data.product.brand || '') + ' ' +
-                (row_data.product.pack_size || '') +
-                (row_data.product.sales_uom || '')
+                (row_data.product_name || '') + ' ' +
+                (row_data.product_brand || '') + ' ' +
+                (row_data.product_pack_size || '') +
+                (row_data.product_sales_uom || '')
             );
             $('#edit').find('.modal-body #quantity_edit').val(numberWithCommas(row_data.quantity));
             $('#edit').find('.modal-body #price_edit').val(formatMoney(row_data.unit_cost));
@@ -403,7 +439,7 @@
 
         $('#received_material_table tbody').on('click', '#delete_btn', function () {
             var row_data = $('#received_material_table').DataTable().row($(this).parents('tr')).data();
-            var message = "Are you sure you want to delete '".concat(row_data.product.name, "'?");
+            var message = "Are you sure you want to delete '".concat(row_data.product_name, "'?");
             $('#delete').find('.modal-body #message').text(message);
             $('#delete').find('.modal-body #id').val(row_data.id);
             $('#delete').modal('show');
