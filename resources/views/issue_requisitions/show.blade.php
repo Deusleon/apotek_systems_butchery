@@ -121,7 +121,7 @@
                             </div>
 
                             <div class="modal-footer">
-                                @can('Approve Requisitions', Model::class)
+                                @can('Approve Stock Issue', Model::class)
                                     @if (!$disable)
                                         <!-- Edit and Issue buttons side by side -->
                                         <div>

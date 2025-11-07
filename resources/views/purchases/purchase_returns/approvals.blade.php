@@ -263,7 +263,7 @@
                     "action": action,
                     "goods_receiving": goods_receiving
                 },
-                type: 'get',
+                type: 'post',
                 dataType: 'json',
                 cache: false,
                 success: function (data) {

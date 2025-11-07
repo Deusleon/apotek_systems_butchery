@@ -207,11 +207,7 @@ class RequisitionController extends Controller
 
         $req_no = date('m') . date('d') . str_pad($Id, 5, '0', STR_PAD_LEFT);
 
-        if(Auth::user()->store_id === 1) {
-            $from_store = $request->from_store;
-        } else {
-            $from_store = Auth::user()->store_id;
-        }
+        $from_store = $request->from_store;
 
         if (!empty($orders)) {
             $requisition = new Requisition();
@@ -397,12 +393,7 @@ class RequisitionController extends Controller
         $req_id = $request->requisition_id;
         $remarks = $request->remark;
 
-        if(Auth::user()->store_id === 1) {
-            $from_store = $request->from_store;
-        } else {
-            $from_store = Auth::user()->store_id;
-        }
-
+        $from_store = $request->from_store;
         $to_store = current_store_id();
 
         // Handle file upload - NEW CODE ADDED
@@ -568,7 +559,7 @@ class RequisitionController extends Controller
 
     public function printIssueHistory($id)
 {
-    if (!Auth()->user()->checkPermission('View Requisitions Issue')) {
+    if (!Auth()->user()->checkPermission('View Stock Issue')) {
         abort(403, 'Access Denied');
     }
 
@@ -595,7 +586,7 @@ class RequisitionController extends Controller
 
     public function getRequisitionsIssue(Request $request)
 {
-    // if (!Auth()->user()->checkPermission('View Requisitions Issue')) {
+    // if (!Auth()->user()->checkPermission('View Stock Issue')) {
     //     abort(403, 'Access Denied');
     // }
 
@@ -622,7 +613,7 @@ class RequisitionController extends Controller
             ->addColumn('action', function ($row) {
                 $btn_view = '';
 
-                if (Auth()->user()->checkPermission('View Requisitions Issue')) {
+                if (Auth()->user()->checkPermission('View Stock Issue')) {
                     $currentStoreId = current_store_id();
 
                     if ($currentStoreId == 1) {
