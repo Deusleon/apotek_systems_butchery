@@ -35,7 +35,7 @@
                         <th>To</th>
                         <th>Products</th>
                         <th>Status</th>
-                        @if(Auth()->user()->checkPermission('View Requisitions Issue'))
+                        @if(Auth()->user()->checkPermission('View Stock Issue'))
                             <th>Action</th>
                         @endif
                     </tr>
@@ -97,7 +97,7 @@
                 orderable: false,
                 searchable: false
             },
-            @if (Auth()->user()->checkPermission('View Requisitions Issue'))
+            @if (Auth()->user()->checkPermission('View Stock Issue'))
             { data: 'action', orderable: false, searchable: false }
             @endif
         ]
