@@ -142,7 +142,9 @@
                                 <th>Amount</th>
                                 <th>Receive Date</th>
                                 <th>Received By</th>
-                                <th>Action</th>
+                                @if(auth()->user()->checkPermission('Edit Material Received') || auth()->user()->checkPermission('Delete Material Received'))
+                                    <th>Action</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
