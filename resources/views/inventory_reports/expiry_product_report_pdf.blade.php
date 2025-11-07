@@ -93,7 +93,7 @@
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
         <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}</h3>
-        <h2 align="center" style="margin-top: -1%">Expiry Products Report</h2>
+        <h2 align="center" style="margin-top: -1%">Expired Products Report</h2>
 
         <div class="row" style="margin-top: 8%;">
             <div class="col-md-12">
@@ -103,7 +103,7 @@
                         <tr style="background: #1f273b; color: white;">
                             <th align="center">#</th>
                             <th align="left">Product Name</th>
-                            <th align="left">Batch No</th>
+                            <th align="left">Batch #</th>
                             <th align="left">Expiry Date</th>
                             <th align="center">Quantity</th>
                         </tr>

@@ -51,7 +51,7 @@
 
                     <div class="d-flex justify-content-end mb-3 mr-3 align-items-center">
                         <label class="mr-2" for="">Date:</label>
-                        <input type="text" name="old_stock_date" id="old_stock_date" class="form-control w-auto" value="{{ request('old_stock_date', \Carbon\Carbon::now()->format('Y-m-d')) }}">
+                        <input type="text" name="old_stock_date" id="old_stock_date" class="form-control w-auto">
                     </div>
                     <div class="d-flex justify-content-end mb-3">
                         <div class="d-flex align-items-center" style="width: 290px;">
@@ -140,22 +140,23 @@
             $('#old_stock_date').daterangepicker({
                 singleDatePicker: true,
                 showDropdowns: true,
-                autoUpdateInput: false,
+                autoUpdateInput: true,
                 minDate: '{{ $min_date }}',
                 maxDate: '{{ $max_date }}',
+                startDate: '{{ $max_date }}',
                 locale: {
                     format: 'YYYY-MM-DD'
                 }
             });
 
             // Handle date selection
-            $('#old_stock_date').on('apply.daterangepicker', function(ev, picker) {
+            $('#old_stock_date').on('apply.daterangepicker', function (ev, picker) {
                 $(this).val(picker.startDate.format('YYYY-MM-DD'));
                 // Auto-submit the form when date is selected
                 $(this).closest('form').submit();
             });
 
-            $('#old_stock_date').on('cancel.daterangepicker', function(ev, picker) {
+            $('#old_stock_date').on('cancel.daterangepicker', function (ev, picker) {
                 $(this).val('');
             });
 

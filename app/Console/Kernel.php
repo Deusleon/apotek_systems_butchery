@@ -20,6 +20,7 @@ class Kernel extends ConsoleKernel
         CalculateStockValues::class,
         CheckLowStock::class,
         FixStockPermissions::class,
+        SnapshotOldStockValue::class,
     ];
 
     /**
@@ -30,9 +31,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('stock:calculate-values')->hourly();
+        $schedule->command('stock:calculate-values')->Daily();
         $schedule->command('stock:check-low')->Daily();
-        $schedule->command('snapshot:oldstock')->everyMinute()->withoutOverlapping();
+        $schedule->command('snapshot:oldstock')->dailyAt('23:59');
     }
 
     /**
