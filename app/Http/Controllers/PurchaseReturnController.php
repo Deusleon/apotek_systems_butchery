@@ -155,14 +155,7 @@ class PurchaseReturnController extends Controller
         }
 
         Log::info('Returning formatted data', ['count' => count($formattedReturns)]);
-
-        // Return data in DataTables expected format
-        return response()->json([
-            "draw" => intval($request->input('draw', 1)),
-            "recordsTotal" => count($formattedReturns),
-            "recordsFiltered" => count($formattedReturns),
-            "data" => $formattedReturns
-        ]);
+        return response()->json($formattedReturns);
     }
 
     public function approve($goodsReceivingData)
