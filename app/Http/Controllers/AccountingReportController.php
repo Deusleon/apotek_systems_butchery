@@ -222,17 +222,23 @@ class AccountingReportController extends Controller
 
         $total_buy = 0;
         $total_sell = 0;
+        $total_profit = 0;
         $to_print = array();
         foreach ($sum_by_category as $item) {
+            $profit = $item['sell_price'] - $item['buy_price'];
             $total_buy = $total_buy + $item['buy_price'];
             $total_sell = $total_sell + $item['sell_price'];
+            $total_profit = $total_profit + $profit;
             array_push($to_print, array(
                 'category_name' => $item['category_name'],
+                'product_name' => $item['category_name'], // Using category name as product name for now
                 'buy_price' => $item['buy_price'],
                 'sell_price' => $item['sell_price'],
+                'profit' => $profit,
                 'store' => $item['store'],
                 'grand_total_buy' => $total_buy,
-                'grand_total_sell' => $total_sell
+                'grand_total_sell' => $total_sell,
+                'grand_total_profit' => $total_profit
             ));
         }
 
