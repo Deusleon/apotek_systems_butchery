@@ -190,7 +190,7 @@
                     <div class="col-25"></div>
                     <div class="col-25">
                         <div class="full-row">
-                            <div class="col-50" align="left"><b>Total Buy</b></div>
+                            <div class="col-50" align="left"><b>Total Buy: </b></div>
                             <div class="col-50" align="right">{{number_format($data[0]['cost_by_supplier'][$key][0]['total_cost'],2)}}</div>
                         </div>
                     </div>
