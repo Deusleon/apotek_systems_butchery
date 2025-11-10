@@ -314,12 +314,13 @@ Invoices
         var end = moment();
 
         function cb(start, end) {
-            $('#due_date_filter span').val(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            $('#due_date_filter').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
         }
 
         $('#due_date_filter').daterangepicker({
             autoUpdateInput: false,
             locale: {
+                format: 'YYYY/MM/DD',
                 cancelLabel: 'Clear'
             },
             ranges: {
@@ -334,7 +335,7 @@ Invoices
 
     });
 
-    $('input[name="invoice_filter_due_date"]').on('apply.daterangepicker', function(ev, picker) {
+    $('#due_date_filter').on('apply.daterangepicker', function(ev, picker) {
         $(this).val(
             picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD')
         );
@@ -397,8 +398,8 @@ Invoices
                 invoice_data_table.rows.add(data);
                 invoice_data_table.draw();
             }
-    });
-}
+        });
+    }
 
     var invoice_data_table = $('#invoice_data_table').DataTable({
         searching: true,
