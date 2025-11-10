@@ -291,7 +291,7 @@
                             </thead>
 
                             <tbody>
-                                @foreach ($outstock as $out)
+                                @foreach ($outDetailed as $out)
                                     <tr>
                                         <td id="o_detal_name_{{ $out->product_id }}">
                                             {{ $out->name }}
@@ -467,7 +467,6 @@
                 maximumFractionDigits: 2
             });
         }
-
 
     </script>
 @endpush

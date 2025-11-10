@@ -6,6 +6,7 @@ use App\CurrentStock;
 use App\GoodsReceiving;
 use App\Product;
 use App\PurchaseReturn;
+use App\StockTracking;
 use App\Supplier;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -178,6 +179,17 @@ class PurchaseReturnController extends Controller
             $stock->save();
             Log::info('Stock updated', ['product_id' => $goodsReceivingData['product_id'], 'new_quantity' => $stock->quantity]);
         }
+        
+        StockTracking::create([
+            'stock_id' => $stock->id,
+            'product_id' => $stock->product_id,
+            'out_mode' => 'Purchase Return',
+            'quantity' => $purchaseReturn->quantity,
+            'store_id' => current_store_id(),
+            'created_by' => Auth::id(),
+            'updated_at' => now()->format('Y-m-d'),
+            'movement' => 'OUT',
+        ]);
 
         $goodsReceiving = GoodsReceiving::find($goodsReceivingData['id']);
 

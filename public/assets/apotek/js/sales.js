@@ -804,7 +804,8 @@ function discount() {
 
     document.getElementById("total").value = formatMoney(total);
     document.getElementById("sub_total").value = formatMoney(sub_total);
-    document.getElementById("total_items").innerHTML = numberWithCommas(total_items);
+    document.getElementById("total_items").innerHTML =
+        numberWithCommas(total_items);
     var t = document.getElementById("total").value;
     var st = document.getElementById("sub_total").value;
 
@@ -819,9 +820,9 @@ function discount() {
     cart_table.draw();
 
     // Save cart to localStorage for persistence on page reload
-    localStorage.setItem('cart', JSON.stringify(cart));
-    localStorage.setItem('default_cart', JSON.stringify(default_cart));
-    localStorage.setItem('order_cart', JSON.stringify(order_cart));
+    localStorage.setItem("cart", JSON.stringify(cart));
+    localStorage.setItem("default_cart", JSON.stringify(default_cart));
+    localStorage.setItem("order_cart", JSON.stringify(order_cart));
 }
 
 function deselect() {
@@ -832,13 +833,13 @@ function deselect() {
     // if (backDate) {
     //     backDate.value = "";
     // }
-    document.getElementById("sub_total").value = 0.00;
-    document.getElementById("total_vat").value = 0.00;
-    document.getElementById("total").value = 0.00;
+    document.getElementById("sub_total").value = 0.0;
+    document.getElementById("total_vat").value = 0.0;
+    document.getElementById("total").value = 0.0;
     document.getElementById("total_items").innerHTML = 0;
     try {
-        document.getElementById("sale_paid").value = 0.00;
-        document.getElementById("change_amount").value = 0.00;
+        document.getElementById("sale_paid").value = 0.0;
+        document.getElementById("change_amount").value = 0.0;
     } catch (e) {}
 
     sub_total = 0;
@@ -849,9 +850,9 @@ function deselect() {
     discount();
     $("#barcode_input").focus();
     // Clear localStorage when cancelling
-    localStorage.removeItem('cart');
-    localStorage.removeItem('default_cart');
-    localStorage.removeItem('order_cart');
+    localStorage.removeItem("cart");
+    localStorage.removeItem("default_cart");
+    localStorage.removeItem("order_cart");
 }
 
 function deselect1() {
@@ -872,9 +873,9 @@ function deselect1() {
     discount();
     $("#barcode_input").focus();
     // Clear localStorage when cancelling
-    localStorage.removeItem('cart');
-    localStorage.removeItem('default_cart');
-    localStorage.removeItem('order_cart');
+    localStorage.removeItem("cart");
+    localStorage.removeItem("default_cart");
+    localStorage.removeItem("order_cart");
 }
 
 function deselectQuote() {
@@ -910,8 +911,8 @@ function saleReturn(items, sale_id) {
                 item.name +
                     " " +
                     (item.brand ? item.brand + " " : "") +
-                    (item.pack_size ?? '') +
-                    (item.sales_uom ?? '')
+                    (item.pack_size ?? "") +
+                    (item.sales_uom ?? "")
             );
             item_data.push(item.quantity);
             item_data.push(item.price);
@@ -1349,7 +1350,7 @@ function valueCollection() {
 }
 
 $(document).ready(function () {
-    var id = document.getElementById("price_category").value;
+    var id = $("#price_category").val() || null;
     if (id) {
         $.ajax({
             url: config.routes.selectProducts,

@@ -69,8 +69,8 @@
 
 
         /**
-                                                                                                  Component
-                                                                                                **/
+                                                                                                      Component
+                                                                                                    **/
 
         label {
             width: 100%;
@@ -126,11 +126,6 @@
 
                     @if(auth()->user()->checkPermission('View Purchasing Summary'))
                         <li class="nav-item">
-                            {{-- @if(!auth()->user()->checkPermission('View Purchase Summary'))
-                            <a class="nav-link active" data-toggle="pill" href="#pills-purchase" role="tab"
-                                aria-selected="false">Purchasing</a>
-                            @endif --}}
-
                             @if(auth()->user()->checkPermission('View Purchasing Summary'))
                                 <a class="nav-link" data-toggle="pill" href="#pills-purchase" role="tab"
                                     aria-selected="false">Purchasing</a>
@@ -141,11 +136,6 @@
 
                     @if(auth()->user()->checkPermission('View Inventory Summary'))
                         <li class="nav-item">
-                            {{-- @if(!auth()->user()->checkPermission('View Inventory Summary'))
-                            <a class="nav-link active" data-toggle="pill" href="#pills-stock" role="tab" aria-selected="false">Inventory
-                            </a>
-                            @endif --}}
-
                             @if(auth()->user()->checkPermission('View Inventory Summary'))
                                 <a class="nav-link" data-toggle="pill" href="#pills-stock" role="tab" aria-selected="false">Inventory
                                 </a>
@@ -162,13 +152,6 @@
 
                     @if(auth()->user()->checkPermission('View Accounting Summary'))
                         <li class="nav-item">
-                            {{-- @if(!auth()->user()->checkPermission('View Sales Summary') && !auth()->user()->checkPermission('View
-                            Purchasing Summary') && !auth()->user()->checkPermission('View Inventory Summary'))
-                            <a class="nav-link active" data-toggle="pill" href="#pills-expense" role="tab"
-                                aria-selected="false">Accounting
-                                Summary</a>
-                            @endif --}}
-
                             @if(auth()->user()->checkPermission('View Accounting Summary') || auth()->user()->checkPermission('View Purchasing Summary') || auth()->user()->checkPermission('View Inventory Summary'))
                                 <a class="nav-link" data-toggle="pill" href="#pills-expense" role="tab" aria-selected="false">Accounting
                                 </a>
@@ -516,7 +499,6 @@
                         </div>
                     @endif
                 @endif
-
                 {{-- end Tab 2 --}}
 
                 {{-- Tab 3 --}}
@@ -701,7 +683,6 @@
                         </div>
                     @endif
                 @endif
-
                 {{-- end Tab 3 --}}
 
                 {{-- Tab 4 --}}
@@ -889,80 +870,82 @@
                 {{-- end Tab 4 --}}
 
                 {{-- Tab 5 --}}
-                <div class="tab-pane fade" id="pills-transport" role="tabpanel" aria-labelledby="pills-transport-tab">
-                    <div class="row">
-                        <div class="col-md-6 col-xl-3">
-                            <div class="card">
-                                <div class="card-block">
-                                    <h6 class="mb-4">Trips</h6>
-                                    <div class="row d-flex align-items-center">
-                                        <div class="col-9">
-                                            <h3 class="f-w-300 d-flex align-items-center m-b-0">
-                                                {{ number_format($transport_data['total_trips']) }}
-                                            </h3>
+                @if(auth()->user()->checkPermission('View Transport Summary'))
+                    <div class="tab-pane fade" id="pills-transport" role="tabpanel" aria-labelledby="pills-transport-tab">
+                        <div class="row">
+                            <div class="col-md-6 col-xl-3">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <h6 class="mb-4">Trips</h6>
+                                        <div class="row d-flex align-items-center">
+                                            <div class="col-9">
+                                                <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                                    {{ number_format($transport_data['total_trips']) }}
+                                                </h3>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-6 col-xl-3">
-                            <div class="card">
-                                <div class="card-block">
-                                    <h6 class="mb-4">Revenue</h6>
-                                    <div class="row d-flex align-items-center">
-                                        <div class="col-9">
-                                            <h3 class="f-w-300 d-flex align-items-center m-b-0">
-                                                Tshs {{ number_format($transport_data['total_revenue'], 2) }}
-                                            </h3>
+                            <div class="col-md-6 col-xl-3">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <h6 class="mb-4">Revenue</h6>
+                                        <div class="row d-flex align-items-center">
+                                            <div class="col-9">
+                                                <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                                    Tshs {{ number_format($transport_data['total_revenue'], 2) }}
+                                                </h3>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-6 col-xl-2">
-                            <div class="card">
-                                <div class="card-block">
-                                    <h6 class="mb-4">Pending</h6>
-                                    <div class="row d-flex align-items-center">
-                                        <div class="col-9">
-                                            <h3 class="f-w-300 d-flex align-items-center m-b-0">
-                                                {{ number_format($transport_data['pending_trips']) }}
-                                            </h3>
+                            <div class="col-md-6 col-xl-2">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <h6 class="mb-4">Pending</h6>
+                                        <div class="row d-flex align-items-center">
+                                            <div class="col-9">
+                                                <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                                    {{ number_format($transport_data['pending_trips']) }}
+                                                </h3>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-6 col-xl-2">
-                            <div class="card">
-                                <div class="card-block">
-                                    <h6 class="mb-4">In Transit</h6>
-                                    <div class="row d-flex align-items-center">
-                                        <div class="col-9">
-                                            <h3 class="f-w-300 d-flex align-items-center m-b-0">
-                                                {{ number_format($transport_data['in_transit_trips']) }}
-                                            </h3>
+                            <div class="col-md-6 col-xl-2">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <h6 class="mb-4">In Transit</h6>
+                                        <div class="row d-flex align-items-center">
+                                            <div class="col-9">
+                                                <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                                    {{ number_format($transport_data['in_transit_trips']) }}
+                                                </h3>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-6 col-xl-2">
-                            <div class="card">
-                                <div class="card-block">
-                                    <h6 class="mb-4">Delivered</h6>
-                                    <div class="row d-flex align-items-center">
-                                        <div class="col-9">
-                                            <h3 class="f-w-300 d-flex align-items-center m-b-0">
-                                                {{ number_format($transport_data['delivered_trips']) }}
-                                            </h3>
+                            <div class="col-md-6 col-xl-2">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <h6 class="mb-4">Delivered</h6>
+                                        <div class="row d-flex align-items-center">
+                                            <div class="col-9">
+                                                <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                                    {{ number_format($transport_data['delivered_trips']) }}
+                                                </h3>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                @endif
                 {{-- end Tab 5 --}}
 
             </div>

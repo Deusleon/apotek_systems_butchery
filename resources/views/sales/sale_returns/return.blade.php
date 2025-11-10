@@ -8,7 +8,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form action="{{ route('sale-returns.store') }}" method="post" name="return-form"
+            <form id="return-form" action="{{ route('sale-returns.store') }}" method="post" name="return-form"
                   enctype="multipart/form-data">
                 @csrf()
                 <div class="modal-body">
