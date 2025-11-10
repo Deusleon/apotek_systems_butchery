@@ -101,8 +101,8 @@
             <table id="table-detail" align="center" style="margin-top: -1%; padding-top: 0%;">
                 <thead>
                     <tr style="background: #1f273b; color: white;">
-                        <th align="center" style="width: 1%;">#</th>
-                        <th align="left">Receipt #</th>
+                        <th align="center" style="width: 1.5%;">#</th>
+                        <th align="left" style="width: 8.5%">Receipt #</th>
                         <th align="left" style="width: 20%">Product Name</th>
                         <th align="left">Batch #</th>
                         <th align="left">Sold By</th>
@@ -165,7 +165,7 @@
                     <td align="right" style="padding-top: -3%">{{ number_format($dat['totals']['grand_total'], 2) }}</td>
                 </tr>
             </table>
-            <hr>
+                <hr style="margin-left: 5px;">
         @endforeach
         {{-- compute overall totals in blade --}}
         @php
