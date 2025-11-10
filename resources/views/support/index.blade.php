@@ -75,7 +75,10 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
-                        <label for="phone">Email : support@apoteksystems.com </label><br>
+                        <label for="phone" class="d-flex">Email :
+                            <ul style="margin-left: -12px;">support@apoteksystems.com
+                            </ul>
+                        </label>
                         <label for="phone" class="d-flex">Phone :
                             <ul>
                                 <li>+255 768 332 031</li>

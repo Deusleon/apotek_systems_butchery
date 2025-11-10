@@ -51,7 +51,7 @@
 
 <li class="nav-item pcoded-hasmenu">
     @if(auth()->user()->checkPermission('View Inventory'))
-        <a href="#!" class="nav-link"><span class="pcoded-micon"><i class="fas fa-dolly"></i></span>
+        <a href="#!" class="nav-link"><span class="pcoded-micon"><i class="fas fa-boxes"></i></span>
             <span class="pcoded-mtext">Inventory</span>
         </a>
         <ul class="pcoded-submenu">

@@ -116,7 +116,7 @@
                     element.setAttribute("value", data[2]);
                     element.setAttribute("name", "formdata");
                     element.setAttribute("class", "form-control");
-                    element.setAttribute("placeholder", "Enter business name");
+                    element.setAttribute("placeholder", "Enter Business Name");
                     document.getElementById("formInput").appendChild(element);
                     break;
                 case 101:
