@@ -130,8 +130,8 @@
                 <!-- loop the product names here -->
                 <thead>
                     <tr style="background: #1f273b; color: white;">
-                        <th align="left" style="width: 1%;">#</th>
-                        <th align="left">Receipt #</th>
+                        <th align="left" style="width: 1.5%;">#</th>
+                        <th align="left" style="width: 8.5%;">Receipt #</th>
                         <th align="left" style="width: 20%">Product Name</th>
                         <th align="left">Batch #</th>
                         <th align="left">Sold By</th>
@@ -195,7 +195,7 @@
                     $grand_amount_total += $e['amount_total'];
                 @endphp
             @endforeach
-            <hr>
+                <hr style="margin-left: 5px;">
         @endforeach
         <div style="margin-top: 10px; padding-top: 5px;">
             <h3 align="center"><b>Summary</b></h3>

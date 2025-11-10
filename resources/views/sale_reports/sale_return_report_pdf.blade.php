@@ -61,6 +61,10 @@
             border-collapse: collapse;
         }
 
+        hr{
+            width: 100.05%;
+        }
+
         #table-detail tr> {
             line-height: 13px;
         }
@@ -119,10 +123,10 @@
                     <thead>
                         <tr style="background: #1f273b; color: white;">
                             <th align="center">#</th>
-                            <th align="left">Product Name</th>
+                            <th align="center">Product Name</th>
                             <th align="left">Sales Date</th>
                             <th align="center">Qty Bought</th>
-                            <th align="left">Return Date</th>
+                            <th align="center">Return Date</th>
                             <th align="center">Qty Returned</th>
                             <th align="left">Reason</th>
                             <th align="right">Refund</th>
@@ -139,7 +143,7 @@
                                                     {{ $datas['item_returned']['brand'] ? ' ' . $datas['item_returned']['brand'] : '' }}
                                                     {{ $datas['item_returned']['pack_size'] ?? '' }}{{ $datas['item_returned']['sales_uom'] ?? '' }}
                                                 </td>
-                                                <td align="left">{{date('Y-m-d', strtotime($datas['item_returned']['b_date']))}}</td>
+                                                <td align="center">{{date('Y-m-d', strtotime($datas['item_returned']['b_date']))}}</td>
                                                 {{-- @if($datas['status'] == 5) --}}
                                                 <td align="center">
                                                     {{number_format(($datas['item_returned']['remained_qty'] + $datas['item_returned']['rtn_qty']), 0)}}
@@ -148,7 +152,7 @@
                                                 <td align="center">{{number_format($datas['item_returned']['remained_qty'], 0)}}</td>
                                                 @endif --}}
 
-                                                <td align="left">{{date('Y-m-d', strtotime($datas['date']))}}</td>
+                                                <td align="center">{{date('Y-m-d', strtotime($datas['date']))}}</td>
                                                 <td align="center">{{number_format($datas['item_returned']['rtn_qty'], 0)}}</td>
                                                 <td align="left">{{$datas['reason']}}</td>
                                                 <td align="right">{{number_format((($datas['item_returned']['rtn_qty']) /
@@ -163,7 +167,7 @@
                         @endforeach
                     </tbody>
                 </table>
-                <hr>
+                <hr style="margin-left: 10px;">
                 <div style="margin-top: 10px; padding-top: 5px;">
                     <h3 align="center"><b>Summary</b></h3>
                     <table
