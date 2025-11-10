@@ -71,7 +71,7 @@
                                     <div class="form-group">
                                         <label for="Amount">Received Amount</label>
                                         <input type="text" class="form-control" id="received_amount_id" name="received_amount"
-                                               aria-describedby="emailHelp" value="0" onkeypress="return isNumberKey(event,this)">
+                                               aria-describedby="emailHelp" value="0" onchange="formatReceivedAmount()" onkeypress="return isNumberKey(event,this)">
                                     </div>
                                 </div>
                             </div>
@@ -192,6 +192,12 @@
         if (days_diff >= 0) {
             document.getElementById("period_id").value = days_diff;
         }
+    }
+
+    function formatReceivedAmount() {
+        var received_amount = document.getElementById("received_amount_id").value;
+        var formatted_amount = formatMoney(parseFloat(received_amount.replace(/\,/g, ''), 10));
+        document.getElementById("received_amount_id").value = formatted_amount;
     }
 
 </script>

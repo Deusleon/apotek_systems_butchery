@@ -204,13 +204,18 @@ class PurchaseReturnController extends Controller
         // IF Partial return the values are re-calculated
         if ($newqty > 0) {
             $status = 5; // Partially returned
-            // Recalculate total cost proportionally
+            // Recalculate total cost, total sell, and item profit proportionally
             $unitCost = $goodsReceiving->unit_cost;
+            $sellPrice = $goodsReceiving->sell_price;
             $goodsReceiving->total_cost = $newqty * $unitCost;
+            $goodsReceiving->total_sell = $newqty * $sellPrice;
+            $goodsReceiving->item_profit = $goodsReceiving->total_sell - $goodsReceiving->total_cost;
             $goodsReceiving->quantity = $newqty;
         } else {
             $status = 3; // Fully returned
             $goodsReceiving->total_cost = 0;
+            $goodsReceiving->total_sell = 0;
+            $goodsReceiving->item_profit = 0;
             $goodsReceiving->quantity = 0;
         }
 
