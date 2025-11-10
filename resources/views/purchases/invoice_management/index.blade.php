@@ -312,9 +312,14 @@ Invoices
     $(function() {
         var start = moment();
         var end = moment();
+        var initialized = false;
 
         function cb(start, end) {
             $('#due_date_filter').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
+            if (initialized) {
+                filterByDueDate();
+            }
+            initialized = true;
         }
 
         $('#due_date_filter').daterangepicker({
@@ -339,7 +344,7 @@ Invoices
         $(this).val(
             picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD')
         );
-        filterByDueDate();
+        // filterByDueDate() is already called in the callback function
     });
 
 
