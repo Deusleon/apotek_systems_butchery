@@ -113,7 +113,7 @@ class CommonFunctions
 
             // Only update if the store has changed or if it's been more than 30 minutes
             $needs_update = ($current_notification_store_id != $store_id) ||
-                           ($existing_notification->updated_at < now()->subMinutes(30));
+                           ($existing_notification->updated_at < now()->subMinutes(300));
 
             if ($needs_update) {
                 // Update existing notification with new store data

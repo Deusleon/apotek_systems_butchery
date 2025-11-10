@@ -108,7 +108,7 @@
             width: 100%;
             border: none;
             border-collapse: collapse;
-            margin-top: 30px;
+            margin-top: 25px;
         }
 
         .table-header {
@@ -125,7 +125,7 @@
         }
 
         .items-table td {
-            padding: 8px 2px;
+            padding: 2px 2px;
             border: 1px solid #858484;
             font-size: 12px;
             height: 15px;

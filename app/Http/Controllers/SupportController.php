@@ -14,12 +14,12 @@ class SupportController extends Controller
 
     public function downloadManual()
     {
-        $filePath = 'manuals/user_manual.pdf';
+        $filePath = 'manuals/APOTEk_User_Guide.pdf';
 
         if (!Storage::disk('public')->exists($filePath)) {
-            return redirect()->back()->with('error', 'User manual not found.');
+            return redirect()->back()->with('error', 'User guide not found.');
         }
 
-        return Storage::disk('public')->download($filePath, 'APOTEK_POS_User_Manual.pdf');
+        return Storage::disk('public')->download($filePath, 'APOTEk_User_Guide.pdf');
     }
 }

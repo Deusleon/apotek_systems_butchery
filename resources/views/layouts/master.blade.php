@@ -591,7 +591,7 @@ $store_id = Auth::user()->store_id;
 
     {{-- custom java scripts for the page --}}
 
-    <script src="{{asset("assets/apotek/js/scheduling.js")}}"></script>
+    {{-- <script src="{{asset("assets/apotek/js/scheduling.js")}}"></script> --}}
     <script src="{{asset("assets/apotek/js/notification.js")}}"></script>
     <script>
 
@@ -602,19 +602,19 @@ $store_id = Auth::user()->store_id;
             }
         };
 
-        $(document).ready(function () {
-            setInterval(checkStock, 60000)
+        // $(document).ready(function () {
+        //     setInterval(checkStock, 60000)
 
-            // Auto-hide alerts after 5 seconds
-            setTimeout(function () {
-                $('.alert').fadeOut('slow');
-            }, 5000);
+        //     // Auto-hide alerts after 5 seconds
+        //     setTimeout(function () {
+        //         $('.alert').fadeOut('slow');
+        //     }, 5000);
 
-            // Handle alert close button
-            $('.alert .close').on('click', function () {
-                $(this).closest('.alert').fadeOut('slow');
-            });
-        });
+        //     // Handle alert close button
+        //     $('.alert .close').on('click', function () {
+        //         $(this).closest('.alert').fadeOut('slow');
+        //     });
+        // });
 
         // Toast notification function
         function showToast(message, type = 'success') {
