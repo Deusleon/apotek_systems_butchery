@@ -59,6 +59,10 @@
             page-break-after: auto
         }
 
+        hr{
+            width: 100.005%;
+        }
+
         thead {
             display: table-header-group
         }
@@ -151,9 +155,8 @@
                     @endforeach
 
                 </table>
-                <hr>
+                <hr style="margin-left: 10px;">
             </div>
-
         @endforeach
         <div style="margin-top: 10px; padding-top: 5px;">
             <h3 align="center"><b>Summary</b></h3>

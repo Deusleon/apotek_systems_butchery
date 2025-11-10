@@ -33,6 +33,10 @@
             page-break-after: auto
         }
 
+        hr{
+            width: 100.005%;
+        }
+
         thead {
             display: table-header-group
         }
@@ -108,7 +112,7 @@
                         <th align="left">Date</th>
                         <th align="right">Total</th>
                         <th align="right">Paid</th>
-                        <th align="right">Balance</th>
+                        <th align="right" style="padding-right: 50px;">Balance</th>
                         <th align="left">Sold By</th>
                         <th align="left">Status</th>
                     </tr>
@@ -123,7 +127,7 @@
                             <td align="left">{{ date('Y-m-d', strtotime($item['sales_date'])) }}</td>
                             <td align="right">{{number_format($item['total'], 2)}}</td>
                             <td align="right">{{number_format($item['paid'], 2)}}</td>
-                            <td align="right">{{number_format($item['balance'], 2)}}</td>
+                            <td align="right" style="padding-right: 50px;">{{number_format($item['balance'], 2)}}</td>
                             <td align="left">{{$item['sold_by']}}</td>
                             <td align="left">
                                 @if ($item['status'] === 'Unpaid')
@@ -140,7 +144,7 @@
                     @endforeach
                 </tbody>
             </table>
-            <hr>
+                <hr style="margin-left: 5px;">
             <div style="margin-top: 10px; padding-top: 5px;">
                 <h3 align="center"><b>Summary</b></h3>
                 <table
