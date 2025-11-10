@@ -153,13 +153,13 @@
                 <thead>
                 <tr style="background: #1f273b; color: white;">
                     <th align="left" style="width: 1%;">#</th>
-                    <th align="left">Product Name</th>
-                    <th align="center">Quantity</th>
-                    <th align="right">Buy Price</th>
-                    <th align="right">Sell Price</th>
-                    <th align="right">Profit</th>
-                    <th align="left">Receive Date</th>
-                    <th align="left">Received By</th>
+                    <th align="left" style="width: 35%;">Product Name</th>
+                    <th align="center" style="width: 10%;">Quantity</th>
+                    <th align="right" style="width: 10%;">Buy Price</th>
+                    <th align="right" style="width: 10%;">Sell Price</th>
+                    <th align="right" style="width: 10%;">Profit</th>
+                    <th align="left" style="width: 15%;">Receive Date</th>
+                    <th align="left" style="width: 15%;">Received By</th>
                 </tr>
                 </thead>
                 @foreach($data as $item)
