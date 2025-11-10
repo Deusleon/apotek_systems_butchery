@@ -144,12 +144,12 @@
                 <thead>
                 <tr style="background: #1f273b; color: white;">
                     <th align="left" style="width: 1%;">#</th>
-                    <th align="left">Product Name</th>
-                    <th align="left">Receive Date</th>
-                    <th align="center">Qty Received</th>
-                    <th align="left">Return Date</th>
-                    <th align="center">Qty Returned</th>
-                    <th align="right">Refund Amount</th>
+                    <th align="left" style="width: 35%;">Product Name</th>
+                    <th align="left" style="width: 10%;">Receive Date</th>
+                    <th align="center" style="width: 10%;">Qty Received</th>
+                    <th align="left" style="width: 10%;">Return Date</th>
+                    <th align="center" style="width: 10%;">Qty Returned</th>
+                    <th align="right" style="width: 15%;">Refund Amount</th>
                 </tr>
                 </thead>
                 @php $total_refund = 0; @endphp

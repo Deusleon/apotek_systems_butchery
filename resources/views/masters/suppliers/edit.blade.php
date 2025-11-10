@@ -28,7 +28,7 @@
                                     color="red">*</font></label>
                             <div class="col-md-8">
                                 <input type="text" class="form-control" id="name_edit" name="name"
-                                       aria-describedby="emailHelp" required="true" maxlength="20">
+                                       aria-describedby="emailHelp" required="true" maxlength="50">
                             </div>
                         </div>
 
