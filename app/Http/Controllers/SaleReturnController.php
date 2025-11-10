@@ -8,6 +8,7 @@ use App\Sale;
 use App\SalesCredit;
 use App\SalesDetail;
 use App\SalesReturn;
+use App\StockTracking;
 use App\Setting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -186,9 +187,20 @@ class SaleReturnController extends Controller
         $details->status = $status;
         $details->updated_by = Auth::User()->id;
 
-
         $details->save();
         $stock->save();
+        
+        StockTracking::create([
+            'stock_id' => $stock->id,
+            'product_id' => $stock->product_id,
+            'out_mode' => 'Sales Return',
+            'quantity' => $request['rtn_qty'],
+            'store_id' => current_store_id(),
+            'created_by' => Auth::id(),
+            'updated_at' => now()->format('Y-m-d'),
+            'movement' => 'IN',
+        ]);
+
         return back();
     }
 

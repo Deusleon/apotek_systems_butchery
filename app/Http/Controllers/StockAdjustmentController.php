@@ -258,7 +258,7 @@ class StockAdjustmentController extends Controller
                 StockTracking::create([
                     'stock_id' => $batch->id,
                     'product_id' => $batch->product_id,
-                    'out_mode' => 'Stock adjustment: ' . $request->reason,
+                    'out_mode' => 'Stock Adjustment',
                     'quantity' => $adjQty,
                     'store_id' => $storeId,
                     'created_by' => Auth::id(),
@@ -325,10 +325,11 @@ class StockAdjustmentController extends Controller
                     StockTracking::create([
                         'stock_id' => $latest->id,
                         'product_id' => $latest->product_id,
-                        'out_mode' => $request->reason,
+                        'out_mode' => 'Stock Adjustment',
                         'quantity' => $adjustmentAmount,
                         'store_id' => $storeId,
                         'created_by' => Auth::id(),
+                        'updated_at' => now()->format('Y-m-d'),
                         'movement' => $typeLatest === 'increase' ? 'IN' : 'OUT',
                     ]);
 
@@ -388,10 +389,11 @@ class StockAdjustmentController extends Controller
                     StockTracking::create([
                         'stock_id' => $batch->id,
                         'product_id' => $batch->product_id,
-                        'out_mode' => 'Stock adjustment: ' . $request->reason,
+                        'out_mode' => 'Stock Adjustment',
                         'quantity' => $deduct,
                         'store_id' => $storeId,
                         'created_by' => Auth::id(),
+                        'updated_at' => now()->format('Y-m-d'),
                         'movement' => 'OUT',
                     ]);
 

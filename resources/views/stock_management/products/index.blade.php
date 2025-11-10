@@ -120,7 +120,7 @@
                                     <th hidden>Brand</th>
                                     <th hidden>Pack Size</th>
                                     <th>Category</th>
-                                    @if(auth()->user()->checkPermission('Edit Products') || auth()->user()->checkPermission('Delete Products'))
+                                    @if(auth()->user()->checkPermission('View Product List'))
                                         <th>Actions</th>
                                     @endif
                                 </tr>

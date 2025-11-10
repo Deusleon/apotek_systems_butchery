@@ -695,7 +695,7 @@ class StockTransferController extends Controller {
         $stock_tracking->quantity = $request->transfer_qty;
         $stock_tracking->store_id = $transfer->to_store;
         $stock_tracking->updated_by = Auth::user()->id;
-        $stock_tracking->out_mode = 'Stock Transfer Completed';
+        $stock_tracking->out_mode = 'Stock Transfer';
         $stock_tracking->updated_at = date('Y-m-d');
         $stock_tracking->movement = 'IN';
         $stock_tracking->save();
@@ -920,7 +920,7 @@ class StockTransferController extends Controller {
 
             DB::commit();
 
-            return redirect()->route('stock-transfer-history')->with(['message' => 'Stock transfer rejected successfully']);
+            return redirect()->route('stock-transfer-history')->with(['message' => 'Stock transfer rejected']);
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Reject transfer error: ' . $e->getMessage());

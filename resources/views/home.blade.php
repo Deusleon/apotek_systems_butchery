@@ -69,8 +69,8 @@
 
 
         /**
-                                                                                                  Component
-                                                                                                **/
+                                                                                                      Component
+                                                                                                    **/
 
         label {
             width: 100%;
@@ -117,23 +117,35 @@
                     auth()->user()->checkPermission('View Accounting Summary')
                 )
                 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                    @php
+                        $firstAvailableTab = '';
+                        
+                        // Determine the first available tab based on permissions
+                        if(auth()->user()->checkPermission('View Sales Summary')) {
+                            $firstAvailableTab = 'sales';
+                        } elseif(auth()->user()->checkPermission('View Purchasing Summary')) {
+                            $firstAvailableTab = 'purchase';
+                        } elseif(auth()->user()->checkPermission('View Inventory Summary')) {
+                            $firstAvailableTab = 'stock';
+                        } elseif(auth()->user()->checkPermission('View Transport Summary')) {
+                            $firstAvailableTab = 'transport';
+                        } elseif(auth()->user()->checkPermission('View Accounting Summary')) {
+                            $firstAvailableTab = 'expense';
+                        }
+                    @endphp
+                    
                     @if(auth()->user()->checkPermission('View Sales Summary'))
                         <li class="nav-item">
-                            <a class="nav-link active" data-toggle="pill" href="#pills-home" role="tab" aria-selected="true">Sales
+                            <a class="nav-link {{ $firstAvailableTab == 'sales' ? 'active' : '' }}" data-toggle="pill" href="#pills-home" role="tab" aria-selected="{{ $firstAvailableTab == 'sales' ? 'true' : 'false' }}">Sales
                             </a>
                         </li>
                     @endif
 
                     @if(auth()->user()->checkPermission('View Purchasing Summary'))
                         <li class="nav-item">
-                            {{-- @if(!auth()->user()->checkPermission('View Purchase Summary'))
-                            <a class="nav-link active" data-toggle="pill" href="#pills-purchase" role="tab"
-                                aria-selected="false">Purchasing</a>
-                            @endif --}}
-
                             @if(auth()->user()->checkPermission('View Purchasing Summary'))
-                                <a class="nav-link" data-toggle="pill" href="#pills-purchase" role="tab"
-                                    aria-selected="false">Purchasing</a>
+                                <a class="nav-link {{ $firstAvailableTab == 'purchase' ? 'active' : '' }}" data-toggle="pill" href="#pills-purchase" role="tab"
+                                    aria-selected="{{ $firstAvailableTab == 'purchase' ? 'true' : 'false' }}">Purchasing</a>
                             @endif
 
                         </li>
@@ -141,13 +153,8 @@
 
                     @if(auth()->user()->checkPermission('View Inventory Summary'))
                         <li class="nav-item">
-                            {{-- @if(!auth()->user()->checkPermission('View Inventory Summary'))
-                            <a class="nav-link active" data-toggle="pill" href="#pills-stock" role="tab" aria-selected="false">Inventory
-                            </a>
-                            @endif --}}
-
                             @if(auth()->user()->checkPermission('View Inventory Summary'))
-                                <a class="nav-link" data-toggle="pill" href="#pills-stock" role="tab" aria-selected="false">Inventory
+                                <a class="nav-link {{ $firstAvailableTab == 'stock' ? 'active' : '' }}" data-toggle="pill" href="#pills-stock" role="tab" aria-selected="{{ $firstAvailableTab == 'stock' ? 'true' : 'false' }}">Inventory
                                 </a>
                             @endif
                         </li>
@@ -155,22 +162,15 @@
 
                     @if(auth()->user()->checkPermission('View Transport Summary'))
                         <li class="nav-item">
-                            <a class="nav-link" data-toggle="pill" href="#pills-transport" role="tab" aria-selected="false">Transport
+                            <a class="nav-link {{ $firstAvailableTab == 'transport' ? 'active' : '' }}" data-toggle="pill" href="#pills-transport" role="tab" aria-selected="{{ $firstAvailableTab == 'transport' ? 'true' : 'false' }}">Transport
                             </a>
                         </li>
                     @endif
 
                     @if(auth()->user()->checkPermission('View Accounting Summary'))
                         <li class="nav-item">
-                            {{-- @if(!auth()->user()->checkPermission('View Sales Summary') && !auth()->user()->checkPermission('View
-                            Purchasing Summary') && !auth()->user()->checkPermission('View Inventory Summary'))
-                            <a class="nav-link active" data-toggle="pill" href="#pills-expense" role="tab"
-                                aria-selected="false">Accounting
-                                Summary</a>
-                            @endif --}}
-
                             @if(auth()->user()->checkPermission('View Accounting Summary') || auth()->user()->checkPermission('View Purchasing Summary') || auth()->user()->checkPermission('View Inventory Summary'))
-                                <a class="nav-link" data-toggle="pill" href="#pills-expense" role="tab" aria-selected="false">Accounting
+                                <a class="nav-link {{ $firstAvailableTab == 'expense' ? 'active' : '' }}" data-toggle="pill" href="#pills-expense" role="tab" aria-selected="{{ $firstAvailableTab == 'expense' ? 'true' : 'false' }}">Accounting
                                 </a>
                             @endif
 
@@ -202,9 +202,9 @@
                 @endif
                 {{-- end Tab 0 --}}
 
-                {{-- Tab 1 --}}
+                {{-- Tab 1 - Sales --}}
                 @if(auth()->user()->checkPermission('View Sales Summary'))
-                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                    <div class="tab-pane fade {{ $firstAvailableTab == 'sales' ? 'show active' : '' }}" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
                         {{-- row 1 start --}}
                         <div class="row">
                             <!-- [ Today sales section ] start -->
@@ -295,10 +295,10 @@
                 @endif
                 {{-- end Tab 1 --}}
 
-                {{-- Tab 2 --}}
+                {{-- Tab 2 - Inventory --}}
                 @if(auth()->user()->checkPermission('View Inventory Summary'))
                     @if(auth()->user()->checkPermission('View Inventory Summary') || auth()->user()->checkPermission('View Inventory Summary'))
-                        <div class="tab-pane fade" id="pills-stock" role="tabpanel" aria-labelledby="pills-stock-tab">
+                        <div class="tab-pane fade {{ $firstAvailableTab == 'stock' ? 'show active' : '' }}" id="pills-stock" role="tabpanel" aria-labelledby="pills-stock-tab">
                             {{-- row starts --}}
                             <div class="row">
                                 <div class="col-md-4 col-lg-4 col-sm-4">
@@ -516,12 +516,11 @@
                         </div>
                     @endif
                 @endif
-
                 {{-- end Tab 2 --}}
 
-                {{-- Tab 3 --}}
+                {{-- Tab 3 - Purchasing --}}
                 @if(auth()->user()->checkPermission('View Purchasing Summary'))
-                    @if(!auth()->user()->checkPermission('View Sales Summary'))
+                    @if($firstAvailableTab == 'purchase')
                         <div class="tab-pane fade show active" id="pills-purchase" role="tabpanel" aria-labelledby="pills-purchase-tab">
                             {{-- row 1 start--}}
                             <div class="row">
@@ -611,8 +610,8 @@
                         </div>
                     @endif
 
-                    @if(auth()->user()->checkPermission('View Sales Summary'))
-                        <div class="tab-pane fade" id="pills-purchase" role="tabpanel" aria-labelledby="pills-purchase-tab">
+                    @if($firstAvailableTab != 'purchase')
+                        <div class="tab-pane fade {{ $firstAvailableTab == 'purchase' ? 'show active' : '' }}" id="pills-purchase" role="tabpanel" aria-labelledby="pills-purchase-tab">
                             {{-- row 1 start--}}
                             <div class="row">
                                 <!-- [ Today purchase section ] start -->
@@ -701,12 +700,11 @@
                         </div>
                     @endif
                 @endif
-
                 {{-- end Tab 3 --}}
 
-                {{-- Tab 4 --}}
+                {{-- Tab 4 - Accounting --}}
                 @if(auth()->user()->checkPermission('View Accounting Summary'))
-                    @if(!auth()->user()->checkPermission('View Sales Summary') && !auth()->user()->checkPermission('View Purchasing Summary') && !auth()->user()->checkPermission('View Inventory Summary'))
+                    @if($firstAvailableTab == 'expense')
                         <div class="tab-pane fade show active" id="pills-expense" role="tabpanel" aria-labelledby="pills-expense-tab">
                             {{-- row 1 start--}}
                             <div class="row">
@@ -796,8 +794,8 @@
                         </div>
                     @endif
 
-                    @if(auth()->user()->checkPermission('View Sales Summary') || auth()->user()->checkPermission('View Purchasing Summary') || auth()->user()->checkPermission('View Inventory Summary'))
-                        <div class="tab-pane fade" id="pills-expense" role="tabpanel" aria-labelledby="pills-expense-tab">
+                    @if($firstAvailableTab != 'expense')
+                        <div class="tab-pane fade {{ $firstAvailableTab == 'expense' ? 'show active' : '' }}" id="pills-expense" role="tabpanel" aria-labelledby="pills-expense-tab">
                             {{-- row 1 start--}}
                             <div class="row">
                                 <!-- [ Today expense section ] start -->
@@ -888,81 +886,83 @@
                 @endif
                 {{-- end Tab 4 --}}
 
-                {{-- Tab 5 --}}
-                <div class="tab-pane fade" id="pills-transport" role="tabpanel" aria-labelledby="pills-transport-tab">
-                    <div class="row">
-                        <div class="col-md-6 col-xl-3">
-                            <div class="card">
-                                <div class="card-block">
-                                    <h6 class="mb-4">Trips</h6>
-                                    <div class="row d-flex align-items-center">
-                                        <div class="col-9">
-                                            <h3 class="f-w-300 d-flex align-items-center m-b-0">
-                                                {{ number_format($transport_data['total_trips']) }}
-                                            </h3>
+                {{-- Tab 5 - Transport --}}
+                @if(auth()->user()->checkPermission('View Transport Summary'))
+                    <div class="tab-pane fade {{ $firstAvailableTab == 'transport' ? 'show active' : '' }}" id="pills-transport" role="tabpanel" aria-labelledby="pills-transport-tab">
+                        <div class="row">
+                            <div class="col-md-6 col-xl-3">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <h6 class="mb-4">Trips</h6>
+                                        <div class="row d-flex align-items-center">
+                                            <div class="col-9">
+                                                <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                                    {{ number_format($transport_data['total_trips']) }}
+                                                </h3>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-6 col-xl-3">
-                            <div class="card">
-                                <div class="card-block">
-                                    <h6 class="mb-4">Revenue</h6>
-                                    <div class="row d-flex align-items-center">
-                                        <div class="col-9">
-                                            <h3 class="f-w-300 d-flex align-items-center m-b-0">
-                                                Tshs {{ number_format($transport_data['total_revenue'], 2) }}
-                                            </h3>
+                            <div class="col-md-6 col-xl-3">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <h6 class="mb-4">Revenue</h6>
+                                        <div class="row d-flex align-items-center">
+                                            <div class="col-9">
+                                                <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                                    Tshs {{ number_format($transport_data['total_revenue'], 2) }}
+                                                </h3>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-6 col-xl-2">
-                            <div class="card">
-                                <div class="card-block">
-                                    <h6 class="mb-4">Pending</h6>
-                                    <div class="row d-flex align-items-center">
-                                        <div class="col-9">
-                                            <h3 class="f-w-300 d-flex align-items-center m-b-0">
-                                                {{ number_format($transport_data['pending_trips']) }}
-                                            </h3>
+                            <div class="col-md-6 col-xl-2">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <h6 class="mb-4">Pending</h6>
+                                        <div class="row d-flex align-items-center">
+                                            <div class="col-9">
+                                                <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                                    {{ number_format($transport_data['pending_trips']) }}
+                                                </h3>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-6 col-xl-2">
-                            <div class="card">
-                                <div class="card-block">
-                                    <h6 class="mb-4">In Transit</h6>
-                                    <div class="row d-flex align-items-center">
-                                        <div class="col-9">
-                                            <h3 class="f-w-300 d-flex align-items-center m-b-0">
-                                                {{ number_format($transport_data['in_transit_trips']) }}
-                                            </h3>
+                            <div class="col-md-6 col-xl-2">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <h6 class="mb-4">In Transit</h6>
+                                        <div class="row d-flex align-items-center">
+                                            <div class="col-9">
+                                                <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                                    {{ number_format($transport_data['in_transit_trips']) }}
+                                                </h3>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-6 col-xl-2">
-                            <div class="card">
-                                <div class="card-block">
-                                    <h6 class="mb-4">Delivered</h6>
-                                    <div class="row d-flex align-items-center">
-                                        <div class="col-9">
-                                            <h3 class="f-w-300 d-flex align-items-center m-b-0">
-                                                {{ number_format($transport_data['delivered_trips']) }}
-                                            </h3>
+                            <div class="col-md-6 col-xl-2">
+                                <div class="card">
+                                    <div class="card-block">
+                                        <h6 class="mb-4">Delivered</h6>
+                                        <div class="row d-flex align-items-center">
+                                            <div class="col-9">
+                                                <h3 class="f-w-300 d-flex align-items-center m-b-0">
+                                                    {{ number_format($transport_data['delivered_trips']) }}
+                                                </h3>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                @endif
                 {{-- end Tab 5 --}}
 
             </div>

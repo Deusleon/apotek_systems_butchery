@@ -249,6 +249,14 @@
 
         });
 
+        $('#return-form').on('submit', function (e) {
+            // Disable all buttons in the form
+            $('#save_btn').prop('disabled', true);
+
+            $('#save_btn').text('Saving...');
+
+        });
+
     </script>
 
     <script type="text/javascript">
