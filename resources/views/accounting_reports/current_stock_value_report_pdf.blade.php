@@ -134,7 +134,7 @@
         <div class="col-md-12">
             <table id="table-detail-main">
                 <tr>
-                    <td><b>Store: </b> {{$data[0]['store']}}
+                    <td><b>Branch: </b> {{$data[0]['store']}}
                     </td>
             </table>
             <table id="table-detail" align="center">
