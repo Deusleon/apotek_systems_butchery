@@ -262,78 +262,19 @@ class GoodsReceivingController extends Controller
 
     public function itemReceive(Request $request)
     {
-
         $default_store_id = current_store_id();
 
-
         if ($request->ajax()) {
-            // dd($request);
             $cart = json_decode($request->cart, true);
 
             $quantity = $cart['quantity'];
             $unit_sell_price = str_replace(',', '', $request->sell_price);
-            // dd($request->sell_price);
             $unit_buy_price = str_replace(',', '', $request->unit_cost);
             $total_buyprice = $quantity * $unit_buy_price;
             $total_sellprice = $quantity * $unit_sell_price;
             $profit = $total_sellprice - $total_buyprice;
 
-
-            /*check if there exists 0 qty of that product*/
-            $current_stock = CurrentStock::where('product_id', $cart['id'])
-                ->where('quantity', '=', 0)
-                ->get();
-            if (!($current_stock->isEmpty())) {
-                //update
-                $update_stock = CurrentStock::find($current_stock->first()->id);
-                $update_stock->batch_number = $request->batch_number;
-                if ($request->expire_date != null) {
-                    $update_stock->expiry_date = date('Y-m-d', strtotime($request->expire_date));
-                } else {
-                    $update_stock->expiry_date = null;
-                }
-                $update_stock->quantity = $cart['quantity'];
-                $update_stock->unit_cost = str_replace(',', '', $request->unit_cost);
-                $update_stock->store_id = $default_store_id;
-                $update_stock->save();
-                $overal_stock_id = $update_stock->id;
-            } else {
-                $stock = new CurrentStock;
-                $stock->product_id = $cart['id'];
-                $stock->batch_number = $request->batch_number;
-                if ($request->expire_date != null) {
-                    $stock->expiry_date = date('Y-m-d', strtotime($request->expire_date));
-                } else {
-                    $stock->expiry_date = null;
-                }
-                $stock->quantity = $cart['quantity'];
-                $stock->unit_cost = str_replace(',', '', $request->unit_cost);
-                $stock->store_id = $default_store_id;
-                $stock->save();
-                $overal_stock_id = $stock->id;
-            }
-
-
-            /*insert into stock tracking*/
-            $stock_tracking = new StockTracking;
-            $stock_tracking->stock_id = $overal_stock_id;
-            $stock_tracking->product_id = $cart['id'];
-            $stock_tracking->quantity = $cart['quantity'];
-            $stock_tracking->store_id = $default_store_id;
-            $stock_tracking->updated_by = Auth::user()->id;
-            $stock_tracking->out_mode = 'Goods Receiving';
-            $stock_tracking->updated_at = date('Y-m-d');
-            $stock_tracking->movement = 'IN';
-            $stock_tracking->save();
-
-            $price = new PriceList;
-            $price->stock_id = $overal_stock_id;
-            $price->price = str_replace(',', '', $request->sell_price);
-            $price->price_category_id = $request->price_category;
-            $price->status = 1;
-            $price->created_at = date('Y-m-d H:m:s');
-            $price->save();
-
+            // 1. Create incoming_stock record first
             $incoming_stock = new GoodsReceiving;
             $incoming_stock->product_id = $cart['id'];
             $incoming_stock->supplier_id = $request->supplier;
@@ -356,18 +297,65 @@ class GoodsReceivingController extends Controller
                 $incoming_stock->created_at = date('Y-m-d', strtotime($request->purchase_date));
             } else {
                 $incoming_stock->created_at = date('Y-m-d');
-
             }
             $incoming_stock->save();
+
+            // 2. Create or update current_stock with reference to incoming_stock
+            $current_stock = CurrentStock::where('product_id', $cart['id'])
+                ->where('quantity', '=', 0)
+                ->get();
+            
+            if (!($current_stock->isEmpty())) {
+                // Update existing stock
+                $update_stock = CurrentStock::find($current_stock->first()->id);
+                $update_stock->batch_number = $request->batch_number;
+                $update_stock->expiry_date = $request->expire_date ? date('Y-m-d', strtotime($request->expire_date)) : null;
+                $update_stock->quantity = $cart['quantity'];
+                $update_stock->unit_cost = str_replace(',', '', $request->unit_cost);
+                $update_stock->store_id = $default_store_id;
+                $update_stock->incoming_stock_id = $incoming_stock->id; // Add reference
+                $update_stock->save();
+                $overal_stock_id = $update_stock->id;
+            } else {
+                $stock = new CurrentStock;
+                $stock->product_id = $cart['id'];
+                $stock->batch_number = $request->batch_number;
+                $stock->expiry_date = $request->expire_date ? date('Y-m-d', strtotime($request->expire_date)) : null;
+                $stock->quantity = $cart['quantity'];
+                $stock->unit_cost = str_replace(',', '', $request->unit_cost);
+                $stock->store_id = $default_store_id;
+                $stock->incoming_stock_id = $incoming_stock->id; // Add reference
+                $stock->save();
+                $overal_stock_id = $stock->id;
+            }
+
+            // 3. Insert into stock tracking
+            $stock_tracking = new StockTracking;
+            $stock_tracking->stock_id = $overal_stock_id;
+            $stock_tracking->product_id = $cart['id'];
+            $stock_tracking->quantity = $cart['quantity'];
+            $stock_tracking->store_id = $default_store_id;
+            $stock_tracking->updated_by = Auth::user()->id;
+            $stock_tracking->out_mode = 'Goods Receiving';
+            $stock_tracking->updated_at = date('Y-m-d');
+            $stock_tracking->movement = 'IN';
+            $stock_tracking->save();
+
+            // 4. Create price list
+            $price = new PriceList;
+            $price->stock_id = $overal_stock_id;
+            $price->price = str_replace(',', '', $request->sell_price);
+            $price->price_category_id = $request->price_category;
+            $price->status = 1;
+            $price->created_at = date('Y-m-d H:m:s');
+            $price->save();
 
             $message = array();
             array_push($message, array(
                 'message' => 'success'
             ));
             return $message;
-
         }
-
     }
 
    public function orderReceive(Request $request)
@@ -448,15 +436,16 @@ class GoodsReceivingController extends Controller
             $goods_receiving->created_by   = Auth::id();
             $goods_receiving->save();
 
-            // Update or create stock
+            // Update or create stock with reference to incoming_stock
             $stock = CurrentStock::firstOrNew([
                 'product_id'   => $itemData['product_id'],
                 'batch_number' => $batch_number,
                 'store_id'     => $default_store_id,
             ]);
-            $stock->quantity   += $received_qty;
-            $stock->unit_cost   = $unit_price;
-            $stock->expiry_date = $expiry_date_value;
+            $stock->quantity           += $received_qty;
+            $stock->unit_cost           = $unit_price;
+            $stock->expiry_date         = $expiry_date_value;
+            $stock->incoming_stock_id   = $goods_receiving->id; // Add reference
             $stock->save();
 
             // Track stock movement
@@ -740,102 +729,23 @@ class GoodsReceivingController extends Controller
             $default_store_id = current_store_id();
 
             foreach($cart as $single_item){
-                // dd($single_item);
                 $quantity = str_replace(',', '', $single_item['quantity']);
                 $item_product_id = str_replace(',', '', $single_item['id']);
                 $unit_sell_price = str_replace(',', '', $single_item['selling_price']);
-                // dd($unit_sell_price);
                 $unit_buy_price = str_replace(',', '', $single_item['buying_price']);
                 $total_buyprice = $quantity * $unit_buy_price;
                 $total_sellprice = $quantity * $unit_sell_price;
                 $profit = $total_sellprice - $total_buyprice;
 
-                /*check if there exists 0 qty of that product*/
-                $current_stock = CurrentStock::where('product_id', $item_product_id)
-                ->where('quantity', '=', 0)
-                ->get();
-
-                if (!($current_stock->isEmpty())) {
-                    //update
-                    $update_stock = CurrentStock::find($current_stock->first()->id);
-                    $update_stock->batch_number = $request->batch_number;
-
-                    if ($request->expire_date == "YES") {
-                        if ($single_item['expire_date'] != null) {
-                        $update_stock->expiry_date = date('Y-m-d', strtotime($single_item['expire_date']));
-                        } else {
-                            $update_stock->expiry_date = null;
-                        }
-                    } else {
-                        $update_stock->expiry_date = null;
-                    }
-                    $update_stock->quantity = $quantity;
-                    $update_stock->unit_cost = str_replace(',', '', $single_item['buying_price']);
-                    $update_stock->store_id = $default_store_id;
-                    $update_stock->save();
-                    $overal_stock_id = $update_stock->id;
-                } else {
-                    $stock = new CurrentStock;
-                    $stock->product_id = $item_product_id;
-                    $stock->batch_number = $request->batch_number;
-                    if ($request->expire_date == "YES") {
-
-                        if ($single_item['expire_date'] != null) {
-                            $stock->expiry_date = date('Y-m-d', strtotime($single_item['expire_date']));
-                        } else {
-                            $stock->expiry_date = null;
-                        }
-
-                    } else {
-                        $stock->expiry_date = null;
-                    }
-                    $stock->quantity = $quantity;
-                    $stock->unit_cost = str_replace(',', '', $single_item['buying_price']);
-                    $stock->store_id = $default_store_id;
-                    $stock->save();
-                    $overal_stock_id = $stock->id;
-                }
-
-                /*insert into stock tracking*/
-
-                $stock_tracking = new StockTracking;
-                $stock_tracking->stock_id = $overal_stock_id;
-                $stock_tracking->product_id = $single_item['id'];
-                $stock_tracking->quantity = $quantity;
-                $stock_tracking->store_id = $default_store_id;
-                $stock_tracking->updated_by = Auth::user()->id;
-                $stock_tracking->out_mode = 'Goods Receiving';
-                $stock_tracking->updated_at = date('Y-m-d');
-                $stock_tracking->movement = 'IN';
-                $stock_tracking->save();
-
-                // Create Prce
-                $price = new PriceList;
-                $price->stock_id = $overal_stock_id;
-                $price->price = $unit_sell_price;
-                $price->price_category_id = $request->invoice_price_category;
-                $price->status = 1;
-                $price->created_at = date('Y-m-d H:m:s');
-                $price->created_by = Auth::user()->id;
-                $price->save();
-
-
+                // 1. Create incoming_stock record first
                 $incoming_stock = new GoodsReceiving;
                 $incoming_stock->product_id = $single_item['id'];
                 $incoming_stock->supplier_id = $request->supplier;
                 $incoming_stock->invoice_no = $request->invoice_no;
                 $incoming_stock->batch_number = $request->batch_number;
-                if ($request->expire_date == "YES") {
-
-                    if ($single_item['expire_date'] != null) {
-                        $incoming_stock->expire_date = date('Y-m-d', strtotime($single_item['expire_date']));
-                    } else {
-                        $incoming_stock->expire_date = null;
-                    }
-
-                } else {
-                    $incoming_stock->expire_date = null;
-                }
+                $incoming_stock->expire_date = ($request->expire_date == "YES" && $single_item['expire_date'] != null)
+                    ? date('Y-m-d', strtotime($single_item['expire_date']))
+                    : null;
                 $incoming_stock->quantity = $quantity;
                 $incoming_stock->unit_cost = str_replace(',', '', $single_item['buying_price']);
                 $incoming_stock->total_cost = $total_buyprice;
@@ -849,18 +759,69 @@ class GoodsReceivingController extends Controller
                     $date2 = date('Y-m-d');
                     if ($date1 < $date2) {
                         $incoming_stock->created_at = date('Y-m-d H:i:s', strtotime($request->purchase_date));
-                    }else {
+                    } else {
                         $newDate = now();
                         $incoming_stock->created_at = $newDate;
                     }
                 } else {
                     $incoming_stock->created_at = now();
+                }
+                $incoming_stock->save();
 
+                // 2. Create or update current_stock with reference to incoming_stock
+                $current_stock = CurrentStock::where('product_id', $item_product_id)
+                    ->where('quantity', '=', 0)
+                    ->get();
+
+                if (!($current_stock->isEmpty())) {
+                    // Update existing stock
+                    $update_stock = CurrentStock::find($current_stock->first()->id);
+                    $update_stock->batch_number = $request->batch_number;
+                    $update_stock->expiry_date = ($request->expire_date == "YES" && $single_item['expire_date'] != null)
+                        ? date('Y-m-d', strtotime($single_item['expire_date']))
+                        : null;
+                    $update_stock->quantity = $quantity;
+                    $update_stock->unit_cost = str_replace(',', '', $single_item['buying_price']);
+                    $update_stock->store_id = $default_store_id;
+                    $update_stock->incoming_stock_id = $incoming_stock->id; // Add reference
+                    $update_stock->save();
+                    $overal_stock_id = $update_stock->id;
+                } else {
+                    $stock = new CurrentStock;
+                    $stock->product_id = $item_product_id;
+                    $stock->batch_number = $request->batch_number;
+                    $stock->expiry_date = ($request->expire_date == "YES" && $single_item['expire_date'] != null)
+                        ? date('Y-m-d', strtotime($single_item['expire_date']))
+                        : null;
+                    $stock->quantity = $quantity;
+                    $stock->unit_cost = str_replace(',', '', $single_item['buying_price']);
+                    $stock->store_id = $default_store_id;
+                    $stock->incoming_stock_id = $incoming_stock->id; // Add reference
+                    $stock->save();
+                    $overal_stock_id = $stock->id;
                 }
 
-                $incoming_stock->save();
-                // dd($incoming_stock);
+                // 3. Insert into stock tracking
+                $stock_tracking = new StockTracking;
+                $stock_tracking->stock_id = $overal_stock_id;
+                $stock_tracking->product_id = $single_item['id'];
+                $stock_tracking->quantity = $quantity;
+                $stock_tracking->store_id = $default_store_id;
+                $stock_tracking->updated_by = Auth::user()->id;
+                $stock_tracking->out_mode = 'Goods Receiving';
+                $stock_tracking->updated_at = date('Y-m-d');
+                $stock_tracking->movement = 'IN';
+                $stock_tracking->save();
 
+                // 4. Create price
+                $price = new PriceList;
+                $price->stock_id = $overal_stock_id;
+                $price->price = $unit_sell_price;
+                $price->price_category_id = $request->invoice_price_category;
+                $price->status = 1;
+                $price->created_at = date('Y-m-d H:m:s');
+                $price->created_by = Auth::user()->id;
+                $price->save();
             }
 
             $message = array();

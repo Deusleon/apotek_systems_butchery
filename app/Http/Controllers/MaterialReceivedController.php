@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\CurrentStock;
 use App\GoodsReceiving;
 use App\Product;
 use App\PurchaseReturn;
@@ -32,6 +33,9 @@ class MaterialReceivedController extends Controller
     {
 
         $update_material = GoodsReceiving::find($request->id);
+        $update_stock = CurrentStock::where('incoming_stock_id', $request->id)
+        ->first(['id', 'incoming_stock_id', 'unit_cost']);
+
 
         $quantity = str_replace(',', '', $request->quantity_edit);
         $unit_buy_price = floatval(preg_replace('/[^\d.]/', '', $request->price_edit));
@@ -55,7 +59,10 @@ class MaterialReceivedController extends Controller
         $newDate = date('Y-m-d', strtotime($request->receive_date_edit));
         $update_material->created_at = $newDate . ' ' . $originalTime;     // ← merge new date with original time
 
-
+        if ($update_stock) {
+            $update_stock->unit_cost = $unit_buy_price;
+            $update_stock->save();
+        }
         $update_material->save();
 
         session()->flash("alert-success", "Material updated successfully!");
