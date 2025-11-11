@@ -58,7 +58,7 @@
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                     <div class="row d-flex justify-content-end mb-3 mr-0">
                         <div class="d-flex justify-content-end mr-3">
-                            <div class="d-flex align-items-center" style="width: 280px;">
+                            <div class="d-flex align-items-center" style="width: 270px;">
                                 <label for="price_category" class="form-label mb-0"
                                     style="white-space: nowrap; margin-right: 8px;">Category:</label>
                                 <select name="price_category" class="js-example-basic-single form-control"
@@ -72,7 +72,7 @@
                             </div>
                         </div>
                         <div class="d-flex justify-content-end">
-                            <div class="d-flex align-items-center" style="width: 255px;">
+                            <div class="d-flex align-items-center" style="width: 245px;">
                                 <label for="price_category" class="form-label mb-0"
                                     style="white-space: nowrap; margin-right: 8px;">Type:</label>
                                 <select name="type_id" class="js-example-basic-single form-control" id="type_id">
@@ -210,52 +210,52 @@
             retrivePriceHistory(value, data.product_id);
         });
 
-        $('#price_category, #type_id').on('change', function () {
-            var selectedCategory = $('#price_category').val();
-            var selectedType = $('#type_id').val();
+        // $('#price_category, #type_id').on('change', function () {
+        //     var selectedCategory = $('#price_category').val();
+        //     var selectedType = $('#type_id').val();
 
-            $('#pendingTable, #tbody1, #tbody_detailed').hide();
+        //     $('#pendingTable, #tbody1, #historyTable').hide();
 
-            // AJAX request backend
-            $.ajax({
-                url: '{{ route("fetch-price-list") }}',
-                type: 'GET',
-                dataType: 'json',
-                data: {
-                    category_id: selectedCategory,
-                    type: selectedType
-                },
-                beforeSend: function () {
-                    $('#loading').show();
-                },
-                success: function (response) {
-                    console.log('FechResponse: ', response);
-                    if (selectedType === "pending") {
-                        renderTable('#pendingPrices', response);
-                        $('#pendingTable').show();
-                    } else if (selectedType === "1") {
-                        renderTable('#fixed-header2', response);
-                        $('#tbody1').show();
-                    } else if (selectedType === "0") {
-                        renderTable('#detailed_body', response);
-                        $('#tbody_detailed').show();
-                    }
-                },
-                complete: function () {
-                    $('#loading').hide();
-                },
-                error: function () {
-                    alert('Error fetching data!');
-                }
-            });
-        });
+        //     // AJAX request backend
+        //     $.ajax({
+        //         url: '{{ route("fetch-price-list") }}',
+        //         type: 'GET',
+        //         dataType: 'json',
+        //         data: {
+        //             category_id: selectedCategory,
+        //             type: selectedType
+        //         },
+        //         beforeSend: function () {
+        //             $('#loading').show();
+        //         },
+        //         success: function (response) {
+        //             console.log('FechResponse: ', response);
+        //             if (selectedType === "pending") {
+        //                 renderTable('#pendingPrices', response);
+        //                 $('#pendingTable').show();
+        //             } else if (selectedType === "1") {
+        //                 renderTable('#fixed-header2', response);
+        //                 $('#tbody1').show();
+        //             } else if (selectedType === "0") {
+        //                 renderTable('#priceHistory', response);
+        //                 $('#historyTable').show();
+        //             }
+        //         },
+        //         complete: function () {
+        //             $('#loading').hide();
+        //         },
+        //         error: function () {
+        //             alert('Error fetching data!');
+        //         }
+        //     });
+        // });
 
-        function renderTable(tableId, data) {
-            var table = $(tableId).DataTable();
-            table.clear();
-            table.rows.add(data);
-            table.draw();
-        }
+        // function renderTable(tableId, data) {
+        //     var table = $(tableId).DataTable();
+        //     table.clear();
+        //     table.rows.add(data);
+        //     table.draw();
+        // }
 
         $('#edit').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
