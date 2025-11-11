@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\CurrentStock;
 use App\PriceCategory;
+use App\GoodsReceiving;
 use App\Product;
 use App\PriceList;
 use App\Setting;
@@ -136,7 +137,8 @@ class PriceListController extends Controller {
                 }
                 $stocks = $query->get();
         } else {
-            $query = DB::table('inv_current_stock as cs')
+            $query = DB::table('inv_incoming_stock as iis')
+                ->join('inv_current_stock as cs', 'cs.incoming_stock_id', '=', 'iis.id')
                 ->join('sales_prices as sp', 'cs.id', '=', 'sp.stock_id')
                 ->join('inv_products as p', 'cs.product_id', '=', 'p.id')
                 ->select(
@@ -144,22 +146,22 @@ class PriceListController extends Controller {
                     'p.brand as brand',
                     'p.pack_size as pack_size',
                     'p.sales_uom as sales_uom',
-                    'cs.unit_cost as unit_cost',
-                    'cs.batch_number as batch_number',
+                    'iis.unit_cost as unit_cost',
+                    'iis.batch_number as batch_number',
                     'sp.price as price',
-                    DB::raw('( ( sp.price - cs.unit_cost )/cs.unit_cost )*100 as profit'),
-                    'cs.id as id',
+                    DB::raw('( ( sp.price - iis.unit_cost )/iis.unit_cost )*100 as profit'),
+                    'iis.id as id',
                     'sp.price_category_id as price_category_id',
-                    'cs.created_at as purchased_at',
+                    'iis.created_at as purchased_at',
                     'sp.created_at as price_date'
                 )
                 ->where('sp.price_category_id', $categoryId)
-                ->where('cs.unit_cost', '>', 0)
-                ->where('cs.quantity', '>', 0)
-                ->orderBy('cs.batch_number', 'desc')
+                // ->where('cs.unit_cost', '>', 0)
+                // ->where('cs.quantity', '>', 0)
+                ->orderBy('iis.batch_number', 'desc')
                 ->orderBy('sp.created_at', 'desc');
                 if (!is_all_store()) {
-                    $query->where('cs.store_id', $store_id);
+                    $query->where('iis.store_id', $store_id);
                 }
                 $stocks = $query->get();
         }
@@ -202,7 +204,7 @@ class PriceListController extends Controller {
     $request->validate([
         'unit_cost' => 'required|numeric|min:0',
         'sell_price' => 'required|numeric|min:0',
-        'price_category_id' => 'required|exists:price_categories,id',
+        'price_category_id' => 'required|exists:price_categories, id',
         'selected_type' => 'required|string',
     ]);
 
@@ -214,11 +216,22 @@ class PriceListController extends Controller {
     try {
         // load the current stock (the batch being edited)
         $current_stock = CurrentStock::findOrFail($request->id);
+        // $incoming_stock = GoodsReceiving::find($current_stock->incoming_stock_id);
+        $incoming_stock = GoodsReceiving::where('id', $current_stock->incoming_stock_id)
+        ->first(['id', 'quantity', 'sell_price', 'total_sell', 'unit_cost']);
 
         // update unit cost for this batch only (as before)
         $current_stock->update([
             'unit_cost' => $request->unit_cost
         ]);
+        
+        if ($incoming_stock) {
+            $incoming_stock->update([
+                'unit_cost' => $request->unit_cost,
+                'total_cost' => $incoming_stock->quantity * $request->unit_cost,
+                'item_profit' => ($incoming_stock->total_sell) - ($incoming_stock->quantity * $request->unit_cost),
+            ]);
+        }
 
         // get all stock ids for the same product (all batches of this product)
         $productId = $current_stock->product_id;
@@ -308,24 +321,70 @@ class PriceListController extends Controller {
     }
 
     public function priceHistory( Request $request ) {
+        $store_id = current_store_id();
         if ( $request->ajax() ) {
             try {
-                $prices = DB::table( 'stock_details' )
-                ->select( '*' )
-                ->where( 'product_id', '=', $request->product_id )
-                ->where( 'price_category_id', $request->price_category_id )
-                ->orderBy( 'id', 'desc' )
-                ->take( 5 )
-                ->get();
+                // Fetch buy prices from inv_incoming_stock table and selling prices from sales_prices
+                $prices = DB::table('inv_incoming_stock as iis')
+                    ->join('inv_current_stock as cs', 'iis.id', '=', 'cs.incoming_stock_id')
+                    ->join('sales_prices as sp', 'cs.id', '=', 'sp.stock_id')
+                    ->join('inv_products as p', 'iis.product_id', '=', 'p.id')
+                    ->join('price_categories as pc', 'sp.price_category_id', '=', 'pc.id')
+                    ->select(
+                        'iis.id as incoming_stock_id',
+                        'iis.product_id',
+                        'p.name as product_name',
+                        'iis.unit_cost as buy_price',
+                        // 'iis.sell_price as original_sell_price',
+                        'sp.price as sell_price',
+                        // 'sp.price_category_id',
+                        // 'pc.name as price_category_name',
+                        // 'iis.quantity',
+                        // 'iis.batch_number',
+                        'iis.expire_date',
+                        // 'iis.created_at as received_date',
+                        // 'sp.created_at as price_set_date',
+                        // 'cs.id as current_stock_id'
+                    )
+                    ->when(!is_all_store(), function ($query) use ($store_id) {
+                        return $query->where('cs.store_id', $store_id);
+                    })
+                    ->where('iis.product_id', $request->product_id)
+                    ->where('sp.price_category_id', $request->price_category_id)
+                    ->orderBy('iis.created_at', 'desc')
+                    ->orderBy('sp.created_at', 'desc')
+                    ->take(5)
+                    ->get();
 
-                return json_decode( $prices, true );
+                // Transform the data to include profit calculations
+                $transformedPrices = $prices->map(function ($price) {
+                    return [
+                        'id' => $price->incoming_stock_id,
+                        'product_id' => $price->product_id,
+                        'product_name' => $price->product_name,
+                        'buy_price' => $price->buy_price,
+                        'sell_price' => $price->sell_price,
+                        // 'current_sell_price' => $price->current_sell_price,
+                        // 'price_category_id' => $price->price_category_id,
+                        // 'price_category_name' => $price->price_category_name,
+                        // 'quantity' => $price->quantity,
+                        'batch_number' => $price->batch_number,
+                        'expire_date' => $price->expire_date,
+                        // 'received_date' => $price->received_date,
+                        // 'price_set_date' => $price->price_set_date,
+                        // 'current_stock_id' => $price->current_stock_id,
+                        'profit' => $price->current_sell_price - $price->buy_price,
+                        'profit_percentage' => $price->buy_price > 0 ?
+                            round((($price->current_sell_price - $price->buy_price) / $price->buy_price) * 100, 2) : 0
+                    ];
+                });
+
+                return $transformedPrices->toArray();
             } catch (\Exception $e) {
                 Log::warning('priceHistory query failed: ' . $e->getMessage());
-                return response()->json(['error' => 'Price history not available'], 500);
+                return response()->json(['error' => 'Price history not available: ' . $e->getMessage()], 500);
             }
-
         }
-
     }
 
     public function priceCategory( Request $request ) {

@@ -22,6 +22,11 @@ class GoodsReceiving extends Model
     {
 
         return $this->belongsTo('App\Supplier');
+    } 
+    
+    public function currentStock()
+    {
+        return $this->hasOne(CurrentStock::class, 'incoming_stock_id');
     }
 
     public function product()

@@ -22,7 +22,8 @@ class CurrentStock extends Model
         'expiry_date',
         'shelf_number',
         'created_by',
-        'updated_by'
+        'updated_by',
+        'incoming_stock_id'
     ];
 
     protected $dates = [
@@ -37,6 +38,11 @@ class CurrentStock extends Model
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_id');
+    }
+
+    public function goodsReceiving()
+    {
+        return $this->belongsTo(GoodsReceiving::class, 'incoming_stock_id');
     }
 
     public function stockTransfer()

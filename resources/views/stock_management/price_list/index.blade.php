@@ -58,7 +58,7 @@
                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                     <div class="row d-flex justify-content-end mb-3 mr-0">
                         <div class="d-flex justify-content-end mr-3">
-                            <div class="d-flex align-items-center" style="width: 280px;">
+                            <div class="d-flex align-items-center" style="width: 270px;">
                                 <label for="price_category" class="form-label mb-0"
                                     style="white-space: nowrap; margin-right: 8px;">Category:</label>
                                 <select name="price_category" class="js-example-basic-single form-control"
@@ -72,7 +72,7 @@
                             </div>
                         </div>
                         <div class="d-flex justify-content-end">
-                            <div class="d-flex align-items-center" style="width: 255px;">
+                            <div class="d-flex align-items-center" style="width: 245px;">
                                 <label for="price_category" class="form-label mb-0"
                                     style="white-space: nowrap; margin-right: 8px;">Type:</label>
                                 <select name="type_id" class="js-example-basic-single form-control" id="type_id">
@@ -214,7 +214,7 @@
             var selectedCategory = $('#price_category').val();
             var selectedType = $('#type_id').val();
 
-            $('#pendingTable, #tbody1, #tbody_detailed').hide();
+            $('#pendingTable, #tbody1, #historyTable').hide();
 
             // AJAX request backend
             $.ajax({
@@ -237,8 +237,8 @@
                         renderTable('#fixed-header2', response);
                         $('#tbody1').show();
                     } else if (selectedType === "0") {
-                        renderTable('#detailed_body', response);
-                        $('#tbody_detailed').show();
+                        renderTable('#priceHistory', response);
+                        $('#historyTable').show();
                     }
                 },
                 complete: function () {
