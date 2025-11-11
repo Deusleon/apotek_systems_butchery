@@ -838,9 +838,9 @@ class ImportDataController extends Controller {
         // Required fields
         // if ( empty( $row[ 0 ] ) ) $errors[] = 'Product code is required';
         if ( empty( $row[ 1 ] ) ) $errors[] = 'Product name is required';
-        if ( empty( $row[ 2 ] ) ) $errors[] = 'Buy price is required';
-        if ( empty( $row[ 3 ] ) ) $errors[] = 'Sell price is required';
-        // if ( empty( $row[ 4 ] ) ) $errors[] = 'Quantity is required';
+        if ( $row[ 2 ] === '' || $row[ 2 ] === null ) $errors[] = 'Buy price is required';
+        if ( $row[ 3 ] === '' || $row[ 3 ] === null ) $errors[] = 'Sell price is required';
+        if ( $row[ 4 ] === '' || $row[ 4 ] === null ) $errors[] = 'Quantity is required';
 
         // Numeric validations
         if ( !empty( $row[ 2 ] ) && !is_numeric( preg_replace( '/[^\d.]/', '', $row[ 2 ] ) ) ) $errors[] = 'Buy price must be numeric';
