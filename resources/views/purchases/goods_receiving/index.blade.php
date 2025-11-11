@@ -52,7 +52,7 @@
                     href="{{ route('goods-receiving.index') }}" role="tab" aria-controls="quotes_list"
                     aria-selected="true">Invoice Receiving</a>
             </li>
-            @if (auth()->user()->checkPermission('Order Receiving'))
+            @if (auth()->user()->checkPermission('View Order Receiving'))
                 <li class="nav-item">
                     <a class="nav-link text-uppercase" id="order-received" data-toggle="pill"
                         href="{{ route('orders-receiving.index') }}" role="tab" aria-controls="new_quotes"
