@@ -10,6 +10,12 @@
 
 @section("content")
 
+    @php
+        $canEditMaterial = auth()->user()->checkPermission('Edit Material Received');
+        $canDeleteMaterial = auth()->user()->checkPermission('Delete Material Received');
+        $hasActionPermission = $canEditMaterial || $canDeleteMaterial;
+    @endphp
+
     <style>
         .select2-container {
             width: 100% !important;
@@ -142,7 +148,7 @@
                                 <th>Amount</th>
                                 <th>Receive Date</th>
                                 <th>Received By</th>
-                                @if(auth()->user()->checkPermission('Edit Material Received') || auth()->user()->checkPermission('Delete Material Received'))
+                                @if($hasActionPermission)
                                     <th>Action</th>
                                 @endif
                             </tr>
@@ -339,13 +345,13 @@
                         { data: 'user.name' },
                        {
                             data: 'action',
-                            defaultContent: 
+                            defaultContent:
                                 `<div>
-                                    @if(auth()->user()->checkPermission('Edit Material Received'))
+                                    @if($canEditMaterial)
                                         <input type='button' value='Edit' id='edit_btn' class='btn btn-info btn-rounded btn-sm'/>
                                     @endif
 
-                                    @if(auth()->user()->checkPermission('Delete Material Received'))
+                                    @if($canDeleteMaterial)
                                         <input type='button' value='Delete' id='delete_btn' class='btn btn-danger btn-rounded btn-sm'/>
                                     @endif
                                 </div>`
@@ -355,7 +361,13 @@
                         {
                             "targets": [0, 2, 4],
                             "visible": false
+                        },
+                        @if(!$hasActionPermission)
+                        {
+                            "targets": [9],
+                            "visible": false
                         }
+                        @endif
                     ],
                     "order": [[0, "desc"]]
 
