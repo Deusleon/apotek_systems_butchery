@@ -157,8 +157,9 @@
 
 @endsection
 @push("page_scripts")
-    @include('partials.notification')
-    <script type="text/javascript">
+@include('partials.notification')
+<script type="text/javascript">
+    var hasPurchaseReturnPermission = @json(auth()->user()->checkPermission('Purchase Return'));
 
         $.ajaxSetup({
             headers: {
@@ -338,6 +339,11 @@
                         {
                             data: 'action',
                             render: function (data, type, row) {
+                                // Only show action column if user has permission
+                                if (!hasPurchaseReturnPermission) {
+                                    return '';
+                                }
+
                                 // Disable the return button if the item has a return process ongoing or completed
                                 // Status: 2=pending return, 3=fully returned, 4=rejected, 5=partially returned
                                 var hasReturn = false;
@@ -346,17 +352,9 @@
                                 }
 
                                 if (hasReturn) {
-                                    return `<div>
-                                                @if(auth()->user()->checkPermission('View Purchase Returns'))
-                                                    <input type='button' value='Return' id='return_btn' class='btn btn-success btn-rounded btn-sm' disabled/>
-                                                @endif
-                                            </div>`;
+                                    return `<input type='button' value='Return' id='return_btn' class='btn btn-success btn-rounded btn-sm' disabled/>`;
                                 } else {
-                                    return `<div>
-                                                @if(auth()->user()->checkPermission('View Purchase Returns'))
-                                                    <input type='button' value='Return' id='return_btn' class='btn btn-primary btn-rounded btn-sm'/>
-                                                @endif
-                                            </div>`;
+                                    return `<input type='button' value='Return' id='return_btn' class='btn btn-primary btn-rounded btn-sm'/>`;
                                 }
                             }
                         }
@@ -365,6 +363,10 @@
                         {
                             "targets": [0, 3, 5],
                             "visible": false
+                        },
+                        {
+                            "targets": [10], // Action column
+                            "visible": hasPurchaseReturnPermission
                         }
                     ],
                     "order": [[0, "desc"]]
