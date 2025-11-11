@@ -214,7 +214,7 @@
             var selectedCategory = $('#price_category').val();
             var selectedType = $('#type_id').val();
 
-            $('#pendingTable, #tbody1, #tbody_detailed').hide();
+            $('#pendingTable, #tbody1, #historyTable').hide();
 
             // AJAX request backend
             $.ajax({
@@ -237,8 +237,8 @@
                         renderTable('#fixed-header2', response);
                         $('#tbody1').show();
                     } else if (selectedType === "0") {
-                        renderTable('#detailed_body', response);
-                        $('#tbody_detailed').show();
+                        renderTable('#priceHistory', response);
+                        $('#historyTable').show();
                     }
                 },
                 complete: function () {

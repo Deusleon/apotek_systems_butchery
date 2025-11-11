@@ -19,8 +19,13 @@
                                 <th>Product Name</th>
                                 <th>Buy Price</th>
                                 <th>Sell Price</th>
+                                <th>Profit</th>
+                                <th>Profit %</th>
+                                <th>Quantity</th>
+                                <th>Received Date</th>
                                 <th>Price Category</th>
                                 <th>Batch Number</th>
+                                <th>Expiry Date</th>
                             </tr>
                             </thead>
                             <tbody></tbody>
