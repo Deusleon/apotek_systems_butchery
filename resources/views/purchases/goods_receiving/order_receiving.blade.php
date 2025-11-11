@@ -18,6 +18,7 @@
     @php
         $current_store = session('current_store_id') ?? auth()->user()->store_id;
         $is_all_branch = $current_store == 1;
+        $canOrderReceive = auth()->user()->checkPermission('Order Receiving');
     @endphp
 
 
@@ -85,13 +86,13 @@
 
         <!-- Navigation Tabs -->
         <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
-            @if (auth()->user()->checkPermission('Invoice Receiving'))
+            @if (auth()->user()->checkPermission('View Invoice Receiving'))
             <li class="nav-item">
                 <a class="nav-link text-uppercase" id="invoice-received"
                    href="{{ route('goods-receiving.index') }}">Invoice Receiving</a>
             </li>
             @endif
-            @if (auth()->user()->checkPermission('Order Receiving'))
+            @if (auth()->user()->checkPermission('View Order Receiving'))
             <li class="nav-item">
                 <a class="nav-link active text-uppercase" id="order-received"
                    href="{{ route('orders-receiving.index') }}">Order Receiving</a>
@@ -118,7 +119,9 @@
                             <th>Date</th>
                             <th class="text-right">Amount</th>
                             <th class="text-center">Status</th> <!-- Status column renamed to look meaningful -->
+                            @if($canOrderReceive)
                             <th class="text-center">Actions</th> <!-- Actions column -->
+                            @endif
                         </tr>
                         </thead>
                         <tbody>
@@ -237,7 +240,7 @@
                     }
                 },
                 {
-                    "data": "status", 
+                    "data": "status",
                     "className": "text-center",
                     "render": function(data) {
                         const badgeClass = "badge btn-rounded btn-sm"; // Rounded & small like buttons
@@ -247,7 +250,9 @@
                         if (data == '4') return `<span class='${badgeClass} badge-success' style='${style}'>Completed</span>`;
                         return `<span class='${badgeClass} badge-secondary' style='${style}'>Rejected</span>`;
                     }
-                },
+                }
+                @if($canOrderReceive)
+                ,
                 {
                 "data": null, "className": "text-center", "orderable": false,
                 "render": function(data, type, row) {
@@ -289,6 +294,7 @@
                                 </button>`;
                 }
             }
+                @endif
             ],
             "responsive": true,
             "pageLength": 10,

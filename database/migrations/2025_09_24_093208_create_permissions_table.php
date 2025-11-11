@@ -148,7 +148,8 @@ class CreatePermissionsTable extends Migration
             ['name' => 'View Payment History', 'guard_name' => 'web', 'created_at' => '2024-11-23 08:25:36', 'updated_at' => '2024-11-23 08:25:36', 'category' => 'ACCOUNTING'],
             // Purchasing Sub Modules
             ['name' => 'View Goods Receiving', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'PURCHASING'],
-            ['name' => 'Invoice Receiving', 'guard_name' => 'web', 'created_at' => '2024-11-15 19:14:30', 'updated_at' => '2024-11-15 19:14:30', 'category' => 'PURCHASING'],
+            ['name' => 'View Invoice Receiving', 'guard_name' => 'web', 'created_at' => '2024-11-15 19:14:30', 'updated_at' => '2024-11-15 19:14:30', 'category' => 'PURCHASING'],
+            ['name' => 'View Order Receiving', 'guard_name' => 'web', 'created_at' => '2024-11-15 19:11:38', 'updated_at' => '2024-11-15 19:11:38', 'category' => 'PURCHASING'],
             ['name' => 'Order Receiving', 'guard_name' => 'web', 'created_at' => '2024-11-15 19:11:38', 'updated_at' => '2024-11-15 19:11:38', 'category' => 'PURCHASING'],
             ['name' => 'View Material Received', 'guard_name' => 'web', 'created_at' => '2024-11-15 19:11:53', 'updated_at' => '2024-11-15 19:11:53', 'category' => 'PURCHASING'],
             ['name' => 'Edit Material Received', 'guard_name' => 'web', 'created_at' => '2024-11-15 19:11:53', 'updated_at' => '2024-11-15 19:11:53', 'category' => 'PURCHASING'],
