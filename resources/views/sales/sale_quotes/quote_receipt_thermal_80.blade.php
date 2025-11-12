@@ -13,7 +13,7 @@
             font-size: 12px;
             margin: 0;
             padding: 10px;
-            font-weight: bold;
+            /* font-weight: bold; */
         }
 
         * {
@@ -35,6 +35,14 @@
         #table-detail thead th {
             border-bottom: 1px solid #000;
         }
+        
+        #table-detail tbody tr td {
+            border-bottom: 1px dotted #000;
+        }
+
+        #table-detail tbody tr:last-child td {
+            border-bottom: none;
+        }
 
         hr {
             border: none;
@@ -47,7 +55,7 @@
         h5,
         h6 {
             margin: 2px 0;
-            font-weight: bold;
+            font-weight: normal;
             text-align: center;
         }
 
@@ -83,10 +91,10 @@
             <table>
                 <tr>
                     <td>
-                        <span>Date:</span> {{date('Y-m-d', strtotime($dat[0]['created_at']))}}<br>
                         <span>Receipt #:</span> {{$datas}}<br>
+                        <span>Date:</span> {{date('Y-m-d', strtotime($dat[0]['created_at']))}}<br>
                         <span>Customer:</span> {{$dat[0]['customer'] ?? 'CASH'}}<br>
-                        <span>Customer TIN:</span> {{$dat[0]['customer_tin'] ?? 'N/A'}}<br>
+                        <span>Customer TIN:</span> {{ !empty($dat[0]['customer_tin']) ? $dat[0]['customer_tin'] : 'N/A' }}<br>
                         <span>Printed On:</span> {{date('Y-m-d H:i:s')}}
                     </td>
                 </tr>
@@ -94,7 +102,7 @@
 
             <table id="table-detail">
                 <thead>
-                    <tr>
+                    <tr style="border-bottom: 1px dotted #000">
                         <th align="left" style="width: 35%;">Description</th>
                         <th class="text-center" style="width: 15%;">Qty</th>
                         <th class="text-right" style="width: 20%;">Price</th>
@@ -106,7 +114,8 @@
                     @foreach($dat as $item)
                         <tr>
                             <td>{{$item['name']}} {{$item['brand'] ?? ''}}
-                                {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}</td>
+                                {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}
+                            </td>
                             <td class="text-center">{{number_format($item['quantity'], 0)}}</td>
                             <td class="text-right">{{number_format($item['price'], 0)}}</td>
                             {{-- <td class="text-right">{{number_format($item['vat'], 2)}}</td> --}}

@@ -22,28 +22,29 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade as PDF;
 
-ini_set('max_execution_time', 500);
-set_time_limit(500);
-ini_set('memory_limit', '512M');
+ini_set( 'max_execution_time', 500 );
+set_time_limit( 500 );
+ini_set( 'memory_limit', '512M' );
 
 class InventoryReportController extends Controller
-{
+ {
 
     public function index()
-    {
-        if (!Auth()->user()->checkPermission('View Inventory Reports')) {
-            abort(403, 'Access Denied');
+ {
+        if ( !Auth()->user()->checkPermission( 'View Inventory Reports' ) ) {
+            abort( 403, 'Access Denied' );
         }
         try {
-            $products = DB::table('product_ledger')
-                ->join('inv_products', 'inv_products.id', '=', 'product_ledger.product_id')
-                ->select('product_id', 'product_name', 'brand', 'pack_size', 'sales_uom')
-                ->groupby(['product_id', 'product_name'])
-                ->orderBy('product_name', 'asc')
-                ->get();
-        } catch (\Exception $e) {
-            Log::warning('InventoryReport index product_ledger query failed: ' . $e->getMessage());
-            $products = collect(); // Return empty collection if table doesn't exist
+            $products = DB::table( 'product_ledger' )
+            ->join( 'inv_products', 'inv_products.id', '=', 'product_ledger.product_id' )
+            ->select( 'product_id', 'product_name', 'brand', 'pack_size', 'sales_uom' )
+            ->groupby( [ 'product_id', 'product_name' ] )
+            ->orderBy( 'product_name', 'asc' )
+            ->get();
+        } catch ( \Exception $e ) {
+            Log::warning( 'InventoryReport index product_ledger query failed: ' . $e->getMessage() );
+            $products = collect();
+            // Return empty collection if table doesn't exist
         }
 
         $store = Store::all();
@@ -157,6 +158,16 @@ class InventoryReportController extends Controller
                 compact( 'data',  'pharmacy' ) )
                 ->setPaper( 'a4', '' );
                 return $pdf->stream( 'product_ledger_report.pdf' );
+            case 17:
+                //product ledger
+                $data = $this->productLedgerDetailedReport($request->product);
+                if ($data == []) {
+                    return response()->view('error_pages.pdf_zero_data');
+                }
+                $pdf = PDF::loadView( 'inventory_reports.product_ledger_detailed_report_pdf',
+                compact( 'data',  'pharmacy' ) )
+                ->setPaper( 'a4', '' );
+                return $pdf->stream( 'product_ledger_detailed_report.pdf' );
             case 4:
                 //expired product
                 $data = $this->expiredProductReport();
@@ -350,7 +361,7 @@ class InventoryReportController extends Controller
                 'inv_products.pack_size',
                 'inv_products.sales_uom',
                 'inv_categories.name as category',
-                DB::raw('SUM(inv_current_stock.quantity) as total_quantity'),
+                DB::raw('SUM( inv_current_stock.quantity ) as total_quantity'),
             );
 
         if (!($store == 1 || $store === '1')) {
@@ -403,7 +414,7 @@ class InventoryReportController extends Controller
                 'inv_current_stock.batch_number',
                 'inv_current_stock.expiry_date',
                 'inv_current_stock.shelf_number',
-                DB::raw('SUM(inv_current_stock.quantity) as total_quantity')
+                DB::raw('SUM( inv_current_stock.quantity ) as total_quantity')
             );
 
         // Filter by store
@@ -468,7 +479,7 @@ class InventoryReportController extends Controller
                 'inv_products.sales_uom',
                 'inv_categories.id as category_id',
                 'inv_categories.name as category',
-                DB::raw('SUM(inv_current_stock.quantity) as total_quantity')
+                DB::raw('SUM( inv_current_stock.quantity ) as total_quantity')
             );
 
         if (!($store == 1 || $store === '1')) {
@@ -545,7 +556,7 @@ class InventoryReportController extends Controller
         return $results_data;
     }
     private function productLedgerReport($product_id){
-        if (!Auth()->user()->checkPermission('Product Ledger Report')) {
+        if (!Auth()->user()->checkPermission('Product Ledger Summary Report')) {
             abort(403, 'Access Denied');
         }
         $store_id = current_store_id();
@@ -565,19 +576,20 @@ class InventoryReportController extends Controller
         }
 
         try {
-            $query2 = DB::table('product_ledger')
-                ->join('inv_products', 'inv_products.id', '=', 'product_ledger.product_id')
-                ->select('product_id', 'inv_products.name as product_name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom', 'received', 'outgoing', 'method', 'date')
-                ->where('product_id', '=', $product_id);
+            $query2 = DB::table( 'product_ledger' )
+            ->join( 'inv_products', 'inv_products.id', '=', 'product_ledger.product_id' )
+            ->select( 'product_id', 'inv_products.name as product_name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom', 'received', 'outgoing', 'method', 'date' )
+            ->where( 'product_id', '=', $product_id );
 
-              if (!is_all_store()) {
-                $query2->where('store_id', $store_id);
+            if ( !is_all_store() ) {
+                $query2->where( 'store_id', $store_id );
             }
 
             $product_ledger = $query2->get();
-        } catch (\Exception $e) {
-            Log::warning('InventoryReport productLedgerReport product_ledger query failed: ' . $e->getMessage());
-            $product_ledger = collect(); // Return empty collection if table doesn't exist
+        } catch ( \Exception $e ) {
+            Log::warning( 'InventoryReport productLedgerReport product_ledger query failed: ' . $e->getMessage() );
+            $product_ledger = collect();
+            // Return empty collection if table doesn't exist
         }
 
         $result = $this->sumProductFilterTotal($product_ledger, $current_stock);
@@ -585,6 +597,80 @@ class InventoryReportController extends Controller
         return $result;
 
     }
+
+    private function productLedgerDetailedReport($product_id)
+    {
+        if (!Auth()->user()->checkPermission('Product Ledger Detailed Report')) {
+            abort(403, 'Access Denied');
+        }
+
+        $store_id = current_store_id();
+
+        // Get current stock info
+        try {
+            $query = DB::table('stock_details')
+                ->select('product_id')
+                ->groupBy(['product_id']);
+
+            if (!is_all_store()) {
+                $query->where('store_id', $store_id);
+            }
+
+            $current_stock = $query->get();
+        } catch (\Exception $e) {
+            Log::warning('InventoryReport productLedgerDetailedReport stock_details query failed: ' . $e->getMessage());
+            $current_stock = collect();
+        }
+
+        try {
+            $query2 = DB::table('product_ledger')
+                ->join('inv_products', 'inv_products.id', '=', 'product_ledger.product_id')
+                ->leftJoin('users', 'users.id', '=', 'product_ledger.user') // optional join for username
+                ->select(
+                    'product_ledger.product_id',
+                    'inv_products.name as product_name',
+                    'inv_products.brand',
+                    'inv_products.pack_size',
+                    'inv_products.sales_uom',
+                    'product_ledger.received',
+                    'product_ledger.outgoing',
+                    'product_ledger.method',
+                    'product_ledger.date',
+                    'users.name as user_name'
+                )
+                ->where('product_ledger.product_id', $product_id);
+
+            if (!is_all_store()) {
+                $query2->where('product_ledger.store_id', $store_id);
+            }
+
+            $product_ledger = $query2->orderBy('product_ledger.date', 'asc')->get();
+        } catch (\Exception $e) {
+            Log::warning('InventoryReport productLedgerDetailedReport product_ledger query failed: ' . $e->getMessage());
+            $product_ledger = collect();
+        }
+
+        // Prepare results (no grouping)
+        $total = 0;
+        $toMainView = [];
+
+        foreach ($product_ledger as $row) {
+            $total += $row->received + $row->outgoing; // outgoing is negative in view
+
+            $toMainView[] = [
+                'date' => $row->date,
+                'name' => $row->product_name . ' ' . ($row->brand ?? '') . ' ' . ($row->pack_size ?? '') . ($row->sales_uom ?? ''),
+                'method' => $row->method,
+                'created_by' => $row->user_name ?? '-', 
+                'received' => $row->received,
+                'outgoing' => abs($row->outgoing),
+                'balance' => $total,
+            ];
+        }
+
+        return $toMainView;
+    }
+
     protected function sumProductFilterTotal($ledger, $current_stock)
     {
         $total = 0;
@@ -648,7 +734,7 @@ class InventoryReportController extends Controller
             abort(403, 'Access Denied');
         }
         $store_id = current_store_id();
-        $query = CurrentStock::where(DB::raw('date(expiry_date)'), '<=', date('Y-m-d'))
+        $query = CurrentStock::where(DB::raw('date( expiry_date )'), ' <= ', date('Y-m-d'))
             ->orderby('expiry_date', 'DESC');
 
         if (!is_all_store()) {
@@ -665,7 +751,7 @@ class InventoryReportController extends Controller
             abort(403, 'Access Denied');
         }
         $store_id = current_store_id();
-        $query = CurrentStock::where(DB::raw('date(expiry_date)'), '>', date('Y-m-d'))
+        $query = CurrentStock::where(DB::raw('date( expiry_date )'), '>', date('Y-m-d'))
             ->orderby('expiry_date', 'DESC');
 
         if (!is_all_store()) {
@@ -782,7 +868,7 @@ class InventoryReportController extends Controller
                 'inv_products.brand',
                 'inv_products.pack_size',
                 'inv_products.sales_uom',
-                DB::raw('SUM(sales_details.quantity) as total_sold')
+                DB::raw('SUM( sales_details.quantity ) as total_sold')
             )
             ->whereBetween('sales.date', [$start_date, $end_date])
             ->groupBy('inv_products.id')
@@ -842,7 +928,7 @@ class InventoryReportController extends Controller
                 'p.pack_size',
                 'p.sales_uom',
                 'cs.store_id',
-                DB::raw('SUM(cs.quantity) as quantity')
+                DB::raw('SUM( cs.quantity ) as quantity')
             )
             ->where('cs.quantity', '>', 0)
             // only exclude sold products if we have any sold ids; otherwise keep all (no sold in period)
@@ -870,7 +956,7 @@ class InventoryReportController extends Controller
         $end = date('Y-m-d', strtotime($dates[1]));
 
         $query = StockAdjustment::with(['currentStock.product', 'user'])
-            ->whereBetween(DB::raw('date(created_at)'), [$start, $end]);
+            ->whereBetween(DB::raw('date( created_at )'), [$start, $end]);
 
         if (!is_all_store()) {
             $query->whereHas('currentStock', function ($q) {
@@ -894,7 +980,7 @@ class InventoryReportController extends Controller
         foreach ($adjustments as $adjustment) {
             $current_stock = CurrentStock::find($adjustment->stock_id);
             $sub_total = floatval($adjustment->quantity) *
-                floatval(preg_replace('/[^\d.]/', '', $current_stock['unit_cost']));
+                floatval(preg_replace('/[ ^\d. ]/', '', $current_stock['unit_cost']));
             $total = $total + $sub_total;
             array_push($to_pdf, array(
                 'product_id' => $adjustment->currentStock['product']['id'],
@@ -924,18 +1010,18 @@ class InventoryReportController extends Controller
         $total_bp = 0;
         $total_sp = 0;
 
-        $stock_issue = StockIssue::whereBetween(DB::raw('date(created_at)'),
+        $stock_issue = StockIssue::whereBetween(DB::raw('date( created_at )'),
             [date('Y-m-d', strtotime($issue_date[0])), date('Y-m-d', strtotime($issue_date[1]))])
             ->get();
 
         foreach ($stock_issue as $issue) {
 
             $buy_price_sub_total = floatval($issue->quantity) *
-                floatval(preg_replace('/[^\d.]/', '', $issue->unit_cost));
+                floatval(preg_replace('/[ ^\d. ]/', '', $issue->unit_cost));
             $total_bp = $total_bp + $buy_price_sub_total;
 
             $sell_price_sub_total = floatval($issue->quantity) *
-                floatval(preg_replace('/[^\d.]/', '', $issue->sales_price));
+                floatval(preg_replace('/[ ^\d. ]/', '', $issue->sales_price));
             $total_sp = $total_sp + $sell_price_sub_total;
 
             array_push($to_pdf, array(
@@ -981,7 +1067,7 @@ class InventoryReportController extends Controller
             abort(403, 'Access Denied');
         }
         $store_id = current_store_id();
-        $query = StockTransfer::whereBetween(DB::raw('date(created_at)'),
+        $query = StockTransfer::whereBetween(DB::raw('date( created_at )'),
             [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))]);
             
         if (!is_all_store()) {
@@ -1004,13 +1090,13 @@ class InventoryReportController extends Controller
 
         $store_id = current_store_id();
         if ($status === '1' || $status === 1) {
-        $query = StockTransfer::whereBetween(DB::raw('date(created_at)'),
+        $query = StockTransfer::whereBetween(DB::raw('date( created_at )'),
             [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))])
-            ->where('status', '!=', 'cancelled')
-            ->where('status', '!=', 'acknowledged')
-            ->where('status', '!=', 'completed');
+            ->where('status', ' != ', 'cancelled')
+            ->where('status', ' != ', 'acknowledged')
+            ->where('status', ' != ', 'completed');
         }else if ($status === '2' || $status === 2) {
-        $query = StockTransfer::whereBetween(DB::raw('date(created_at)'),
+        $query = StockTransfer::whereBetween(DB::raw('date( created_at )'),
             [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))])
             ->where('status', '=', 'completed');
         }
@@ -1036,7 +1122,7 @@ class InventoryReportController extends Controller
         }
         $stock_max = [];
         $store_id = current_store_id();
-        $query = CurrentStock::select('product_id', DB::raw('sum(quantity) as qty'))
+        $query = CurrentStock::select('product_id', DB::raw('sum( quantity ) as qty'))
             ->groupby('product_id');
 
         if (!is_all_store()) {
@@ -1066,7 +1152,7 @@ class InventoryReportController extends Controller
         $stock_max = [];
         $store_id = current_store_id();
 
-        $query = CurrentStock::select('product_id', DB::raw('sum(quantity) as qty'))
+        $query = CurrentStock::select('product_id', DB::raw('sum( quantity ) as qty'))
             ->groupby('product_id');
         
         if (!is_all_store()) {
@@ -1119,7 +1205,7 @@ class InventoryReportController extends Controller
         $totalSchedules = StockCountSchedule::count();
 
         // Breakdown of schedules by status
-        $schedulesByStatus = StockCountSchedule::select('status', DB::raw('count(*) as count'))
+        $schedulesByStatus = StockCountSchedule::select('status', DB::raw('count( * ) as count'))
             ->groupBy('status')
             ->pluck('count', 'status');
 
@@ -1134,7 +1220,7 @@ class InventoryReportController extends Controller
 
         // Breakdown of adjustments by type (increase/decrease)
         $adjustmentsByType = DB::table('stock_adjustment_logs')
-            ->select('adjustment_type', DB::raw('SUM(adjustment_quantity) as total_quantity'))
+            ->select('adjustment_type', DB::raw('SUM( adjustment_quantity ) as total_quantity'))
             ->where('source', 'Daily Stock Count')
             ->groupBy('adjustment_type')
             ->pluck('total_quantity', 'adjustment_type');
@@ -1152,7 +1238,7 @@ class InventoryReportController extends Controller
             'totalAdjustments',
             'increaseAdjustments',
             'decreaseAdjustments'
-        ));
+        ) );
     }
 
 }

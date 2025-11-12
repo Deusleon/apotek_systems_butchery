@@ -579,13 +579,13 @@
                         <input type="text" class="form-control" name="" id="gracePeriod">
                     </div> --}}
                     <div class="form-group" id="gracePeriodDiv">
-                        <label>Grace Period(In Days)<font color="red">*</font></label>
+                        <label>Grace Period (Days)<font color="red">*</font></label>
                         <select class="form-control" name="" id="gracePeriod">
                             <option value="">Select grace period</option>
                             <option value="1">1</option>
                             <option value="7">7</option>
                             <option value="14">14</option>
-                            <option value="21">21</option>
+                            <option value="21" selected>21</option>
                             <option value="30">30</option>
                             <option value="60">60</option>
                             <option value="90">90</option>
@@ -795,7 +795,7 @@
                 _token: '{{ csrf_token() }}'
             },
             success: function (response) {
-                console.log('Response is: ', response);
+                // console.log('Response is: ', response);
                 $('#convertConfirmModal').modal('hide');
 
                 if (response.status === 'success' && response.sale_id) {
@@ -813,7 +813,7 @@
 
                     // Set document links
                     $('#deliveryNoteLink').attr('href', '{{ route('generate-delivery-note', '') }}/' + response.sale_id);
-                    $('#receiptLink').attr('href', '{{ route('getCashReceipt', '') }}/' + response.sale_id);
+                    $('#receiptLink').attr('href', '{{ route('getCashReceipt', '') }}/' + response.saletype);
 
                     // $('#successModal').modal('show');
                     notify(response.message, "top", "right", "success");
@@ -827,7 +827,7 @@
 
                     // Open receipt in new tab
                     if (response.redirect_to === 'receipt') {
-                        let receiptUrl = '{{ route('getCashReceipt', '') }}/' + response.sale_id;
+                        let receiptUrl = '{{ route('getCashReceipt', '') }}/' + response.saletype;
                         window.open(receiptUrl, '_blank');
                     }
 

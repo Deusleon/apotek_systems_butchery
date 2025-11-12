@@ -13,7 +13,7 @@
             font-size: 10px;
             margin: 0;
             padding: 10px 30px 10px 10px;
-            font-weight: bold;
+            /* font-weight: bold; */
         }
 
         * {
@@ -35,6 +35,14 @@
         #table-detail thead th {
             border-bottom: 1px solid #000;
         }
+        
+        #table-detail tbody tr td {
+            border-bottom: 1px dotted #000;
+        }
+
+        #table-detail tbody tr:last-child td {
+            border-bottom: none;
+        }
 
         hr {
             border: none;
@@ -47,7 +55,7 @@
         h5,
         h6 {
             margin: 2px 0;
-            font-weight: bold;
+            font-weight: normal;
             text-align: center;
         }
     </style>
@@ -65,8 +73,8 @@
             <table>
                 <tr>
                     <td>
-                        <span>Sales Date:</span> {{date('Y-m-d', strtotime($dat[0]['created_at']))}}<br>
                         <span>Receipt #:</span> {{$datas}}<br>
+                        <span>Sales Date:</span> {{date('Y-m-d', strtotime($dat[0]['created_at']))}}<br>
                         <span>Customer:</span> {{$dat[0]['customer'] ?? 'CASH'}}<br>
                         <span>TIN:</span> {{$dat[0]['customer_tin'] ?? 'N/A'}}<br>
                         <span>Printed On:</span> {{date('Y-m-d H:i:s')}}

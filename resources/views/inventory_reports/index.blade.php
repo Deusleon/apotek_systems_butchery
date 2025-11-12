@@ -81,8 +81,11 @@
                                             @if(auth()->user()->checkPermission('Product Details Report'))
                                                 <option value="2">Product Details Report</option>
                                             @endif
-                                            @if(auth()->user()->checkPermission('Product Ledger Report'))
+                                            @if(auth()->user()->checkPermission('Product Ledger Summary Report'))
                                                 <option value="3">Product Ledger Report</option>
+                                            @endif
+                                            @if(auth()->user()->checkPermission('Product Ledger Detailed Report'))
+                                                <option value="17">Product Ledger Detailed Report</option>
                                             @endif
                                             @if ($expireEnabled)
                                                 @if(auth()->user()->checkPermission('Expired Products Report'))
@@ -438,7 +441,7 @@
             // product ledger
             let ledgerDiv = document.getElementById('product_ledger');
             let warning = document.getElementById('warning');
-            if (Number(report_option_index) === 3) {
+            if (Number(report_option_index) === 3 || Number(report_option_index) === 17) {
                 if (ledgerDiv) ledgerDiv.style.display = 'block';
             } else {
                 if (ledgerDiv) ledgerDiv.style.display = 'none';

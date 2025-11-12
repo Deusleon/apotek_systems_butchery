@@ -677,6 +677,8 @@ class SaleController extends Controller
                     'sold_by' => $item->sale['user']['name'],
                     'customer' => $item->sale['customer']['name'],
                     'customer_tin' => $item->sale['customer']['tin'],
+                    'customer_phone' => $item->sale['customer']['phone'],
+                    'customer_address' => $item->sale['customer']['address'],
                     'paid' => $paid,
                     'balance' => $balance,
                     'remark' => $remark,

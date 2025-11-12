@@ -20,7 +20,7 @@ try {
 }
 
 try {
-    discount_enable = document.getElementById("discount_enabled").value;
+    discount_enable = document.getElementById("enable_discount").value;
 } catch (e) {
     console.log("discount error");
 }
@@ -813,7 +813,7 @@ function discount() {
         parseFloat(t.replace(/\,/g, ""), 10) -
             parseFloat(st.replace(/\,/g, ""), 10)
     );
-    console.log("Total items (number of cart entries):", total_items);
+    // console.log("Total items (number of cart entries):", total_items);
     $("#barcode_input").focus();
     cart_table.clear();
     cart_table.rows.add(cart);

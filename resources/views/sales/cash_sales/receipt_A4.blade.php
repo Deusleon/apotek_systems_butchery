@@ -8,38 +8,6 @@
             font-family: Arial, sans-serif;
             font-size: 14px;
             margin: 0;
-            /* border-left: 2px dashed #949393; */
-            /* min-height: 135mm; */
-        }
-
-        .header-section {
-            display: flex;
-            align-items: center;
-            /* margin-bottom: 10px; */
-        }
-
-        .logo-container {
-            margin-right: 10px;
-        }
-
-        .logo-container img {
-            max-width: 100px;
-            max-height: 100px;
-        }
-
-        .company-info {
-            flex: 1;
-            margin-left: 110px;
-        }
-
-        .company-name {
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .company-address {
-            font-size: 14px;
-            line-height: 1.2;
         }
 
         .receipt-header {
@@ -49,85 +17,55 @@
 
         .receipt-title {
             font-weight: bold;
-            font-size: 17px;
+            font-size: 15px;
             margin: 0;
         }
 
-        .receipt-number {
-            font-weight: bold;
-            font-size: 12px;
-            margin: 2px 0;
-            color: red;
-        }
-
-        .bill-to-label {
-            font-weight: bold;
-            font-size: 12px;
-            margin-bottom: 5px;
-        }
-
-        .bill-to-line1 {
-            border-bottom: 1.5px solid #a19f9f;
-            width: 40%;
-            height: 15px;
-            margin-top: -25px;
-        }
-
-        .bill-to-line2 {
-            border-bottom: 1.5px solid #a19f9f;
-            width: 40%;
-            height: 15px;
-            margin-top: -18px;
-        }
-
-        .date-section {
-            float: right;
-            display: inline-flex;
-            text-align: left;
-        }
-
-        .date-label {
-            font-size: 12px;
-            font-weight: bold;
-            margin-top: 41px;
-        }
-
-        .date-line {
-            margin-left: 30px;
-            margin-top: 50px;
-            border-bottom: 1.5px solid #a19f9f;
-            padding-left: 8px;
-            padding-right: 30px;
-            padding-top: 40px;
-            font-size: 13px;
-            height: 15px;
-        }
-
         /* Table styling */
-        .items-table {
+        .customer-table {
             width: 100%;
             border: none;
             border-collapse: collapse;
-            margin-top: 25px;
+            margin-top: 10px;
+        }
+
+        .customer-table .index-col {
+            width: auto;
+            text-align: left;
+            padding-left: 5px;
+        }
+
+        .customer-table td {
+            padding: 4px 2px;
+            border: 1px solid #858484;
+            font-size: 12px;
+            height: 15px;
+        }
+
+        .items-table {
+            width: 100%;
+            border: 1px solid #000;
+            border-collapse: collapse;
+            margin-top: 10px;
         }
 
         .table-header {
             background-color: #000;
             color: white;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 11px;
             text-align: center;
         }
 
         .table-header th {
-            padding: 8px 2px;
+            padding: 6px 2px;
             border: 1px solid #dbdada;
         }
 
         .items-table td {
-            padding: 2px 2px;
+            padding: 4px 2px;
             border: 1px solid #858484;
-            font-size: 14px;
+            font-size: 12px;
             height: 15px;
         }
 
@@ -155,7 +93,7 @@
         .summary-section {
             width: 40%;
             margin-left: auto;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .summary-row {
@@ -164,7 +102,6 @@
             /* margin-bottom: 3px; */
             padding: 2px 5px;
         }
-
 
         .summary-row.total {
             font-weight: bold;
@@ -183,14 +120,8 @@
 
         .slogan {
             text-align: left;
-            font-size: 10px;
+            font-size: 12px;
             font-style: italic;
-        }
-
-        /* Customer info inline */
-        .customer-info {
-            padding-left: 12mm;
-            margin-bottom: 10px;
         }
 
         .info-row {
@@ -219,56 +150,46 @@
 <body>
 
     <!-- Header Section -->
-    <div class="header-section">
+    <div style="width: 100%; text-align: center; align-items: center;">
         @if($pharmacy['logo'])
-            <div class="logo-container">
-                <img src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
-            </div>
+            <img style="max-width: 90px; max-height: 90px;" src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
         @endif
-        <div class="company-info">
-            <div class="company-name">{{$pharmacy['name']}}</div>
-            <div class="company-address">
-                {{$pharmacy['address']}}<br>
-                {{$pharmacy['phone']}}<br>
-                <span>TIN: {{$pharmacy['tin_number']}}</span> |
-                <span>VRN: {{$pharmacy['vrn_number']}}</span>
-            </div>
+        <div style="font-weight: bold; font-size: 16px;">{{$pharmacy['name']}}</div>
+        <div style="justify-content: center; font-size: 12px; line-height: 1.2;">
+            {{$pharmacy['address']}}<br>
+            {{$pharmacy['phone']}}<br>
+            <span>TIN: {{$pharmacy['tin_number'] ?? 'N/A'}}</span> |
+            <span>VRN: {{$pharmacy['vrn_number'] ?? 'N/A'}}</span>
         </div>
     </div>
-
-    <!-- Receipt Header -->
-    <div class="receipt-header">
-        <div class="receipt-title">SALES INVOICE</div>
-        @foreach($data as $datas => $dat)
-            <span style="font-size: 12px; font-weight: 400;">NO.</span><span class="receipt-number"> {{$datas}}</span>
-            @break
-        @endforeach
+    <div style="font-weight: bold; text-align: center;">
+        SALES INVOICE
     </div>
-    <div style="display: inline-flex;">
-        {{-- @dd($data) --}}
-        @foreach($data as $datas => $dat)
-            <!-- Bill To Section -->
-            <div class="bill-to-section">
-                <div class="bill-to-label">BILL TO:</div>
-                <div class="info-left">
-                    {{$dat[0]['customer'] ?? 'CASH'}}
-                </div>
-                <div class="bill-to-line1"></div>
-                <div class="info-left2">
-                    TIN: {{$dat[0]['customer_tin'] ?? 'N/A'}}
-                </div>
-                <div class="bill-to-line2"></div>
-            </div>
+    @foreach($data as $datas => $dat)
+        <table class="customer-table">
+            <tbody>
+                <tr>
+                    <td class="index-col" style="width: 15%;">Customer Name:</td>
+                    <td class="index-col" style="width: 50%;">{{$dat[0]['customer'] ?? 'CASH'}}</td>
+                    <td class="index-col" style="width: 17%;">TIN:</td>
+                    <td class="index-col" style="width: 20%;">{{$dat[0]['customer_tin'] ?? 'N/A'}}</td>
+                </tr>
+                <tr>
+                    <td class="index-col" style="width: 15%;">Phone Number:</td>
+                    <td class="index-col" style="width: 50%;">{{$dat[0]['customer_phone'] ?? 'N/A'}}</td>
+                    <td class="index-col" style="width: 17%;">Receipt No:</td>
+                    <td class="index-col" style="width: 20%;">{{$datas ?? 'N/A'}}</td>
+                </tr>
+                <tr>
+                    <td class="index-col" style="width: 15%;">Address:</td>
+                    <td class="index-col" style="width: 50%;">{{$dat[0]['customer_address'] ?? 'N/A'}}</td>
+                    <td class="index-col" style="width: 17%;">Date:</td>
+                    <td class="index-col" style="width: 20%;">{{date('Y-m-d', strtotime($dat[0]['created_at']))}}</td>
+                </tr>
+            </tbody>
+        </table>
+    @endforeach
 
-            <!-- Date Section -->
-            <div class="date-section">
-                <div class="date-label">DATE:</div>
-                <div class="date-line">{{date('Y-m-d', strtotime($dat[0]['created_at']))}}</div>
-            </div>
-        @endforeach
-    </div>
-
-    <!-- Customer Information -->
     @foreach($data as $datas => $dat)
         <!-- Items Table -->
         <table class="items-table">
@@ -350,7 +271,6 @@
     <div class="footer-section" style="margin-top: -20px;">        
         @foreach($data as $datas => $dat)
             <div class="sold-by">Issued By: {{$dat[0]['sold_by']}}</div>
-            <div class="slogan">{{$pharmacy['slogan'] ?? 'Thank you for your business'}}</div>
             @break
         @endforeach
         <span style="font-size: 10px; border-bottom: 1px solid #ccc;">Printed on: {{date('Y-m-d H:i:s')}}</span>
@@ -364,6 +284,9 @@
             </div>
         </div>
     @endif
+    <div style="width: 100%; text-align: center; font-size: 12px; margin-top: 100px !important; font-style: italic; display: flex; justify-content: center; align-items: center;">
+        {{$pharmacy['slogan'] ?? 'Thank you for your business'}}
+    </div>
 </body>
 
 </html>
