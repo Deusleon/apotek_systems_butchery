@@ -119,26 +119,26 @@ class ImportDataController extends Controller {
         // Headers with proper column names matching Excel structure
         if ($is_detailed === 'Detailed') {
             $headers = [
-                'A1' => 'code',
-                'B1' => 'product_name',
-                'C1' => 'barcode',
-                'D1' => 'brand',
-                'E1' => 'pack_size',
-                'F1' => 'category',
-                'G1' => 'unit',
-                'H1' => 'min_stock',
-                'I1' => 'max_stock'
+                // 'A1' => 'code',
+                'A1' => 'product_name',
+                'B1' => 'barcode',
+                'C1' => 'brand',
+                'D1' => 'pack_size',
+                'E1' => 'category',
+                'F1' => 'unit',
+                'G1' => 'min_stock',
+                'H1' => 'max_stock'
             ];
         }
 
         if ($is_detailed === 'Normal') {
             $headers = [
-            'A1' => 'code',
-            'B1' => 'product_name',
-            'C1' => 'barcode',
-            'D1' => 'category',
+            // 'A1' => 'code',
+            'A1' => 'product_name',
+            'B1' => 'barcode',
+            'C1' => 'category',
             // 'E1' => 'Unit',
-            'E1' => 'min_stock',
+            'D1' => 'min_stock',
         ];
     }
 
@@ -148,24 +148,24 @@ class ImportDataController extends Controller {
 
         if( $is_detailed === 'Detailed' ) {
             // Sample row for Detailed
-            $sheet->setCellValue( 'A2', '100001' );
-            $sheet->setCellValue( 'B2', 'Sample Product' );
-            $sheet->setCellValue( 'C2', '1234567890123' );
-            $sheet->setCellValue( 'D2', 'Sample Brand' );
-            $sheet->setCellValue( 'E2', '500' );
-            $sheet->setCellValue( 'F2', 'ml' );
-            $sheet->setCellValue( 'G2', 'BEVERAGE' );
-            $sheet->setCellValue( 'H2', '10' );
-            $sheet->setCellValue( 'I2', '100' );
+            // $sheet->setCellValue( 'A2', '100001' );
+            $sheet->setCellValue( 'A2', 'Sample Product' );
+            $sheet->setCellValueExplicit('B2', '1234567890123', \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $sheet->setCellValue( 'C2', 'Sample Brand' );
+            $sheet->setCellValue( 'D2', '500' );
+            $sheet->setCellValue( 'E2', 'ml' );
+            $sheet->setCellValue( 'F2', 'General' );
+            $sheet->setCellValue( 'G2', '10' );
+            $sheet->setCellValue( 'H2', '100' );
         }
         if( $is_detailed === 'Normal' ) {
             // Sample row for Normal
-            $sheet->setCellValue( 'A2', '100001' );
-            $sheet->setCellValue( 'B2', 'Sample Product' );
-            $sheet->setCellValue( 'C2', '1234567890123' );
-            $sheet->setCellValue( 'D2', 'BEVERAGE' );
+            // $sheet->setCellValue( 'A2', '100001' );
+            $sheet->setCellValue( 'A2', 'Sample Product' );
+            $sheet->setCellValueExplicit('B2', '1234567890123', \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+            $sheet->setCellValue( 'C2', 'BEVERAGE' );
             // $sheet->setCellValue( 'E2', 'ml' );
-            $sheet->setCellValue( 'E2', '10' );
+            $sheet->setCellValue( 'D2', '10' );
         }
 
         $writer = new Xlsx($spreadsheet);
@@ -288,7 +288,7 @@ class ImportDataController extends Controller {
                     'store_id' => $request->store_id,
                     'price_category_id' => $request->price_category_id,
                     'supplier_id' => $request->supplier_id,
-                    'temp_file' => $path // Changed to use the full path
+                    'temp_file' => $path
                 ] );
 
             } catch ( \Exception $e ) {
@@ -364,9 +364,9 @@ class ImportDataController extends Controller {
                     $is_detailed = Setting::where( 'id', 127 )->value( 'value' );
 
                     if ( $is_detailed === 'Detailed' ) {
-                        $expectedColumns = 9;
+                        $expectedColumns = 8;
                     } else if ( $is_detailed === 'Normal' ) {
-                        $expectedColumns = 5;
+                        $expectedColumns = 4;
                     }
 
                     $actualColumns = count( $row );
@@ -530,7 +530,7 @@ class ImportDataController extends Controller {
             Session::forget( 'import_preview' );
 
             $message = 'Import completed. ';
-            $message .= "Successfully imported {$successful_records} products. ";
+            $message .= 'Successfully imported '.number_format( $successful_records, 0 ).' products.';
             if ( $failed_records > 0 ) {
                 $message .= "Failed to import {$failed_records} products. Check import history for details.";
                 return redirect()->route( 'import-products' )->with( 'warning', $message );
@@ -581,7 +581,7 @@ class ImportDataController extends Controller {
 
             $total_rows = count( $excel_raw_data[ 0 ] ) - 1;
             // Minus header
-            Log::info( 'Creating import history record', [ 'total_rows' => $total_rows ] );
+            // Log::info( 'Creating import history record', [ 'total_rows' => $total_rows ] );
 
             // Create import history record
             $import_history = ImportHistory::create( [
@@ -637,7 +637,26 @@ class ImportDataController extends Controller {
                         $buy_price = preg_replace( '/[^\d.]/', '', $row[ 2 ] );
                         $sell_price = preg_replace( '/[^\d.]/', '', $row[ 3 ] );
                         $quantity = preg_replace( '/[^\d.]/', '', $row[ 4 ] );
-
+                        $total_profit = ($sell_price - $buy_price) * $quantity;
+                        
+                        // 1. Create incoming_stock record first
+                        $incoming_stock = new GoodsReceiving;
+                        $incoming_stock->product_id = $row[ 0 ];
+                        $incoming_stock->supplier_id = $preview['supplier_id'];
+                        $incoming_stock->invoice_no = null;
+                        $incoming_stock->batch_number = now()->format( 'Y-m-d' );
+                        $incoming_stock->expire_date = $row[ 5 ];
+                        $incoming_stock->quantity = $quantity;
+                        $incoming_stock->unit_cost = $buy_price;
+                        $incoming_stock->total_cost = $buy_price * $quantity;
+                        $incoming_stock->store_id = $preview[ 'store_id' ];
+                        $incoming_stock->total_sell = $sell_price * $quantity;
+                        $incoming_stock->item_profit = $total_profit;
+                        $incoming_stock->created_by = Auth::user()->id;
+                        $incoming_stock->sell_price = $sell_price;
+                        $incoming_stock->created_at = date( 'Y-m-d' );
+                        $incoming_stock->save();
+                        
                         // Create stock record
                         $stock_data = [
                             'product_id' => $row[ 0 ],
@@ -645,9 +664,10 @@ class ImportDataController extends Controller {
                             'quantity' => $row[ 4 ],
                             'expiry_date' => $row[ 5 ],
                             'store_id' => $preview[ 'store_id' ],
-                            'created_by' => Auth::id()
+                            'created_by' => Auth::id(),
+                            'incoming_stock_id' => $incoming_stock->id
                         ];
-
+                        
                         $stock = CurrentStock::create( $stock_data );
 
                         // Create stock tracking record
@@ -734,9 +754,9 @@ class ImportDataController extends Controller {
 
             Session::forget( 'import_preview' );
 
-            $message = "Successfully imported {$successful_records} stock records. ";
+            $message = 'Successfully imported '.number_format( $successful_records ).' stock records. ';
             if ( $failed_records > 0 ) {
-                $message .= "Failed to import {$failed_records} records. Check import history for details.";
+                $message .= 'Failed to import '.number_format( $failed_records ).' records. Check import history for details.';
                 return redirect()->route( 'import-data' )->with( 'warning', $message );
             } else {
                 return redirect()->route( 'import-data' )->with( 'success', $message );
@@ -757,28 +777,28 @@ class ImportDataController extends Controller {
         $errors = [];
 
         // Required fields
-        if ( empty( $row[ 1 ] ) ) $errors[] = 'Product name is required';
-        if ( empty( $row[ 5 ] ) ) $errors[] = 'Category is required';
+        if ( empty( $row[ 0 ] ) ) $errors[] = 'Product name is required';
+        if ( empty( $row[ 4 ] ) ) $errors[] = 'Category is required';
 
         // Numeric validations
-        if ( !empty( $row[ 4 ] ) && !is_numeric( $row[ 4 ] ) ) $errors[] = 'Pack Size must be numeric';
-        if ( !empty( $row[ 7 ] ) && !is_numeric( $row[ 7 ] ) ) $errors[] = 'Min stock must be numeric';
-        if ( !empty( $row[ 8 ] ) && !is_numeric( $row[ 8 ] ) ) $errors[] = 'Max stock must be numeric';
+        if ( !empty( $row[ 3 ] ) && !is_numeric( $row[ 3 ] ) ) $errors[] = 'Pack Size must be numeric';
+        if ( !empty( $row[ 6 ] ) && !is_numeric( $row[ 6 ] ) ) $errors[] = 'Min stock must be numeric';
+        if ( !empty( $row[ 7 ] ) && !is_numeric( $row[ 7 ] ) ) $errors[] = 'Max stock must be numeric';
 
         // Min/Max stock validation
-        if ( !empty( $row[ 7 ] ) && !empty( $row[ 8 ] ) && $row[ 7 ] > $row[ 8 ] ) {
+        if ( !empty( $row[ 6 ] ) && !empty( $row[ 7 ] ) && $row[ 6 ] > $row[ 7 ] ) {
             $errors[] = 'Min stock cannot be greater than max stock';
         }
 
         // Uniqueness validation ( name+category )
-        if ( !empty( $row[ 1 ] ) && !empty( $row[ 5 ] ) ) {
+        if ( !empty( $row[ 0 ] ) && !empty( $row[ 4 ] ) ) {
             $exists = DB::table( 'inv_products' )
-            ->where( 'name', $row[ 1 ] )
-            ->where( 'category_id', $row[ 5 ] )
+            ->where( 'name', $row[ 0 ] )
+            ->where( 'category_id', $row[ 4 ] )
             ->exists();
 
             if ( $exists ) {
-                $errors[] = "Product '{$row[1]}' already exists in this category";
+                $errors[] = "Product '{$row[0]}' already exists in this category";
             }
         }
 
@@ -800,21 +820,21 @@ class ImportDataController extends Controller {
         $errors = [];
 
         // Required fields
-        if ( empty( $row[ 1 ] ) ) $errors[] = 'Product name is required';
-        if ( empty( $row[ 3 ] ) ) $errors[] = 'Category is required';
+        if ( empty( $row[ 0 ] ) ) $errors[] = 'Product name is required';
+        if ( empty( $row[ 2 ] ) ) $errors[] = 'Category is required';
 
         // Numeric validations
-        if ( !empty( $row[ 4 ] ) && !is_numeric( $row[ 4 ] ) ) $errors[] = 'Min stock must be numeric';
+        if ( !empty( $row[ 3 ] ) && !is_numeric( $row[ 3 ] ) ) $errors[] = 'Min stock must be numeric';
 
         // Uniqueness validation ( name+category )
-        if ( !empty( $row[ 1 ] ) && !empty( $row[ 3 ] ) ) {
+        if ( !empty( $row[ 0 ] ) && !empty( $row[ 2 ] ) ) {
             $exists = DB::table( 'inv_products' )
-            ->where( 'name', $row[ 1 ] )
-            ->where( 'category_id', $row[ 3 ] )
+            ->where( 'name', $row[ 0 ] )
+            ->where( 'category_id', $row[ 2 ] )
             ->exists();
 
             if ( $exists ) {
-                $errors[] = "Product '{$row[1]}' already exists in this category";
+                $errors[] = "Product '{$row[0]}' already exists in this category";
             }
         }
 
@@ -832,15 +852,36 @@ class ImportDataController extends Controller {
 
     private function validateStockRow( $row, $row_number ) {
         // Log::info( 'Validating row', [ 'row_number' => $row_number ] );
-
+        $productCode = trim( $row[ 0 ] ?? '' );
+        $productName = trim( $row[ 1 ] ?? '' );
+        $buyPrice    = $row[ 2 ] ?? null;
+        $sellPrice   = $row[ 3 ] ?? null;
+        $quantity    = $row[ 4 ] ?? null;
         $errors = [];
 
         // Required fields
-        // if ( empty( $row[ 0 ] ) ) $errors[] = 'Product code is required';
+        if ( empty( $row[ 0 ] ) ) $errors[] = 'Product code is required';
         if ( empty( $row[ 1 ] ) ) $errors[] = 'Product name is required';
-        if ( empty( $row[ 2 ] ) ) $errors[] = 'Buy price is required';
-        if ( empty( $row[ 3 ] ) ) $errors[] = 'Sell price is required';
-        // if ( empty( $row[ 4 ] ) ) $errors[] = 'Quantity is required';
+        if ( $buyPrice === '' || $buyPrice === null ) {
+            $errors[] = 'Buy price is required';
+        }
+        if ( $sellPrice === '' || $sellPrice === null ) {
+            $errors[] = 'Sell price is required';
+        }
+        if ( $quantity === '' || $quantity === null ) {
+            $errors[] = 'Quantity is required';
+        }
+
+        // Database existence validation
+        if ( $productCode !== '' ) {
+            $product = DB::table( 'inv_products' )->where( 'id', $productCode )->first();
+
+            if ( !$product ) {
+                $errors[] = "Product code {$productCode} does not exist in the database.";
+            } elseif ( strcasecmp( $product->name, $productName ) !== 0 ) {
+                $errors[] = "Product name '{$productName}' does not match the name for product code {$productCode} '{$product->name}'.";
+            }
+        }
 
         // Numeric validations
         if ( !empty( $row[ 2 ] ) && !is_numeric( preg_replace( '/[^\d.]/', '', $row[ 2 ] ) ) ) $errors[] = 'Buy price must be numeric';

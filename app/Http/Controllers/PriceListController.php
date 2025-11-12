@@ -106,7 +106,7 @@ class PriceListController extends Controller {
             DB::raw('NULL as price_category_id') 
         )
         ->where('cs.quantity', '>', 0)
-        ->where('cs.unit_cost', '>', 0)
+        // ->where('cs.unit_cost', '>', 0)
         ->whereNull('sp.id');
         if (!is_all_store()) {
             $query->where('cs.store_id', $store_id);
@@ -130,7 +130,7 @@ class PriceListController extends Controller {
                     'sp.price_category_id as price_category_id'
                 )
                 ->where('sp.price_category_id', $categoryId)
-                ->where('cs.unit_cost', '>', 0)
+                // ->where('cs.unit_cost', '>', 0)
                 ->where('cs.quantity', '>', 0);
                 if (!is_all_store()) {
                     $query->where('cs.store_id', $store_id);
@@ -204,7 +204,7 @@ class PriceListController extends Controller {
     $request->validate([
         'unit_cost' => 'required|numeric|min:0',
         'sell_price' => 'required|numeric|min:0',
-        'price_category_id' => 'required|exists:price_categories, id',
+        'price_category_id' => 'required|exists:price_categories,id',
         'selected_type' => 'required|string',
     ]);
 
@@ -235,7 +235,10 @@ class PriceListController extends Controller {
 
         // get all stock ids for the same product (all batches of this product)
         $productId = $current_stock->product_id;
-        $allStockIds = CurrentStock::where('product_id', $productId)->pluck('id')->toArray();
+        $allStockIds = CurrentStock::where('product_id', $productId)
+                                    ->where('quantity', '>', 0)
+                                    ->pluck('id')
+                                    ->toArray();
 
         $priceCategoryId = $request->price_category_id;
         $newPrice = $request->sell_price;

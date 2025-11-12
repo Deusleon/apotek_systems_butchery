@@ -14,7 +14,7 @@ var cart_table = $("#cart_table").DataTable({
     bSort: false,
     order: [[0, "desc"]],
     language: {
-        emptyTable: "Add products to transfer",
+        emptyTable: "No data available in table",
     },
     data: cart,
     columns: [

@@ -28,7 +28,7 @@ class CreatePermissionsTable extends Migration
             ['name' => 'View Sales', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'MODULES'],
             ['name' => 'View Purchasing', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'MODULES'],
             ['name' => 'View Inventory', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'MODULES'],
-            ['name' => 'View Transport', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'MODULES'],
+            // ['name' => 'View Transport', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'MODULES'],
             ['name' => 'View Accounting', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'MODULES'],
             ['name' => 'View Reports', 'guard_name' => 'web', 'created_at' => '2024-11-11 20:17:51', 'updated_at' => '2024-11-11 20:17:51', 'category' => 'MODULES'],
             ['name' => 'View Settings', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'MODULES'],
@@ -36,7 +36,7 @@ class CreatePermissionsTable extends Migration
            ['name' => 'View Sales Summary', 'guard_name' => 'web', 'created_at' => '2024-11-15 16:49:39', 'updated_at' => '2024-11-15 16:49:39', 'category' => 'DASHBOARD'],
             ['name' => 'View Purchasing Summary', 'guard_name' => 'web', 'created_at' => '2024-11-15 16:49:56', 'updated_at' => '2024-11-15 16:49:56', 'category' => 'DASHBOARD'],
             ['name' => 'View Inventory Summary', 'guard_name' => 'web', 'created_at' => '2024-11-15 16:50:12', 'updated_at' => '2024-11-15 16:50:12', 'category' => 'DASHBOARD'],
-            ['name' => 'View Transport Summary', 'guard_name' => 'web', 'created_at' => '2024-11-15 16:50:28', 'updated_at' => '2024-11-15 16:50:28', 'category' => 'DASHBOARD'],
+            // ['name' => 'View Transport Summary', 'guard_name' => 'web', 'created_at' => '2024-11-15 16:50:28', 'updated_at' => '2024-11-15 16:50:28', 'category' => 'DASHBOARD'],
             ['name' => 'View Accounting Summary', 'guard_name' => 'web', 'created_at' => '2024-11-15 16:50:28', 'updated_at' => '2024-11-15 16:50:28', 'category' => 'DASHBOARD'],
             // Sales Sub Modules
             ['name' => 'View Cash Sales', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'SALES'],
@@ -215,7 +215,7 @@ class CreatePermissionsTable extends Migration
             ['name' => 'Stock Above Max. Level', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'REPORTS'],
             ['name' => 'Stock Below Min. Level', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'REPORTS'],
             ['name' => 'View Expense Reports', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'REPORTS'],
-            ['name' => 'View Transport Reports', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'REPORTS'],
+            // ['name' => 'View Transport Reports', 'guard_name' => 'web', 'created_at' => '2019-10-17 20:25:55', 'updated_at' => '2019-10-17 20:25:55', 'category' => 'REPORTS'],
             
         ]);
 

@@ -190,7 +190,7 @@
                     {data: 'category_name', name: 'category_name'}
                 ],
                 order: [[0, 'asc']],
-                responsive: true,
+                responsive: false,
                 dom: 'Bfrtip',
                 buttons: [
                     'copy', 'csv', 'excel', 'pdf', 'print'

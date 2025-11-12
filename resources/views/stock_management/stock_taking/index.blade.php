@@ -204,8 +204,8 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body">
-                        <table class="table table-striped" id="preview-table">
+                    <div class="modal-body table-responsive">
+                        <table class="table table-striped" id="preview-table" style="width:100%">
                             <thead>
                                 <tr>
                                     <th>#</th>
@@ -368,16 +368,16 @@
 
                 // DataTable initialization (if not already)
                 var table = $('#fixed-header2').DataTable({
-                    pageLength: 25,
+                    pageLength: 10,
                     lengthMenu: [10, 25, 50, 100],
                     order: [],
                     columnDefs: [
                         { targets: [1, 2, 3], className: 'dt-body-right' }
                     ],
-                    responsive: true,
+                    responsive: false,
                     autoWidth: false
                 });
-
+                
                 // Preview button — collect numeric from data-raw (only rows where user entered a value)
                 $('#process-adjustments-btn').on('click', function () {
                     let items = [];

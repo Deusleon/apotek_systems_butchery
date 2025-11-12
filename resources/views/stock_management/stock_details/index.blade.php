@@ -24,9 +24,8 @@
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="stock-details-table" class="table table-striped table-hover mb-3"
-                            style="background: white;width: 100%; font-size: 14px;">
-
+                        <table id="stock-details-table" class="display table nowrap table-striped table-hover"
+                            style="background: white; width: 100%; font-size: 14px;">
                             <thead>
                                 <tr>
                                     <th>Product Name</th>
@@ -119,7 +118,7 @@
     <script>
         $(document).ready(function () {
             $('#stock-details-table').DataTable({
-                responsive: true,
+                responsive: false,
                 order: [[0, 'asc']]
             });
 

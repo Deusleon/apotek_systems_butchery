@@ -31,7 +31,7 @@
                                     </label>
                                     <div class="col-md-9">
                                         <input type="text" class="form-control" id="name_edit_normal" name="name"
-                                            maxlength="50" minlength="2" required value="{{ old('name') }}">
+                                            maxlength="100" minlength="2" required value="{{ old('name') }}">
                                     </div>
                                 </div>
                                 {{-- Barcode --}}

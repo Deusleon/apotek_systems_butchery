@@ -77,7 +77,7 @@
                                         @if (current_store()->id === 1)
                                             <select id="from_id" name="from_id"
                                                 class="js-example-basic-single form-control drop">
-                                                <option selected="true" value="0" disabled="disabled">Select branch
+                                                <option selected="true" value="0" disabled="disabled">Select Branch
                                                 </option>
                                                 @foreach($stores as $store)
                                                     <option value="{{$store->id}}">{{$store->name}}</option>
@@ -91,8 +91,8 @@
                                             </select>
                                         @endif
                                     </div>
-                                    <span id="from_danger" style="display: none; font-size: 14px; color: red">Please choose
-                                        branch</span>
+                                    <span id="from_danger" style="display: none; font-size: 14px; color: red">Please Select
+                                        Branch</span>
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -100,7 +100,7 @@
                                     <label for="to_id">To</label>
                                     <div id="to_border">
                                         <select id="to_id" name="to_id" class="js-example-basic-single form-control drop">
-                                            <option selected="true" value="0" disabled="disabled">Select branch
+                                            <option selected="true" value="0" disabled="disabled">Select Branch
                                             </option>
                                             @foreach($stores as $store)
                                                 <option value="{{$store->id}}">{{$store->name}}</option>
@@ -108,8 +108,8 @@
                                         </select>
                                         <input type="hidden" id="current_store_id" value="{{ current_store()->id }}">
                                     </div>
-                                    <span id="to_danger" style="display: none; font-size: 14px; color: red">Please choose
-                                        branch</span>
+                                    <span id="to_danger" style="display: none; font-size: 14px; color: red">Please Select
+                                        Branch</span>
                                 </div>
                             </div>
                             <div class="col-md-6">

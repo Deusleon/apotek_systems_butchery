@@ -104,7 +104,7 @@
     <script>
         $('#history').DataTable({
             searching: true,
-            responsive: true,
+            responsive: false,
             order: [
                 [0, 'asc']
             ]
