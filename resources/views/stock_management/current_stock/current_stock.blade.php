@@ -333,42 +333,42 @@
             document.getElementById("outstock_detailed").style.display = "none";
 
             $('#all_summary').DataTable({
-                responsive: true,
+                responsive: false,
                 order: [
                     [0, 'asc']
                 ]
             });
 
             $('#all_detailed').DataTable({
-                responsive: true,
+                responsive: false,
                 order: [
                     [0, 'asc']
                 ]
             });
 
             $('#current_stock').DataTable({
-                responsive: true,
+                responsive: false,
                 order: [
                     [0, 'asc']
                 ]
             });
 
             $('#current_stock_detailed').DataTable({
-                responsive: true,
+                responsive: false,
                 order: [
                     [0, 'asc']
                 ]
             });
 
             $('#current_stock_out').DataTable({
-                responsive: true,
+                responsive: false,
                 order: [
                     [0, 'asc']
                 ]
             });
 
             $('#current_stock_out_detailed').DataTable({
-                responsive: true,
+                responsive: false,
                 order: [
                     [0, 'asc']
                 ]

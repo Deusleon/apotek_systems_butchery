@@ -210,53 +210,6 @@
             retrivePriceHistory(value, data.product_id);
         });
 
-        // $('#price_category, #type_id').on('change', function () {
-        //     var selectedCategory = $('#price_category').val();
-        //     var selectedType = $('#type_id').val();
-
-        //     $('#pendingTable, #tbody1, #historyTable').hide();
-
-        //     // AJAX request backend
-        //     $.ajax({
-        //         url: '{{ route("fetch-price-list") }}',
-        //         type: 'GET',
-        //         dataType: 'json',
-        //         data: {
-        //             category_id: selectedCategory,
-        //             type: selectedType
-        //         },
-        //         beforeSend: function () {
-        //             $('#loading').show();
-        //         },
-        //         success: function (response) {
-        //             console.log('FechResponse: ', response);
-        //             if (selectedType === "pending") {
-        //                 renderTable('#pendingPrices', response);
-        //                 $('#pendingTable').show();
-        //             } else if (selectedType === "1") {
-        //                 renderTable('#fixed-header2', response);
-        //                 $('#tbody1').show();
-        //             } else if (selectedType === "0") {
-        //                 renderTable('#priceHistory', response);
-        //                 $('#historyTable').show();
-        //             }
-        //         },
-        //         complete: function () {
-        //             $('#loading').hide();
-        //         },
-        //         error: function () {
-        //             alert('Error fetching data!');
-        //         }
-        //     });
-        // });
-
-        // function renderTable(tableId, data) {
-        //     var table = $(tableId).DataTable();
-        //     table.clear();
-        //     table.rows.add(data);
-        //     table.draw();
-        // }
-
         $('#edit').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
             var name = button.data('name');
@@ -441,7 +394,7 @@
 
             function initPriceTable(selector) {
                 return $(selector).DataTable({
-                    responsive: true,
+                    responsive: false,
                     order: [[0, 'asc']],
                     destroy: true,
                     columns: [
@@ -481,7 +434,7 @@
 
             function initHistoryTable(selector) {
                 return $(selector).DataTable({
-                    responsive: true,
+                    responsive: false,
                     order: [[0, 'asc']],
                     destroy: true,
                     columns: [

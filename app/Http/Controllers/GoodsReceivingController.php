@@ -58,9 +58,8 @@ class GoodsReceivingController extends Controller
                 'order_receiving', 'price_categories','stores', 'default_store_id', 'default_store_name',
                 'current_stock', 'item_stocks', 'invoices', 'batch_setting', 'invoice_setting', 'back_date', 'expire_date'])));
     }
-      
 
-        private function resolveStoreId($request = null)
+    private function resolveStoreId($request = null)
     {
         // 1. request store (if passed directly)
         if ($request && $request->filled('store')) {
@@ -80,9 +79,6 @@ class GoodsReceivingController extends Controller
         // 4. fallback: first store id (never hard-code 1)
         return (int) (Store::first()->id ?? 1);
     }
-
-
-
     public function orderReceiving()
     {
         $batch_setting = Setting::where('id', 110)->value('value');
@@ -140,7 +136,6 @@ class GoodsReceivingController extends Controller
             'expire_date'
         ));
     }
-
     public function allProductToReceive()
     {
         $max_prices = array();

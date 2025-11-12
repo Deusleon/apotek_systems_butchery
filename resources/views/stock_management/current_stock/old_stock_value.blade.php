@@ -54,7 +54,7 @@
                         <input type="text" name="old_stock_date" id="old_stock_date" class="form-control w-auto">
                     </div>
                     <div class="d-flex justify-content-end mb-3">
-                        <div class="d-flex align-items-center" style="width: 290px;">
+                        <div class="d-flex align-items-center" style="width: 281px;">
                             <label for="price_category" class="form-label mb-0"
                                 style="white-space: nowrap; margin-right: 8px;">Price Type:</label>
                             <select name="price_category" id="price_category" class="form-control"
@@ -132,7 +132,7 @@
         $(document).ready(function () {
 
             $('#old_stock').DataTable({
-                responsive: true,
+                responsive: false,
                 order: [[0, 'asc']]
             });
 

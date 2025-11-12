@@ -47,7 +47,7 @@
             <div class="card-body">
                 <div class="d-flex justify-content-end mb-3">
                     <form method="POST" action="{{ route('current_stock_value') }}" class="d-flex align-items-center"
-                        style="width: 290px;">
+                        style="width: 281px;">
                         @csrf
                         <label for="price_category" class="form-label mb-0"
                             style="white-space: nowrap; margin-right: 8px;">Price Type:</label>
@@ -134,7 +134,7 @@
         $(document).ready(function () {
 
             $('#current_stock').DataTable({
-                responsive: true,
+                responsive: false,
                 order: [[0, 'asc']]
             });
 

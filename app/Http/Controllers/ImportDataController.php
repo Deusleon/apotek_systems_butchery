@@ -288,7 +288,7 @@ class ImportDataController extends Controller {
                     'store_id' => $request->store_id,
                     'price_category_id' => $request->price_category_id,
                     'supplier_id' => $request->supplier_id,
-                    'temp_file' => $path // Changed to use the full path
+                    'temp_file' => $path
                 ] );
 
             } catch ( \Exception $e ) {
@@ -530,7 +530,7 @@ class ImportDataController extends Controller {
             Session::forget( 'import_preview' );
 
             $message = 'Import completed. ';
-            $message .= "Successfully imported ".number_format($successful_records, 0)." products.";
+            $message .= 'Successfully imported '.number_format( $successful_records, 0 ).' products.';
             if ( $failed_records > 0 ) {
                 $message .= "Failed to import {$failed_records} products. Check import history for details.";
                 return redirect()->route( 'import-products' )->with( 'warning', $message );
@@ -637,7 +637,26 @@ class ImportDataController extends Controller {
                         $buy_price = preg_replace( '/[^\d.]/', '', $row[ 2 ] );
                         $sell_price = preg_replace( '/[^\d.]/', '', $row[ 3 ] );
                         $quantity = preg_replace( '/[^\d.]/', '', $row[ 4 ] );
-
+                        $total_profit = ($sell_price - $buy_price) * $quantity;
+                        
+                        // 1. Create incoming_stock record first
+                        $incoming_stock = new GoodsReceiving;
+                        $incoming_stock->product_id = $row[ 0 ];
+                        $incoming_stock->supplier_id = $preview['supplier_id'];
+                        $incoming_stock->invoice_no = null;
+                        $incoming_stock->batch_number = now()->format( 'Y-m-d' );
+                        $incoming_stock->expire_date = $row[ 5 ];
+                        $incoming_stock->quantity = $quantity;
+                        $incoming_stock->unit_cost = $buy_price;
+                        $incoming_stock->total_cost = $buy_price * $quantity;
+                        $incoming_stock->store_id = $preview[ 'store_id' ];
+                        $incoming_stock->total_sell = $sell_price * $quantity;
+                        $incoming_stock->item_profit = $total_profit;
+                        $incoming_stock->created_by = Auth::user()->id;
+                        $incoming_stock->sell_price = $sell_price;
+                        $incoming_stock->created_at = date( 'Y-m-d' );
+                        $incoming_stock->save();
+                        
                         // Create stock record
                         $stock_data = [
                             'product_id' => $row[ 0 ],
@@ -645,9 +664,10 @@ class ImportDataController extends Controller {
                             'quantity' => $row[ 4 ],
                             'expiry_date' => $row[ 5 ],
                             'store_id' => $preview[ 'store_id' ],
-                            'created_by' => Auth::id()
+                            'created_by' => Auth::id(),
+                            'incoming_stock_id' => $incoming_stock->id
                         ];
-
+                        
                         $stock = CurrentStock::create( $stock_data );
 
                         // Create stock tracking record
@@ -734,9 +754,9 @@ class ImportDataController extends Controller {
 
             Session::forget( 'import_preview' );
 
-            $message = "Successfully imported ".number_format($successful_records)." stock records. ";
+            $message = 'Successfully imported '.number_format( $successful_records ).' stock records. ';
             if ( $failed_records > 0 ) {
-                $message .= "Failed to import ".number_format($failed_records)." records. Check import history for details.";
+                $message .= 'Failed to import '.number_format( $failed_records ).' records. Check import history for details.';
                 return redirect()->route( 'import-data' )->with( 'warning', $message );
             } else {
                 return redirect()->route( 'import-data' )->with( 'success', $message );

@@ -666,7 +666,7 @@
 
         //Applying datatabale on the table
         const stockTransfer = $('#fixed-header1').DataTable({
-            responsive: true,
+            responsive: false,
             order: [[7, 'desc']],
             columnDefs: [
                 {
