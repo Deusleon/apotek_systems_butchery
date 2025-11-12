@@ -154,7 +154,7 @@ class ImportDataController extends Controller {
             $sheet->setCellValue( 'C2', 'Sample Brand' );
             $sheet->setCellValue( 'D2', '500' );
             $sheet->setCellValue( 'E2', 'ml' );
-            $sheet->setCellValue( 'F2', 'BEVERAGE' );
+            $sheet->setCellValue( 'F2', 'General' );
             $sheet->setCellValue( 'G2', '10' );
             $sheet->setCellValue( 'H2', '100' );
         }
@@ -530,7 +530,7 @@ class ImportDataController extends Controller {
             Session::forget( 'import_preview' );
 
             $message = 'Import completed. ';
-            $message .= "Successfully imported {$successful_records} products. ";
+            $message .= "Successfully imported ".number_format($successful_records, 0)." products.";
             if ( $failed_records > 0 ) {
                 $message .= "Failed to import {$failed_records} products. Check import history for details.";
                 return redirect()->route( 'import-products' )->with( 'warning', $message );
@@ -734,9 +734,9 @@ class ImportDataController extends Controller {
 
             Session::forget( 'import_preview' );
 
-            $message = "Successfully imported {$successful_records} stock records. ";
+            $message = "Successfully imported ".number_format($successful_records)." stock records. ";
             if ( $failed_records > 0 ) {
-                $message .= "Failed to import {$failed_records} records. Check import history for details.";
+                $message .= "Failed to import ".number_format($failed_records)." records. Check import history for details.";
                 return redirect()->route( 'import-data' )->with( 'warning', $message );
             } else {
                 return redirect()->route( 'import-data' )->with( 'success', $message );

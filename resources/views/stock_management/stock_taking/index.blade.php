@@ -204,8 +204,8 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <div class="modal-body">
-                        <table class="table table-striped" id="preview-table">
+                    <div class="modal-body table-responsive">
+                        <table class="table table-striped" id="preview-table" style="width:100%">
                             <thead>
                                 <tr>
                                     <th>#</th>

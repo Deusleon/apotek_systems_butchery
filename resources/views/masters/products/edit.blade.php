@@ -20,7 +20,7 @@
                                     Name<span class="text-danger">*</span>
                                 </label>
                                 <div class="col-md-8">
-                                    <input type="text" class="form-control" id="name_edit" name="name" maxlength="50"
+                                    <input type="text" class="form-control" id="name_edit" name="name" maxlength="100"
                                         minlength="2" required value="{{ old('name') }}">
                                 </div>
                             </div>

@@ -218,10 +218,10 @@
                                 <th>Price Category</th>
                                 <th>Supplier</th>
                                 <th>Total Records</th>
-                                <th>Success</th>
+                                <th>Succeded</th>
                                 <th>Failed</th>
                                 <th>Status</th>
-                                <th>Created By</th>
+                                <th>Imported By</th>
                             </tr>
                         </thead>
                         <tbody>
