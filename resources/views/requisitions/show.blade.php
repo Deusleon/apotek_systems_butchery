@@ -98,7 +98,7 @@
                             <input type="hidden" name="requisition_id" value="{{ $requisition->id }}">
                             <div class="table-responsive">
                                 <input type="hidden" name="orders" id="orders">
-                                <table style="width: 100%" class="table nowrap table-striped table-hover" id="order_table">
+                                <table style="width: 100%; font-size: 14px;" class="table nowrap table-striped table-hover" id="order_table">
                                     <thead>
                                         <tr class="bg-navy disabled">
                                             <th>Product Name</th>
