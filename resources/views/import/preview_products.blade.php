@@ -119,20 +119,20 @@
                             <tbody>
                                 @foreach($preview_data as $row)
                                     <tr class="{{ !empty($row['errors']) ? 'error-row' : 'valid-row' }}">
+                                        <td>{{ $row['data'][0] ?? '' }}</td>
                                         <td>{{ $row['data'][1] ?? '' }}</td>
                                         <td>{{ $row['data'][2] ?? '' }}</td>
-                                        <td>{{ $row['data'][3] ?? '' }}</td>
                                         @if ($is_detailed === 'Detailed')
-                                            <td>{{ is_numeric($row['data'][4]) ? number_format($row['data'][4], 0) : '' }}</td>
+                                            <td>{{ is_numeric($row['data'][3]) ? number_format($row['data'][3], 0) : '' }}</td>
                                         @endif
                                         @if ($is_detailed === 'Normal')
-                                            <td>{{ $row['data'][4] ?? '' }}</td>
+                                            <td>{{ $row['data'][3] ?? '' }}</td>
                                         @endif
                                         @if ($is_detailed === 'Detailed')
+                                            <td>{{ $row['data'][4] ?? '' }}</td>
                                             <td>{{ $row['data'][5] ?? '' }}</td>
-                                            <td>{{ $row['data'][6] ?? '' }}</td>
+                                            <td>{{ is_numeric($row['data'][6]) ? number_format($row['data'][6], 0) : '' }}</td>
                                             <td>{{ is_numeric($row['data'][7]) ? number_format($row['data'][7], 0) : '' }}</td>
-                                            <td>{{ is_numeric($row['data'][8]) ? number_format($row['data'][8], 0) : '' }}</td>
                                         @endif
                                         <td>
                                             @if(!empty($row['errors']))

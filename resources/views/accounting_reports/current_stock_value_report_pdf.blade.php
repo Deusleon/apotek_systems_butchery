@@ -214,7 +214,7 @@
 
         <hr>
         <!-- SUMMARY - Centered like Gross Profit Detail Report -->
-        <div style="margin-top: 20px; padding-top: 10px;">
+        {{-- <div style="margin-top: 20px; padding-top: 10px;">
             <h3 align="center"><b>Summary</b></h3>
             <table style="min-width: 25%; width: auto; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
                 <tr>
@@ -233,7 +233,7 @@
                     <td style="padding: 6px; text-align: right;"><b>{{ number_format(max(array_column($data, 'grand_total_profit')), 2) }}</b></td>
                 </tr>
             </table>
-        </div>
+        </div> --}}
 
     </div>
 </div>
