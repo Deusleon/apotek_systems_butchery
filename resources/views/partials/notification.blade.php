@@ -38,16 +38,8 @@ $(document).ready(function() {
                 '</div>'
         });
     }
-    @if($flash = session("success"))
-        notify('{{session("success")}}', 'top','right','success');
-    @endif
-
     @if($flash = session("alert-success"))
         notify('{{session("alert-success")}}', 'top','right','success');
-    @endif
-
-    @if($flash = session("warning"))
-        notify('{{session("warning")}}', 'top','right','warning');
     @endif
 
     @if($flash = session("alert-danger"))

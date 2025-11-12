@@ -128,7 +128,8 @@
                         <div class="row" id="detail">
                             <hr>
                             <div class="table-responsive" style="width: 100%;">
-                                <table id="cart_table" class="table nowrap table-striped table-hover pl-3 pr-3" width="100%"></table>
+                                <table id="cart_table" class="table nowrap table-striped table-hover pl-3 pr-3" width="100%">
+                                </table>
                             </div>
 
                         </div>
@@ -189,7 +190,8 @@
                             <input type="hidden" value="{{ $enable_discount }}" id="enable_discount">
 
                         </div>
-                        {{-- <hr> --}}
+                        {{--
+                        <hr> --}}
                         <div class="row" hidden>
                             <div class="col-md-12">
                                 <div class="form-group">
@@ -274,7 +276,7 @@
             var default_cart = JSON.parse(localStorage.getItem('default_cart')) || [];
             var order_cart = JSON.parse(localStorage.getItem('order_cart')) || [];
             var tax = parseFloat(document.getElementById('vat').value) || 0;
-            var sale_discount = 0;
+            var sale_discount = "0.00";
             var discount_enable = document.getElementById('enable_discount').value === 'YES';
             var cart_table;
             var edit_btn_set = 0; // For edit functionality
@@ -369,6 +371,7 @@
                 // Update display
                 document.getElementById('sub_total').value = formatMoney(sub_total);
                 document.getElementById('total_vat').value = formatMoney(total_vat);
+                document.getElementById('sale_discount').value = formatMoney(discount_amount);
                 document.getElementById('total').value = formatMoney(total);
                 document.getElementById('total_items').innerHTML = cart.length;
 
@@ -426,7 +429,7 @@
                     cart_table.clear();
                     cart_table.rows.add(cart);
                     cart_table.draw();
-    
+
                     // Save cart to localStorage for persistence on page reload
                     localStorage.setItem('cart', JSON.stringify(cart));
                     localStorage.setItem('default_cart', JSON.stringify(default_cart));
@@ -888,6 +891,8 @@
                 }
                 discount(); // Update totals
                 document.getElementById('total_items').innerHTML = 0;
+                document.getElementById("sale_discount").value = "0.00";
+                document.getElementById("total").value = "0.00";
                 // Clear localStorage to prevent cart persistence on page reload
                 localStorage.removeItem('cart');
                 localStorage.removeItem('default_cart');

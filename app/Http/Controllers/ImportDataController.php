@@ -678,6 +678,7 @@ class ImportDataController extends Controller {
                             'quantity' => $stock->quantity,
                             'store_id' => $preview[ 'store_id' ],
                             'created_by' => Auth::id(),
+                            'updated_by' => Auth::id(),
                             'updated_at' => date( 'Y-m-d' ),
                             'movement' => 'IN',
                         ] );

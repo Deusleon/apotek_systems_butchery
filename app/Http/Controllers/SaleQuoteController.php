@@ -600,7 +600,7 @@ class SaleQuoteController extends Controller {
                 'total_vat' => ( $item->quote[ 'cost' ][ 'vat' ] ),
                 'sold_by' => $item->quote[ 'user' ][ 'name' ],
                 'customer' => $item->quote[ 'customer' ][ 'name' ],
-                'customer_tin' => $item->quote->customer->tin,
+                'customer_tin' => $item->quote['customer']['tin'],
                 'created_at' => date( 'Y-m-d', strtotime( $item->quote[ 'date' ] ) )
             ) );
         }
@@ -874,7 +874,8 @@ class SaleQuoteController extends Controller {
                 'status' => 'success',
                 'message' => 'Order converted successfully',
                 'sale_id' => $sale,
-                'redirect_to' => 'receipt'
+                'redirect_to' => 'receipt',
+                'saletype' => $saleType === 'cash' ? '1' : '-1'
             ];
         }else{
             return [
