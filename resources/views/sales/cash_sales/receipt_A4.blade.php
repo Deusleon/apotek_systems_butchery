@@ -47,6 +47,7 @@
             border: 1px solid #000;
             border-collapse: collapse;
             margin-top: 10px;
+            margin-bottom: 10px;
         }
 
         .table-header {
@@ -115,34 +116,17 @@
             font-size: 11px;
             font-weight: bold;
             margin-bottom: 3px;
-            margin-top: -40px;
         }
-
-        .slogan {
-            text-align: left;
-            font-size: 12px;
+        .slogan-section {
+            text-align: center;
+            font-size: 10px;
             font-style: italic;
-        }
-
-        .info-row {
+            /* adjust as needed */
             display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            margin-bottom: 2px;
-        }
-
-        .info-left,
-        .info-right {
-            display: flex;
+            justify-content: center;
             align-items: center;
-        }
-
-        .info-left2 {
-            margin-top: 10px;
-        }
-
-        .info-right {
-            margin-right: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ccc;
         }
     </style>
 </head>
@@ -207,7 +191,8 @@
                     <tr>
                         <td class="index-col">{{$loop->iteration}}.</td>
                         <td class="description-col">{{$item['name']}} {{$item['brand'] ?? ''}}
-                            {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}</td>
+                            {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}
+                        </td>
                         <td class="qty-col">{{number_format($item['quantity'], 0)}}</td>
                         <td class="unit-col">{{number_format($item['price'], 2)}}</td>
                         <td class="amount-col">{{number_format($item['price'] * $item['quantity'], 2)}}</td>
@@ -228,63 +213,65 @@
                 @endif
             </tbody>
         </table>
-
-        <!-- Summary Section -->
-        <div class="summary-section" style="margin-top: 5px;">
-            <div class="summary-row">
-                <div>Sub Total:</div>
-                <div style="float: right;">
-                    {{number_format(($dat[0]['grand_total'] - $dat[0]['total_vat'] + $dat[0]['discount_total']), 2)}}
+        <div style="display: inline-flex;">
+            <div>
+                <div class="footer-section">
+                    @foreach($data as $datas => $dat)
+                        <div class="sold-by">Issued By: {{$dat[0]['sold_by']}}</div>
+                        @break
+                    @endforeach
+                    <span style="font-size: 10px; border-bottom: 1px solid #ccc;">Printed on: {{date('Y-m-d H:i:s')}}</span>
                 </div>
+
+                @if($generalSettings && $generalSettings->cash_sale_terms)
+                    <div style="padding-top: 10px;">
+                        <div style="font-weight: bold; font-size: 12px; margin-bottom: 5px;">Terms & Conditions:</div>
+                        <div style="font-size: 11px; line-height: 1.4; text-align: justify;">
+                            {!! nl2br(e($generalSettings->cash_sale_terms)) !!}
+                        </div>
+                    </div>
+                @endif
             </div>
-            <div class="summary-row">
-                <span>VAT:</span>
-                <span style="float: right;">{{number_format($dat[0]['total_vat'], 2)}}</span>
-            </div>
-            @if($dat[0]['discount_total'] > 0)
+            <!-- Summary Section -->
+            <div class="summary-section">
                 <div class="summary-row">
-                    <div>Discount:</div>
-                    <div style="float: right;">{{number_format($dat[0]['discount_total'], 2)}}</div>
-                </div>
-            @endif
-            <div class="summary-row total">
-                <span>Total:</span>
-                <span style="float: right;">{{number_format($dat[0]['grand_total'], 2)}}</span>
-            </div>
-
-            @if($page == -1)
-                <div class="summary-row" style="margin-top: 10px;">
-                    <span>Paid:</span>
-                    <span style="float: right;">{{number_format($dat[0]['paid'], 2)}}</span>
+                    <div>Sub Total:</div>
+                    <div style="float: right;">
+                        {{number_format(($dat[0]['grand_total'] - $dat[0]['total_vat'] + $dat[0]['discount_total']), 2)}}
+                    </div>
                 </div>
                 <div class="summary-row">
-                    <span>Balance:</span>
-                    <span style="float: right;">{{number_format($dat[0]['grand_total'] - $dat[0]['paid'], 2)}}</span>
+                    <span>VAT:</span>
+                    <span style="float: right;">{{number_format($dat[0]['total_vat'], 2)}}</span>
                 </div>
-            @endif
+                @if($dat[0]['discount_total'] > 0)
+                    <div class="summary-row">
+                        <div>Discount:</div>
+                        <div style="float: right;">{{number_format($dat[0]['discount_total'], 2)}}</div>
+                    </div>
+                @endif
+                <div class="summary-row total">
+                    <span>Total:</span>
+                    <span style="float: right;">{{number_format($dat[0]['grand_total'], 2)}}</span>
+                </div>
+
+                @if($page == -1)
+                    <div class="summary-row" style="margin-top: 10px;">
+                        <span>Paid:</span>
+                        <span style="float: right;">{{number_format($dat[0]['paid'], 2)}}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Balance:</span>
+                        <span style="float: right;">{{number_format($dat[0]['grand_total'] - $dat[0]['paid'], 2)}}</span>
+                    </div>
+                @endif
+            </div>
         </div>
-
         @break
     @endforeach
 
     <!-- Footer Section -->
-    <div class="footer-section" style="margin-top: -20px;">        
-        @foreach($data as $datas => $dat)
-            <div class="sold-by">Issued By: {{$dat[0]['sold_by']}}</div>
-            @break
-        @endforeach
-        <span style="font-size: 10px; border-bottom: 1px solid #ccc;">Printed on: {{date('Y-m-d H:i:s')}}</span>
-    </div>
-
-    @if($generalSettings && $generalSettings->cash_sale_terms)
-        <div style="padding-top: 10px;">
-            <div style="font-weight: bold; font-size: 12px; margin-bottom: 5px;">Terms & Conditions:</div>
-            <div style="font-size: 10px; line-height: 1.4; text-align: justify;">
-                {!! nl2br(e($generalSettings->cash_sale_terms)) !!}
-            </div>
-        </div>
-    @endif
-    <div style="width: 100%; text-align: center; font-size: 12px; margin-top: 100px !important; font-style: italic; display: flex; justify-content: center; align-items: center;">
+    <div class="slogan-section">
         {{$pharmacy['slogan'] ?? 'Thank you for your business'}}
     </div>
 </body>

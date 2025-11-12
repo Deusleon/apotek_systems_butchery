@@ -47,13 +47,14 @@
             border: 1px solid #000;
             border-collapse: collapse;
             margin-top: 10px;
+            margin-bottom: 10px;
         }
 
         .table-header {
             background-color: #000;
             color: white;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 10px;
             text-align: center;
         }
 
@@ -114,21 +115,17 @@
             font-size: 9px;
             font-weight: bold;
             margin-bottom: 3px;
-            margin-top: -40px;
         }
-
-        .info-left,
-        .info-right {
+        .slogan-section {
+            text-align: center;
+            font-size: 10px;
+            font-style: italic;
+            /* adjust as needed */
             display: flex;
+            justify-content: center;
             align-items: center;
-        }
-
-        .info-left2 {
-            margin-top: 10px;
-        }
-
-        .info-right {
-            margin-right: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #ccc;
         }
     </style>
 </head>
@@ -214,64 +211,63 @@
                 @endif
             </tbody>
         </table>
+        <div style="display: inline-flex;">
+            <div>
+                <div class="footer-section">
+                    @foreach($data as $datas => $dat)
+                        <div class="sold-by">Issued By: {{$dat[0]['sold_by']}}</div>
+                        @break
+                    @endforeach
+                    <span style="font-size: 10px; border-bottom: 1px solid #ccc;">Printed on: {{date('Y-m-d H:i:s')}}</span>
+                </div>
 
-        <!-- Summary Section -->
-        <div class="summary-section" style="margin-top: 5px;">
-            <div class="summary-row">
-                <div>Sub Total:</div>
-                <div style="float: right;">
-                    {{number_format(($dat[0]['grand_total'] - $dat[0]['total_vat'] + $dat[0]['discount_total']), 2)}}
-                </div>
+                @if($generalSettings && $generalSettings->credit_sale_terms)
+                    <div style="padding-top: 10px;">
+                        <div style="font-weight: bold; font-size: 9px;">Terms & Conditions:</div>
+                        <div style="font-size: 9px; line-height: 1.4; text-align: justify;">
+                            {!! nl2br(e($generalSettings->credit_sale_terms)) !!}
+                        </div>
+                    </div>
+                @endif
             </div>
-            <div class="summary-row">
-                <span>VAT:</span>
-                <span style="float: right;">{{number_format($dat[0]['total_vat'], 2)}}</span>
-            </div>
-            @if($dat[0]['discount_total'] > 0)
+            <!-- Summary Section -->
+            <div class="summary-section">
                 <div class="summary-row">
-                    <div>Discount:</div>
-                    <div style="float: right;">{{number_format($dat[0]['discount_total'], 2)}}</div>
-                </div>
-            @endif
-            <div class="summary-row total">
-                <span>Total:</span>
-                <span style="float: right;">{{number_format($dat[0]['grand_total'], 2)}}</span>
-            </div>
-            <hr>
-            @if($page == -1)
-                <div class="summary-row">
-                    <span>Paid:</span>
-                    <span style="float: right;">{{number_format($dat[0]['paid'], 2)}}</span>
+                    <div>Sub Total:</div>
+                    <div style="float: right;">
+                        {{number_format(($dat[0]['grand_total'] - $dat[0]['total_vat'] + $dat[0]['discount_total']), 2)}}
+                    </div>
                 </div>
                 <div class="summary-row">
-                    <span>Balance:</span>
-                    <span style="float: right;">{{number_format($dat[0]['grand_total'] - $dat[0]['paid'], 2)}}</span>
+                    <span>VAT:</span>
+                    <span style="float: right;">{{number_format($dat[0]['total_vat'], 2)}}</span>
                 </div>
-            @endif
+                @if($dat[0]['discount_total'] > 0)
+                    <div class="summary-row">
+                        <div>Discount:</div>
+                        <div style="float: right;">{{number_format($dat[0]['discount_total'], 2)}}</div>
+                    </div>
+                @endif
+                <div class="summary-row total">
+                    <span>Total:</span>
+                    <span style="float: right;">{{number_format($dat[0]['grand_total'], 2)}}</span>
+                </div>
+                <hr>
+                @if($page == -1)
+                    <div class="summary-row" style="margin-top: 10px;">
+                        <span>Paid:</span>
+                        <span style="float: right;">{{number_format($dat[0]['paid'], 2)}}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Balance:</span>
+                        <span style="float: right;">{{number_format($dat[0]['grand_total'] - $dat[0]['paid'], 2)}}</span>
+                    </div>
+                @endif
+            </div>
         </div>
-
         @break
     @endforeach
-
-    <!-- Footer Section -->
-    <div class="footer-section">
-        <div class="footer-note">
-            @foreach($data as $datas => $dat)
-                <div class="sold-by">Issued By: {{$dat[0]['sold_by']}}</div>
-                @break
-            @endforeach
-            <span style="font-size: 8px; border-bottom: 1px solid #ccc;">Printed on: {{date('Y-m-d H:i:s')}}</span>
-        </div>
-        @if($generalSettings && $generalSettings->credit_sale_terms)
-            <div style="padding-top: 10px;">
-                <div style="font-weight: bold; font-size: 10px; margin-bottom: 4px;">Terms & Conditions:</div>
-                <div style="font-size: 8px; line-height: 1.3; text-align: justify;">
-                    {!! nl2br(e($generalSettings->credit_sale_terms)) !!}
-                </div>
-            </div>
-        @endif
-    </div>
-    <div style="width: 100%; text-align: center; font-size: 9px; margin-top: 100px !important; font-style: italic; display: flex; justify-content: center; align-items: center;">
+    <div class="slogan-section">
         {{$pharmacy['slogan'] ?? 'Thank you for your business'}}
     </div>
 </body>

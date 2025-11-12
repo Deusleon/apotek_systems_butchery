@@ -952,7 +952,7 @@ class SaleController extends Controller
         $paid = null;
         $balance = null;
         $remark = null;
-        if (intVal($page) === -1) {
+        if (intVal($page) == -1) {
             /*get paid amount*/
             $amounts = SalesCredit::select('sale_id', 'remark', DB::raw('sum(paid_amount) as paid'), DB::raw('sum(balance) as balance'))
                 ->where('sale_id', $id)
@@ -1019,7 +1019,7 @@ class SaleController extends Controller
         $data = $grouped_sales;
 
         if ($receipt_size === '58mm Thermal Paper') {
-            if ($page === "-1") {
+            if ($page === "-1" || $page == -1) {
                 $pdf = PDF::loadView('sales.cash_sales.credit_receipt_thermal',
                     compact('data', 'pharmacy', 'page', 'generalSettings'))
                     ->setPaper([0, 0, 163, 600], '');

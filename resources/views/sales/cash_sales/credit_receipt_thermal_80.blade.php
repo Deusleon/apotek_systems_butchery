@@ -145,7 +145,7 @@
                 </tbody>
             </table>
 
-            @if($page === "-1")
+            @if($page == -1)
                 <hr>
                 <table id="footer-detail">
                     <tbody>
