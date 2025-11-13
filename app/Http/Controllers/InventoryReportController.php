@@ -22,12 +22,12 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade as PDF;
 
-ini_set( 'max_execution_time', 500 );
-set_time_limit( 500 );
-ini_set( 'memory_limit', '512M' );
+ini_set('max_execution_time', 1800);
+set_time_limit(1800);
+ini_set('memory_limit', '2048M');
 
 class InventoryReportController extends Controller
- {
+{
 
     public function index()
  {
@@ -149,15 +149,34 @@ class InventoryReportController extends Controller
                     return $pdf->stream( 'product_details_report.pdf' );
                 }
             case 3:
-                //product ledger
-                $data = $this->productLedgerReport($request->product);
-                if ($data == []) {
-                    return response()->view('error_pages.pdf_zero_data');
-                }
-                $pdf = PDF::loadView( 'inventory_reports.product_ledger_report_pdf',
-                compact( 'data',  'pharmacy' ) )
-                ->setPaper( 'a4', '' );
-                return $pdf->stream( 'product_ledger_report.pdf' );
+// Force cleanup before processing
+if (function_exists('gc_collect_cycles')) {
+    gc_collect_cycles();
+}
+
+//product ledger
+$data = $this->productLedgerReport($request->product);
+if (empty($data)) {
+    return response()->view('error_pages.pdf_zero_data');
+}
+
+// Temporarily increase limits for this report
+$oldMemoryLimit = ini_get('memory_limit');
+$oldTimeLimit = ini_get('max_execution_time');
+
+ini_set('memory_limit', '3072M');
+set_time_limit(1800);
+
+try {
+    $pdf = PDF::loadView( 'inventory_reports.product_ledger_report_pdf',
+    compact( 'data',  'pharmacy' ) )
+    ->setPaper( 'a4', '' );
+    return $pdf->stream( 'product_ledger_report.pdf' );
+} finally {
+    // Restore original limits
+    ini_set('memory_limit', $oldMemoryLimit);
+    set_time_limit($oldTimeLimit);
+}
             case 17:
                 //product ledger
                 $data = $this->productLedgerDetailedReport($request->product);
@@ -520,82 +539,176 @@ class InventoryReportController extends Controller
         if (!Auth()->user()->checkPermission('Product Details Report')) {
             abort(403, 'Access Denied');
         }
+        
         $store_id = current_store_id();
-        if (!is_all_store()) {
-            if ($category != null) {
-                $products = Product::join('inv_current_stock', 'inv_current_stock.product_id', '=', 'inv_products.id')
-                            ->where('category_id', $category)
-                            ->where('inv_current_stock.store_id', $store_id)
-                            ->get();
+        $startTime = microtime(true);
+        
+        // Optimize memory and execution time for large datasets
+        ini_set('memory_limit', '1024M');
+        set_time_limit(1200);
+        
+        try {
+            if (!is_all_store()) {
+                if ($category != null) {
+                    $products = Product::join('inv_current_stock', 'inv_current_stock.product_id', '=', 'inv_products.id')
+                                ->where('category_id', $category)
+                                ->where('inv_current_stock.store_id', $store_id)
+                                ->select('inv_products.*') // Only select needed columns
+                                ->chunk(500, function($chunk) use (&$results_data) {
+                                    foreach ($chunk as $product) {
+                                        $results_data[] = [
+                                            'product_id' => $product->id,
+                                            'name' => $product->name,
+                                            'brand' => $product->brand,
+                                            'pack_size' => $product->pack_size,
+                                            'sales_uom' => $product->sales_uom,
+                                            'category' => $product->category->name ?? ''
+                                        ];
+                                    }
+                                });
+                } else {
+                    $products = Product::join('inv_current_stock', 'inv_current_stock.product_id', '=', 'inv_products.id')
+                                ->where('inv_current_stock.store_id', $store_id)
+                                ->select('inv_products.*')
+                                ->chunk(500, function($chunk) use (&$results_data) {
+                                    foreach ($chunk as $product) {
+                                        $results_data[] = [
+                                            'product_id' => $product->id,
+                                            'name' => $product->name,
+                                            'brand' => $product->brand,
+                                            'pack_size' => $product->pack_size,
+                                            'sales_uom' => $product->sales_uom,
+                                            'category' => $product->category->name ?? ''
+                                        ];
+                                    }
+                                });
+                }
             } else {
-                $products = Product::join('inv_current_stock', 'inv_current_stock.product_id', '=', 'inv_products.id')
-                            ->where('inv_current_stock.store_id', $store_id)
-                            ->get();
+                if ($category != null) {
+                    Product::where('category_id', $category)
+                          ->select('id', 'name', 'brand', 'pack_size', 'sales_uom', 'category_id')
+                          ->chunk(1000, function($chunk) use (&$results_data) {
+                              foreach ($chunk as $product) {
+                                  $results_data[] = [
+                                      'product_id' => $product->id,
+                                      'name' => $product->name,
+                                      'brand' => $product->brand,
+                                      'pack_size' => $product->pack_size,
+                                      'sales_uom' => $product->sales_uom,
+                                      'category' => $product->category->name ?? ''
+                                  ];
+                              }
+                          });
+                } else {
+                    Product::select('id', 'name', 'brand', 'pack_size', 'sales_uom', 'category_id')
+                          ->chunk(1000, function($chunk) use (&$results_data) {
+                              foreach ($chunk as $product) {
+                                  $results_data[] = [
+                                      'product_id' => $product->id,
+                                      'name' => $product->name,
+                                      'brand' => $product->brand,
+                                      'pack_size' => $product->pack_size,
+                                      'sales_uom' => $product->sales_uom,
+                                      'category' => $product->category->name ?? ''
+                                  ];
+                              }
+                          });
+                }
             }
-        }else{
-            if ($category != null) {
-                $products = Product::where('category_id', $category)
-                            ->get();
-            } else {
-                $products = Product::all();
-            }
+        } catch (\Exception $e) {
+            Log::error('Product Detail Report error: ' . $e->getMessage());
+            $results_data = [];
         }
-        $results_data = array();
+        
+        // Log performance
+        $duration = microtime(true) - $startTime;
+        Log::info("Product Detail Report Performance", [
+            'category' => $category,
+            'duration' => round($duration, 2) . ' seconds',
+            'records_processed' => count($results_data),
+            'memory_usage' => round(memory_get_usage(true) / 1024 / 1024, 2) . ' MB'
+        ]);
 
-        foreach ($products as $product) {
-            array_push($results_data, array(
-                'product_id' => $product->id,
-                'name' => $product->name,
-                'brand' => $product->brand,
-                'pack_size' => $product->pack_size,
-                'sales_uom' => $product->sales_uom,
-                'category' => $product->category->name ?? ''
-            ));
-        }
-
-        return $results_data;
+        return $results_data ?? [];
     }
     private function productLedgerReport($product_id){
         if (!Auth()->user()->checkPermission('Product Ledger Summary Report')) {
             abort(403, 'Access Denied');
         }
+        
         $store_id = current_store_id();
+        $startTime = microtime(true);
+        
         try {
-            $query = DB::table('stock_details')
-                ->select('product_id')
-                ->groupby(['product_id']);
-
-            if (!is_all_store()) {
-                $query->where('store_id', $store_id);
-            }
-
-            $current_stock = $query->get();
-        } catch (\Exception $e) {
-            Log::warning('InventoryReport productLedgerReport stock_details query failed: ' . $e->getMessage());
-            $current_stock = collect(); // Return empty collection if table doesn't exist
-        }
-
-        try {
-            $query2 = DB::table( 'product_ledger' )
+            // Optimized query with smaller chunk size for large datasets
+            $query = DB::table( 'product_ledger' )
             ->join( 'inv_products', 'inv_products.id', '=', 'product_ledger.product_id' )
             ->select( 'product_id', 'inv_products.name as product_name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom', 'received', 'outgoing', 'method', 'date' )
             ->where( 'product_id', '=', $product_id );
 
             if ( !is_all_store() ) {
-                $query2->where( 'store_id', $store_id );
+                $query->where( 'store_id', $store_id );
             }
 
-            $product_ledger = $query2->get();
+            $query->orderBy('date', 'asc');
+            
+            // Process in smaller chunks to prevent memory issues
+            $product_ledger = collect();
+            $chunkSize = 500;
+            $offset = 0;
+            
+            do {
+                $chunk = clone $query;
+                $chunkRecords = $chunk->limit($chunkSize)->offset($offset)->get();
+                
+                if ($chunkRecords->isEmpty()) {
+                    break;
+                }
+                
+                $product_ledger = $product_ledger->merge($chunkRecords);
+                $offset += $chunkSize;
+                
+                // Force garbage collection periodically
+                if ($offset % ($chunkSize * 10) === 0) {
+                    if (function_exists('gc_collect_cycles')) {
+                        gc_collect_cycles();
+                    }
+                }
+                
+            } while ($chunkRecords->count() === $chunkSize);
+            
         } catch ( \Exception $e ) {
             Log::warning( 'InventoryReport productLedgerReport product_ledger query failed: ' . $e->getMessage() );
             $product_ledger = collect();
-            // Return empty collection if table doesn't exist
+        }
+
+        try {
+            $current_stock_query = DB::table('stock_details')
+                ->select('product_id')
+                ->groupby(['product_id']);
+
+            if (!is_all_store()) {
+                $current_stock_query->where('store_id', $store_id);
+            }
+
+            $current_stock = $current_stock_query->get();
+        } catch (\Exception $e) {
+            Log::warning('InventoryReport productLedgerReport stock_details query failed: ' . $e->getMessage());
+            $current_stock = collect();
         }
 
         $result = $this->sumProductFilterTotal($product_ledger, $current_stock);
+        
+        // Log performance
+        $duration = microtime(true) - $startTime;
+        Log::info("Product Ledger Report Performance", [
+            'product_id' => $product_id,
+            'duration' => round($duration, 2) . ' seconds',
+            'records_processed' => count($result),
+            'memory_usage' => round(memory_get_usage(true) / 1024 / 1024, 2) . ' MB'
+        ]);
 
         return $result;
-
     }
 
     private function productLedgerDetailedReport($product_id)
