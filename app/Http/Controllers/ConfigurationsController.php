@@ -60,14 +60,14 @@ class ConfigurationsController extends Controller
             $user = auth()->user();
 
             if ( !$user || $user->store->name !== 'ALL' ) {
-                return redirect()->back()->with( 'warning', 'You do not have permission to perform this action!' );
+                return redirect()->back()->with( 'alert-warning', 'You do not have permission to perform this action!' );
             }
 
             $defaultStoreName = Setting::where( 'id', 122 )->value( 'value' );
             $defaultStore = Store::where( 'name', $defaultStoreName )->first();
 
             if ( !$defaultStore ) {
-                return redirect()->back()->with( 'error', 'Default Branch not found' );
+                return redirect()->back()->with( 'danger', 'Default Branch not found' );
             }
 
             $setting->updated_by = Auth::user()->id;
@@ -78,7 +78,7 @@ class ConfigurationsController extends Controller
                 'store' => $defaultStore->name
             ] );
 
-            return redirect()->back()->with( 'success', "Default Branch is {$defaultStore->name}" );
+            return redirect()->back()->with( 'alert-success', "Default Branch is {$defaultStore->name}" );
         }
 
         if ( $request->setting_id == 122 ) {
@@ -109,7 +109,7 @@ class ConfigurationsController extends Controller
         $setting->updated_by = Auth::user()->id;
         $setting->save();
 
-        return redirect()->back()->with( 'success', 'Changes saved successfully!' );
+        return redirect()->back()->with( 'alert-success', 'Changes saved successfully!' );
     }
 
     public function destroy( $id )

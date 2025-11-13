@@ -280,15 +280,14 @@ class ImportDataController extends Controller {
                     'supplier_id' => $request->supplier_id
                 ] );
 
-                // Flash success message
-                Session::flash( 'success', 'File uploaded successfully. Please review the data below.' );
-
                 return view( 'import.preview', [
                     'preview_data' => $preview_data,
                     'store_id' => $request->store_id,
                     'price_category_id' => $request->price_category_id,
                     'supplier_id' => $request->supplier_id,
-                    'temp_file' => $path
+                    'temp_file' => $path,
+                    'alert_success' => 'File uploaded successfully. Please review the data below.',
+                    'msgTyp' => 'success'
                 ] );
 
             } catch ( \Exception $e ) {
@@ -408,14 +407,13 @@ class ImportDataController extends Controller {
                     'store_id' => $request->store_id
                 ] );
 
-                // Flash success message
-                Session::flash( 'success', 'File uploaded successfully. Please review the data below.' );
-
                 return view( 'import.preview_products', [
                     'preview_data' => $preview_data,
                     'store_id' => $request->store_id,
                     'temp_file' => $path,
-                    'is_detailed' => $is_detailed
+                    'is_detailed' => $is_detailed,
+                    'alert_success' => 'File uploaded successfully. Please review the data below.',
+                    'msgTyp' => 'success'
                 ] );
 
             } catch ( \Exception $e ) {

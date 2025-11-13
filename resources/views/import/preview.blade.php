@@ -148,6 +148,8 @@
                             </tbody>
                         </table>
                     </div>
+                    <input type="hidden" id="flashMessage" value="{{ $alert_success }}">
+                    <input type="hidden" id="msgTyp" value="{{ $msgTyp }}">
 
                     <div class="row mt-4">
                         <div class="col-md-12 text-center">
@@ -177,6 +179,9 @@
 @push('page_scripts')
     <script>
         $(document).ready(function () {
+            var msg = $('#flashMessage').val();
+            var msgTyp = $('#msgTyp').val();
+            notify(msg, "top", "right", msgTyp);
             // Create a hidden form for submission
             var $hiddenForm = $('<form>', {
                 'method': 'POST',
