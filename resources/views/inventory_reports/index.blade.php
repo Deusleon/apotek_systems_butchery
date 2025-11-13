@@ -82,7 +82,7 @@
                                                 <option value="2">Product Details Report</option>
                                             @endif
                                             @if(auth()->user()->checkPermission('Product Ledger Summary Report'))
-                                                <option value="3">Product Ledger Report</option>
+                                                <option value="3">Product Ledger Summary Report</option>
                                             @endif
                                             @if(auth()->user()->checkPermission('Product Ledger Detailed Report'))
                                                 <option value="17">Product Ledger Detailed Report</option>

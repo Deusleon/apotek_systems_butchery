@@ -121,12 +121,9 @@
             text-align: center;
             font-size: 9px;
             font-style: italic;
-            /* adjust as needed */
             display: flex;
             justify-content: center;
             align-items: center;
-            padding-top: 10px;
-            border-top: 1px solid #ccc;
         }
     </style>
 </head>
@@ -146,7 +143,7 @@
             <span>VRN: {{$pharmacy['vrn_number'] ?? 'N/A'}}</span>
         </div>
     </div>
-    <div style="font-weight: bold; text-align: center;">
+    <div style="font-weight: bold; margin-top: 5px; text-align: center;">
         SALES INVOICE
     </div>
     @foreach($data as $datas => $dat)
@@ -214,7 +211,7 @@
             </tbody>
         </table>
         <div style="display: inline-flex;">
-            <div>
+            <div style="width: 60%">
                 <div class="footer-section">
                     @foreach($data as $datas => $dat)
                         <div class="sold-by">Issued By: {{$dat[0]['sold_by']}}</div>

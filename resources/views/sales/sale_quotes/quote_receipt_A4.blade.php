@@ -149,7 +149,7 @@
             <span>VRN: {{$pharmacy['vrn_number'] ?? 'N/A'}}</span>
         </div>
     </div>
-    <div style="font-weight: bold; text-align: center;">
+    <div style="font-weight: bold; margin-top: 5px; text-align: center;">
         PROFORMA INVOICE
     </div>
 
