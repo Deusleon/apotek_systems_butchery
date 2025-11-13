@@ -107,10 +107,9 @@
         .summary-row {
             display: flex;
             justify-content: space-between;
-            /* margin-bottom: 3px; */
-            padding: 2px 5px;
+            margin-bottom: 3px;
+            padding: 2px 0px;
         }
-
 
         .summary-row.total {
             font-weight: bold;
@@ -266,11 +265,11 @@
                 </div>
                 <hr>
                 @if($page == -1)
-                    <div class="summary-row" style="margin-top: 10px;">
+                    <div class="summary-row" style="">
                         <span>Paid:</span>
                         <span style="float: right;">{{number_format($dat[0]['paid'], 2)}}</span>
                     </div>
-                    <div class="summary-row">
+                    <div class="summary-row" style="">
                         <span>Balance:</span>
                         <span style="float: right;">{{number_format($dat[0]['grand_total'] - $dat[0]['paid'], 2)}}</span>
                     </div>
