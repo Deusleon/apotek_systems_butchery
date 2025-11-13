@@ -8,6 +8,8 @@
             font-family: Arial, sans-serif;
             font-size: 14px;
             margin: 0;
+            position: relative;
+            min-height: 100vh;
         }
 
         .receipt-header {
@@ -120,16 +122,17 @@
         }
 
         .slogan-section {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
             text-align: center;
             font-size: 12px;
             font-style: italic;
-            /* adjust as needed */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding-top: 10px;
+            padding: 10px 0;
+            background-color: white;
             border-top: 1px solid #ccc;
-            /* optional, gives separation */
+            z-index: 1000;
         }
     </style>
 </head>

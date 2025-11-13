@@ -55,22 +55,23 @@ class ConfigurationsController extends Controller
         } else {
             $setting->value = $request->formdata;
         }
-        $setting->updated_by = Auth::user()->id;
-        $setting->save();
 
-        if ( $request->setting_id == 121 && $request->formdata === 'NO' ) {
+        if ( $request->setting_id == 121 ) {
             $user = auth()->user();
 
             if ( !$user || $user->store->name !== 'ALL' ) {
-                return response()->json( [ 'error' => 'Not allowed' ], 403 );
+                return redirect()->back()->with( 'warning', 'You do not have permission to perform this action!' );
             }
 
             $defaultStoreName = Setting::where( 'id', 122 )->value( 'value' );
             $defaultStore = Store::where( 'name', $defaultStoreName )->first();
 
             if ( !$defaultStore ) {
-                return response()->json( [ 'error' => 'Default Branch not found' ], 422 );
+                return redirect()->back()->with( 'error', 'Default Branch not found' );
             }
+
+            $setting->updated_by = Auth::user()->id;
+            $setting->save();
 
             session( [
                 'current_store_id' => $defaultStore->id,
@@ -84,15 +85,18 @@ class ConfigurationsController extends Controller
             $user = auth()->user();
 
             if ( !$user || $user->store->name !== 'ALL' ) {
-                return response()->json( [ 'error' => 'Not allowed' ], 403 );
+                return redirect()->back()->with( 'warning', 'You do not have permission to perform this action!' );
             }
 
             $storeName = $request->formdata;
             $store = Store::where( 'name', $storeName )->first();
 
             if ( !$store ) {
-                return response()->json( [ 'error' => 'Branch not found' ], 422 );
+                return redirect()->back()->with( 'error', 'Branch not found' );
             }
+
+            $setting->updated_by = Auth::user()->id;
+            $setting->save();
 
             session( [
                 'current_store_id' => $store->id,
@@ -101,6 +105,9 @@ class ConfigurationsController extends Controller
 
             return redirect()->back()->with( 'success', "Branch changed to {$storeName}" );
         }
+
+        $setting->updated_by = Auth::user()->id;
+        $setting->save();
 
         return redirect()->back()->with( 'success', 'Changes saved successfully!' );
     }
