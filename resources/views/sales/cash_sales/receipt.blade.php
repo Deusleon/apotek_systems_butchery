@@ -2,25 +2,16 @@
 <html>
 
 <head>
-    <title>Receipt</title>
+    <title>Sales Invoice</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             font-size: 10px;
-            margin: 0;
+            margin: -15px;
+            margin-top: -25px;
+            padding: 0;
             position: relative;
             min-height: 100vh;
-        }
-
-        .receipt-header {
-            text-align: right;
-            margin-top: -5%;
-        }
-
-        .receipt-title {
-            font-weight: bold;
-            font-size: 15px;
-            margin: 0;
         }
 
         /* Table styling */
@@ -40,7 +31,7 @@
         .customer-table td {
             padding: 2px 2px;
             border: 1px solid #858484;
-            font-size: 10px;
+            font-size: 11px;
             height: 15px;
         }
 
@@ -53,8 +44,9 @@
         }
 
         .table-header {
-            background-color: #000;
-            color: white;
+            border-top: 2px solid #000;
+            border-bottom: 2px solid #000;
+            color: #000;
             font-weight: bold;
             font-size: 10px;
             text-align: center;
@@ -62,7 +54,9 @@
 
         .table-header th {
             padding: 4px 2px;
-            border: 1px solid #dbdada;
+            border-top: 2px solid #000;
+            border-bottom: 2px solid #000;
+            border-left: 1px solid #858484;
         }
 
         .items-table td {
@@ -73,23 +67,8 @@
         }
 
         .index-col {
-            width: auto;
+            width: 20px;
             text-align: center;
-        }
-
-        .description-col {
-            width: 45%;
-        }
-
-        .qty-col {
-            width: 10.33%;
-            text-align: center;
-        }
-
-        .unit-col,
-        .amount-col {
-            width: 20.33%;
-            text-align: right;
         }
 
         /* Summary section */
@@ -102,7 +81,7 @@
         .summary-row {
             display: flex;
             justify-content: space-between;
-            padding: 2px 5px;
+            padding: 2px 2px;
         }
 
         .summary-row.total {
@@ -157,22 +136,22 @@
         <table class="customer-table">
             <tbody>
                 <tr>
-                    <td class="index-col" style="width: 22%;">Customer Name:</td>
-                    <td class="index-col" style="width: 42%;">{{$dat[0]['customer'] ?? 'CASH'}}</td>
-                    <td class="index-col" style="width: 17%">TIN:</td>
-                    <td class="index-col" style="width: 21%;">{{$dat[0]['customer_tin'] ?? 'N/A'}}</td>
+                    <td style="width: 50px; padding-left: 5px;">Customer:</td>
+                    <td style="width: 180px; padding-left: 5px;">{{$dat[0]['customer'] ?? 'CASH'}}</td>
+                    <td style="width: 55px; padding-left: 5px;">TIN:</td>
+                    <td style="width: 140px; padding-left: 5px;">{{$dat[0]['customer_tin'] ?? 'N/A'}}</td>
                 </tr>
                 <tr>
-                    <td class="index-col" style="width: 22%;">Phone Number:</td>
-                    <td class="index-col" style="width: 42%;">{{$dat[0]['customer_phone'] ?? 'N/A'}}</td>
-                    <td class="index-col" style="width: 17%">Receipt No:</td>
-                    <td class="index-col" style="width: 21%;">{{$datas ?? 'N/A'}}</td>
+                    <td style="width: 50px; padding-left: 5px;">Phone:</td>
+                    <td style="width: 180px; padding-left: 5px;">{{$dat[0]['customer_phone'] ?? 'N/A'}}</td>
+                    <td style="width: 55px; padding-left: 5px;">Receipt No:</td>
+                    <td style="width: 140px; padding-left: 5px;">{{$datas ?? 'N/A'}}</td>
                 </tr>
                 <tr>
-                    <td class="index-col" style="width: 22%;">Address:</td>
-                    <td class="index-col" style="width: 42%;">{{$dat[0]['customer_address'] ?? 'N/A'}}</td>
-                    <td class="index-col" style="width: 17%">Date:</td>
-                    <td class="index-col" style="width: 21%;">{{date('Y-m-d', strtotime($dat[0]['created_at']))}}</td>
+                    <td style="width: 50px; padding-left: 5px;">Address:</td>
+                    <td style="width: 180px; padding-left: 5px;">{{$dat[0]['customer_address'] ?? 'N/A'}}</td>
+                    <td style="width: 55px; padding-left: 5px;">Date:</td>
+                    <td style="width: 140px; padding-left: 5px;">{{date('Y-m-d', strtotime($dat[0]['created_at']))}}</td>
                 </tr>
             </tbody>
         </table>
@@ -183,23 +162,23 @@
         <table class="items-table">
             <thead>
                 <tr class="table-header">
-                    <th class="index-col">#</th>
-                    <th class="description-col">Description</th>
-                    <th class="qty-col">Qty</th>
-                    <th class="unit-col">Price</th>
-                    <th class="amount-col">Amount</th>
+                    <th style="width: 22px; text-align: center;">#</th>
+                    <th style="width: 230px; text-align: left; padding-left: 7px;">Description</th>
+                    <th style="width: 64px; text-align: center;">Qty</th>
+                    <th style="width: 75.5px; text-align: right;">Price</th>
+                    <th style="width: 75.5px; text-align: right;">Amount</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($dat as $item)
                     <tr>
-                        <td class="index-col">{{$loop->iteration}}.</td>
-                        <td class="description-col">{{$item['name']}} {{$item['brand'] ?? ''}}
+                        <td style="width: 22px; text-align: center;">{{$loop->iteration}}.</td>
+                        <td style="width: 230.8px; text-align: left; padding-left: 7px;">{{$item['name']}} {{$item['brand'] ?? ''}}
                             {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}
                         </td>
-                        <td class="qty-col">{{number_format($item['quantity'], 0)}}</td>
-                        <td class="unit-col">{{number_format($item['price'], 2)}}</td>
-                        <td class="amount-col">{{number_format($item['price'] * $item['quantity'], 2)}}</td>
+                        <td style="width: 63.8px; text-align: center;">{{number_format($item['quantity'], 0)}}</td>
+                        <td style="width: 75.5px; text-align: right;">{{number_format($item['price'], 2)}}</td>
+                        <td style="width: 75.5px; text-align: right;">{{number_format($item['price'] * $item['quantity'], 2)}}</td>
                     </tr>
                 @endforeach
 
