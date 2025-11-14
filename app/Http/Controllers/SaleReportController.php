@@ -53,7 +53,8 @@ class SaleReportController extends Controller {
         $pharmacy[ 'website' ] = Setting::where( 'id', 109 )->value( 'value' );
         $pharmacy[ 'phone' ] = Setting::where( 'id', 107 )->value( 'value' );
         $pharmacy[ 'tin_number' ] = Setting::where( 'id', 102 )->value( 'value' );
-        $pharmacy[ 'date_range' ] = 'From' . ' ' . date( 'Y-m-d', strtotime( $from ) ) . ' ' . 'To' . ' ' . date( 'Y-m-d', strtotime( $to ) );
+        $pharmacy[ 'from_date' ] = date( 'Y-m-d', strtotime( $from ) );
+        $pharmacy[ 'to_date' ] = date( 'Y-m-d', strtotime( $to ) );
 
         switch ( $request->report_option ) {
             case 1:
@@ -125,7 +126,7 @@ class SaleReportController extends Controller {
             }
             $pdf = PDF::loadView( 'sale_reports.sales_total_report_pdf',
             compact( 'data', 'pharmacy', 'enable_discount' ) )
-            ->setPaper( 'a4', 'landscape' );
+            ->setPaper( 'a4', '' );
             return $pdf->stream( 'Sales_total_report.pdf' );
 
             case 8:

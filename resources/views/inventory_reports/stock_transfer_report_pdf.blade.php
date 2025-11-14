@@ -101,17 +101,17 @@
             <h4 align="center" style="margin-top: -1%">From: <b>{{date('Y-m-d', strtotime($data[0]['from']))}}</b> To:
                 <b>{{date('Y-m-d', strtotime($data[0]['to']))}}</b>
             </h4>
-            <h4 align="center" style="margin-top: -1%">Printed On: {{now()->format('Y-m-d H:i:s')}}</h4>
+            <h4 align="center" style="margin-top: -2%">Printed On: {{now()->format('Y-m-d H:i:s')}}</h4>
         </div>
     </div>
     <div class="row" style="padding-top: -2%">
-        <div class="row" style="margin-top: 6%;">
+        <div class="row" style="margin-top: 7%;">
             <div class="col-md-12">
                 <table id="table-detail" align="center">
                     <!-- loop the product names here -->
                     <thead>
                         <tr style="background: #1f273b; color: white;">
-                            <th align="center">#</th>
+                            <th align="center" style="text-align: center;">#</th>
                             <th align="left">Date</th>
                             <th align="left">Product Name</th>
                             <th align="left">Transfer #</th>

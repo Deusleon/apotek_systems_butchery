@@ -108,11 +108,11 @@
             <h4 align="center" style="margin-top: -2%">From: <b>{{date('Y-m-d', strtotime($data[0]['from']))}}</b> To:
                 <b>{{date('Y-m-d', strtotime($data[0]['to']))}}</b>
             </h4>
-            <h4 align="center" style="margin-top: -1%">Printed On: {{now()->format('Y-m-d H:i:s')}}</h4>
+            <h4 align="center" style="margin-top: -2%">Printed On: {{now()->format('Y-m-d H:i:s')}}</h4>
         </div>
     </div>
     <div class="row" style="padding-top: -2%">
-        <div class="row" style="margin-top: 6%;">
+        <div class="row" style="margin-top: 6.5%;">
                     <div class="col-md-12">
                         <table id="table-detail" align="center">
                             <!-- loop the product names here -->
