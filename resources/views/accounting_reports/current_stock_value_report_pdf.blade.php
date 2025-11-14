@@ -163,14 +163,14 @@
         <hr>
 
         <div class="full-row" style="padding-top: 1%">
-            <div class="col-35">
+            <div class="col-25">
                 <div class="full-row">
                 </div>
 
             </div>
             <div class="col-15"></div>
             <div class="col-25"></div>
-            <div class="col-25">
+            <div class="col-35">
                 <div class="full-row">
                     <div class="col-50" align="left"><b>Total Buy: </b></div>
                     <div class="col-50"
@@ -179,14 +179,14 @@
             </div>
         </div>
         <div class="full-row" style="padding-top: 1%">
-            <div class="col-35">
+            <div class="col-25">
                 <div class="full-row">
                 </div>
 
             </div>
             <div class="col-15"></div>
             <div class="col-25"></div>
-            <div class="col-25">
+            <div class="col-35">
                 <div class="full-row">
                     <div class="col-50" align="left"><b>Total Sell: </b></div>
                     <div class="col-50"
@@ -196,14 +196,14 @@
         </div>
 
         <div class="full-row" style="padding-top: 1%">
-            <div class="col-35">
+            <div class="col-25">
                 <div class="full-row">
                 </div>
 
             </div>
             <div class="col-15"></div>
             <div class="col-25"></div>
-            <div class="col-25">
+            <div class="col-35">
                 <div class="full-row">
                     <div class="col-50" align="left"><b>Total Profit: </b></div>
                     <div class="col-50"
