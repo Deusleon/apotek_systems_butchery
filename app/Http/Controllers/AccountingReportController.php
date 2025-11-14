@@ -188,6 +188,7 @@ class AccountingReportController extends Controller
 
 
             array_push($category_total_cost, array(
+                'product_name' => $data->currentStock['product']['name'] . ' ' . ($data->currentStock['product']['brand'] ?? '') . ' ' . ($data->currentStock['product']['pack_size'] ?? '') . '' . ($data->currentStock['product']['sales_uom'] ?? ''),
                 'category_name' => $data->currentStock['product']['category']['name'],
                 'buy_price' => $data->currentStock['quantity'] * $data->currentStock['unit_cost'],
                 'sell_price' => $data->currentStock['quantity'] * $data->price,
@@ -205,18 +206,9 @@ class AccountingReportController extends Controller
             if ($index < 0) {
                 $sum_by_product_id[] = $value;
             } else {
+                $sum_by_product_id[$index]['buy_price'] += $value['buy_price'];
+                $sum_by_product_id[$index]['sell_price'] += $value['sell_price'];
                 $sum_by_product_id[$index]['quantity'] += $value['quantity'];
-            }
-        }
-
-        $sum_by_category = array();
-        foreach ($category_total_cost as $value) {
-            $index = $sum_by_key->sumByKey($value['category_name'], $sum_by_category, 'category_name');
-            if ($index < 0) {
-                $sum_by_category[] = $value;
-            } else {
-                $sum_by_category[$index]['buy_price'] += $value['buy_price'];
-                $sum_by_category[$index]['sell_price'] += $value['sell_price'];
             }
         }
 
@@ -224,14 +216,14 @@ class AccountingReportController extends Controller
         $total_sell = 0;
         $total_profit = 0;
         $to_print = array();
-        foreach ($sum_by_category as $item) {
+        foreach ($sum_by_product_id as $item) {
             $profit = $item['sell_price'] - $item['buy_price'];
             $total_buy = $total_buy + $item['buy_price'];
             $total_sell = $total_sell + $item['sell_price'];
             $total_profit = $total_profit + $profit;
             array_push($to_print, array(
                 'category_name' => $item['category_name'],
-                'product_name' => $item['category_name'], // Using category name as product name for now
+                'product_name' => $item['product_name'],
                 'buy_price' => $item['buy_price'],
                 'sell_price' => $item['sell_price'],
                 'profit' => $profit,

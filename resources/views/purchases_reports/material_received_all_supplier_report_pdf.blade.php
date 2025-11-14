@@ -156,8 +156,8 @@
                         <th align="center" style="width: 10%;">Quantity</th>
                         <th align="right" style="width: 10%;">Buy Price</th>
                         <th align="right" style="width: 10%;">Sell Price</th>
-                        <th align="right" style="width: 10%;">Profit</th>
-                        <th align="left" style="width: 15%;">Receive Date</th>
+                        <th align="center" style="width: 10%;">Profit</th>
+                        <th align="center" style="width: 15%;">Receive Date</th>
                         <th align="left" style="width: 15%;">Received By</th>
                     </tr>
                     </thead>
@@ -169,8 +169,8 @@
                             <td align="center">{{number_format($item['quantity'],0)}}</td>
                             <td align="right">{{number_format($item['unit_cost'],2)}}</td>
                             <td align="right">{{number_format($item['sell_price'],2)}}</td>
-                            <td align="right">{{number_format($item['profit'],2)}}</td>
-                            <td align="left">{{date('Y-m-d',strtotime($item['date']))}}</td>
+                            <td align="center">{{number_format($item['profit'],2)}}</td>
+                            <td align="center">{{date('Y-m-d',strtotime($item['date']))}}</td>
                             <td align="left">{{$item['received_by']}}</td>
                         </tr>
                     @endforeach
@@ -224,21 +224,54 @@
             <!-- GRAND TOTAL SUMMARY - Centered like Cash Sales -->
             <div style="margin-top: 10px; padding-top: 5px;">
                 <h3 align="center"><b>Total Summary</b></h3>
-                <table style="min-width: 25%; width: auto; margin: 0 auto; background-color: #f8f9fa; border: 1px solid #ddd; border-collapse: collapse;">
+
+                <table style="
+                    min-width: 25%;
+                    width: auto;
+                    margin: 0 auto;
+                    background-color: #f8f9fa;
+                    border: 1px solid #ddd;
+                    border-collapse: collapse;
+                    table-layout: auto;
+                ">
                     <tr>
-                        <td style="padding: 4px; text-align: right;"><b>Total Buy</b></td>
-                        <td style="padding: 4px; text-align: center;"><b>:</b></td>
-                        <td style="padding: 4px; text-align: right;"><b>{{ number_format($grand_total_cost, 2) }}</b></td>
+                        <td style="padding: 6px; text-align: right; white-space: nowrap;"><b>Total Buy</b></td>
+                        <td style="padding: 6px; text-align: center; white-space: nowrap;"><b>:</b></td>
+                        <td style="
+                            padding: 6px; 
+                            text-align: right; 
+                            white-space: nowrap; 
+                            max-width: 1px; 
+                            overflow: visible;
+                        ">
+                            <b>{{ number_format($grand_total_cost, 2) }}</b>
+                        </td>
                     </tr>
                     <tr>
-                        <td style="padding: 4px; text-align: right;"><b>Total Sales</b></td>
-                        <td style="padding: 4px; text-align: center;"><b>:</b></td>
-                        <td style="padding: 4px; text-align: right;"><b>{{ number_format($grand_total_sell, 2) }}</b></td>
+                        <td style="padding: 6px; text-align: right; white-space: nowrap;"><b>Total Sales</b></td>
+                        <td style="padding: 6px; text-align: center; white-space: nowrap;"><b>:</b></td>
+                        <td style="
+                            padding: 6px; 
+                            text-align: right; 
+                            white-space: nowrap; 
+                            max-width: 1px; 
+                            overflow: visible;
+                        ">
+                            <b>{{ number_format($grand_total_sell, 2) }}</b>
+                        </td>
                     </tr>
                     <tr>
-                        <td style="padding: 4px; text-align: right;"><b>Total Profit</b></td>
-                        <td style="padding: 4px; text-align: center;"><b>:</b></td>
-                        <td style="padding: 4px; text-align: right;"><b>{{ number_format($grand_total_profit, 2) }}</b></td>
+                        <td style="padding: 6px; text-align: right; white-space: nowrap;"><b>Total Profit</b></td>
+                        <td style="padding: 6px; text-align: center; white-space: nowrap;"><b>:</b></td>
+                        <td style="
+                            padding: 6px; 
+                            text-align: right; 
+                            white-space: nowrap; 
+                            max-width: 1px; 
+                            overflow: visible;
+                        ">
+                            <b>{{ number_format($grand_total_profit, 2) }}</b>
+                        </td>
                     </tr>
                 </table>
             </div>
