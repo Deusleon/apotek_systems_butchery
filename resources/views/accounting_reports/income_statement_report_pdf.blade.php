@@ -168,17 +168,17 @@
             <hr>
 
             <div class="full-row" style="padding-top: 1%">
-                <div class="col-35">
+                <div class="col-25">
                     <div class="full-row">
                     </div>
 
                 </div>
                 <div class="col-15"></div>
                 <div class="col-25"></div>
-                <div class="col-25">
+                <div class="col-35">
                     <div class="full-row">
-                        <div class="col-50" align="left"><b>Total Sales: </b></div>
-                        <div class="col-50"
+                        <div class="col-50" style="width: 40%;" align="left"><b>Total Sales: </b></div>
+                        <div class="col-50" style="width: 60%;"
                              align="right">{{number_format($data->last()->total_sell,2)}}</div>
                     </div>
                 </div>
@@ -200,17 +200,17 @@
             <hr>
 
             <div class="full-row" style="padding-top: 1%">
-                <div class="col-35">
+                <div class="col-25">
                     <div class="full-row">
                     </div>
 
                 </div>
                 <div class="col-15"></div>
                 <div class="col-25"></div>
-                <div class="col-25">
+                <div class="col-35">
                     <div class="full-row">
-                        <div class="col-50" align="left"><b>Total Buy: </b></div>
-                        <div class="col-50"
+                        <div class="col-50" style="width: 40%;" align="left"><b>Total Buy: </b></div>
+                        <div class="col-50" style="width: 60%;"
                              align="right">{{number_format($data->last()->total_buy,2)}}</div>
                     </div>
                 </div>
@@ -232,17 +232,17 @@
             <hr>
 
             <div class="full-row" style="padding-top: 1%">
-                <div class="col-35">
+                <div class="col-25">
                     <div class="full-row">
                     </div>
 
                 </div>
                 <div class="col-15"></div>
                 <div class="col-25"></div>
-                <div class="col-25">
+                <div class="col-35">
                     <div class="full-row">
-                        <div class="col-50" align="left"><b>Total Expenses: </b></div>
-                        <div class="col-50"
+                        <div class="col-50" style="width: 40%;" align="left"><b>Total Expenses: </b></div>
+                        <div class="col-50" style="width: 60%;"
                              align="right">{{number_format($data->last()->expense_amount,2)}}</div>
                     </div>
                 </div>
