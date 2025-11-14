@@ -137,19 +137,19 @@
                 <!-- loop the product names here -->
                 <thead>
                 <tr style="background: #1f273b; color: white;">
-                    <th align="left">Date</th>
-                    <th align="left">Pay Method</th>
-                    <th align="left">Category</th>
-                    <th align="left">Updated by</th>
-                    <th align="left">Description</th>
-                    <th align="left">Amount</th>
+                    <th align="left" style="width: 14%;">Date</th>
+                    <th align="left" style="width: 14%;">Pay Method</th>
+                    <th align="left" style="width: 14%;">Category</th>
+                    <th align="left" style="width: 14%;">Updated by</th>
+                    <th align="left" style="width: 30%;">Description</th>
+                    <th align="right" style="width: 14%;">Amount</th>
                     {{--                <th>Payment Method</th>--}}
                 </tr>
                 </thead>
                 @foreach($data as $item)
                     <tr>
-                        <td align="left">{{date('d-m-Y',strtotime($item->created_at))}}</td>
-                        <td align="left">
+                        <td align="left" style="width: 14%;">{{date('Y-m-d',strtotime($item->created_at))}}</td>
+                        <td align="left" style="width: 14%;">
                             @if($item->payment_method_id == 1)
                                 CASH
                             @elseif($item->payment_method_id == 2)
@@ -164,10 +164,10 @@
                                 UNKNOWN
                             @endif
                         </td>
-                        <td align="left">{{$item->accExpenseCategory['name']}}</td>
-                        <td align="left">{{$item->user['name'] ?? 'Unknown'}}</td>
-                        <td align="left">{{$item->expense_description}}</td>
-                        <td align="left">{{number_format($item->amount,2)}}</td>
+                        <td align="left" style="width: 14%;">{{$item->accExpenseCategory['name']}}</td>
+                        <td align="left" style="width: 14%;">{{$item->user['name'] ?? 'Unknown'}}</td>
+                        <td align="left" style="width: 30%;">{{$item->expense_description}}</td>
+                        <td align="right" style="width: 14%;">{{number_format($item->amount,2)}}</td>
 
                     </tr>
                 @endforeach
