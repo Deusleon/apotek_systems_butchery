@@ -981,7 +981,7 @@ class SaleController extends Controller
             $sub_total = ($amount / (1 + $vat_percent));
             $vat = $item->vat * $item->quantity;
             $sn++;
-            // dd($item->sale['cost']);
+            // dd($item->sale['customer']);
             array_push($sales, array(
                 'receipt_number' => $item->sale['receipt_number'],
                 'name' => $item->currentStock['product']['name'],
@@ -1001,6 +1001,8 @@ class SaleController extends Controller
                 'sold_by' => $item->sale['user']['name'],
                 'customer' => $item->sale['customer']['name'],
                 'customer_tin' => $item->sale['customer']['tin'],
+                'customer_phone' => $item->sale['customer']['phone'],
+                'customer_address' => $item->sale['customer']['address'],
                 'paid' => $paid,
                 'balance' => $balance,
                 'remark' => $remark,
@@ -1123,6 +1125,8 @@ class SaleController extends Controller
                 'sold_by' => $item->sale['user']['name'],
                 'customer' => $item->sale['customer']['name'],
                 'customer_tin' => $item->sale['customer']['tin'],
+                'phone_number' => $item->sale['customer']['phone_number'],
+                'address' => $item->sale['customer']['address'],
                 'created_at' => date('Y/m/d', strtotime($item->sale['date']))
             ));
         }

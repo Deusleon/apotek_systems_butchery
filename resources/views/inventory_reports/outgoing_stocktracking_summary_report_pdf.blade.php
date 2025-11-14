@@ -16,9 +16,12 @@
         table,
         th,
         td {
-            /*border: 1px solid black;*/
             border-collapse: collapse;
-            padding: 10px;
+            padding: 8px;
+        }
+
+        th {
+            text-align: left;
         }
 
         table {
@@ -31,7 +34,10 @@
         }
 
         thead {
-            display: table-header-group
+            display: table-header-group;
+            background: #1f273b;
+            color: white;
+            font-size: 12px;
         }
 
         tfoot {
@@ -39,13 +45,13 @@
         }
 
         #table-detail {
-            /*border-spacing: 5px;*/
             width: 100%;
-            margin-top: -10%;
+            margin-top: -13%;
+            border-collapse: collapse;
         }
 
-        #table-detail tr> {
-            line-height: 13px;
+        #table-detail tr {
+            line-height: 10px;
         }
 
         tr:nth-child(even) {
@@ -71,53 +77,58 @@
         }
 
         #container .logo-container img {
-            max-width: 160px;
-            max-height: 160px;
+            max-width: 100px;
+            max-height: 100px;
         }
     </style>
 
 </head>
 
 <body>
-    <div class="row">
-        <div id="container">
-            <div class="logo-container">
-                @if($pharmacy['logo'])
-                    <img src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
-                @endif
-            </div>
+    <!-- Header Section -->
+    <div style="width: 100%; text-align: center; align-items: center;">
+        @if($pharmacy['logo'])
+            <img style="max-width: 90px; max-height: 90px;" src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
+        @endif
+        <div style="font-weight: bold; font-size: 16px;">{{$pharmacy['name']}}</div>
+        <div style="justify-content: center; font-size: 12px; line-height: 1.2;">
+            {{$pharmacy['address']}}<br>
+            {{$pharmacy['phone']}}<br>
+            {{$pharmacy['email'] . ' | ' . $pharmacy['website']}}
+        </div><br>
+        <div>
+            <h3 align="center" style="font-weight: bold; margin-top: -1%">Outgoing Stock Summary Report</h3>
+            <h4 align="center" style="margin-top: -1%">From : <b>{{date('Y-m-d', strtotime($date1))}}</b> To: <b>{{date('Y-m-d', strtotime($date2))}}</b></h4>
+            <h4 align="center" style="margin-top: -1%">Printed On: {{now()->format('Y-m-d H:i:s')}}</h4>
         </div>
     </div>
     <div class="row" style="padding-top: -2%">
-        <h1 align="center">{{$pharmacy['name']}}</h1>
-        <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
-        <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
-        <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}</h3>
-        <h2 align="center" style="margin-top: -1%">Outgoing Stock Summary Report</h2>
-
         <div class="row" style="margin-top: 8%;">
             <div class="col-md-12">
                 <table id="table-detail" align="center">
                     <!-- loop the product names here -->
                     <thead>
                         <tr style="background: #1f273b; color: white;">
-                            <th align="center">#</th>
+                            <th style="padding-left: 20px;">#</th>
                             {{-- <th align="left">Date</th> --}}
                             <th align="left">Product Name</th>
                             {{-- <th align="left">Out Mode</th> --}}
-                            <th>Quantity</th>
-                            {{-- <th align="left">Made By</th> --}}
+                            <th align="center" style="text-align: center;">Quantity</th>
+                            <th align="center" style="text-align: center;">QoH</th>
                         </tr>
                     </thead>
                     @foreach($data as $item)
                         <tr>
-                            <td align="center">{{$loop->iteration}}.</td>
+                            <td style="padding-left: 20px;">{{$loop->iteration}}.</td>
                             {{-- <td>{{$item->date}}</td> --}}
                             <td>{{$item->product->name . ' ' . ($item->product->brand . ' ' ?? '') . ($item->product->pack_size ?? '') . ($item->product->sales_uom ?? '')}}
                             </td>
                             {{-- <td>{{$item->out_mode}}</td> --}}
                             <td align="center">
                                 <div>{{number_format($item->quantity)}}</div>
+                            </td>
+                            <td align="center">
+                                <div>{{number_format($item->qoh)}}</div>
                             </td>
                             {{-- <td>{{$item->user['name']}}</td> --}}
                         </tr>
