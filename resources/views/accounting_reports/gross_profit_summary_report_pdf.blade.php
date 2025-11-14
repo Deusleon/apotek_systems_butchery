@@ -15,7 +15,7 @@
 
         table, th, td {
             border-collapse: collapse;
-            padding: 10px;
+            padding: 5px;
         }
 
         table {
@@ -107,22 +107,22 @@
             <table id="table-detail" align="center">
                 <thead>
                     <tr style="background: #1f273b; color: white;">
-                        <th align="left">Date</th>
-                        <th align="right">Total Buy</th>
-                        <th align="right">Total Sales</th>
-                        <th align="right">Total Profit</th>
+                        <th align="left" style="width: 25%;">Date</th>
+                        <th align="right" style="width: 25%;">Total Buy</th>
+                        <th align="right" style="width: 25%;">Total Sales</th>
+                        <th align="right" style="width: 25%;">Total Profit</th>
                     </tr>
                 </thead>
                 @foreach($data[0]['dates'] as $items)
                     <tr>
-                        <td align="left">{{ date('Y-m-d', strtotime($items)) }}</td>
+                        <td align="left" style="width: 25%;">{{ date('Y-m-d', strtotime($items)) }}</td>
                         @php
                             $total_buy  = $data[0]['total_buy'][$items][0]['total_buy'] ?? 0;
                             $total_sell = $data[0]['total_sell'][$items][0]['total_sell'] ?? 0;
                         @endphp
-                        <td align="right">{{ number_format($total_buy, 2) }}</td>
-                        <td align="right">{{ number_format($total_sell, 2) }}</td>
-                        <td align="right">{{ number_format($total_sell - $total_buy, 2) }}</td>
+                        <td align="right" style="width: 25%;">{{ number_format($total_buy, 2) }}</td>
+                        <td align="right" style="width: 25%;">{{ number_format($total_sell, 2) }}</td>
+                        <td align="right" style="width: 25%;">{{ number_format($total_sell - $total_buy, 2) }}</td>
                     </tr>
                 @endforeach
             </table>
