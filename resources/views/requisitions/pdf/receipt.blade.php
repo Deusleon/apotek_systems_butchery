@@ -80,12 +80,11 @@
 </div>
 
 <div class="row" style="padding-top: -2%">
-    <h3 align="center">REQUISITION</h3>
+    <h3 align="center"></h3>
     <h3 align="center" style="margin-top: -2%">{{ $pharmacy['name'] }}</h3>
     <h5 align="center" style="margin-top: -2%">{{ $pharmacy['address'] }}</h5>
     <h6 align="center" style="margin-top: -2%">{{ $pharmacy['phone'] }}</h6>
-    <h5 align="center" style="margin-top: -2%">TIN: {{ $pharmacy['tin_number'] }}</h5>
-    <h5 align="center" style="margin-top: -2%">VRN: {{ $pharmacy['vrn_number'] }}</h5>
+    <h3 align="center" style="margin-top: -3%">REQUISITION RECEIPT</h3>
     <h5 align="center" style="margin-top: -2%">Requisition #: {{ $requisition->req_no }}</h5>
     <h5 align="center" style="margin-top: -2%">Date: {{ date('j M, Y', strtotime($requisition->created_at)) }}</h5>
 </div>
@@ -93,7 +92,7 @@
 <div class="row" style="margin-top: 13%">
     <table class="table table-sm" id="table-detail" align="center">
         <tr class="table-header">
-            <th align="left">Product</th>
+            <th align="left">Product Name</th>
             <th align="right">Qty</th>
         </tr>
 
