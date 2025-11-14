@@ -45,7 +45,6 @@
         #table-detail {
             border-spacing: 6%;
             width: 96%;
-            margin-top: -13%;
             border: none;
         }
 
@@ -66,6 +65,27 @@
             color: white;
         }
 
+        /* Table styling */
+        .customer-table {
+            width: 96%;
+            border: none;
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+
+        .customer-table .index-col {
+            width: auto;
+            text-align: left;
+            padding-left: 5px;
+        }
+
+        .customer-table td {
+            padding: 2px 2px;
+            border: 1px solid #858484;
+            font-size: 10px;
+            height: 15px;
+        }
+
     </style>
 </head>
 <body>
@@ -84,12 +104,27 @@
     <h3 align="center" style="margin-top: -2%">{{ $pharmacy['name'] }}</h3>
     <h5 align="center" style="margin-top: -2%">{{ $pharmacy['address'] }}</h5>
     <h6 align="center" style="margin-top: -2%">{{ $pharmacy['phone'] }}</h6>
-    <h3 align="center" style="margin-top: -3%">REQUISITION RECEIPT</h3>
-    <h5 align="center" style="margin-top: -2%">Requisition #: {{ $requisition->req_no }}</h5>
-    <h5 align="center" style="margin-top: -2%">Date: {{ date('j M, Y', strtotime($requisition->created_at)) }}</h5>
+    <h3 align="center" style="margin-top: -2%">REQUISITION RECEIPT</h3>
 </div>
 
-<div class="row" style="margin-top: 13%">
+<table class="customer-table">
+    <tbody>
+        <tr>
+            <td class="index-col" style="width: 25%;">Requisition #</td>
+            <td class="index-col" style="width: 25%;">Date</td>
+            <td class="index-col" style="width: 25%">From</td>
+            <td class="index-col" style="width: 25%;">To</td>
+        </tr>
+        <tr>
+            <td class="index-col" style="width: 25%;">{{ $requisition->req_no }}</td>
+            <td class="index-col" style="width: 25%;">{{ date('Y-m-d', strtotime($requisition->created_at)) }}</td>
+            <td class="index-col" style="width: 25%">{{ $fromStore->name ?? '' }}</td>
+            <td class="index-col" style="width: 25%;">{{ $toStore->name ?? '' }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="row">
     <table class="table table-sm" id="table-detail" align="center">
         <tr class="table-header">
             <th align="left">Product Name</th>
