@@ -10,20 +10,20 @@
         }
 
         body {
-            font-size: 12px;
+            font-size: 18px;
             margin: 0;
             padding: 12px;
-            /* font-weight: bold; */
+            padding-right: 30px;
         }
 
         * {
             font-family: Arial, Helvetica, sans-serif
         }
-
+        
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 10px;
+            font-size: 14px;
         }
 
         th,
@@ -33,6 +33,7 @@
         }
 
         #table-detail thead th {
+            border-top: 1px solid #000;
             border-bottom: 1px solid #000;
         }
 
@@ -46,7 +47,7 @@
 
         hr {
             border: none;
-            border-top: 1px dashed #000;
+            border-top: 1px solid #000;
             margin: 3px 0;
         }
 
@@ -105,8 +106,8 @@
             <table id="table-detail">
                 <thead>
                     <tr>
-                        <th align="left" style="width: 50%;">Description</th>
-                        <th class="text-center">Qty</th>
+                        <th align="left" style="width: 40%;">Description</th>
+                        <th class="text-center" style="width: 20%">Qty</th>
                         <th class="text-right">Amount</th>
                     </tr>
                 </thead>

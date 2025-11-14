@@ -238,6 +238,20 @@
                             </div>
                         </div>
                     </div>
+                    {{--outgoing stock--}}
+                    <div id="outgoing-stock" style="display: none">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="outgoing-date">Date<font color="red">*</font></label>
+                                    <div id="out_date" style="border: 2px solid white; border-radius: 6px;">
+                                        <input type="text" name="out_dates" class="form-control" id="d_auto_91211"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     {{--stock transfer--}}
                     <div id="stock-transfer" style="display: none">
                         <div class="row">
@@ -425,6 +439,31 @@
                 }
             });
         });
+        
+        $(function () {
+            var start = moment();
+            var end = moment();
+
+            $('#d_auto_91211').daterangepicker({
+                showDropdowns: true,
+                maxDate: end,
+                autoUpdateInput: true,
+                startDate: moment().startOf('month'),
+                endDate: moment().endOf('month'),
+                locale: {
+                    format: 'YYYY/MM/DD'
+                },
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                    'This Year': [moment().startOf('year'), moment()]
+                }
+            });
+        });
 
         $('input[name="transfer_date"]').on('apply.daterangepicker', function (ev, picker) {
             $(this).val(picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD'));
@@ -483,6 +522,14 @@
             } else {
                 if (transferDiv) transferDiv.style.display = 'none';
             }
+            
+            // outgoing stock
+            let outgoingDiv = document.getElementById('outgoing-stock');
+            if (Number(report_option_index) === 6 || Number(report_option_index) === 14) {
+                if (outgoingDiv) outgoingDiv.style.display = 'block';
+            } else {
+                if (outgoingDiv) outgoingDiv.style.display = 'none';
+            }
 
             // stock adjustment
             let adjustDiv = document.getElementById('stock-adjustment');
@@ -501,7 +548,7 @@
             var product_option = document.getElementById("product");
             var product_option_index = product_option.options[product_option.selectedIndex].value;
 
-            /*current stock*/            
+            /*current stock*/
             var store_option = document.getElementById("store-name");
             var store_option_index = store_option ? Number(store_option.value || 0) : 0;
 
@@ -516,7 +563,7 @@
             /*stock transfer*/
             var transfer_option = document.getElementById("stock-transfers");
             var transfer_option_index = transfer_option.options[transfer_option.selectedIndex].value;
-
+            
             /*stock adjustment*/
             var adj_option = document.getElementById("stock-adjustments");
             var adj_option_index = adj_option.options[adj_option.selectedIndex].value;
@@ -548,7 +595,7 @@
                 document.getElementById('warning-store').style.display = 'block';
                 return false;
             }
-            
+
             /*if current stock*/
             if (Number(report_option_index) === Number(12) && Number(store_option_index) !== Number(0)) {
                 document.getElementById('warning-store').style.display = 'none';
@@ -596,6 +643,19 @@
                 return true;
 
             }
+            
+            /*if outgoing stock*/
+            var date = document.getElementById('d_auto_91211').value;
+
+            if (Number(report_option_index) === Number(6) || Number(report_option_index) !== Number(13)) {
+                document.getElementById('warning-details').style.display = 'none';
+                //make request
+                if (date === '') {
+                    document.getElementById('date').style.borderColor = 'red';
+                    return false;
+                }
+                return true;
+            }
 
             /*if stock adjustment*/
             var date = document.getElementById('d_auto_91').value;
@@ -609,7 +669,6 @@
                     return false;
                 }
                 return true;
-
             }
 
 

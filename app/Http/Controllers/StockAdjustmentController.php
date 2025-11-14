@@ -262,6 +262,7 @@ class StockAdjustmentController extends Controller
                     'quantity' => $adjQty,
                     'store_id' => $storeId,
                     'created_by' => Auth::id(),
+                    'updated_by' => Auth::id(),
                     'updated_at' => now()->format('Y-m-d'),
                     'movement' => $type === 'increase' ? 'IN' : 'OUT',
                 ]);
@@ -329,6 +330,7 @@ class StockAdjustmentController extends Controller
                         'quantity' => $adjustmentAmount,
                         'store_id' => $storeId,
                         'created_by' => Auth::id(),
+                        'updated_by' => Auth::id(),
                         'updated_at' => now()->format('Y-m-d'),
                         'movement' => $typeLatest === 'increase' ? 'IN' : 'OUT',
                     ]);
@@ -393,6 +395,7 @@ class StockAdjustmentController extends Controller
                         'quantity' => $deduct,
                         'store_id' => $storeId,
                         'created_by' => Auth::id(),
+                        'updated_by' => Auth::id(),
                         'updated_at' => now()->format('Y-m-d'),
                         'movement' => 'OUT',
                     ]);

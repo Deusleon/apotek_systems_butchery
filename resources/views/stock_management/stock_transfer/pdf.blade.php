@@ -16,9 +16,12 @@
         table,
         th,
         td {
-            /*border: 1px solid black;*/
             border-collapse: collapse;
-            padding: 10px;
+            padding: 8px;
+        }
+
+        th {
+            text-align: left;
         }
 
         table {
@@ -31,7 +34,10 @@
         }
 
         thead {
-            display: table-header-group
+            display: table-header-group;
+            background: #1f273b;
+            color: white;
+            font-size: 12px;
         }
 
         tfoot {
@@ -39,19 +45,13 @@
         }
 
         #table-detail {
-            /*border-spacing: 5px;*/
             width: 100%;
-        }
-
-        #table-detail-main {
-            width: 102%;
-            margin-top: -10%;
-            margin-bottom: 1%;
+            margin-top: -13%;
             border-collapse: collapse;
         }
 
-        #table-detail tr> {
-            line-height: 13px;
+        #table-detail tr {
+            line-height: 10px;
         }
 
         tr:nth-child(even) {
@@ -77,82 +77,87 @@
         }
 
         #container .logo-container img {
-            max-width: 160px;
-            max-height: 160px;
+            max-width: 100px;
+            max-height: 100px;
         }
     </style>
+
 </head>
+
 <body>
-    <div class="row">
-        <div id="container">
-            <div class="logo-container">
-                @if($pharmacy['logo'] ?? null)
-                    <img src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
-                @endif
-            </div>
+    <!-- Header Section -->
+    <div style="width: 100%; text-align: center; align-items: center;">
+        @if($pharmacy['logo'])
+            <img style="max-width: 90px; max-height: 90px;" src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
+        @endif
+        <div style="font-weight: bold; font-size: 16px;">{{$pharmacy['name']}}</div>
+        <div style="justify-content: center; font-size: 12px; line-height: 1.2;">
+            {{$pharmacy['address']}}<br>
+            {{$pharmacy['phone']}}<br>
+            {{$pharmacy['email'] . ' | ' . $pharmacy['website']}}
+        </div><br>
+        <div>
+            <h3 align="center" style="font-weight: bold; margin-top: -1%">Stock Transfer Receipt</h3>
+            <h4 align="center" style="margin-top: -1%">Transfer No: <b>{{ $transfer->transfer_no }}</b></h4>
+            <h4 align="center" style="margin-top: -1%">Printed On: {{now()->format('Y-m-d H:i:s')}}</h4>
         </div>
     </div>
     <div class="row" style="padding-top: -2%">
-        <h1 align="center">{{$pharmacy['name'] ?? 'Company Name'}}</h1>
-        <h3 align="center" style="margin-top: -1%">{{$pharmacy['address'] ?? ''}}</h3>
-        <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone'] ?? ''}}</h3>
-        <h3 align="center" style="margin-top: -1%">{{($pharmacy['email'] ?? '') . ' | ' . ($pharmacy['website'] ?? '')}}</h3>
-        <h2 align="center" style="margin-top: -1%">Stock Transfer Receipt</h2>
-        <h3 align="center" style="margin-top: -1%">Transfer No: <b>{{ $transfer->transfer_no }}</b></h3>
-        <div class="row">
+        <div class="row" style="margin-top: 8%;">
             <div class="col-md-12">
                 <table id="table-detail" align="center">
                     <thead>
                         <tr style="background: #1f273b; color: white;">
-                            <th align="center">#</th>
+                            <th align="center" style="text-align: center;">#</th>
                             <th align="left">Product Name</th>
-                            <th align="center">Quantity</th>
-                            <th align="left">From Store</th>
-                            <th align="left">To Store</th>
+                            <th align="center" style="text-align: center;">Quantity</th>
+                            <th align="left">From Branch</th>
+                            <th align="left">To Branch</th>
                             <th align="left">Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($transfer->all_items ?? [$transfer] as $index => $item)
-                        <tr>
-                            <td align="center">{{ $index + 1 }}.</td>
-                            <td align="left">
-                                {{ ($item->currentStock->product->name ?? '') . ' ' .
-                                   ($item->currentStock->product->brand ?? '') . ' ' .
-                                   ($item->currentStock->product->pack_size ?? '') . ' ' .
-                                   ($item->currentStock->product->sales_uom ?? '') }}
-                            </td>
-                            <td align="center">{{ number_format($item->transfer_qty ?? 0) }}</td>
-                            <td align="left">{{ $transfer->fromStore->name ?? '' }}</td>
-                            <td align="left">{{ $transfer->toStore->name ?? '' }}</td>
-                            <td align="left">
-                                @php
-                                    $statuses = [
-                                        'created' => ['name' => 'Pending', 'class' => 'color: blue;'],
-                                        'assigned' => ['name' => 'Assigned', 'class' => 'color: orange;'],
-                                        'approved' => ['name' => 'Approved', 'class' => 'color: orange;'],
-                                        'in_transit' => ['name' => 'In Transit', 'class' => 'color: teal;'],
-                                        'acknowledged' => ['name' => 'Acknowledged', 'class' => 'color: green;'],
-                                        'completed' => ['name' => 'Completed', 'class' => 'color: green;'],
-                                        'cancelled' => ['name' => 'Cancelled', 'class' => 'color: red;']
-                                    ];
-                                    $currentStatus = $transfer->status ?? 'created';
-                                    $statusInfo = $statuses[$currentStatus] ?? ['name' => 'Unknown', 'class' => 'color: black;'];
-                                @endphp
-                                <span style="font-weight: bold; {{ $statusInfo['class'] }}">{{ $statusInfo['name'] }}</span>
-                            </td>
-                        </tr>
+                                            <tr>
+                                                <td align="center">{{ $index + 1 }}.</td>
+                                                <td align="left">
+                                                    {{ ($item->currentStock->product->name ?? '') . ' ' .
+                            ($item->currentStock->product->brand ?? '') . ' ' .
+                            ($item->currentStock->product->pack_size ?? '') . ' ' .
+                            ($item->currentStock->product->sales_uom ?? '') }}
+                                                </td>
+                                                <td align="center">{{ number_format($item->transfer_qty ?? 0) }}</td>
+                                                <td align="left">{{ $transfer->fromStore->name ?? '' }}</td>
+                                                <td align="left">{{ $transfer->toStore->name ?? '' }}</td>
+                                                <td align="left">
+                                                    @php
+                                                        $statuses = [
+                                                            'created' => ['name' => 'Pending', 'class' => 'color: blue;'],
+                                                            'assigned' => ['name' => 'Assigned', 'class' => 'color: orange;'],
+                                                            'approved' => ['name' => 'Approved', 'class' => 'color: orange;'],
+                                                            'in_transit' => ['name' => 'In Transit', 'class' => 'color: teal;'],
+                                                            'acknowledged' => ['name' => 'Acknowledged', 'class' => 'color: green;'],
+                                                            'completed' => ['name' => 'Completed', 'class' => 'color: green;'],
+                                                            'cancelled' => ['name' => 'Cancelled', 'class' => 'color: red;']
+                                                        ];
+                                                        $currentStatus = $transfer->status ?? 'created';
+                                                        $statusInfo = $statuses[$currentStatus] ?? ['name' => 'Unknown', 'class' => 'color: black;'];
+                                                    @endphp
+                                                    <span
+                                                        style="font-weight: bold; {{ $statusInfo['class'] }}">{{ $statusInfo['name'] }}</span>
+                                                </td>
+                                            </tr>
                         @endforeach
                     </tbody>
                 </table>
 
                 @if($transfer->remarks)
-                <div style="margin-top: 20px;">
-                    <strong>Remarks:</strong> {{ $transfer->remarks }}
-                </div>
+                    <div style="margin-top: 14%;">
+                        <strong>Remarks:</strong> {{ $transfer->remarks }}
+                    </div>
                 @endif
 
-                <div style="margin-top: 20px;">
+                <div style="margin-top: 14%;">
                     <table id="table-detail" align="center" style="width: 50%;">
                         <tr>
                             <td style="border: none; padding: 5px;"><strong>Created By:</strong></td>
@@ -160,25 +165,28 @@
                         </tr>
                         <tr>
                             <td style="border: none; padding: 5px;"><strong>Created Date:</strong></td>
-                            <td style="border: none; padding: 5px;">{{ date('d-m-Y H:i:s', strtotime($transfer->created_at)) }}</td>
+                            <td style="border: none; padding: 5px;">
+                                {{ date('Y-m-d H:i:s', strtotime($transfer->created_at)) }}
+                            </td>
                         </tr>
                         @if($transfer->approvedBy)
-                        <tr>
-                            <td style="border: none; padding: 5px;"><strong>Approved By:</strong></td>
-                            <td style="border: none; padding: 5px;">{{ $transfer->approvedBy->name ?? 'N/A' }}</td>
-                        </tr>
+                            <tr>
+                                <td style="border: none; padding: 5px;"><strong>Approved By:</strong></td>
+                                <td style="border: none; padding: 5px;">{{ $transfer->approvedBy->name ?? 'N/A' }}</td>
+                            </tr>
                         @endif
                         @if($transfer->acknowledgedBy)
-                        <tr>
-                            <td style="border: none; padding: 5px;"><strong>Acknowledged By:</strong></td>
-                            <td style="border: none; padding: 5px;">{{ $transfer->acknowledgedBy->name ?? 'N/A' }}</td>
-                        </tr>
+                            <tr>
+                                <td style="border: none; padding: 5px;"><strong>Acknowledged By:</strong></td>
+                                <td style="border: none; padding: 5px;">{{ $transfer->acknowledgedBy->name ?? 'N/A' }}
+                                </td>
+                            </tr>
                         @endif
                         @if($transfer->cancelledBy)
-                        <tr>
-                            <td style="border: none; padding: 5px;"><strong>Cancelled By:</strong></td>
-                            <td style="border: none; padding: 5px;">{{ $transfer->cancelledBy->name ?? 'N/A' }}</td>
-                        </tr>
+                            <tr>
+                                <td style="border: none; padding: 5px;"><strong>Cancelled By:</strong></td>
+                                <td style="border: none; padding: 5px;">{{ $transfer->cancelledBy->name ?? 'N/A' }}</td>
+                            </tr>
                         @endif
                     </table>
                 </div>
@@ -201,4 +209,5 @@
     }
     </script>
 </body>
+
 </html>

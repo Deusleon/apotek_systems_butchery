@@ -22,12 +22,12 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade as PDF;
 
-ini_set('max_execution_time', 1800);
-set_time_limit(1800);
-ini_set('memory_limit', '2048M');
+ini_set( 'max_execution_time', 1800 );
+set_time_limit( 1800 );
+ini_set( 'memory_limit', '2048M' );
 
 class InventoryReportController extends Controller
-{
+ {
 
     public function index()
  {
@@ -219,26 +219,32 @@ try {
                 return $pdf->stream( 'outofstock_report.pdf' );
             case 6:
                 //outgoing tracking report
-                $data = $this->outgoingTrackingReport();
+                $dates = explode(" - ", $request->out_dates);
+                $date1 = $dates[0];
+                $date2 = $dates[1];
+                $data = $this->outgoingTrackingReport($dates);
                 if ($data->isEmpty()) {
                     return response()->view('error_pages.pdf_zero_data');
                 }
                 $pdf = PDF::loadView( 'inventory_reports.outgoing_stocktracking_report_pdf',
-                compact( 'data',  'pharmacy' ) )
+                compact( 'data', 'date1', 'date2', 'pharmacy' ) )
                 ->setPaper( 'a4', '' );
                 return $pdf->stream( 'outgoing_stocktracking_report.pdf' );
             case 14:
                 //outgoing tracking summary report
-                $data = $this->outgoingTrackingSummaryReport();
+                $dates = explode(" - ", $request->out_dates);
+                $date1 = $dates[0];
+                $date2 = $dates[1];
+                $data = $this->outgoingTrackingSummaryReport($dates);
                 if ($data->isEmpty()) {
                     return response()->view('error_pages.pdf_zero_data');
                 }
                 $pdf = PDF::loadView( 'inventory_reports.outgoing_stocktracking_summary_report_pdf',
-                compact( 'data',  'pharmacy' ) )
+                compact( 'data', 'date1', 'date2',  'pharmacy' ) )
                 ->setPaper( 'a4', '' );
                 return $pdf->stream( 'outgoing_stocktracking_summary_report.pdf' );
             case 15:
-                //outgoing tracking summary report
+                //fast moving summary report
                 $request_store = $request->store_name ?? current_store_id();    
                 $store_name = Store::where('id', $request_store)
                             ->first();
@@ -252,7 +258,7 @@ try {
                 ->setPaper( 'a4', '' );
                 return $pdf->stream( 'fast_moving_report.pdf' );
             case 16:
-                //outgoing tracking summary report
+                //dead stock summary report
                 $request_store = $request->store_name ?? current_store_id();    
                 $store_name = Store::where('id', $request_store)
                             ->first();
@@ -484,7 +490,7 @@ try {
     }
     private function currentStockReport($store, $category)
     {
-        if (!Auth()->user()->checkPermission('Current Stock Report')) {
+        if (!Auth()->user()->checkPermission('Current Stock Summary Report')) {
             abort(403, 'Access Denied');
         }
         $query = CurrentStock::join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
@@ -847,7 +853,7 @@ try {
             abort(403, 'Access Denied');
         }
         $store_id = current_store_id();
-        $query = CurrentStock::where(DB::raw('date( expiry_date )'), ' <= ', date('Y-m-d'))
+        $query = CurrentStock::where(DB::raw('date( expiry_date )'), '<=', date('Y-m-d'))
             ->orderby('expiry_date', 'DESC');
 
         if (!is_all_store()) {
@@ -892,13 +898,16 @@ try {
 
         return $out_of_stock;
     }
-    private function outgoingTrackingReport() 
+    private function outgoingTrackingReport($dates) 
     {
         if (!Auth()->user()->checkPermission('Outgoing Stock Detailed Report')) {
             abort(403, 'Access Denied');
         }
+        $start = date('Y-m-d', strtotime($dates[0]));
+        $end = date('Y-m-d', strtotime($dates[1]));
         $store_id = current_store_id();
         $query = StockTracking::where('movement', 'OUT')
+            ->whereBetween('updated_at', [$start, $end])
             ->with(['currentStock.product', 'user']);
 
         if (!is_all_store()) {
@@ -929,137 +938,200 @@ try {
 
         return $merged;
     }  
-    private function outgoingTrackingSummaryReport() 
-    {
-        if (!Auth()->user()->checkPermission('Outgoing Stock Summary Report')) {
-            abort(403, 'Access Denied');
-        }
-        $store_id = current_store_id();
-        $query = StockTracking::where('movement', 'OUT')
-            ->with(['currentStock.product', 'user']);
+    private function outgoingTrackingSummaryReport($dates) 
+{
+    if (!Auth()->user()->checkPermission('Outgoing Stock Summary Report')) {
+        abort(403, 'Access Denied');
+    }
+    
+    $start = date('Y-m-d', strtotime($dates[0]));
+    $end   = date('Y-m-d', strtotime($dates[1]));
+    $store_id = current_store_id();
+
+    $query = StockTracking::where('movement', 'OUT')
+        ->whereBetween('updated_at', [$start, $end])
+        ->with(['currentStock.product', 'user']);
+
+    if (!is_all_store()) {
+        $query->where('store_id', $store_id);
+    }
+
+    $outgoing = $query->get();
+
+    // Group by product_id
+    $grouped = $outgoing->groupBy(function ($item) {
+        return $item->currentStock->product->id;
+    });
+
+    // Merge + add QOH
+    $merged = $grouped->map(function ($rows) {
+
+        $first = $rows->first();
+        $product = $first->currentStock->product;
+        $product_id = $product->id;
+
+        // --- QOH (available quantity) ---
+        $qohQuery = DB::table('inv_current_stock')
+            ->where('product_id', $product_id);
 
         if (!is_all_store()) {
-            $query->where('store_id', $store_id);
+            $qohQuery->where('store_id', current_store_id());
         }
 
-        $outgoing = $query->get();
+        $qoh = $qohQuery->sum('quantity');
 
-        // group product_id
-        $grouped = $outgoing->groupBy(function ($item) {
-            return $item->currentStock->product->id;
-        });
+        return (object) [
+            'product'  => $product,
+            'quantity' => $rows->sum('quantity'), // total outgoing
+            'qoh'      => (float) $qoh,           // available qty
+        ];
 
-        // convert grouped data into flat array with summed quantities
-        $merged = $grouped->map(function ($rows) {
-            $first = $rows->first();
-            return (object) [
-                'product' => $first->currentStock->product,
-                'quantity' => $rows->sum('quantity'),
-            ];
-        })->values();
+    })->values();
 
-        return $merged;
-    }
+    return $merged;
+}
+
     private function fastMovingReport()
-    {
-        if (!Auth()->user()->checkPermission('Fast Moving Products Report')) {
-            abort(403, 'Access Denied');
-        }
-
-        $store_id = current_store_id();
-
-        // Automatically get range: from 3 months ago to today
-        $start_date = now()->subMonths(3)->startOfDay();
-        $end_date = now()->endOfDay();
-
-        $query = SalesDetail::join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
-            ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
-            ->join('sales', 'sales.id', '=', 'sales_details.sale_id')
-            ->select(
-                'inv_products.id as product_id',
-                'inv_products.name as product_name',
-                'inv_products.brand',
-                'inv_products.pack_size',
-                'inv_products.sales_uom',
-                DB::raw('SUM( sales_details.quantity ) as total_sold')
-            )
-            ->whereBetween('sales.date', [$start_date, $end_date])
-            ->groupBy('inv_products.id')
-            ->orderByDesc('total_sold');
-
-        if (!is_all_store()) {
-            $query->where('inv_current_stock.store_id', $store_id);
-        }
-
-        $fast_moving = $query->get();
-
-        // Optional: add rank numbering
-        $ranked = $fast_moving->map(function ($item, $index) {
-            return [
-                'rank'        => $index + 1,
-                'product_id'  => $item->product_id,
-                'name'        => $item->product_name,
-                'brand'       => $item->brand,
-                'pack_size'   => $item->pack_size,
-                'sales_uom'   => $item->sales_uom,
-                'quantity'  => (float) $item->total_sold,
-            ];
-        });
-
-        return $ranked;
+{
+    if (!Auth()->user()->checkPermission('Fast Moving Products Report')) {
+        abort(403, 'Access Denied');
     }
+
+    $store_id = current_store_id();
+
+    // Automatically get range: from 3 months ago to today
+    $start_date = now()->subMonths(3)->startOfDay();
+    $end_date = now()->endOfDay();
+
+    // ----------------------------------------------
+    // Subquery: total sold + number of sales
+    // ----------------------------------------------
+    $salesSub = SalesDetail::join('sales', 'sales.id', '=', 'sales_details.sale_id')
+        ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_details.stock_id')
+        ->whereBetween('sales.date', [$start_date, $end_date])
+        ->when(!is_all_store(), function ($q) use ($store_id) {
+            $q->where('inv_current_stock.store_id', $store_id);
+        })
+        ->select(
+            'inv_current_stock.product_id',
+            DB::raw('SUM( sales_details.quantity ) as total_sold'),
+            DB::raw('COUNT( DISTINCT sales_details.sale_id ) as no_of_sales')
+        )
+        ->groupBy('inv_current_stock.product_id');
+
+    // ----------------------------------------------
+    // Subquery: available quantity
+    // ----------------------------------------------
+    $stockSub = DB::table('inv_current_stock')
+        ->select(
+            'product_id',
+            DB::raw('SUM( quantity ) as available_qty')
+        )
+        ->groupBy('product_id');
+
+    if (!is_all_store()) {
+        $stockSub->where('store_id', $store_id);
+    }
+
+    // ----------------------------------------------
+    // Main query: products LEFT JOIN aggregates
+    // ----------------------------------------------
+    $query = DB::table('inv_products as p')
+        ->joinSub($salesSub, 's', 's.product_id', '=', 'p.id')
+        ->leftJoinSub($stockSub, 'cs', 'cs.product_id', '=', 'p.id')
+        ->select(
+            'p.id as product_id',
+            'p.name as product_name',
+            'p.brand',
+            'p.pack_size',
+            'p.sales_uom',
+            DB::raw('COALESCE( s.total_sold, 0 ) as total_sold'),
+            DB::raw('COALESCE( cs.available_qty, 0 ) as available_qty'),
+            DB::raw('COALESCE( s.no_of_sales, 0 ) as no_of_sales')
+        )
+        ->orderByDesc('total_sold');
+
+    $fast_moving = $query->get();
+
+    // Ranking + final formatting
+    $ranked = $fast_moving->map(function ($item, $index) {
+        return [
+            'rank'          => $index + 1,
+            'product_id'    => $item->product_id,
+            'name'          => $item->product_name,
+            'brand'         => $item->brand,
+            'pack_size'     => $item->pack_size,
+            'sales_uom'     => $item->sales_uom,
+            'quantity'      => (float) $item->total_sold,
+            'qoh' => (float) $item->available_qty,
+            'no_of_sales'   => (int) $item->no_of_sales,
+        ];
+    });
+
+    return $ranked;
+}
+
     private function deadStockReport()
-    {
-        if (!Auth()->user()->checkPermission('Dead Stock Report')) {
-            abort(403, 'Access Denied');
-        }
-
-        $store_id = current_store_id();
-
-        // Range: 3 months ago -> now
-        $three_months_ago = now()->subMonths(3)->startOfDay();
-        $today = now()->endOfDay();
-
-        $sold_product_ids = DB::table('sales_details as sd')
-            ->join('inv_current_stock as cs', 'cs.id', '=', 'sd.stock_id')
-            ->join('sales as s', 's.id', '=', 'sd.sale_id')
-            ->when(!is_all_store(), function ($q) use ($store_id) {
-                $q->where('cs.store_id', $store_id);
-            })
-            ->whereBetween('s.date', [$three_months_ago, $today])
-            ->distinct()
-            ->pluck('cs.product_id')
-            ->toArray();
-
-        // 2) Get current stock entries & exclude sold products
-        $query = DB::table('inv_current_stock as cs')
-            ->join('inv_products as p', 'p.id', '=', 'cs.product_id')
-            ->select(
-                'p.id as product_id',
-                'p.name',
-                'p.brand',
-                'p.pack_size',
-                'p.sales_uom',
-                'cs.store_id',
-                DB::raw('SUM( cs.quantity ) as quantity')
-            )
-            ->where('cs.quantity', '>', 0)
-            // only exclude sold products if we have any sold ids; otherwise keep all (no sold in period)
-            ->when(!empty($sold_product_ids), function ($q) use ($sold_product_ids) {
-                $q->whereNotIn('cs.product_id', $sold_product_ids);
-            })
-            ->when(!is_all_store(), function ($q) use ($store_id) {
-                $q->where('cs.store_id', $store_id);
-            })
-            ->groupBy(
-                'p.id'
-            )
-            ->orderBy('p.name', 'asc');
-
-        $dead_stock = $query->get();
-
-        return $dead_stock;
+{
+    if (!Auth()->user()->checkPermission('Dead Stock Report')) {
+        abort(403, 'Access Denied');
     }
+
+    $store_id = current_store_id();
+
+    // Range: 3 months ago -> now
+    $three_months_ago = now()->subMonths(3)->startOfDay();
+    $today = now()->endOfDay();
+
+    // --------------------------------------------------
+    // 1) Find products that HAVE BEEN SOLD in the last 3 months
+    // --------------------------------------------------
+    $sold_product_ids = DB::table('sales_details as sd')
+        ->join('inv_current_stock as cs', 'cs.id', '=', 'sd.stock_id')
+        ->join('sales as s', 's.id', '=', 'sd.sale_id')
+        ->when(!is_all_store(), function ($q) use ($store_id) {
+            $q->where('cs.store_id', $store_id);
+        })
+        ->whereBetween('s.date', [$three_months_ago, $today])
+        ->distinct()
+        ->pluck('cs.product_id')
+        ->toArray();
+
+    // --------------------------------------------------
+    // 2) Dead stock = NOT sold in last 3 months AND added > 3 months ago
+    // --------------------------------------------------
+    $query = DB::table('inv_current_stock as cs')
+        ->join('inv_products as p', 'p.id', '=', 'cs.product_id')
+        ->select(
+            'p.id as product_id',
+            'p.name',
+            'p.brand',
+            'p.pack_size',
+            'p.sales_uom',
+            'cs.store_id',
+            DB::raw('SUM(cs.quantity) as quantity')
+        )
+        ->where('cs.quantity', '>', 0)
+
+        // Product must NOT be in sold list
+        ->when(!empty($sold_product_ids), function ($q) use ($sold_product_ids) {
+            $q->whereNotIn('cs.product_id', $sold_product_ids);
+        })
+
+        // Only consider stock entries older than 3 months
+        ->where('cs.created_at', '<=', $three_months_ago)
+
+        ->when(!is_all_store(), function ($q) use ($store_id) {
+            $q->where('cs.store_id', $store_id);
+        })
+        ->groupBy('p.id')
+        ->orderBy('p.name', 'asc');
+
+    $dead_stock = $query->get();
+
+    return $dead_stock;
+}
+
     private function stockAdjustmentReport($dates, $type, $reason)
     {  
         if (!Auth()->user()->checkPermission('Stock Adjustment Report')) {
@@ -1202,13 +1274,13 @@ try {
     {
 
         $store_id = current_store_id();
-        if ($status === '1' || $status === 1) {
+        if ($status === '1' || $status == 1) {
         $query = StockTransfer::whereBetween(DB::raw('date( created_at )'),
             [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))])
-            ->where('status', ' != ', 'cancelled')
-            ->where('status', ' != ', 'acknowledged')
-            ->where('status', ' != ', 'completed');
-        }else if ($status === '2' || $status === 2) {
+            ->where('status', '!=', 'cancelled')
+            ->where('status', '!=', 'acknowledged')
+            ->where('status', '!=', 'completed');
+        }else if ($status === '2' || $status == 2) {
         $query = StockTransfer::whereBetween(DB::raw('date( created_at )'),
             [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))])
             ->where('status', '=', 'completed');

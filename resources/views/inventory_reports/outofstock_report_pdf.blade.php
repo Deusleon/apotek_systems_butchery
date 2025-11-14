@@ -1,109 +1,111 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-    <title>Products Out of Stock Report</title>
+<style>
+    body {
+        font-size: 12px;
+    }
 
-    <style>
-        body {
-            font-size: 12=px;
-        }
+    * {
+        font-family: Verdana, Arial, sans-serif;
+    }
 
-        * {
-            font-family: Verdana, Arial, sans-serif;
-        }
+    table,
+    th,
+    td {
+        border-collapse: collapse;
+        padding: 8px;
+    }
 
-        table,
-        th,
-        td {
-            /*border: 1px solid black;*/
-            border-collapse: collapse;
-            padding: 10px;
-        }
-        th{
-            font-size: 12px;
-        }
+    th {
+        text-align: left;
+    }
 
-        table {
-            page-break-inside: auto
-        }
+    table {
+        page-break-inside: auto
+    }
 
-        tr {
-            page-break-inside: avoid;
-            page-break-after: auto
-        }
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto
+    }
 
-        thead {
-            display: table-header-group
-        }
+    thead {
+        display: table-header-group;
+        background: #1f273b;
+        color: white;
+        font-size: 12px;
+    }
 
-        tfoot {
-            display: table-footer-group
-        }
+    tfoot {
+        display: table-footer-group
+    }
 
-        #table-detail {
-            /*border-spacing: 5px;*/
-            width: 100%;
-            margin-top: -10%;
-        }
+    #table-detail {
+        width: 100%;
+        margin-top: -13%;
+        border-collapse: collapse;
+    }
 
-        #table-detail tr> {
-            line-height: 13px;
-        }
+    #table-detail tr {
+        line-height: 10px;
+    }
 
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
 
-        #category {
-            text-transform: uppercase;
-        }
+    #category {
+        text-transform: uppercase;
+    }
 
-        h3 {
-            font-weight: normal;
-        }
+    h3 {
+        font-weight: normal;
+    }
 
-        h4 {
-            font-weight: normal;
-        }
-        #container .logo-container {
-            padding-top: -2%;
-            text-align: center;
-            vertical-align: middle;
-        }
+    h4 {
+        font-weight: normal;
+    }
 
-        #container .logo-container img {
-            max-width: 160px;
-            max-height: 160px;
-        }
-    </style>
+    #container .logo-container {
+        padding-top: -2%;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    #container .logo-container img {
+        max-width: 100px;
+        max-height: 100px;
+    }
+</style>
 
 </head>
 
 <body>
-    <div class="row">
-        <div id="container">
-            <div class="logo-container">
-                @if($pharmacy['logo'])
-                    <img src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
-                @endif
-            </div>
+    <!-- Header Section -->
+    <div style="width: 100%; text-align: center; align-items: center;">
+        @if($pharmacy['logo'])
+            <img style="max-width: 90px; max-height: 90px;" src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
+        @endif
+        <div style="font-weight: bold; font-size: 16px;">{{$pharmacy['name']}}</div>
+        <div style="justify-content: center; font-size: 12px; line-height: 1.2;">
+            {{$pharmacy['address']}}<br>
+            {{$pharmacy['phone']}}<br>
+            {{$pharmacy['email'] . ' | ' . $pharmacy['website']}}
+        </div><br>
+        <div>
+            <h3 align="center" style="font-weight: bold; margin-top: -1%">Products Out of Stock Report</h3>
+            <h4 align="center" style="margin-top: -1%">Printed On: {{now()->format('Y-m-d H:i:s')}}</h4>
         </div>
     </div>
     <div class="row" style="padding-top: -2%">
-        <h1 align="center">{{$pharmacy['name']}}</h1>
-        <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
-        <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
-        <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}</h3>
-        <h2 align="center" style="margin-top: -1%">Products Out of Stock Report</h2>
-
         <div class="row" style="margin-top: 8%;">
             <div class="col-md-12">
                 <table id="table-detail" align="center">
                     <!-- loop the product names here -->
                     <thead>
                         <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                            <th align="center">#</th>
+                            <th style="padding-left: 20px;">#</th>
                             <th align="left">Product Name</th>
                             <th align="left">Category</th>
                         </tr>
@@ -111,8 +113,10 @@
                     {{-- @dd($data); --}}
                     @foreach($data as $item)
                         <tr>
-                            <td align="center">{{ $loop->iteration }}.</td>
-                            <td align="left">{{ $item->product->name.' '.($item->product->brand.' ' ?? '').($item->product->pack_size ?? '').($item->product->sales_uom ?? '') }}</td>
+                            <td style="padding-left: 20px;">{{ $loop->iteration }}.</td>
+                            <td align="left">
+                                {{ $item->product->name . ' ' . ($item->product->brand . ' ' ?? '') . ($item->product->pack_size ?? '') . ($item->product->sales_uom ?? '') }}
+                            </td>
                             <td align="left">{{ $item->product->category->name ?? '' }}</td>
                         </tr>
                     @endforeach

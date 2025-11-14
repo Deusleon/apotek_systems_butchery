@@ -559,6 +559,7 @@ class StockTransferController extends Controller {
                 ->where('inv_products.status', 1)
                 ->where('inv_current_stock.store_id', $request->from_id)
                 ->groupBy('inv_current_stock.product_id', 'inv_products.name', 'inv_products.pack_size')
+                ->orderBy('inv_products.name', 'asc')
                 // ->limit(10)
                 ->get();
 
@@ -579,6 +580,7 @@ class StockTransferController extends Controller {
                 ->where('inv_current_stock.store_id', $request->from_id)
                 ->where('inv_products.status', '=', 1)
                 ->groupby('inv_current_stock.product_id', 'inv_products.name', 'inv_products.pack_size')
+                ->orderBy('inv_products.name', 'asc')
                 ->limit(10)
                 ->get();
             foreach ($products as $product) {
@@ -989,7 +991,6 @@ class StockTransferController extends Controller {
             'stock_transfer_items' => $products
         ]);
     }
-
     public function markInTransit(Request $request, $id)
     {
         $transfer = DB::table('inv_stock_transfers')->where('id', $id)->first();
@@ -1009,7 +1010,6 @@ class StockTransferController extends Controller {
         $this->sendNotifications($transfer, 4, 'status_change');
         return response()->json(['message' => 'Transfer marked as in transit successfully']);
     }
-
     public function acknowledgeTransfer(Request $request, $id)
     {
         $transfer = DB::table('inv_stock_transfers')->where('id', $id)->first();
