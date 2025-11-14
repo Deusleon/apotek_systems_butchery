@@ -679,7 +679,9 @@ class SaleQuoteController extends Controller {
                     'total_vat' => ( $item->quote[ 'cost' ][ 'vat' ] ),
                     'sold_by' => $item->quote[ 'user' ][ 'name' ],
                     'customer' => $item->quote[ 'customer' ][ 'name' ],
-                    'customer_tin' => $item->sale[ 'customer' ][ 'tin' ] ?? '',
+                    'customer_tin' => $item->quote[ 'customer' ][ 'tin' ] ?? '',
+                    'customer_phone' => $item->quote['customer']['phone'],
+                    'customer_address' => $item->quote['customer']['address'],
                     'created_at' => date( 'Y-m-d', strtotime( $item->quote[ 'date' ] ) )
                 ) );
             }

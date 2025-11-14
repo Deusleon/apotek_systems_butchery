@@ -6,7 +6,7 @@
 
     <style>
         body {
-            font-size: 13px;
+            font-size: 12px;
         }
 
         * {
@@ -16,9 +16,12 @@
         table,
         th,
         td {
-            /*border: 1px solid black;*/
             border-collapse: collapse;
-            padding: 10px;
+            padding: 8px;
+        }
+
+        th {
+            text-align: left;
         }
 
         table {
@@ -31,7 +34,10 @@
         }
 
         thead {
-            display: table-header-group
+            display: table-header-group;
+            background: #1f273b;
+            color: white;
+            font-size: 12px;
         }
 
         tfoot {
@@ -39,20 +45,13 @@
         }
 
         #table-detail {
-            /*border-spacing: 5px;*/
             width: 100%;
-            /*margin-top: -10%;*/
-        }
-
-        #table-detail-main {
-            width: 102%;
-            margin-top: -10%;
-            margin-bottom: -2%;
+            margin-top: -13%;
             border-collapse: collapse;
         }
 
-        #table-detail tr> {
-            line-height: 13px;
+        #table-detail tr {
+            line-height: 10px;
         }
 
         tr:nth-child(even) {
@@ -70,6 +69,7 @@
         h4 {
             font-weight: normal;
         }
+
         #container .logo-container {
             padding-top: -2%;
             text-align: center;
@@ -77,33 +77,35 @@
         }
 
         #container .logo-container img {
-            max-width: 160px;
-            max-height: 160px;
+            max-width: 100px;
+            max-height: 100px;
         }
     </style>
 
 </head>
 
 <body>
-    <div class="row">
-        <div id="container">
-            <div class="logo-container">
-                @if($pharmacy['logo'])
-                    <img src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
-                @endif
-            </div>
+    <!-- Header Section -->
+    <div style="width: 100%; text-align: center; align-items: center;">
+        @if($pharmacy['logo'])
+            <img style="max-width: 90px; max-height: 90px;" src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
+        @endif
+        <div style="font-weight: bold; font-size: 16px;">{{$pharmacy['name']}}</div>
+        <div style="justify-content: center; font-size: 12px; line-height: 1.2;">
+            {{$pharmacy['address']}}<br>
+            {{$pharmacy['phone']}}<br>
+            {{$pharmacy['email'] . ' | ' . $pharmacy['website']}}
+        </div><br>
+        <div>
+            <h3 align="center" style="font-weight: bold; margin-top: -1%">Stock Transfer Report</h3>
+            <h4 align="center" style="margin-top: -1%">From: <b>{{date('Y-m-d', strtotime($data[0]['from']))}}</b> To:
+                <b>{{date('Y-m-d', strtotime($data[0]['to']))}}</b>
+            </h4>
+            <h4 align="center" style="margin-top: -1%">Printed On: {{now()->format('Y-m-d H:i:s')}}</h4>
         </div>
     </div>
     <div class="row" style="padding-top: -2%">
-        <h1 align="center">{{$pharmacy['name']}}</h1>
-        <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
-        <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
-        <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}</h3>
-        <h2 align="center" style="margin-top: -1%">Stock Transfer Report</h2>
-        <h3 align="center" style="margin-top: -1%">From: <b>{{date('Y-m-d', strtotime($data[0]['from']))}}</b> To:
-            <b>{{date('Y-m-d', strtotime($data[0]['to']))}}</b>
-        </h3>
-        <div class="row">
+        <div class="row" style="margin-top: 6%;">
             <div class="col-md-12">
                 <table id="table-detail" align="center">
                     <!-- loop the product names here -->
@@ -132,10 +134,13 @@
                                 @else
                                     Unkown
                                 @endif
-                                {{-- {{($item->currentStock['product']['name'] . ' ' ?? '') . ($item->currentStock['product']['brand'] . ' ' ?? '') . ($item->currentStock['product']['pack_size'] ?? '') . $item->currentStock['product']['sales_uom'] ?? ''}} --}}
+                                {{-- {{($item->currentStock['product']['name'] . ' ' ?? '') .
+                                ($item->currentStock['product']['brand'] . ' ' ?? '') .
+                                ($item->currentStock['product']['pack_size'] ?? '') .
+                                $item->currentStock['product']['sales_uom'] ?? ''}} --}}
                             </td>
                             <td align="left">{{$item->transfer_no}}</td>
-                            <td align="center">{{number_format($item->transfer_qty)}}</td>
+                            <td align="">{{number_format($item->transfer_qty)}}</td>
                             <td align="left">{{$item->fromStore['name']}}</td>
                             <td align="left">{{$item->toStore['name']}}</td>
                             <td align="left">

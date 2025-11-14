@@ -16,9 +16,12 @@
         table,
         th,
         td {
-            /*border: 1px solid black;*/
             border-collapse: collapse;
-            padding: 10px;
+            padding: 8px;
+        }
+
+        th {
+            text-align: left;
         }
 
         table {
@@ -31,7 +34,10 @@
         }
 
         thead {
-            display: table-header-group
+            display: table-header-group;
+            background: #1f273b;
+            color: white;
+            font-size: 12px;
         }
 
         tfoot {
@@ -39,19 +45,13 @@
         }
 
         #table-detail {
-            /*border-spacing: 5px;*/
             width: 100%;
-        }
-
-        #table-detail-main {
-            width: 103%;
-            margin-top: -10%;
-            margin-bottom: 1%;
+            margin-top: -13%;
             border-collapse: collapse;
         }
 
-        #table-detail tr> {
-            line-height: 13px;
+        #table-detail tr {
+            line-height: 10px;
         }
 
         tr:nth-child(even) {
@@ -69,44 +69,64 @@
         h4 {
             font-weight: normal;
         }
+
+        #container .logo-container {
+            padding-top: -2%;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        #container .logo-container img {
+            max-width: 100px;
+            max-height: 100px;
+        }
     </style>
 
 </head>
 
 <body>
-
-    <div class="row" style="padding-top: -2%">
-        <h1 align="center">{{$pharmacy['name']}}</h1>
-        <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
-        <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
-        <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}</h3>
-        <h2 align="center" style="margin-top: -1%">Stock Adjustment Report</h2>
-        @if ($type)
-            <h3 align="center" style="margin-top: -1%">
-                @if ($data[0]['type'] == 'increase') Positive @else Negative
-                @endif Adjustment
-            </h3>
+    <!-- Header Section -->
+    <div style="width: 100%; text-align: center; align-items: center;">
+        @if($pharmacy['logo'])
+            <img style="max-width: 90px; max-height: 90px;" src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
         @endif
-        <h3 align="center" style="margin-top: -1%">Reason: {{$data[0]['reason']}} </h3>
-        <h3 align="center" style="margin-top: -1%">From: <b>{{date('Y-m-d', strtotime($data[0]['dates'][0]))}}</b> To:
-            <b>{{date('Y-m-d', strtotime($data[0]['dates'][1]))}}</b>
-        </h3>
-
-
-        <div class="row">
+        <div style="font-weight: bold; font-size: 16px;">{{$pharmacy['name']}}</div>
+        <div style="justify-content: center; font-size: 12px; line-height: 1.2;">
+            {{$pharmacy['address']}}<br>
+            {{$pharmacy['phone']}}<br>
+            {{$pharmacy['email'] . ' | ' . $pharmacy['website']}}
+        </div><br>
+        <div>
+            <h3 align="center" style="font-weight: bold; margin-top: -1%">Stock Adjustment Report</h3>
+            @if ($type)
+                <h4 align="center" style="margin-top: -1%">
+                    @if ($data[0]['type'] == 'increase') Positive @else Negative
+                    @endif Adjustment
+                </h4>
+            @endif
+            <h4 align="center" style="margin-top: -1%">Reason: {{$data[0]['reason']}} </h4>
+            <h4 align="center" style="margin-top: -1%">From: <b>{{date('Y-m-d', strtotime($data[0]['dates'][0]))}}</b>
+                To:
+                <b>{{date('Y-m-d', strtotime($data[0]['dates'][1]))}}</b>
+            </h4>
+            <h4 align="center" style="margin-top: -1%">Printed On: {{now()->format('Y-m-d H:i:s')}}</h4>
+        </div>
+    </div>
+    <div class="row" style="padding-top: -2%">
+        <div class="row" style="margin-top: 8%;">
             <div class="col-md-12">
                 <table id="table-detail" align="center">
                     <!-- loop the product names here -->
                     <thead>
                         <tr style="background: #1f273b; color: white;">
-                            <th align="center">#</th>
+                            <th align="center" style="text-align: center; max-width: 1%;">#</th>
                             <th align="left">Product Name</th>
                             @if (!$type)
                                 <th align="left">
                                     Type
                                 </th>
                             @endif
-                            <th align="center">Quantity</th>
+                            <th align="center" style="text-align: center;">Quantity</th>
                             {{-- <th>Reason</th>--}}
                             <th align="left">Adjusted By</th>
                         </tr>
