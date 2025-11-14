@@ -1041,6 +1041,7 @@ class ProductController extends Controller
                                 'quantity' => $adjustmentQuantity,
                                 'store_id' => $storeId,
                                 'created_by' => $userId,
+                                'updated_by' => Auth::id(),
                                 'updated_at' => now()->format('Y-m-d'),
                                 'movement' => 'IN',
                             ]);
@@ -1085,6 +1086,7 @@ class ProductController extends Controller
                                 'quantity' => $quantity,
                                 'store_id' => $storeId,
                                 'created_by' => $userId,
+                                'updated_by' => Auth::id(),
                                 'movement' => 'IN',
                             ]);
 
@@ -1135,6 +1137,7 @@ class ProductController extends Controller
                                 'quantity' => $deduct,
                                 'store_id' => $storeId,
                                 'created_by' => $userId,
+                                'updated_by' => Auth::id(),
                                 'movement' => 'OUT',
                             ]);
 
@@ -1259,6 +1262,7 @@ class ProductController extends Controller
                     'quantity' => $prevQuantity,
                     'store_id' => $storeId,
                     'created_by' => $userId,
+                    'updated_by' => Auth::id(),
                     'updated_at' => now()->format('Y-m-d'),
                     'movement' => 'OUT',
                 ]);

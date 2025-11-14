@@ -108,7 +108,7 @@
                 <table id="table-detail" align="center">
                     <thead>
                         <tr style="background: #1f273b; color: white">
-                            <th>#</th>
+                            <th style="text-align: center;">#</th>
                             <th style="text-align: left">Date</th>
                             <th style="text-align: left">Transaction Method</th>
                             <th style="text-align: center">Received</th>

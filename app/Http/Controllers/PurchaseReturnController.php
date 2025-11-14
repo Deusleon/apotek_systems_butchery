@@ -187,6 +187,7 @@ class PurchaseReturnController extends Controller
             'quantity' => $purchaseReturn->quantity,
             'store_id' => current_store_id(),
             'created_by' => Auth::id(),
+            'updated_by' => Auth::id(),
             'updated_at' => now()->format('Y-m-d'),
             'movement' => 'OUT',
         ]);

@@ -186,6 +186,8 @@ class BatchStockCountController extends Controller
                                 'tracking_type' => 'batch_stock_count_adjustment',
                                 'tracking_id' => $currentStock->id, 
                                 'user_id' => Auth::id(),
+                                'created_by' => Auth::id(),
+                                'updated_by' => Auth::id(),
                                 'description' => 'Batch stock count adjustment from imported file'
                             ]);
                         }
@@ -224,6 +226,8 @@ class BatchStockCountController extends Controller
                                 'tracking_type' => 'batch_stock_count_new_entry',
                                 'tracking_id' => $newStock->id,
                                 'user_id' => Auth::id(),
+                                'created_by' => Auth::id(),
+                                'updated_by' => Auth::id(),
                                 'description' => 'New stock entry from batch stock count import'
                             ]);
                             $successful_records++;

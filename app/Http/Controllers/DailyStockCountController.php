@@ -288,8 +288,10 @@ public function processStockTaking(Request $request)
                             'store_id' => $store_id,
                             'quantity' => $difference,
                             'tracking_type' => 'stock_count_adjustment',
-                            'tracking_id' => $currentStock->id, // Consider linking to StockAdjustmentLog ID if more appropriate
+                            'tracking_id' => $currentStock->id, 
                             'user_id' => Auth::id(),
+                            'created_by' => Auth::id(),
+                            'updated_by' => Auth::id(),
                             'description' => 'Stock count adjustment from physical count'
                         ]);
 

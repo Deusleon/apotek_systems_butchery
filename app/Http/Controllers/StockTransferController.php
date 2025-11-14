@@ -850,6 +850,7 @@ class StockTransferController extends Controller {
                         'quantity' => $consumed,
                         'store_id' => $fromStore,
                         'created_by' => Auth::id(),
+                        'updated_by' => Auth::id(),
                         'out_mode' => 'Stock Transfer',
                         'updated_at' => date('Y-m-d'),
                         'movement' => 'OUT'

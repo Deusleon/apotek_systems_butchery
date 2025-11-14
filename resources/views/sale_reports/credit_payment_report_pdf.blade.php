@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Credit Payments Report</title>
+    <title>Credit Payment Report</title>
 
     <style>
         body {
@@ -14,11 +14,15 @@
         }
 
         table,
-        th,
-        td {
-            /*border: 1px solid black;*/
+        th {
             border-collapse: collapse;
-            padding: 10px;
+            padding: 8px;
+        }
+
+        table,
+        td {
+            border-collapse: collapse;
+            padding: 5px;
         }
 
         table {
@@ -39,19 +43,7 @@
         }
 
         #table-detail {
-            /*border-spacing: 5px;*/
             width: 100%;
-            /*margin-top: 2%;*/
-        }
-
-        #table-detail-1 {
-            width: 100%;
-            margin-top: 3%;
-        }
-
-        #table-detail-2 {
-            width: 100%;
-            margin-top: 0%;
         }
 
         #table-detail-main {
@@ -62,7 +54,7 @@
         }
 
         #table-detail tr> {
-            line-height: 13px;
+            line-height: 10px;
         }
 
         #table-detail tr:nth-child(even) {
@@ -88,42 +80,46 @@
         }
 
         #container .logo-container img {
-            max-width: 160px;
-            max-height: 160px;
+            max-width: 100px;
+            max-height: 100px;
         }
     </style>
-
 </head>
 
 <body>
-    <div class="row">
-        <div id="container">
-            <div class="logo-container">
-                @if($pharmacy['logo'])
-                    <img src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
-                @endif
+    <div class="row" style="padding-top: -2%">
+        <!-- Header Section -->
+        <div style="width: 100%; text-align: center; align-items: center; margin-bottom: -3%;">
+            @if($pharmacy['logo'])
+                <img style="max-width: 90px; max-height: 90px;"
+                    src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
+            @endif
+            <div style="font-weight: bold; font-size: 16px;">{{$pharmacy['name']}}</div>
+            <div style="justify-content: center; font-size: 12px; line-height: 1.2;">
+                {{$pharmacy['address']}}<br>
+                {{$pharmacy['phone']}}<br>
+                {{$pharmacy['email'] . ' | ' . $pharmacy['website']}}
+            </div><br>
+            <div>
+                <h3 align="center" style="font-weight: bold; margin-top: -1%">Credit Payment Report</h3>
+                <h4 align="center" style="margin-top: -1%">From: <b>{{$pharmacy['from_date']}}</b> To:
+                    <b>{{$pharmacy['to_date']}}</b>
+                </h4>
+                <h4 align="center" style="margin-top: -1.5%">Printed On: {{now()->format('Y-m-d H:i:s')}}</h4>
             </div>
         </div>
-    </div>
-    <div class="row" style="padding-top: -2%">
-        <h1 align="center">{{$pharmacy['name']}}</h1>
-        <h3 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['address']}}</h3>
-        <h3 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['phone']}}</h3>
-        <h3 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['email'] . ' | ' . $pharmacy['website']}}
-        </h3>
-        <h2 align="center" style="margin-top: -1%">Credit Payment Report</h2>
-        <h4 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['date_range']}}</h4>
-
         <div class="row" style="margin-top: 2%;">
             <div class="col-md-12">
                 <table id="table-detail" align="center">
                     <thead>
                         <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                            <th align="center">#</th>
+                            <th align="center" style="width: 3%;">#</th>
                             <th align="left">Receipt #</th>
+                            <th align="left">Date</th>
+                            <th></th>
                             <th align="left">Customer Name</th>
-                            <th align="center">Date</th>
                             <th align="right">Amount</th>
+                            <th></th>
                             <th align="left">Received By</th>
                         </tr>
                         <thead>
@@ -134,9 +130,11 @@
                                 <tr>
                                     <td align="center">{{ $loop->iteration }}.</td>
                                     <td align="left">{{$payment->receipt_number}}</td>
+                                    <td align="left">{{date('Y-m-d', strtotime($payment->created_at))}}</td>
+                                    <td></td>
                                     <td align="left">{{$payment->customer_name}}</td>
-                                    <td align="center">{{date('Y-m-d', strtotime($payment->created_at))}}</td>
                                     <td align="right">{{number_format($payment->paid_amount, 2)}}</td>
+                                    <td></td>
                                     <td align="left">{{$payment->received_by}}</td>
                                     <?php    $total += $payment->paid_amount ?>
                             @endforeach

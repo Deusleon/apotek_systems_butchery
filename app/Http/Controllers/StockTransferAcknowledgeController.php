@@ -275,22 +275,6 @@ class StockTransferAcknowledgeController extends Controller
                 }
                 $transfer->save();
 
-                // 5 ) StockTracking: record movements
-                // a ) If there is remaining ( i.e., returned to source ), record it for source store as IN
-                // if ( $remaining > 0 && $sourceStock ) {
-                //     $stkTrack = new StockTracking();
-                //     $stkTrack->stock_id = $stockId;
-                //     $stkTrack->product_id = $productId;
-                //     $stkTrack->quantity = $remaining;
-                //     $stkTrack->store_id = $sourceStock->store_id ?? $fromStore;
-                //     $stkTrack->updated_by = Auth::id();
-                //     $stkTrack->out_mode = 'Stock Transfer Acknowledged - Remaining Returned';
-                //     $stkTrack->updated_at = now()->toDateString();
-                //     $stkTrack->movement = 'IN';
-                //     $stkTrack->save();
-                // }
-
-                // b ) If there is acceptedToday > 0, record IN to destination store
                 if ( $acceptedToday > 0 ) {
                     $stkTrack2 = new StockTracking();
                     $stkTrack2->stock_id = $stockId;
@@ -298,7 +282,8 @@ class StockTransferAcknowledgeController extends Controller
                     $stkTrack2->quantity = $acceptedToday;
                     $stkTrack2->store_id = $toStore;
                     $stkTrack2->created_by = Auth::id();
-                    $stkTrack2->out_mode = ( $newAcceptedTotal >= $transferedQty ) ? 'Stock Transfer Completed' : 'Stock Transfer Acknowledged';
+                    $stkTrack2->updated_by = Auth::id();
+                    $stkTrack2->out_mode = ( $newAcceptedTotal >= $transferedQty ) ? 'Stock Transfer' : 'Stock Transfer';
                     $stkTrack2->updated_at = now()->toDateString();
                     $stkTrack2->movement = 'IN';
                     $stkTrack2->save();

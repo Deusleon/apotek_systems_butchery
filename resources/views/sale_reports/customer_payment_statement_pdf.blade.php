@@ -3,6 +3,7 @@
 
 <head>
     <title>Customer Credit Payment Statement</title>
+
     <style>
         body {
             font-size: 12px;
@@ -12,42 +13,16 @@
             font-family: Verdana, Arial, sans-serif;
         }
 
-        .full-row {
-            width: 100%;
-            padding-left: 3%;
-            padding-right: 2%;
-        }
-
-        .col-50 {
-            display: inline-block;
-            font-size: 13px;
-            width: 50%;
-        }
-
-        .col-25 {
-            display: inline-block;
-            font-size: 13px;
-            width: 25%;
-        }
-
-        .col-35 {
-            display: inline-block;
-            font-size: 13px;
-            width: 35%;
-        }
-
-        .col-15 {
-            display: inline-block;
-            font-size: 13px;
-            width: 15%;
+        table,
+        th {
+            border-collapse: collapse;
+            padding: 8px;
         }
 
         table,
-        th,
         td {
-            /*border: 1px solid black;*/
             border-collapse: collapse;
-            padding: 10px;
+            padding: 5px;
         }
 
         table {
@@ -57,10 +32,6 @@
         tr {
             page-break-inside: avoid;
             page-break-after: auto
-        }
-
-        hr{
-            width: 100.005%;
         }
 
         thead {
@@ -73,15 +44,33 @@
 
         #table-detail {
             width: 100%;
-            /* margin-top: -13%; */
+        }
+
+        #table-detail-main {
+            width: 103%;
+            margin-top: 2%;
+            margin-bottom: -2%;
+            border-collapse: collapse;
         }
 
         #table-detail tr> {
-            line-height: 13px;
+            line-height: 10px;
         }
 
         #table-detail tr:nth-child(even) {
             background-color: #f2f2f2;
+        }
+
+        #category {
+            text-transform: uppercase;
+        }
+
+        h3 {
+            font-weight: normal;
+        }
+
+        h4 {
+            font-weight: normal;
         }
 
         #container .logo-container {
@@ -91,37 +80,38 @@
         }
 
         #container .logo-container img {
-            max-width: 160px;
-            max-height: 160px;
+            max-width: 100px;
+            max-height: 100px;
         }
     </style>
 </head>
 
 <body>
-    <div class="row">
-        <div id="container">
-            <div class="logo-container">
-                @if($pharmacy['logo'])
-                    <img src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
-                @endif
+    <div class="row" style="padding-top: -2%">
+        <!-- Header Section -->
+        <div style="width: 100%; text-align: center; align-items: center; margin-bottom: -3%;">
+            @if($pharmacy['logo'])
+                <img style="max-width: 90px; max-height: 90px;"
+                    src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
+            @endif
+            <div style="font-weight: bold; font-size: 16px;">{{$pharmacy['name']}}</div>
+            <div style="justify-content: center; font-size: 12px; line-height: 1.2;">
+                {{$pharmacy['address']}}<br>
+                {{$pharmacy['phone']}}<br>
+                {{$pharmacy['email'] . ' | ' . $pharmacy['website']}}
+            </div><br>
+            <div>
+                <h3 align="center" style="font-weight: bold; margin-top: -1%">Customer Credit Payment Statement</h3>
+                <h4 align="center" style="margin-top: -1%">From: <b>{{$pharmacy['from_date']}}</b> To:
+                    <b>{{$pharmacy['to_date']}}</b>
+                </h4>
+                <h4 align="center" style="margin-top: -1.5%">Printed On: {{now()->format('Y-m-d H:i:s')}}</h4>
             </div>
         </div>
-    </div>
-    <div class="row" style="padding-top: -2%">
-        <h1 align="center">{{$pharmacy['name']}}</h1>
-        <h3 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['address']}}</h3>
-        <h3 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['phone']}}</h3>
-        <h3 align="center" style="font-weight: normal;margin-top: -1%">
-            {{$pharmacy['email'] . ' | ' . $pharmacy['website']}}
-        </h3>
-        <h2 align="center" style="margin-top: -1%">{{'Customer Credit Payment Statement'}}</h2>
-        <h3 align="center" style="font-weight: normal; margin-top: -1%">{{'Customer name: ' . ucfirst($customer)}}</h3>
-        <h4 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['date_range']}}</h4>
-
         {{-- @dd($data) --}}
         @foreach($data['grouped_data'] as $datas => $dat)
 
-            <div align="left" style="margin-top: 30px; width: 55%;">
+            <div align="left" style="margin-top: 20px; width: 55%;">
                 <div class="full-row" style="margin-bottom: 3px;">
                     <div class="col-50"><b>Receipt Number:</b> {{$datas}}</div>
                 </div>
@@ -130,12 +120,12 @@
                     <div class="col-50">
                         <b>Date of Sale:</b> {{date('Y-m-d', strtotime($dat[0]['date']))}}
                     </div>
-                    <div class="col-50" style="text-align: right;">
+                    <div class="col-50" style="text-align: right; margin-top: -2%;">
                         <b>Total:</b> {{number_format(($dat[0]['paid_amount'] + $dat[0]['balance']), 2)}}
                     </div>
                 </div>
             </div>
-            <div class="row" style="margin-top: -1%">
+            <div class="row" style="margin-top: 0%; margin-left: -5px;">
                 <table class="table table-sm" id="table-detail" align="center">
                     <tr style="background: #1f273b; color: white; font-size: 0.9em">
                         <th align="left">#</th>
@@ -177,7 +167,7 @@
                 <tr>
                     <td style="padding: 4px; text-align: right;"><b>Balance</b></td>
                     <td style="padding: 4px; text-align: center;"><b>:</b></td>
-                    <td style="padding: 4px; text-align: right; color: red;">
+                    <td style="padding: 4px; text-align: right;">
                         <b>{{ number_format($data['total_balance'], 2) }}</b>
                     </td>
                 </tr>

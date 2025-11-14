@@ -195,7 +195,7 @@ class SaleReportController extends Controller {
             }
             $pdf = PDF::loadView( 'sale_reports.cash_sales_total_report_pdf',
             compact( 'data', 'pharmacy', 'enable_discount' ) )
-            ->setPaper( 'a4', 'landscape' );
+            ->setPaper( 'a4', '' );
             return $pdf->stream( 'Cash_sales_total_report.pdf' );
             
             case 14:
@@ -205,7 +205,7 @@ class SaleReportController extends Controller {
             }
             $pdf = PDF::loadView( 'sale_reports.credit_sales_total_report_pdf',
             compact( 'data', 'pharmacy', 'enable_discount' ) )
-            ->setPaper( 'a4', 'landscape' );
+            ->setPaper( 'a4', '' );
             return $pdf->stream( 'Credit_sales_total_report.pdf' );
 
             case 15:
@@ -995,7 +995,7 @@ unset($dayData);
         $total_balance = 0;
 
         foreach ($sale_detail as $item) {
-            $status = 'Unpaid';
+            $status = 'Not Paid';
             if ($item->balance <= 0) {
                 $status = 'Paid';
             } elseif ($item->paid > 0 && $item->balance > 0) {

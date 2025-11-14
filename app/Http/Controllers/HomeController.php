@@ -56,7 +56,7 @@ class HomeController extends Controller {
         $commonFunction = new CommonFunctions();
         $commonFunction->stockNotificationSchedule($user->id);
 
-        return redirect()->back()->with( 'success', "Branch changed to {$store->name}" );
+        return redirect()->back()->with( 'alert-success', "Branch changed to {$store->name}" );
     }
 
     //login form

@@ -3,9 +3,10 @@
 
 <head>
     <title>Credit Sales Details Report</title>
+    
     <style>
         body {
-            font-size: 13px;
+            font-size: 12px;
         }
 
         * {
@@ -47,15 +48,30 @@
 
         #table-detail-main {
             width: 103%;
+            margin-top: 2%;
+            padding-left: 0%;
+            margin-bottom: -1%;
             border-collapse: collapse;
         }
 
         #table-detail tr> {
-            line-height: 13px;
+            line-height: 10px;
         }
 
         #table-detail tr:nth-child(even) {
             background-color: #f2f2f2;
+        }
+
+        #category {
+            text-transform: uppercase;
+        }
+
+        h3 {
+            font-weight: normal;
+        }
+
+        h4 {
+            font-weight: normal;
         }
 
         #container .logo-container {
@@ -65,31 +81,34 @@
         }
 
         #container .logo-container img {
-            max-width: 160px;
-            max-height: 160px;
+            max-width: 100px;
+            max-height: 100px;
         }
     </style>
 </head>
 
 <body>
-    <div class="row">
-        <div id="container">
-            <div class="logo-container">
-                @if($pharmacy['logo'])
-                    <img src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
-                @endif
+    <div class="row" style="padding-top: -2%">
+        <!-- Header Section -->
+        <div style="width: 100%; text-align: center; align-items: center; margin-bottom: -6%;">
+            @if($pharmacy['logo'])
+                <img style="max-width: 90px; max-height: 90px;"
+                    src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
+            @endif
+            <div style="font-weight: bold; font-size: 16px;">{{$pharmacy['name']}}</div>
+            <div style="justify-content: center; font-size: 12px; line-height: 1.2;">
+                {{$pharmacy['address']}}<br>
+                {{$pharmacy['phone']}}<br>
+                {{$pharmacy['email'] . ' | ' . $pharmacy['website']}}
+            </div><br>
+            <div>
+                <h3 align="center" style="font-weight: bold; margin-top: -1%">Credit Sales Details Report</h3>
+                <h4 align="center" style="margin-top: -1%">From: <b>{{$pharmacy['from_date']}}</b> To:
+                    <b>{{$pharmacy['to_date']}}</b>
+                </h4>
+                <h4 align="center" style="margin-top: -2%">Printed On: {{now()->format('Y-m-d H:i:s')}}</h4>
             </div>
         </div>
-    </div>
-    <div class="row" style="padding-top: -2%">
-        <h1 align="center">{{$pharmacy['name']}}</h1>
-        <h3 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['address']}}</h3>
-        <h3 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['phone']}}</h3>
-        <h3 align="center" style="font-weight: normal;margin-top: -1%">
-            {{$pharmacy['email'] . ' | ' . $pharmacy['website']}}
-        </h3>
-        <h2 align="center" style="margin-top: -1%">Credit Sales Details Report</h2>
-        <h4 align="center" style="font-weight: normal;margin-top: -1%">{{$pharmacy['date_range']}}</h4>
         {{-- @dd($data) --}}
         @foreach($data as $dat)
             <table id="table-detail-main">
@@ -101,12 +120,12 @@
             <table id="table-detail" align="center" style="margin-top: -1%; padding-top: 0%;">
                 <thead>
                     <tr style="background: #1f273b; color: white;">
-                        <th align="center" style="width: 1.5%;">#</th>
-                        <th align="left" style="width: 8.5%">Receipt #</th>
+                        <th align="left" style="width: 1.5%;">#</th>
+                        <th align="left" style="width: 7%">Receipt #</th>
                         <th align="left" style="width: 20%">Product Name</th>
-                        <th align="left">Batch #</th>
-                        <th align="left">Sold By</th>
-                        <th align="center" style="width: 3%">Qty</th>
+                        <th align="left" style="width: 7%;">Batch #</th>
+                        <th align="left" style="width: 11%;">Sold By</th>
+                        <th align="center" style="width: 2%">Qty</th>
                         <th align="right">Sales Price</th>
                         <th align="right">Sub Total</th>
                         <th align="right">VAT</th>
@@ -255,7 +274,7 @@
                 <tr>
                     <td style="padding: 8px; text-align: right;"><b>Balance</b></td>
                     <td style="padding: 8px; text-align: center;"><b>:</b></td>
-                    <td style="padding: 8px; text-align: right; color: red;">
+                    <td style="padding: 8px; text-align: right;">
                         <b>{{ number_format($overallTotals['total_balance'], 2) }}</b>
                     </td>
                 </tr>

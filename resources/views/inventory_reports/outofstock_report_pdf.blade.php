@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+    <title>Out of Stock Report</title>
 
 <style>
     body {
