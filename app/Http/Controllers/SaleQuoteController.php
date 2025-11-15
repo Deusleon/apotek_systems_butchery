@@ -348,7 +348,7 @@ class SaleQuoteController extends Controller {
         
         $cart = json_decode( $request->cart, true );
         $vat = Setting::where( 'id', 120 )->value( 'value' ) / 100;
-        $quote_number = strtoupper( substr( md5( microtime() ), rand( 0, 26 ), 8 ) );
+        $quote_number = strtoupper( substr( md5( microtime() ), rand( 0, 24 ), 8 ) );
         $discount = $request->discount_amount;
         $date = date( 'Y-m-d H:i:s' );
         $total = 0;

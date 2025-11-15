@@ -421,7 +421,7 @@ class SaleController extends Controller
 
             //some attributes declaration
             $vat = Setting::where('id', 120)->value('value') / 100;//Get VAT %
-            $receipt_number = strtoupper(substr(md5(microtime()), rand(0, 26), 8));
+            $receipt_number = strtoupper(substr(md5(microtime()), rand(0, 24), 8));
             $cart = json_decode($request->cart, true);
             $discount = $request->discount_amount;
             $total = 0;
@@ -612,8 +612,6 @@ class SaleController extends Controller
 
             // Get general settings for terms & conditions
             $generalSettings = GeneralSetting::first();
-
-            // Log::info('PrintSize', ['Size' => $receipt_size]);
 
             $receipt_number = $receipt ?? $request->reprint_receipt;
             $id = Sale::where('receipt_number', $receipt_number)->value('id');

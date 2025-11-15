@@ -237,7 +237,7 @@
                     </div>
                 @endif
             </div>
-            <div class="summary-section" style="float: left;">
+            <div class="summary-section" style="width: 40%; margin-top: -50px; padding-top: 0; float: right;">
                 <div class="summary-row">
                     <div>Sub Total:</div>
                     <div style="float: right;">
