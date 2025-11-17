@@ -305,7 +305,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="stock-adjustment-reason">Adjustment Type</label>
+                                    <label for="stock-adjustment-reason">Adjustment Reason</label>
                                     <select id="stock-adjustments-reason" name="stock_adjustment_reason" onchange=""
                                         class="js-example-basic-single form-control drop">
                                         <option value="0" selected="true" disabled="disabled">Select reason</option>
