@@ -3,16 +3,21 @@
 <head>
     <title>Requisition Issue History - {{ $requisition->req_no }}</title>
     <style>
-        body {
-            font-size: 12px;
+        * {
             font-family: Verdana, Arial, sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
             margin: 0;
-            padding: 0;
+            padding: 20px;
+            line-height: 1.4;
+            font-size: 12px;
         }
 
         table, th, td {
             border-collapse: collapse;
-            padding: 10px;
+            padding: 8px;
         }
 
         table {
@@ -35,7 +40,7 @@
 
         #items {
             width: 100%;
-            margin-top: 2%;
+            margin-top: 15px;
         }
 
         #items tr:nth-child(even) {
@@ -46,43 +51,42 @@
             background: #1f273b;
             color: white;
             text-align: left;
+            padding: 10px 8px;
+            font-weight: bold;
+        }
+
+        #items td {
+            padding: 8px;
         }
 
         h1, h2, h3, h4 {
             font-weight: normal;
-            margin: 2px 0;
+            margin: 5px 0;
+            line-height: 1.2;
         }
 
         #container .logo-container {
             text-align: center;
-            vertical-align: middle;
+            margin-bottom: 15px;
         }
 
         #container .logo-container img {
-            max-width: 160px;
-            max-height: 160px;
-        }
-
-        .req-info {
-            margin: 2% 0;
-            font-size: 12px;
-            width: 100%;
-        }
-
-        .req-info td {
-            padding: 4px 6px;
-            vertical-align: top;
+            max-width: 120px;
+            max-height: 120px;
         }
 
         .footer {
             text-align: center;
-            margin-top: 25px;
+            margin-top: 40px;
             font-size: 12px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
         }
 
         .slogan {
             font-style: italic;
-            margin-top: 5px;
+            margin-top: 10px;
+            color: #666;
         }
         
         .text-center {
@@ -92,23 +96,47 @@
         .text-right {
             text-align: right;
         }
-        
-        .difference-positive {
-            color: green;
+
+        /* Updated first table styling to match reference design */
+        .info-table {
+            width: 100%;
+            margin-top: -15px
+            border-collapse: collapse;
         }
-        
-        .difference-negative {
-            color: red;
+
+        .info-table td {
+            padding: 5px;
+            border: 1px solid #858484;
+            font-size: 11px;
+            vertical-align: top;
         }
-        
-        .difference-zero {
-            color: #666;
+
+        .col-25 { 
+            width: 25%; 
+        }
+
+        .header-section {
+            margin-bottom: 25px;
+        }
+
+        .content-section {
+            margin-top: -15px;
+        }
+
+        /* Page break protection */
+        .page-break-protect {
+            page-break-inside: avoid;
+        }
+
+        /* Ensure proper spacing */
+        .spacing {
+            margin: 15px 0;
         }
     </style>
 </head>
 <body>
     <!-- Logo -->
-    <div id="container">
+    <div id="container" class="page-break-protect">
         <div class="logo-container">
             @if($pharmacy['logo'])
                 <img src="{{ public_path('fileStore/logo/'.$pharmacy['logo']) }}" />
@@ -117,40 +145,40 @@
     </div>
 
     <!-- Pharmacy Information -->
-    <div style="padding-top: 5px;">
-        <h1 align="center">{{ $pharmacy['name'] }}</h1>
-        <br>
-        <h3 align="center" style="margin-top: -1%">{{ $pharmacy['address'] }}</h3>
-        <br>
-        <h3 align="center" style="margin-top: -1%">{{ $pharmacy['phone'] }}</h3>
-        <br>
+    <div class="header-section page-break-protect">
+        <h1 align="center" style="font-size: 18px; margin-bottom: 10px;">{{ $pharmacy['name'] }}</h1>
+        <h3 align="center" style="margin: 5px 0;">{{ $pharmacy['address'] }}</h3>
+        <h3 align="center" style="margin: 5px 0;">{{ $pharmacy['phone'] }}</h3>
         @if(!empty($pharmacy['tin_number']))
-            <h3 align="center" style="margin-top: -1%">TIN: {{ $pharmacy['tin_number'] }}</h3>
+            <h3 align="center" style="margin: 5px 0;">TIN: {{ $pharmacy['tin_number'] }}</h3>
         @endif
-        <br>
-        <h2 align="center" style="margin-top: -1%; font-size: 20px; font-weight: bold;">
-            REQUISITION ISSUE HISTORY
+        <h2 align="center" style="margin: 15px 0; font-size: 16px; font-weight: bold;">
+            STOCK ISSUE HISTORY
         </h2>
-        <br>
-        <h4 align="center" style="margin-top: -1%">Date: {{ date('Y-m-d', strtotime($requisition->updated_at)) }}</h4>
-        <br>
-        <h4 align="center" style="margin-top: -1%">From: {{ $fromStore->name ?? '' }} To:  {{ $toStore->name ?? '' }}</h4>
     </div>
 
-    <!-- Requisition Info -->
-    <table class="req-info" style="margin-top: -1%;">
-        <tr>
-            <td><b>Requisition #:</b> {{ $requisition->req_no ?? '' }}</td>
-        </tr>
-        @if(!empty($requisition->remarks))
-        <tr>
-            <td colspan="2"><b>Remarks:</b> {{ $requisition->remarks }}</td>
-        </tr>
-        @endif
-    </table>
+    <!-- Requisition Info - UPDATED TO MATCH REFERENCE DESIGN -->
+    <div class="content-section page-break-protect">
+        <table class="info-table">
+            <tbody>
+                <tr>
+                    <td class="col-25"><strong>Requisition #</strong></td>
+                    <td class="col-25"><strong>Date</strong></td>
+                    <td class="col-25"><strong>From</strong></td>
+                    <td class="col-25"><strong>To</strong></td>
+                </tr>
+                <tr>
+                    <td class="col-25">{{ $requisition->req_no }}</td>
+                    <td class="col-25">{{ date('Y-m-d', strtotime($requisition->created_at)) }}</td>
+                    <td class="col-25">{{ $fromStore->name ?? '' }}</td>
+                    <td class="col-25">{{ $toStore->name ?? '' }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     <!-- Requisition Items -->
-    <div style="margin-top: -5%;">
+    <div class="content-section">
         <table id="items">
             <thead>
                 <tr>
@@ -183,20 +211,26 @@
                                 {{ $item->products_->pack_size }}{{ $item->products_->sales_uom }}
                             @endif
                         </td>
-                        <td class="text-left-zero">{{ number_format($item->quantity, 0) }}</td>
-                        <td class="text-left-zero">{{ number_format($item->quantity_given, 0) }}</td>
+                        <td class="text-center">{{ number_format($item->quantity, 0) }}</td>
+                        <td class="text-center">{{ number_format($item->quantity_given, 0) }}</td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
     </div>
 
+    @if(!empty($requisition->remarks))
+    <div class="content-section" style="margin-top: 20px; padding: 10px; background-color: #f9f9f9; border: 1px solid #ddd;">
+        <p style="margin: 0;"><b>Remarks:</b> {{ $requisition->remarks }}</p>
+    </div>
+    @endif
+
     <!-- Footer -->
-    <div class="footer">
-        <p>Issued By: <b>{{ $requisition->creator->name ?? 'N/A' }}</b></p>
-        <p>Printed on: <b>{{ date('Y-m-d') }}</b></p>
+    <div class="footer page-break-protect">
+        <p style="margin: 5px 0;">Issued By: <b>{{ $requisition->creator->name ?? 'N/A' }}</b></p>
+        <!-- <p style="margin: 5px 0;">Printed on: <b>{{ date('Y-m-d H:i:s') }}</b></p> -->
         @if(!empty($pharmacy['slogan']))
-            <p class="slogan">{{ $pharmacy['slogan'] }}</p>
+            <p class="slogan" style="margin: 10px 0;">{{ $pharmacy['slogan'] }}</p>
         @endif
     </div>
 
@@ -213,4 +247,4 @@
         }
     </script>
 </body>
-</html>s
+</html>
