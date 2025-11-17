@@ -1,3 +1,15 @@
+@php
+function customRound($num) {
+    $whole = floor($num);
+    $decimal = $num - $whole;
+
+    if ($decimal > 0.5) {
+        return number_format($whole + 1, 2);
+    } else {
+        return number_format($whole, 2);
+    }
+}
+@endphp
 <!DOCTYPE html>
 <html>
 
@@ -176,9 +188,9 @@
                         <td style="width: 230.8px; text-align: left; padding-left: 7px;">{{$item['name']}} {{$item['brand'] ?? ''}}
                             {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}
                         </td>
-                        <td style="width: 63.8px; text-align: center;">{{number_format($item['quantity'], 0)}}</td>
-                        <td style="width: 75.5px; text-align: right;">{{number_format($item['price'], 2)}}</td>
-                        <td style="width: 75.5px; text-align: right;">{{number_format($item['price'] * $item['quantity'], 2)}}</td>
+                        <td style="width: 63.8px; text-align: center;">{{customRound($item['quantity'])}}</td>
+                        <td style="width: 75.5px; text-align: right;">{{customRound($item['price'])}}</td>
+                        <td style="width: 75.5px; text-align: right;">{{customRound($item['price'] * $item['quantity'])}}</td>
                     </tr>
                 @endforeach
                 @if(count($dat) < 5)
@@ -219,32 +231,32 @@
                 <div class="summary-row">
                     <div>Sub Total:</div>
                     <div style="float: right;">
-                        {{number_format(($dat[0]['grand_total'] - $dat[0]['total_vat'] + $dat[0]['discount_total']), 2)}}
+                        {{customRound(($dat[0]['grand_total'] - $dat[0]['total_vat'] + $dat[0]['discount_total']))}}
                     </div>
                 </div>
                 <div class="summary-row">
                     <span>VAT:</span>
-                    <span style="float: right;">{{number_format($dat[0]['total_vat'], 2)}}</span>
+                    <span style="float: right;">{{customRound($dat[0]['total_vat'])}}</span>
                 </div>
                 @if($dat[0]['discount_total'] > 0)
                     <div class="summary-row">
                         <div>Discount:</div>
-                        <div style="float: right;">{{number_format($dat[0]['discount_total'], 2)}}</div>
+                        <div style="float: right;">{{customRound($dat[0]['discount_total'])}}</div>
                     </div>
                 @endif
                 <div class="summary-row total">
                     <span>Total:</span>
-                    <span style="float: right;">{{number_format($dat[0]['grand_total'], 2)}}</span>
+                    <span style="float: right;">{{customRound($dat[0]['grand_total'])}}</span>
                 </div>
                 <hr>
                 @if($page == -1)
                     <div class="summary-row" style="">
                         <span>Paid:</span>
-                        <span style="float: right;">{{number_format($dat[0]['paid'], 2)}}</span>
+                        <span style="float: right;">{{customRound($dat[0]['paid'])}}</span>
                     </div>
                     <div class="summary-row">
                         <span>Balance:</span>
-                        <span style="float: right;">{{number_format($dat[0]['grand_total'] - $dat[0]['paid'], 2)}}</span>
+                        <span style="float: right;">{{customRound($dat[0]['grand_total'] - $dat[0]['paid'])}}</span>
                     </div>
                 @endif
             </div>

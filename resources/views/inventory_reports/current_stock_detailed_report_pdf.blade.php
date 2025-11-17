@@ -124,7 +124,7 @@
                             <td>{{$item['name']}} {{$item['brand'] ?? ''}}
                                 {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}
                             </td>
-                            <td>{{$item['batch_number']}}</td>
+                            <td style="width: 70px;">{{$item['batch_number']}}</td>
                             {{-- @if($item['expiry_date'] === null) --}}
                             {{-- <td align="center"></td>
                             @else

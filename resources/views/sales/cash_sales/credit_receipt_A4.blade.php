@@ -1,3 +1,15 @@
+@php
+function customRound($num) {
+    $whole = floor($num);
+    $decimal = $num - $whole;
+
+    if ($decimal > 0.5) {
+        return number_format($whole + 1, 2);
+    } else {
+        return number_format($whole, 2);
+    }
+}
+@endphp
 <!DOCTYPE html>
 <html>
 
@@ -145,16 +157,17 @@
     @foreach($data as $datas => $dat)
         <table class="customer-table">
             <tbody>
-                <tr>
-                    <td style="width: 40px; padding-left: 10px;">Receipt No : {{$datas ?? 'N/A'}}</td>
-                    <td style="width: 110px; padding-left: 10px;">Customer : {{$dat[0]['customer'] ?? 'CASH'}}</td>
-                    <td style="width: 80px; padding-left: 10px;">Phone : {{$dat[0]['customer_phone'] ?? 'N/A'}}</td>
+                <tr style="width: 100%; position: relative;">
+                    <td style="width: 21%; position: absolute; padding-left: 10px;">Receipt No : {{$datas ?? 'N/A'}}</td>
+                    <td style="width: 43.5%; padding-left: 10px;">Customer : {{$dat[0]['customer'] ?? 'CASH'}}</td>
+                    <td style="width: 30%; padding-left: 10px;">Phone : {{$dat[0]['customer_phone'] ?? 'N/A'}}</td>
                 </tr>
-                <tr>
-                    <td style="width: 40px; padding-left: 10px;">Sales Date :
-                        {{date('Y-m-d', strtotime($dat[0]['created_at']))}}</td>
-                    <td style="width: 110px; padding-left: 10px;">Address : {{$dat[0]['customer_address'] ?? 'N/A'}}</td>
-                    <td style="width: 80px; padding-left: 10px;">TIN :
+                <tr style="width: 100%; position: relative;">
+                    <td style="width: 21%; padding-left: 10px;">Sales Date :
+                        {{date('Y-m-d', strtotime($dat[0]['created_at']))}}
+                    </td>
+                    <td style="width: 43.5%; padding-left: 10px;">Address : {{$dat[0]['customer_address'] ?? 'N/A'}}</td>
+                    <td style="width: 30%; padding-left: 10px;">TIN :
                         {{ !empty($dat[0]['customer_tin']) ? $dat[0]['customer_tin'] : 'N/A' }}
                     </td>
                 </tr>
@@ -166,12 +179,12 @@
         <!-- Items Table -->
         <table class="items-table">
             <thead>
-                <tr class="table-header">
-                    <th style="width: 20px; text-align: center;">#</th>
-                    <th style="width: 287.5px; text-align: left; padding-left: 7px;">Description</th>
-                    <th style="width: 50px; text-align: center;">Qty</th>
-                    <th style="width: 83px; text-align: right;">Price</th>
-                    <th style="width: 83px; text-align: right;">Amount</th>
+                <tr class="table-header" style="width: 100%; position: relative;">
+                    <th style="width: 2%; position: absolute; text-align: center;">#</th>
+                    <th style="width: 52%; position: absolute; text-align: left; padding-left: 7px;">Description</th>
+                    <th style="width: 10%; position: absolute; text-align: center;">Qty</th>
+                    <th style="width: 18%; position: absolute; text-align: right;">Price</th>
+                    <th style="width: 18%; position: absolute; text-align: right;">Amount</th>
                 </tr>
             </thead>
             <tbody>
@@ -182,9 +195,9 @@
                             {{$item['brand'] ?? ''}}
                             {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}
                         </td>
-                        <td style="width: 50px; text-align: center;">{{number_format($item['quantity'], 0)}}</td>
-                        <td style="width: 82.5px; text-align: right;">{{number_format($item['price'], 2)}}</td>
-                        <td style="width: 82.5px; text-align: right;">{{number_format($item['price'] * $item['quantity'], 2)}}
+                        <td style="width: 48.5px; text-align: center;">{{customRound($item['quantity'])}}</td>
+                        <td style="width: 82.5px; text-align: right;">{{customRound($item['price'])}}</td>
+                        <td style="width: 82.5px; text-align: right;">{{customRound($item['price'] * $item['quantity'])}}
                         </td>
                     </tr>
                 @endforeach
@@ -226,32 +239,32 @@
                 <div class="summary-row">
                     <div>Sub Total:</div>
                     <div style="float: right;">
-                        {{number_format(($dat[0]['grand_total'] - $dat[0]['total_vat'] + $dat[0]['discount_total']), 2)}}
+                        {{customRound(($dat[0]['grand_total'] - $dat[0]['total_vat'] + $dat[0]['discount_total']))}}
                     </div>
                 </div>
                 <div class="summary-row">
                     <span>VAT:</span>
-                    <span style="float: right;">{{number_format($dat[0]['total_vat'], 2)}}</span>
+                    <span style="float: right;">{{customRound($dat[0]['total_vat'])}}</span>
                 </div>
                 @if($dat[0]['discount_total'] > 0)
                     <div class="summary-row">
                         <div>Discount:</div>
-                        <div style="float: right;">{{number_format($dat[0]['discount_total'], 2)}}</div>
+                        <div style="float: right;">{{customRound($dat[0]['discount_total'])}}</div>
                     </div>
                 @endif
                 <div class="summary-row total">
                     <span>Total:</span>
-                    <span style="float: right;">{{number_format($dat[0]['grand_total'], 2)}}</span>
+                    <span style="float: right;">{{customRound($dat[0]['grand_total'])}}</span>
                 </div>
                 <hr>
                 @if($page == -1)
                     <div class="summary-row" style="">
                         <span>Paid:</span>
-                        <span style="float: right;">{{number_format($dat[0]['paid'], 2)}}</span>
+                        <span style="float: right;">{{customRound($dat[0]['paid'])}}</span>
                     </div>
                     <div class="summary-row" style="">
                         <span>Balance:</span>
-                        <span style="float: right;">{{number_format($dat[0]['grand_total'] - $dat[0]['paid'], 2)}}</span>
+                        <span style="float: right;">{{customRound($dat[0]['grand_total'] - $dat[0]['paid'])}}</span>
                     </div>
                 @endif
             </div>

@@ -1,3 +1,15 @@
+@php
+function customRound($num) {
+    $whole = floor($num);
+    $decimal = $num - $whole;
+
+    if ($decimal > 0.5) {
+        return number_format($whole + 1, 2);
+    } else {
+        return number_format($whole, 2);
+    }
+}
+@endphp
 <!DOCTYPE html>
 <html>
 
@@ -115,8 +127,8 @@
                     @foreach($dat as $item)
                         <tr>
                             <td>{{$item['name']}} {{$item['brand'] ?? ''}} {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}</td>
-                            <td class="text-center">{{number_format($item['quantity'], 0)}}</td>
-                            <td class="text-right">{{number_format($item['price'] * $item['quantity'], 2)}}</td>
+                            <td class="text-center">{{customRound($item['quantity'])}}</td>
+                            <td class="text-right">{{customRound($item['price'] * $item['quantity'])}}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -127,21 +139,21 @@
                 <tbody>
                     <tr>
                         <td>Sub Total</td>
-                        <td class="text-right">{{number_format($dat[0]['grand_total'] - $dat[0]['total_vat'] + $dat[0]['discount_total'], 2)}}</td>
+                        <td class="text-right">{{customRound($dat[0]['grand_total'] - $dat[0]['total_vat'] + $dat[0]['discount_total'])}}</td>
                     </tr>
                     @if($dat[0]['discount_total'] > 0)
                         <tr>
                             <td>Discount</td>
-                            <td class="text-right">{{number_format($dat[0]['discount_total'], 2)}}</td>
+                            <td class="text-right">{{customRound($dat[0]['discount_total'])}}</td>
                         </tr>
                     @endif
                     <tr>
                         <td>VAT</td>
-                        <td class="text-right">{{number_format($dat[0]['total_vat'], 2)}}</td>
+                        <td class="text-right">{{customRound($dat[0]['total_vat'])}}</td>
                     </tr>
                     <tr>
                         <td><b>Total</b></td>
-                        <td class="text-right"><b>{{number_format($dat[0]['grand_total'], 2)}}</b></td>
+                        <td class="text-right"><b>{{customRound($dat[0]['grand_total'])}}</b></td>
                     </tr>
                 </tbody>
             </table>
@@ -152,11 +164,11 @@
                     <tbody>
                         <tr>
                             <td>Paid</td>
-                            <td class="text-right">{{number_format($dat[0]['paid'], 2)}}</td>
+                            <td class="text-right">{{customRound($dat[0]['paid'])}}</td>
                         </tr>
                         <tr>
                             <td>Balance</td>
-                            <td class="text-right">{{number_format($dat[0]['grand_total'] - $dat[0]['paid'], 2)}}</td>
+                            <td class="text-right">{{customRound($dat[0]['grand_total'] - $dat[0]['paid'])}}</td>
                         </tr>
                     </tbody>
                 </table>
