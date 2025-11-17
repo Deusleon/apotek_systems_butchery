@@ -130,15 +130,15 @@
                             </thead>
                             @foreach($data as $item)
                                 <tr>
-                                    <td align="left">{{$loop->iteration}}.</td>
-                                    <td align="left">{{date('Y-m-d', strtotime($item->created_at))}}</td>
+                                    <td align="left" style="width: 20px;">{{$loop->iteration}}.</td>
+                                    <td align="left" style="width: 70px;">{{date('Y-m-d', strtotime($item->created_at))}}</td>
                                     <td align="left">
                                         {{($item->currentStock['product']['name'] . ' ' ?? '') . ($item->currentStock['product']['brand'] . ' ' ?? '') . ($item->currentStock['product']['pack_size'] ?? '') . $item->currentStock['product']['sales_uom'] ?? ''}}
                                     </td>
                                     <td align="left">{{$item->transfer_no}}</td>
                                     <td align="left">{{$item->fromStore['name']}}</td>
                                     <td align="left">{{$item->toStore['name']}}</td>
-                                    <td align="center">{{number_format($item->transfer_qty)}}</td>
+                                    <td align="center" style="text-align: center;">{{number_format($item->transfer_qty)}}</td>
                                     <td align="center">{{number_format($item->accepted_qty)}}</td>
                                 </tr>
                             @endforeach

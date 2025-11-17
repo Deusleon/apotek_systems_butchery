@@ -140,7 +140,7 @@
                                 $item->currentStock['product']['sales_uom'] ?? ''}} --}}
                             </td>
                             <td align="left">{{$item->transfer_no}}</td>
-                            <td align="">{{number_format($item->transfer_qty)}}</td>
+                            <td align="center" style="text-align: center;">{{number_format($item->transfer_qty)}}</td>
                             <td align="left">{{$item->fromStore['name']}}</td>
                             <td align="left">{{$item->toStore['name']}}</td>
                             <td align="left">
@@ -154,7 +154,7 @@
                                         $color = 'green';
                                     }
                                 @endphp
-                                <span style="color: {{$color}}; font-weight: bold;">{{$status}}</span>
+                                <span style="">{{$status}}</span>
                             </td>
 
                         </tr>
