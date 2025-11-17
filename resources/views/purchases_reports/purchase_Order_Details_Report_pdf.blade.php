@@ -99,7 +99,7 @@
             width: 15%;
         }
 
-         #container .logo-container {
+        #container .logo-container {
             padding-top: -2%;
             text-align: center;
             vertical-align: middle;
@@ -132,10 +132,24 @@
     <h2 align="center" style="margin-top: -1%">Purchase Order Details Report</h2>
     <h4 align="center" style="margin-top: -1%">From: {{date('Y-m-d',strtotime($data->first()->date_range[0]))}} To: {{date('Y-m-d',strtotime($data->first()->date_range[1]))}}</h4>
 
-    <div class="row" style="margin-top: 5%;">
+    <div class="row" style="margin-top: 3%;">
         <div class="col-md-12">
 
             <table id="table-detail" align="center">
+                
+                <!-- COLUMN WIDTH DEFINITIONS -->
+                <colgroup>
+                    <col style="width: 8%;">   <!-- Order # -->
+                    <col style="width: 18%;">  <!-- Supplier (wide) -->
+                    <col style="width: 8%;">   <!-- Date -->
+                    <col style="width: 28%;">  <!-- Product Name (widest) -->
+                    <col style="width: 8%;">   <!-- Ordered Qty -->
+                    <col style="width: 8%;">   <!-- Received Qty -->
+                    <col style="width: 8%;">   <!-- Unit Price -->
+                    <col style="width: 7%;">   <!-- VAT -->
+                    <col style="width: 9%;">   <!-- Amount -->
+                </colgroup>
+
                 <thead>
                 <tr style="background: #1f273b; color: white; font-size: 0.9em">
                     <th align="left">Order #</th>
@@ -149,6 +163,7 @@
                     <th align="right">Amount</th>
                 </tr>
                 </thead>
+
                 @php $total_amount = 0; @endphp
                 @foreach($data as $order)
                     @foreach($order->details as $detail)
@@ -169,6 +184,7 @@
                     @endforeach
                 @endforeach
             </table>
+
             <hr>
 
             <div class="full-row" style="padding-top: 1%">

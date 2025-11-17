@@ -68,7 +68,7 @@ class PurchaseOrderListController extends Controller
     // Get general settings for terms & conditions
     $generalSettings = GeneralSetting::first();
 
-        $order_details = OrderDetail::where('order_id', $order_no)->get();
+        $order_details = OrderDetail::with('order.supplier')->where('order_id', $order_no)->get();
         $sub_total = 0;
         $vat = 0;
         $total = 0;
