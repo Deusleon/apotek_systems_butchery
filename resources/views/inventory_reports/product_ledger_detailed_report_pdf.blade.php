@@ -114,7 +114,7 @@
                             <th style="text-align: center">Received</th>
                             <th style="text-align: center">Outgoing</th>
                             <th style="text-align: center">Balance</th>
-                            <th style="text-align: center">Created By</th>
+                            <th style="text-align: left">Created By</th>
                         </tr>
                     </thead>
                     @foreach($data as $item)

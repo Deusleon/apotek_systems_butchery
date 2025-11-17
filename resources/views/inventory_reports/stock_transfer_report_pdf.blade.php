@@ -111,8 +111,8 @@
                     <!-- loop the product names here -->
                     <thead>
                         <tr style="background: #1f273b; color: white;">
-                            <th align="center" style="text-align: center;">#</th>
-                            <th align="left">Date</th>
+                            <th align="center" style="text-align: center; width: 20px;">#</th>
+                            <th align="left" style="width: 70px;">Date</th>
                             <th align="left">Product Name</th>
                             <th align="left">Transfer #</th>
                             <th align="center">Quantity</th>
@@ -123,8 +123,8 @@
                     </thead>
                     @foreach($data as $item)
                         <tr>
-                            <td align="center">{{$loop->iteration}}.</td>
-                            <td align="left">{{date('Y-m-d', strtotime($item->created_at))}}</td>
+                            <td align="center" style="width: 20px;">{{$loop->iteration}}.</td>
+                            <td align="left" style="width: 70px;">{{date('Y-m-d', strtotime($item->created_at))}}</td>
                             <td>
                                 @if($item->currentStock && $item->currentStock->product)
                                     {{ $item->currentStock->product->name ?? '' }}

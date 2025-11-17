@@ -114,7 +114,7 @@
                     <thead>
                         <tr style="background: #1f273b; color: white;">
                             <th align="center">#</th>
-                            <th align="center">Product Name</th>
+                            <th align="left">Product Name</th>
                             <th align="left">Sales Date</th>
                             <th align="center">Qty Bought</th>
                             <th align="center">Return Date</th>
@@ -145,7 +145,7 @@
 
                                                 <td align="center">{{date('Y-m-d', strtotime($datas['date']))}}</td>
                                                 <td align="center">{{number_format($datas['item_returned']['rtn_qty'], 0)}}</td>
-                                                <td align="left">{{$datas['reason']}}</td>
+                                                <td align="left" style="padding-left: 10px;">{{$datas['reason']}}</td>
                                                 <td align="right">{{number_format((($datas['item_returned']['rtn_qty']) /
                             ($datas['item_returned']['remained_qty'])) * ($datas['item_returned']['amount']
                             - $datas['item_returned']['discount']), 2)}}</td>
