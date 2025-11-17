@@ -48,7 +48,7 @@ class AccountingReportController extends Controller
                 }
                 $pdf = PDF::loadView( 'accounting_reports.current_stock_value_report_pdf',
                 compact( 'data', 'pharmacy') )
-                ->setPaper( 'a4', '' );
+                ->setPaper( 'a4', 'landscape' );
                 return $pdf->stream( 'current_stock_value_report.pdf' );
             case 2:
                 $dates = explode(" - ", $request->date_range);
@@ -57,7 +57,8 @@ class AccountingReportController extends Controller
                     return response()->view('error_pages.pdf_zero_data');
                 }
                 $pdf = PDF::loadView('accounting_reports.gross_profit_detail_report_pdf',
-                    compact('data', 'pharmacy'));
+                    compact('data', 'pharmacy'))
+                    ->setPaper('a4', 'landscape');
                 return $pdf->stream('gross_profit_detail_report.pdf');
                 break;
             case 3:
@@ -182,6 +183,7 @@ class AccountingReportController extends Controller
             $data = PriceList::select('stock_id', 'price')->where('price_category_id', $price_category_id)
                 ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
                 ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                ->where('store_id', '=', $store_id)
                 ->orderBy('stock_id', 'desc')
                 ->where('product_id', $product->id)
                 ->first('price');
