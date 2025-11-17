@@ -123,8 +123,8 @@
 </head>
 
 <body>
-    <!-- Header Section -->
-    <div style="width: 100%; text-align: center; align-items: center;">
+    <!-- Header Section - Updated to match Cash Sales Report style -->
+    <div style="width: 100%; text-align: center; align-items: center; margin-bottom: -1%;">
         @if($pharmacy['logo'])
             <img style="max-width: 90px; max-height: 90px;" src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
         @endif
@@ -132,12 +132,12 @@
         <div style="justify-content: center; font-size: 12px; line-height: 1.2;">
             {{$pharmacy['address']}}<br>
             {{$pharmacy['phone']}}<br>
-            <span>TIN: {{$pharmacy['tin_number'] ?? 'N/A'}}</span> |
-            <span>VRN: {{$pharmacy['vrn_number'] ?? 'N/A'}}</span>
+            {{$pharmacy['email'] . ' | ' . $pharmacy['website']}}
+        </div><br>
+        <div>
+            <h3 align="center" style="font-weight: bold; margin-top: -1%">PURCHASE ORDER</h3>
+            <h4 align="center" style="margin-top: -1.5%">Printed On: {{date('Y-m-d H:i:s')}}</h4>
         </div>
-    </div>
-    <div style="font-weight: bold; margin-top: 5px; text-align: center;">
-        PURCHASE ORDER
     </div>
 
     <!-- Supplier Table -->

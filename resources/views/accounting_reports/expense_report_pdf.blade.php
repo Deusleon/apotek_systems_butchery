@@ -137,7 +137,7 @@
         </div>
     </div>
 
-    <div class="row" style="margin-top: 3%;">
+    <div class="row" style="margin-top: 1%;">
         <div class="col-md-12">
             <table id="table-detail" align="center">
                 <!-- loop the product names here -->

@@ -90,7 +90,7 @@
         </div>
     </div>
 
-    <div class="row" style="margin-top: 5%;">
+    <div class="row" style="margin-top: 1%;">
         <div class="col-md-12">
 
             @php

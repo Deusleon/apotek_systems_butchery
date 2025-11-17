@@ -84,34 +84,27 @@
     </style>
 </head>
 <body>
-    <!-- Logo -->
-    <div id="container">
-        <div class="logo-container">
-            @if($pharmacy['logo'])
-                <img src="{{ public_path('fileStore/logo/'.$pharmacy['logo']) }}" />
-            @endif
-        </div>
-    </div>
-
-    <!-- Pharmacy Information -->
-    <div style="padding-top: 5px;">
-        <h1 align="center">{{ $pharmacy['name'] }}</h1>
-        <br>
-        <h3 align="center" style="margin-top: -1%">{{ $pharmacy['address'] }}</h3>
-        <br>
-        <h3 align="center" style="margin-top: -1%">{{ $pharmacy['phone'] }}</h3>
-        <br>
-        @if(!empty($pharmacy['tin_number']))
-            <h3 align="center" style="margin-top: -1%">TIN: {{ $pharmacy['tin_number'] }}</h3>
+    <!-- Header Section - Updated to match Cash Sales Report style -->
+    <div style="width: 100%; text-align: center; align-items: center; margin-bottom: -1%;">
+        @if($pharmacy['logo'])
+            <img style="max-width: 90px; max-height: 90px;"
+                src="{{ public_path('fileStore/logo/' . $pharmacy['logo']) }}" />
         @endif
-        <br>
-        <h2 align="center" style="margin-top: -1%; font-size: 20px; font-weight: bold;">
-            Stock Requisition
-        </h2>
-        <br>
-        <h4 align="center" style="margin-top: -1%">Date: {{ date('Y-m-d', strtotime($requisition->created_at)) }}</h4>
-        <br>
-        <h4 align="center" style="margin-top: -1%">From: {{ $fromStore->name ?? '' }} To: {{ $toStore->name ?? '' }}</h4>
+        <div style="font-weight: bold; font-size: 16px;">{{ $pharmacy['name'] }}</div>
+        <div style="justify-content: center; font-size: 12px; line-height: 1.2;">
+            {{ $pharmacy['address'] }}<br>
+            {{ $pharmacy['phone'] }}<br>
+            @if(!empty($pharmacy['tin_number']))
+                TIN: {{ $pharmacy['tin_number'] }}<br>
+            @endif
+            {{ $pharmacy['email'] . ' | ' . $pharmacy['website'] }}
+        </div><br>
+        <div>
+            <h3 align="center" style="font-weight: bold; margin-top: -1%">Stock Requisition</h3>
+            <h4 align="center" style="margin-top: -1%">Date: <b>{{ date('Y-m-d', strtotime($requisition->created_at)) }}</b></h4>
+            <h4 align="center" style="margin-top: -1%">From: <b>{{ $fromStore->name ?? '' }}</b> To: <b>{{ $toStore->name ?? '' }}</b></h4>
+            <h4 align="center" style="margin-top: -1.5%">Printed On: {{ date('Y-m-d H:i:s') }}</h4>
+        </div>
     </div>
 
     <!-- Requisition Info -->

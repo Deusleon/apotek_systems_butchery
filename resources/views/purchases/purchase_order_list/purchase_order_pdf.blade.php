@@ -60,75 +60,80 @@
     </style>
 </head>
 <body>
-<div class="row">
-    <div id="container">
-        <div class="logo-container">
-            <img src="{{public_path('fileStore/logo/'.$pharmacy['logo'])}}"/>
-        </div>
-    </div>
-</div>
 <div class="row" style="padding-top: -2%">
-    <h3 align="center">{{$pharmacy['name']}}</h3>
-    <h6 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h6>
-    <h3 align="center">Purchase Order</h3>
-</div>
+    <!-- Header Section - Updated to match Cash Sales Report style -->
+    <div style="width: 100%; text-align: center; align-items: center; margin-bottom: -1%;">
+        @if($pharmacy['logo'])
+            <img style="max-width: 90px; max-height: 90px;"
+                src="{{ public_path('fileStore/logo/' . $pharmacy['logo']) }}" />
+        @endif
+        <div style="font-weight: bold; font-size: 16px;">{{ $pharmacy['name'] }}</div>
+        <div style="justify-content: center; font-size: 12px; line-height: 1.2;">
+            {{ $pharmacy['address'] }}<br>
+            {{ $pharmacy['phone'] }}<br>
+            {{ $pharmacy['email'] . ' | ' . $pharmacy['website'] }}
+        </div><br>
+        <div>
+            <h3 align="center" style="font-weight: bold; margin-top: -1%">Purchase Order</h3>
+            <h4 align="center" style="margin-top: -1.5%">Printed On: {{ date('Y-m-d H:i:s') }}</h4>
+        </div>
+    </div>
 
-<div class="row" style="margin-top: 13%">
-    <table class="table table-sm" id="table-detail" align="center">
-        <tr>
-            <th align="left">Product Name</th>
-            <th align="right">Quantity</th>
-            <th align="right">Price</th>
-            <th align="right" hidden>Sub Total</th>
-            <th align="right">VAT</th>
-            <th align="right">Amount</th>
-        </tr>
-
-        @foreach($data as $item)
+    <div class="row" style="margin-top: 13%">
+        <table class="table table-sm" id="table-detail" align="center">
             <tr>
-                <td align="left">{{$item->product['name']}}</td>
-                <td align="right">
-                    <div style="margin-right: 50%">{{$item->ordered_qty}}</div>
-                </td>
-                <td align="right">{{number_format($item->unit_price,2)}}</td>
-                <td align="right" hidden>{{number_format($item->sub_total,2)}}</td>
-                <td align="right">{{number_format($item->vat,2)}}</td>
-                <td align="right">{{number_format($item->amount,2)}}</td>
+                <th align="left">Product Name</th>
+                <th align="right">Quantity</th>
+                <th align="right">Price</th>
+                <th align="right" hidden>Sub Total</th>
+                <th align="right">VAT</th>
+                <th align="right">Amount</th>
             </tr>
-        @endforeach
-    </table>
-</div>
-<div class="full-row" style="padding-top: 1%">
-    <div class="col-25"></div>
-    <div class="col-50"></div>
-    <div class="col-25">
-        <div class="full-row" style="background-color: #f2f2f2;">
-            <div class="col-50" align="left"><b>Sub Total: </b></div>
-            <div class="col-50" align="right">{{number_format($data->max('sub_totals'),2)}}</div>
-        </div>
-    </div>
-</div>
-<div class="full-row">
-    <div class="col-25"></div>
-    <div class="col-50"></div>
-    <div class="col-25">
-        <div class="full-row">
-            <div class="col-50" align="left"><b>VAT: </b></div>
-            <div class="col-50" align="right">{{number_format($data->max('vats'),2)}}</div>
-        </div>
-    </div>
-</div>
-<div class="full-row">
-    <div class="col-25"></div>
-    <div class="col-50"></div>
-    <div class="col-25">
-        <div class="full-row" style="background-color: #f2f2f2;">
-            <div class="col-50" align="left"><b>Total:</b></div>
-            <div class="col-50" align="right">{{number_format($data->max('total'),2)}}</div>
-        </div>
-    </div>
-</div>
 
+            @foreach($data as $item)
+                <tr>
+                    <td align="left">{{$item->product['name']}}</td>
+                    <td align="right">
+                        <div style="margin-right: 50%">{{$item->ordered_qty}}</div>
+                    </td>
+                    <td align="right">{{number_format($item->unit_price,2)}}</td>
+                    <td align="right" hidden>{{number_format($item->sub_total,2)}}</td>
+                    <td align="right">{{number_format($item->vat,2)}}</td>
+                    <td align="right">{{number_format($item->amount,2)}}</td>
+                </tr>
+            @endforeach
+        </table>
+    </div>
+    <div class="full-row" style="padding-top: 1%">
+        <div class="col-25"></div>
+        <div class="col-50"></div>
+        <div class="col-25">
+            <div class="full-row" style="background-color: #f2f2f2;">
+                <div class="col-50" align="left"><b>Sub Total: </b></div>
+                <div class="col-50" align="right">{{number_format($data->max('sub_totals'),2)}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="full-row">
+        <div class="col-25"></div>
+        <div class="col-50"></div>
+        <div class="col-25">
+            <div class="full-row">
+                <div class="col-50" align="left"><b>VAT: </b></div>
+                <div class="col-50" align="right">{{number_format($data->max('vats'),2)}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="full-row">
+        <div class="col-25"></div>
+        <div class="col-50"></div>
+        <div class="col-25">
+            <div class="full-row" style="background-color: #f2f2f2;">
+                <div class="col-50" align="left"><b>Total:</b></div>
+                <div class="col-50" align="right">{{number_format($data->max('total'),2)}}</div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
-

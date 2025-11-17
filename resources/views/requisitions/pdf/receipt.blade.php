@@ -89,65 +89,66 @@
     </style>
 </head>
 <body>
-<div class="row">
-    <div id="container">
-        @if($pharmacy['logo'])
-            <div class="logo-container">
-                <img src="{{ public_path('fileStore/logo/'.$pharmacy['logo']) }}" />
-            </div>
-        @endif
-    </div>
-</div>
-
 <div class="row" style="padding-top: -2%">
-    <h3 align="center"></h3>
-    <h3 align="center" style="margin-top: -2%">{{ $pharmacy['name'] }}</h3>
-    <h5 align="center" style="margin-top: -2%">{{ $pharmacy['address'] }}</h5>
-    <h6 align="center" style="margin-top: -2%">{{ $pharmacy['phone'] }}</h6>
-    <h3 align="center" style="margin-top: -2%">REQUISITION RECEIPT</h3>
-</div>
+    <!-- Header Section - Updated to match Cash Sales Report style -->
+    <div style="width: 100%; text-align: center; align-items: center; margin-bottom: -1%;">
+        @if($pharmacy['logo'])
+            <img style="max-width: 90px; max-height: 90px;"
+                src="{{ public_path('fileStore/logo/' . $pharmacy['logo']) }}" />
+        @endif
+        <div style="font-weight: bold; font-size: 16px;">{{ $pharmacy['name'] }}</div>
+        <div style="justify-content: center; font-size: 12px; line-height: 1.2;">
+            {{ $pharmacy['address'] }}<br>
+            {{ $pharmacy['phone'] }}<br>
+            {{ $pharmacy['email'] . ' | ' . $pharmacy['website'] }}
+        </div><br>
+        <div>
+            <h3 align="center" style="font-weight: bold; margin-top: -1%">REQUISITION RECEIPT</h3>
+            <h4 align="center" style="margin-top: -1.5%">Printed On: {{ date('Y-m-d H:i:s') }}</h4>
+        </div>
+    </div>
 
-<table class="customer-table">
-    <tbody>
-        <tr>
-            <td class="index-col" style="width: 25%;">Requisition #</td>
-            <td class="index-col" style="width: 25%;">Date</td>
-            <td class="index-col" style="width: 25%">From</td>
-            <td class="index-col" style="width: 25%;">To</td>
-        </tr>
-        <tr>
-            <td class="index-col" style="width: 25%;">{{ $requisition->req_no }}</td>
-            <td class="index-col" style="width: 25%;">{{ date('Y-m-d', strtotime($requisition->created_at)) }}</td>
-            <td class="index-col" style="width: 25%">{{ $fromStore->name ?? '' }}</td>
-            <td class="index-col" style="width: 25%;">{{ $toStore->name ?? '' }}</td>
-        </tr>
-    </tbody>
-</table>
-
-<div class="row">
-    <table class="table table-sm" id="table-detail" align="center">
-        <tr class="table-header">
-            <th align="left">Product Name</th>
-            <th align="right">Qty</th>
-        </tr>
-
-        @foreach($requisitionDet as $item)
+    <table class="customer-table">
+        <tbody>
             <tr>
-                <td align="left">
-                    {{ $item->products_->name ?? '' }}
-                    @if(!empty($item->products_->brand)) {{ $item->products_->brand }} @endif
-                    @if(!empty($item->products_->pack_size) && !empty($item->products_->sales_uom))
-                        {{ $item->products_->pack_size }}{{ $item->products_->sales_uom }}
-                    @endif
-                </td>
-                <td align="right">{{ number_format($item->quantity, 0) ?? '' }}</td>
+                <td class="index-col" style="width: 25%;">Requisition #</td>
+                <td class="index-col" style="width: 25%;">Date</td>
+                <td class="index-col" style="width: 25%">From</td>
+                <td class="index-col" style="width: 25%;">To</td>
             </tr>
-        @endforeach
+            <tr>
+                <td class="index-col" style="width: 25%;">{{ $requisition->req_no }}</td>
+                <td class="index-col" style="width: 25%;">{{ date('Y-m-d', strtotime($requisition->created_at)) }}</td>
+                <td class="index-col" style="width: 25%">{{ $fromStore->name ?? '' }}</td>
+                <td class="index-col" style="width: 25%;">{{ $toStore->name ?? '' }}</td>
+            </tr>
+        </tbody>
     </table>
+
+    <div class="row">
+        <table class="table table-sm" id="table-detail" align="center">
+            <tr class="table-header">
+                <th align="left">Product Name</th>
+                <th align="right">Qty</th>
+            </tr>
+
+            @foreach($requisitionDet as $item)
+                <tr>
+                    <td align="left">
+                        {{ $item->products_->name ?? '' }}
+                        @if(!empty($item->products_->brand)) {{ $item->products_->brand }} @endif
+                        @if(!empty($item->products_->pack_size) && !empty($item->products_->sales_uom))
+                            {{ $item->products_->pack_size }}{{ $item->products_->sales_uom }}
+                        @endif
+                    </td>
+                    <td align="right">{{ number_format($item->quantity, 0) ?? '' }}</td>
+                </tr>
+            @endforeach
+        </table>
+    </div>
+
+    <h6 align="center">Created By: {{ $requisition->creator->name }}</h6>
+    <h6 align="center" style="font-style: italic; margin-top: -2%">{{ $pharmacy['slogan'] }}</h6>
 </div>
-
-<h6 align="center">Created By: {{ $requisition->creator->name }}</h6>
-<h6 align="center" style="font-style: italic; margin-top: -2%">{{ $pharmacy['slogan'] }}</h6>
-
 </body>
 </html>
