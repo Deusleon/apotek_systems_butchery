@@ -1,3 +1,15 @@
+@php
+function customRound($num) {
+    $whole = floor($num);
+    $decimal = $num - $whole;
+
+    if ($decimal > 0.5) {
+        return number_format($whole + 1, 2);
+    } else {
+        return number_format($whole, 2);
+    }
+}
+@endphp
 <!DOCTYPE html>
 <html>
 <head>
@@ -149,8 +161,8 @@
             @foreach($dat as $item)
                 <tr>
                     <td align="left">{{$item['name']}}</td>
-                    <td align="right">{{number_format($item['quantity'],0) }}</td>
-                    <td align="right">{{number_format($item['sub_total'],2)}}</td>
+                    <td align="right">{{customRound($item['quantity'],0) }}</td>
+                    <td align="right">{{customRound($item['sub_total'],2)}}</td>
                 </tr>
             @endforeach
         </table>
@@ -159,19 +171,19 @@
         </div>
         <div align="right"
              style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
-            {{number_format(($dat[0]['grand_total']-$dat[0]['total_vat'] + $dat[0]['discount_total']),2)}}
+            {{customRound(($dat[0]['grand_total']-$dat[0]['total_vat'] + $dat[0]['discount_total']),2)}}
         </div>
         <div style="margin-left: 8%;width: 29.6%;margin-top: 1%; padding: -1.6%"><b>Discount</b>
         </div>
         <div align="right"
              style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
-            {{number_format($dat[0]['discount_total'],2)}}
+            {{customRound($dat[0]['discount_total'],2)}}
         </div>
         <div style="margin-left: 8%;width: 29.6%;margin-top: 1%; padding: -1.6%"><b>VAT</b>
         </div>
         <div align="right"
              style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
-            {{number_format($dat[0]['total_vat'],2)}}
+            {{customRound($dat[0]['total_vat'],2)}}
         </div>
         <hr style="margin-left: 4%; margin-right: -4%; margin-top: 1%;">
 
@@ -180,7 +192,7 @@
            </div>
            <div align="right"
                 style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
-               {{number_format(($dat[0]['grand_total']),2)}}
+               {{customRound(($dat[0]['grand_total']),2)}}
            </div>
         </div>
 
@@ -190,13 +202,13 @@
             </div>
             <div align="right"
                  style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
-                {{number_format($dat[0]['paid'],2)}}
+                {{customRound($dat[0]['paid'],2)}}
             </div>
             <div style="margin-left: 10%;width: 29.6%;margin-top: 2%; padding: -1.6%"><b>Balance</b>
             </div>
             <div align="right"
                  style="margin-top: -10%; padding-top: -1.6%; padding-left: 1%">
-                {{number_format($dat[0]['grand_total'] - $dat[0]['paid'],2)}}
+                {{customRound($dat[0]['grand_total'] - $dat[0]['paid'],2)}}
             </div>
             <div style="margin-left: 10%;width: 29.6%;margin-top: 2%; padding: -1.6%"><b>Remark</b>
             </div>
