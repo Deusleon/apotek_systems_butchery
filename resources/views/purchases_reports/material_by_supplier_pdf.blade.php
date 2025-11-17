@@ -82,20 +82,24 @@
     </style>
 </head>
 <body>
-<div class="row">
-    <div id="container">
-        <div class="logo-container">
-            @if($pharmacy['logo'])
-                <img src="{{public_path('fileStore/logo/'.$pharmacy['logo'])}}"/>
-            @endif
+<div class="row" style="padding-top: -2%">
+    <!-- Header Section - Updated to match Cash Sales Report style -->
+    <div style="width: 100%; text-align: center; align-items: center; margin-bottom: -1%;">
+        @if($pharmacy['logo'])
+            <img style="max-width: 90px; max-height: 90px;"
+                src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
+        @endif
+        <div style="font-weight: bold; font-size: 16px;">{{$pharmacy['name']}}</div>
+        <div style="justify-content: center; font-size: 12px; line-height: 1.2;">
+            {{$pharmacy['address']}}<br>
+            {{$pharmacy['phone']}}<br>
+            {{$pharmacy['email'] . ' | ' . $pharmacy['website']}}
+        </div><br>
+        <div>
+            <h3 align="center" style="font-weight: bold; margin-top: -1%">Material Received Report</h3>
+            <h4 align="center" style="margin-top: -1.5%">Printed On: {{now()->format('Y-m-d H:i:s')}}</h4>
         </div>
     </div>
-</div>
-
-<div class="row" style="padding-top: -2%">
-    <h1 align="center">{{$pharmacy['name']}}</h1>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
-    <h2 align="center" style="margin-top: -1%">Material Received Report</h2>
 
     <div class="row">
         <div class="col-md-12">
