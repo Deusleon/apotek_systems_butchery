@@ -51,12 +51,12 @@
             background: #1f273b;
             color: white;
             text-align: left;
-            padding: 8px 6px;
+            padding: 10px 8px;
             font-weight: bold;
         }
 
         #items td {
-            padding: 6px;
+            padding: 8px;
         }
 
         h1, h2, h3, h4 {
@@ -145,16 +145,19 @@
         <div style="justify-content: center; font-size: 12px; line-height: 1.2;">
             {{ $pharmacy['address'] }}<br>
             {{ $pharmacy['phone'] }}<br>
+            @if(!empty($pharmacy['tin_number']))
+                TIN: {{ $pharmacy['tin_number'] }}<br>
+            @endif
             {{ $pharmacy['email'] . ' | ' . $pharmacy['website'] }}
         </div><br>
         <div>
-            <h3 align="center" style="font-weight: bold; margin-top: -1%">STOCK ISSUE RECEIPT</h3>
-            <h4 align="center" style="margin-top: 0.5%">Printed On: {{ date('Y-m-d H:i:s') }}</h4>
+            <h3 align="center" style="font-weight: bold; margin-top: -1%">STOCK ISSUE HISTORY</h3>
+            <h4 align="center" style="margin-top: -1.5%">Printed On: {{ date('Y-m-d H:i:s') }}</h4>
         </div>
     </div>
 
     <!-- Requisition Info - UPDATED TO MATCH REFERENCE DESIGN -->
-    <div class="content-section page-break-protect" style="margin-top: 20px;">
+    <div class="content-section page-break-protect">
         <table class="info-table">
             <tbody>
                 <tr>
@@ -201,10 +204,10 @@
                     <tr>
                         <td>{{ $index + 1 }}</td>
                         <td>
-                            {{ $item->name ?? '' }}
-                            @if(!empty($item->brand)) {{ $item->brand }} @endif
-                            @if(!empty($item->pack_size) && !empty($item->sales_uom))
-                                {{ $item->pack_size }}{{ $item->sales_uom }}
+                            {{ $item->products_->name ?? '' }}
+                            @if(!empty($item->products_->brand)) {{ $item->products_->brand }} @endif
+                            @if(!empty($item->products_->pack_size) && !empty($item->products_->sales_uom))
+                                {{ $item->products_->pack_size }}{{ $item->products_->sales_uom }}
                             @endif
                         </td>
                         <td class="text-center">{{ number_format($item->quantity, 0) }}</td>

@@ -569,8 +569,7 @@ class RequisitionController extends Controller
     $pharmacy = $this->companyInfo();
     
     // Get requisition details with product information
-    $requisitionDetails = RequisitionDetail::leftJoin('inv_products', 'requisition_details.product', '=', 'inv_products.id')
-        ->select('requisition_details.*', 'inv_products.name', 'inv_products.brand', 'inv_products.pack_size', 'inv_products.sales_uom')
+    $requisitionDetails = RequisitionDetail::with('products_')
         ->where('req_id', $id)
         ->get();
     

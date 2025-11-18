@@ -102,7 +102,7 @@
                                             <option value="5">Credit Payments Report</option>
                                         @endif
                                         @if(auth()->user()->checkPermission('Customer Payment Statement'))
-                                            <option value="6">Customer Credit Payment Statement</option>
+                                            <option value="6">Customer Payment Statement</option>
                                         @endif
                                         <!-- <option value="6">Bill Sales Details Report</option>
                                                                 <option value="7">Company Billing Report</option> -->

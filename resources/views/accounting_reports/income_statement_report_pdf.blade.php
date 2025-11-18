@@ -158,12 +158,12 @@
                 <!-- loop the product names here -->
                 <thead>
                 <tr style="background: #1f273b; color: white;">
-                    <th style="text-align: left;">Sales</th>
+                    <th>Sales</th>
                     <th></th>
                 </tr>
                 </thead>
                 <tr>
-                    <td align="center">Sale Amount</td>
+                    <td align="right">Sale Amount</td>
                     <td align="right">{{number_format($data->last()->total_sell,2)}}</td>
                 </tr>
             </table>
@@ -190,12 +190,12 @@
                 <!-- loop the product names here -->
                 <thead>
                 <tr style="background: #1f273b; color: white;">
-                    <th style="text-align: left;">Cost of Sales</th>
+                    <th>Cost of Sales</th>
                     <th></th>
                 </tr>
                 </thead>
                 <tr>
-                    <td align="center">Buy Amount</td>
+                    <td align="right">Buy Amount</td>
                     <td align="right">{{number_format($data->last()->total_buy,2)}}</td>
                 </tr>
             </table>
@@ -222,12 +222,12 @@
                 <!-- loop the product names here -->
                 <thead>
                 <tr style="background: #1f273b; color: white;">
-                    <th style="text-align: left;">Expenses</th>
+                    <th>Expenses</th>
                     <th></th>
                 </tr>
                 </thead>
                 <tr>
-                    <td align="center">Expense Amount</td>
+                    <td align="right">Expense Amount</td>
                     <td align="right">{{number_format($data->last()->expense_amount,2)}}</td>
                 </tr>
             </table>

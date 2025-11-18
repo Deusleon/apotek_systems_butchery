@@ -51,7 +51,7 @@
 
         #table-detail-main {
             width: 103%;
-            margin-top: -2%;
+            margin-top: 2%;
             margin-bottom: -2%;
             border-collapse: collapse;
         }
@@ -204,7 +204,7 @@
                     <div class="col-25"></div>
                     <div class="col-25">
                         <div class="full-row">
-                            <div class="col-50" align="left"><b>Total Sell: </b></div>
+                            <div class="col-50" align="left"><b>Total Sales: </b></div>
                             <div class="col-50" align="right">{{number_format($data[0]['cost_by_supplier'][$key][0]['total_sell'],2)}}</div>
                         </div>
                     </div>
@@ -250,7 +250,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding: 6px; text-align: right; white-space: nowrap;"><b>Total Sell</b></td>
+                        <td style="padding: 6px; text-align: right; white-space: nowrap;"><b>Total Sales</b></td>
                         <td style="padding: 6px; text-align: center; white-space: nowrap;"><b>:</b></td>
                         <td style="
                             padding: 6px; 
@@ -282,25 +282,18 @@
 </div>
 
 <script type="text/php">
-if (isset($pdf)) {
-
-    $width = $pdf->get_width();
-    $height = $pdf->get_height();
-
-    // Center horizontally, 30px from bottom
-    $x = $width / 2 - 50;
-    $y = $height - 30;
-
-    $text = "{PAGE_NUM} of {PAGE_COUNT} pages";
-
-    // Use a safe non-bold font
-    $font = $fontMetrics->get_font("helvetica", "normal");
-
-    $size = 10;
-    $color = array(0,0,0);
-
-    $pdf->page_text($x, $y, $text, $font, $size, $color);
-}
+    if ( isset($pdf) ) {
+        $x = 400;
+        $y = 560;
+        $text = "{PAGE_NUM} of {PAGE_COUNT} pages";
+        $font = null;
+        $size = 10;
+        $color = array(0,0,0);
+        $word_space = 0.0;
+        $char_space = 0.0;
+        $angle = 0.0;
+        $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
+    }
 </script>
 
 </body>

@@ -16,7 +16,7 @@
         table, th, td {
             /*border: 1px solid black;*/
             border-collapse: collapse;
-            padding: 5px;
+            padding: 10px;
         }
 
         table {
@@ -44,7 +44,7 @@
 
         #table-detail-main {
             width: 103%;
-            margin-top: -12%;
+            margin-top: -10%;
             margin-bottom: -3%;
             border-collapse: collapse;
         }
@@ -134,7 +134,7 @@
         </div>
     </div>
 
-    <div class="row" style="margin-top: 5%;">
+    <div class="row" style="margin-top: 7%;">
         <div class="col-md-12">
             <table id="table-detail-main">
                 <tr>
@@ -145,7 +145,6 @@
                 <!-- loop the product names here -->
                 <thead>
                 <tr style="background: #1f273b; color: white;">
-                    <th align="center" style="width: 5%;">#</th>
                     <th align="left">Product</th>
                     <th align="left">Category</th>
                     <th align="right">Total Buy</th>
@@ -155,7 +154,6 @@
                 </thead>
                 @foreach($data as $item)
                     <tr>
-                        <td align="center" style="width: 5%;">{{ $loop->index + 1 }}</td>
                         <td align="left">{{$item['product_name']}}</td>
                         <td align="left">{{$item['category_name']}}</td>
                         <td align="right">{{number_format($item['buy_price'],2)}}</td>
@@ -168,32 +166,55 @@
 
         <hr>
 
-        <table id="table-detail" align="center">
-            <tr>
-                <td style="width: 5%;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td align="right"><b>Total Buy:</b></td>
-                <td align="right">{{number_format(max(array_column($data, 'grand_total_buy')),2)}}</td>
-            </tr>
-            <tr>
-                <td style="width: 5%;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td align="right"><b>Total Sell:</b></td>
-                <td align="right">{{number_format(max(array_column($data, 'grand_total_sell')),2)}}</td>
-            </tr>
-            <tr>
-                <td style="width: 5%;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td align="right"><b>Total Profit:</b></td>
-                <td align="right">{{number_format(max(array_column($data, 'grand_total_profit')),2)}}</td>
-            </tr>
-        </table>
+        <div class="full-row" style="padding-top: 1%">
+            <div class="col-25">
+                <div class="full-row">
+                </div>
+
+            </div>
+            <div class="col-15"></div>
+            <div class="col-25"></div>
+            <div class="col-35">
+                <div class="full-row">
+                    <div class="col-50" align="left"><b>Total Buy: </b></div>
+                    <div class="col-50"
+                         align="right">{{number_format(max(array_column($data, 'grand_total_buy')),2)}}</div>
+                </div>
+            </div>
+        </div>
+        <div class="full-row" style="padding-top: 1%">
+            <div class="col-25">
+                <div class="full-row">
+                </div>
+
+            </div>
+            <div class="col-15"></div>
+            <div class="col-25"></div>
+            <div class="col-35">
+                <div class="full-row">
+                    <div class="col-50" align="left"><b>Total Sell: </b></div>
+                    <div class="col-50"
+                         align="right">{{number_format(max(array_column($data, 'grand_total_sell')),2)}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="full-row" style="padding-top: 1%">
+            <div class="col-25">
+                <div class="full-row">
+                </div>
+
+            </div>
+            <div class="col-15"></div>
+            <div class="col-25"></div>
+            <div class="col-35">
+                <div class="full-row">
+                    <div class="col-50" align="left"><b>Total Profit: </b></div>
+                    <div class="col-50"
+                         align="right">{{number_format(max(array_column($data, 'grand_total_profit')),2)}}</div>
+                </div>
+            </div>
+        </div>
 
         <hr>
         <!-- SUMMARY - Centered like Gross Profit Detail Report -->
@@ -222,25 +243,25 @@
 </div>
 
 <script type="text/php">
-if (isset($pdf)) {
+    if ( isset($pdf) ) {
+        $x = 280;
+        $y = 820;
+        $text = "{PAGE_NUM} of {PAGE_COUNT} pages";
+        $font = null;
+        $size = 10;
+        $color = array(0,0,0);
+        $word_space = 0.0;  //  default
+        $char_space = 0.0;  //  default
+        $angle = 0.0;   //  default
+        $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
 
-    $width = $pdf->get_width();
-    $height = $pdf->get_height();
 
-    // Center horizontally, 30px from bottom
-    $x = $width / 2 - 50;
-    $y = $height - 30;
+     }
 
-    $text = "{PAGE_NUM} of {PAGE_COUNT} pages";
 
-    // Use a safe non-bold font
-    $font = $fontMetrics->get_font("helvetica", "normal");
 
-    $size = 10;
-    $color = array(0,0,0);
 
-    $pdf->page_text($x, $y, $text, $font, $size, $color);
-}
+
 </script>
 
 </body>
