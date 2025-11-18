@@ -202,7 +202,7 @@
                 <div class="col-25"></div>
                 <div class="col-35">
                     <div class="full-row">
-                        <div class="col-50" align="left"><b>Total Sales: </b></div>
+                        <div class="col-50" align="left"><b>Total Sell: </b></div>
                         <div class="col-50" align="right">{{number_format($data->first()->total_sp,2)}}</div>
                     </div>
                 </div>
@@ -224,18 +224,25 @@
 </div>
 
 <script type="text/php">
-    if ( isset($pdf) ) {
-        $x = 400;
-        $y = 560;
-        $text = "{PAGE_NUM} of {PAGE_COUNT} pages";
-        $font = null;
-        $size = 10;
-        $color = array(0,0,0);
-        $word_space = 0.0;
-        $char_space = 0.0;
-        $angle = 0.0;
-        $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
-     }
+if (isset($pdf)) {
+
+    $width = $pdf->get_width();
+    $height = $pdf->get_height();
+
+    // Center horizontally, 30px from bottom
+    $x = $width / 2 - 50;
+    $y = $height - 30;
+
+    $text = "{PAGE_NUM} of {PAGE_COUNT} pages";
+
+    // Use a safe non-bold font
+    $font = $fontMetrics->get_font("helvetica", "normal");
+
+    $size = 10;
+    $color = array(0,0,0);
+
+    $pdf->page_text($x, $y, $text, $font, $size, $color);
+}
 </script>
 
 </body>

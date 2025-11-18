@@ -8,6 +8,10 @@
             font-family: Verdana, Arial, sans-serif;
         }
 
+         body {
+            font-size: 12px;
+        }
+
         table, th, td {
             border-collapse: collapse;
             padding: 10px;
@@ -40,6 +44,14 @@
             display: inline-block;
             font-size: 13px;
             width: 25%;
+        }
+
+         h3 {
+            font-weight: normal;
+        }
+
+        h4 {
+            font-weight: normal;
         }
 
         #table-detail {
@@ -128,12 +140,14 @@
     <div class="row">
         <table class="table table-sm" id="table-detail" align="center">
             <tr class="table-header">
+                <th align="center" style="width: 5%;">#</th>
                 <th align="left">Product Name</th>
-                <th align="right">Qty</th>
+                <th align="right">Quantity</th>
             </tr>
 
             @foreach($requisitionDet as $item)
                 <tr>
+                    <td align="center" style="width: 5%;">{{ $loop->index + 1 }}</td>
                     <td align="left">
                         {{ $item->products_->name ?? '' }}
                         @if(!empty($item->products_->brand)) {{ $item->products_->brand }} @endif
@@ -148,7 +162,34 @@
     </div>
 
     <h6 align="center">Created By: {{ $requisition->creator->name }}</h6>
-    <h6 align="center" style="font-style: italic; margin-top: -2%">{{ $pharmacy['slogan'] }}</h6>
+    <h6 align="center" style="font-style: italic; margin-top: -2%">Created Date: {{ date('Y-m-d', strtotime($requisition->created_at)) }}</h6>
 </div>
+
+<script type="text/php">
+if (isset($pdf)) {
+
+    $width = $pdf->get_width();
+    $height = $pdf->get_height();
+
+    // Slogan at the bottom, above page number
+    $x_slogan = $width / 2 - 50;
+    $y_slogan = $height - 50;
+    $text_slogan = "{{ $pharmacy['slogan'] }}";
+    $font_slogan = $fontMetrics->get_font("helvetica", "italic");
+    $size_slogan = 10;
+    $color_slogan = array(0,0,0);
+    $pdf->page_text($x_slogan, $y_slogan, $text_slogan, $font_slogan, $size_slogan, $color_slogan);
+
+    // Page numbers at the bottom
+    $x = $width / 2 - 50;
+    $y = $height - 30;
+    $text = "{PAGE_NUM} of {PAGE_COUNT} pages";
+    $font = $fontMetrics->get_font("helvetica", "normal");
+    $size = 10;
+    $color = array(0,0,0);
+    $pdf->page_text($x, $y, $text, $font, $size, $color);
+}
+</script>
+
 </body>
 </html>
