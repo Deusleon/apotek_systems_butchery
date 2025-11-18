@@ -133,27 +133,29 @@
             <h4 align="center" style="margin-top: -1%">From: <b>{{date('Y-m-d',strtotime($data->first()->from))}}</b> To:
                 <b>{{date('Y-m-d',strtotime($data->first()->to))}}</b>
             </h4>
-            <h4 align="center" style="margin-top: -1.5%">Printed On: {{now()->format('Y-m-d H:i:s')}}</h4>
+            <h4 align="center" style="margin-top: -1.2%">Printed On: {{now()->format('Y-m-d H:i:s')}}</h4>
         </div>
     </div>
 
-    <div class="row" style="margin-top: 1%;">
+    <div class="row" style="margin-top: 0.3%;">
         <div class="col-md-12">
             <table id="table-detail" align="center">
                 <!-- loop the product names here -->
                 <thead>
                 <tr style="background: #1f273b; color: white;">
+                    <th style="width: 5%">#</th>
                     <th align="left" style="width: 14%;">Date</th>
-                    <th align="left" style="width: 14%;">Pay Method</th>
-                    <th align="left" style="width: 14%;">Category</th>
-                    <th align="left" style="width: 14%;">Updated by</th>
-                    <th align="left" style="width: 30%;">Description</th>
+                    <th align="left" style="width: 13%;">Pay Method</th>
+                    <th align="left" style="width: 13%;">Category</th>
+                    <th align="left" style="width: 12%;">Updated By</th>
+                    <th align="left" style="width: 29%;">Description</th>
                     <th align="right" style="width: 14%;">Amount</th>
                     {{--                <th>Payment Method</th>--}}
                 </tr>
                 </thead>
                 @foreach($data as $item)
                     <tr>
+                        <td>{{ $loop->index + 1 }}</td>
                         <td align="left" style="width: 14%;">{{date('Y-m-d',strtotime($item->created_at))}}</td>
                         <td align="left" style="width: 14%;">
                             @if($item->payment_method_id == 1)
