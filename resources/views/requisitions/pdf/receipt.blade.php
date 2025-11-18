@@ -8,6 +8,10 @@
             font-family: Verdana, Arial, sans-serif;
         }
 
+         body {
+            font-size: 12px;
+        }
+
         table, th, td {
             border-collapse: collapse;
             padding: 10px;
@@ -40,6 +44,14 @@
             display: inline-block;
             font-size: 13px;
             width: 25%;
+        }
+
+         h3 {
+            font-weight: normal;
+        }
+
+        h4 {
+            font-weight: normal;
         }
 
         #table-detail {
@@ -129,7 +141,7 @@
         <table class="table table-sm" id="table-detail" align="center">
             <tr class="table-header">
                 <th align="left">Product Name</th>
-                <th align="right">Qty</th>
+                <th align="right">Quantity</th>
             </tr>
 
             @foreach($requisitionDet as $item)
