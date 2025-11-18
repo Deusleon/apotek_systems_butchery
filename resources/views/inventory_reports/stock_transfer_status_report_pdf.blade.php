@@ -120,7 +120,7 @@
                                 <tr style="background: #1f273b; color: white;">
                                     <th align="left">#</th>
                                     <th align="left" style="min-width: 5%;">Date</th>
-                                    <th align="left">Product Name</th>
+                                    <th align="left" style="width: 290px;">Product Name</th>
                                     <th align="left">Transfer #</th>
                                     <th align="left">From</th>
                                     <th align="left">To</th>
