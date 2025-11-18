@@ -113,7 +113,7 @@
 
             <div align="left" style="margin-top: 20px; width: 55%;">
                 <div class="full-row" style="margin-bottom: 3px;">
-                    <div class="col-50"><b>Receipt Number:</b> {{$datas}}</div>
+                    <div class="col-50"><b>Receipt #:</b> {{$datas}}</div>
                 </div>
 
                 <div class="full-row" style="width: 100%;">

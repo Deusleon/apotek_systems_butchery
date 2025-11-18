@@ -115,7 +115,7 @@
                             <th align="left" style="width: 70px;">Date</th>
                             <th align="left">Product Name</th>
                             <th align="left">Transfer #</th>
-                            <th align="center">Quantity</th>
+                            <th align="" >Quantity</th>
                             <th align="left">From</th>
                             <th align="left">To</th>
                             <th align="left">Status</th>
@@ -125,7 +125,7 @@
                         <tr>
                             <td align="center" style="width: 20px;">{{$loop->iteration}}.</td>
                             <td align="left" style="width: 70px;">{{date('Y-m-d', strtotime($item->created_at))}}</td>
-                            <td>
+                            <td style="width: 290px;">
                                 @if($item->currentStock && $item->currentStock->product)
                                     {{ $item->currentStock->product->name ?? '' }}
                                     {{ $item->currentStock->product->brand ?? '' }}
@@ -140,7 +140,7 @@
                                 $item->currentStock['product']['sales_uom'] ?? ''}} --}}
                             </td>
                             <td align="left">{{$item->transfer_no}}</td>
-                            <td align="center" style="text-align: center;">{{number_format($item->transfer_qty)}}</td>
+                            <td align="">{{number_format($item->transfer_qty)}}</td>
                             <td align="left">{{$item->fromStore['name']}}</td>
                             <td align="left">{{$item->toStore['name']}}</td>
                             <td align="left">

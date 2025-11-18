@@ -112,7 +112,7 @@
             <table id="table-detail" align="center">
                 <thead>
                     <tr style="background: #1f273b; color: white;">
-                        <th align="center" style="width: 5%;">#</th>
+                        <th align="center" style="width: 22px;">#</th>
                         <th align="left" style="width: 100px;">Date</th>
                         <th align="right">Sub Total</th>
                         <th align="right">VAT</th>

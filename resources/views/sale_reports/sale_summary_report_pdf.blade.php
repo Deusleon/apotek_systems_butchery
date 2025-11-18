@@ -112,10 +112,10 @@
             <table id="table-detail" align="center">
                 <thead>
                     <tr style="background: #1f273b; color: white;">
-                        <th align="center" style="width: 3%;">#</th>
-                        <th align="left" style="width: 8%;">Receipt #</th>
-                        <th align="left">Date</th>
-                        <th align="left">Customer Name</th>
+                        <th align="center" style="width: 15px;">#</th>
+                        <th align="left" style="width: 30px;">Receipt #</th>
+                        <th align="left" style="width: 70px;">Date</th>
+                        <th align="left" style="width: 190px;">Customer Name</th>
                         <th align="left">Sold By</th>
                         <th align="right">Sub Total</th>
                         <th align="right">VAT</th>
