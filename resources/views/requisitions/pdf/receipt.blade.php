@@ -140,12 +140,14 @@
     <div class="row">
         <table class="table table-sm" id="table-detail" align="center">
             <tr class="table-header">
+                <th align="center" style="width: 5%;">#</th>
                 <th align="left">Product Name</th>
                 <th align="right">Quantity</th>
             </tr>
 
             @foreach($requisitionDet as $item)
                 <tr>
+                    <td align="center" style="width: 5%;">{{ $loop->index + 1 }}</td>
                     <td align="left">
                         {{ $item->products_->name ?? '' }}
                         @if(!empty($item->products_->brand)) {{ $item->products_->brand }} @endif
