@@ -51,7 +51,7 @@
 
         #table-detail-main {
             width: 103%;
-            margin-top: 2%;
+            margin-top: -2%;
             margin-bottom: -2%;
             border-collapse: collapse;
         }
