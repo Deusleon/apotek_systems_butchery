@@ -70,6 +70,9 @@
                                     <label for="products">Products <font color="red">*</font></label>
                                     <select name="products" class="js-example-basic-single form-control products" id="products">
                                         <option value="">Select Products...</option>
+                                        @php
+                                            $items = collect($items)->sortBy('name');
+                                        @endphp
                                         @foreach ($items as $item)
                                             <option value='@json($item)'>
                                                 {{ $item->name }} {{ $item->brand }} {{ $item->pack_size }}{{ $item->sales_uom }}
@@ -379,6 +382,9 @@
                 success: function(products) {
                     // Clear existing options except the first one
                     $('#products').find('option:not(:first)').remove();
+
+                    // Sort products alphabetically by name
+                    products.sort((a, b) => a.name.localeCompare(b.name));
 
                     // Add filtered products
                     products.forEach(function(product) {
