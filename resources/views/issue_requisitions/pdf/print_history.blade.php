@@ -56,7 +56,7 @@
         }
 
         #items td {
-            padding: 8px;
+            padding: 4px;
         }
 
         h1, h2, h3, h4 {
@@ -136,7 +136,7 @@
 </head>
 <body>
     <!-- Header Section - Updated to match Cash Sales Report style -->
-    <div style="width: 100%; text-align: center; align-items: center; margin-bottom: -1%;" class="page-break-protect">
+    <div style="width: 100%; text-align: center; align-items: center; margin-bottom: 3%;" class="page-break-protect">
         @if($pharmacy['logo'])
             <img style="max-width: 90px; max-height: 90px;"
                 src="{{ public_path('fileStore/logo/' . $pharmacy['logo']) }}" />
@@ -145,14 +145,11 @@
         <div style="justify-content: center; font-size: 12px; line-height: 1.2;">
             {{ $pharmacy['address'] }}<br>
             {{ $pharmacy['phone'] }}<br>
-            @if(!empty($pharmacy['tin_number']))
-                TIN: {{ $pharmacy['tin_number'] }}<br>
-            @endif
             {{ $pharmacy['email'] . ' | ' . $pharmacy['website'] }}
         </div><br>
         <div>
-            <h3 align="center" style="font-weight: bold; margin-top: -1%">STOCK ISSUE HISTORY</h3>
-            <h4 align="center" style="margin-top: -1.5%">Printed On: {{ date('Y-m-d H:i:s') }}</h4>
+            <h3 align="center" style="font-weight: bold; margin-top: -1%">STOCK ISSUE RECEIPT</h3>
+            <h4 align="center" style="margin-top: -0.5%">Printed On: {{ date('Y-m-d H:i:s') }}</h4>
         </div>
     </div>
 
