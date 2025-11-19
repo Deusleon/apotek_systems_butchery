@@ -6,8 +6,8 @@
         body {
             font-family: Arial, sans-serif;
             font-size: 14px;
-            margin: -15px;
-            margin-top: -25px;
+            margin: -13px;
+            margin-top: -10px;
             padding: 0;
             position: relative;
             min-height: 100vh;
@@ -136,7 +136,6 @@
         </div><br>
         <div>
             <h3 align="center" style="font-weight: bold; margin-top: -1%">PURCHASE ORDER</h3>
-            <h4 align="center" style="margin-top: -1.5%">Printed On: {{date('Y-m-d H:i:s')}}</h4>
         </div>
     </div>
 
@@ -149,7 +148,7 @@
             </tr>
             <tr>
                 <td style="width: 40px; padding-left: 10px;">Order Date : {{date('Y-m-d', strtotime($data[0]->order['ordered_at']))}}</td>
-                <td style="width: 80px; padding-left: 10px;">TIN : {{$pharmacy['tin_number'] ?? 'N/A'}}</td>
+                <td style="width: 80px; padding-left: 10px;">Address : {{$data[0]->order->supplier->address}}</td>
             </tr>
         </tbody>
     </table>
@@ -197,7 +196,7 @@
     <div style="display: inline-flex;">
         <div>
             <div class="footer-section">
-                <div class="issued-by">Ordered By:</div>
+                <div class="issued-by">Ordered By: {{$data[0]->order->user->name}}</div>
                 <span style="font-size: 10px; border-bottom: 1px solid #ccc;">Printed on: {{date('Y-m-d H:i:s')}}</span>
             </div>
 
