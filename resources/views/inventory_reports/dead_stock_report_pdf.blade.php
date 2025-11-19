@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Stock Stock Report</title>
+    <title>Dead Stock Report</title>
 
     <style>
         body {
@@ -108,7 +108,7 @@
                 <table id="table-detail" align="center">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th style="width: 3%;">#</th>
                             {{-- <th>Code</th> --}}
                             <th>Product Name</th>
                             {{-- <th>Category</th> --}}
