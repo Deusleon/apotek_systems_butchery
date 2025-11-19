@@ -80,53 +80,55 @@
 <body>
 
 <div class="row" style="padding-top: -2%">
-    <h1 align="center">{{$pharmacy['name']}}</h1>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['address']}}</h3>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['phone']}}</h3>
-    <h3 align="center" style="margin-top: -1%">{{$pharmacy['email'].' | '.$pharmacy['website']}}</h3>
-    <h2 align="center" style="margin-top: -1%">Stock Issue Report</h2>
+    <div style="width: 100%; text-align: center; align-items: center; margin-bottom: -1%;">
+        @if($pharmacy['logo'])
+            <img style="max-width: 90px; max-height: 90px;"
+                src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
+        @endif
+        <div style="font-weight: bold; font-size: 16px;">{{$pharmacy['name']}}</div>
+        <div style="justify-content: center; font-size: 12px; line-height: 1.2;">
+            {{$pharmacy['address']}}<br>
+            {{$pharmacy['phone']}}<br>
+            {{$pharmacy['email'] . ' | ' . $pharmacy['website']}}
+        </div>
+        <div>
 
-    <div class="row" style="margin-top: 10%;">
+        </div>
+            <h3 align="center" style="font-weight: bold; margin-top: -2%">Stock Issue Report</h3>
+            <h4 align="center" style="margin-top: -1%">From: {{date('d-m-Y',strtotime($data[0]['dates'][0]))}} To: {{date('d-m-Y',strtotime($data[0]['dates'][1]))}} </h4>
+            <h4 align="center" style="margin-top: -1.5%">Printed On: {{now()->format('Y-m-d H:i:s')}}</h4>
+        </div>
+
+    <div class="row" style="margin-top: -2%;">
         <div class="col-md-12">
-            <table id="table-detail-main">
-                <tr>
-                    <td style="background: #1f273b; color: white"><b>From
-                            Date:</b> {{date('d-m-Y',strtotime($data[0]['dates'][0]))}}</td>
-                    <td style="background: #1f273b; color: white"><b>To
-                            Date:</b> {{date('d-m-Y',strtotime($data[0]['dates'][1]))}}</td>
-                </tr>
-            </table>
             <table id="table-detail" align="center">
                 <!-- loop the product names here -->
                 <thead>
                 <tr style="background: #1f273b; color: white;">
-                    <th>Code</th>
-                    <th>Product Name</th>
-                    <th>Buy Price</th>
-                    <th>Sell Price</th>
-                    <th>Issue Qty</th>
-                    {{--                <th>SubTotal</th>--}}
-                    <th>Issue No</th>
-                    <th>Issued By</th>
-                    <th>Issued Date</th>
-                    <th>Issued To</th>
+                    <th align="left" style="width: 1%;">#</th>
+                    <th align="left">Code</th>
+                    <th align="left">Product Name</th>
+                    <th align="right">Buy Price</th>
+                    <th align="right">Sell Price</th>
+                    <th align="center">Issue Qty</th>
+                    <th align="left">Issue No</th>
+                    <th align="left">Issued By</th>
+                    <th align="left">Issued Date</th>
+                    <th align="left">Issued To</th>
                 </tr>
                 </thead>
                 @foreach($data as $item)
                     <tr>
-                        <td>{{$item['product_id']}}</td>
-                        <td>{{$item['name']}}</td>
+                        <td align="left">{{$loop->iteration}}.</td>
+                        <td align="left">{{$item['product_id']}}</td>
+                        <td align="left">{{$item['name']}}</td>
                         <td align="right">{{number_format($item['buy_price'],2)}}</td>
                         <td align="right">{{number_format($item['sell_price'],2)}}</td>
-                        <td align="right">
-                            <div style="margin-right: 50%">
-                                {{number_format($item['issue_qty'])}}</div>
-                        </td>
-                        {{--                    <td align="right">{{number_format(floatval($item['buy_price_sb']))}}</td>--}}
-                        <td align="">{{$item['issue_no']}}</td>
-                        <td align="">{{$item['issued_by']}}</td>
-                        <td align="">{{$item['issued_date']}}</td>
-                        <td align="">{{$item['issued_to']}}</td>
+                        <td align="center">{{number_format($item['issue_qty'],0)}}</td>
+                        <td align="left">{{$item['issue_no']}}</td>
+                        <td align="left">{{$item['issued_by']}}</td>
+                        <td align="left">{{$item['issued_date']}}</td>
+                        <td align="left">{{$item['issued_to']}}</td>
                     </tr>
                 @endforeach
             </table>

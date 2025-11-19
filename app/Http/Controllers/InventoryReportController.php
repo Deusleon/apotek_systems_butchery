@@ -293,7 +293,7 @@ try {
             case 8:
                 //stock issue report
                 $dates = explode(" - ", $request->issue_date);
-                if ($request->stock_issue == null) {
+                if ($request->stock_issue == null || $request->stock_issue == '0') {
 
                     $data = $this->stockIssueReport($dates);
                     if ($data == []) {
@@ -308,7 +308,7 @@ try {
                     //stock issue return report
                     if ($request->stock_issue == 2) {
                         $data = $this->stockIssueReturnReport($request->stock_issue, $dates);
-                        if ($data->isEmpty()) {
+                        if (empty($data)) {
                             return response()->view('error_pages.pdf_zero_data');
                         }
                 $pdf = PDF::loadView( 'inventory_reports.issue_return_report_pdf',
@@ -317,13 +317,13 @@ try {
                 return $pdf->stream( 'issue_return_report.pdf' );
                     } else {
                         $data = $this->stockIssueReturnReport($request->stock_issue, $dates);
-                        if ($data->isEmpty()) {
+                        if (empty($data)) {
                             return response()->view('error_pages.pdf_zero_data');
                         }
                 $pdf = PDF::loadView( 'inventory_reports.issue_issued_report_pdf',
                 compact( 'data', 'pharmacy' ) )
                 ->setPaper( 'a4', '' );
-                return $pdf->stream( 'issue_return_report.pdf' );
+                return $pdf->stream( 'issue_issued_report.pdf' );
                     }
                 }
             case 9:
@@ -1195,31 +1195,44 @@ try {
         $total_bp = 0;
         $total_sp = 0;
 
-        $stock_issue = StockIssue::whereBetween(DB::raw('date( created_at )'),
-            [date('Y-m-d', strtotime($issue_date[0])), date('Y-m-d', strtotime($issue_date[1]))])
-            ->get();
+        $start = date('Y-m-d', strtotime($issue_date[0]));
+        $end = date('Y-m-d', strtotime($issue_date[1]));
 
-        foreach ($stock_issue as $issue) {
+        $query = StockTracking::where('out_mode', 'Requisition Issued')
+            ->whereBetween(DB::raw('date(updated_at)'), [$start, $end])
+            ->with(['currentStock.product', 'user', 'store']);
 
-            $buy_price_sub_total = floatval($issue->quantity) *
-                floatval(preg_replace('/[ ^\d. ]/', '', $issue->unit_cost));
+        // Temporarily show all stores for testing
+        // if (!is_all_store()) {
+        //     $query->where('store_id', current_store_id());
+        // }
+
+        $stock_issues = $query->get();
+
+        foreach ($stock_issues as $issue) {
+            // Get price from current stock or price list
+            $currentStock = $issue->currentStock;
+            $product = $currentStock ? $currentStock->product : null;
+            $buy_price = $currentStock ? $currentStock->unit_cost : 0;
+            $sell_price = $currentStock ? ($currentStock->getActivePrice() ? $currentStock->getActivePrice()->price : $currentStock->unit_cost) : 0;
+
+            $buy_price_sub_total = floatval($issue->quantity) * floatval($buy_price);
             $total_bp = $total_bp + $buy_price_sub_total;
 
-            $sell_price_sub_total = floatval($issue->quantity) *
-                floatval(preg_replace('/[ ^\d. ]/', '', $issue->sales_price));
+            $sell_price_sub_total = floatval($issue->quantity) * floatval($sell_price);
             $total_sp = $total_sp + $sell_price_sub_total;
 
             array_push($to_pdf, array(
-                'product_id' => $issue->currentStock['product']['id'],
-                'name' => $issue->currentStock['product']['name'],
-                'buy_price' => $issue->unit_cost,
-                'sell_price' => $issue->sales_price,
+                'product_id' => $issue->product_id ?: '',
+                'name' => $product ? $product->name . ' ' . ($product->brand ?? '') . ' ' . ($product->pack_size ?? '') . ($product->sales_uom ?? '') : 'Unknown Product',
+                'buy_price' => $buy_price,
+                'sell_price' => $sell_price,
                 'issue_qty' => $issue->quantity,
-                'sub_total' => $issue->sub_total,
-                'issue_no' => $issue->issue_no,
-                'issued_by' => $issue->user['name'],
-                'issued_date' => date('Y-m-d', strtotime($issue->created_at)),
-                'issued_to' => $issue->issueLocation['name'],
+                'sub_total' => $sell_price_sub_total,
+                'issue_no' => $issue->id,
+                'issued_by' => $issue->user ? $issue->user->name : '',
+                'issued_date' => date('Y-m-d', strtotime($issue->updated_at)),
+                'issued_to' => $issue->store ? $issue->store->name : 'Unknown Store',
                 'buy_price_sb' => $buy_price_sub_total,
                 'sell_price_sb' => $sell_price_sub_total,
                 'total_bp' => $total_bp,
@@ -1235,16 +1248,64 @@ try {
         if (!Auth()->user()->checkPermission('Stock Issue Return Report')) {
             abort(403, 'Access Denied');
         }
+        $start = date('Y-m-d', strtotime($dates[0]));
+        $end = date('Y-m-d', strtotime($dates[1]));
+
+        $query = StockTracking::whereBetween(DB::raw('date(updated_at)'), [$start, $end])
+            ->with(['currentStock.product', 'user', 'store']);
+
+        // Temporarily show all stores
+        // if (!is_all_store()) {
+        //     $query->where('store_id', current_store_id());
+        // }
+
         if ($status == 2) {
-            $issue_return = IssueReturn::all();
-            return $issue_return;
+            // For returned items
+            $query->where('out_mode', 'Purchase Return');
         } else {
-            $issues = StockIssue::leftJoin('inv_issue_returns', function ($join) {
-                $join->on('inv_stock_issues.id', '=', 'inv_issue_returns.issue_id');
-            })->where('status', $status)->get();
-            return $issues;
+            // For issued items
+            $query->where('out_mode', 'Requisition Issued');
         }
 
+        $tracking_records = $query->get();
+
+        // Convert to array format like stockIssueReport
+        $to_pdf = array();
+        $total_bp = 0;
+        $total_sp = 0;
+
+        foreach ($tracking_records as $issue) {
+            $currentStock = $issue->currentStock;
+            $product = $currentStock ? $currentStock->product : null;
+            $buy_price = $currentStock ? $currentStock->unit_cost : 0;
+            $sell_price = $currentStock ? ($currentStock->getActivePrice() ? $currentStock->getActivePrice()->price : $currentStock->unit_cost) : 0;
+
+            $buy_price_sub_total = floatval($issue->quantity) * floatval($buy_price);
+            $total_bp = $total_bp + $buy_price_sub_total;
+
+            $sell_price_sub_total = floatval($issue->quantity) * floatval($sell_price);
+            $total_sp = $total_sp + $sell_price_sub_total;
+
+            $to_pdf[] = array(
+                'product_id' => $issue->product_id ?: '',
+                'name' => $product ? $product->name . ' ' . ($product->brand ?? '') . ' ' . ($product->pack_size ?? '') . ($product->sales_uom ?? '') : 'Unknown Product',
+                'buy_price' => $buy_price,
+                'sell_price' => $sell_price,
+                'issue_qty' => $issue->quantity,
+                'sub_total' => $sell_price_sub_total,
+                'issue_no' => $issue->id,
+                'issued_by' => $issue->user ? $issue->user->name : '',
+                'issued_date' => date('Y-m-d', strtotime($issue->updated_at)),
+                'issued_to' => $issue->store ? $issue->store->name : 'Unknown Store',
+                'buy_price_sb' => $buy_price_sub_total,
+                'sell_price_sb' => $sell_price_sub_total,
+                'total_bp' => $total_bp,
+                'total_sp' => $total_sp,
+                'dates' => $dates
+            );
+        }
+
+        return $to_pdf;
     }
     private function stockTransferReport($dates)
     {

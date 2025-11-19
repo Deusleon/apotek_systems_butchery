@@ -29,12 +29,17 @@ class StockTracking extends Model
 
     public function user()
     {
-	    return $this->belongsTo(User::class,'created_by');
+      return $this->belongsTo(User::class,'updated_by');
     }
     
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_id', 'id');
+    }
+
+    public function store()
+    {
+        return $this->belongsTo(Store::class, 'store_id');
     }
 
 }
