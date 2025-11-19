@@ -112,20 +112,20 @@
                     <thead>
                         <tr style="background: #1f273b; color: white;">
                             <th align="center" style="text-align: center; width: 20px;">#</th>
-                            <th align="left" style="width: 70px;">Date</th>
-                            <th align="left">Product Name</th>
-                            <th align="left">Transfer #</th>
-                            <th align="center">Quantity</th>
+                            <th align="left" style="width: 80px;">Date</th>
+                            <th align="left" style="width: 300px;">Product Name</th>
+                            <th align="left" style="width: 70px;">Transfer #</th>
+                            <th align="" style="width: 90px; text-align: center;">Quantity</th>
                             <th align="left">From</th>
                             <th align="left">To</th>
-                            <th align="left">Status</th>
+                            <th align="left" style="width: 100px;">Status</th>
                         </tr>
                     </thead>
                     @foreach($data as $item)
                         <tr>
                             <td align="center" style="width: 20px;">{{$loop->iteration}}.</td>
-                            <td align="left" style="width: 70px;">{{date('Y-m-d', strtotime($item->created_at))}}</td>
-                            <td>
+                            <td align="left" style="width: 80px;">{{date('Y-m-d', strtotime($item->created_at))}}</td>
+                            <td style="width: 300px;">
                                 @if($item->currentStock && $item->currentStock->product)
                                     {{ $item->currentStock->product->name ?? '' }}
                                     {{ $item->currentStock->product->brand ?? '' }}
@@ -139,11 +139,11 @@
                                 ($item->currentStock['product']['pack_size'] ?? '') .
                                 $item->currentStock['product']['sales_uom'] ?? ''}} --}}
                             </td>
-                            <td align="left">{{$item->transfer_no}}</td>
-                            <td align="center" style="text-align: center;">{{number_format($item->transfer_qty)}}</td>
+                            <td align="left" style="width: 70px;">{{$item->transfer_no}}</td>
+                            <td align="" style="width: 90px; text-align: center;">{{number_format($item->transfer_qty)}}</td>
                             <td align="left">{{$item->fromStore['name']}}</td>
                             <td align="left">{{$item->toStore['name']}}</td>
-                            <td align="left">
+                            <td align="left" style="width: 100px;">
                                 @php
                                     $status = ucfirst($item->status ?? '');
                                     $color = 'black';
