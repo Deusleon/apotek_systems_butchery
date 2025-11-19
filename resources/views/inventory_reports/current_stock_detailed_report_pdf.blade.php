@@ -108,20 +108,20 @@
                 <table id="table-detail">
                     <thead>
                         <tr style="background: #1f273b; color: white;">
-                            <th>#</th>
+                            <th style="width: 20px;">#</th>
                             {{-- <th>Code</th> --}}
-                            <th>Product Name</th>
+                            <th style="width: auto;">Product Name</th>
                             <th>Batch No</th>
                             {{-- <th style="text-align: center">Expiry Date</th> --}}
-                            <th style="text-align: center">Quantity</th>
+                            <th style="text-align: center;">Quantity</th>
                         </tr>
                     </thead>
 
                     @foreach($data as $item)
                         <tr>
-                            <td>{{$loop->iteration}}.</td>
+                            <td style="width: 20px;">{{$loop->iteration}}.</td>
                             {{-- <td>{{ $item['product_id'] }}</td> --}}
-                            <td>{{$item['name']}} {{$item['brand'] ?? ''}}
+                            <td style="width: auto;">{{$item['name']}} {{$item['brand'] ?? ''}}
                                 {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}
                             </td>
                             <td style="width: 70px;">{{$item['batch_number']}}</td>
@@ -130,7 +130,7 @@
                             @else
                             <td align="center">{{date('Y-m-d', strtotime($item['expiry_date']))}}</td>
                             @endif --}}
-                            <td align="center">
+                            <td align="center" style="text-align: center;">
                                 <div>{{number_format($item['quantity'])}}</div>
                             </td>
                         </tr>

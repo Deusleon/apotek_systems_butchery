@@ -110,8 +110,8 @@
                         <tr style="background: #1f273b; color: white;">
                             <th align="left">#</th>
                             <th align="left">Product Name</th>
-                            <th>Max. Quantity</th>
-                            <th>Available Quantity</th>
+                            <th style="text-align: center;">Max. Quantity</th>
+                            <th style="text-align: center;">Available</th>
                         </tr>
                     </thead>
                     @foreach($data as $item)
