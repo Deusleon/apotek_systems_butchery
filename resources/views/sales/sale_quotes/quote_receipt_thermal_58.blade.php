@@ -128,7 +128,7 @@ function customRound($num) {
                             <td>{{$item['name']}} {{$item['brand'] ?? ''}}
                                 {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}
                             </td>
-                            <td class="text-center">{{customRound($item['quantity'])}}</td>
+                            <td class="text-center">{{number_format($item['quantity'], 0)}}</td>
                             <td class="text-right">{{customRound($item['price'])}}</td>
                             {{-- <td class="text-right">{{customRound($item['vat'])}}</td> --}}
                             <td class="text-right">{{customRound($item['sub_total'])}}</td>

@@ -4,10 +4,9 @@
 <head>
     <title>Inventory Count Sheet</title>
 
-
     <style>
         body {
-            font-size: 14px;
+            font-size: 12px;
         }
 
         * {
@@ -17,9 +16,12 @@
         table,
         th,
         td {
-            /*border: 1px solid black;*/
             border-collapse: collapse;
-            padding: 10px;
+            padding: 8px;
+        }
+
+        th {
+            text-align: left;
         }
 
         table {
@@ -32,7 +34,10 @@
         }
 
         thead {
-            display: table-header-group
+            display: table-header-group;
+            background: #1f273b;
+            color: white;
+            font-size: 12px;
         }
 
         tfoot {
@@ -40,50 +45,21 @@
         }
 
         #table-detail {
-            /*border-spacing: 5px;*/
             width: 100%;
-            margin-bottom: 10%;
+            margin-top: -13%;
+            border-collapse: collapse;
         }
 
-        #table-top-detail {
-            /*border-spacing: 5px;*/
-            width: 100%;
-            margin-top: -10%;
-            margin-bottom: -3%;
+        #table-detail tr {
+            line-height: 10px;
         }
 
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
 
-        #table-info {
-            width: 50%;
-            border-spacing: 5px;
-        }
-
-        .tab {
-            display: inline-block;
-            margin-left: 20px;
-        }
-
-        #receiver-sign {
-            top: 10%;
-        }
-
-        #sender-sign {
-            margin-top: 0%;
-        }
-
-        .topcorner {
-            position: absolute;
-            top: 0;
-            right: 0;
-            margin-top: -4%;
-            margin-left: 78%;
-        }
-
-        .topcorner>p {
-            font-size: 10px;
+        #category {
+            text-transform: uppercase;
         }
 
         h3 {
@@ -93,6 +69,7 @@
         h4 {
             font-weight: normal;
         }
+
         #container .logo-container {
             padding-top: -2%;
             text-align: center;
@@ -100,31 +77,35 @@
         }
 
         #container .logo-container img {
-            max-width: 160px;
-            max-height: 160px;
+            max-width: 100px;
+            max-height: 100px;
         }
     </style>
 
 </head>
 
 <body>
-    <div class="row">
-        <div id="container">
-            <div class="logo-container">
-                @if($pharmacy['logo'])
-                    <img src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
-                @endif
-            </div>
+    <!-- Header Section -->
+    <div style="width: 100%; text-align: center; align-items: center;">
+        @if($pharmacy['logo'])
+            <img style="max-width: 90px; max-height: 90px;" src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
+        @endif
+        <div style="font-weight: bold; font-size: 16px;">{{$pharmacy['name']}}</div>
+        <div style="justify-content: center; font-size: 12px; line-height: 1.2;">
+            {{$pharmacy['address']}}<br>
+            {{$pharmacy['phone']}}<br>
+            {{$pharmacy['email'] . ' | ' . $pharmacy['website']}}
+        </div><br>
+        <div>
+            <h3 align="center" style="font-weight: bold; margin-top: -1%">Inventory Count Sheet</h3>
+            <h4 align="center" style="margin-top: -1%;">Perfomed By: {{Auth::user()->name}}</h4>
+            <h4 align="center" style="margin-top: -1.6%;">Branch: <b>{{ $default_store }}</b></h4>
+            <h4 align="center" style="margin-top: -1.6%">Printed On: {{now()->format('Y-m-d H:i:s')}}</h4>
         </div>
     </div>
-    <h2 align="center">{{$pharmacy['name']}}</h2>
-    <h3 align="center" style="margin-top: -2%">{{$pharmacy['address']}}</h3>
-    <h2 align="center" style="margin-top: -2%">Inventory Count Sheet</h2>
-
-    <div class="row" style="margin-top: -2%">
-        <div class="col-md-12">
-            <div align="center">Perfomed By: {{Auth::user()->name}}, on {{date('Y-m-d')}}</div>
-            <div align="center">Branch: <b>{{ $default_store }}</b></div>
+    <div class="row" style="padding-top: -2%">
+        <div class="row" style="margin-top: 8%;">
+            <div class="col-md-12">
             @php
                 $groupedData = [];
                 foreach ($data as $store => $stocks) {
@@ -144,13 +125,13 @@
             <table id="table-detail" align="center">
                 <thead>
                     <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                        <th align="left">#</th>
-                        <th align="left">Product Name</th>
+                        <th align="left" style="width: 22px;">#</th>
+                        <th align="left" style="width: 400px;">Product Name</th>
                         @if ($showQoH)
-                            <th align="center">QoH</th>
-                            <th align="center">CountedQty</th>
+                            <th align="" style="text-align: center; padding-left: 10px;">QoH</th>
+                            <th align="" style="text-align: center; padding-left: 10px;">CountedQty</th>
                         @else
-                            <th align="center">CountedQty</th>
+                            <th align="" style="text-align: center;">CountedQty</th>
                         @endif
                     </tr>
                 </thead>
@@ -161,7 +142,7 @@
                             <td align="left">{{ $stock['product_name'] . ' ' . $stock['brand'] . ' ' . $stock['pack_size'] . $stock['sales_uom'] }}
                             </td>
                         @if ($showQoH)
-                            <td align="center">{{ number_format($stock['quantity_on_hand']) }}</td>
+                            <td align="" style="text-align: center;">{{ number_format($stock['quantity_on_hand']) }}</td>
                             <td></td>
                         @else
                             <td></td>
