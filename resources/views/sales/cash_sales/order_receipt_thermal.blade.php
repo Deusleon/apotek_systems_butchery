@@ -161,8 +161,8 @@ function customRound($num) {
             @foreach($dat as $item)
                 <tr>
                     <td align="left">{{$item['name']}}</td>
-                    <td align="right">{{customRound($item['quantity'],0) }}</td>
-                    <td align="right">{{customRound($item['sub_total'],2)}}</td>
+                    <td align="right">{{number_format($item['quantity'],0) }}</td>
+                    <td align="right">{{customRound($item['sub_total'])}}</td>
                 </tr>
             @endforeach
         </table>

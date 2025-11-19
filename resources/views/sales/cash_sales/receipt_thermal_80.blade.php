@@ -121,7 +121,7 @@ function customRound($num) {
                     @foreach($dat as $item)
                         <tr>
                             <td>{{$item['name']}} {{$item['brand'] ?? ''}} {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}</td>
-                            <td class="text-center">{{customRound($item['quantity'])}}</td>
+                            <td class="text-center">{{number_format($item['quantity'], 0)}}</td>
                             <td class="text-right">{{customRound($item['price'] * $item['quantity'])}}</td>
                         </tr>
                     @endforeach

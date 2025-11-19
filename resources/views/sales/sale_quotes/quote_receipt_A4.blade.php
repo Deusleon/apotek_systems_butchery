@@ -205,7 +205,7 @@ function customRound($num) {
                             {{$item['brand'] ?? ''}}
                             {{$item['pack_size'] ?? ''}}{{$item['sales_uom'] ?? ''}}
                         </td>
-                        <td style="width: 48.5px; text-align: center;">{{customRound($item['quantity'])}}</td>
+                        <td style="width: 48.5px; text-align: center;">{{number_format($item['quantity'], 0)}}</td>
                         <td style="width: 82.5px; text-align: right;">{{customRound($item['price'])}}</td>
                         <td style="width: 82.5px; text-align: right;">{{customRound($item['price'] * $item['quantity'])}}
                         </td>

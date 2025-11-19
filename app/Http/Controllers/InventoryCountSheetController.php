@@ -25,10 +25,13 @@ class InventoryCountSheetController extends Controller
         $default_store_id = current_store_id();
 
         // Pharmacy info
-        $pharmacy[ 'name' ]    = Setting::where( 'id', 100 )->value( 'value' );
-        $pharmacy[ 'address' ] = Setting::where( 'id', 106 )->value( 'value' );
-        $pharmacy[ 'logo' ]    = Setting::where( 'id', 105 )->value( 'value' );
-        $pharmacy[ 'phone' ]   = Setting::where( 'id', 107 )->value( 'value' );
+    $pharmacy['name'] = Setting::where('id', 100)->value('value');
+    $pharmacy['address'] = Setting::where('id', 106)->value('value');
+    $pharmacy['phone'] = Setting::where('id', 107)->value('value');
+    $pharmacy['email'] = Setting::where('id', 108)->value('value');
+    $pharmacy['website'] = Setting::where('id', 109)->value('value');
+    $pharmacy['logo'] = Setting::where('id', 105)->value('value');
+    $pharmacy['tin_number'] = Setting::where('id', 102)->value('value');
 
         // Fetch current stock with product and store info using join
         $current_stocks = DB::table( 'inv_current_stock as cs' )
