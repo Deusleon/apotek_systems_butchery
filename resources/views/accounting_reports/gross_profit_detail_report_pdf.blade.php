@@ -16,7 +16,7 @@
         table, th, td {
             /*border: 1px solid black;*/
             border-collapse: collapse;
-            padding: 10px;
+            padding: 6px;
         }
 
         table {
@@ -124,7 +124,7 @@
 
 <div class="row" style="padding-top: -2%">
     <!-- Header Section - Updated to match Cash Sales Report style -->
-    <div style="width: 100%; text-align: center; align-items: center; margin-bottom: -1%;">
+    <div style="width: 100%; text-align: center; align-items: center; margin-bottom: -3%;">
         @if($pharmacy['logo'])
             <img style="max-width: 90px; max-height: 90px;"
                 src="{{public_path('fileStore/logo/' . $pharmacy['logo'])}}" />
@@ -134,9 +134,9 @@
             {{$pharmacy['address']}}<br>
             {{$pharmacy['phone']}}<br>
             {{$pharmacy['email'] . ' | ' . $pharmacy['website']}}
-        </div><br>
+        </div>
         <div>
-            <h3 align="center" style="font-weight: bold; margin-top: -1%">Gross Profit Detail Report</h3>
+            <h3 align="center" style="font-weight: bold; margin-top: 1%">Gross Profit Detail Report</h3>
             <h4 align="center" style="margin-top: -1%">From: <b>{{ date('Y-m-d', strtotime($data[0]['from'])) }}</b> To:
                 <b>{{ date('Y-m-d', strtotime($data[0]['to'])) }}</b>
             </h4>
@@ -157,6 +157,7 @@
                     <!-- loop the product names here -->
                     <thead>
                     <tr style="background: #1f273b; color: white;">
+                        <th align="center" style="width: 5%;">#</th>
                         <th align="left" style="width: 30%;">Product Name</th>
                         <th align="center" style="width: 14%;">Qty</th>
                         <th align="right" style="width: 14%;">Buy Price</th>
@@ -167,6 +168,7 @@
                     </thead>
                     @foreach($items as $item)
                         <tr>
+                            <td align="center" style="width: 5%;">{{ $loop->index + 1 }}</td>
                             <td align="left" style="width: 30%;">{{$item['name']}}</td>
                             <td align="center" style="width: 14%;">
                                 <div>{{ number_format($item['quantity'], 0) }}</div>
@@ -182,43 +184,39 @@
             @endforeach
             <hr>
 
-            <div class="full-row" style="padding-top: 1%">
-                <div class="col-25">
-                    <div class="full-row">
-                    </div>
-
-                </div>
-                <div class="col-15"></div>
-                <div class="col-25"></div>
-                <div class="col-35">
-                    <div class="full-row">
-                        <div class="col-50" align="left"><b>Total Amount: </b></div>
-                        <div class="col-50"
-                             align="right">{{number_format($data[0]['total_amount'],2)}}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="full-row" style="padding-top: 1%">
-                <div class="col-25">
-                    <div class="full-row">
-                    </div>
-
-                </div>
-                <div class="col-15"></div>
-                <div class="col-25"></div>
-                <div class="col-35">
-                    <div class="full-row">
-                        <div class="col-50" align="left"><b>Total Profit: </b></div>
-                        <div class="col-50"
-                             align="right">{{number_format($data[0]['total_profit'],2)}}</div>
-                    </div>
-                </div>
-            </div>
-
+            <table id="table-detail" align="center">
+                <tr>
+                    <td style="width: 5%;"></td>
+                    <td style="width: 30%;"></td>
+                    <td style="width: 14%;"></td>
+                    <td style="width: 14%;"></td>
+                    <td style="width: 14%;"></td>
+                    <td align="left" style="width: 14%;"><b>Total Buy:</b></td>
+                    <td align="right" style="width: 14%;">{{number_format($data[0]['total_buy'],2)}}</td>
+                </tr>
+                <tr>
+                    <td style="width: 5%;"></td>
+                    <td style="width: 30%;"></td>
+                    <td style="width: 14%;"></td>
+                    <td style="width: 14%;"></td>
+                    <td style="width: 14%;"></td>
+                    <td align="left" style="width: 14%;"><b>Total Sales:</b></td>
+                    <td align="right" style="width: 14%;">{{number_format($data[0]['total_amount'],2)}}</td>
+                </tr>
+                <tr>
+                    <td style="width: 5%;"></td>
+                    <td style="width: 30%;"></td>
+                    <td style="width: 14%;"></td>
+                    <td style="width: 14%;"></td>
+                    <td style="width: 14%;"></td>
+                    <td align="left" style="width: 14%;"><b>Total Profit:</b></td>
+                    <td align="right" style="width: 14%;">{{number_format($data[0]['total_profit'],2)}}</td>
+                </tr>
+            </table>
 
             <hr>
             <!-- SUMMARY - Centered like Cash Sales -->
-        <div style="margin-top: 20px; padding-top: 10px;">
+        <div style="margin-top: 20px; padding-top: 10px; page-break-inside: avoid;">
             <h3 align="center"><b>Summary</b></h3>
 
             <table style="
@@ -229,6 +227,7 @@
                 border: 1px solid #ddd;
                 border-collapse: collapse;
                 table-layout: auto;
+                page-break-inside: avoid;
             ">
                 <tr>
                     <td style="padding: 6px; text-align: right; white-space: nowrap;"><b>Total Buy</b></td>
@@ -280,30 +279,29 @@
 
 
 <script type="text/php">
-    if ( isset($pdf) ) {
-        $x = 280;
-        $y = 820;
-        $text = "{PAGE_NUM} of {PAGE_COUNT} pages";
-        $font = null;
-        $size = 10;
-        $color = array(0,0,0);
-        $word_space = 0.0;  //  default
-        $char_space = 0.0;  //  default
-        $angle = 0.0;   //  default
-        $pdf->page_text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
+if (isset($pdf)) {
 
+    $width = $pdf->get_width();
+    $height = $pdf->get_height();
 
-     }
+    // Center horizontally, 30px from bottom
+    $x = $width / 2 - 50;
+    $y = $height - 30;
 
+    $text = "{PAGE_NUM} of {PAGE_COUNT} pages";
 
+    // Use a safe non-bold font
+    $font = $fontMetrics->get_font("helvetica", "normal");
 
+    $size = 10;
+    $color = array(0,0,0);
 
-
-
-
-
-
+    $pdf->page_text($x, $y, $text, $font, $size, $color);
+}
 </script>
+
+
+
 
 </body>
 </html>
