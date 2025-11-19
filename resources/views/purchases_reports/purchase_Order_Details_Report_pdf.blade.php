@@ -137,13 +137,14 @@
         </div>
     </div>
 
-    <div class="row" style="margin-top: 3%;">
+    <div class="row" style="margin-top: -2%;">
         <div class="col-md-12">
 
             <table id="table-detail" align="center">
                 
                 <!-- COLUMN WIDTH DEFINITIONS -->
                 <colgroup>
+                    <col style="width: 5%;">   <!-- # -->
                     <col style="width: 8%;">   <!-- Order # -->
                     <col style="width: 18%;">  <!-- Supplier (wide) -->
                     <col style="width: 8%;">   <!-- Date -->
@@ -157,6 +158,7 @@
 
                 <thead>
                 <tr style="background: #1f273b; color: white; font-size: 0.9em">
+                    <th align="center">#</th>
                     <th align="left">Order #</th>
                     <th align="left">Supplier</th>
                     <th align="left">Date</th>
@@ -169,10 +171,11 @@
                 </tr>
                 </thead>
 
-                @php $total_amount = 0; @endphp
+                @php $total_amount = 0; $index = 1; @endphp
                 @foreach($data as $order)
                     @foreach($order->details as $detail)
                     <tr>
+                        <td align="center">{{ $index++ }}</td>
                         <td align="left">{{$order->order_number}}</td>
                         <td align="left">{{$order->supplier->name ?? ''}}</td>
                         <td align="left">{{date('Y-m-d', strtotime($order->ordered_at))}}</td>
@@ -188,21 +191,14 @@
                     @php $total_amount += $detail->amount; @endphp
                     @endforeach
                 @endforeach
+
+                <!-- Total Row -->
+                <tr style="font-weight: bold;">
+                    <td colspan="9" align="right" style="border-top: 2px solid #000; padding-top: 10px;"><b>Total Amount:</b></td>
+                    <td align="right" style="border-top: 2px solid #000; padding-top: 10px;">{{number_format($total_amount, 2)}}</td>
+                </tr>
             </table>
 
-            <hr>
-
-            <div class="full-row" style="padding-top: 1%">
-                <div class="col-35"><div class="full-row"></div></div>
-                <div class="col-15"></div>
-                <div class="col-25"></div>
-                <div class="col-25">
-                    <div class="full-row">
-                        <div class="col-50" align="left"><b>Total Amount: </b></div>
-                        <div class="col-50" align="right">{{number_format($total_amount, 2)}}</div>
-                    </div>
-                </div>
-            </div>
 
         </div>
     </div>
