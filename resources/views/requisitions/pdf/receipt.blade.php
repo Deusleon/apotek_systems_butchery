@@ -41,6 +41,9 @@
             font-size: 13px;
             width: 25%;
         }
+        h3, h4 {
+            font-weight: normal;
+        }
 
         #table-detail {
             border-spacing: 6%;
@@ -103,8 +106,8 @@
             {{ $pharmacy['email'] . ' | ' . $pharmacy['website'] }}
         </div><br>
         <div>
-            <h3 align="center" style="font-weight: bold; margin-top: -1%">REQUISITION RECEIPT</h3>
-            <h4 align="center" style="margin-top: -1.5%">Printed On: {{ date('Y-m-d H:i:s') }}</h4>
+            <h3 align="center" style="font-weight: bold; font-size: 14px; margin-top: -1.5%">REQUISITION RECEIPT</h3>
+            <h4 align="center" style="margin-top: -1.5%; font-size: 12px;">Printed On: {{ date('Y-m-d H:i:s') }}</h4>
         </div>
     </div>
 
@@ -128,12 +131,14 @@
     <div class="row">
         <table class="table table-sm" id="table-detail" align="center">
             <tr class="table-header">
+                <th align="left" style="width: 5%;">#</th>
                 <th align="left">Product Name</th>
-                <th align="right">Qty</th>
+                <th align="right">Quantity</th>
             </tr>
 
             @foreach($requisitionDet as $item)
                 <tr>
+                    <td align="left">{{ $loop->iteration }}</td>
                     <td align="left">
                         {{ $item->products_->name ?? '' }}
                         @if(!empty($item->products_->brand)) {{ $item->products_->brand }} @endif
@@ -147,8 +152,31 @@
         </table>
     </div>
 
-    <h6 align="center">Created By: {{ $requisition->creator->name }}</h6>
-    <h6 align="center" style="font-style: italic; margin-top: -2%">{{ $pharmacy['slogan'] }}</h6>
+    <h6 align="center" style="font-weight: normal;">Created By: {{ $requisition->creator->name }}</h6>
+    <h6 align="center" style="margin-top: -2%; font-weight: normal;">Created Date: {{ date('Y-m-d', strtotime($requisition->created_at)) }}</h6>
 </div>
+
+<script type="text/php">
+if (isset($pdf)) {
+
+    $width = $pdf->get_width();
+    $height = $pdf->get_height();
+
+    // Center horizontally, 30px from bottom
+    $x = $width / 2 - 50;
+    $y = $height - 30;
+
+    $text = "{PAGE_NUM} of {PAGE_COUNT} pages";
+
+    // Use a safe non-bold font
+    $font = $fontMetrics->get_font("helvetica", "normal");
+
+    $size = 10;
+    $color = array(0,0,0);
+
+    $pdf->page_text($x, $y, $text, $font, $size, $color);
+}
+</script>
+
 </body>
 </html>
