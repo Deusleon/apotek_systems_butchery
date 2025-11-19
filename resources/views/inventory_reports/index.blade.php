@@ -549,7 +549,7 @@
             var product_option_index = product_option.options[product_option.selectedIndex].value;
 
             /*current stock*/
-            var store_option = document.getElementById("store-name");
+            var store_option = document.getElementById("store_name");
             var store_option_index = store_option ? Number(store_option.value || 0) : 0;
 
             /*product detail*/
