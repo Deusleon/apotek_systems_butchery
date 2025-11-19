@@ -8,9 +8,11 @@
                 </button>
             </div>
             <div class="modal-body">
-                <table id="order_details_table" class="table nowrap table-striped table-hover"
-                       style="width:100%">
-                </table>
+                <div style="overflow-x: auto;">
+                    <table id="order_details_table" class="table nowrap table-striped table-hover"
+                           style="width:100%; min-width: 600px;">
+                    </table>
+                </div>
             </div>
             <!-- Modal Footer (ADD THIS) -->
             <div class="modal-footer">
