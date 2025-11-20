@@ -130,6 +130,7 @@
                                     <select id="store" name="store_id" onchange=""
                                             class="js-example-basic-single form-control drop" required>
                                         <option value="" selected="true" disabled="disabled">Select Branch...</option>
+                                        <option value="all">ALL</option>
                                         @foreach($stores as $store)
                                             <option value="{{$store->id}}">{{$store->name}}</option>
                                         @endforeach

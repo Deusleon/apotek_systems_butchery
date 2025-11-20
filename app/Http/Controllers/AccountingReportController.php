@@ -170,34 +170,79 @@ class AccountingReportController extends Controller
     {
         $category_total_cost = array();
 
-        $products = PriceList::where('price_category_id', $price_category_id)
+        $query = PriceList::where('price_category_id', $price_category_id)
             ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
             ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
-            ->where('store_id', '=', $store_id)
             ->Where('inv_products.status', '1')
             ->select('inv_products.id as id', 'name')
-            ->groupBy('product_id')
-            ->get();
+            ->groupBy('product_id');
+
+        if ($store_id !== 'all') {
+            $query->where('store_id', '=', $store_id);
+        }
+
+        $products = $query->get();
 
         foreach ($products as $product) {
-            $data = PriceList::select('stock_id', 'price')->where('price_category_id', $price_category_id)
-                ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
-                ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
-                ->where('store_id', '=', $store_id)
-                ->orderBy('stock_id', 'desc')
-                ->where('product_id', $product->id)
-                ->first('price');
+            if ($store_id === 'all') {
+                // For all branches, sum quantities across stores
+                $stockData = PriceList::select(
+                        'inv_products.name',
+                        'inv_products.brand',
+                        'inv_products.pack_size',
+                        'inv_products.sales_uom',
+                        'inv_categories.name as category_name',
+                        DB::raw('SUM(inv_current_stock.quantity) as total_quantity'),
+                        DB::raw('AVG(sales_prices.price) as avg_price'), // Assuming price is same, take average
+                        DB::raw('SUM(inv_current_stock.quantity * inv_current_stock.unit_cost) as total_buy_price')
+                    )
+                    ->where('price_category_id', $price_category_id)
+                    ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
+                    ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                    ->join('inv_categories', 'inv_categories.id', '=', 'inv_products.category_id')
+                    ->where('product_id', $product->id)
+                    ->where('inv_products.status', '1')
+                    ->first();
 
+                if ($stockData) {
+                    $total_quantity = $stockData->total_quantity;
+                    $price = $stockData->avg_price;
+                    $total_buy_price = $stockData->total_buy_price;
+                    $total_sell_price = $total_quantity * $price;
 
-            array_push($category_total_cost, array(
-                'product_name' => $data->currentStock['product']['name'] . ' ' . ($data->currentStock['product']['brand'] ?? '') . ' ' . ($data->currentStock['product']['pack_size'] ?? '') . '' . ($data->currentStock['product']['sales_uom'] ?? ''),
-                'category_name' => $data->currentStock['product']['category']['name'],
-                'buy_price' => $data->currentStock['quantity'] * $data->currentStock['unit_cost'],
-                'sell_price' => $data->currentStock['quantity'] * $data->price,
-                'store' => $data->currentStock['store']['name'],
-                'product_id' => $data->currentStock['product_id'],
-                'quantity' => $data->currentStock['quantity']
-            ));
+                    array_push($category_total_cost, array(
+                        'product_name' => $stockData->name . ' ' . ($stockData->brand ?? '') . ' ' . ($stockData->pack_size ?? '') . '' . ($stockData->sales_uom ?? ''),
+                        'category_name' => $stockData->category_name,
+                        'buy_price' => $total_buy_price,
+                        'sell_price' => $total_sell_price,
+                        'store' => 'ALL Branches',
+                        'product_id' => $product->id,
+                        'quantity' => $total_quantity
+                    ));
+                }
+            } else {
+                // For specific store, use existing logic
+                $query = PriceList::select('stock_id', 'price')->where('price_category_id', $price_category_id)
+                    ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
+                    ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                    ->orderBy('stock_id', 'desc')
+                    ->where('product_id', $product->id)
+                    ->where('store_id', '=', $store_id);
+
+                $data = $query->first('price');
+
+                if ($data) {
+                    array_push($category_total_cost, array(
+                        'product_name' => $data->currentStock['product']['name'] . ' ' . ($data->currentStock['product']['brand'] ?? '') . ' ' . ($data->currentStock['product']['pack_size'] ?? '') . '' . ($data->currentStock['product']['sales_uom'] ?? ''),
+                        'category_name' => $data->currentStock['product']['category']['name'],
+                        'buy_price' => $data->currentStock['quantity'] * $data->currentStock['unit_cost'],
+                        'sell_price' => $data->currentStock['quantity'] * $data->price,
+                        'store' => $data->currentStock['store']['name'],
+                        'product_id' => $data->currentStock['product_id'],
+                        'quantity' => $data->currentStock['quantity']
+                    ));
+                }
+            }
         }
 
 
