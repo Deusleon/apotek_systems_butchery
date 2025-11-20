@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Requisition Issue History - {{ $requisition->req_no }}</title>
+    <title>Requisition Issue Receipt - {{ $requisition->req_no }}</title>
     <style>
         * {
             font-family: Verdana, Arial, sans-serif;
