@@ -148,7 +148,7 @@
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label for="supplier">Supplier Name</label><font color="red">*</font>
+                                    <label for="supplier">Supplier Name</label>
                                     <select name="suppliers" class="js-example-basic-single form-control drop"
                                             id="suppliers">
                                         <option value="" selected disabled>Select Supplier...</option>
@@ -361,7 +361,6 @@
             //if invoice
             if (Number(report_option_index) === Number(2)) {
                 document.getElementById('invoice_options').style.display = 'block';
-                $("#suppliers").prop("required", true);
                 $("#supplier_ids").val("");
                 $("#supplier_ids").change();
             }

@@ -308,35 +308,22 @@ class PurchaseReportController extends Controller
     public function InvoiceSummaryReport($supplier, $date, $status, $period)
     {
         $dates = explode(" - ", $date);
-        if ($status !== null) {
-            $datas = Invoice::where('supplier_id', $supplier)
-                ->whereBetween(DB::raw('date(invoice_date)'),
-                    [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))])
-                ->where('received_status', $status)
-                ->orderby('invoice_date', 'DESC')
-                ->get();
-        } elseif ($period !== null) {
-            $datas = Invoice::where('supplier_id', $supplier)
-                ->whereBetween(DB::raw('date(invoice_date)'),
-                    [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))])
-                ->where('grace_period', $period)
-                ->orderby('invoice_date', 'DESC')
-                ->get();
-        } elseif ($period !== null && $status !== null) {
-            $datas = Invoice::where('supplier_id', $supplier)
-                ->whereBetween(DB::raw('date(invoice_date)'),
-                    [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))])
-                ->where('received_status', $status)
-                ->where('grace_period', $period)
-                ->orderby('invoice_date', 'DESC')
-                ->get();
-        } else {
-            $datas = Invoice::where('supplier_id', $supplier)
-                ->whereBetween(DB::raw('date(invoice_date)'),
-                    [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))])
-                ->orderby('invoice_date', 'DESC')
-                ->get();
+        $query = Invoice::whereBetween(DB::raw('date(invoice_date)'),
+            [date('Y-m-d', strtotime($dates[0])), date('Y-m-d', strtotime($dates[1]))]);
+
+        if ($supplier !== null) {
+            $query->where('supplier_id', $supplier);
         }
+
+        if ($status !== null) {
+            $query->where('received_status', $status);
+        }
+
+        if ($period !== null) {
+            $query->where('grace_period', $period);
+        }
+
+        $datas = $query->orderby('invoice_date', 'DESC')->get();
 
         foreach ($datas as $d) {
             $d->dates = $dates;
