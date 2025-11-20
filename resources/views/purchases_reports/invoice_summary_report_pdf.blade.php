@@ -101,8 +101,9 @@
             <table id="table-detail" align="center">
                 <thead>
                     <tr style="background: #1f273b; color: white; font-size: 0.9em">
-                        <th align="center">Invoice #</th>
-                        <th align="center">Supplier</th>
+                        <th align="center" style="width: 3%;">#</th>
+                        <th align="left">Invoice #</th>
+                        <th align="left">Supplier</th>
                         <th align="center">Invoice Date</th>
                         <th align="right">Amount</th>
                         <th align="right">Paid</th>
@@ -115,8 +116,9 @@
                 <tbody>
                     @foreach($data as $item)
                         <tr>
-                            <td align="center">{{$item->invoice_no}}</td>
-                            <td align="center">{{$item->supplier['name']}}</td>
+                            <td align="center" style="width: 5%;">{{$loop->iteration}}</td>
+                            <td align="left">{{$item->invoice_no}}</td>
+                            <td align="left">{{$item->supplier['name']}}</td>
                             <td align="center">{{date('Y-m-d', strtotime($item->invoice_date))}}</td>
                             <td align="right">{{number_format($item->invoice_amount, 2)}}</td>
                             <td align="right">{{number_format($item->paid_amount, 2)}}</td>
