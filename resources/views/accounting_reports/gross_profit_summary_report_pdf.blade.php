@@ -105,6 +105,7 @@
             <table id="table-detail" align="center">
                 <thead>
                     <tr style="background: #1f273b; color: white;">
+                        <th align="center" style="width: 5%;">#</th>
                         <th align="left" style="width: 25%;">Date</th>
                         <th align="right" style="width: 25%;">Total Buy</th>
                         <th align="right" style="width: 25%;">Total Sales</th>
@@ -113,6 +114,7 @@
                 </thead>
                 @foreach($data[0]['dates'] as $items)
                     <tr>
+                        <td align="center" style="width: 5%;">{{$loop->iteration}}</td>
                         <td align="left" style="width: 25%;">{{ date('Y-m-d', strtotime($items)) }}</td>
                         @php
                             $total_buy  = $data[0]['total_buy'][$items][0]['total_buy'] ?? 0;
@@ -127,17 +129,17 @@
 
             <hr>
 
-            <div style="margin-left: 70%;width: 29.6%;background: #f2f2f2;margin-top: 2%; padding: 1%"><b>Total Buy: </b></div>
+            <div style="margin-left: 70%;width: 29.6%;margin-top: 0.5%; padding: 1%"><b>Total Buy: </b></div>
             <div align="right" style="margin-top: -10%; padding-top: 1%; padding-left: 1%">
                 {{ number_format($data[0]['grand_total_buy'], 2) }}
             </div>
 
-            <div style="margin-left: 70%;width: 29.6%;background: #f2f2f2;margin-top: 2%; padding: 1%"><b>Total Sales: </b></div>
+            <div style="margin-left: 70%;width: 29.6%;margin-top: 0.5%; padding: 1%"><b>Total Sales: </b></div>
             <div align="right" style="margin-top: -10%; padding-top: 1%; padding-left: 1%">
                 {{ number_format($data[0]['grand_total_sell'], 2) }}
             </div>
 
-            <div style="margin-left: 70%;width: 29.6%;background: #f2f2f2;margin-top: 2%; padding: 1%"><b>Total Profit: </b></div>
+            <div style="margin-left: 70%;width: 29.6%;margin-top: 0.5%; padding: 1%"><b>Total Profit: </b></div>
             <div align="right" style="margin-top: -10%; padding-top: 1%; padding-left: 1%">
                 {{ number_format($data[0]['grand_total_sell'] - $data[0]['grand_total_buy'], 2) }}
             </div>
