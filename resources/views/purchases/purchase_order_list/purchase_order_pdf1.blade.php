@@ -143,7 +143,7 @@
     <table class="supplier-table">
         <tbody>
             <tr>
-                <td style="width: 40px; padding-left: 10px;">Order No : {{$data[0]->order['order_number']}}</td>
+                <td style="width: 40px; padding-left: 10px;">Order # : {{$data[0]->order['order_number']}}</td>
                 <td style="width: 110px; padding-left: 10px;">Supplier : {{$data[0]->order->supplier->name}}</td>
             </tr>
             <tr>
