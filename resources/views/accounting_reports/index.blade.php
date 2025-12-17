@@ -19,7 +19,7 @@
 @section("content")
 
     <style>
-        .datepicker > .datepicker-days {
+        .datepicker>.datepicker-days {
             display: block;
         }
 
@@ -56,41 +56,41 @@
             border-color: #748892;
             color: white;
         }
-
     </style>
 
     <div class="col-sm-12">
         <div class="card">
             <div class="card-body">
                 <form id="inventory_report_form" action="{{route('accounting-report-filter')}}" method="get"
-                      target="_blank">
+                    target="_blank">
                     @csrf()
                     <div class="row">
                         <div class="col-md-8">
                             <div class="form-group">
                                 <div class="form-group">
-                                    <label for="report_option">Select Accounting Report<font
-                                            color="red">*</font></label>
+                                    <label for="report_option">Select Accounting Report<font color="red">*</font></label>
                                     <select id="report_option" name="report_option" onchange="reportOption()"
-                                            class="js-example-basic-single form-control drop" required>
+                                        class="js-example-basic-single form-control drop" required>
                                         <option selected="true" value="" disabled="disabled">Select report</option>
                                         @if(auth()->user()->checkPermission('Current Stock Value'))
-                                        <option value="1">Current Stock Value</option>
+                                            <option value="1">Current Stock Value</option>
                                         @endif
                                         @if(auth()->user()->checkPermission('Gross Profit Detail'))
-                                        <option value="2">Gross Profit Detail</option>
+                                            <option value="2">Gross Profit Detail</option>
                                         @endif
                                         @if(auth()->user()->checkPermission('Gross Profit Summary'))
-                                        <option value="3">Gross Profit Summary</option>
+                                            <option value="3">Gross Profit Summary</option>
                                         @endif
                                         @if(auth()->user()->checkPermission('Expense Report'))
-                                        <option value="4">Expense Report</option>
+                                            <option value="4">Expense Report</option>
                                         @endif
                                         @if(auth()->user()->checkPermission('Income Statement Report'))
-                                        <option value="5">Income Statement Report</option>
+                                            <option value="5">Income Statement Report</option>
                                         @endif
-                                        @if(auth()->user()->checkPermission('Cost of Expired Products'))
-                                        <option value="6">Cost of Expired Products</option>
+                                        @if (\App\Setting::where('id', 123)->value('value') === 'YES')
+                                            @if(auth()->user()->checkPermission('Cost of Expired Products'))
+                                                <option value="6">Cost of Expired Products</option>
+                                            @endif
                                         @endif
                                     </select>
                                 </div>
@@ -103,7 +103,7 @@
                             <div class="col-md-4">
                                 <div id="range">
                                     <label for="filter">Date<font color="red">*</font></label>
-                                    <input type="text" class="form-control" name="date_range" id="daterange" readonly/>
+                                    <input type="text" class="form-control" name="date_range" id="daterange" readonly />
                                 </div>
 
                             </div>
@@ -116,7 +116,7 @@
                                 <div class="form-group">
                                     <label for="price-category">Price Category<font color="red">*</font></label>
                                     <select id="price-category" name="price_category_id" onchange=""
-                                            class="js-example-basic-single form-control drop" required>
+                                        class="js-example-basic-single form-control drop" required>
                                         <option value="" selected="true" disabled="disabled">Select Category...</option>
                                         @foreach($price_categories as $category)
                                             <option value="{{$category->id}}">{{$category->name}}</option>
@@ -128,7 +128,7 @@
                                 <div class="form-group">
                                     <label for="store">Branch<font color="red">*</font></label>
                                     <select id="store" name="store_id" onchange=""
-                                            class="js-example-basic-single form-control drop" required>
+                                        class="js-example-basic-single form-control drop" required>
                                         <option value="" selected="true" disabled="disabled">Select Branch...</option>
                                         <option value="all">ALL</option>
                                         @foreach($stores as $store)
@@ -146,7 +146,7 @@
                                 <div class="form-group">
                                     <label for="price-category">Price Category<font color="red">*</font></label>
                                     <select id="price-category-expire" name="price_category_id_expire" onchange=""
-                                            class="js-example-basic-single form-control drop" required>
+                                        class="js-example-basic-single form-control drop" required>
                                         <option value="" selected="true" disabled="disabled">Select Category...</option>
                                         @foreach($price_categories as $category)
                                             <option value="{{$category->id}}">{{$category->name}}</option>
@@ -157,7 +157,7 @@
                             <div class="col-md-4">
                                 <label for="filter">Date</label>
                                 <input type="text" class="form-control" name="expire_date_range" id="expiredaterange"
-                                       autocomplete="off" readonly/>
+                                    autocomplete="off" readonly />
                             </div>
                         </div>
                     </div>
@@ -170,10 +170,10 @@
                         </div>
                         <div class="col-md-2">
                             {{--<a href="" target="_blank">--}}
-                            <button class="btn btn-secondary" style="width: 100%">
-                                Show
-                            </button>
-                            {{--</a>--}}
+                                <button class="btn btn-secondary" style="width: 100%">
+                                    Show
+                                </button>
+                                {{--</a>--}}
                         </div>
                     </div>
                 </form>
@@ -191,92 +191,92 @@
 
 
     <script type="text/javascript">
-    $(function () {
+        $(function () {
 
-        // Expired Products Date Range Picker
-        var startExpired = moment();
-        var endExpired = moment();
+            // Expired Products Date Range Picker
+            var startExpired = moment();
+            var endExpired = moment();
 
-        $('#expiredaterange').daterangepicker({
-            autoUpdateInput: false,
-            locale: {
-                cancelLabel: 'Clear',
-                format: 'YYYY/MM/DD'
-            },
-            ranges: {
-                'Today': [moment(), moment()],
-                'Next 2 Weeks': [startExpired, moment().add(13, 'days')],
-                'Next 3 Weeks': [startExpired, moment().add(20, 'days')],
-                'Next 4 Weeks': [startExpired, moment().add(27, 'days')]
-            }
+            $('#expiredaterange').daterangepicker({
+                autoUpdateInput: false,
+                locale: {
+                    cancelLabel: 'Clear',
+                    format: 'YYYY/MM/DD'
+                },
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Next 2 Weeks': [startExpired, moment().add(13, 'days')],
+                    'Next 3 Weeks': [startExpired, moment().add(20, 'days')],
+                    'Next 4 Weeks': [startExpired, moment().add(27, 'days')]
+                }
+            });
+
+            $('input[name="expire_date_range"]').on('apply.daterangepicker', function (ev, picker) {
+                $(this).val(picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD'));
+            });
+
         });
 
-        $('input[name="expire_date_range"]').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD'));
+        $(function () {
+
+            // Main Accounting Report Date Range Picker
+            var startMain = moment().startOf('month');
+            var endMain = moment();
+
+            function cb(start, end) {
+                $('#reportrange span').html(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
+            }
+
+            $('#daterange').daterangepicker({
+                startDate: startMain,
+                endDate: endMain,
+                locale: {
+                    format: 'YYYY/MM/DD',
+                    cancelLabel: 'Clear'
+                },
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                    'This Year': [moment().startOf('year'), moment()]
+                }
+            }, cb);
+
+            cb(startMain, endMain);
+
         });
 
-    });
+        // Report Option Logic
+        function reportOption() {
+            var report_option = document.getElementById("report_option");
+            var report_option_index = report_option.options[report_option.selectedIndex].value;
 
-    $(function () {
-
-        // Main Accounting Report Date Range Picker
-        var startMain = moment().startOf('month');
-        var endMain = moment();
-
-        function cb(start, end) {
-            $('#reportrange span').html(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
-        }
-
-        $('#daterange').daterangepicker({
-            startDate: startMain,
-            endDate: endMain,
-            locale: {
-                format: 'YYYY/MM/DD',
-                cancelLabel: 'Clear'
-            },
-            ranges: {
-                'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
-                'This Year': [moment().startOf('year'), moment()]
+            if (Number(report_option_index) === 1) {
+                $("#price-category").prop("required", true);
+                $("#store").prop("required", true);
+                $('#date-row').hide();
+                $('#current-stock-value').show();
+            } else {
+                $("#price-category").prop("required", false);
+                $("#store").prop("required", false);
+                $('#current-stock-value').hide();
+                $('#date-row').show();
             }
-        }, cb);
 
-        cb(startMain, endMain);
-
-    });
-
-    // Report Option Logic
-    function reportOption() {
-        var report_option = document.getElementById("report_option");
-        var report_option_index = report_option.options[report_option.selectedIndex].value;
-
-        if (Number(report_option_index) === 1) {
-            $("#price-category").prop("required", true);
-            $("#store").prop("required", true);
-            $('#date-row').hide();
-            $('#current-stock-value').show();
-        } else {
-            $("#price-category").prop("required", false);
-            $("#store").prop("required", false);
-            $('#current-stock-value').hide();
-            $('#date-row').show();
+            if (Number(report_option_index) === 6) {
+                $("#price-category-expire").prop("required", true);
+                $('#expired-product-cost').show();
+                $('#date-row').hide();
+                $('#current-stock-value').hide();
+            } else {
+                $("#price-category-expire").prop("required", false);
+                $('#expired-product-cost').hide();
+            }
         }
-
-        if (Number(report_option_index) === 6) {
-            $("#price-category-expire").prop("required", true);
-            $('#expired-product-cost').show();
-            $('#date-row').hide();
-            $('#current-stock-value').hide();
-        } else {
-            $("#price-category-expire").prop("required", false);
-            $('#expired-product-cost').hide();
-        }
-    }
-</script>
+    </script>
 
 
 
