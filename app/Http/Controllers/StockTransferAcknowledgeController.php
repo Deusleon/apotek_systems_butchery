@@ -293,7 +293,7 @@ class StockTransferAcknowledgeController extends Controller
 
             DB::commit();
 
-            session()->flash( 'alert-success', 'Transfer(s) acknowledged successfully!' );
+            session()->flash( 'alert-success', 'Transfer acknowledged successfully!' );
             return redirect()->route( 'stock-transfer-history' );
 
         } catch ( \Exception $e ) {

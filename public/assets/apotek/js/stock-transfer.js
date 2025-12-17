@@ -26,7 +26,7 @@ var cart_table = $("#cart_table").DataTable({
                 return numberWithCommas(num);
             },
         },
-        { title: "Transfer Quantity" },
+        { title: "TRQ" },
         { title: "Product Id" },
         { title: "Stock Id" },
         {

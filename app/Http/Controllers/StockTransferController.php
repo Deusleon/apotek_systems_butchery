@@ -246,7 +246,7 @@ class StockTransferController extends Controller {
             return redirect()->route('stock-transfer-history')->with('error', 'Transfer group not found.');
         }
 
-        $transfers = StockTransfer::with(['currentStock', 'fromStore', 'toStore'])
+        $transfers = StockTransfer::with(['currentStock.product', 'fromStore', 'toStore'])
             ->where('transfer_no', $transfer_group->transfer_no)
             ->get();
 

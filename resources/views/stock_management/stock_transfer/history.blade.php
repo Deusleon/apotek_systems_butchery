@@ -217,6 +217,7 @@
                                                                         @if ($transfer->status === 'approved' && ($transfer->to_store == current_store_id()))
                                                                             <button type="button" class="btn btn-primary btn-sm btn-rounded btn-acknowledge"
                                                                                 data-toggle="modal" data-target="#acknowledgeModal"
+                                                                                data-evidence="{{ $transfer->evidence }}"
                                                                                 data-transfer-no="{{ $transfer->transfer_no }}"
                                                                                 data-from-store="{{ $transfer->fromStore->id }}"
                                                                                 data-to-store="{{ $transfer->toStore->id }}"
@@ -503,6 +504,7 @@
                             $('#acknowledge_transfer_no').text(transferNo);
                             $('#acknowledge_from_store').text(item.from_store.name);
                             $('#acknowledge_to_store').text(item.to_store.name);
+                            $('#acknowledge_evidence').attr('href', '{{ asset('./fileStore/') }}/' + item.evidence);
 
                             $('#acknowledge_items_body').append(`
                                                                                                                                                                                 <tr data-item-id="${item.id}">

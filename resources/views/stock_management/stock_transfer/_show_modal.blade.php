@@ -27,11 +27,11 @@
                     </div>
                     <div class="row">
                         <div class="col-4">
-                            <strong class="">From Store:</strong>
+                            <strong class="">From Branch:</strong>
                             <p id="show_from_store" class="text-body"></p>
                         </div>
                         <div class="col-4">
-                            <strong class="">To Store:</strong>
+                            <strong class="">To Branch:</strong>
                             <p id="show_to_store" class="text-body"></p>
                         </div>
                         <div class="col-4">
