@@ -123,25 +123,25 @@ class ImportDataController extends Controller {
         if ($is_detailed === 'Detailed') {
             $headers = [
                 // 'A1' => 'code',
-                'A1' => 'product_name',
-                'B1' => 'barcode',
-                'C1' => 'brand',
-                'D1' => 'pack_size',
-                'E1' => 'category',
-                'F1' => 'unit',
-                'G1' => 'min_stock',
-                'H1' => 'max_stock'
+                'A1' => 'Product Name',
+                'B1' => 'Barcode',
+                'C1' => 'Brand',
+                'D1' => 'Pack Size',
+                'E1' => 'Category',
+                'F1' => 'Unit',
+                'G1' => 'Min Stock',
+                'H1' => 'Max Stock'
             ];
         }
 
         if ($is_detailed === 'Normal') {
             $headers = [
             // 'A1' => 'code',
-            'A1' => 'product_name',
-            'B1' => 'barcode',
-            'C1' => 'category',
+            'A1' => 'Product Name',
+            'B1' => 'Barcode',
+            'C1' => 'Category',
             // 'E1' => 'Unit',
-            'D1' => 'min_stock',
+            'D1' => 'Min Stock',
         ];
     }
 
@@ -781,17 +781,17 @@ class ImportDataController extends Controller {
         $errors = [];
 
         // Required fields
-        if ( empty( $row[ 0 ] ) ) $errors[] = 'Product name is required';
+        if ( empty( $row[ 0 ] ) ) $errors[] = 'Product Name is required';
         if ( empty( $row[ 4 ] ) ) $errors[] = 'Category is required';
 
         // Numeric validations
         if ( !empty( $row[ 3 ] ) && !is_numeric( $row[ 3 ] ) ) $errors[] = 'Pack Size must be numeric';
-        if ( !empty( $row[ 6 ] ) && !is_numeric( $row[ 6 ] ) ) $errors[] = 'Min stock must be numeric';
-        if ( !empty( $row[ 7 ] ) && !is_numeric( $row[ 7 ] ) ) $errors[] = 'Max stock must be numeric';
+        if ( !empty( $row[ 6 ] ) && !is_numeric( $row[ 6 ] ) ) $errors[] = 'Min Stock must be numeric';
+        if ( !empty( $row[ 7 ] ) && !is_numeric( $row[ 7 ] ) ) $errors[] = 'Max Stock must be numeric';
 
         // Min/Max stock validation
         if ( !empty( $row[ 6 ] ) && !empty( $row[ 7 ] ) && $row[ 6 ] > $row[ 7 ] ) {
-            $errors[] = 'Min stock cannot be greater than max stock';
+            $errors[] = 'Min Stock cannot be greater than Max Stock';
         }
 
         // Uniqueness validation ( name+category )
@@ -823,11 +823,11 @@ class ImportDataController extends Controller {
         $errors = [];
 
         // Required fields
-        if ( empty( $row[ 0 ] ) ) $errors[] = 'Product name is required';
+        if ( empty( $row[ 0 ] ) ) $errors[] = 'Product Name is required';
         if ( empty( $row[ 2 ] ) ) $errors[] = 'Category is required';
 
         // Numeric validations
-        if ( !empty( $row[ 3 ] ) && !is_numeric( $row[ 3 ] ) ) $errors[] = 'Min stock must be numeric';
+        if ( !empty( $row[ 3 ] ) && !is_numeric( $row[ 3 ] ) ) $errors[] = 'Min Stock must be numeric';
 
         // Uniqueness validation ( name+category )
         if ( !empty( $row[ 0 ] ) && !empty( $row[ 2 ] ) ) {
@@ -862,13 +862,13 @@ class ImportDataController extends Controller {
         $errors = [];
 
         // Required fields
-        if ( empty( $row[ 0 ] ) ) $errors[] = 'Product code is required';
-        if ( empty( $row[ 1 ] ) ) $errors[] = 'Product name is required';
+        if ( empty( $row[ 0 ] ) ) $errors[] = 'Product Code is required';
+        if ( empty( $row[ 1 ] ) ) $errors[] = 'Product Name is required';
         if ( $buyPrice === '' || $buyPrice === null ) {
-            $errors[] = 'Buy price is required';
+            $errors[] = 'Buy Price is required';
         }
         if ( $sellPrice === '' || $sellPrice === null ) {
-            $errors[] = 'Sell price is required';
+            $errors[] = 'Sell Price is required';
         }
         if ( $quantity === '' || $quantity === null ) {
             $errors[] = 'Quantity is required';
@@ -886,15 +886,15 @@ class ImportDataController extends Controller {
         }
 
         // Numeric validations
-        if ( !empty( $row[ 2 ] ) && !is_numeric( preg_replace( '/[^\d.]/', '', $row[ 2 ] ) ) ) $errors[] = 'Buy price must be numeric';
-        if ( !empty( $row[ 3 ] ) && !is_numeric( preg_replace( '/[^\d.]/', '', $row[ 3 ] ) ) ) $errors[] = 'Sell price must be numeric';
+        if ( !empty( $row[ 2 ] ) && !is_numeric( preg_replace( '/[^\d.]/', '', $row[ 2 ] ) ) ) $errors[] = 'Buy Price must be numeric';
+        if ( !empty( $row[ 3 ] ) && !is_numeric( preg_replace( '/[^\d.]/', '', $row[ 3 ] ) ) ) $errors[] = 'Sell Price must be numeric';
         if ( !empty( $row[ 4 ] ) && !is_numeric( preg_replace( '/[^\d.]/', '', $row[ 4 ] ) ) ) $errors[] = 'Quantity must be numeric';
 
         // Price validation
         $buy_price = !empty( $row[ 2 ] ) ? preg_replace( '/[^\d.]/', '', $row[ 2 ] ) : 0;
         $sell_price = !empty( $row[ 3 ] ) ? preg_replace( '/[^\d.]/', '', $row[ 3 ] ) : 0;
         if ( $buy_price > 0 && $sell_price > 0 && $buy_price >= $sell_price ) {
-            $errors[] = 'Buy price must be less than sell price';
+            $errors[] = 'Buy Price must be less than Sell Price';
         }
 
         if ( !empty( $errors ) ) {

@@ -121,11 +121,11 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, WithBat
     public function customValidationMessages()
     {
         return [
-            'product_name.required' => 'Product name is required',
+            'product_name.required' => 'Product Name is required',
             'category.required' => 'Category is required',
-            'pack_size.numeric' => 'Pack size must be a number',
-            'min_stock.numeric' => 'Min stock must be a number',
-            'max_stock.numeric' => 'Max stock must be a number',
+            'pack_size.numeric' => 'Pack Size must be a number',
+            'min_stock.numeric' => 'Min Stock must be a number',
+            'max_stock.numeric' => 'Max Stock must be a number',
         ];
     }
 
