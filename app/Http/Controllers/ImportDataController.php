@@ -41,7 +41,6 @@ class ImportDataController extends Controller {
 
         return view( 'import.index', compact( 'stores',  'import_history' ) );
     }
-
     public function importData() {
         $categories = Category::all();
         $price_categories = PriceCategory::all();
@@ -54,7 +53,6 @@ class ImportDataController extends Controller {
 
         return view( 'import.import_stocks', compact( 'categories', 'price_categories', 'stores', 'suppliers', 'import_history' ) );
     }
-
     public function downloadStockTemplate() {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -65,8 +63,9 @@ class ImportDataController extends Controller {
         $sheet->setCellValue( 'C1', 'Buy Price' );
         $sheet->setCellValue( 'D1', 'Sell Price' );
         $sheet->setCellValue( 'E1', 'Quantity' );
-        $sheet->setCellValue( 'F1', 'Expiry' );
-
+        if ( Setting::where( 'id', 123 )->value( 'value' ) === 'YES' ) {
+            $sheet->setCellValue( 'F1', 'Expiry' );
+        }
         // Fetch all products from database
         $products = Product::orderBy( 'name' )->get();
 
@@ -82,8 +81,11 @@ class ImportDataController extends Controller {
             // Sell Price ( empty for user input )
             $sheet->setCellValue( 'E'.$row, '' );
             // Quantity ( empty for user input )
-            $sheet->setCellValue( 'F'.$row, '' );
-            // Expiry ( empty for user input )
+            if ( Setting::where( 'id', 123 )->value( 'value' ) === 'YES' ) {
+                $sheet->setCellValue( 'F'.$row, '' );
+                // Expiry ( empty for user input )
+            }
+
             $row++;
         }
 
@@ -94,7 +96,9 @@ class ImportDataController extends Controller {
             $sheet->setCellValue( 'C2', '' );
             $sheet->setCellValue( 'D2', '' );
             $sheet->setCellValue( 'E2', '' );
-            $sheet->setCellValue( 'F2', '' );
+            if ( Setting::where( 'id', 123 )->value( 'value' ) === 'YES' ) {
+                $sheet->setCellValue( 'F2', '' );
+            }
         }
 
         $writer = new Xlsx( $spreadsheet );
@@ -110,7 +114,6 @@ class ImportDataController extends Controller {
         filename = "' . $fileName . '"'
         ])->deleteFileAfterSend(true);
     }
-
     public function downloadTemplate() {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -180,7 +183,6 @@ class ImportDataController extends Controller {
             'Content-Disposition' => 'attachment; filename="' . $fileName . '"'
         ] )->deleteFileAfterSend( true );
     }
-
     public function previewStockImport( Request $request ) {
 
         try {
@@ -242,7 +244,11 @@ class ImportDataController extends Controller {
 
                 foreach ( $excel_raw_data[ 0 ] as $index => $row ) {
 
-                    $expectedColumns = 6;
+                    if ( Setting::where( 'id', 123 )->value( 'value' ) === 'YES' ) {
+                        $expectedColumns = 6;
+                    } else {
+                        $expectedColumns = 5;
+                    }
                     $actualColumns = count( $row );
 
                     if ( $actualColumns < $expectedColumns ) {
@@ -302,7 +308,6 @@ class ImportDataController extends Controller {
             return back()->withErrors( [ 'file' => 'An error occurred while processing your file. Please try again.' ] )->withInput();
         }
     }
-
     public function previewImport( Request $request ) {
         try {
             // Validate request
@@ -428,7 +433,6 @@ class ImportDataController extends Controller {
             return back()->withErrors( [ 'file' => 'An error occurred while processing your file. Please try again.' ] )->withInput();
         }
     }
-
     private function getUploadErrorMessage( $errorCode ) {
         switch ( $errorCode ) {
             case UPLOAD_ERR_INI_SIZE:
@@ -449,7 +453,6 @@ class ImportDataController extends Controller {
             return 'Unknown upload error';
         }
     }
-
     public function recordImport( Request $request ) {
         $start_time = microtime( true );
         Log::info( 'Starting products import process', [ 'start_time' => $start_time ] );
@@ -548,7 +551,6 @@ class ImportDataController extends Controller {
             return redirect()->route( 'import-products' )->with( 'error', 'Import failed: ' . $e->getMessage() );
         }
     }
-
     public function recordStockImport( Request $request ) {
         $start_time = microtime( true );
         // Log::info( 'Starting stock import process', [ 'start_time' => $start_time ] );
@@ -635,15 +637,19 @@ class ImportDataController extends Controller {
                         $buy_price = preg_replace( '/[^\d.]/', '', $row[ 2 ] );
                         $sell_price = preg_replace( '/[^\d.]/', '', $row[ 3 ] );
                         $quantity = preg_replace( '/[^\d.]/', '', $row[ 4 ] );
-                        $total_profit = ($sell_price - $buy_price) * $quantity;
-                        
+                        $total_profit = ( $sell_price - $buy_price ) * $quantity;
+
                         // 1. Create incoming_stock record first
                         $incoming_stock = new GoodsReceiving;
                         $incoming_stock->product_id = $row[ 0 ];
-                        $incoming_stock->supplier_id = $preview['supplier_id'];
+                        $incoming_stock->supplier_id = $preview[ 'supplier_id' ];
                         $incoming_stock->invoice_no = null;
                         $incoming_stock->batch_number = now()->format( 'Y-m-d' );
-                        $incoming_stock->expire_date = $row[ 5 ];
+                        if ( Setting::where( 'id', 123 )->value( 'value' ) === 'YES' ) {
+                            $incoming_stock->expire_date = $row[ 5 ];
+                        } else {
+                            $incoming_stock->expire_date = null;
+                        }
                         $incoming_stock->quantity = $quantity;
                         $incoming_stock->unit_cost = $buy_price;
                         $incoming_stock->total_cost = $buy_price * $quantity;
@@ -654,18 +660,18 @@ class ImportDataController extends Controller {
                         $incoming_stock->sell_price = $sell_price;
                         $incoming_stock->created_at = date( 'Y-m-d' );
                         $incoming_stock->save();
-                        
+
                         // Create stock record
                         $stock_data = [
                             'product_id' => $row[ 0 ],
                             'unit_cost' => $row[ 2 ],
                             'quantity' => $row[ 4 ],
-                            'expiry_date' => $row[ 5 ],
+                            'expiry_date' => $row[ 5 ] ?? null,
                             'store_id' => $preview[ 'store_id' ],
                             'created_by' => Auth::id(),
                             'incoming_stock_id' => $incoming_stock->id
                         ];
-                        
+
                         $stock = CurrentStock::create( $stock_data );
 
                         // Create stock tracking record
@@ -769,7 +775,6 @@ class ImportDataController extends Controller {
             return redirect()->route( 'import-data' )->with( 'error', 'Import failed: ' . $e->getMessage() );
         }
     }
-
     private function validateRow( $row, $row_number ) {
         // Log::info( 'Validating row', [ 'row_number' => $row_number ] );
 
@@ -812,7 +817,6 @@ class ImportDataController extends Controller {
 
         return $errors;
     }
-
     private function validateRowNormal( $row, $row_number ) {
         // Log::info( 'Validating row', [ 'row_number' => $row_number ] );
 
@@ -848,7 +852,6 @@ class ImportDataController extends Controller {
 
         return $errors;
     }
-
     private function validateStockRow( $row, $row_number ) {
         // Log::info( 'Validating row', [ 'row_number' => $row_number ] );
         $productCode = trim( $row[ 0 ] ?? '' );
@@ -905,7 +908,6 @@ class ImportDataController extends Controller {
 
         return $errors;
     }
-
     public function showPreview() {
         $preview_data = Session::get( 'import_preview' );
         if ( !$preview_data ) {

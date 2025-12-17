@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Artisan;
 use Maatwebsite\Excel\Facades\Excel;
 
 ini_set('max_execution_time', 500);
@@ -63,6 +64,32 @@ class DailyStockCountController extends Controller
 
     return view('stock_management.stock_taking.index', compact('products'));
 }
+
+public function snapshotStockValue()
+{
+    if (!Auth()->user()->checkPermission('View Stock Taking')) {
+        return response()->json(['success' => false, 'message' => 'Access Denied'], 403);
+    }
+
+    try {
+        // Call the artisan command
+        Artisan::call('snapshot:oldstock');
+        
+        $output = Artisan::output();
+        
+        return response()->json([
+            'success' => true, 
+            'message' => 'Stock saved successfully. You can now proceed with stock taking.'
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error creating stock snapshot: ' . $e->getMessage());
+        return response()->json([
+            'success' => false, 
+            'message' => 'Error creating snapshot: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
 
 
 public function processStockTaking(Request $request)

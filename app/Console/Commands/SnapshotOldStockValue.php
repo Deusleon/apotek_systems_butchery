@@ -39,16 +39,16 @@ class SnapshotOldStockValue extends Command
             foreach ($priceCategoryIds as $priceCategoryId) {
 
                 // Remove existing snapshot rows for this date & price_category to avoid duplicates
-                $deleteQuery = DB::table('inv_old_stock_values')->where('snapshot_date', $snapshotDate);
-                if (!is_null($priceCategoryId)) {
-                    $deleteQuery->where('price_category_id', $priceCategoryId);
-                } else {
-                    $deleteQuery->whereNull('price_category_id');
-                }
-                if (!$isAllStore && $storeId) {
-                    $deleteQuery->where('store_id', $storeId);
-                }
-                $deleteQuery->delete();
+                // $deleteQuery = DB::table('inv_old_stock_values')->where('snapshot_date', $snapshotDate);
+                // if (!is_null($priceCategoryId)) {
+                //     $deleteQuery->where('price_category_id', $priceCategoryId);
+                // } else {
+                //     $deleteQuery->whereNull('price_category_id');
+                // }
+                // if (!$isAllStore && $storeId) {
+                //     $deleteQuery->where('store_id', $storeId);
+                // }
+                // $deleteQuery->delete();
 
                 // Subquery: latest stock id & unit_cost per product + store
                 $latestStock = DB::table('inv_current_stock as ics1')

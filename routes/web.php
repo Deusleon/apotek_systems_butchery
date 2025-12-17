@@ -497,6 +497,7 @@ Route::middleware(["auth","main_branch"])->group(function () {
     
     Route::get('inventory/stock-taking', 'DailyStockCountController@stockTaking')->name('stock-taking');
     Route::post('inventory/stock-taking/process', 'DailyStockCountController@processStockTaking')->name('stock-taking.process');
+    Route::post('inventory/stock-taking/snapshot', 'DailyStockCountController@snapshotStockValue')->name('stock-taking.snapshot');
 
     Route::get('expenses/expense-date-filter', 'ExpenseController@filterExpenseDate')->name('expense-date-filter');
 

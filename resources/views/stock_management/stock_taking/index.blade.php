@@ -100,9 +100,16 @@
                             <image id="loading-image" src="{{asset('assets/images/spinner.gif')}}"></image>
                         </div>
 
-                        <div class="d-flex justify-content-end mb-3 align-items-center">
-                            <label class="mr-2" for="">Date:</label>
-                            <input type="text" name="sale_date" id="d_auto_8" class="form-control w-auto">
+                        <div class="d-flex justify-content-between mb-3 align-items-center">
+                            <div>
+                                <button type="button" class="btn btn-primary" id="snapshot-stock-btn">
+                                    Save Current Stock
+                                </button>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <label class="mr-2 mb-0" for="">Date:</label>
+                                <input type="text" name="sale_date" id="d_auto_8" class="form-control w-auto">
+                            </div>
                         </div>
 
                         <div id="tbody2" class="table-responsive">
@@ -341,6 +348,44 @@
                         updateDifferenceForRow($input.closest('tr'));
                     }, 50);
                 });
+
+                // Handle snapshot button click
+                $('#snapshot-stock-btn').on('click', function () {
+                    if (!confirm(`Are you sure you wan't save the current stock?`)) {
+                        return;
+                    }
+
+                    $.ajax({
+                        url: "{{ route('stock-taking.snapshot') }}",
+                        type: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        beforeSend: function () {
+                            $("#loading").show();
+                            $('#snapshot-stock-btn').prop('disabled', true);
+                        },
+                        success: function (res) {
+                            $("#loading").hide();
+                            $('#snapshot-stock-btn').prop('disabled', false);
+                            if (res.success) {
+                                notify(res.message, 'top', 'right', 'success');
+                            } else {
+                                notify(res.message || 'Failed to create snapshot.', 'top', 'right', 'danger');
+                            }
+                        },
+                        error: function (xhr) {
+                            $("#loading").hide();
+                            $('#snapshot-stock-btn').prop('disabled', false);
+                            let message = 'Error occurred while creating snapshot.';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                message = xhr.responseJSON.message;
+                            }
+                            notify(message, 'top', 'right', 'danger');
+                        }
+                    });
+                });
+
 
                 // on blur ensure formatting correct
                 $(document).on('blur', '.physical', function () {

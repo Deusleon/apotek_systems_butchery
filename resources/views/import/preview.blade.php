@@ -48,7 +48,8 @@
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="#"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item" style="color: #000 !import"><a href="#">Inventory / Products Import / Stock Import / Preview Stock Import</a></li>
+    <li class="breadcrumb-item" style="color: #000 !import"><a href="#">Inventory / Products Import / Stock Import / Preview
+            Stock Import</a></li>
 @endsection
 
 @section("content")
@@ -110,7 +111,10 @@
                                     <th>Buy Price</th>
                                     <th>Sell Price</th>
                                     <th>Quantity</th>
-                                    <th>Expiry</th>
+
+                                    @if (\App\Setting::where('id', 123)->value('value') === 'YES')
+                                        <th>Expiry</th>
+                                    @endif
                                     <th>Validation</th>
                                 </tr>
                             </thead>
@@ -130,7 +134,9 @@
                                         <td>{{ is_numeric($row['data'][2]) ? number_format($row['data'][2], 0) : '' }}</td>
                                         <td>{{ is_numeric($row['data'][3]) ? number_format($row['data'][3], 0) : '' }}</td>
                                         <td>{{ is_numeric($row['data'][4]) ? number_format($row['data'][4], 0) : '' }}</td>
-                                        <td>{{ $row['data'][5] ?? '' }}</td>
+                                        @if (\App\Setting::where('id', 123)->value('value') === 'YES')
+                                            <td>{{ $row['data'][5] ?? '' }}</td>
+                                        @endif
                                         <td>
                                             @if(!empty($row['errors']))
                                                 <span class="text-danger">

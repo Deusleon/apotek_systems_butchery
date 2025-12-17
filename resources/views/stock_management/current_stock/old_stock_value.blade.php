@@ -49,9 +49,16 @@
                 <form method="GET" class="d-flex justify-content-end" action="{{ route('old-stocks') }}">
                     @csrf
 
-                    <div class="d-flex justify-content-end mb-3 mr-3 align-items-center">
-                        <label class="mr-2" for="">Date:</label>
-                        <input type="text" name="old_stock_date" id="old_stock_date" class="form-control w-auto">
+                    <div class="d-flex justify-content-end mb-3 mr-3 align-items-center" style="width: 250px;">
+                        <label for="code" class="mr-2">Date:</label>
+                        <select name="old_stock_date" id="old_stock_date" class="js-example-basic-single form-control"
+                            onchange="this.form.submit()">
+                            <option value="" disabled>Select Date</option>
+                            @foreach($dates as $date)
+                                <option value="{{$date->created_at}}" {{$default_date === $date->created_at ? 'selected' : ''}}>
+                                    {{$date->created_at}}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="d-flex justify-content-end mb-3">
                         <div class="d-flex align-items-center" style="width: 281px;">
@@ -134,30 +141,6 @@
             $('#old_stock').DataTable({
                 responsive: false,
                 order: [[0, 'asc']]
-            });
-
-            // Initialize date picker for old stock date
-            $('#old_stock_date').daterangepicker({
-                singleDatePicker: true,
-                showDropdowns: true,
-                autoUpdateInput: true,
-                minDate: '{{ $min_date }}',
-                maxDate: '{{ $max_date }}',
-                startDate: '{{ $max_date }}',
-                locale: {
-                    format: 'YYYY-MM-DD'
-                }
-            });
-
-            // Handle date selection
-            $('#old_stock_date').on('apply.daterangepicker', function (ev, picker) {
-                $(this).val(picker.startDate.format('YYYY-MM-DD'));
-                // Auto-submit the form when date is selected
-                $(this).closest('form').submit();
-            });
-
-            $('#old_stock_date').on('cancel.daterangepicker', function (ev, picker) {
-                $(this).val('');
             });
 
             $('#current-stock-tablist').on('click', function (e) {
