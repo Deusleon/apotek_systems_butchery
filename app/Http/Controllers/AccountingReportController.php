@@ -60,7 +60,6 @@ class AccountingReportController extends Controller
                     compact('data', 'pharmacy'))
                     ->setPaper('a4', 'landscape');
                 return $pdf->stream('gross_profit_detail_report.pdf');
-                break;
             case 3:
                 $dates = explode(" - ", $request->date_range);
                 $data = $this->grossProfitSummary($dates);
@@ -107,7 +106,18 @@ class AccountingReportController extends Controller
                 $pdf = PDF::loadView('accounting_reports.expired_products_cost_report_pdf',
                     compact('data', 'pharmacy'))
                     ->setPaper('a4', '');
-                return $pdf->stream('expired_products_cost_report.pdf');
+                return $pdf->stream('cost_of_expired_products_report.pdf');
+
+            case 7:
+                $expMonth = $request->months;
+                $data = $this->costOfNearToExpireProduct($expMonth, $request->price_category_id_expire);
+                if ($data == []) {
+                    return response()->view('error_pages.pdf_zero_data');
+                }
+                $pdf = PDF::loadView('accounting_reports.cost_of_products_near_to_expire_report_pdf',
+                    compact('data', 'expMonth', 'pharmacy'))
+                    ->setPaper('a4', '');
+                return $pdf->stream('cost_of_products_near_to_expire_report.pdf');
             default:
         }
     }
@@ -355,10 +365,89 @@ class AccountingReportController extends Controller
             }
 
         }
-
         return $max_prices;
-
     }
+
+    private function costOfNearToExpireProduct($month, $price_category_id_expire){
+        $today = now();
+        $date = [];
+        
+        if (in_array($month, [1, 3, 6, 12])) {
+            if ($month == 1) {
+                // For month = 1: from today to end of current month
+                $date = [
+                    $today->format('Y-m-d'),
+                    $today->endOfMonth()->format('Y-m-d')
+                ];
+            } else {
+                // For month = 3, 6, 12: from today to end of that many months from today
+                $date = [
+                    $today->format('Y-m-d'),
+                    (clone $today)->addMonths($month)->endOfMonth()->format('Y-m-d')
+                ];
+            }
+        }
+
+        $max_prices = array();
+        $total_buy = 0;
+        $total_sell = 0;
+        $products = PriceList::where('price_category_id', $price_category_id_expire)
+            ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
+            ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+            ->where('quantity', '>', 0)
+            ->Where('inv_products.status', '1')
+            ->select('inv_products.id as id', 'name')
+            ->groupBy('product_id')
+            ->get();
+        foreach ($products as $product) {
+            if (sizeof($date) == 0) {
+                /*from today forward*/
+                $data = PriceList::select('stock_id', 'price', 'expiry_date')->where('price_category_id', $price_category_id_expire)
+                    ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
+                    ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                    ->orderBy('stock_id', 'desc')
+                    ->where(DB::raw('date(expiry_date)'), '>=', date('Y-m-d'))
+                    ->where('product_id', $product->id)
+                    ->first('price');
+
+                $quantity = CurrentStock::where('product_id', $product->id)
+                    ->where(DB::raw('date(expiry_date)'), '>=', date('Y-m-d'))
+                    ->sum('quantity');
+
+            } else {
+                $data = PriceList::select('stock_id', 'price', 'expiry_date')->where('price_category_id', $price_category_id_expire)
+                    ->join('inv_current_stock', 'inv_current_stock.id', '=', 'sales_prices.stock_id')
+                    ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
+                    ->orderBy('stock_id', 'desc')
+                    ->whereBetween(DB::raw('date(expiry_date)'), [$date[0], $date[1]])
+                    ->where('product_id', $product->id)
+                    ->first('price');
+
+                $quantity = CurrentStock::where('product_id', $product->id)
+                    ->whereBetween(DB::raw('date(expiry_date)'), [$date[0], $date[1]])
+                    ->sum('quantity');
+
+            }
+            if ($data) {
+                $total_buy += $data->currentStock['unit_cost'] * $quantity;
+                $total_sell += $data->price * $quantity;
+                array_push($max_prices, array(
+                    'product_id' => $product->id,
+                    'product_name' => $product->name,
+                    'cost_buy_price' => $data->currentStock['unit_cost'] * $quantity,
+                    'cost_sell_price' => $data->price * $quantity,
+                    'quantity' => $quantity,
+                    'batch_number' => $data->currentStock['batch_number'],
+                    'expire_date' => $data->currentStock['expiry_date'],
+                    'total_buy' => $total_buy,
+                    'total_sell' => $total_sell
+                ));
+            }
+
+        }
+        return $max_prices;
+    }
+
 
 private function grossProfitSummary(array $dates)
 {

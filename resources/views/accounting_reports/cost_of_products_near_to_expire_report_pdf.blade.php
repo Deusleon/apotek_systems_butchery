@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Expired Product Cost Report</title>
+    <title>Cost of Products Near to Expire Report</title>
 
     <style>
         body {
@@ -138,7 +138,7 @@
 <body>
 
     <div class="row" style="padding-top: -2%">
-        <!-- Header Section - Updated to match Cash Sales Report style -->
+        <!-- Header Section -->
         <div style="width: 100%; text-align: center; align-items: center; margin-bottom: -1%;">
             @if($pharmacy['logo'])
                 <img style="max-width: 90px; max-height: 90px;"
@@ -151,8 +151,12 @@
                 {{$pharmacy['email'] . ' | ' . $pharmacy['website']}}
             </div><br>
             <div>
-                <h3 align="center" style="font-weight: bold; margin-top: -1%">Cost of Expired Products Report</h3>
-                <h4 align="center" style="margin-top: -1.5%">Printed On: {{now()->format('Y-m-d H:i:s')}}</h4>
+                <h3 align="center" style="font-weight: bold; margin-top: -1%">Cost of Products Near to Expire Report
+                </h3>
+                <h3 align="center" style="margin-top: -1%;">Expiry in
+                    {{ $expMonth === 1 ? 'This Month' : ' next ' . $expMonth . ' months' }}
+                </h3>
+                <h4 align="center" style="margin-top: -1%">Printed On: {{now()->format('Y-m-d H:i:s')}}</h4>
             </div>
         </div>
 
@@ -163,21 +167,22 @@
                     <thead>
                         <tr style="background: #1f273b; color: white;">
                             <th align="left">Product Name</th>
-                            <th align="left" style="min-width: 70px;">Batch No.</th>
+                            <th align="left" style="min-width: 70px; white-space: nowrap;">Batch No.</th>
                             <th align="center">QOH</th>
-                            <th align="center" style="min-width: 70px;">Expired Date</th>
+                            <th align="center" style="min-width: 70px; white-space: nowrap;">Expiry Date</th>
                             <th align="right">Cost Buy</th>
                             <th align="right">Cost Sell</th>
                         </tr>
                     </thead>
                     @foreach($data as $item)
                         <tr>
-                            <td align="left">{{$item['name']}}</td>
-                            <td align="left" style="min-width: 70px;">{{$item['batch_number']}}</td>
+                            <td align="left">{{$item['product_name']}}</td>
+                            <td align="left" style="min-width: 70px; white-space: nowrap;">{{$item['batch_number']}}</td>
                             <td align="center">
                                 {{number_format($item['quantity'])}}
                             </td>
-                            <td align="center" style="min-width: 70px;">{{date('Y-m-d', strtotime($item['expire_date']))}}
+                            <td align="center" style="min-width: 70px; white-space: nowrap;">
+                                {{date('Y-m-d', strtotime($item['expire_date']))}}
                             </td>
                             <td align="right">{{number_format($item['cost_buy_price'], 2)}}</td>
                             <td align="right">{{number_format($item['cost_sell_price'], 2)}}</td>
@@ -190,7 +195,6 @@
                 <div class="col-35">
                     <div class="full-row">
                     </div>
-
                 </div>
                 <div class="col-10"></div>
                 <div class="col-25"></div>
@@ -217,7 +221,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 

@@ -89,7 +89,10 @@
                                         @endif
                                         @if (\App\Setting::where('id', 123)->value('value') === 'YES')
                                             @if(auth()->user()->checkPermission('Cost of Expired Products'))
-                                                <option value="6">Cost of Expired Products</option>
+                                                <option value="6">Cost of Expired Products Report</option>
+                                            @endif
+                                            @if(auth()->user()->checkPermission('Cost of Expired Products'))
+                                                <option value="7">Cost of Products Near to Expire Report</option>
                                             @endif
                                         @endif
                                     </select>
@@ -98,7 +101,7 @@
                         </div>
                     </div>
 
-                    <div id="date-row">
+                    <div id="date_row">
                         <div class="row">
                             <div class="col-md-4">
                                 <div id="range">
@@ -112,7 +115,7 @@
                     {{--Current Stock--}}
                     <div id="current-stock-value" style="display: none">
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-4" id="priceDiv">
                                 <div class="form-group">
                                     <label for="price-category">Price Category<font color="red">*</font></label>
                                     <select id="price-category" name="price_category_id" onchange=""
@@ -154,10 +157,14 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-4" id="dateDiv">
                                 <label for="filter">Date</label>
-                                <input type="text" class="form-control" name="expire_date_range" id="expiredaterange"
-                                    autocomplete="off" readonly />
+                                <select name="months" class="form-control" id="months">
+                                    <option value="1">This Month</option>
+                                    <option value="3">Next 3 Months</option>
+                                    <option value="6">Next 6 Months</option>
+                                    <option value="12">Next 12 Months</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -257,23 +264,28 @@
             if (Number(report_option_index) === 1) {
                 $("#price-category").prop("required", true);
                 $("#store").prop("required", true);
-                $('#date-row').hide();
+                $('#date_row').hide();
                 $('#current-stock-value').show();
             } else {
                 $("#price-category").prop("required", false);
                 $("#store").prop("required", false);
                 $('#current-stock-value').hide();
-                $('#date-row').show();
+                $('#date_row').show();
             }
 
             if (Number(report_option_index) === 6) {
                 $("#price-category-expire").prop("required", true);
                 $('#expired-product-cost').show();
-                $('#date-row').hide();
+                $('#date_row').hide();
+                $('#dateDiv').hide();
                 $('#current-stock-value').hide();
-            } else {
-                $("#price-category-expire").prop("required", false);
-                $('#expired-product-cost').hide();
+            }            
+            if (Number(report_option_index) === 7) {
+                $("#price-category-expire").prop("required", true);
+                $('#expired-product-cost').show();
+                $('#date_row').hide();
+                $('#dateDiv').show();
+                $('#current-stock-value').hide();
             }
         }
     </script>
