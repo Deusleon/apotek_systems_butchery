@@ -186,15 +186,19 @@ class RequisitionController extends Controller
 
         // Validate file upload (evidence is now optional)
         $request->validate([
-            'evidence' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048', // max 2MB
+            'evidence' => 'nullable|file|mimes:jpg,jpeg,png,webp,pdf|max:2048', // max 2MB
         ]);
 
         $orders = json_decode($request->orders);
-
-        // Handle file upload - FIXED VARIABLE NAME
-        $evidencePath = null;
-        if($request->hasFile('evidence')) {
-            $evidencePath = $request->file('evidence')->store('requisition_evidence', 'public');
+        
+        $pictureName = null;
+        if ($request->hasFile('evidence')) {
+            $picture = $request->file('evidence');
+            $pictureExtension = $picture->getClientOriginalExtension();
+            $pictureName = $picture->getFilename() . '.' . $pictureExtension;
+            $picture->move(public_path('fileStore'), $pictureName);
+        }else{
+            $pictureName = $request->input('old_evidence');
         }
 
         $last_req_id = Requisition::orderBy('id', 'DESC')->first();
@@ -214,7 +218,7 @@ class RequisitionController extends Controller
             $requisition->req_no = $req_no;
             $requisition->notes = $request->notes;
             $requisition->remarks = $request->remark;
-            $requisition->evidence_document = $evidencePath; // FIXED COLUMN NAME
+            $requisition->evidence_document = $pictureName; // FIXED COLUMN NAME
             $requisition->from_store = $from_store;
             $requisition->to_store = current_store_id();
             $requisition->status = 0;
@@ -247,7 +251,7 @@ class RequisitionController extends Controller
         abort(403, 'Access Denied');
     }
 
-    $items = Product::where('status', 1)->get();
+    $items = Product::where('status', 1)->orderBy('name', 'ASC')->get();
     $stores = Store::get();
 
     $requisition = Requisition::with(['reqDetails', 'creator'])->find($id);
@@ -387,7 +391,7 @@ class RequisitionController extends Controller
 
         // Validate file upload (evidence is now optional)
         $request->validate([
-            'evidence' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048', // max 2MB
+            'evidence' => 'nullable|file|mimes:jpg,jpeg,webp,png,pdf|max:2048', // max 2MB
         ]);
 
         $req_id = $request->requisition_id;
@@ -397,10 +401,17 @@ class RequisitionController extends Controller
         $to_store = current_store_id();
 
         // Handle file upload - NEW CODE ADDED
-        $evidencePath = null;
+            $pictureName = null;
         if($request->hasFile('evidence')) {
-            $evidencePath = $request->file('evidence')->store('requisition_evidence', 'public');
-
+            if ($request->hasFile('evidence')) {
+                $picture = $request->file('evidence');
+                $pictureExtension = $picture->getClientOriginalExtension();
+                $pictureName = $picture->getFilename() . '.' . $pictureExtension;
+                $picture->move(public_path('fileStore'), $pictureName);
+            }else{
+                $pictureName = $request->input('old_evidence');
+            }
+        
             // Optional: Delete old evidence file if it exists
             $oldRequisition = Requisition::find($req_id);
             if ($oldRequisition->evidence_document && Storage::disk('public')->exists($oldRequisition->evidence_document)) {
@@ -419,8 +430,8 @@ class RequisitionController extends Controller
             $requisition->updated_by = Auth::user()->id;
 
             // Update evidence document if a new file was uploaded - NEW CODE
-            if ($evidencePath) {
-                $requisition->evidence_document = $evidencePath;
+            if ($pictureName) {
+                $requisition->evidence_document = $pictureName;
             }
 
             $requisition->save();

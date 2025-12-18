@@ -44,20 +44,20 @@
                                 <div class="form-group col-md-3">
                                     <label for="from_store">Supplying Branch <font color="red">*</font></label>
                                     
-                                    @if(Auth::user()->store_id === 1)
-                                    <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
+                                    @if(is_all_store())
+                                    <select name="from_store" class="js-example-basic-single form-control" id="from_store" required {{ $is_all_branch ? 'disabled' : '' }}>
                                         <option value="">Select Branch...</option>
                                         @foreach ($stores as $item)
-                                            @if($item->id != Auth::user()->store_id)
+                                            @if($item->id != current_store_id())
                                                 <option value="{{ $item->id }}" {{ $loop->first ? 'selected' : '' }}>{{ $item->name }}</option>
                                             @endif
                                         @endforeach
                                     </select>
                                     @else
-                                    <select name="from_store" class="js-example-basic-single form-control" id="from_store" required>
+                                    <select name="from_store" class="js-example-basic-single form-control" id="from_store" required {{ $is_all_branch ? 'disabled' : '' }}>
                                         <option value="">Select Branch...</option>
                                         @foreach ($stores as $item)
-                                            @if($item->id != Auth::user()->store_id)
+                                            @if($item->id != current_store_id())
                                                 <option value="{{ $item->id }}">{{ $item->name }}</option>
                                             @endif
                                         @endforeach
@@ -68,7 +68,7 @@
                                 <!--Concurtination of product name, brand, pack_size and sales_uom-->
                                 <div class="form-group col-md-7">
                                     <label for="products">Products <font color="red">*</font></label>
-                                    <select name="products" class="js-example-basic-single form-control products" id="products">
+                                    <select name="products" class="js-example-basic-single form-control products" id="products" {{ $is_all_branch ? 'disabled' : '' }}>
                                         <option value="">Select Products...</option>
                                         @php
                                             $items = collect($items)->sortBy('name');
@@ -110,7 +110,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label><b>Remarks</b></label>
-                                        <textarea id="remark" name="remark" class="form-control" rows="2" placeholder="Enter Remarks Here"></textarea>
+                                        <textarea id="remark" name="remark" class="form-control" rows="2" placeholder="Enter Remarks Here" {{ $is_all_branch ? 'disabled' : '' }}></textarea>
                                     </div>
                                 </div>
 
@@ -118,7 +118,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label><b>Evidence</b></label>
-                                        <input type="file" id="evidence" name="evidence" class="form-control" accept=".pdf,.doc,.docx,.jpg,.png">
+                                        <input type="file" id="evidence" name="evidence" class="form-control" accept=".pdf,.doc,.docx,.jpg,.png" {{ $is_all_branch ? 'disabled' : '' }}>
                                     </div>
                                 </div>
                             </div>
@@ -164,6 +164,9 @@
 
         // Check if user is in ALL branch
         if (@json($is_all_branch)) {
+            // Show initial notification on page load
+            notify('You cannot create requisitions in branch ALL. Please switch to another branch to proceed.', 'top', 'right', 'warning');
+            
             // Prevent form interactions and show message
             function showNotification() {
                 if (!notificationShown) {

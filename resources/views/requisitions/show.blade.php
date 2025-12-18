@@ -133,7 +133,7 @@
                                     <label class="form-label mb-2"><b>Existing</b></label>
                                     @if($requisition->evidence_document)
                                         <div>
-                                            <a href="{{ asset('storage/' . $requisition->evidence_document) }}" 
+                                            <a href="{{ asset('./fileStore/' . $requisition->evidence_document) }}" 
                                             target="_blank" 
                                             class="btn btn-warning text-body"
                                             title="View Document">
