@@ -155,7 +155,7 @@
                             <label class="font-weight-bold">Evidence:</label>
                             <div class="mt-1">
                                 ${requisition.evidence_document ? 
-                                    `<a href="/storage/${requisition.evidence_document}" target="_blank" class="btn btn-warning btn-sm color-body">View</a>` : 
+                                    `<a href="{{ asset('./fileStore/${requisition.evidence_document}') }}" target="_blank" class="btn btn-warning btn-sm color-body">View</a>` : 
                                     '<span class="text-muted">No document attached</span>'
                                 }
                             </div>
@@ -184,8 +184,8 @@
                 $.each(products, function(i, item){
                     html += `<tr>
                                 <td class="font-weight-medium">${item.full_product_name || item.name}</td>
-                                <td class="text-center">${item.quantity}</td>
-                                <td class="text-center font-weight-bold">${item.quantity_given}</td>
+                                <td class="text-center">${formatNumber(item.quantity)}</td>
+                                <td class="text-center font-weight-bold">${formatNumber(item.quantity_given)}</td>
                             </tr>`;
                 });
 
@@ -218,6 +218,12 @@
         e.preventDefault();
         window.location.href = $(this).attr('href');
     });
+
+function formatNumber(digit) {
+    return String(parseFloat(digit))
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
 </script>
 
 <style>

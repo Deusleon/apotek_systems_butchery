@@ -56,7 +56,7 @@
                                     <label for="evidence_document">View Evidence:</label>
                                         @if($requisition->evidence_document)
                                             <div class="d-flex align-items-center gap-3">
-                                                <a href="{{ Storage::url($requisition->evidence_document) }}" target="_blank" 
+                                                <a href="{{ asset('./fileStore/' . $requisition->evidence_document) }}" target="_blank" 
                                                 class="btn btn-warning text-body">
                                                  View
                                                 </a>
@@ -89,6 +89,7 @@
                                                 $isEditable = true;
                                             }
                                         @endphp
+                                        {{-- @dd($requisitionDet) --}}
                                         @foreach ($requisitionDet as $index => $item)
                                             <tr>
                                                 <td style="display: none"><input type="text" name="product_id[]"

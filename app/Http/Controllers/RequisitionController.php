@@ -567,7 +567,6 @@ class RequisitionController extends Controller
         }
     }
 
-
     public function printIssueHistory($id)
 {
     if (!Auth()->user()->checkPermission('View Stock Issue')) {
@@ -594,7 +593,6 @@ class RequisitionController extends Controller
     
     return $pdf->stream($output);
 }
-
     public function getRequisitionsIssue(Request $request)
 {
     // if (!Auth()->user()->checkPermission('View Stock Issue')) {
@@ -657,8 +655,6 @@ class RequisitionController extends Controller
             ->make(true);
     }
 }
-
-
     public function issue($id)
     {
     //        if (!Auth()->user()->checkPermission('View Requisitions Issue')) {
@@ -680,17 +676,20 @@ class RequisitionController extends Controller
         $fromStore = Store::findOrFail($requisition->from_store);
         $toStore = Store::findOrFail($requisition->to_store);
 
+        // First get all requisition details
         $requisitionDet = RequisitionDetail::with('products_')
-            ->leftJoin('inv_current_stock', 'inv_current_stock.product_id', 'requisition_details.product')
-            ->selectRaw('requisition_details.*, sum(inv_current_stock.quantity) as qty_oh')
-            ->groupBy('inv_current_stock.product_id')
-            // ->havingRaw(DB::raw('sum(inv_current_stock.quantity) > 0'))
-            // ->where('inv_current_stock.store_id', $fromStore)
-            ->where('requisition_details.req_id', $id)
+            ->where('req_id', $id)
             ->get();
 
-        // ADD CONCATENATION LOGIC HERE:
-        $requisitionDet->each(function($detail) {
+        // Then for each detail, get the quantity on hand from current stock
+        $requisitionDet->each(function($detail) use ($fromStore) {
+            $qty_oh = CurrentStock::where('product_id', $detail->product)
+                ->where('store_id', $fromStore->id)
+                ->sum('quantity');
+            
+            // Explicitly set to 0 if null or false
+            $detail->qty_oh = $qty_oh ?: 0;
+            
             if ($detail->products_) {
                 $detail->products_->full_product_name = 
                     $detail->products_->name . ' ' . 
@@ -714,7 +713,7 @@ class RequisitionController extends Controller
         $store_id = $request->store_id;
 
         $content = array_map(null, $request->product_id, $request->qty, $request->qty_req);
-        // dd($content);
+        dd($content);
 
         foreach ($content as $value) {
 
@@ -741,18 +740,6 @@ class RequisitionController extends Controller
 
                 $update_stock = CurrentStock::find($current_stock->first()->id);
                 $update_stock->batch_number = null;
-
-                //TODO: Commented not understood
-//                if ($request->expire_date == "YES") {
-//                    if ($single_item['expire_date'] != null) {
-//                        $update_stock->expiry_date = date('Y-m-d', strtotime($single_item['expire_date']));
-//                    } else {
-//                        $update_stock->expiry_date = null;
-//                    }
-//                } else {
-//                    $update_stock->expiry_date = null;
-//                }
-
                 $update_stock->quantity = $qty_given;
                 $update_stock->store_id = $store_id;
                 $update_stock->save();
