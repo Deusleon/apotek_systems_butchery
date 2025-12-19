@@ -66,7 +66,8 @@
                                         @endif
                                 </div>
                             </div>
-                            <input type="hidden" name="store_id" value="{{ $toStore->id }}">
+                            <input type="hidden" name="from_store" id="" value="{{ $fromStore->id }}">
+                            <input type="hidden" name="to_store" value="{{ $toStore->id }}">
                             <input type="hidden" name="requisition_id" value="{{ $requisition->id }}">
                             
                             <div class="table-responsive">

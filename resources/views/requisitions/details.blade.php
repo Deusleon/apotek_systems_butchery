@@ -28,7 +28,8 @@
                             <thead>
                             <tr class="bg-navy disabled">
                                 <th>Product Name</th>
-                                <th>Quantity</th>
+                                <th>Requested</th>
+                                <th>Issued</th>
                             </tr>
                             </thead>
                             <tbody>

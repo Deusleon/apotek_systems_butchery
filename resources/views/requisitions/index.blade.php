@@ -40,6 +40,7 @@
                                         <th>From</th>
                                         <th>To</th>
                                         <th>Products</th>
+                                        <th>Status</th>
                                         <th>Action</th>                                   
                                     </tr>
                                 </thead>
@@ -89,7 +90,8 @@
                 ordering: false, // modal list - no ordering necessary
                 columns: [
                     { title: "Product Name" },
-                    { title: "Quantity" }
+                    { title: "Requested" },
+                    { title: "Issued" }
                 ]
             });
         }
@@ -109,7 +111,9 @@
                     item.name, item.brand, item.pack_size, item.sales_uom
                 ].filter(Boolean).join(' ');
                 var qty = (item.quantity !== undefined ? Number(item.quantity).toLocaleString() : '') + (item.unit ? ' ' + item.unit : '');
-                orderTable.row.add([name, qty]);
+                var issued = (item.issued !== undefined ? Number(item.issued).toLocaleString() : '') + (item.unit ? ' ' + item.unit : '');
+
+                orderTable.row.add([name, qty, issued]);
             });
 
             orderTable.draw();
@@ -201,6 +205,17 @@
                     name: 'products',
                     render: function(data, type, row) {
                         return data || '';
+                    }
+                },
+                {
+                    data: 'status',
+                    name: 'status',
+                    render: function(data, type, row) {
+                        var statusMap = {
+                            '0': '<span class="badge badge-secondary">Pending</span>',
+                            '1': '<span class="badge badge-success">Issued</span>'
+                        };
+                        return statusMap[data] || '<span class="badge badge-secondary">Unknown</span>';
                     }
                 },
                 {
