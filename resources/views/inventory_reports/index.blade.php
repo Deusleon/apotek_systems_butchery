@@ -115,6 +115,9 @@
                                             @if(auth()->user()->checkPermission('Stock Adjustment Report'))
                                                 <option value="7">Stock Adjustment Report</option>
                                             @endif
+                                            @if(auth()->user()->checkPermission('Stock Requisition Report'))
+                                                <option value="18">Stock Requisition Report</option>
+                                            @endif
                                             @if(auth()->user()->checkPermission('Stock Issue Report'))
                                                 <option value="8">Stock Issue Report</option>
                                             @endif
@@ -233,6 +236,31 @@
                                         <option value="0" selected="true">All</option>
                                         <option value="1">Issued</option>
                                         <option value="2">Returned</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{--stock requisition--}}
+                    <div id="stock-requisition" style="display: none">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="requisition-date">Date<font color="red">*</font></label>
+                                    <div id="requisition_date" style="border: 2px solid white; border-radius: 6px;">
+                                        <input type="text" name="requisition_date" class="form-control" id="d_auto_913"
+                                            autocomplete="off" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="requisition-status">Status</label>
+                                    <select id="requisition-status" name="requisition_status" onchange=""
+                                        class="js-example-basic-single form-control drop">
+                                        <option value="" selected="true">All</option>
+                                        <option value="0">Pending</option>
+                                        <option value="1">Issued</option>
                                     </select>
                                 </div>
                             </div>
@@ -415,6 +443,36 @@
             $(this).val(picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD'));
         });
 
+        // Stock Requisition Date Picker
+        $(function () {
+            var start = moment();
+            var end = moment();
+
+            $('#d_auto_913').daterangepicker({
+                showDropdowns: true,
+                maxDate: end,
+                autoUpdateInput: true,
+                startDate: moment().startOf('month'),
+                endDate: moment().endOf('month'),
+                locale: {
+                    format: 'YYYY/MM/DD'
+                },
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                    'This Year': [moment().startOf('year'), moment()]
+                }
+            });
+        });
+
+        $('input[name="requisition_date"]').on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD'));
+        });
+
         $(function () {
             var start = moment();
             var end = moment();
@@ -513,6 +571,14 @@
                 if (issueDiv) issueDiv.style.display = 'block';
             } else {
                 if (issueDiv) issueDiv.style.display = 'none';
+            }
+
+            // stock requisition
+            let requisitionDiv = document.getElementById('stock-requisition');
+            if (Number(report_option_index) === 18) {
+                if (requisitionDiv) requisitionDiv.style.display = 'block';
+            } else {
+                if (requisitionDiv) requisitionDiv.style.display = 'none';
             }
 
             // stock transfer
@@ -627,6 +693,18 @@
                     return false;
                 }
                 document.getElementById('issue_date').style.borderColor = 'white';
+                return true;
+            }
+
+            /*if stock requisition*/
+            var requisition_date = document.getElementById('d_auto_913').value;
+            if (Number(report_option_index) === Number(18)) {
+                //make request
+                if (requisition_date === '') {
+                    document.getElementById('requisition_date').style.borderColor = 'red';
+                    return false;
+                }
+                document.getElementById('requisition_date').style.borderColor = 'white';
                 return true;
             }
 

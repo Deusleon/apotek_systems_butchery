@@ -15,6 +15,8 @@ use App\StockTransfer;
 use App\StockCountSchedule;
 use App\Store;
 use App\SalesDetail;
+use App\Requisition;
+use App\RequisitionDetail;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -366,6 +368,18 @@ try {
                     compact( 'data', 'pharmacy' ) )
                     ->setPaper( 'a4', '' );
                     return $pdf->stream( 'stock_min_level.pdf' );
+            case 18:
+                //stock requisition report
+                $dates = explode(" - ", $request->requisition_date);
+                $status = $request->requisition_status;
+                $data = $this->stockRequisitionReport($dates, $status);
+                if ($data == []) {
+                    return response()->view('error_pages.pdf_zero_data');
+                }
+                $pdf = PDF::loadView( 'inventory_reports.stock_requisition_report_pdf',
+                compact( 'data', 'pharmacy' ) )
+                ->setPaper( 'a4', 'landscape' );
+                return $pdf->stream( 'stock_requisition_report.pdf' );
             default:
         }
     }
@@ -1485,6 +1499,60 @@ try {
             'increaseAdjustments',
             'decreaseAdjustments'
         ) );
+    }
+
+    private function stockRequisitionReport($dates, $status)
+    {
+        if (!Auth()->user()->checkPermission('Stock Requisition Report')) {
+            abort(403, 'Access Denied');
+        }
+        
+        $to_pdf = array();
+        $total_value = 0;
+
+        $start = date('Y-m-d', strtotime($dates[0]));
+        $end = date('Y-m-d', strtotime($dates[1]));
+
+        $query = Requisition::with(['reqDetails.products_', 'creator'])
+            ->whereBetween(DB::raw('date(created_at)'), [$start, $end]);
+
+        // Filter by status if not 'All' (0)
+        if ($status != '' && $status != null) {
+            $query->where('status', $status);
+        }
+
+        $requisitions = $query->get();
+
+        foreach ($requisitions as $requisition) {
+            foreach ($requisition->reqDetails as $detail) {
+                $product = $detail->products_;
+                $unit_cost = $detail->unit_cost ?? 0;
+                $quantity = $detail->quantity ?? 0;
+                $sub_total = floatval($unit_cost) * floatval($quantity);
+                $total_value += $sub_total;
+
+                // Get store names
+                $from_store = Store::find($requisition->from_store);
+                $to_store = Store::find($requisition->to_store);
+
+                array_push($to_pdf, array(
+                    'req_no' => $requisition->req_no,
+                    'product_name' => $product ? $product->name . ' ' . ($product->brand ?? '') . ' ' . ($product->pack_size ?? '') . ' ' . ($product->sales_uom ?? '') : 'Unknown Product',
+                    'unit_cost' => $unit_cost,
+                    'quantity' => $quantity,
+                    'sub_total' => $sub_total,
+                    'status' => $requisition->status ?? 'pending',
+                    'from_store' => $from_store ? $from_store->name : 'N/A',
+                    'to_store' => $to_store ? $to_store->name : 'N/A',
+                    'created_by' => $requisition->creator ? $requisition->creator->name : 'Unknown',
+                    'created_date' => date('Y-m-d', strtotime($requisition->created_at)),
+                    'total_value' => $total_value,
+                    'dates' => $dates
+                ));
+            }
+        }
+
+        return $to_pdf;
     }
 
 }
