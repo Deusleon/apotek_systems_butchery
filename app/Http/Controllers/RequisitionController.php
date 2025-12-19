@@ -336,7 +336,7 @@ class RequisitionController extends Controller
         });
 
         if ($receipt_size == '58mm Thermal Paper') {
-            $view = 'requisitions.pdf.receipt_thermal';
+            $view = 'requisitions.pdf.receipt';
             $output = 'request.pdf';
             $pdf = PDF::loadView($view, compact('requisition', 'requisitionDet', 'pharmacy', 'fromStore', 'toStore'));
             return $pdf->stream($output);
@@ -346,7 +346,7 @@ class RequisitionController extends Controller
             $pdf = PDF::loadView($view, compact('requisition', 'requisitionDet', 'pharmacy', 'fromStore', 'toStore'));
             return $pdf->stream($output);
         } else if ($receipt_size == '80mm Thermal Paper') {
-            $view = 'requisitions.pdf.receipt_thermal';
+            $view = 'requisitions.pdf.receipt';
             $output = 'request.pdf';
             $pdf = PDF::loadView($view, compact('requisition', 'requisitionDet', 'pharmacy', 'fromStore', 'toStore'));
             return $pdf->stream($output);
@@ -536,7 +536,7 @@ class RequisitionController extends Controller
                 ->addColumn('action', function ($row) {
                     return '
                         <button type="button" class="btn btn-sm btn-success btn-view btn-rounded" data-id="'.$row->id.'">Show</button>
-                        <a href="'.route('requisitions.issue-history.print', $row->id).'" target="_blank" class="btn btn-sm btn-primary btn-print btn-rounded"><span class="fa fa-print" aria-hidden="true"></span> Print</a>
+                        <a href="'.route('requisitions.issue-history.print', $row->id).'" target="_blank" class="btn btn-sm btn-secondary btn-print btn-rounded"><span class="fa fa-print" aria-hidden="true"></span> Print</a>
                     ';
                 })
 

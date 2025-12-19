@@ -133,7 +133,8 @@
             <tr class="table-header">
                 <th align="left" style="width: 5%;">#</th>
                 <th align="left">Product Name</th>
-                <th align="right">Quantity</th>
+                <th align="right">Requested</th>
+                <th align="center">Issued</th>
             </tr>
 
             @foreach($requisitionDet as $item)
@@ -147,13 +148,14 @@
                         @endif
                     </td>
                     <td align="right">{{ number_format($item->quantity, 0) ?? '' }}</td>
+                    <td align="center">{{ number_format($item->quantity_given ?? 0, 0) }}</td>
                 </tr>
             @endforeach
         </table>
     </div>
 
     <h6 align="center" style="font-weight: normal;">Created By: {{ $requisition->creator->name }}</h6>
-    <h6 align="center" style="margin-top: -2%; font-weight: normal;">Created Date: {{ date('Y-m-d', strtotime($requisition->created_at)) }}</h6>
+    <h6 align="center" style="margin-top: -2%; font-weight: normal;">Our goal is Customer Satisfaction</h6>
 </div>
 
 <script type="text/php">

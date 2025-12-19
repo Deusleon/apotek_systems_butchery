@@ -101,7 +101,7 @@
             orderTable.clear();
 
             if (!rows || rows.length === 0) {
-                orderTable.row.add(['No products found', '']).draw();
+                orderTable.row.add(['No products found', '', '']).draw();
                 return;
             }
 
@@ -125,7 +125,7 @@
             var id = button.data('id');
 
             // Show quick loading row
-            orderTable.clear().row.add(['Loading...', '']).draw();
+            orderTable.clear().row.add(['Loading...', '', '']).draw();
 
             $.ajax({
                 url: config.routes.retrieveRequisitions,
@@ -152,7 +152,7 @@
 
                 error: function(xhr, status, error) {
                     console.error('Error fetching requisition data:', error, xhr.responseText);
-                    orderTable.clear().row.add(['Error loading data', '']).draw();
+                    orderTable.clear().row.add(['Error loading data', '', '']).draw();
                 }
             });
         });

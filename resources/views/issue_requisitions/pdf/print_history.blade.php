@@ -51,7 +51,7 @@
             background: #1f273b;
             color: white;
             text-align: left;
-            padding: 10px 8px;
+            padding: 5px 8px;
             font-weight: bold;
         }
 
@@ -180,8 +180,8 @@
                 <tr>
                     <th style="width: 5%">#</th>
                     <th style="width: 55%">Product Name</th>
-                    <th style="width: 15%" class="text-center">Requested</th>
-                    <th style="width: 15%" class="text-center">Issued</th>
+                    <th style="width: 15%; text-align: center;">Requested</th>
+                    <th style="width: 15%; text-align: center;">Issued</th>
                 </tr>
             </thead>
             <tbody>

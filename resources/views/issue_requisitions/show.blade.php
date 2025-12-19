@@ -118,7 +118,7 @@
                             <div class="row mt-3">
                                 <div class="form-group col-md-12">
                                     <label for="products">Remarks:</label>
-                                    <textarea class="form-control" name="remarks" id="remarksTextarea" rows="2">{{ $requisition->remarks }}</textarea>
+                                    <textarea class="form-control" name="remarks" id="remarksTextarea" rows="2" readonly>{{ $requisition->remarks }}</textarea>
                                 </div>
                             </div>
 
