@@ -733,3 +733,7 @@ Route::get('production', 'ProductionController@index')->name('production.index')
 Route::post('production/store', 'ProductionController@store')->name('production.store');
 Route::get('production/data', 'ProductionController@data')->name('production.data');
 Route::delete('production/{id}', 'ProductionController@destroy')->name('production.destroy');
+
+// Production Report Routes
+Route::get('production-reports', 'ProductionReportController@index')->name('production-reports.index');
+Route::get('production-reports/filter', 'ProductionReportController@filter')->name('production-report-filter');

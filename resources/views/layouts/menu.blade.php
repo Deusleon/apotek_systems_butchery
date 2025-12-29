@@ -26,9 +26,11 @@
         </ul>
     @endif
 </li>
-<li class="nav-item"><a href="{{ route('production.index') }}" class="nav-link"><span class="pcoded-micon"><i
-                class="fas fa-industry"></i></span><span class="pcoded-mtext">Production</span></a>
-</li>
+@if(auth()->user()->checkPermission('View Production'))
+    <li class="nav-item"><a href="{{ route('production.index') }}" class="nav-link"><span class="pcoded-micon"><i
+                    class="fas fa-industry"></i></span><span class="pcoded-mtext">Production</span></a>
+    </li>
+@endif
 <li class="nav-item pcoded-hasmenu">
     @if(auth()->user()->checkPermission('View Purchasing'))
         <a href="#!" class="nav-link"><span class="pcoded-micon"><i class="fas fa-shopping-cart"></i></span>
@@ -158,6 +160,10 @@
         <ul class="pcoded-submenu">
             @if(auth()->user()->checkPermission('View Sales Reports'))
                 <li class=""><a href="{{route('sale-report-index')}}" class="">Sales Reports</a></li>
+            @endif
+            @if(auth()->user()->checkPermission('View Production Report'))
+                <li class=""><a href="{{route('production-reports.index')}}" class="">Production Reports</a>
+                </li>
             @endif
             @if(auth()->user()->checkPermission('View Purchasing Reports'))
                 <li class=""><a href="{{route('purchase-report-index')}}" class="">Purchasing Reports</a>
