@@ -995,13 +995,16 @@
 
             $('#out_of_stock').on('click', function () {
 
-                document.getElementById('stock_items_table').style.display = 'block';
-                if (expireEnabled) {
+                var expired = document.getElementById('stock_items_expired_table') ?? null;
+                var deadStk = document.getElementById('dead_stock_table') ?? null;
+
+                if (expired || deadStk) {
                     document.getElementById('stock_items_expired_table').style.display = 'none';
                     document.getElementById('dead_stock_table').style.display = 'none';
                 }
                 document.getElementById('stock_items_fast_table').style.display = 'none';
                 document.getElementById('below_items_table').style.display = 'none';
+                document.getElementById('stock_items_table').style.display = 'block';
 
                 $('#stock_items').DataTable().clear().destroy();
                 $('#stock_items').DataTable({
@@ -1040,13 +1043,15 @@
             });
 
             $('#fastMoving').on('click', function () {
+                var expired = document.getElementById('stock_items_expired_table') ?? null;
+                var deadStk = document.getElementById('dead_stock_table') ?? null;
 
                 document.getElementById('stock_items_table').style.display = 'none';
-                if (expireEnabled) {
+                document.getElementById('below_items_table').style.display = 'none';
+                if (expired || deadStk) {
                     document.getElementById('stock_items_expired_table').style.display = 'none';
                     document.getElementById('dead_stock_table').style.display = 'none';
                 }
-                document.getElementById('below_items_table').style.display = 'none';
                 document.getElementById('stock_items_fast_table').style.display = 'block';
 
                 $('#stock_items_fast').DataTable().clear().destroy();
@@ -1119,12 +1124,15 @@
 
             $('#below').on('click', function () {
 
+                var expired = document.getElementById('stock_items_expired_table') ?? null;
+                var deadStk = document.getElementById('dead_stock_table') ?? null;
+
                 document.getElementById('stock_items_table').style.display = 'none';
-                if (expireEnabled) {
+                document.getElementById('stock_items_fast_table').style.display = 'none';
+                if (expired || deadStk) {
                     document.getElementById('stock_items_expired_table').style.display = 'none';
                     document.getElementById('dead_stock_table').style.display = 'none';
                 }
-                document.getElementById('stock_items_fast_table').style.display = 'none';
                 document.getElementById('below_items_table').style.display = 'block';
 
                 $('#below_stock_items').DataTable().clear().destroy();

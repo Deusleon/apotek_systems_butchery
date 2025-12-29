@@ -769,6 +769,7 @@ class HomeController extends Controller {
             ->toArray();
 
         // 2) Get current stock entries & exclude sold products
+        // Also ensure stock has been in inventory for at least 3 months
         $query = DB::table('inv_current_stock as cs')
             ->join('inv_products as p', 'p.id', '=', 'cs.product_id')
             ->select(
@@ -782,6 +783,8 @@ class HomeController extends Controller {
                 DB::raw('SUM(cs.quantity) as quantity')
             )
             ->where('cs.quantity', '>', 0)
+            // Only include stock that was created at least 3 months ago
+            ->where('cs.created_at', '<=', $three_months_ago)
             // only exclude sold products if we have any sold ids; otherwise keep all (no sold in period)
             ->when(!empty($sold_product_ids), function ($q) use ($sold_product_ids) {
                 $q->whereNotIn('cs.product_id', $sold_product_ids);
