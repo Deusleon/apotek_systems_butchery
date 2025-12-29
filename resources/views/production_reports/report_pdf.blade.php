@@ -97,7 +97,7 @@
                             <th align="center">Cows Received</th>
                             <th align="center">Live Weight (kg)</th>
                             <th align="center">Meat Output (kg)</th>
-                            <th align="center">Yield (%)</th>
+                            <th align="center">Production Margin (%)</th>
                         </tr>
                     </thead>
                     <tbody>
