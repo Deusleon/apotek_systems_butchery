@@ -727,3 +727,9 @@ Route::delete('/documents/{document}', 'DocumentController@destroy')->name('docu
 // Transport Reports Routes
 Route::get('/transport-reports', 'TransportReportController@index')->name('transport-reports.index');
 Route::post('/transport-reports/generate', 'TransportReportController@generateReport')->name('transport-reports.generate');
+
+// Production Routes
+Route::get('production', 'ProductionController@index')->name('production.index');
+Route::post('production/store', 'ProductionController@store')->name('production.store');
+Route::get('production/data', 'ProductionController@data')->name('production.data');
+Route::delete('production/{id}', 'ProductionController@destroy')->name('production.destroy');

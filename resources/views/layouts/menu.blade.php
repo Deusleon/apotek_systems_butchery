@@ -26,7 +26,9 @@
         </ul>
     @endif
 </li>
-
+<li class="nav-item"><a href="{{ route('production.index') }}" class="nav-link"><span class="pcoded-micon"><i
+                class="fas fa-industry"></i></span><span class="pcoded-mtext">Production</span></a>
+</li>
 <li class="nav-item pcoded-hasmenu">
     @if(auth()->user()->checkPermission('View Purchasing'))
         <a href="#!" class="nav-link"><span class="pcoded-micon"><i class="fas fa-shopping-cart"></i></span>
