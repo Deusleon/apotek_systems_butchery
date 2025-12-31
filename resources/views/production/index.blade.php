@@ -26,13 +26,15 @@
     <div class="col-sm-12">
         <div class="card">
             <div class="card-body">
-                <div class="d-flex justify-content-end align-items-end mb-3">
-                    <div class="form-inline">
-                        <button class="btn btn-secondary" data-toggle="modal" data-target="#productionModal">
-                           <i class="fas fa-plus mr-1"></i> Add Production
-                        </button>
+                @if (current_store_id() === 2)
+                    <div class="d-flex justify-content-end align-items-end mb-3">
+                        <div class="form-inline">
+                            <button class="btn btn-secondary" data-toggle="modal" data-target="#productionModal">
+                            <i class="fas fa-plus mr-1"></i> Add Production
+                            </button>
+                        </div>
                     </div>
-                </div>
+                @endif
                 <div class="d-flex justify-content-end align-items-end mb-3">
                     <div class="form-inline">
                         <label for="date_range" class="mr-2">Date:</label>
@@ -46,7 +48,7 @@
                                 <th>Date</th>
                                 <th class="text-center">Cows Received</th>
                                 <th class="text-center">Live Weight (kg)</th>
-                                <th class="text-center">Meat Output (kg)</th>
+                                <th class="text-center">Meat Weight (kg)</th>
                                 <th class="text-center">Production margin (%)</th>
                             </tr>
                         </thead>
