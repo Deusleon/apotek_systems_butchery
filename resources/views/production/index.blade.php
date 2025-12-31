@@ -49,7 +49,7 @@
                                 <th class="text-center">Cows Received</th>
                                 <th class="text-center">Live Weight (kg)</th>
                                 <th class="text-center">Meat Weight (kg)</th>
-                                <th class="text-center">Production margin (%)</th>
+                                <th class="text-center">Production Margin (%)</th>
                             </tr>
                         </thead>
                         <tbody>
