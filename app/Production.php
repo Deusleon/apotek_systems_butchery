@@ -10,4 +10,8 @@ class Production extends Model
 
     protected $fillable = ['production_date', 'cows_received', 'total_weight', 'meat_output'];
 
+    public function distributions()
+    {
+        return $this->hasMany(ProductionDistribution::class);
+    }
 }

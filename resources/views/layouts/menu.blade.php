@@ -167,6 +167,8 @@
                 @if(auth()->user()->checkPermission('View Production Report'))
                     <li class=""><a href="{{route('production-reports.index')}}" class="">Production Reports</a>
                     </li>
+                    <li class=""><a href="{{route('distributions.index')}}" class="">Distribution Reports</a>
+                    </li>
                 @endif
             @endif
             @if(auth()->user()->checkPermission('View Purchasing Reports'))

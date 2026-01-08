@@ -732,7 +732,17 @@ Route::post('/transport-reports/generate', 'TransportReportController@generateRe
 Route::get('production', 'ProductionController@index')->name('production.index');
 Route::post('production/store', 'ProductionController@store')->name('production.store');
 Route::get('production/data', 'ProductionController@data')->name('production.data');
+Route::get('production/{id}', 'ProductionController@show')->name('production.show');
+Route::put('production/{id}', 'ProductionController@update')->name('production.update');
 Route::delete('production/{id}', 'ProductionController@destroy')->name('production.destroy');
+Route::get('production/{id}/distributions', 'ProductionController@getDistributions')->name('production.distributions');
+Route::post('production/{id}/distributions', 'ProductionController@storeDistributions')->name('production.storeDistributions');
+Route::get('stores/list', 'ProductionController@getStores')->name('stores.list');
+
+// Distributions Report Routes
+Route::get('distributions', 'ProductionController@distributionsReport')->name('distributions.index');
+Route::get('distributions/data', 'ProductionController@distributionsData')->name('distributions.data');
+Route::delete('distributions/{id}', 'ProductionController@deleteDistribution')->name('distributions.destroy');
 
 // Production Report Routes
 Route::get('production-reports', 'ProductionReportController@index')->name('production-reports.index');
