@@ -97,10 +97,15 @@
                         <thead>
                             <tr>
                                 <th>Date</th>
-                                <th class="text-center">Cows Received</th>
-                                <th class="text-center">Live Weight (kg)</th>
-                                <th class="text-center">Meat Weight (kg)</th>
-                                <th class="text-center">Production Margin (%)</th>
+                                <th>Details</th>
+                                <th class="text-center">No. of Items</th>
+                                <th class="text-center">Total Weight (kg)</th>
+                                <th class="text-center">Meat (kg)</th>
+                                <th class="text-center">Steak (kg)</th>
+                                <th class="text-center">Beef Fillet (kg)</th>
+                                <th class="text-center">Weight Diff (kg)</th>
+                                <th class="text-center">Beef Liver (kg)</th>
+                                <th class="text-center">Tripe (kg)</th>
                                 <th class="text-center">Action</th>
                             </tr>
                         </thead>
@@ -116,7 +121,7 @@
     <!-- Production Modal -->
     <div class="modal fade" id="productionModal" tabindex="-1" role="dialog" aria-labelledby="productionModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="productionModalLabel">Record New
@@ -128,37 +133,90 @@
                 <div class="modal-body">
                     <form id="production_form">
                         @csrf()
-                        <div class="form-group d-flex align-items-center">
-                            <label class="col-4" for="production_date">Production Date <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control mr-2" id="production_date" name="production_date"
-                                value="{{ date('Y-m-d') }}" autocomplete="off" required>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label for="production_date" class="col-md-4 col-form-label text-md-right">Date <span class="text-danger">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="production_date" name="production_date"
+                                        value="{{ date('Y-m-d') }}" autocomplete="off" required>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="details" class="col-md-4 col-form-label text-md-right">Details</label>
+                                    <div class="col-md-8">
+                                        <select class="form-control" id="details" name="details">
+                                            <option value="">Select type...</option>
+                                            <option value="Cows">Cows</option>
+                                            <option value="Goat">Goat</option>
+                                            <option value="Fish">Fish</option>
+                                            <option value="Chicken">Chicken</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="items_received" class="col-md-4 col-form-label text-md-right">Count <span class="text-danger">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="items_received" name="items_received" min="1"
+                                            placeholder="Count" required>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="total_weight" class="col-md-4 col-form-label text-md-right">Total Weight<span class="text-danger">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control bg-light" id="total_weight"
+                                            placeholder="Total weight" required>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="weight_difference" class="col-md-4 col-form-label text-md-right">Weight Diff<span class="text-danger">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" step="0.01" class="form-control weight-input" id="weight_difference" name="weight_difference"
+                                            min="0" placeholder="weight difference" required readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label for="meat" class="col-md-4 col-form-label text-md-right">Meat<span class="text-danger">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" step="0.01" class="form-control weight-input" id="meat" name="meat"
+                                            min="0" placeholder="Meat weight" required>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="steak" class="col-md-4 col-form-label text-md-right">Steak<span class="text-danger">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" step="0.01" class="form-control weight-input" id="steak" name="steak"
+                                            min="0" placeholder="Steak weight" required>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="beef_fillet" class="col-md-4 col-form-label text-md-right">Beef Fillet<span class="text-danger">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" step="0.01" class="form-control weight-input" id="beef_fillet" name="beef_fillet"
+                                            min="0" placeholder="Beef fillet weight" required>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="beef_liver" class="col-md-4 col-form-label text-md-right">Beef Liver</label>
+                                    <div class="col-md-8">
+                                        <input type="text" step="0.01" class="form-control" id="beef_liver" name="beef_liver"
+                                            min="0" placeholder="Beef liver weight">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="tripe" class="col-md-4 col-form-label text-md-right">Tripe</label>
+                                    <div class="col-md-8">
+                                        <input type="text" step="0.01" class="form-control" id="tripe" name="tripe"
+                                            min="0" placeholder="Tripe weight">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group d-flex align-items-center">
-                            <label class="col-4" for="cows_received">Cows Received <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control mr-2" id="cows_received" name="cows_received" min="1"
-                                placeholder="Enter number of cows" required>
-                        </div>
-                        <div class="form-group d-flex align-items-center">
-                            <label class="col-4" for="total_weight">Live Weight (kg) <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" step="0.01" class="form-control mr-2" id="total_weight" name="total_weight"
-                                min="0" placeholder="Enter live weight" required>
-                        </div>
-                        <div class="form-group d-flex align-items-center">
-                            <label class="col-4" for="meat_output">Meat Weight (kg) <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" step="0.01" class="form-control mr-2" id="meat_output" name="meat_output"
-                                min="0" placeholder="Enter meat weight" onkeypress="return isNumberKey(event,this)"
-                                required>
-                        </div>
-                        <div class="alert alert-info" role="alert" hidden>
-                            <i class="feather icon-info"></i> <strong>Note:</strong> Please ensure all weights are accurate.
-                            The system will automatically calculate the yield percentage.
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">
                                 Cancel
                             </button>
                             <button type="submit" class="btn btn-primary">
@@ -174,7 +232,7 @@
     <!-- Edit Production Modal -->
     <div class="modal fade" id="editProductionModal" tabindex="-1" role="dialog" aria-labelledby="editProductionModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editProductionModalLabel">Edit Production</h5>
@@ -186,31 +244,89 @@
                     <form id="edit_production_form">
                         @csrf()
                         <input type="hidden" id="edit_production_id" name="id">
-                        <div class="form-group d-flex align-items-center">
-                            <label class="col-4" for="edit_production_date">Production Date <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control mr-2" id="edit_production_date" name="production_date"
-                                autocomplete="off" required>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label for="edit_production_date" class="col-md-4 col-form-label text-md-right">Date <span class="text-danger">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="edit_production_date" name="production_date"
+                                            autocomplete="off" required>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="edit_details" class="col-md-4 col-form-label text-md-right">Details</label>
+                                    <div class="col-md-8">
+                                        <select class="form-control" id="edit_details" name="details">
+                                            <option value="">Select type...</option>
+                                            <option value="Cows">Cows</option>
+                                            <option value="Goat">Goat</option>
+                                            <option value="Fish">Fish</option>
+                                            <option value="Chicken">Chicken</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="edit_items_received" class="col-md-4 col-form-label text-md-right">Count <span class="text-danger">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="edit_items_received" name="items_received" min="1"
+                                            placeholder="Count" required>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="edit_total_weight" class="col-md-4 col-form-label text-md-right">Total Weight<span class="text-danger">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control bg-light" id="edit_total_weight"
+                                            placeholder="Total weight" required>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="edit_weight_difference" class="col-md-4 col-form-label text-md-right">Weight Diff<span class="text-danger">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" step="0.01" class="form-control edit-weight-input" id="edit_weight_difference" name="weight_difference"
+                                            min="0" placeholder="Weight difference" required readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label for="edit_meat" class="col-md-4 col-form-label text-md-right">Meat<span class="text-danger">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" step="0.01" class="form-control edit-weight-input" id="edit_meat" name="meat"
+                                            min="0" placeholder="Meat weight" required>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="edit_steak" class="col-md-4 col-form-label text-md-right">Steak<span class="text-danger">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" step="0.01" class="form-control edit-weight-input" id="edit_steak" name="steak"
+                                            min="0" placeholder="Steak weight" required>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="edit_beef_fillet" class="col-md-4 col-form-label text-md-right">Beef Fillet<span class="text-danger">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" step="0.01" class="form-control edit-weight-input" id="edit_beef_fillet" name="beef_fillet"
+                                            min="0" placeholder="Beef fillet weight" required>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="edit_beef_liver" class="col-md-4 col-form-label text-md-right">Beef Liver</label>
+                                    <div class="col-md-8">
+                                        <input type="text" step="0.01" class="form-control" id="edit_beef_liver" name="beef_liver"
+                                            min="0" placeholder="Beef liver weight">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="edit_tripe" class="col-md-4 col-form-label text-md-right">Tripe</label>
+                                    <div class="col-md-8">
+                                        <input type="text" step="0.01" class="form-control" id="edit_tripe" name="tripe"
+                                            min="0" placeholder="Tripe weight">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group d-flex align-items-center">
-                            <label class="col-4" for="edit_cows_received">Cows Received <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control mr-2" id="edit_cows_received" name="cows_received" min="1"
-                                placeholder="Enter number of cows" required>
-                        </div>
-                        <div class="form-group d-flex align-items-center">
-                            <label class="col-4" for="edit_total_weight">Live Weight (kg) <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" step="0.01" class="form-control mr-2" id="edit_total_weight" name="total_weight"
-                                min="0" placeholder="Enter live weight" required>
-                        </div>
-                        <div class="form-group d-flex align-items-center">
-                            <label class="col-4" for="edit_meat_output">Meat Weight (kg) <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" step="0.01" class="form-control mr-2" id="edit_meat_output" name="meat_output"
-                                min="0" placeholder="Enter meat weight" required>
-                        </div>
-                        <div class="d-flex justify-content-end">
+                        <div class="d-flex justify-content-end mt-3">
                             <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal">
                                 Cancel
                             </button>
@@ -227,7 +343,7 @@
     <!-- Distribution Modal -->
     <div class="modal fade" id="distributionModal" tabindex="-1" role="dialog" aria-labelledby="distributionModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-dialog modal-md" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="distributionModalLabel">Distribution to Branches</h5>
@@ -236,14 +352,38 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="alert alert-info">
-                        <strong>Production Date:</strong> <span id="dist_production_date"></span> |
-                        <strong>Total Meat Weight:</strong> <span id="dist_total_weight"></span> kg |
-                        <strong>Remaining:</strong> <span id="dist_remaining_weight">0.00</span> kg
+                    <!-- Loading Overlay -->
+                    <div id="distributionLoading" class="text-center py-5">
+                        <img id="loading-image" src="{{asset('assets/images/spinner.gif')}}" />
+                        {{-- <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Loading distribution data...</p> --}}
                     </div>
                     
-                    <div class="branch-step-indicator" id="stepIndicator">
+                    <!-- Content Container (hidden while loading) -->
+                    <div id="distributionContent" style="display: none;">
+                    <div class="d-flex justify-content-between">
+                        <div style="display: none;"><strong>Production Date:</strong> <span id="dist_production_date"></span></div>
+                        {{-- <div><strong>Total Weight:</strong> <span id="dist_total_weight"></span>kg</div> --}}
+                        {{-- <div><strong>Remaining:</strong> <span id="dist_remaining_weight">0.00</span>kg</div> --}}
+                    </div>
+                        <div class="form-group d-flex align-items-center">
+                            <label class="col-4" for="dist_total_weight">Total Weight </label>
+                            <input type="text" class="form-control" id="dist_total_weight" name="total_weight" 
+                                placeholder="Total weight" disabled>
+                        </div>
+                        <div class="form-group d-flex align-items-center">
+                            <label class="col-4" for="dist_remaining_weight">Remaining Weight </label>
+                            <input type="text" class="form-control" id="dist_remaining_weight" name="remaining_weight" 
+                                placeholder="Remaining weight" disabled>
+                        </div>
+                    
+                    <div class="branch-step-indicator" id="stepIndicator" style="display: none;">
                         <!-- Step dots will be dynamically added -->
+                    </div>
+                    <div class="mb-3">
+
                     </div>
                     
                     <div id="distributionFormContainer">
@@ -261,14 +401,14 @@
                             <label class="col-4" for="dist_meat_type">Meat Type <span class="text-danger">*</span></label>
                             <select class="form-control" id="dist_meat_type" name="meat_type" required>
                                 <option value="">Select Meat Type</option>
-                                <option value="Beef">Beef</option>
-                                <option value="Offal">Offal</option>
-                                <option value="Bones">Bones</option>
-                                <option value="Mixed">Mixed</option>
+                                <option value="Meat">Meat</option>
+                                <option value="Steak">Steak</option>
+                                <option value="Beef Liver">Beef Liver</option>
+                                <option value="Beef Fillet">Beef Fillet</option>
                             </select>
                         </div>
                         <div class="form-group d-flex align-items-center">
-                            <label class="col-4" for="dist_weight">Weight Distributed (kg) <span class="text-danger">*</span></label>
+                            <label class="col-4" for="dist_weight">Distributed (kg) <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="dist_weight" name="weight_distributed" 
                                 placeholder="Enter weight" required>
                         </div>
@@ -281,6 +421,7 @@
                             <strong>Total Distributed:</strong> <span id="totalDistributed">0.00</span> kg
                         </div>
                     </div>
+                    </div><!-- End distributionContent -->
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -312,37 +453,6 @@
                 locale: { format: 'YYYY-MM-DD', cancelLabel: 'Clear' }
             });
             $('#date_range').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
-            
-            $('#cows_received').on('change', function () {
-                var min = document.getElementById('cows_received').value;
-
-                if (min !== '') {
-                    document.getElementById('cows_received').value =
-                        numberWithCommas(parseFloat(min.replace(/\,/g, ''), 10));
-                } else {
-                    document.getElementById('cows_received').value = '';
-                }
-            });
-            $('#total_weight').on('change', function () {
-                var min = document.getElementById('total_weight').value;
-
-                if (min !== '') {
-                    document.getElementById('total_weight').value =
-                        numberWithCommas(parseFloat(min.replace(/\,/g, ''), 10));
-                } else {
-                    document.getElementById('total_weight').value = '';
-                }
-            });
-            $('#meat_output').on('change', function () {
-                var min = document.getElementById('meat_output').value;
-
-                if (min !== '') {
-                    document.getElementById('meat_output').value =
-                        numberWithCommas(parseFloat(min.replace(/\,/g, ''), 10));
-                } else {
-                    document.getElementById('meat_output').value = '';
-                }
-            });
 
             $('#production_date').daterangepicker({
                 singleDatePicker: true,
@@ -363,11 +473,51 @@
                 return !(charCode > 31 && (charCode < 48 || charCode > 57));
             }
 
+            // Format number with thousand separators
             function numberWithCommas(digit) {
-                return String(parseFloat(digit))
-                    .toString()
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                if (digit === '' || digit === null || isNaN(digit)) return '';
+                return parseFloat(digit).toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
             }
+
+            // Remove commas and get raw number
+            function unformatNumber(value) {
+                if (!value) return 0;
+                return parseFloat(String(value).replace(/,/g, '')) || 0;
+            }
+
+            // Format input field on blur (when user leaves the field)
+            function formatInputOnBlur(selector) {
+                $(document).on('blur', selector, function() {
+                    var val = $(this).val();
+                    if (val !== '') {
+                        var num = unformatNumber(val);
+                        $(this).val(numberWithCommas(num));
+                    }
+                });
+            }
+
+            // Apply formatting to all weight fields in Add modal
+            formatInputOnBlur('#total_weight');
+            formatInputOnBlur('#meat');
+            formatInputOnBlur('#steak');
+            formatInputOnBlur('#beef_fillet');
+            formatInputOnBlur('#weight_difference');
+            formatInputOnBlur('#beef_liver');
+            formatInputOnBlur('#tripe');
+            formatInputOnBlur('#items_received');
+
+            // Apply formatting to all weight fields in Edit modal
+            formatInputOnBlur('#edit_total_weight');
+            formatInputOnBlur('#edit_meat');
+            formatInputOnBlur('#edit_steak');
+            formatInputOnBlur('#edit_beef_fillet');
+            formatInputOnBlur('#edit_weight_difference');
+            formatInputOnBlur('#edit_beef_liver');
+            formatInputOnBlur('#edit_tripe');
+            formatInputOnBlur('#edit_items_received');
             // Initialize DataTable
             var table = $('#production_table').DataTable({
                 "processing": true,
@@ -393,10 +543,15 @@
                 },
                 "columns": [
                     { "data": "production_date" },
-                    { "data": "cows_received", "className": "dt-center" },
+                    { "data": "details" },
+                    { "data": "items_received", "className": "dt-center" },
                     { "data": "total_weight", "className": "dt-center" },
-                    { "data": "meat_output", "className": "dt-center" },
-                    { "data": "yield", "className": "dt-center" },
+                    { "data": "meat", "className": "dt-center" },
+                    { "data": "steak", "className": "dt-center" },
+                    { "data": "beef_fillet", "className": "dt-center" },
+                    { "data": "weight_difference", "className": "dt-center" },
+                    { "data": "beef_liver", "className": "dt-center" },
+                    { "data": "tripe", "className": "dt-center" },
                     {
                         "data": null,
                         "className": "dt-center",
@@ -430,19 +585,6 @@
             $('#production_form').on('submit', function (e) {
                 e.preventDefault();
 
-                // Validate meat output is not greater than total weight
-                var totalWeight = parseFloat($('#total_weight').val());
-                var meatOutput = parseFloat($('#meat_output').val());
-
-                console.log('Total Weight:', totalWeight);
-                console.log('Meat Output:', meatOutput);
-                return;
-
-                if (meatOutput > totalWeight) {
-                    notify('Meat weight cannot be greater than total live weight', 'top', 'right', 'warning');
-                    return false;
-                }
-
                 var formData = $(this).serialize();
                 var submitBtn = $(this).find('button[type="submit"]');
                 submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Saving...');
@@ -456,6 +598,7 @@
                             notify(response.message || 'Production recorded successfully', 'top', 'right', 'success');
                             $('#production_form')[0].reset();
                             $('#production_date').datepicker('update', moment().format('YYYY-MM-DD'));
+                            $('#weight_difference').val('');
                             $('#productionModal').modal('hide');
                             table.ajax.reload();
                         } else {
@@ -472,7 +615,7 @@
                         }
                     },
                     complete: function () {
-                        submitBtn.prop('disabled', false).html('<i class="feather icon-save"></i> Record Production');
+                        submitBtn.prop('disabled', false).html('Save');
                     }
                 });
             });
@@ -502,15 +645,24 @@
                 }
             });
 
-            // Calculate yield percentage on input
-            $('#total_weight, #meat_output').on('input', function () {
-                var totalWeight = parseFloat($('#total_weight').val()) || 0;
-                var meatOutput = parseFloat($('#meat_output').val()) || 0;
+            // Calculate weight difference: totalWeight - (meat + steak + beefFillet)
+            function calculateWeightDifference(prefix) {
+                var totalWeight = unformatNumber($('#' + prefix + 'total_weight').val());
+                var meat = unformatNumber($('#' + prefix + 'meat').val());
+                var steak = unformatNumber($('#' + prefix + 'steak').val());
+                var beefFillet = unformatNumber($('#' + prefix + 'beef_fillet').val());
+                var weightDiff = totalWeight - (meat + steak + beefFillet);
+                $('#' + prefix + 'weight_difference').val(numberWithCommas(weightDiff));
+            }
 
-                if (totalWeight > 0) {
-                    var yield = (meatOutput / totalWeight) * 100;
-                    // Show yield in a tooltip or info text if needed
-                }
+            // Add form - calculate weight difference when total_weight, meat, steak, or beef_fillet changes
+            $(document).on('input', '#total_weight, #meat, #steak, #beef_fillet', function () {
+                calculateWeightDifference('');
+            });
+
+            // Edit form - calculate weight difference when total_weight, meat, steak, or beef_fillet changes
+            $(document).on('input', '#edit_total_weight, #edit_meat, #edit_steak, #edit_beef_fillet', function () {
+                calculateWeightDifference('edit_');
             });
 
             // Initialize edit date picker
@@ -535,9 +687,15 @@
                             var data = response.data;
                             $('#edit_production_id').val(data.id);
                             $('#edit_production_date').val(data.production_date);
-                            $('#edit_cows_received').val(data.cows_received);
+                            $('#edit_details').val(data.details);
+                            $('#edit_items_received').val(data.items_received);
                             $('#edit_total_weight').val(data.total_weight);
-                            $('#edit_meat_output').val(data.meat_output);
+                            $('#edit_meat').val(data.meat);
+                            $('#edit_steak').val(data.steak);
+                            $('#edit_beef_fillet').val(data.beef_fillet);
+                            $('#edit_weight_difference').val(data.weight_difference);
+                            $('#edit_beef_liver').val(data.beef_liver);
+                            $('#edit_tripe').val(data.tripe);
                             $('#editProductionModal').modal('show');
                         } else {
                             notify('Error loading production data', 'top', 'right', 'danger');
@@ -553,6 +711,7 @@
             $('#edit_production_form').on('submit', function (e) {
                 e.preventDefault();
                 var id = $('#edit_production_id').val();
+
                 var formData = $(this).serialize();
                 var submitBtn = $(this).find('button[type="submit"]');
                 submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
@@ -623,7 +782,7 @@
                     return sum + parseFloat(d.weight_distributed || 0);
                 }, 0);
                 var remaining = totalMeatWeight - distributed;
-                $('#dist_remaining_weight').text(remaining.toFixed(2));
+                $('#dist_remaining_weight').val(remaining.toFixed(2));
                 $('#totalDistributed').text(distributed.toFixed(2));
                 return remaining;
             }
@@ -642,7 +801,7 @@
                     html += '</div>';
                 });
                 $('#summaryContent').html(html);
-                $('#distributionSummary').show();
+                $('#distributionSummary').hide();
                 updateRemainingWeight();
             }
 
@@ -666,6 +825,11 @@
                 currentProductionId = id;
                 resetDistributionModal();
 
+                // Show modal immediately with loading state
+                $('#distributionLoading').show();
+                $('#distributionContent').hide();
+                $('#distributionModal').modal('show');
+
                 $.ajax({
                     url: "{{ url('production') }}/" + id + "/distributions",
                     type: "GET",
@@ -675,7 +839,7 @@
                             totalMeatWeight = parseFloat(production.meat_output);
                             $('#dist_production_id').val(production.id);
                             $('#dist_production_date').text(production.production_date);
-                            $('#dist_total_weight').text(parseFloat(production.meat_output).toFixed(2));
+                            $('#dist_total_weight').val(parseFloat(production.meat_output).toFixed(2));
 
                             // Load existing distributions if any
                             if (response.data && response.data.length > 0) {
@@ -696,12 +860,17 @@
                             updateStepIndicator();
                             updateRemainingWeight();
                             $('#nextBranchBtn').text('Next').removeClass('btn-success').addClass('btn-primary');
-                            $('#distributionModal').modal('show');
+                            
+                            // Hide loading, show content
+                            $('#distributionLoading').hide();
+                            $('#distributionContent').show();
                         } else {
+                            $('#distributionModal').modal('hide');
                             notify('Error loading distribution data', 'top', 'right', 'danger');
                         }
                     },
                     error: function () {
+                        $('#distributionModal').modal('hide');
                         notify('Error loading distribution data', 'top', 'right', 'danger');
                     }
                 });

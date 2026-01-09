@@ -11,9 +11,9 @@
             text-align: center !important;
         }
         .summary-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: white;
             color: white;
-            border-radius: 10px;
+            border-radius: 3px;
             padding: 20px;
             margin-bottom: 20px;
         }
@@ -41,34 +41,6 @@
 
 @section("content")
     <div class="col-sm-12">
-        <!-- Summary Cards -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="summary-card">
-                    <h4>Total Distributions</h4>
-                    <h2 id="totalDistributions">0</h2>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="summary-card" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
-                    <h4>Total Weight Distributed</h4>
-                    <h2><span id="totalWeight">0.00</span> kg</h2>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="summary-card" style="background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);">
-                    <h4>Branches Served</h4>
-                    <h2 id="branchesServed">0</h2>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="summary-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                    <h4>Productions</h4>
-                    <h2 id="totalProductions">0</h2>
-                </div>
-            </div>
-        </div>
-
         <div class="card">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">

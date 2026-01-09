@@ -21,29 +21,39 @@ class ProductionController extends Controller
         return view('production.index', compact('stores'));
 
     }
-
     public function store(Request $request)
-
     {
+        // Remove commas from numeric fields
+        $numericFields = ['items_received', 'total_weight', 'meat', 'steak', 'beef_fillet', 'weight_difference', 'beef_liver', 'tripe'];
+        foreach ($numericFields as $field) {
+            if ($request->has($field)) {
+                $request->merge([$field => str_replace(',', '', $request->input($field))]);
+            }
+        }
 
         $request->validate([
-
             'production_date' => 'required|date',
-
-            'cows_received' => 'required|integer|min:1',
-
-            'total_weight' => 'required|numeric|min:0',
-
-            'meat_output' => 'required|numeric|min:0',
-
+            'details' => 'nullable|string|max:255',
+            'items_received' => 'required|numeric|min:1',
+            'meat' => 'required|numeric|min:0',
+            'steak' => 'required|numeric|min:0',
+            'beef_fillet' => 'required|numeric|min:0',
+            'weight_difference' => 'required|numeric',
+            'beef_liver' => 'nullable|numeric|min:0',
+            'tripe' => 'nullable|numeric|min:0',
         ]);
 
-        Production::create($request->all());
+        // Calculate total_weight (meat + steak + beef_fillet + weight_difference, excluding beef_liver)
+        $total_weight = floatval($request->meat) + floatval($request->steak) + 
+                        floatval($request->beef_fillet) + floatval($request->weight_difference);
+
+        $data = $request->all();
+        $data['total_weight'] = $total_weight;
+
+        Production::create($data);
 
         return response()->json(['success' => true, 'message' => 'Production record saved successfully']);
-
     }
-
     public function show($id)
     {
         $production = Production::find($id);
@@ -52,26 +62,44 @@ class ProductionController extends Controller
         }
         return response()->json(['success' => false, 'message' => 'Production record not found'], 404);
     }
-
     public function update(Request $request, $id)
     {
+        Log::info('Update Production Request Data: ', $request->all());
+        // Remove commas from numeric fields
+        $numericFields = ['items_received', 'total_weight', 'meat', 'steak', 'beef_fillet', 'weight_difference', 'beef_liver', 'tripe'];
+        foreach ($numericFields as $field) {
+            if ($request->has($field)) {
+                $request->merge([$field => str_replace(',', '', $request->input($field))]);
+            }
+        }
+
         $request->validate([
             'production_date' => 'required|date',
-            'cows_received' => 'required|integer|min:1',
-            'total_weight' => 'required|numeric|min:0',
-            'meat_output' => 'required|numeric|min:0',
+            'details' => 'nullable|string|max:255',
+            'items_received' => 'required|numeric|min:1',
+            'meat' => 'required|numeric|min:0',
+            'steak' => 'required|numeric|min:0',
+            'beef_fillet' => 'required|numeric|min:0',
+            'weight_difference' => 'required|numeric',
+            'beef_liver' => 'nullable|numeric|min:0',
+            'tripe' => 'nullable|numeric|min:0',
         ]);
 
         $production = Production::find($id);
         if ($production) {
-            $production->update($request->all());
+            // Calculate total_weight (meat + steak + beef_fillet + weight_difference, excluding beef_liver)
+            $total_weight = floatval($request->meat) + floatval($request->steak) + 
+                            floatval($request->beef_fillet) + floatval($request->weight_difference);
+
+            $data = $request->all();
+            $data['total_weight'] = $total_weight;
+
+            $production->update($data);
             return response()->json(['success' => true, 'message' => 'Production record updated successfully']);
         }
         return response()->json(['success' => false, 'message' => 'Production record not found'], 404);
     }
-
     public function data(Request $request)
-
     {
         $start_date = $request->input('start_date');
         $end_date = $request->input('end_date');
@@ -81,62 +109,44 @@ class ProductionController extends Controller
             $productions = Production::whereBetween('production_date', [$start_date, $end_date])
                 ->where(function($query) use ($search_value) {
                     $query->where('production_date', 'like', '%' . $search_value . '%')
-                          ->orWhere('cows_received', 'like', '%' . $search_value . '%')
-                          ->orWhere('total_weight', 'like', '%' . $search_value . '%')
-                          ->orWhere('meat_output', 'like', '%' . $search_value . '%');
+                          ->orWhere('details', 'like', '%' . $search_value . '%')
+                          ->orWhere('items_received', 'like', '%' . $search_value . '%')
+                          ->orWhere('total_weight', 'like', '%' . $search_value . '%');
                 })
                 ->orderBy('production_date', 'desc')
+                ->orderBy('id', 'desc')
                 ->get();
         } else {
-        $productions = Production::whereBetween('production_date', [$start_date, $end_date])
-            ->orderBy('production_date', 'desc')
-            ->get();
+            $productions = Production::whereBetween('production_date', [$start_date, $end_date])
+                ->orderBy('production_date', 'desc')
+                ->orderBy('id', 'desc')
+                ->get();
         }
+        
         $data = [];
-
         foreach ($productions as $production) {
-
-            $yield = 0;
-
-            if ($production->total_weight > 0) {
-
-                $yield = ($production->meat_output / $production->total_weight) * 100;
-
-            }
-
             $data[] = [
                 'id' => $production->id,
                 'production_date' => date('Y-m-d', strtotime($production->production_date)),
-
-                'cows_received' => $production->cows_received,
-
+                'details' => $production->details ?? '-',
+                'items_received' => $production->items_received,
                 'total_weight' => number_format($production->total_weight, 2),
-
-                'meat_output' => number_format($production->meat_output, 2),
-
-                'yield' => number_format($yield, 2) . '%',
-
-                'actions' => '<button class="btn btn-sm btn-info view-btn" data-id="' . $production->id . '"><i class="feather icon-eye"></i></button> 
-                             <button class="btn btn-sm btn-danger delete-btn" data-id="' . $production->id . '"><i class="feather icon-trash"></i></button>'
-
+                'meat' => number_format($production->meat, 2),
+                'steak' => number_format($production->steak, 2),
+                'beef_fillet' => number_format($production->beef_fillet, 2),
+                'weight_difference' => number_format($production->weight_difference, 2),
+                'beef_liver' => number_format($production->beef_liver, 2),
+                'tripe' => number_format($production->tripe, 2),
             ];
-
         }
 
         return response()->json([
-
             'draw' => intval($request->draw),
-
             'recordsTotal' => count($data),
-
             'recordsFiltered' => count($data),
-
             'data' => $data
-
         ]);
-
     }
-
     public function destroy($id)
 
     {
@@ -154,13 +164,11 @@ class ProductionController extends Controller
         return response()->json(['success' => false, 'message' => 'Production record not found'], 404);
 
     }
-
     public function getStores()
     {
         $stores = Store::where('id', '>', 1)->orderBy('name')->get();
         return response()->json(['success' => true, 'data' => $stores]);
     }
-
     public function getDistributions($id)
     {
         $production = Production::with('distributions.store')->find($id);
@@ -173,7 +181,6 @@ class ProductionController extends Controller
         }
         return response()->json(['success' => false, 'message' => 'Production record not found'], 404);
     }
-
     public function storeDistributions(Request $request, $id)
     {
         $request->validate([
@@ -211,13 +218,11 @@ class ProductionController extends Controller
             return response()->json(['success' => false, 'message' => 'Error saving distributions'], 500);
         }
     }
-
     public function distributionsReport()
     {
         $stores = Store::where('id', '>', 1)->orderBy('name')->get();
         return view('production.distributions', compact('stores'));
     }
-
     public function distributionsData(Request $request)
     {
         $start_date = $request->input('start_date');
@@ -289,7 +294,6 @@ class ProductionController extends Controller
             'summary' => $summary
         ]);
     }
-
     public function deleteDistribution($id)
     {
         $distribution = ProductionDistribution::find($id);

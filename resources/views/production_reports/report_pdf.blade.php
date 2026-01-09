@@ -94,30 +94,71 @@
                         <tr style="background: #1f273b; color: white;">
                             <th align="center">#</th>
                             <th align="left">Date</th>
-                            <th align="center">Cows Received</th>
-                            <th align="center">Live Weight (kg)</th>
-                            <th align="center">Meat Output (kg)</th>
-                            <th align="center">Production Margin (%)</th>
+                            <th align="left">Details</th>
+                            <th align="center">Cows</th>
+                            <th align="right">Total Weight</th>
+                            <th align="right">Meat</th>
+                            <th align="right">Steak</th>
+                            <th align="right">Beef Fillet</th>
+                            <th align="right">Wt. Diff</th>
+                            <th align="right">Beef Liver</th>
+                            <th align="right">Tripe</th>
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                            $totalCows = 0;
+                            $totalWeight = 0;
+                            $totalMeat = 0;
+                            $totalSteak = 0;
+                            $totalBeefFillet = 0;
+                            $totalWtDiff = 0;
+                            $totalBeefLiver = 0;
+                            $totalTripe = 0;
+                        @endphp
                         @forelse($data as $prod)
+                            @php
+                                $totalCows += $prod->items_received;
+                                $totalWeight += $prod->total_weight;
+                                $totalMeat += $prod->meat;
+                                $totalSteak += $prod->steak;
+                                $totalBeefFillet += $prod->beef_fillet;
+                                $totalWtDiff += $prod->weight_difference;
+                                $totalBeefLiver += $prod->beef_liver;
+                                $totalTripe += $prod->tripe ?? 0;
+                            @endphp
                             <tr>
                                 <td align="center">{{ $loop->iteration }}.</td>
-                                <td align="">{{ $prod->production_date }}</td>
-                                <td align="center">{{ $prod->cows_received }}</td>
-                                <td align="center">{{ number_format($prod->total_weight, 2) }}</td>
-                                <td align="center">{{ number_format($prod->meat_output, 2) }}</td>
-                                <td align="center">
-                                    {{ $prod->total_weight > 0 ? number_format(($prod->meat_output / $prod->total_weight) * 100, 2) : '0.00' }}%
-                                </td>
+                                <td align="left">{{ $prod->production_date }}</td>
+                                <td align="left">{{ $prod->details ?? '-' }}</td>
+                                <td align="center">{{ number_format($prod->items_received) }}</td>
+                                <td align="right">{{ number_format($prod->total_weight, 2) }}</td>
+                                <td align="right">{{ number_format($prod->meat, 2) }}</td>
+                                <td align="right">{{ number_format($prod->steak, 2) }}</td>
+                                <td align="right">{{ number_format($prod->beef_fillet, 2) }}</td>
+                                <td align="right">{{ number_format($prod->weight_difference, 2) }}</td>
+                                <td align="right">{{ number_format($prod->beef_liver, 2) }}</td>
+                                <td align="right">{{ number_format($prod->tripe ?? 0, 2) }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6">No production records found for this period.</td>
+                                <td colspan="11">No production records found for this period.</td>
                             </tr>
                         @endforelse
                     </tbody>
+                    <tfoot>
+                        <tr style="background: #e9ecef; font-weight: bold;">
+                            <td colspan="3" align="right"><strong>TOTALS:</strong></td>
+                            <td align="center">{{ number_format($totalCows) }}</td>
+                            <td align="right">{{ number_format($totalWeight, 2) }}</td>
+                            <td align="right">{{ number_format($totalMeat, 2) }}</td>
+                            <td align="right">{{ number_format($totalSteak, 2) }}</td>
+                            <td align="right">{{ number_format($totalBeefFillet, 2) }}</td>
+                            <td align="right">{{ number_format($totalWtDiff, 2) }}</td>
+                            <td align="right">{{ number_format($totalBeefLiver, 2) }}</td>
+                            <td align="right">{{ number_format($totalTripe, 2) }}</td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>

@@ -27,11 +27,21 @@
     @endif
 </li>
 @if (current_store_id() === 1 || current_store_id() === 2)
-    @if(auth()->user()->checkPermission('View Production'))
-        <li class="nav-item"><a href="{{ route('production.index') }}" class="nav-link"><span class="pcoded-micon"><i
-                        class="fas fa-industry"></i></span><span class="pcoded-mtext">Production</span></a>
-        </li>
-    @endif
+    <li class="nav-item pcoded-hasmenu">
+        @if(auth()->user()->checkPermission('View Production'))
+            <a href="#!" class="nav-link"><span class="pcoded-micon"><i class="fas fa-industry"></i></span>
+                <span class="pcoded-mtext">Production</span>
+            </a>
+            <ul class="pcoded-submenu">
+                @if(auth()->user()->checkPermission('View Production'))
+                    <li class=""><a href="{{ route('production.index') }}" class="">Production</a>
+                    </li>
+                    <li class=""><a href="{{route('distributions.index')}}" class="">Distribution</a>
+                    </li>
+                @endif
+            </ul>
+        @endif
+    </li>
 @endif
 <li class="nav-item pcoded-hasmenu">
     @if(auth()->user()->checkPermission('View Purchasing'))
@@ -167,8 +177,6 @@
                 @if(auth()->user()->checkPermission('View Production Report'))
                     <li class=""><a href="{{route('production-reports.index')}}" class="">Production Reports</a>
                     </li>
-                    <li class=""><a href="{{route('distributions.index')}}" class="">Distribution Reports</a>
-                    </li>
                 @endif
             @endif
             @if(auth()->user()->checkPermission('View Purchasing Reports'))
@@ -253,16 +261,6 @@
                     </ul>
                 </li>
             @endif
-            {{-- @if(auth()->user()->checkPermission('View Alerts'))
-            <li>
-                <a href="#">Alerts</a>
-                <ul class="pcoded-submenu">
-                    <li class=""><a href="#" class="">Alerts</a></li>
-                    <li class=""><a href="#" class="">Alerts Details</a></li>
-                    <li class=""><a href="#" class="">Min/Max Levels</a></li>
-                </ul>
-            </li>
-            @endif --}}
             @if(auth()->user()->checkPermission('View Tools'))
                 <li>
                     <a href="#">Tools</a>

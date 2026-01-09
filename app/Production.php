@@ -5,10 +5,19 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 class Production extends Model
-
 {
-
-    protected $fillable = ['production_date', 'cows_received', 'total_weight', 'meat_output'];
+    protected $fillable = [
+        'production_date',
+        'details',
+        'items_received',
+        'total_weight',
+        'meat',
+        'steak',
+        'beef_fillet',
+        'weight_difference',
+        'beef_liver',
+        'tripe'
+    ];
 
     public function distributions()
     {

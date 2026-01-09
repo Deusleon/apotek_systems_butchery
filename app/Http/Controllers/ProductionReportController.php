@@ -38,7 +38,7 @@ class ProductionReportController extends Controller
         
         $pdf = PDF::loadView( 'production_reports.report_pdf',
         compact( 'data', 'pharmacy', 'enable_discount' ) )
-        ->setPaper( 'a4', '' );
+        ->setPaper( 'a4', 'landscape' );
         return $pdf->stream( 'Production_Report.pdf' );
     }
 
