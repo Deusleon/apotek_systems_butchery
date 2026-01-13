@@ -301,6 +301,7 @@ class SaleController extends Controller
                 ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                 ->orderBy('stock_id', 'desc')
                 ->where('product_id', $product->id)
+                ->where('inv_current_stock.store_id', $default_store)
                 ->first('price');
 
             $quantity = CurrentStock::where('product_id', $product->id)
@@ -367,6 +368,7 @@ class SaleController extends Controller
                     ->join('inv_products', 'inv_products.id', '=', 'inv_current_stock.product_id')
                     ->orderBy('stock_id', 'desc')
                     ->where('product_id', $product->id)
+                    ->where('inv_current_stock.store_id', $default_store_id)
                     ->first('price');
 
                 $quantity = CurrentStock::where('product_id', $product->id)

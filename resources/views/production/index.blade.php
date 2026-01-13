@@ -75,46 +75,52 @@
 @section("content")
 
     <div class="col-sm-12">
-        <div class="card">
-            <div class="card-body">
-                @if (current_store_id() === 2)
+        <div class="card">            
+            @if (current_store_id() === 2)
+                <div class="card-body">
+                    @if (current_store_id() === 2)
+                        <div class="d-flex justify-content-end align-items-end mb-3">
+                            <div class="form-inline">
+                                <button class="btn btn-secondary" data-toggle="modal" data-target="#productionModal">
+                                    <i class="fas fa-plus mr-1"></i> Add Production
+                                </button>
+                            </div>
+                        </div>
+                    @endif
                     <div class="d-flex justify-content-end align-items-end mb-3">
                         <div class="form-inline">
-                            <button class="btn btn-secondary" data-toggle="modal" data-target="#productionModal">
-                                <i class="fas fa-plus mr-1"></i> Add Production
-                            </button>
+                            <label for="date_range" class="mr-2">Date:</label>
+                            <input type="text" id="date_range" class="form-control" autocomplete="off" style="min-width:200px;">
                         </div>
                     </div>
-                @endif
-                <div class="d-flex justify-content-end align-items-end mb-3">
-                    <div class="form-inline">
-                        <label for="date_range" class="mr-2">Date:</label>
-                        <input type="text" id="date_range" class="form-control" autocomplete="off" style="min-width:200px;">
+                    <div id="production_table_container" class="table-responsive">
+                        <table id="production_table" class="display table nowrap table-striped table-hover" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Details</th>
+                                    <th class="text-center">Count</th>
+                                    <th class="text-center">Total Weight (kg)</th>
+                                    <th class="text-center">Weight Diff (kg)</th>
+                                    <th class="text-center">Meat (kg)</th>
+                                    <th class="text-center">Steak (kg)</th>
+                                    <th class="text-center">Beef Fillet (kg)</th>
+                                    <th class="text-center">Beef Liver (kg)</th>
+                                    <th class="text-center">Tripe (kg)</th>
+                                    <th class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data will be loaded via AJAX -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div id="production_table_container" class="table-responsive">
-                    <table id="production_table" class="display table nowrap table-striped table-hover" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Details</th>
-                                <th class="text-center">Count</th>
-                                <th class="text-center">Total Weight (kg)</th>
-                                <th class="text-center">Weight Diff (kg)</th>
-                                <th class="text-center">Meat (kg)</th>
-                                <th class="text-center">Steak (kg)</th>
-                                <th class="text-center">Beef Fillet (kg)</th>
-                                <th class="text-center">Beef Liver (kg)</th>
-                                <th class="text-center">Tripe (kg)</th>
-                                <th class="text-center">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Data will be loaded via AJAX -->
-                        </tbody>
-                    </table>
+            @else
+                <div class="card-body">
+                    <div class="card-title">Production is only allowed from Main Branch</div>
                 </div>
-            </div>
+            @endif
         </div>
     </div>
 
@@ -149,8 +155,8 @@
                                             <option value="">Select type...</option>
                                             <option value="Cows">Cows</option>
                                             <option value="Goat">Goat</option>
-                                            <option value="Fish">Fish</option>
-                                            <option value="Chicken">Chicken</option>
+                                            {{-- <option value="Fish">Fish</option>
+                                            <option value="Chicken">Chicken</option> --}}
                                             <option value="Other">Other</option>
                                         </select>
                                     </div>
@@ -260,8 +266,8 @@
                                             <option value="">Select type...</option>
                                             <option value="Cows">Cows</option>
                                             <option value="Goat">Goat</option>
-                                            <option value="Fish">Fish</option>
-                                            <option value="Chicken">Chicken</option>
+                                            {{-- <option value="Fish">Fish</option>
+                                            <option value="Chicken">Chicken</option> --}}
                                             <option value="Other">Other</option>
                                         </select>
                                     </div>
@@ -367,18 +373,7 @@
                         <div style="display: none;"><strong>Production Date:</strong> <span id="dist_production_date"></span></div>
                         {{-- <div><strong>Total Weight:</strong> <span id="dist_total_weight"></span>kg</div> --}}
                         {{-- <div><strong>Remaining:</strong> <span id="dist_remaining_weight">0.00</span>kg</div> --}}
-                    </div>
-                        <div class="form-group d-flex align-items-center">
-                            <label class="col-4" for="dist_total_weight">Total Weight </label>
-                            <input type="text" class="form-control" id="dist_total_weight" name="total_weight" 
-                                placeholder="Total weight" disabled>
-                        </div>
-                        <div class="form-group d-flex align-items-center">
-                            <label class="col-4" for="dist_remaining_weight">Remaining Weight </label>
-                            <input type="text" class="form-control" id="dist_remaining_weight" name="remaining_weight" 
-                                placeholder="Remaining weight" disabled>
-                        </div>
-                    
+                    </div>                    
                     <div class="branch-step-indicator" id="stepIndicator" style="display: none;">
                         <!-- Step dots will be dynamically added -->
                     </div>
@@ -389,15 +384,6 @@
                     <div id="distributionFormContainer">
                         <input type="hidden" id="dist_production_id">
                         <div class="form-group d-flex align-items-center">
-                            <label class="col-4" for="dist_store_id">Branch Name <span class="text-danger">*</span></label>
-                            <select class="form-control" id="dist_store_id" name="store_id" required>
-                                <option value="">Select Branch</option>
-                                @foreach($stores as $store)
-                                    <option value="{{ $store->id }}">{{ $store->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="form-group d-flex align-items-center">
                             <label class="col-4" for="dist_meat_type">Meat Type <span class="text-danger">*</span></label>
                             <select class="form-control" id="dist_meat_type" name="meat_type" required>
                                 <option value="">Select Meat Type</option>
@@ -405,6 +391,25 @@
                                 <option value="Steak">Steak</option>
                                 <option value="Beef Liver">Beef Liver</option>
                                 <option value="Beef Fillet">Beef Fillet</option>
+                            </select>
+                        </div>
+                        <div class="form-group d-flex align-items-center">
+                            <label class="col-4" for="dist_total_weight">Total Weight </label>
+                            <input type="text" class="form-control" id="dist_total_weight" name="total_weight" 
+                                placeholder="Total weight" disabled>
+                        </div>
+                        <div class="form-group d-flex align-items-center">
+                            <label class="col-4" for="dist_remaining_weight">Remaining Weight </label>
+                            <input type="text" class="form-control" id="dist_remaining_weight" name="remaining_weight" 
+                                placeholder="Remaining weight" disabled>
+                        </div>
+                        <div class="form-group d-flex align-items-center">
+                            <label class="col-4" for="dist_store_id">Branch Name <span class="text-danger">*</span></label>
+                            <select class="form-control" id="dist_store_id" name="store_id" required>
+                                <option value="">Select Branch</option>
+                                @foreach($stores as $store)
+                                    <option value="{{ $store->id }}">{{ $store->name }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="form-group d-flex align-items-center">
@@ -424,8 +429,9 @@
                     </div><!-- End distributionContent -->
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    {{-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button> --}}
                     <button type="button" class="btn btn-warning" id="skipBranchBtn">Skip</button>
+                    <button type="button" class="btn btn-info" id="backBranchBtn" disabled>Prev</button>
                     <button type="button" class="btn btn-primary" id="nextBranchBtn">Next</button>
                 </div>
             </div>
@@ -764,20 +770,67 @@
             var distributions = [];
             var currentProductionId = null;
             var totalMeatWeight = 0;
+            var productionData = null; // Store full production data
+            var meatTypeLocked = false; // Flag to lock meat type after first distribution
 
             function resetDistributionModal() {
                 currentStoreIndex = 0;
                 distributions = [];
                 totalMeatWeight = 0;
+                productionData = null;
+                meatTypeLocked = false;
                 $('#dist_store_id').val('');
-                $('#dist_meat_type').val('');
+                $('#dist_meat_type').val('').prop('disabled', false);
                 $('#dist_weight').val('');
                 $('#dist_total_weight').val('0');
                 $('#dist_remaining_weight').val('0');
                 $('#distributionSummary').hide();
                 $('#summaryContent').html('');
+                $('#backBranchBtn').prop('disabled', true);
                 updateStepIndicator();
             }
+
+            // Get weight for specific meat type from production data
+            function getMeatTypeWeight(meatType) {
+                if (!productionData) return 0;
+                switch(meatType) {
+                    case 'Meat': return parseFloat(productionData.meat) || 0;
+                    case 'Steak': return parseFloat(productionData.steak) || 0;
+                    case 'Beef Fillet': return parseFloat(productionData.beef_fillet) || 0;
+                    case 'Beef Liver': return parseFloat(productionData.beef_liver) || 0;
+                    default: return 0;
+                }
+            }
+
+            // Get already distributed weight for specific meat type
+            function getDistributedWeightForMeatType(meatType) {
+                return distributions
+                    .filter(d => d.meat_type === meatType)
+                    .reduce((sum, d) => sum + parseFloat(d.weight_distributed || 0), 0);
+            }
+
+            // Update weights based on selected meat type
+            function updateWeightsForMeatType() {
+                var selectedMeatType = $('#dist_meat_type').val();
+                if (!selectedMeatType || !productionData) {
+                    $('#dist_total_weight').val('0');
+                    $('#dist_remaining_weight').val('0');
+                    return;
+                }
+                
+                var totalForType = getMeatTypeWeight(selectedMeatType);
+                var distributedForType = getDistributedWeightForMeatType(selectedMeatType);
+                var remainingForType = totalForType - distributedForType;
+                
+                totalMeatWeight = totalForType;
+                $('#dist_total_weight').val(formatSmartDecimal(totalForType));
+                $('#dist_remaining_weight').val(formatSmartDecimal(remainingForType));
+            }
+
+            // Handle meat type change
+            $(document).on('change', '#dist_meat_type', function() {
+                updateWeightsForMeatType();
+            });
 
             function updateStepIndicator() {
                 var html = '';
@@ -807,12 +860,19 @@
             }
 
             function updateRemainingWeight() {
-                var distributed = distributions.reduce(function(sum, d) {
-                    return sum + parseFloat(d.weight_distributed || 0);
-                }, 0);
-                var remaining = totalMeatWeight - distributed;
+                var selectedMeatType = $('#dist_meat_type').val();
+                if (!selectedMeatType) {
+                    $('#dist_remaining_weight').val('0');
+                    $('#totalDistributed').text('0');
+                    return 0;
+                }
+                
+                var distributedForType = getDistributedWeightForMeatType(selectedMeatType);
+                var totalForType = getMeatTypeWeight(selectedMeatType);
+                var remaining = totalForType - distributedForType;
+                
                 $('#dist_remaining_weight').val(formatSmartDecimal(remaining));
-                $('#totalDistributed').text(formatSmartDecimal(distributed));
+                $('#totalDistributed').text(formatSmartDecimal(distributedForType));
                 return remaining;
             }
 
@@ -843,9 +903,47 @@
                     // Pre-select next store
                     $('#dist_store_id').val(stores[currentStoreIndex].id);
                 }
-                $('#dist_meat_type').val('');
+                // Keep meat type selected and locked - don't clear it
+                // $('#dist_meat_type').val(''); // Removed - keep meat type selected
                 $('#dist_weight').val('');
+                // Enable back button since we moved forward
+                $('#backBranchBtn').prop('disabled', false);
                 updateStepIndicator();
+                updateRemainingWeight(); // Update remaining weight for current meat type
+            }
+
+            function moveToPreviousBranch() {
+                if (currentStoreIndex <= 0) return;
+                
+                currentStoreIndex--;
+                
+                // Reset Next button if we were on Save
+                $('#nextBranchBtn').text('Next').removeClass('btn-success').addClass('btn-primary');
+                
+                // Pre-select the previous store
+                $('#dist_store_id').val(stores[currentStoreIndex].id);
+                
+                // Check if there was a distribution for this store and meat type, pre-fill weight
+                var currentMeatType = $('#dist_meat_type').val();
+                var existingDist = distributions.find(d => d.store_id == stores[currentStoreIndex].id && d.meat_type == currentMeatType);
+                if (existingDist) {
+                    $('#dist_weight').val(formatSmartDecimal(existingDist.weight_distributed));
+                } else {
+                    $('#dist_weight').val('');
+                }
+                
+                // Disable back button if we're at the first branch
+                if (currentStoreIndex === 0) {
+                    $('#backBranchBtn').prop('disabled', true);
+                    // Unlock meat type if going back to first branch and no distributions yet
+                    if (distributions.length === 0) {
+                        meatTypeLocked = false;
+                        $('#dist_meat_type').prop('disabled', false);
+                    }
+                }
+                
+                updateStepIndicator();
+                updateRemainingWeight();
             }
 
             // Handle Distribution button click
@@ -866,10 +964,16 @@
                         if (response.success) {
                             var production = response.production;
                             console.log('Distribution data:', response);
-                            totalMeatWeight = parseFloat(production.total_weight) || 0;
+                            
+                            // Store full production data for meat type weight lookups
+                            productionData = production;
+                            
                             $('#dist_production_id').val(production.id);
                             $('#dist_production_date').text(production.production_date);
-                            $('#dist_total_weight').val(formatSmartDecimal(totalMeatWeight));
+                            
+                            // Don't set total weight yet - wait for meat type selection
+                            $('#dist_total_weight').val('0');
+                            $('#dist_remaining_weight').val('0');
 
                             // Load existing distributions if any
                             if (response.data && response.data.length > 0) {
@@ -888,7 +992,6 @@
                                 $('#dist_store_id').val(stores[0].id);
                             }
                             updateStepIndicator();
-                            updateRemainingWeight();
                             $('#nextBranchBtn').text('Next').removeClass('btn-success').addClass('btn-primary');
                             
                             // Hide loading, show content
@@ -985,8 +1088,8 @@
                     return;
                 }
 
-                // Check for duplicate store
-                var existingIndex = distributions.findIndex(d => d.store_id == storeId);
+                // Check for duplicate store with same meat type
+                var existingIndex = distributions.findIndex(d => d.store_id == storeId && d.meat_type == meatType);
                 if (existingIndex >= 0) {
                     // Update existing
                     distributions[existingIndex] = {
@@ -1003,6 +1106,12 @@
                     });
                 }
 
+                // Lock meat type after first distribution is added
+                if (!meatTypeLocked) {
+                    meatTypeLocked = true;
+                    $('#dist_meat_type').prop('disabled', true);
+                }
+
                 updateSummary();
                 moveToNextBranch();
             });
@@ -1010,6 +1119,11 @@
             // Handle Skip button
             $('#skipBranchBtn').on('click', function () {
                 moveToNextBranch();
+            });
+
+            // Handle Back button
+            $('#backBranchBtn').on('click', function () {
+                moveToPreviousBranch();
             });
         });
     </script>

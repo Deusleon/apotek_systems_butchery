@@ -747,3 +747,7 @@ Route::delete('distributions/{id}', 'ProductionController@deleteDistribution')->
 // Production Report Routes
 Route::get('production-reports', 'ProductionReportController@index')->name('production-reports.index');
 Route::get('production-reports/filter', 'ProductionReportController@filter')->name('production-report-filter');
+
+// Distribution Report Routes
+Route::get('distribution-reports', 'DistributionReportController@index')->name('distribution-reports.index');
+Route::get('distribution-reports/filter', 'DistributionReportController@filter')->name('distribution-report-filter');

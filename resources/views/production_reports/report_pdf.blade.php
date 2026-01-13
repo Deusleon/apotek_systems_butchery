@@ -98,10 +98,10 @@
                             <th align="left">Details</th>
                             <th align="center">Cows</th>
                             <th align="center">Total Weight</th>
+                            <th align="center">Wt. Diff</th>
                             <th align="center">Meat</th>
                             <th align="center">Steak</th>
                             <th align="center">Beef Fillet</th>
-                            <th align="center">Wt. Diff</th>
                             <th align="center">Beef Liver</th>
                             <th align="center">Tripe</th>
                         </tr>
@@ -142,10 +142,10 @@
                                 <td align="left">{{ $prod->details ?? '-' }}</td>
                                 <td align="center">{{ number_format($prod->items_received) }}</td>
                                 <td align="center">{{ formatSmartDecimal($prod->total_weight) }}</td>
+                                <td align="center">{{ formatSmartDecimal($prod->weight_difference) }}</td>
                                 <td align="center">{{ formatSmartDecimal($prod->meat) }}</td>
                                 <td align="center">{{ formatSmartDecimal($prod->steak) }}</td>
                                 <td align="center">{{ formatSmartDecimal($prod->beef_fillet) }}</td>
-                                <td align="center">{{ formatSmartDecimal($prod->weight_difference) }}</td>
                                 <td align="center">{{ formatSmartDecimal($prod->beef_liver) }}</td>
                                 <td align="center">{{ formatSmartDecimal($prod->tripe ?? 0) }}</td>
                             </tr>
@@ -160,10 +160,10 @@
                             <td colspan="3" align="right"><strong>TOTALS:</strong></td>
                             <td align="center">{{ number_format($totalCows) }}</td>
                             <td align="center">{{ formatSmartDecimal($totalWeight) }}</td>
+                            <td align="center">{{ formatSmartDecimal($totalWtDiff) }}</td>
                             <td align="center">{{ formatSmartDecimal($totalMeat) }}</td>
                             <td align="center">{{ formatSmartDecimal($totalSteak) }}</td>
                             <td align="center">{{ formatSmartDecimal($totalBeefFillet) }}</td>
-                            <td align="center">{{ formatSmartDecimal($totalWtDiff) }}</td>
                             <td align="center">{{ formatSmartDecimal($totalBeefLiver) }}</td>
                             <td align="center">{{ formatSmartDecimal($totalTripe) }}</td>
                         </tr>
