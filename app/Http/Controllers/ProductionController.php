@@ -13,6 +13,21 @@ use App\Store;
 class ProductionController extends Controller
 
 {
+    /**
+     * Format number with decimals only when applicable
+     * e.g., 192.5 shows as "192.5", 174.00 shows as "174"
+     */
+    private function formatSmartDecimal($num)
+    {
+        if ($num === null || $num === '') {
+            return '0';
+        }
+        $num = floatval($num);
+        if ($num == floor($num)) {
+            return number_format($num, 0);
+        }
+        return rtrim(rtrim(number_format($num, 2), '0'), '.');
+    }
 
     public function index()
 
@@ -64,7 +79,6 @@ class ProductionController extends Controller
     }
     public function update(Request $request, $id)
     {
-        Log::info('Update Production Request Data: ', $request->all());
         // Remove commas from numeric fields
         $numericFields = ['items_received', 'total_weight', 'meat', 'steak', 'beef_fillet', 'weight_difference', 'beef_liver', 'tripe'];
         foreach ($numericFields as $field) {
@@ -129,14 +143,14 @@ class ProductionController extends Controller
                 'id' => $production->id,
                 'production_date' => date('Y-m-d', strtotime($production->production_date)),
                 'details' => $production->details ?? '-',
-                'items_received' => $production->items_received,
-                'total_weight' => number_format($production->total_weight, 2),
-                'meat' => number_format($production->meat, 2),
-                'steak' => number_format($production->steak, 2),
-                'beef_fillet' => number_format($production->beef_fillet, 2),
-                'weight_difference' => number_format($production->weight_difference, 2),
-                'beef_liver' => number_format($production->beef_liver, 2),
-                'tripe' => number_format($production->tripe, 2),
+                'items_received' => $this->formatSmartDecimal($production->items_received),
+                'total_weight' => $this->formatSmartDecimal($production->total_weight),
+                'meat' => $this->formatSmartDecimal($production->meat),
+                'steak' => $this->formatSmartDecimal($production->steak),
+                'beef_fillet' => $this->formatSmartDecimal($production->beef_fillet),
+                'weight_difference' => $this->formatSmartDecimal($production->weight_difference),
+                'beef_liver' => $this->formatSmartDecimal($production->beef_liver),
+                'tripe' => $this->formatSmartDecimal($production->tripe),
             ];
         }
 
@@ -262,7 +276,7 @@ class ProductionController extends Controller
                 'production_date' => $dist->production ? date('Y-m-d', strtotime($dist->production->production_date)) : '',
                 'store_name' => $dist->store ? $dist->store->name : 'Unknown',
                 'meat_type' => $dist->meat_type,
-                'weight_distributed' => number_format($dist->weight_distributed, 2),
+                'weight_distributed' => $this->formatSmartDecimal($dist->weight_distributed),
                 'production_id' => $dist->production_id,
             ];
         }

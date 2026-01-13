@@ -30,21 +30,21 @@
 @endsection
 
 @section('content-title')
-    Production Distributions Report
+    Distributions
 @endsection
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
     <li class="breadcrumb-item"><a href="{{route('production.index')}}">Production</a></li>
-    <li class="breadcrumb-item"><a href="#">Distributions Report</a></li>
+    <li class="breadcrumb-item"><a href="#">Distributions</a></li>
 @endsection
 
 @section("content")
     <div class="col-sm-12">
         <div class="card">
             <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="card-title mb-0">Distribution Records</h5>
+                <div class="d-flex justify-content-end align-items-center mb-3">
+                    {{-- <h5 class="card-title mb-0">Distribution Records</h5> --}}
                     <div class="form-inline">
                         <label for="filter_store" class="mr-2">Branch:</label>
                         <select id="filter_store" class="form-control mr-3" style="min-width: 150px;">
@@ -56,10 +56,11 @@
                         <label for="filter_meat_type" class="mr-2">Meat Type:</label>
                         <select id="filter_meat_type" class="form-control mr-3" style="min-width: 120px;">
                             <option value="">All Types</option>
-                            <option value="Beef">Beef</option>
-                            <option value="Offal">Offal</option>
-                            <option value="Bones">Bones</option>
-                            <option value="Mixed">Mixed</option>
+                            <option value="Meat">Meat</option>
+                            <option value="Steak">Steak</option>
+                            <option value="Fillet">Fillet</option>
+                            <option value="Beef Liver">Beef Liver</option>
+                            {{-- <option value="Tripe">Tripe</option> --}}
                         </select>
                         <label for="date_range" class="mr-2">Date:</label>
                         <input type="text" id="date_range" class="form-control" autocomplete="off" style="min-width:200px;">

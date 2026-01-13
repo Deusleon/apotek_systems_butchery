@@ -16,6 +16,7 @@
         th {
             border-collapse: collapse;
             padding: 8px;
+            padding-left: 5px;
         }
 
         table,
@@ -96,13 +97,13 @@
                             <th align="left">Date</th>
                             <th align="left">Details</th>
                             <th align="center">Cows</th>
-                            <th align="right">Total Weight</th>
-                            <th align="right">Meat</th>
-                            <th align="right">Steak</th>
-                            <th align="right">Beef Fillet</th>
-                            <th align="right">Wt. Diff</th>
-                            <th align="right">Beef Liver</th>
-                            <th align="right">Tripe</th>
+                            <th align="center">Total Weight</th>
+                            <th align="center">Meat</th>
+                            <th align="center">Steak</th>
+                            <th align="center">Beef Fillet</th>
+                            <th align="center">Wt. Diff</th>
+                            <th align="center">Beef Liver</th>
+                            <th align="center">Tripe</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -115,6 +116,14 @@
                             $totalWtDiff = 0;
                             $totalBeefLiver = 0;
                             $totalTripe = 0;
+                            
+                            // Helper function to format numbers with decimals only when applicable
+                            function formatSmartDecimal($num) {
+                                if ($num == floor($num)) {
+                                    return number_format($num, 0);
+                                }
+                                return rtrim(rtrim(number_format($num, 2), '0'), '.');
+                            }
                         @endphp
                         @forelse($data as $prod)
                             @php
@@ -132,13 +141,13 @@
                                 <td align="left">{{ $prod->production_date }}</td>
                                 <td align="left">{{ $prod->details ?? '-' }}</td>
                                 <td align="center">{{ number_format($prod->items_received) }}</td>
-                                <td align="right">{{ number_format($prod->total_weight, 2) }}</td>
-                                <td align="right">{{ number_format($prod->meat, 2) }}</td>
-                                <td align="right">{{ number_format($prod->steak, 2) }}</td>
-                                <td align="right">{{ number_format($prod->beef_fillet, 2) }}</td>
-                                <td align="right">{{ number_format($prod->weight_difference, 2) }}</td>
-                                <td align="right">{{ number_format($prod->beef_liver, 2) }}</td>
-                                <td align="right">{{ number_format($prod->tripe ?? 0, 2) }}</td>
+                                <td align="center">{{ formatSmartDecimal($prod->total_weight) }}</td>
+                                <td align="center">{{ formatSmartDecimal($prod->meat) }}</td>
+                                <td align="center">{{ formatSmartDecimal($prod->steak) }}</td>
+                                <td align="center">{{ formatSmartDecimal($prod->beef_fillet) }}</td>
+                                <td align="center">{{ formatSmartDecimal($prod->weight_difference) }}</td>
+                                <td align="center">{{ formatSmartDecimal($prod->beef_liver) }}</td>
+                                <td align="center">{{ formatSmartDecimal($prod->tripe ?? 0) }}</td>
                             </tr>
                         @empty
                             <tr>
@@ -150,13 +159,13 @@
                         <tr style="background: #e9ecef; font-weight: bold;">
                             <td colspan="3" align="right"><strong>TOTALS:</strong></td>
                             <td align="center">{{ number_format($totalCows) }}</td>
-                            <td align="right">{{ number_format($totalWeight, 2) }}</td>
-                            <td align="right">{{ number_format($totalMeat, 2) }}</td>
-                            <td align="right">{{ number_format($totalSteak, 2) }}</td>
-                            <td align="right">{{ number_format($totalBeefFillet, 2) }}</td>
-                            <td align="right">{{ number_format($totalWtDiff, 2) }}</td>
-                            <td align="right">{{ number_format($totalBeefLiver, 2) }}</td>
-                            <td align="right">{{ number_format($totalTripe, 2) }}</td>
+                            <td align="center">{{ formatSmartDecimal($totalWeight) }}</td>
+                            <td align="center">{{ formatSmartDecimal($totalMeat) }}</td>
+                            <td align="center">{{ formatSmartDecimal($totalSteak) }}</td>
+                            <td align="center">{{ formatSmartDecimal($totalBeefFillet) }}</td>
+                            <td align="center">{{ formatSmartDecimal($totalWtDiff) }}</td>
+                            <td align="center">{{ formatSmartDecimal($totalBeefLiver) }}</td>
+                            <td align="center">{{ formatSmartDecimal($totalTripe) }}</td>
                         </tr>
                     </tfoot>
                 </table>

@@ -98,12 +98,12 @@
                             <tr>
                                 <th>Date</th>
                                 <th>Details</th>
-                                <th class="text-center">No. of Items</th>
+                                <th class="text-center">Count</th>
                                 <th class="text-center">Total Weight (kg)</th>
+                                <th class="text-center">Weight Diff (kg)</th>
                                 <th class="text-center">Meat (kg)</th>
                                 <th class="text-center">Steak (kg)</th>
                                 <th class="text-center">Beef Fillet (kg)</th>
-                                <th class="text-center">Weight Diff (kg)</th>
                                 <th class="text-center">Beef Liver (kg)</th>
                                 <th class="text-center">Tripe (kg)</th>
                                 <th class="text-center">Action</th>
@@ -473,13 +473,24 @@
                 return !(charCode > 31 && (charCode < 48 || charCode > 57));
             }
 
-            // Format number with thousand separators
+            // Format number with thousand separators (decimals only when applicable)
             function numberWithCommas(digit) {
                 if (digit === '' || digit === null || isNaN(digit)) return '';
-                return parseFloat(digit).toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
+                var num = parseFloat(digit);
+                // Check if the number has meaningful decimals
+                if (num % 1 === 0) {
+                    // No decimal part, format without decimals
+                    return num.toLocaleString('en-US', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    });
+                } else {
+                    // Has decimal part, show up to 2 decimal places
+                    return num.toLocaleString('en-US', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2
+                    });
+                }
             }
 
             // Remove commas and get raw number
@@ -518,6 +529,9 @@
             formatInputOnBlur('#edit_beef_liver');
             formatInputOnBlur('#edit_tripe');
             formatInputOnBlur('#edit_items_received');
+
+            // Apply formatting to distribution weight field
+            formatInputOnBlur('#dist_weight');
             // Initialize DataTable
             var table = $('#production_table').DataTable({
                 "processing": true,
@@ -546,10 +560,10 @@
                     { "data": "details" },
                     { "data": "items_received", "className": "dt-center" },
                     { "data": "total_weight", "className": "dt-center" },
+                    { "data": "weight_difference", "className": "dt-center" },
                     { "data": "meat", "className": "dt-center" },
                     { "data": "steak", "className": "dt-center" },
                     { "data": "beef_fillet", "className": "dt-center" },
-                    { "data": "weight_difference", "className": "dt-center" },
                     { "data": "beef_liver", "className": "dt-center" },
                     { "data": "tripe", "className": "dt-center" },
                     {
@@ -566,7 +580,7 @@
                 ],
                 "order": [[0, 'desc']],
                 "language": {
-                    "emptyTable": "No production records found",
+                    "emptyTable": "No data available in table",
                     "processing": '<img id="loading-image" style="width: 50px; height: 50px; opacity: 0.5;" src="{{asset('assets/images/spinner.gif')}}" />'
                 }
             });
@@ -688,14 +702,14 @@
                             $('#edit_production_id').val(data.id);
                             $('#edit_production_date').val(data.production_date);
                             $('#edit_details').val(data.details);
-                            $('#edit_items_received').val(data.items_received);
-                            $('#edit_total_weight').val(data.total_weight);
-                            $('#edit_meat').val(data.meat);
-                            $('#edit_steak').val(data.steak);
-                            $('#edit_beef_fillet').val(data.beef_fillet);
-                            $('#edit_weight_difference').val(data.weight_difference);
-                            $('#edit_beef_liver').val(data.beef_liver);
-                            $('#edit_tripe').val(data.tripe);
+                            $('#edit_items_received').val(numberWithCommas(data.items_received));
+                            $('#edit_total_weight').val(numberWithCommas(data.total_weight));
+                            $('#edit_meat').val(numberWithCommas(data.meat));
+                            $('#edit_steak').val(numberWithCommas(data.steak));
+                            $('#edit_beef_fillet').val(numberWithCommas(data.beef_fillet));
+                            $('#edit_weight_difference').val(numberWithCommas(data.weight_difference));
+                            $('#edit_beef_liver').val(numberWithCommas(data.beef_liver));
+                            $('#edit_tripe').val(numberWithCommas(data.tripe));
                             $('#editProductionModal').modal('show');
                         } else {
                             notify('Error loading production data', 'top', 'right', 'danger');
@@ -754,13 +768,15 @@
             function resetDistributionModal() {
                 currentStoreIndex = 0;
                 distributions = [];
+                totalMeatWeight = 0;
                 $('#dist_store_id').val('');
                 $('#dist_meat_type').val('');
                 $('#dist_weight').val('');
+                $('#dist_total_weight').val('0');
+                $('#dist_remaining_weight').val('0');
                 $('#distributionSummary').hide();
                 $('#summaryContent').html('');
                 updateStepIndicator();
-                updateRemainingWeight();
             }
 
             function updateStepIndicator() {
@@ -777,13 +793,26 @@
                 $('#stepIndicator').html(html);
             }
 
+            // Format number for display (decimals only when applicable)
+            function formatSmartDecimal(num) {
+                if (num === null || num === undefined || num === '' || isNaN(num)) {
+                    return '0';
+                }
+                num = parseFloat(num);
+                if (isNaN(num)) return '0';
+                if (num % 1 === 0) {
+                    return num.toLocaleString('en-US');
+                }
+                return num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+            }
+
             function updateRemainingWeight() {
                 var distributed = distributions.reduce(function(sum, d) {
                     return sum + parseFloat(d.weight_distributed || 0);
                 }, 0);
                 var remaining = totalMeatWeight - distributed;
-                $('#dist_remaining_weight').val(remaining.toFixed(2));
-                $('#totalDistributed').text(distributed.toFixed(2));
+                $('#dist_remaining_weight').val(formatSmartDecimal(remaining));
+                $('#totalDistributed').text(formatSmartDecimal(distributed));
                 return remaining;
             }
 
@@ -797,7 +826,7 @@
                     var storeName = stores.find(s => s.id == d.store_id)?.name || 'Unknown';
                     html += '<div class="distribution-summary-item">';
                     html += '<span>' + storeName + ' (' + d.meat_type + ')</span>';
-                    html += '<span>' + parseFloat(d.weight_distributed).toFixed(2) + ' kg</span>';
+                    html += '<span>' + formatSmartDecimal(parseFloat(d.weight_distributed)) + ' kg</span>';
                     html += '</div>';
                 });
                 $('#summaryContent').html(html);
@@ -836,10 +865,11 @@
                     success: function (response) {
                         if (response.success) {
                             var production = response.production;
-                            totalMeatWeight = parseFloat(production.meat_output);
+                            console.log('Distribution data:', response);
+                            totalMeatWeight = parseFloat(production.total_weight) || 0;
                             $('#dist_production_id').val(production.id);
                             $('#dist_production_date').text(production.production_date);
-                            $('#dist_total_weight').val(parseFloat(production.meat_output).toFixed(2));
+                            $('#dist_total_weight').val(formatSmartDecimal(totalMeatWeight));
 
                             // Load existing distributions if any
                             if (response.data && response.data.length > 0) {
@@ -886,10 +916,17 @@
                 if ($(this).text() === 'Save') {
                     // Add current entry if filled
                     if (storeId && meatType && weight) {
+                        // Validate weight doesn't exceed remaining before adding
+                        var enteredWeight = unformatNumber(weight);
+                        var currentRemaining = updateRemainingWeight();
+                        if (enteredWeight > currentRemaining) {
+                            notify('Distributed weight ' + formatSmartDecimal(enteredWeight) + 'kg  cannot exceed remaining weight ' + formatSmartDecimal(currentRemaining) + 'kg', 'top', 'right', 'warning');
+                            return;
+                        }
                         distributions.push({
                             store_id: storeId,
                             meat_type: meatType,
-                            weight_distributed: weight
+                            weight_distributed: unformatNumber(weight)
                         });
                     }
 
@@ -940,6 +977,14 @@
                     return;
                 }
 
+                // Validate weight doesn't exceed remaining
+                var enteredWeight = unformatNumber(weight);
+                var currentRemaining = updateRemainingWeight();
+                if (enteredWeight > currentRemaining) {
+                    notify('Distributed weight ' + formatSmartDecimal(enteredWeight) + 'kg cannot exceed remaining weight ' + formatSmartDecimal(currentRemaining) + 'kg', 'top', 'right', 'warning');
+                    return;
+                }
+
                 // Check for duplicate store
                 var existingIndex = distributions.findIndex(d => d.store_id == storeId);
                 if (existingIndex >= 0) {
@@ -947,14 +992,14 @@
                     distributions[existingIndex] = {
                         store_id: storeId,
                         meat_type: meatType,
-                        weight_distributed: weight
+                        weight_distributed: unformatNumber(weight)
                     };
                 } else {
                     // Add new
                     distributions.push({
                         store_id: storeId,
                         meat_type: meatType,
-                        weight_distributed: weight
+                        weight_distributed: unformatNumber(weight)
                     });
                 }
 
