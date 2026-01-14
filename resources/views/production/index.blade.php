@@ -352,7 +352,7 @@
         <div class="modal-dialog modal-md" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="distributionModalLabel">Distribution to Branches</h5>
+                    <h5 class="modal-title" id="distributionModalLabel">Record Distribution</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -384,6 +384,14 @@
                     <div id="distributionFormContainer">
                         <input type="hidden" id="dist_production_id">
                         <div class="form-group d-flex align-items-center">
+                            <label class="col-4" for="dist_distribution_type">Distribution Type <span class="text-danger">*</span></label>
+                            <select class="form-control" id="dist_distribution_type" name="distribution_type" required>
+                                <option value="branch">Branch</option>
+                                <option value="cash_sale">Cash Sale</option>
+                                <option value="order">Order</option>
+                            </select>
+                        </div>
+                        <div class="form-group d-flex align-items-center">
                             <label class="col-4" for="dist_meat_type">Meat Type <span class="text-danger">*</span></label>
                             <select class="form-control" id="dist_meat_type" name="meat_type" required>
                                 <option value="">Select Meat Type</option>
@@ -403,20 +411,39 @@
                             <input type="text" class="form-control" id="dist_remaining_weight" name="remaining_weight" 
                                 placeholder="Remaining weight" disabled>
                         </div>
-                        <div class="form-group d-flex align-items-center">
+                        <!-- Branch Selection (for branch type) -->
+                        <div class="form-group d-flex align-items-center" id="dist_branch_group">
                             <label class="col-4" for="dist_store_id">Branch Name <span class="text-danger">*</span></label>
-                            <select class="form-control" id="dist_store_id" name="store_id" required>
+                            <select class="form-control" id="dist_store_id" name="store_id">
                                 <option value="">Select Branch</option>
                                 @foreach($stores as $store)
                                     <option value="{{ $store->id }}">{{ $store->name }}</option>
                                 @endforeach
                             </select>
                         </div>
+                        <!-- Customer Input (for cash sale type) -->
+                        <div class="form-group d-none align-items-center" id="dist_customer_group">
+                            <label class="col-4" for="dist_customer_name">Customer Name</label>
+                            <input type="text" class="form-control" id="dist_customer_name" name="customer_name" 
+                                placeholder="Walk-in Customer (optional)">
+                        </div>
+                        <!-- Order Selection (for order type) -->
+                        <div class="form-group d-none align-items-center" id="dist_order_group">
+                            <label class="col-4" for="dist_order_id">Order To</label>
+                            <input type="text" class="form-control" id="dist_order_id" name="order_id" 
+                                placeholder="Enter Order To">
+                        </div>
                         <div class="form-group d-flex align-items-center">
                             <label class="col-4" for="dist_weight">Distributed (kg) <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="dist_weight" name="weight_distributed" 
                                 placeholder="Enter weight" required>
                         </div>
+                        <!-- Notes field -->
+                        {{-- <div class="form-group d-flex align-items-center hidden" style="display: none;">
+                            <label class="col-4" for="dist_notes">Notes</label>
+                            <input type="text" class="form-control" id="dist_notes" name="notes" 
+                                placeholder="Optional notes">
+                        </div> --}}
                     </div>
 
                     <div class="distribution-summary" id="distributionSummary" style="display: none;">
@@ -772,6 +799,41 @@
             var totalMeatWeight = 0;
             var productionData = null; // Store full production data
             var meatTypeLocked = false; // Flag to lock meat type after first distribution
+            var distributionTypeLocked = false; // Flag to lock distribution type after first distribution
+
+            // Handle distribution type change
+            $(document).on('change', '#dist_distribution_type', function() {
+                var distType = $(this).val();
+                // Hide all recipient fields first
+                $('#dist_branch_group').addClass('d-none').removeClass('d-flex');
+                $('#dist_customer_group').addClass('d-none').removeClass('d-flex');
+                $('#dist_order_group').addClass('d-none').removeClass('d-flex');
+                
+                // Show the appropriate field and adjust buttons
+                switch(distType) {
+                    case 'branch':
+                        $('#dist_branch_group').removeClass('d-none').addClass('d-flex');
+                        // Show branch navigation buttons
+                        $('#skipBranchBtn').show();
+                        $('#backBranchBtn').show();
+                        $('#nextBranchBtn').text('Next').removeClass('btn-success').addClass('btn-primary');
+                        break;
+                    case 'cash_sale':
+                        // $('#dist_customer_group').removeClass('d-none').addClass('d-flex');
+                        // Hide branch navigation, show Save directly
+                        $('#skipBranchBtn').hide();
+                        $('#backBranchBtn').hide();
+                        $('#nextBranchBtn').text('Save').removeClass('btn-primary').addClass('btn-success');
+                        break;
+                    case 'order':
+                        $('#dist_order_group').removeClass('d-none').addClass('d-flex');
+                        // Hide branch navigation, show Save directly
+                        $('#skipBranchBtn').hide();
+                        $('#backBranchBtn').hide();
+                        $('#nextBranchBtn').text('Save').removeClass('btn-primary').addClass('btn-success');
+                        break;
+                }
+            });
 
             function resetDistributionModal() {
                 currentStoreIndex = 0;
@@ -779,7 +841,12 @@
                 totalMeatWeight = 0;
                 productionData = null;
                 meatTypeLocked = false;
+                distributionTypeLocked = false;
+                $('#dist_distribution_type').val('branch').prop('disabled', false);
                 $('#dist_store_id').val('');
+                $('#dist_customer_name').val('');
+                $('#dist_order_id').val('');
+                $('#dist_notes').val('');
                 $('#dist_meat_type').val('').prop('disabled', false);
                 $('#dist_weight').val('');
                 $('#dist_total_weight').val('0');
@@ -787,6 +854,14 @@
                 $('#distributionSummary').hide();
                 $('#summaryContent').html('');
                 $('#backBranchBtn').prop('disabled', true);
+                // Show branch group by default, hide others
+                $('#dist_branch_group').removeClass('d-none').addClass('d-flex');
+                $('#dist_customer_group').addClass('d-none').removeClass('d-flex');
+                $('#dist_order_group').addClass('d-none').removeClass('d-flex');
+                // Reset buttons for branch mode
+                $('#skipBranchBtn').show();
+                $('#backBranchBtn').show();
+                $('#nextBranchBtn').text('Next').removeClass('btn-success').addClass('btn-primary');
                 updateStepIndicator();
             }
 
@@ -883,9 +958,24 @@
                 }
                 var html = '';
                 distributions.forEach(function(d) {
-                    var storeName = stores.find(s => s.id == d.store_id)?.name || 'Unknown';
+                    var recipientName = '';
+                    switch(d.distribution_type) {
+                        case 'branch':
+                            recipientName = stores.find(s => s.id == d.store_id)?.name || 'Unknown Branch';
+                            break;
+                        case 'cash_sale':
+                            recipientName = d.customer_name || 'Cash Sale';
+                            break;
+                        case 'order':
+                            recipientName = d.order_to ? 'Order: ' + d.order_to : 'Order';
+                            break;
+                        default:
+                            recipientName = 'Order';
+                    }
+                    var typeLabel = d.distribution_type === 'branch' ? 'Branch' : 
+                                   (d.distribution_type === 'cash_sale' ? 'Cash Sale' : 'Order');
                     html += '<div class="distribution-summary-item">';
-                    html += '<span>' + storeName + ' (' + d.meat_type + ')</span>';
+                    html += '<span><small class="badge badge-secondary">' + typeLabel + '</small> ' + recipientName + ' (' + d.meat_type + ')</span>';
                     html += '<span>' + formatSmartDecimal(parseFloat(d.weight_distributed)) + ' kg</span>';
                     html += '</div>';
                 });
@@ -979,9 +1069,14 @@
                             if (response.data && response.data.length > 0) {
                                 distributions = response.data.map(function(d) {
                                     return {
+                                        distribution_type: d.distribution_type || 'branch',
                                         store_id: d.store_id,
+                                        customer_id: d.customer_id,
+                                        customer_name: d.customer ? d.customer.name : null,
+                                        order_id: d.order_id,
                                         meat_type: d.meat_type,
-                                        weight_distributed: d.weight_distributed
+                                        weight_distributed: d.weight_distributed,
+                                        notes: d.notes
                                     };
                                 });
                                 updateSummary();
@@ -1011,26 +1106,68 @@
 
             // Handle Next/Save button
             $('#nextBranchBtn').on('click', function () {
+                var distributionType = $('#dist_distribution_type').val();
                 var storeId = $('#dist_store_id').val();
+                var customerName = $('#dist_customer_name').val();
+                var orderId = $('#dist_order_id').val();
                 var meatType = $('#dist_meat_type').val();
                 var weight = $('#dist_weight').val();
+                var notes = $('#dist_notes').val();
+
+                // Build distribution entry based on type
+                function buildDistributionEntry() {
+                    var entry = {
+                        distribution_type: distributionType,
+                        meat_type: meatType,
+                        weight_distributed: unformatNumber(weight),
+                        notes: notes || null
+                    };
+                    
+                    switch(distributionType) {
+                        case 'branch':
+                            entry.store_id = storeId;
+                            break;
+                        case 'cash_sale':
+                            entry.customer_name = customerName;
+                            break;
+                        case 'order':
+                            entry.order_to = orderId;
+                            break;
+                    }
+                    return entry;
+                }
+
+                // Validate based on distribution type
+                function validateEntry() {
+                    if (!meatType) {
+                        notify('Please select a meat type', 'top', 'right', 'warning');
+                        return false;
+                    }
+                    if (!weight) {
+                        notify('Please enter the distributed weight', 'top', 'right', 'warning');
+                        return false;
+                    }
+                    if (distributionType === 'branch' && !storeId) {
+                        notify('Please select a branch', 'top', 'right', 'warning');
+                        return false;
+                    }
+                    return true;
+                }
 
                 // If we're on the last branch and clicking Save
                 if ($(this).text() === 'Save') {
                     // Add current entry if filled
-                    if (storeId && meatType && weight) {
+                    if (meatType && weight) {
+                        if (!validateEntry()) return;
+                        
                         // Validate weight doesn't exceed remaining before adding
                         var enteredWeight = unformatNumber(weight);
                         var currentRemaining = updateRemainingWeight();
                         if (enteredWeight > currentRemaining) {
-                            notify('Distributed weight ' + formatSmartDecimal(enteredWeight) + 'kg  cannot exceed remaining weight ' + formatSmartDecimal(currentRemaining) + 'kg', 'top', 'right', 'warning');
+                            notify('Distributed weight ' + formatSmartDecimal(enteredWeight) + 'kg cannot exceed remaining weight ' + formatSmartDecimal(currentRemaining) + 'kg', 'top', 'right', 'warning');
                             return;
                         }
-                        distributions.push({
-                            store_id: storeId,
-                            meat_type: meatType,
-                            weight_distributed: unformatNumber(weight)
-                        });
+                        distributions.push(buildDistributionEntry());
                     }
 
                     if (distributions.length === 0) {
@@ -1075,8 +1212,7 @@
                 }
 
                 // Validate current entry
-                if (!storeId || !meatType || !weight) {
-                    notify('Please fill all fields before proceeding', 'top', 'right', 'warning');
+                if (!validateEntry()) {
                     return;
                 }
 
@@ -1088,28 +1224,29 @@
                     return;
                 }
 
-                // Check for duplicate store with same meat type
-                var existingIndex = distributions.findIndex(d => d.store_id == storeId && d.meat_type == meatType);
-                if (existingIndex >= 0) {
-                    // Update existing
-                    distributions[existingIndex] = {
-                        store_id: storeId,
-                        meat_type: meatType,
-                        weight_distributed: unformatNumber(weight)
-                    };
+                // For branch type, check for duplicate store with same meat type
+                if (distributionType === 'branch') {
+                    var existingIndex = distributions.findIndex(d => d.distribution_type === 'branch' && d.store_id == storeId && d.meat_type == meatType);
+                    if (existingIndex >= 0) {
+                        // Update existing
+                        distributions[existingIndex] = buildDistributionEntry();
+                    } else {
+                        // Add new
+                        distributions.push(buildDistributionEntry());
+                    }
                 } else {
-                    // Add new
-                    distributions.push({
-                        store_id: storeId,
-                        meat_type: meatType,
-                        weight_distributed: unformatNumber(weight)
-                    });
+                    // For cash sale and order, just add new entry
+                    distributions.push(buildDistributionEntry());
                 }
 
-                // Lock meat type after first distribution is added
+                // Lock meat type and distribution type after first distribution is added
                 if (!meatTypeLocked) {
                     meatTypeLocked = true;
                     $('#dist_meat_type').prop('disabled', true);
+                }
+                if (!distributionTypeLocked) {
+                    distributionTypeLocked = true;
+                    $('#dist_distribution_type').prop('disabled', true);
                 }
 
                 updateSummary();

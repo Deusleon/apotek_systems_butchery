@@ -46,6 +46,13 @@
                 <div class="d-flex justify-content-end align-items-center mb-3">
                     {{-- <h5 class="card-title mb-0">Distribution Records</h5> --}}
                     <div class="form-inline">
+                        <label for="filter_distribution_type" class="mr-2">Type:</label>
+                        <select id="filter_distribution_type" class="form-control mr-3" style="min-width: 120px;">
+                            <option value="">All Types</option>
+                            <option value="branch">Branch</option>
+                            <option value="cash_sale">Cash Sale</option>
+                            <option value="order">Order</option>
+                        </select>
                         <label for="filter_store" class="mr-2">Branch:</label>
                         <select id="filter_store" class="form-control mr-3" style="min-width: 150px;">
                             <option value="">All Branches</option>
@@ -71,10 +78,10 @@
                         <thead>
                             <tr>
                                 <th>Date</th>
-                                <th>Branch</th>
+                                <th>Type</th>
+                                <th>Recipient</th>
                                 <th>Meat Type</th>
                                 <th class="text-center">Weight (kg)</th>
-                                <th class="text-center">Production ID</th>
                                 <th class="text-center">Actions</th>
                             </tr>
                         </thead>
@@ -125,6 +132,7 @@
                         }
                         d.store_id = $('#filter_store').val();
                         d.meat_type = $('#filter_meat_type').val();
+                        d.distribution_type = $('#filter_distribution_type').val();
                     },
                     "error": function (xhr, error, thrown) {
                         console.error('DataTables error:', error, thrown);
@@ -133,10 +141,10 @@
                 },
                 "columns": [
                     { "data": "production_date" },
-                    { "data": "store_name" },
+                    { "data": "distribution_type" },
+                    { "data": "recipient" },
                     { "data": "meat_type" },
                     { "data": "weight_distributed", "className": "dt-center" },
-                    { "data": "production_id", "className": "dt-center" },
                     {
                         "data": null,
                         "className": "dt-center",
@@ -176,7 +184,7 @@
                 $(this).val('');
                 table.ajax.reload();
             });
-            $('#filter_store, #filter_meat_type').on('change', function() {
+            $('#filter_store, #filter_meat_type, #filter_distribution_type').on('change', function() {
                 table.ajax.reload();
             });
 

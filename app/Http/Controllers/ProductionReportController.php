@@ -35,9 +35,18 @@ class ProductionReportController extends Controller
         if ($data->isEmpty()) {
             return response()->view('error_pages.pdf_zero_data');
         }
+
+        // Get meat prices from request or use defaults
+        $prices = [
+            'meat' => $request->input('meat_price', 100),
+            'steak' => $request->input('steak_price', 0),
+            'beef_fillet' => $request->input('beef_fillet_price', 0),
+            'beef_liver' => $request->input('beef_liver_price', 0),
+            'tripe' => $request->input('tripe_price', 0),
+        ];
         
         $pdf = PDF::loadView( 'production_reports.report_pdf',
-        compact( 'data', 'pharmacy', 'enable_discount' ) )
+        compact( 'data', 'pharmacy', 'enable_discount', 'prices' ) )
         ->setPaper( 'a4', 'landscape' );
         return $pdf->stream( 'Production_Report.pdf' );
     }

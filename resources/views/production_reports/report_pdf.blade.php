@@ -96,7 +96,7 @@
                             <th align="center">#</th>
                             <th align="left">Date</th>
                             <th align="left">Details</th>
-                            <th align="center">Cows</th>
+                            <th align="center">Count</th>
                             <th align="center">Total Weight</th>
                             <th align="center">Wt. Diff</th>
                             <th align="center">Meat</th>
@@ -168,6 +168,128 @@
                             <td align="center">{{ formatSmartDecimal($totalTripe) }}</td>
                         </tr>
                     </tfoot>
+                </table>
+            </div>
+
+            <!-- Summary Section -->
+            @php
+                $meatPrice = isset($prices['meat']) ? floatval($prices['meat']) : 0;
+                $steakPrice = isset($prices['steak']) ? floatval($prices['steak']) : 0;
+                $beefFilletPrice = isset($prices['beef_fillet']) ? floatval($prices['beef_fillet']) : 0;
+                $beefLiverPrice = isset($prices['beef_liver']) ? floatval($prices['beef_liver']) : 0;
+                $tripePrice = isset($prices['tripe']) ? floatval($prices['tripe']) : 0;
+
+                $meatTotal = $totalMeat * $meatPrice;
+                $steakTotal = $totalSteak * $steakPrice;
+                $beefFilletTotal = $totalBeefFillet * $beefFilletPrice;
+                $beefLiverTotal = $totalBeefLiver * $beefLiverPrice;
+                $tripeTotal = $totalTripe * $tripePrice;
+
+                $grandTotal = $meatTotal + $steakTotal + $beefFilletTotal + $beefLiverTotal + $tripeTotal;
+                
+                $hasPrices = $meatPrice > 0 || $steakPrice > 0 || $beefFilletPrice > 0 || $beefLiverPrice > 0 || $tripePrice > 0;
+            @endphp
+
+            <div style="margin-top: 20px; page-break-inside: avoid;">
+                <h3 style="font-weight: bold; text-align: left; margin-bottom: 10px; border-bottom: 2px solid #1f273b; padding-bottom: 5px;">SUMMARY</h3>
+                
+                <table style="width: 22%; margin-left: 0;">
+                    <tr>
+                        <td style="padding: 5px 0;"><strong>Total Items (Cows):</strong></td>
+                        <td style="padding: 5px 0; margin-left: 100px;" align="left">{{ number_format($totalCows) }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px 0;"><strong>Total Weight:</strong></td>
+                        <td style="padding: 5px 0; margin-left: 100px;" align="left">{{ formatSmartDecimal($totalWeight) }} kg</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px 0;"><strong>Total Weight Difference:</strong></td>
+                        <td style="padding: 5px 0; margin-left: 100px;" align="left">{{ formatSmartDecimal($totalWtDiff) }} kg</td>
+                    </tr>
+                </table>
+
+                <h4 style="font-weight: bold; text-align: left; margin-top: 15px; margin-bottom: 10px;">Meat Type Breakdown:</h4>
+                
+                <table style="width: 60%; margin-left: 0; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #1f273b; color: #ffffff; border-bottom: 1px solid #dee2e6;">
+                            <th align="left" style="padding: 8px;">Meat Type</th>
+                            <th align="left" style="padding: 8px;"></th>
+                            <th align="center" style="padding: 8px;">Weight (kg)</th>
+                            @if($hasPrices)
+                            <th align="center" style="padding: 8px;"></th>
+                            <th align="left" style="padding: 8px;">Price/kg</th>
+                            <th align="center" style="padding: 8px;"></th>
+                            <th align="right" style="padding: 8px;">Total</th>
+                            @endif
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid #dee2e6;">
+                            <td style="padding: 8px 0px;"><strong>i.</strong> Meat</td>
+                            <td style="padding: 8px;"> :</td>
+                            <td align="center" style="padding: 8px;">{{ formatSmartDecimal($totalMeat) }}</td>
+                            @if($hasPrices)
+                            <td align="center" style="padding: 8px;">×</td>
+                            <td align="left" style="padding: 8px;">{{ number_format($meatPrice, 2) }}</td>
+                            <td align="center" style="padding: 8px;">=</td>
+                            <td align="right" style="padding: 8px;"><strong>{{ number_format($meatTotal, 2) }}</strong></td>
+                            @endif
+                        </tr>
+                        <tr style="border-bottom: 1px solid #dee2e6;">
+                            <td style="padding: 8px 0px;"><strong>ii.</strong> Steak</td>
+                            <td style="padding: 8px;"> :</td>
+                            <td align="center" style="padding: 8px;">{{ formatSmartDecimal($totalSteak) }}</td>
+                            @if($hasPrices)
+                            <td align="center" style="padding: 8px;">×</td>
+                            <td align="left" style="padding: 8px;">{{ number_format($steakPrice, 2) }}</td>
+                            <td align="center" style="padding: 8px;">=</td>
+                            <td align="right" style="padding: 8px;"><strong>{{ number_format($steakTotal, 2) }}</strong></td>
+                            @endif
+                        </tr>
+                        <tr style="border-bottom: 1px solid #dee2e6;">
+                            <td style="padding: 8px 0px;"><strong>iii.</strong> Beef Fillet</td>
+                            <td style="padding: 8px;"> :</td>
+                            <td align="center" style="padding: 8px;">{{ formatSmartDecimal($totalBeefFillet) }}</td>
+                            @if($hasPrices)
+                            <td align="center" style="padding: 8px;">×</td>
+                            <td align="left" style="padding: 8px;">{{ number_format($beefFilletPrice, 2) }}</td>
+                            <td align="center" style="padding: 8px;">=</td>
+                            <td align="right" style="padding: 8px;"><strong>{{ number_format($beefFilletTotal, 2) }}</strong></td>
+                            @endif
+                        </tr>
+                        <tr style="border-bottom: 1px solid #dee2e6;">
+                            <td style="padding: 8px 0px;"><strong>iv.</strong> Beef Liver</td>
+                            <td style="padding: 8px;"> :</td>
+                            <td align="center" style="padding: 8px;">{{ formatSmartDecimal($totalBeefLiver) }}</td>
+                            @if($hasPrices)
+                            <td align="center" style="padding: 8px;">×</td>
+                            <td align="left" style="padding: 8px;">{{ number_format($beefLiverPrice, 2) }}</td>
+                            <td align="center" style="padding: 8px;">=</td>
+                            <td align="right" style="padding: 8px;"><strong>{{ number_format($beefLiverTotal, 2) }}</strong></td>
+                            @endif
+                        </tr>
+                        <tr style="border-bottom: 1px solid #dee2e6;">
+                            <td style="padding: 8px 0px;"><strong>v.</strong> Tripe</td>
+                            <td style="padding: 8px;"> :</td>
+                            <td align="center" style="padding: 8px;">{{ formatSmartDecimal($totalTripe) }}</td>
+                            @if($hasPrices)
+                            <td align="center" style="padding: 8px;">×</td>
+                            <td align="left" style="padding: 8px;">{{ number_format($tripePrice, 2) }}</td>
+                            <td align="center" style="padding: 8px;">=</td>
+                            <td align="right" style="padding: 8px;"><strong>{{ number_format($tripeTotal, 2) }}</strong></td>
+                            @endif
+                        </tr>
+                    </tbody>
+                    @if($hasPrices)
+                    <tfoot>
+                        <tr style="">
+                            <td colspan="5" align="right" style="padding: 10px;"><strong>GRAND TOTAL</strong></td>
+                            <td align="center" style="padding: 8px;"> =</td>
+                            <td align="right" style="padding: 10px;"><strong>{{ number_format($grandTotal, 2) }}</strong></td>
+                        </tr>
+                    </tfoot>
+                    @endif
                 </table>
             </div>
         </div>

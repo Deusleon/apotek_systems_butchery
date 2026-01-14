@@ -36,7 +36,7 @@ class DistributionReportController extends Controller
 
         $data = $this->getDistributions($from, $to, $store_id);
         
-        if (empty($data['rows'])) {
+        if (empty($data['dateGroups'])) {
             return response()->view('error_pages.pdf_zero_data');
         }
 
@@ -55,8 +55,8 @@ class DistributionReportController extends Controller
         // Get all stores (branches)
         $stores = Store::where('id', '>', 1)->orderBy('name')->get();
         
-        // Get distributions grouped by date and store
-        $query = ProductionDistribution::with(['production', 'store'])
+        // Get distributions grouped by date and recipient
+        $query = ProductionDistribution::with(['production', 'store', 'customer'])
             ->whereHas('production', function($q) use ($from, $to) {
                 $q->whereBetween('production_date', [$from, $to]);
             });
@@ -67,21 +67,42 @@ class DistributionReportController extends Controller
 
         $distributions = $query->get();
 
-        // Group by date and store
+        // Group by date and recipient (using a unique key)
         $groupedData = [];
         foreach ($distributions as $dist) {
             $date = date('Y-m-d', strtotime($dist->production->production_date));
-            $storeId = $dist->store_id;
-            $storeName = $dist->store ? $dist->store->name : 'Unknown';
+            $distributionType = $dist->distribution_type ?? 'branch';
+            
+            // Create unique key for grouping
+            $recipientKey = $distributionType . '_';
+            switch ($distributionType) {
+                case 'branch':
+                    $recipientKey .= $dist->store_id ?? 'unknown';
+                    $recipientName = $dist->store ? $dist->store->name : 'Unknown Branch';
+                    break;
+                case 'cash_sale':
+                    $recipientKey .= $dist->customer_id ?? 'cash_sale_' . $dist->id;
+                    $recipientName = $dist->customer ? $dist->customer->name : 'Cash Sale';
+                    break;
+                case 'order':
+                    $recipientKey .= $dist->order_to ?? 'order_' . $dist->id;
+                    $recipientName = $dist->order_to ? 'Order: ' . $dist->order_to : 'Order';
+                    break;
+                default:
+                    $recipientKey .= 'order_' . $dist->id;
+                    $recipientName = 'Order';
+            }
+            
             $meatType = $dist->meat_type;
             $weight = floatval($dist->weight_distributed);
 
             if (!isset($groupedData[$date])) {
                 $groupedData[$date] = [];
             }
-            if (!isset($groupedData[$date][$storeId])) {
-                $groupedData[$date][$storeId] = [
-                    'store_name' => $storeName,
+            if (!isset($groupedData[$date][$recipientKey])) {
+                $groupedData[$date][$recipientKey] = [
+                    'distribution_type' => $distributionType,
+                    'recipient_name' => $recipientName,
                     'meat' => 0,
                     'steak' => 0,
                     'beef_fillet' => 0,
@@ -93,20 +114,20 @@ class DistributionReportController extends Controller
             // Map meat types to columns
             switch (strtolower($meatType)) {
                 case 'meat':
-                    $groupedData[$date][$storeId]['meat'] += $weight;
+                    $groupedData[$date][$recipientKey]['meat'] += $weight;
                     break;
                 case 'steak':
-                    $groupedData[$date][$storeId]['steak'] += $weight;
+                    $groupedData[$date][$recipientKey]['steak'] += $weight;
                     break;
                 case 'fillet':
                 case 'beef fillet':
-                    $groupedData[$date][$storeId]['beef_fillet'] += $weight;
+                    $groupedData[$date][$recipientKey]['beef_fillet'] += $weight;
                     break;
                 case 'beef liver':
-                    $groupedData[$date][$storeId]['beef_liver'] += $weight;
+                    $groupedData[$date][$recipientKey]['beef_liver'] += $weight;
                     break;
                 case 'tripe':
-                    $groupedData[$date][$storeId]['tripe'] += $weight;
+                    $groupedData[$date][$recipientKey]['tripe'] += $weight;
                     break;
             }
         }
@@ -114,8 +135,8 @@ class DistributionReportController extends Controller
         // Sort dates in ascending order
         ksort($groupedData);
 
-        // Flatten into rows for the report
-        $rows = [];
+        // Structure data grouped by date for the report
+        $dateGroups = [];
         $totals = [
             'meat' => 0,
             'steak' => 0,
@@ -124,11 +145,22 @@ class DistributionReportController extends Controller
             'tripe' => 0,
         ];
 
-        foreach ($groupedData as $date => $storeData) {
-            foreach ($storeData as $storeId => $data) {
-                $rows[] = [
-                    'date' => $date,
-                    'store_name' => $data['store_name'],
+        foreach ($groupedData as $date => $recipientData) {
+            $dateGroups[$date] = [
+                'rows' => [],
+                'totals' => [
+                    'meat' => 0,
+                    'steak' => 0,
+                    'beef_fillet' => 0,
+                    'beef_liver' => 0,
+                    'tripe' => 0,
+                ],
+            ];
+
+            foreach ($recipientData as $recipientKey => $data) {
+                $dateGroups[$date]['rows'][] = [
+                    'distribution_type' => $data['distribution_type'],
+                    'recipient_name' => $data['recipient_name'],
                     'meat' => $data['meat'],
                     'steak' => $data['steak'],
                     'beef_fillet' => $data['beef_fillet'],
@@ -136,6 +168,14 @@ class DistributionReportController extends Controller
                     'tripe' => $data['tripe'],
                 ];
 
+                // Date totals
+                $dateGroups[$date]['totals']['meat'] += $data['meat'];
+                $dateGroups[$date]['totals']['steak'] += $data['steak'];
+                $dateGroups[$date]['totals']['beef_fillet'] += $data['beef_fillet'];
+                $dateGroups[$date]['totals']['beef_liver'] += $data['beef_liver'];
+                $dateGroups[$date]['totals']['tripe'] += $data['tripe'];
+
+                // Grand totals
                 $totals['meat'] += $data['meat'];
                 $totals['steak'] += $data['steak'];
                 $totals['beef_fillet'] += $data['beef_fillet'];
@@ -145,7 +185,7 @@ class DistributionReportController extends Controller
         }
 
         return [
-            'rows' => $rows,
+            'dateGroups' => $dateGroups,
             'totals' => $totals,
         ];
     }

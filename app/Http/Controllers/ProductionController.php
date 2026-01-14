@@ -185,7 +185,7 @@ class ProductionController extends Controller
     }
     public function getDistributions($id)
     {
-        $production = Production::with('distributions.store')->find($id);
+        $production = Production::with(['distributions.store', 'distributions.customer'])->find($id);
         if ($production) {
             return response()->json([
                 'success' => true, 
@@ -199,7 +199,7 @@ class ProductionController extends Controller
     {
         $request->validate([
             'distributions' => 'required|array',
-            'distributions.*.store_id' => 'required|exists:inv_stores,id',
+            'distributions.*.distribution_type' => 'required|in:branch,cash_sale,order',
             'distributions.*.meat_type' => 'required|string',
             'distributions.*.weight_distributed' => 'required|numeric|min:0',
         ]);
@@ -216,12 +216,28 @@ class ProductionController extends Controller
 
             // Insert new distributions
             foreach ($request->distributions as $dist) {
-                ProductionDistribution::create([
+                $distributionData = [
                     'production_id' => $id,
-                    'store_id' => $dist['store_id'],
+                    'distribution_type' => $dist['distribution_type'] ?? 'branch',
                     'meat_type' => $dist['meat_type'],
                     'weight_distributed' => $dist['weight_distributed'],
-                ]);
+                    'notes' => $dist['notes'] ?? null,
+                ];
+
+                // Set appropriate foreign key based on distribution type
+                switch ($dist['distribution_type'] ?? 'branch') {
+                    case 'branch':
+                        $distributionData['store_id'] = $dist['store_id'] ?? null;
+                        break;
+                    case 'cash_sale':
+                        $distributionData['customer_id'] = $dist['customer_id'] ?? null;
+                        break;
+                    case 'order':
+                        $distributionData['order_to'] = $dist['order_to'] ?? null;
+                        break;
+                }
+
+                ProductionDistribution::create($distributionData);
             }
 
             DB::commit();
@@ -245,13 +261,19 @@ class ProductionController extends Controller
         $meat_type = $request->input('meat_type');
         $search_value = $request->input('search.value');
 
-        $query = ProductionDistribution::with(['production', 'store'])
+        $distribution_type = $request->input('distribution_type');
+
+        $query = ProductionDistribution::with(['production', 'store', 'customer'])
             ->whereHas('production', function($q) use ($start_date, $end_date) {
                 $q->whereBetween('production_date', [$start_date, $end_date]);
             });
 
         if ($store_id) {
             $query->where('store_id', $store_id);
+        }
+
+        if ($distribution_type) {
+            $query->where('distribution_type', $distribution_type);
         }
 
         if ($meat_type) {
@@ -261,7 +283,11 @@ class ProductionController extends Controller
         if ($search_value) {
             $query->where(function($q) use ($search_value) {
                 $q->where('meat_type', 'like', '%' . $search_value . '%')
+                  ->orWhere('distribution_type', 'like', '%' . $search_value . '%')
                   ->orWhereHas('store', function($sq) use ($search_value) {
+                      $sq->where('name', 'like', '%' . $search_value . '%');
+                  })
+                  ->orWhereHas('customer', function($sq) use ($search_value) {
                       $sq->where('name', 'like', '%' . $search_value . '%');
                   });
             });
@@ -274,10 +300,13 @@ class ProductionController extends Controller
             $data[] = [
                 'id' => $dist->id,
                 'production_date' => $dist->production ? date('Y-m-d', strtotime($dist->production->production_date)) : '',
-                'store_name' => $dist->store ? $dist->store->name : 'Unknown',
+                'distribution_type' => $dist->distribution_type_label,
+                'recipient' => $dist->recipient_name,
+                'store_name' => $dist->store ? $dist->store->name : ($dist->distribution_type === 'branch' ? 'Unknown' : '-'),
                 'meat_type' => $dist->meat_type,
                 'weight_distributed' => $this->formatSmartDecimal($dist->weight_distributed),
                 'production_id' => $dist->production_id,
+                'notes' => $dist->notes,
             ];
         }
 
