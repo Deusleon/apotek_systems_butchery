@@ -53,13 +53,13 @@
                             <option value="cash_sale">Cash Sale</option>
                             <option value="order">Order</option>
                         </select>
-                        <label for="filter_store" class="mr-2">Branch:</label>
+                        {{-- <label for="filter_store" class="mr-2">Branch:</label>
                         <select id="filter_store" class="form-control mr-3" style="min-width: 150px;">
                             <option value="">All Branches</option>
                             @foreach($stores as $store)
                                 <option value="{{ $store->id }}">{{ $store->name }}</option>
                             @endforeach
-                        </select>
+                        </select> --}}
                         <label for="filter_meat_type" class="mr-2">Meat Type:</label>
                         <select id="filter_meat_type" class="form-control mr-3" style="min-width: 120px;">
                             <option value="">All Types</option>
@@ -67,7 +67,7 @@
                             <option value="Steak">Steak</option>
                             <option value="Fillet">Fillet</option>
                             <option value="Beef Liver">Beef Liver</option>
-                            {{-- <option value="Tripe">Tripe</option> --}}
+                            <option value="Tripe">Tripe</option>
                         </select>
                         <label for="date_range" class="mr-2">Date:</label>
                         <input type="text" id="date_range" class="form-control" autocomplete="off" style="min-width:200px;">
@@ -78,8 +78,8 @@
                         <thead>
                             <tr>
                                 <th>Date</th>
+                                <th hidden>Recipient</th>
                                 <th>Type</th>
-                                <th>Recipient</th>
                                 <th>Meat Type</th>
                                 <th class="text-center">Weight (kg)</th>
                                 <th class="text-center">Actions</th>
@@ -141,8 +141,8 @@
                 },
                 "columns": [
                     { "data": "production_date" },
-                    { "data": "distribution_type" },
-                    { "data": "recipient" },
+                    { "data": "distribution_type", "visible": false },
+                    { "data": "recipient", },
                     { "data": "meat_type" },
                     { "data": "weight_distributed", "className": "dt-center" },
                     {
@@ -151,7 +151,7 @@
                         "orderable": false,
                         "render": function (data, type, row) {
                             return `<button class='btn btn-sm btn-danger btn-rounded delete-dist-btn' data-id='${row.id}'>
-                                <i class='feather icon-trash'></i>
+                                Delete
                             </button>`;
                         }
                     }

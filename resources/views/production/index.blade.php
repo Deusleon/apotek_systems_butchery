@@ -399,6 +399,7 @@
                                 <option value="Steak">Steak</option>
                                 <option value="Beef Liver">Beef Liver</option>
                                 <option value="Beef Fillet">Beef Fillet</option>
+                                <option value="Tripe">Tripe</option>
                             </select>
                         </div>
                         <div class="form-group d-flex align-items-center">
