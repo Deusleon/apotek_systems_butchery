@@ -874,6 +874,7 @@
                     case 'Steak': return parseFloat(productionData.steak) || 0;
                     case 'Beef Fillet': return parseFloat(productionData.beef_fillet) || 0;
                     case 'Beef Liver': return parseFloat(productionData.beef_liver) || 0;
+                    case 'Tripe': return parseFloat(productionData.tripe) || 0;
                     default: return 0;
                 }
             }

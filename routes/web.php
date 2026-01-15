@@ -745,10 +745,8 @@ Route::get('distributions/data', 'ProductionController@distributionsData')->name
 Route::delete('distributions/{id}', 'ProductionController@deleteDistribution')->name('distributions.destroy');
 Route::post('distributions/bulk-delete', 'ProductionController@bulkDeleteDistributions')->name('distributions.bulk-delete');
 
-// Production Report Routes
+// Production & Distribution Reports (Combined Page)
 Route::get('production-reports', 'ProductionReportController@index')->name('production-reports.index');
 Route::get('production-reports/filter', 'ProductionReportController@filter')->name('production-report-filter');
-
-// Distribution Report Routes
-Route::get('distribution-reports', 'DistributionReportController@index')->name('distribution-reports.index');
+Route::get('distribution-reports', 'ProductionReportController@index')->name('distribution-reports.index');
 Route::get('distribution-reports/filter', 'DistributionReportController@filter')->name('distribution-report-filter');

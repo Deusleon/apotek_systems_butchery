@@ -36,7 +36,7 @@
                 @if(auth()->user()->checkPermission('View Production'))
                     <li class=""><a href="{{ route('production.index') }}" class="">Production</a>
                     </li>
-                    <li class=""><a href="{{route('distributions.index')}}" class="">Distribution</a>
+                    <li class=""><a href="{{route('distributions.index')}}" class="">Distributions</a>
                     </li>
                 @endif
             </ul>
@@ -176,10 +176,6 @@
             @if (current_store_id() === 1 || current_store_id() === 2)
                 @if(auth()->user()->checkPermission('View Production Report'))
                     <li class=""><a href="{{route('production-reports.index')}}" class="">Production Reports</a>
-                    </li>
-                @endif
-                @if(auth()->user()->checkPermission('View Production Report'))
-                    <li class=""><a href="{{route('distribution-reports.index')}}" class="">Distribution Reports</a>
                     </li>
                 @endif
             @endif

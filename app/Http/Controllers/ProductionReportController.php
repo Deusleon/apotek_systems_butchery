@@ -15,7 +15,10 @@ class ProductionReportController extends Controller
         // Get selling prices for meat types from database
         $meatPrices = $this->getMeatPrices();
         
-        return view( 'production_reports.index', compact('meatPrices') );
+        // Get stores for distribution report filter
+        $stores = \App\Store::where('id', '>', 1)->orderBy('name')->get();
+        
+        return view( 'production_reports.index', compact('meatPrices', 'stores') );
     }
 
     public function filter( Request $request )

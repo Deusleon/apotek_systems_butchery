@@ -32,7 +32,7 @@ class ProductionController extends Controller
     public function index()
 
     {
-        $stores = Store::where('id', '>', 1)->orderBy('name')->get();
+        $stores = Store::where('id', '>', 2)->orderBy('name')->get();
         return view('production.index', compact('stores'));
 
     }
@@ -287,7 +287,9 @@ class ProductionController extends Controller
             });
         }
 
-        $distributions = $query->orderBy('created_at', 'desc')->get();
+        $distributions = $query->orderBy('created_at', 'desc')
+                               ->orderBy('id', 'desc')
+                               ->get();
 
         // Group distributions by production_id and recipient to pivot meat types into columns
         $grouped = [];

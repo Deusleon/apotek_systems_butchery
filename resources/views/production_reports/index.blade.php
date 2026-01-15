@@ -1,6 +1,7 @@
 @extends("layouts.master")
 
 @section('page_css')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     <style>
         .datepicker>.datepicker-days { display: block; }
         .text-center { text-align: center; }
@@ -19,21 +20,37 @@
 @endsection
 
 @section('content-title')
-    Production Reports
+    Production & Distribution Reports
 @endsection
 
 @section('content-sub-title')
     <li class="breadcrumb-item"><a href="{{route('home')}}"><i class="feather icon-home"></i></a></li>
-    <li class="breadcrumb-item"><a href="#"> Reports / Production Reports </a></li>
+    <li class="breadcrumb-item"><a href="#"> Reports / Production & Distribution Reports </a></li>
 @endsection
 
 @section("content")
 <div class="col-sm-12">
     <div class="card">
         <div class="card-body">
-            <form id="production_report_form" action="{{route('production-report-filter')}}" method="get" target="_blank">
+            <form id="report_form" action="" method="get" target="_blank">
                 @csrf()
+                
+                <!-- Report Type Selection -->
                 <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="report_option">Select Report Type <span class="text-danger">*</span></label>
+                            <select id="report_option" name="report_option" class="form-control" onchange="reportOption()">
+                                <option value="" selected disabled>Select report</option>
+                                <option value="1">Production Report</option>
+                                <option value="2">Distribution Report</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date Range - Common for both reports -->
+                <div class="row mb-3" id="date_section" style="display: none;">
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="date_range">Date <span class="text-danger">*</span></label>
@@ -42,8 +59,23 @@
                     </div>
                 </div>
 
-                <!-- Price Section - Auto-populated from Selling Prices -->
-                <div class="price-section" hidden>
+                <!-- Distribution Report Options -->
+                <div class="row mb-3" id="distribution_options" style="display: none;">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="store_id">Branch (Optional)</label>
+                            <select name="store_id" id="store_id" class="form-control">
+                                <option value="">All Branches</option>
+                                @foreach($stores as $store)
+                                    <option value="{{ $store->id }}">{{ $store->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price Section - Production Report Only (Hidden) -->
+                <div class="price-section" id="price_section" style="display: none;" hidden>
                     <h6><i class="feather icon-tag"></i> Selling Prices per kg (auto-populated from system)</h6>
                     <div class="row">
                         <div class="col-md-2">
@@ -77,11 +109,13 @@
                             </div>
                         </div>
                     </div>
-                    <small class="text-muted"><i class="feather icon-info"></i> Prices are fetched automatically from the product selling prices. Update prices in Price List to change these values.</small>
+                    <small class="text-muted"><i class="feather icon-info"></i> Prices are fetched automatically from the product selling prices.</small>
                 </div>
 
-                <div class="row mt-3">
-                    <div class="col-md-4">
+                <hr>
+                <div class="row">
+                    <div class="col-md-5"></div>
+                    <div class="col-md-2">
                         <button class="btn btn-secondary" style="width: 100%">Show</button>
                     </div>
                 </div>
@@ -93,6 +127,7 @@
 
 @push("page_scripts")
 <script src="{{asset('assets/plugins/bootstrap-datetimepicker/js/bootstrap-datepicker.min.js')}}"></script>
+<script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script>
     $(document).ready(function () {
         $('#date_range').daterangepicker({
@@ -108,5 +143,26 @@
             $(this).val('');
         });
     });
+
+    function reportOption() {
+        var reportType = $('#report_option').val();
+        
+        // Hide all optional sections first
+        $('#date_section').hide();
+        $('#distribution_options').hide();
+        $('#price_section').hide();
+        
+        if (reportType == '1') {
+            // Production Report
+            $('#report_form').attr('action', '{{ route("production-report-filter") }}');
+            $('#date_section').show();
+            // $('#price_section').show(); // Uncomment if you want to show prices
+        } else if (reportType == '2') {
+            // Distribution Report
+            $('#report_form').attr('action', '{{ route("distribution-report-filter") }}');
+            $('#date_section').show();
+            $('#distribution_options').show();
+        }
+    }
 </script>
 @endpush
