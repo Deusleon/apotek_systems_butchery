@@ -53,22 +53,6 @@
                             <option value="cash_sale">Cash Sale</option>
                             <option value="order">Order</option>
                         </select>
-                        {{-- <label for="filter_store" class="mr-2">Branch:</label>
-                        <select id="filter_store" class="form-control mr-3" style="min-width: 150px;">
-                            <option value="">All Branches</option>
-                            @foreach($stores as $store)
-                                <option value="{{ $store->id }}">{{ $store->name }}</option>
-                            @endforeach
-                        </select> --}}
-                        <label for="filter_meat_type" class="mr-2">Meat Type:</label>
-                        <select id="filter_meat_type" class="form-control mr-3" style="min-width: 120px;">
-                            <option value="">All Types</option>
-                            <option value="Meat">Meat</option>
-                            <option value="Steak">Steak</option>
-                            <option value="Fillet">Fillet</option>
-                            <option value="Beef Liver">Beef Liver</option>
-                            <option value="Tripe">Tripe</option>
-                        </select>
                         <label for="date_range" class="mr-2">Date:</label>
                         <input type="text" id="date_range" class="form-control" autocomplete="off" style="min-width:200px;">
                     </div>
@@ -78,10 +62,12 @@
                         <thead>
                             <tr>
                                 <th>Date</th>
-                                <th hidden>Recipient</th>
-                                <th>Type</th>
-                                <th>Meat Type</th>
-                                <th class="text-center">Weight (kg)</th>
+                                <th>Item</th>
+                                <th class="text-center">Meat</th>
+                                <th class="text-center">Steak</th>
+                                <th class="text-center">Beef Fillet</th>
+                                <th class="text-center">Beef Liver</th>
+                                <th class="text-center">Tripe</th>
                                 <th class="text-center">Actions</th>
                             </tr>
                         </thead>
@@ -131,7 +117,6 @@
                             d.end_date = dates[1];
                         }
                         d.store_id = $('#filter_store').val();
-                        d.meat_type = $('#filter_meat_type').val();
                         d.distribution_type = $('#filter_distribution_type').val();
                     },
                     "error": function (xhr, error, thrown) {
@@ -141,16 +126,18 @@
                 },
                 "columns": [
                     { "data": "production_date" },
-                    { "data": "distribution_type", "visible": false },
-                    { "data": "recipient", },
-                    { "data": "meat_type" },
-                    { "data": "weight_distributed", "className": "dt-center" },
+                    { "data": "recipient" },
+                    { "data": "meat", "className": "dt-center" },
+                    { "data": "steak", "className": "dt-center" },
+                    { "data": "beef_fillet", "className": "dt-center" },
+                    { "data": "beef_liver", "className": "dt-center" },
+                    { "data": "tripe", "className": "dt-center" },
                     {
                         "data": null,
                         "className": "dt-center",
                         "orderable": false,
                         "render": function (data, type, row) {
-                            return `<button class='btn btn-sm btn-danger btn-rounded delete-dist-btn' data-id='${row.id}'>
+                            return `<button class='btn btn-sm btn-danger btn-rounded delete-dist-btn' data-ids='${row.dist_ids}'>
                                 Delete
                             </button>`;
                         }
@@ -184,19 +171,20 @@
                 $(this).val('');
                 table.ajax.reload();
             });
-            $('#filter_store, #filter_meat_type, #filter_distribution_type').on('change', function() {
+            $('#filter_store, #filter_distribution_type').on('change', function() {
                 table.ajax.reload();
             });
 
-            // Handle delete button click
+            // Handle delete button click - deletes all distribution records for this row
             $(document).on('click', '.delete-dist-btn', function () {
-                var id = $(this).data('id');
+                var ids = $(this).data('ids').toString();
                 if (confirm('Are you sure you want to delete this distribution record?')) {
                     $.ajax({
-                        url: "{{ url('distributions') }}/" + id,
-                        type: "DELETE",
+                        url: "{{ url('distributions/bulk-delete') }}",
+                        type: "POST",
                         data: {
-                            _token: "{{csrf_token()}}"
+                            _token: "{{csrf_token()}}",
+                            ids: ids
                         },
                         success: function (response) {
                             if (response.success) {

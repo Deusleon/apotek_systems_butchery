@@ -258,9 +258,7 @@ class ProductionController extends Controller
         $start_date = $request->input('start_date');
         $end_date = $request->input('end_date');
         $store_id = $request->input('store_id');
-        $meat_type = $request->input('meat_type');
         $search_value = $request->input('search.value');
-
         $distribution_type = $request->input('distribution_type');
 
         $query = ProductionDistribution::with(['production', 'store', 'customer'])
@@ -274,10 +272,6 @@ class ProductionController extends Controller
 
         if ($distribution_type) {
             $query->where('distribution_type', $distribution_type);
-        }
-
-        if ($meat_type) {
-            $query->where('meat_type', $meat_type);
         }
 
         if ($search_value) {
@@ -295,18 +289,59 @@ class ProductionController extends Controller
 
         $distributions = $query->orderBy('created_at', 'desc')->get();
 
-        $data = [];
+        // Group distributions by production_id and recipient to pivot meat types into columns
+        $grouped = [];
         foreach ($distributions as $dist) {
+            $date = $dist->production ? date('Y-m-d', strtotime($dist->production->production_date)) : '';
+            $recipient = $dist->recipient_name;
+            $key = $dist->production_id . '_' . $dist->distribution_type . '_' . ($dist->store_id ?? '') . '_' . ($dist->customer_id ?? '') . '_' . ($dist->order_to ?? '');
+            
+            if (!isset($grouped[$key])) {
+                $grouped[$key] = [
+                    'id' => $dist->id,
+                    'production_id' => $dist->production_id,
+                    'production_date' => $date,
+                    'distribution_type' => $dist->distribution_type,
+                    'recipient' => $recipient,
+                    'meat' => 0,
+                    'steak' => 0,
+                    'beef_fillet' => 0,
+                    'beef_liver' => 0,
+                    'tripe' => 0,
+                    'dist_ids' => [],
+                ];
+            }
+            
+            // Add to the appropriate meat type column
+            $meatType = strtolower($dist->meat_type);
+            if ($meatType === 'meat') {
+                $grouped[$key]['meat'] += $dist->weight_distributed;
+            } elseif ($meatType === 'steak') {
+                $grouped[$key]['steak'] += $dist->weight_distributed;
+            } elseif ($meatType === 'fillet' || $meatType === 'beef fillet') {
+                $grouped[$key]['beef_fillet'] += $dist->weight_distributed;
+            } elseif ($meatType === 'beef liver') {
+                $grouped[$key]['beef_liver'] += $dist->weight_distributed;
+            } elseif ($meatType === 'tripe') {
+                $grouped[$key]['tripe'] += $dist->weight_distributed;
+            }
+            
+            $grouped[$key]['dist_ids'][] = $dist->id;
+        }
+
+        $data = [];
+        foreach ($grouped as $row) {
             $data[] = [
-                'id' => $dist->id,
-                'production_date' => $dist->production ? date('Y-m-d', strtotime($dist->production->production_date)) : '',
-                'distribution_type' => $dist->distribution_type_label,
-                'recipient' => $dist->recipient_name,
-                'store_name' => $dist->store ? $dist->store->name : ($dist->distribution_type === 'branch' ? 'Unknown' : '-'),
-                'meat_type' => $dist->meat_type,
-                'weight_distributed' => $this->formatSmartDecimal($dist->weight_distributed),
-                'production_id' => $dist->production_id,
-                'notes' => $dist->notes,
+                'id' => $row['id'],
+                'production_id' => $row['production_id'],
+                'production_date' => $row['production_date'],
+                'recipient' => $row['recipient'],
+                'meat' => $this->formatSmartDecimal($row['meat']),
+                'steak' => $this->formatSmartDecimal($row['steak']),
+                'beef_fillet' => $this->formatSmartDecimal($row['beef_fillet']),
+                'beef_liver' => $this->formatSmartDecimal($row['beef_liver']),
+                'tripe' => $this->formatSmartDecimal($row['tripe']),
+                'dist_ids' => implode(',', $row['dist_ids']),
             ];
         }
 
@@ -317,9 +352,6 @@ class ProductionController extends Controller
 
         if ($store_id) {
             $summaryQuery->where('store_id', $store_id);
-        }
-        if ($meat_type) {
-            $summaryQuery->where('meat_type', $meat_type);
         }
 
         $summary = [
@@ -345,5 +377,16 @@ class ProductionController extends Controller
             return response()->json(['success' => true, 'message' => 'Distribution deleted successfully']);
         }
         return response()->json(['success' => false, 'message' => 'Distribution not found'], 404);
+    }
+
+    public function bulkDeleteDistributions(Request $request)
+    {
+        $ids = $request->input('ids');
+        if ($ids) {
+            $idArray = explode(',', $ids);
+            ProductionDistribution::whereIn('id', $idArray)->delete();
+            return response()->json(['success' => true, 'message' => 'Distributions deleted successfully']);
+        }
+        return response()->json(['success' => false, 'message' => 'No IDs provided'], 400);
     }
 }

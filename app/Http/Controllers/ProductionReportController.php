@@ -5,13 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Production;
 use App\Setting;
+use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade as PDF;
 
 class ProductionReportController extends Controller
  {
     public function index()
  {
-        return view( 'production_reports.index' );
+        // Get selling prices for meat types from database
+        $meatPrices = $this->getMeatPrices();
+        
+        return view( 'production_reports.index', compact('meatPrices') );
     }
 
     public function filter( Request $request )
@@ -36,13 +40,14 @@ class ProductionReportController extends Controller
             return response()->view('error_pages.pdf_zero_data');
         }
 
-        // Get meat prices from request or use defaults
+        // Get meat prices from database automatically
+        $meatPrices = $this->getMeatPrices();
         $prices = [
-            'meat' => $request->input('meat_price', 100),
-            'steak' => $request->input('steak_price', 0),
-            'beef_fillet' => $request->input('beef_fillet_price', 0),
-            'beef_liver' => $request->input('beef_liver_price', 0),
-            'tripe' => $request->input('tripe_price', 0),
+            'meat' => $meatPrices['meat'] ?? 0,
+            'steak' => $meatPrices['steak'] ?? 0,
+            'beef_fillet' => $meatPrices['beef_fillet'] ?? 0,
+            'beef_liver' => $meatPrices['beef_liver'] ?? 0,
+            'tripe' => $meatPrices['tripe'] ?? 0,
         ];
         
         $pdf = PDF::loadView( 'production_reports.report_pdf',
@@ -58,5 +63,49 @@ class ProductionReportController extends Controller
         ->get();
 
         return $productions;
+    }
+
+    /**
+     * Get selling prices for meat types from the database
+     * Maps product names to meat type keys
+     */
+    private function getMeatPrices()
+    {
+        // Map database product names to meat type keys
+        $productMapping = [
+            'Nyama' => 'meat',      // Swahili for Meat
+            'Meat' => 'meat',
+            'Steak' => 'steak',
+            'Beef Fillet' => 'beef_fillet',
+            'Fillet' => 'beef_fillet',
+            'Beef Liver' => 'beef_liver',
+            'Tripe' => 'tripe',
+        ];
+
+        // Query to get latest prices for meat products
+        $prices = DB::table('sales_prices as sp')
+            ->join('inv_current_stock as cs', 'sp.stock_id', '=', 'cs.id')
+            ->join('inv_products as p', 'cs.product_id', '=', 'p.id')
+            ->whereIn('p.name', array_keys($productMapping))
+            ->select('p.name', 'sp.price')
+            ->orderBy('sp.updated_at', 'desc')
+            ->get();
+
+        $meatPrices = [
+            'meat' => 0,
+            'steak' => 0,
+            'beef_fillet' => 0,
+            'beef_liver' => 0,
+            'tripe' => 0,
+        ];
+
+        foreach ($prices as $price) {
+            $key = $productMapping[$price->name] ?? null;
+            if ($key && $meatPrices[$key] == 0) {
+                $meatPrices[$key] = $price->price;
+            }
+        }
+
+        return $meatPrices;
     }
 }

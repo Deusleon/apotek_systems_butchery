@@ -743,6 +743,7 @@ Route::get('stores/list', 'ProductionController@getStores')->name('stores.list')
 Route::get('distributions', 'ProductionController@distributionsReport')->name('distributions.index');
 Route::get('distributions/data', 'ProductionController@distributionsData')->name('distributions.data');
 Route::delete('distributions/{id}', 'ProductionController@deleteDistribution')->name('distributions.destroy');
+Route::post('distributions/bulk-delete', 'ProductionController@bulkDeleteDistributions')->name('distributions.bulk-delete');
 
 // Production Report Routes
 Route::get('production-reports', 'ProductionReportController@index')->name('production-reports.index');

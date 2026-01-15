@@ -42,41 +42,42 @@
                     </div>
                 </div>
 
-                <!-- Price Section for Summary Calculation -->
-                <div class="price-section">
-                    <h6><i class="feather icon-tag"></i> Prices per kg (for summary calculation - optional)</h6>
+                <!-- Price Section - Auto-populated from Selling Prices -->
+                <div class="price-section" hidden>
+                    <h6><i class="feather icon-tag"></i> Selling Prices per kg (auto-populated from system)</h6>
                     <div class="row">
                         <div class="col-md-2">
                             <div class="form-group">
-                                <label for="meat_price">Meat Price</label>
-                                <input type="number" step="0.01" min="0" class="form-control" name="meat_price" id="meat_price" placeholder="0.00" />
+                                <label for="meat_price">Meat (Nyama)</label>
+                                <input type="text" class="form-control bg-light" id="meat_price" value="{{ number_format($meatPrices['meat'] ?? 0, 2) }}" readonly />
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="form-group">
-                                <label for="steak_price">Steak Price</label>
-                                <input type="number" step="0.01" min="0" class="form-control" name="steak_price" id="steak_price" placeholder="0.00" />
+                                <label for="steak_price">Steak</label>
+                                <input type="text" class="form-control bg-light" id="steak_price" value="{{ number_format($meatPrices['steak'] ?? 0, 2) }}" readonly />
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="form-group">
-                                <label for="beef_fillet_price">Beef Fillet Price</label>
-                                <input type="number" step="0.01" min="0" class="form-control" name="beef_fillet_price" id="beef_fillet_price" placeholder="0.00" />
+                                <label for="beef_fillet_price">Beef Fillet</label>
+                                <input type="text" class="form-control bg-light" id="beef_fillet_price" value="{{ number_format($meatPrices['beef_fillet'] ?? 0, 2) }}" readonly />
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="form-group">
-                                <label for="beef_liver_price">Beef Liver Price</label>
-                                <input type="number" step="0.01" min="0" class="form-control" name="beef_liver_price" id="beef_liver_price" placeholder="0.00" />
+                                <label for="beef_liver_price">Beef Liver</label>
+                                <input type="text" class="form-control bg-light" id="beef_liver_price" value="{{ number_format($meatPrices['beef_liver'] ?? 0, 2) }}" readonly />
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="form-group">
-                                <label for="tripe_price">Tripe Price</label>
-                                <input type="number" step="0.01" min="0" class="form-control" name="tripe_price" id="tripe_price" placeholder="0.00" />
+                                <label for="tripe_price">Tripe</label>
+                                <input type="text" class="form-control bg-light" id="tripe_price" value="{{ number_format($meatPrices['tripe'] ?? 0, 2) }}" readonly />
                             </div>
                         </div>
                     </div>
+                    <small class="text-muted"><i class="feather icon-info"></i> Prices are fetched automatically from the product selling prices. Update prices in Price List to change these values.</small>
                 </div>
 
                 <div class="row mt-3">

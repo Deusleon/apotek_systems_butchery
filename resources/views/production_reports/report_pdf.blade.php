@@ -232,7 +232,7 @@
                             @if($hasPrices)
                             <td align="" style="padding: 0px;">×</td>
                             <td align="" style="padding: 0px;">{{ number_format($meatPrice, 2) }}</td>
-                            <td align="left" style="padding: 0px;">=</td>
+                            <td align="right" style="padding: 0px;">=</td>
                             <td align="right" style="padding-right: 8px;"><strong>{{ number_format($meatTotal, 2) }}</strong></td>
                             @endif
                         </tr>
@@ -243,7 +243,7 @@
                             @if($hasPrices)
                             <td align="" style="padding: 0px;">×</td>
                             <td align="" style="padding: 0px;">{{ number_format($steakPrice, 2) }}</td>
-                            <td align="left" style="padding: 0px;">=</td>
+                            <td align="right" style="padding: 0px;">=</td>
                             <td align="right" style="padding-right: 8px;"><strong>{{ number_format($steakTotal, 2) }}</strong></td>
                             @endif
                         </tr>
@@ -254,7 +254,7 @@
                             @if($hasPrices)
                             <td align="" style="padding: 0px;">×</td>
                             <td align="" style="padding: 0px;">{{ number_format($beefFilletPrice, 2) }}</td>
-                            <td align="left" style="padding: 0px;">=</td>
+                            <td align="right" style="padding: 0px;">=</td>
                             <td align="right" style="padding-right: 8px;"><strong>{{ number_format($beefFilletTotal, 2) }}</strong></td>
                             @endif
                         </tr>
@@ -265,7 +265,7 @@
                             @if($hasPrices)
                             <td align="" style="padding: 0px;">×</td>
                             <td align="" style="padding: 0px;">{{ number_format($beefLiverPrice, 2) }}</td>
-                            <td align="left" style="padding: 0px;">=</td>
+                            <td align="right" style="padding: 0px;">=</td>
                             <td align="right" style="padding-right: 8px;"><strong>{{ number_format($beefLiverTotal, 2) }}</strong></td>
                             @endif
                         </tr>
@@ -276,7 +276,7 @@
                             @if($hasPrices)
                             <td align="" style="padding: 0px;">×</td>
                             <td align="" style="padding: 0px;">{{ number_format($tripePrice, 2) }}</td>
-                            <td align="left" style="padding: 0px;">=</td>
+                            <td align="right" style="padding: 0px;">=</td>
                             <td align="right" style="padding-right: 8px;"><strong>{{ number_format($tripeTotal, 2) }}</strong></td>
                             @endif
                         </tr>
@@ -285,7 +285,7 @@
                     <tfoot>
                         <tr style="">
                             <td colspan="5" align="right" style="padding-right: 20px;"><strong>GRAND TOTAL</strong></td>
-                            <td align="left" style="padding: 0px;"> =</td>
+                            <td align="right" style="padding: 0px;"> =</td>
                             <td align="right" style="padding-right: 8px;"><strong>{{ number_format($grandTotal, 2) }}</strong></td>
                         </tr>
                     </tfoot>
